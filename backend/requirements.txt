@@ -10,7 +10,7 @@ openpyxl>=3.1
 python-multipart>=0.0.9
 httpx>=0.27
 boto3>=1.34
-# CEL 规则引擎可选依赖（本地启动可不装，缺失时规则执行会返回 SKIP）
+# 可选：未安装时规则引擎中的 CEL 表达式会返回 SKIP，不影响服务启动
 # cel-python>=0.4.0
 pymysql>=1.1
 bce-python-sdk>=0.9.0    # 百度云 BOS SDK（OIS 对象存储上传）
