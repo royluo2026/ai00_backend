@@ -24,10 +24,12 @@ _candidates = [_env_file] if _env_file else [".env.dev", ".env.test.example", ".
 for _fname in _candidates:
     _p = Path(_fname) if Path(_fname).is_absolute() else (_HERE / _fname)
     if _p.exists():
+        # 显式指定 ENV_FILE 时，以文件为准覆盖已有环境变量，避免镜像内默认 ENV 干扰。
+        _override = bool(_env_file)
         try:
-            load_dotenv(_p, override=False, encoding='utf-8')
+            load_dotenv(_p, override=_override, encoding='utf-8')
         except UnicodeDecodeError:
-            load_dotenv(_p, override=False, encoding='gbk')
+            load_dotenv(_p, override=_override, encoding='gbk')
         break
 
 
