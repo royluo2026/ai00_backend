@@ -6,21 +6,40 @@ App Secret 只在这里，永远不序列化到任何响应体。
 
 加载顺序：
     1. 若设置 ENV_FILE，优先加载该文件
-    2. 未设置时，按同目录 .env.dev -> .env.test.example -> .env 依次加载首个存在的文件
+    2. 未设置时：
+       - 容器内：按同目录 .env -> .env.test.example 依次加载首个存在的文件（跳过 .env.dev）
+       - 非容器：按同目录 .env.dev -> .env.test.example -> .env 依次加载首个存在的文件
     3. 系统环境变量
 """
 import os
+import logging
 from functools import lru_cache
 from pathlib import Path
 
 from dotenv import load_dotenv
 
+_log = logging.getLogger(__name__)
+
 # 兼容部署场景：支持通过 ENV_FILE 显式指定配置文件。
-# 未指定时，按 .env.dev -> .env.test.example -> .env 顺序加载首个存在的文件。
+# 容器内未指定 ENV_FILE 时，跳过 .env.dev，避免误读本地开发配置。
 # 兼容 Windows 下 GBK/ANSI 编码的 .env 文件。
 _HERE = Path(__file__).parent
 _env_file = os.getenv("ENV_FILE", "").strip()
-_candidates = [_env_file] if _env_file else [".env.dev", ".env.test.example", ".env"]
+_in_container = Path("/.dockerenv").exists()
+if _env_file:
+    _candidates = [_env_file]
+elif _in_container:
+    _candidates = [".env", ".env.test.example"]
+else:
+    _candidates = [".env.dev", ".env.test.example", ".env"]
+if _env_file:
+    _must_exist = Path(_env_file) if Path(_env_file).is_absolute() else (_HERE / _env_file)
+    if not _must_exist.exists():
+        raise RuntimeError(f"ENV_FILE 指定的配置文件不存在: {_must_exist}")
+    # 避免继承镜像或运行时残留的旧数据库地址（例如 127.0.0.1）。
+    os.environ.pop("USERS_DB_URL", None)
+
+_loaded_env_path = None
 for _fname in _candidates:
     _p = Path(_fname) if Path(_fname).is_absolute() else (_HERE / _fname)
     if _p.exists():
@@ -30,7 +49,13 @@ for _fname in _candidates:
             load_dotenv(_p, override=_override, encoding='utf-8')
         except UnicodeDecodeError:
             load_dotenv(_p, override=_override, encoding='gbk')
+        _loaded_env_path = str(_p)
         break
+
+if _loaded_env_path:
+    _log.info("配置加载文件: %s", _loaded_env_path)
+else:
+    _log.info("配置加载文件: 未命中文件候选，使用运行时环境变量")
 
 
 def _require(key: str) -> str:
