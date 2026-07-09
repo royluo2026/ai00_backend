@@ -107,6 +107,7 @@ class Settings:
         支持格式：mysql://user:password@host:port/dbname
         """
         import re
+        from urllib.parse import unquote
         url = self.users_db_url
         m = re.match(
             r"(?:mysql|postgresql)://([^:]+):([^@]*)@([^:/]+):?(\d*)/(.+)",
@@ -115,9 +116,14 @@ class Settings:
         if not m:
             raise RuntimeError(
                 f"USERS_DB_URL 格式不合法：{url!r}\n"
-                "期望格式：mysql://user:password@host:3306/dbname"
+                "期望格式：mysql://user:password@host:3306/dbname\n"
+                "若用户名/密码包含 @ # + 等特殊字符，请先做 URL 编码。"
             )
         user, password, host, port_str, db = m.groups()
+        # 配置中允许使用 URL 编码（如 %40、%23、%2B），连接前恢复原始凭证。
+        user = unquote(user)
+        password = unquote(password)
+        db = unquote(db)
         return {
             "host": host,
             "port": int(port_str) if port_str else 3306,
