@@ -1,12 +1,18 @@
-FROM python:3.12-slim
+ARG sdkVersion=3.12
+FROM artifactory.ep.chehejia.com/licloud-docker/base/run/python:${sdkVersion}
 
-WORKDIR /app
+RUN mkdir -p /chj/app /chj/app/backend/static/uploads && chmod 775 -R /chj
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR /chj/app
 
-COPY . .
+# 默认复制仓库根目录，保证 backend 包结构可用
+ENV SOURCE_PATH=.
+ENV SERVICE_PORT=8080
+
+COPY ${SOURCE_PATH} .
+
+RUN pip install --upgrade pip && pip install -r backend/requirements.txt
 
 EXPOSE 8080
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD sh -c "python -m uvicorn backend.main:app --host 0.0.0.0 --port ${SERVICE_PORT} 2>&1"
