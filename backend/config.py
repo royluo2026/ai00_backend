@@ -5,9 +5,9 @@ backend/config.py
 App Secret 只在这里，永远不序列化到任何响应体。
 
 加载顺序：
-  1. 同目录 .env.dev（本地开发，优先）
-  2. 同目录 .env（生产）
-  3. 系统环境变量
+    1. 若设置 ENV_FILE，优先加载该文件
+    2. 未设置时，按同目录 .env.dev -> .env.test -> .env 依次加载首个存在的文件
+    3. 系统环境变量
 """
 import os
 from functools import lru_cache
@@ -15,11 +15,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# 优先加载 .env.dev（本地开发），其次 .env（生产）
-# 兼容 Windows 下 GBK/ANSI 编码的 .env 文件
+# 兼容部署场景：支持通过 ENV_FILE 显式指定配置文件。
+# 未指定时，按 .env.dev -> .env.test -> .env 顺序加载首个存在的文件。
+# 兼容 Windows 下 GBK/ANSI 编码的 .env 文件。
 _HERE = Path(__file__).parent
-for _fname in (".env.dev", ".env"):
-    _p = _HERE / _fname
+_env_file = os.getenv("ENV_FILE", "").strip()
+_candidates = [_env_file] if _env_file else [".env.dev", ".env.test", ".env"]
+for _fname in _candidates:
+    _p = Path(_fname) if Path(_fname).is_absolute() else (_HERE / _fname)
     if _p.exists():
         try:
             load_dotenv(_p, override=False, encoding='utf-8')
