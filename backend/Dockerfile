@@ -7,11 +7,7 @@ WORKDIR /chj/app
 
 ENV SOURCE_PATH=.
 ENV SERVICE_PORT=8080
-ENV FEISHU_APP_ID=local_dummy_app_id
-ENV FEISHU_APP_SECRET=local_dummy_app_secret
-ENV FEISHU_REDIRECT_URI=http://127.0.0.1:8080/auth/feishu/callback
-ENV JWT_SECRET=local_dummy_jwt_secret_replace_me
-ENV USERS_DB_URL=mysql://root:root@127.0.0.1:3306/workmanship
+ENV ENV_FILE=/chj/app/backend/.env.test.example
 ENV HOST=0.0.0.0
 ENV PORT=8080
 
