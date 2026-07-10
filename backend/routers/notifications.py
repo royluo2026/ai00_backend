@@ -44,6 +44,18 @@ def _safe_prefs(raw) -> dict:
     return {k: raw.get(k, v) for k, v in NOTIF_TYPE_DEFAULTS.items()}
 
 
+def _row_get(row, key: str, idx: int = 0, default=None):
+    """兼容 dict/tuple 两类游标返回结构。"""
+    if row is None:
+        return default
+    if isinstance(row, dict):
+        return row.get(key, default)
+    try:
+        return row[idx]
+    except Exception:
+        return default
+
+
 # ── 通知列表 ──────────────────────────────────────────────────────────────────
 
 @router.get("")
@@ -63,13 +75,21 @@ def list_notifications(
                 )
                 cur.execute(sql, (uid,))
                 rows = cur.fetchall()
-        return {"success": True, "data": [
-            {
-                "gid": r[0], "type": r[1], "item_type": r[2], "item_gid": r[3],
-                "title": r[4], "body": r[5], "is_read": r[6], "created_at": str(r[7])
-            }
-            for r in rows
-        ]}
+        out = []
+        for r in rows:
+            out.append(
+                {
+                    "gid": _row_get(r, "gid", 0, ""),
+                    "type": _row_get(r, "type", 1, ""),
+                    "item_type": _row_get(r, "item_type", 2, ""),
+                    "item_gid": _row_get(r, "item_gid", 3, ""),
+                    "title": _row_get(r, "title", 4, ""),
+                    "body": _row_get(r, "body", 5, ""),
+                    "is_read": bool(_row_get(r, "is_read", 6, False)),
+                    "created_at": str(_row_get(r, "created_at", 7, "")),
+                }
+            )
+        return {"success": True, "data": out}
     except Exception as e:
         logger.warning(f"[notifications] list failed: {e}")
         return {"success": True, "data": []}
@@ -87,7 +107,8 @@ def unread_count(current_user: dict = Depends(get_current_user)):
                     "SELECT COUNT(*) FROM workmanship_work_notifications WHERE user_gid = %s AND is_read = FALSE",
                     (uid,)
                 )
-                count = cur.fetchone()[0]
+                row = cur.fetchone()
+                count = int(_row_get(row, "COUNT(*)", 0, 0) or 0)
         return {"success": True, "data": {"count": count}}
     except Exception as e:
         logger.warning(f"[notifications] unread_count failed: {e}")
@@ -107,7 +128,7 @@ def get_prefs(current_user: dict = Depends(get_current_user)):
                     "SELECT notification_prefs FROM workmanship_auth_users WHERE gid = %s", (uid,)
                 )
                 raw = cur.fetchone()
-                raw = raw[0] if raw else {}
+                raw = _row_get(raw, "notification_prefs", 0, {})
         return {"success": True, "data": _safe_prefs(raw)}
     except Exception as e:
         logger.warning(f"[notifications] get_prefs failed: {e}")
@@ -125,7 +146,7 @@ def update_prefs(body: dict, current_user: dict = Depends(get_current_user)):
                     "SELECT notification_prefs FROM workmanship_auth_users WHERE gid = %s", (uid,)
                 )
                 row = cur.fetchone()
-                current = _safe_prefs(row[0] if row else {})
+                current = _safe_prefs(_row_get(row, "notification_prefs", 0, {}))
                 # 只允许修改已知类型的开关
                 for k in NOTIF_TYPE_DEFAULTS:
                     if k in body:
