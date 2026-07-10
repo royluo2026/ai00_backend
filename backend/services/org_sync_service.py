@@ -133,8 +133,7 @@ def sync_depts_only_to_db() -> dict:
                         cur.executemany(
                             "INSERT INTO workmanship_auth_teams (gid, name, feishu_dept_id) "
                             "VALUES (%s, %s, %s) "
-                            "ON CONFLICT (feishu_dept_id) WHERE feishu_dept_id IS NOT NULL "
-                            "DO UPDATE SET name = EXCLUDED.name",
+                            "ON DUPLICATE KEY UPDATE name = VALUES(name)",
                             rows_to_insert,
                         )
                     # 把本层所有部门的 gid 刷新到 map（含已存在的）
@@ -235,7 +234,9 @@ def sync_all_from_feishu(root_dept_id: str | None = None) -> dict:
                 with get_conn() as conn:
                     with conn.cursor() as cur:
                         cur.execute(
-                            "UPDATE workmanship_auth_teams SET parent_team_gid=%s WHERE gid=%s AND parent_team_gid IS DISTINCT FROM %s",
+                            "UPDATE workmanship_auth_teams "
+                            "SET parent_team_gid=%s "
+                            "WHERE gid=%s AND (parent_team_gid <> %s OR parent_team_gid IS NULL)",
                             (parent_gid, team_gid, parent_gid),
                         )
                     conn.commit()
@@ -301,6 +302,6 @@ def _count_user(open_id: str) -> int:
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT COUNT(*) FROM workmanship_auth_users WHERE feishu_open_id=%s", (open_id,)
+                "SELECT COUNT(*) AS total FROM workmanship_auth_users WHERE feishu_open_id=%s", (open_id,)
             )
-            return cur.fetchone()["count"]
+            return cur.fetchone()["total"]

@@ -3,7 +3,7 @@ backend/routers/ai_audit.py
 ────────────────────────────
 AI 工具调用审计日志端点
 
-POST /api/ai/audit          — 内部调用（Python 端 fire-and-forget），写入 app.ai_audit_logs
+POST /api/ai/audit          — 内部调用（Python 端 fire-and-forget），写入 workmanship_app_ai_audit_logs
 GET  /api/ai/audit-logs     — 超管查询，支持 session_gid / user_gid / tool_name / limit / offset
 """
 from fastapi import APIRouter, Depends, Query
@@ -17,24 +17,58 @@ router = APIRouter(prefix="/api/ai", tags=["ai_audit"])
 _SUPER_ONLY = require_role("super_admin")
 
 
+def _ensure_ai_audit_table() -> None:
+    """幂等建表：AI 审计日志（MySQL/OceanBase 兼容）。"""
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS workmanship_app_ai_audit_logs (
+                    id            BIGINT NOT NULL AUTO_INCREMENT,
+                    gid           CHAR(36)     NOT NULL,
+                    session_gid   VARCHAR(128) NOT NULL DEFAULT '',
+                    user_gid      VARCHAR(128) NOT NULL DEFAULT '',
+                    tool_name     VARCHAR(128) NOT NULL DEFAULT '',
+                    is_write      BOOLEAN      NOT NULL DEFAULT FALSE,
+                    is_confirmed  BOOLEAN      NOT NULL DEFAULT FALSE,
+                    inputs_json   LONGTEXT,
+                    result_json   LONGTEXT,
+                    resource_gid  VARCHAR(128) NOT NULL DEFAULT '',
+                    resource_type VARCHAR(64)  NOT NULL DEFAULT '',
+                    status        VARCHAR(32)  NOT NULL DEFAULT 'ok',
+                    created_at    DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                    updated_at    DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                    PRIMARY KEY (id),
+                    UNIQUE KEY uk_ai_audit_gid (gid),
+                    KEY idx_ai_audit_created (created_at),
+                    KEY idx_ai_audit_session (session_gid),
+                    KEY idx_ai_audit_user (user_gid),
+                    KEY idx_ai_audit_tool (tool_name)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """
+            )
+        conn.commit()
+
+
 # ── 内部写入（无需鉴权，仅 Python 内网调用）────────────────────────────────────
 
 @router.post("/audit", include_in_schema=False)
 def record_audit(body: dict):
     """
-    由 ai_tool_logger.push_cloud_audit() 调用，写入 app.ai_audit_logs。
+    由 ai_tool_logger.push_cloud_audit() 调用，写入 workmanship_app_ai_audit_logs。
     不校验 token（内网调用），仅限本地 uvicorn 可达。
     """
     gid = body.get("gid") or str(next_gid())
     try:
+        _ensure_ai_audit_table()
         with get_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO app.ai_audit_logs
+                    INSERT INTO workmanship_app_ai_audit_logs
                         (gid, session_gid, user_gid, tool_name, is_write, is_confirmed,
                          inputs_json, result_json, resource_gid, resource_type, status)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (gid) DO NOTHING
+                    ON DUPLICATE KEY UPDATE updated_at = updated_at
                 """, (
                     gid,
                     body.get("session_gid", ""),
@@ -76,6 +110,8 @@ def list_audit_logs(
     _user:       dict = Depends(_SUPER_ONLY),
 ):
     """超管专用：查询 AI 工具调用审计日志（支持按会话/用户/工具过滤）。"""
+    _ensure_ai_audit_table()
+
     conditions = ["1=1"]
     params: list = []
 
@@ -86,28 +122,28 @@ def list_audit_logs(
         conditions.append("user_gid = %s")
         params.append(user_gid)
     if tool_name:
-        conditions.append("tool_name ILIKE %s")
+        conditions.append("tool_name LIKE %s")
         params.append(f"%{tool_name}%")
     if is_write == "true":
-        conditions.append("is_write = TRUE")
+        conditions.append("is_write = 1")
     elif is_write == "false":
-        conditions.append("is_write = FALSE")
+        conditions.append("is_write = 0")
 
     where = " AND ".join(conditions)
 
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                f"SELECT COUNT(*) FROM app.ai_audit_logs WHERE {where}",
+                f"SELECT COUNT(*) AS total FROM workmanship_app_ai_audit_logs WHERE {where}",
                 params,
             )
-            total = cur.fetchone()["count"]
+            total = cur.fetchone()["total"]
 
             cur.execute(
                 f"""
                 SELECT id, gid, session_gid, user_gid, tool_name, is_write, is_confirmed,
                        inputs_json, result_json, resource_gid, resource_type, status, created_at
-                FROM app.ai_audit_logs
+                  FROM workmanship_app_ai_audit_logs
                 WHERE {where}
                 ORDER BY created_at DESC
                 LIMIT %s OFFSET %s

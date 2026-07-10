@@ -89,6 +89,8 @@ def _run_route_self_check(app: FastAPI) -> None:
     )
     if not route_set:
         _log.warning("路由自检未采集到任何可匹配路由，请检查框架版本或自检实现")
+        # 无法可靠采集时不输出“关键路由缺失”错误，避免误报噪音。
+        return
     if missing:
         for _m, _p in missing:
             _log.error("❌ 关键路由缺失: %s %s", _m, _p)
