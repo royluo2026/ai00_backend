@@ -23,6 +23,8 @@ backend/routers/ontology.py
   GET    /api/bop/entries/{gid}/entity-props  — 读实体属性（固定列+ext）
   PATCH  /api/bop/entries/{gid}/entity-props  — 写实体属性（自动路由固定列/ext）
 """
+from __future__ import annotations
+
 import logging
 from typing import Any, Optional
 

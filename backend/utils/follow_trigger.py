@@ -9,6 +9,8 @@ backend/utils/follow_trigger.py
                      events=['status_change', 'resolved'],
                      actor_user_gid=current_user_gid)
 """
+from __future__ import annotations
+
 import json
 import logging
 

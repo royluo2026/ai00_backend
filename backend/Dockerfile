@@ -1,5 +1,4 @@
-ARG sdkVersion=3.12
-FROM artifactory.ep.chehejia.com/licloud-docker/base/run/python:${sdkVersion}
+FROM artifactory.ep.chehejia.com/licloud-docker/base/run/python:3.12
 
 RUN mkdir -p /chj/app /chj/app/backend/static/uploads && chmod 775 -R /chj
 

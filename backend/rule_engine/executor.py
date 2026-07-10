@@ -5,6 +5,8 @@ CEL 表达式执行器。返回四态结果：PASS / WARN / FAIL / SKIP。
 
 依赖：cel-python（pip install cel-python），缺失时所有规则返回 SKIP。
 """
+from __future__ import annotations
+
 import logging
 from enum import Enum
 

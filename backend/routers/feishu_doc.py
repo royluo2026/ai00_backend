@@ -4,6 +4,8 @@ backend/routers/feishu_doc.py
 飞书文档集成 —— 读取内容 + 写入单元格
 路由前缀：/api/feishu/doc
 """
+from __future__ import annotations
+
 import re
 from fastapi import APIRouter, Depends, Body
 from backend.routers.deps import get_current_user

@@ -8,6 +8,8 @@ POST /api/file-store/config      — 保存 MinIO 配置
 POST /api/file-store/ois-config  — 保存 OIS 配置
 POST /api/file-store/test        — 测试 MinIO 连接
 """
+from __future__ import annotations
+
 import json
 import logging
 

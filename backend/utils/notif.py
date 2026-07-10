@@ -3,6 +3,8 @@ backend/utils/notif.py
 ──────────────────────
 通知创建工具函数。
 """
+from __future__ import annotations
+
 import json
 import logging
 

@@ -6,6 +6,8 @@ backend/routers/change_logs.py
 GET /api/change-logs?item_type=&item_gid=  单条目历史
 GET /api/change-logs?list_gid=             清单全量历史（仅 owner）
 """
+from __future__ import annotations
+
 from fastapi import APIRouter, Depends, Query, HTTPException
 from backend.db.connection import get_conn
 from backend.routers.deps import get_current_user

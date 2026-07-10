@@ -4,6 +4,8 @@ backend/routers/feishu_proxy.py
 飞书 API 代理：客户端发请求到这里，本服务用 App Secret 调飞书。
 客户端永远不接触 App Secret。
 """
+from __future__ import annotations
+
 import logging
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from pydantic import BaseModel

@@ -31,6 +31,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.routing import APIRoute
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -42,6 +43,52 @@ from backend.db.connection import init_pool
 setup_logging(os.getenv("LOG_LEVEL", "INFO"))
 
 _log = logging.getLogger(__name__)
+
+
+_CRITICAL_ROUTE_SPECS: list[tuple[str, str]] = [
+    ("GET", "/health"),
+    ("GET", "/auth/me"),
+    ("GET", "/api/lists"),
+    ("GET", "/api/notifications/unread_count"),
+    ("GET", "/api/workbench/home"),
+    ("GET", "/feishu/calendar/today"),
+    ("GET", "/api/tasks"),
+    ("GET", "/api/projects"),
+    ("GET", "/api/bop/versions"),
+]
+
+
+def _run_route_self_check(app: FastAPI) -> None:
+    """启动自检：检查关键路由是否已注册，缺失时在启动日志高亮告警。"""
+    # 可通过 ROUTE_SELF_CHECK=0 显式关闭。
+    if os.getenv("ROUTE_SELF_CHECK", "1").strip().lower() in ("0", "false", "off", "no"):
+        _log.info("⏭️  路由自检已关闭（ROUTE_SELF_CHECK）")
+        return
+
+    route_set: set[tuple[str, str]] = set()
+    for _r in app.routes:
+        if not isinstance(_r, APIRoute):
+            continue
+        for _m in (_r.methods or set()):
+            route_set.add((_m.upper(), _r.path))
+
+    missing: list[tuple[str, str]] = []
+    for _spec in _CRITICAL_ROUTE_SPECS:
+        if _spec in route_set:
+            _log.info("✅ 路由自检通过: %s %s", _spec[0], _spec[1])
+        else:
+            missing.append(_spec)
+
+    _log.info(
+        "🧭 路由自检摘要: registered=%d critical=%d missing=%d",
+        len(route_set),
+        len(_CRITICAL_ROUTE_SPECS),
+        len(missing),
+    )
+    if missing:
+        for _m, _p in missing:
+            _log.error("❌ 关键路由缺失: %s %s", _m, _p)
+        _log.error("可能原因：模块导入异常被跳过、插件路由加载失败或运行镜像版本不一致")
 
 
 def _ensure_lists_table():
@@ -843,6 +890,7 @@ async def lifespan(app: FastAPI):
         seed_engineering_skills()
     except Exception as _e:
         _log.warning(f"seed_engineering_skills 跳过: {_e}")
+    _run_route_self_check(app)
     yield
 
 
@@ -926,18 +974,34 @@ _plugin_loader.discover()
 # 收集所有插件声明的 OWNED_MODULES（这些模块由插件管理，不走 auto-scan）
 _plugin_owned: set[str] = set()
 for _plugin in _plugin_loader._plugins:
+    _plugin_id = _plugin.get("plugin_id", "")
     _mod_path = _plugin.get("backend", {}).get("routers_module")
     if not _mod_path:
         continue
+
+    _pkg_dir = _plugin_loader._plugin_backend_dirs.get(_plugin_id) or _plugin_loader._plugin_dirs.get(_plugin_id)
+    _pkg_dir_str = str(_pkg_dir) if _pkg_dir else ""
+    _injected = False
+    if _pkg_dir_str and _pkg_dir_str not in sys.path:
+        sys.path.insert(0, _pkg_dir_str)
+        _injected = True
+
     try:
         _mod = importlib.import_module(_mod_path)
         if hasattr(_mod, "OWNED_MODULES"):
             _plugin_owned.update(_mod.OWNED_MODULES)
+    except ModuleNotFoundError as _e:
+        # 非致命：get_routers() 会再次尝试加载并给出完整错误。
+        _log.debug(f"Plugin module 预加载跳过 [{_mod_path}]: {_e}")
     except Exception as _e:
         _log.warning(f"Plugin module 预加载失败 [{_mod_path}]: {_e}")
+    finally:
+        if _injected and _pkg_dir_str in sys.path:
+            sys.path.remove(_pkg_dir_str)
 
 # 加载插件路由
-for _router in _plugin_loader.get_routers():
+_plugin_routers = _plugin_loader.get_routers()
+for _router in _plugin_routers:
     app.include_router(_router)
 
 # auto-scan backend/routers/*.py（跳过插件已接管的模块）
@@ -951,7 +1015,7 @@ for _finder, _mod_name, _is_pkg in pkgutil.iter_modules([str(_routers_dir)]):
             app.include_router(_mod.router)
     except Exception as _e:
         _log.warning(f"Router 加载跳过 [backend.routers.{_mod_name}]: {_e}")
-_log.info(f"✅ Router 自动注册完成（插件路由: {len(_plugin_loader.get_routers())} 个，跳过模块: {_plugin_owned}）")
+_log.info(f"✅ Router 自动注册完成（插件路由: {len(_plugin_routers)} 个，跳过模块: {_plugin_owned}）")
 
 # 静态文件：附件上传目录
 app.mount("/static", StaticFiles(directory="backend/static"), name="static")

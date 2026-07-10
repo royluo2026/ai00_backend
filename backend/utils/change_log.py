@@ -13,6 +13,8 @@ backend/utils/change_log.py
         })
         conn.commit()
 """
+from __future__ import annotations
+
 from backend.utils.gid import next_gid
 
 

@@ -5,6 +5,8 @@ backend/db/local_sqlite.py
 
 路径优先级：环境变量 LOCAL_SQLITE_PATH → 后端根目录 local_annotations.db
 """
+from __future__ import annotations
+
 import os
 import sqlite3
 import threading

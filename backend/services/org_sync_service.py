@@ -5,6 +5,8 @@ backend/services/org_sync_service.py
   - sync_user_departments(user_gid, department_ids)  登录时调用，同步该用户所在部门树（最多2级）
   - sync_all_from_feishu()                           超管手动触发，全量拉取飞书成员+部门
 """
+from __future__ import annotations
+
 import logging
 
 from backend.db.connection import get_conn, new_gid

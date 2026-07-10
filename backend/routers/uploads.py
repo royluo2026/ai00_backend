@@ -14,6 +14,8 @@ PUT /api/uploads/{filename}
   validate: 文件必须已存在; size ≤ 1MB
   return: { url: "/static/uploads/{filename}" }
 """
+from __future__ import annotations
+
 import base64
 import os
 import re
