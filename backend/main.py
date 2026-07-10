@@ -31,7 +31,6 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.routing import APIRoute
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -66,11 +65,14 @@ def _run_route_self_check(app: FastAPI) -> None:
         return
 
     route_set: set[tuple[str, str]] = set()
-    for _r in app.routes:
-        if not isinstance(_r, APIRoute):
+    # 使用 app.router.routes 更稳定；不同 FastAPI/Starlette 版本下 route 类型可能不同。
+    for _r in getattr(app.router, "routes", []):
+        _methods = getattr(_r, "methods", None)
+        _path = getattr(_r, "path", None)
+        if not _methods or not _path:
             continue
-        for _m in (_r.methods or set()):
-            route_set.add((_m.upper(), _r.path))
+        for _m in _methods:
+            route_set.add((str(_m).upper(), str(_path)))
 
     missing: list[tuple[str, str]] = []
     for _spec in _CRITICAL_ROUTE_SPECS:
@@ -85,6 +87,8 @@ def _run_route_self_check(app: FastAPI) -> None:
         len(_CRITICAL_ROUTE_SPECS),
         len(missing),
     )
+    if not route_set:
+        _log.warning("路由自检未采集到任何可匹配路由，请检查框架版本或自检实现")
     if missing:
         for _m, _p in missing:
             _log.error("❌ 关键路由缺失: %s %s", _m, _p)
