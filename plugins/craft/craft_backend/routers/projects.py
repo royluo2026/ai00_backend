@@ -37,6 +37,7 @@ class CreateProjectBody(BaseModel):
     model_year: Optional[int] = None          # 年款，4位年份
     suffix: str = ""                          # 后缀（如 A、SOP、PRE 等）
     description: str = ""
+    status: str = "preparing"
     vehicle_model_gid: Optional[str] = None
     team_id: Optional[str] = None
     jph: Optional[float] = None
@@ -207,11 +208,11 @@ def create_project(body: CreateProjectBody, current_user: dict = Depends(_PROJEC
         with conn.cursor() as cur:
             cur.execute(
                 "INSERT INTO workmanship_proj_projects "
-                "(gid, name, project_code, model_year, suffix, description, "
-                " vehicle_model_gid, team_id, owner_gid, jph, factory_gid) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                 "(gid, name, project_code, model_year, suffix, description, status, "
+                 " vehicle_model_gid, team_id, owner_gid, jph, factory_gid) "
+                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (gid, name, body.project_code.strip(), body.model_year,
-                 body.suffix.strip(), body.description,
+                  body.suffix.strip(), body.description, body.status,
                  body.vehicle_model_gid,
                  body.team_id or current_user.get("team_id"), current_user["gid"],
                  body.jph, body.factory_gid)
