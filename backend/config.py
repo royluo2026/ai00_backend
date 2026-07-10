@@ -24,7 +24,7 @@ _log = logging.getLogger(__name__)
 _FALLBACK_ENV = {
     "FEISHU_APP_ID": "cli_a9f2faec80f85cef",
     "FEISHU_APP_SECRET": "lM0mSvcfOyK2XMeD6upnQgbnHA81rGCB",
-    "FEISHU_REDIRECT_URI": "https://workmanship-web-test.chehejia.com/auth/feishu/callback",
+    "FEISHU_REDIRECT_URI": "https://workmanship-backend-test.chehejia.com/auth/feishu/callback",
     "JWT_SECRET": "549bfca71485c1832a064d3f4d251fcbc360b662e72d44fe0aec19c1ebc36a5a",
     "JWT_EXPIRE_HOURS": "72",
     "USERS_DB_URL": "mysql://sht_mes_tool%40mom%23test_bdms01:Hsb2Q%2B6_@sam-bdmsdb01-test.chj.cloud:2883/sht_mes_tool",
