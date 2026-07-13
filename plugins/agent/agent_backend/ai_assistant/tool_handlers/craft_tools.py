@@ -6,9 +6,10 @@ backend/ai_assistant/tool_handlers/craft_tools.py
 全部通过云端 REST 调用 backend 自身接口（httpx 直连 127.0.0.1:8080）。
 """
 from __future__ import annotations
-import os
 from typing import Any
 from urllib.parse import urlencode
+
+from backend.config import get_settings
 
 TOOL_NAMES: set[str] = {
     "search_parts",
@@ -28,9 +29,8 @@ TOOL_NAMES: set[str] = {
     "global_search",
 }
 
-# 从环境变量或 .env 读端口，默认 8081（测试环境）
-_port = os.environ.get("PORT", os.environ.get("UVICORN_PORT", "8081"))
-_BASE_URL = os.environ.get("BACKEND_BASE_URL", f"http://127.0.0.1:{_port}")
+_settings = get_settings()
+_BASE_URL = _settings.internal_backend_base_url
 
 
 def dispatch(

@@ -25,6 +25,7 @@ _FALLBACK_ENV = {
     "HOST": "0.0.0.0",
     "PORT": "8080",
     "PUBLIC_URL": "",
+    "BACKEND_BASE_URL": "",
     "CORS_ALLOW_ORIGINS": "http://127.0.0.1:5173,http://localhost:5173,app://root,null",
     "DEBUG": "true",
     "FIRST_SUPER_ADMIN_EMAIL": "",
@@ -112,6 +113,7 @@ class Settings:
     debug:                    bool = False
     # 对外访问 URL（用于网页版 /config 端点告知前端后端地址，留空时前端用 window.location.origin）
     public_url:               str = ""
+    backend_base_url:         str = ""
     cors_allow_origins:       list[str] = []
     # 超管自举：第一个以此邮箱登录飞书的用户自动获得 super_admin 角色
     # 一旦 DB 中已有超管，此配置自动失效（防止被持续滥用为提权通道）
@@ -127,6 +129,15 @@ class Settings:
     @property
     def minio_enabled(self) -> bool:
         return bool(self.minio_endpoint and self.minio_access_key and self.minio_secret_key)
+
+    @property
+    def internal_backend_base_url(self) -> str:
+        if self.backend_base_url:
+            return self.backend_base_url
+        host = (self.host or "0.0.0.0").strip()
+        if host in {"0.0.0.0", "::", "::0", ""}:
+            host = "127.0.0.1"
+        return f"http://{host}:{self.port}"
 
     def get_db_params(self) -> dict:
         """将 USERS_DB_URL 解析为 PyMySQL 连接参数字典。
@@ -169,6 +180,7 @@ class Settings:
         self.port                     = int(_get_with_fallback("PORT") or "8080")
         self.debug                    = (_get_with_fallback("DEBUG") or "false").lower() == "true"
         self.public_url               = _get_with_fallback("PUBLIC_URL").rstrip("/")
+        self.backend_base_url         = _get_with_fallback("BACKEND_BASE_URL").rstrip("/")
         self.cors_allow_origins       = _get_csv_list("CORS_ALLOW_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173,app://root,null")
         self.first_super_admin_email  = (_get_with_fallback("FIRST_SUPER_ADMIN_EMAIL") or "").strip().lower()
         # MinIO（可选）

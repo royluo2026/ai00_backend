@@ -33,6 +33,27 @@ def test_public_url_trims_trailing_slash(monkeypatch):
     assert settings.public_url == 'https://workmanship-backend-test.chehejia.com'
 
 
+def test_public_url_can_be_empty_but_internal_backend_base_can_be_explicit(monkeypatch):
+    settings = make_settings(
+        monkeypatch,
+        PUBLIC_URL='',
+        BACKEND_BASE_URL='http://backend.internal:9000',
+    )
+    assert settings.public_url == ''
+    assert settings.backend_base_url == 'http://backend.internal:9000'
+
+
+def test_internal_backend_base_derives_from_host_and_port(monkeypatch):
+    settings = make_settings(
+        monkeypatch,
+        PUBLIC_URL='',
+        BACKEND_BASE_URL=None,
+        HOST='0.0.0.0',
+        PORT='8088',
+    )
+    assert settings.internal_backend_base_url == 'http://127.0.0.1:8088'
+
+
 def test_cors_allow_origins_splits_csv(monkeypatch):
     settings = make_settings(
         monkeypatch,
