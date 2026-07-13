@@ -5,7 +5,6 @@ RUN mkdir -p /chj/app /chj/app/backend/static/uploads && chmod 775 -R /chj
 WORKDIR /chj/app
 
 ENV SOURCE_PATH=.
-ENV SERVICE_PORT=8080
 ENV ENV_FILE=/chj/app/backend/.env.test.example
 ENV HOST=0.0.0.0
 ENV PORT=8080
@@ -16,4 +15,4 @@ RUN pip install --upgrade pip && pip install -r backend/requirements.txt
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "python -m uvicorn backend.main:app --host 0.0.0.0 --port ${SERVICE_PORT} 2>&1"]
+CMD ["python", "-c", "import os; from dotenv import load_dotenv; env_file = os.getenv('ENV_FILE', '').strip(); load_dotenv(env_file, override=True) if env_file else None; import uvicorn; uvicorn.run('backend.main:app', host=os.getenv('HOST', '0.0.0.0'), port=int(os.getenv('PORT', '8080') or '8080'))"]

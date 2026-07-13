@@ -5,13 +5,20 @@ gunicorn 生产配置（uvicorn worker 模式）
 
 用法：
   gunicorn backend.main:app -c backend/gunicorn.conf.py
-
-Windows 部署（通过 NSSM 服务）时，accesslog/errorlog 路径由 NSSM 日志重定向接管，
-可将此处路径保持为占位或改为实际路径。
 """
 import multiprocessing
+import os
 
-bind             = "0.0.0.0:8080"
+from dotenv import load_dotenv
+
+env_file = os.getenv("ENV_FILE", "").strip()
+if env_file:
+    load_dotenv(env_file, override=False)
+
+host = os.getenv("HOST", "0.0.0.0")
+port = int(os.getenv("PORT", "8080") or "8080")
+
+bind             = f"{host}:{port}"
 workers          = multiprocessing.cpu_count() * 2 + 1
 worker_class     = "uvicorn.workers.UvicornWorker"
 timeout          = 120

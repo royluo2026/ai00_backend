@@ -20,26 +20,14 @@ from dotenv import load_dotenv
 
 _log = logging.getLogger(__name__)
 
-# backend/.env.example 全量兜底配置（仅在对应环境变量缺失时使用）
 _FALLBACK_ENV = {
-    "FEISHU_APP_ID": "cli_a9f2faec80f85cef",
-    "FEISHU_APP_SECRET": "lM0mSvcfOyK2XMeD6upnQgbnHA81rGCB",
-    "FEISHU_REDIRECT_URI": "https://workmanship-backend-test.chehejia.com/auth/feishu/callback",
-    "JWT_SECRET": "549bfca71485c1832a064d3f4d251fcbc360b662e72d44fe0aec19c1ebc36a5a",
     "JWT_EXPIRE_HOURS": "72",
-    "USERS_DB_URL": "mysql://sht_mes_tool%40mom%23test_bdms01:Hsb2Q%2B6_@sam-bdmsdb01-test.chj.cloud:2883/sht_mes_tool",
     "HOST": "0.0.0.0",
-    "PORT": "8081",
+    "PORT": "8080",
+    "PUBLIC_URL": "",
+    "CORS_ALLOW_ORIGINS": "http://127.0.0.1:5173,http://localhost:5173,app://root,null",
     "DEBUG": "true",
-    "FIRST_SUPER_ADMIN_EMAIL": "luoyi8@lixiang.com",
-    "OIS_REGION": "cnhb01",
-    "OIS_IDENTIFY": "vrdos-wms-0xeeEXoe-public",
-    "OIS_LICLOUD_APPID": "factory-mes-trial-tool-api",
-    "OIS_IDAAS_CLIENT_ID": "79HDtleGluGq0NzrfLDhJh",
-    "OIS_IDAAS_CLIENT_SECRET": "eyJrdHkiOiJvY3QiLCJraWQiOiJsVC1mQy1JemdnIiwiYWxnIjoiSFMyNTYiLCJrIjoiUEYwWDd0Y1ZCYXJXMl81MGZTTjhRajVQSkRtQUU5czdPU3hpQ3ctNUlacyJ9",
-    "OIS_IDAAS_SERVICE_ID": "5Nku9Oc7V7kAzSwK1aTcNU",
-    "OIS_IDAAS_URL": "https://id-ontest.lixiang.com/api",
-    "OIS_OIS3_URL": "https://ois3-cnhbnp01-ontest.inner.chj.cloud",
+    "FIRST_SUPER_ADMIN_EMAIL": "",
 }
 
 
@@ -51,6 +39,11 @@ def _get_with_fallback(key: str) -> str:
     if fallback:
         _log.warning("%s 未注入，使用内置兜底配置", key)
     return fallback
+
+
+def _get_csv_list(key: str, default: str = "") -> list[str]:
+    raw = _get_with_fallback(key) or default
+    return [item.strip() for item in raw.split(",") if item.strip()]
 
 # 兼容部署场景：支持通过 ENV_FILE 显式指定配置文件。
 # 容器内未指定 ENV_FILE 时，跳过 .env.dev，避免误读本地开发配置。
@@ -119,6 +112,7 @@ class Settings:
     debug:                    bool = False
     # 对外访问 URL（用于网页版 /config 端点告知前端后端地址，留空时前端用 window.location.origin）
     public_url:               str = ""
+    cors_allow_origins:       list[str] = []
     # 超管自举：第一个以此邮箱登录飞书的用户自动获得 super_admin 角色
     # 一旦 DB 中已有超管，此配置自动失效（防止被持续滥用为提权通道）
     first_super_admin_email:  str = ""
@@ -171,10 +165,11 @@ class Settings:
         self.jwt_secret               = _require("JWT_SECRET")
         self.users_db_url             = _require("USERS_DB_URL")
         self.jwt_expire_hours         = int(_get_with_fallback("JWT_EXPIRE_HOURS") or "72")
-        self.host                     = _get_with_fallback("HOST") or "0.0.0.0"
+        self.host                     = (_get_with_fallback("HOST") or "0.0.0.0").strip()
         self.port                     = int(_get_with_fallback("PORT") or "8080")
         self.debug                    = (_get_with_fallback("DEBUG") or "false").lower() == "true"
-        self.public_url               = os.getenv("PUBLIC_URL", "").rstrip("/")
+        self.public_url               = _get_with_fallback("PUBLIC_URL").rstrip("/")
+        self.cors_allow_origins       = _get_csv_list("CORS_ALLOW_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173,app://root,null")
         self.first_super_admin_email  = (_get_with_fallback("FIRST_SUPER_ADMIN_EMAIL") or "").strip().lower()
         # MinIO（可选）
         self.minio_endpoint   = os.getenv("MINIO_ENDPOINT",   "").strip().rstrip("/")

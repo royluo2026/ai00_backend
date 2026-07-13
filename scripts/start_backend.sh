@@ -41,17 +41,41 @@ EOF
 fi
 
 source "$ROOT_DIR/.venv/bin/activate"
+
+export ENV_FILE="$ENV_FILE"
 export PYTHONUNBUFFERED=1
 
-nohup python -m uvicorn backend.main:app --host 0.0.0.0 --port 8080 > "$OUT_LOG" 2>&1 &
+eval "$(python - "$ENV_FILE" <<'PY'
+import json
+import pathlib
+import sys
+
+env_path = pathlib.Path(sys.argv[1])
+for raw in env_path.read_text(encoding='utf-8').splitlines():
+    line = raw.strip()
+    if not line or line.startswith('#') or '=' not in line:
+        continue
+    key, value = line.split('=', 1)
+    print(f'export {key.strip()}={json.dumps(value)}')
+PY
+)"
+
+HOST="${HOST:-0.0.0.0}"
+PORT="${PORT:-8080}"
+PROBE_HOST="$HOST"
+if [[ "$HOST" == "0.0.0.0" || "$HOST" == "::" ]]; then
+  PROBE_HOST="127.0.0.1"
+fi
+
+nohup python -m uvicorn backend.main:app --host "$HOST" --port "$PORT" > "$OUT_LOG" 2>&1 &
 NEW_PID=$!
 echo "$NEW_PID" > "$PID_FILE"
 
 for _ in $(seq 1 15); do
-  if curl -fsS "http://127.0.0.1:8080/health" >/dev/null 2>&1; then
+  if curl -fsS "http://${PROBE_HOST}:${PORT}/health" >/dev/null 2>&1; then
     echo "[OK] 后端已启动: PID=$NEW_PID"
     echo "[OK] 日志文件: $OUT_LOG"
-    echo "[OK] 健康检查: http://127.0.0.1:8080/health"
+    echo "[OK] 健康检查: http://${PROBE_HOST}:${PORT}/health"
     exit 0
   fi
   if ! kill -0 "$NEW_PID" >/dev/null 2>&1; then

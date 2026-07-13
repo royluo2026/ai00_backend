@@ -36,6 +36,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend.core.log_setup import setup_logging
+from backend.config import get_settings
 from backend.db.connection import init_pool
 
 # ── 日志初始化（必须在所有模块 import 之前完成）─────────────────────────────────
@@ -961,12 +962,27 @@ async def access_log_middleware(request: Request, call_next):
 
 
 # 允许客户端跨域（桌面客户端通过本地 HTTP 调用）
+def _resolve_cors_allow_origins() -> list[str]:
+    raw = os.getenv("CORS_ALLOW_ORIGINS", "").strip()
+    if raw:
+        values = [item.strip() for item in raw.split(",") if item.strip()]
+        if values:
+            return values
+    return [
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+        "app://root",
+        "null",
+    ]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],         # 桌面客户端无固定 Origin，放开
+    allow_origins=_resolve_cors_allow_origins(),
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["X-New-Token"],   # 允许客户端读取 token 刷新头
+    expose_headers=["X-New-Token"],
 )
 
 # ── 自动注册 Router ───────────────────────────────────────────────────────────
@@ -1024,7 +1040,8 @@ for _finder, _mod_name, _is_pkg in pkgutil.iter_modules([str(_routers_dir)]):
 _log.info(f"✅ Router 自动注册完成（插件路由: {len(_plugin_routers)} 个，跳过模块: {_plugin_owned}）")
 
 # 静态文件：附件上传目录
-app.mount("/static", StaticFiles(directory="backend/static"), name="static")
+_STATIC_DIR = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=str(_STATIC_DIR), check_dir=False), name="static")
 
 _start_time = time.time()
 _SLOW_MS = 2000  # 慢请求阈值（毫秒）

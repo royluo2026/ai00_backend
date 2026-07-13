@@ -185,7 +185,22 @@ def _find_bare_table_refs(sql: str) -> list[str]:
 def mock_conn():
     """mock backend.db.connection.get_conn → 返回 MagicMock cursor"""
     mock_cursor = MagicMock()
-    mock_cursor.fetchone.return_value = None
+    sequence_rows = {
+        "proj_tasks_display_seq": {"val": 1001},
+        "proj_issues_display_seq": {"val": 2001},
+    }
+
+    def _fetchone_side_effect():
+        if not mock_cursor.execute.call_args_list:
+            return None
+        args, _ = mock_cursor.execute.call_args_list[-1]
+        sql = str(args[0]) if args else ""
+        params = args[1] if len(args) > 1 else []
+        if "SELECT val FROM workmanship_display_id_counters" in sql and params:
+            return sequence_rows.get(params[0])
+        return None
+
+    mock_cursor.fetchone.side_effect = _fetchone_side_effect
     mock_cursor.fetchall.return_value = []
     mock_cursor.rowcount = 0
 
