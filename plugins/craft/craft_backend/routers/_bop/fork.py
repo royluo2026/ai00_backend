@@ -116,12 +116,13 @@ def fork_version(source_gid: str, body: ForkBody, _u=Depends(_WRITE)):
                 f"INSERT INTO workmanship_bop_bop_versions "
                 f"(gid,version_tag,bop_name,version_family_gid,"
                 f" project_gid,factory_gid,vehicle_model_gid,maturity,takt_time,"
-                f" parent_version_gid,change_note,version_type) "
-                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                f" status,meta,lifecycle_phase,lifecycle_state,visibility,parent_version_gid,change_note,version_type) "
+                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (new_ver_gid, body.target_version_tag, bop_name, family_gid,
                  src_ver.get('project_gid'), src_ver.get('factory_gid'),
                  src_ver.get('vehicle_model_gid'), src_ver.get('maturity', 'concept'),
                  src_ver.get('takt_time', 60),
+                 'active', json.dumps({}), 'init', json.dumps({}), 'team',
                  source_gid, body.change_note, body.version_type)
             )
             cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (new_ver_gid,))

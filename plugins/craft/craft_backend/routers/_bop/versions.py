@@ -178,13 +178,13 @@ def create_version(body: CreateBopVersionBody, _u=Depends(_WRITE)):
                 f"INSERT INTO workmanship_bop_bop_versions "
                 f"(gid,version_tag,bop_name,version_family_gid,"
                 f"project_gid,factory_gid,vehicle_model_gid,maturity,takt_time,"
-                f"version_type,pbom_version_gid,owner_gid,data_stage) "
-                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                f"status,meta,lifecycle_phase,lifecycle_state,visibility,version_type,pbom_version_gid,owner_gid,data_stage) "
+                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (gid, body.version_tag, body.bop_name, family_gid,
                  body.project_gid, body.factory_gid,
                  body.vehicle_model_gid, body.maturity, body.takt_time,
-                 body.version_type, body.pbom_version_gid, body.owner_gid,
-                 body.data_stage)
+                 'active', json.dumps({}), 'init', json.dumps({}), 'team', body.version_type,
+                 body.pbom_version_gid, body.owner_gid, body.data_stage)
             )
             conn.commit()
             cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))

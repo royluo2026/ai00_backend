@@ -12,6 +12,9 @@ VPPS 操作审计测试套件
 """
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
+import importlib
+import sys
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -105,10 +108,32 @@ def _collect_sqls(mc) -> list[str]:
 # ─────────────────────────────────────────────────────────────────────────────
 
 @pytest.fixture
+def bop_entries_module(monkeypatch):
+    project_root = Path(__file__).resolve().parents[2]
+    craft_plugin_root = project_root / "plugins" / "craft"
+    craft_plugin_root_str = str(craft_plugin_root)
+    if craft_plugin_root_str not in sys.path:
+        sys.path.insert(0, craft_plugin_root_str)
+    module_name = "craft_backend.routers._bop.entries"
+    sys.modules.pop(module_name, None)
+    module = importlib.import_module(module_name)
+    yield module
+    sys.modules.pop(module_name, None)
+    if craft_plugin_root_str in sys.path:
+        sys.path.remove(craft_plugin_root_str)
+
+
+@pytest.fixture
+def bop_mock_conn():
+    mc, conn = _make_cursor_and_conn()
+    with patch("craft_backend.routers._bop.entries.get_conn", return_value=conn):
+        yield conn, mc
+
+
+@pytest.fixture
 def mock_conn():
     mc, conn = _make_cursor_and_conn()
-    # Patch where the name is *used* (router's local binding), not where it's defined.
-    with patch("backend.routers.vpps_audit.get_conn", return_value=conn):
+    with patch("craft_backend.routers.vpps_audit.get_conn", return_value=conn):
         yield conn, mc
 
 
@@ -571,9 +596,227 @@ class TestVppsAuditRoutes:
         assert "test_user_gid" in params
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 4. SQL Schema 前缀验证（端点级）
-# ─────────────────────────────────────────────────────────────────────────────
+class TestBopCreateEntry:
+    def test_create_entry_sets_default_version_no_for_operation(self, bop_entries_module, bop_mock_conn):
+        _, mc = bop_mock_conn
+        mc.fetchone.side_effect = [
+            {"status": "active"},
+            {"level": 2},
+            {"project_gid": "proj_001"},
+            {"frozen_at": None},
+            {"gid": "entry_gid_001", "entity_gid": "entity_gid_001"},
+            None,
+        ]
+        mc.fetchall.return_value = []
+
+        body = bop_entries_module.CreateEntryBody(
+            version_gid="ver_001",
+            parent_gid="parent_001",
+            node_type="operation",
+            sort_order=1,
+            title="新加工序",
+            vpps="VPPS-001",
+            vpps_desc="desc",
+        )
+
+        bop_entries_module.create_entry(body, _u={"gid": "user_001", "name": "Tester"})
+
+        sql_to_params = [
+            (str(call.args[0]), call.args[1] if len(call.args) > 1 else None)
+            for call in mc.execute.call_args_list
+        ]
+        entity_insert = next(
+            params
+            for sql, params in sql_to_params
+            if "INSERT INTO workmanship_bop_bop_steps" in sql
+        )
+        assert entity_insert[1:] == (
+            "proj_001",
+            "01",
+            "新加工序",
+            "VPPS-001",
+            "desc",
+            "",
+            False,
+            "{}",
+            "{}",
+        )
+
+        entry_insert = next(
+            params
+            for sql, params in sql_to_params
+            if "INSERT INTO workmanship_bop_bop_entries" in sql
+        )
+        assert entry_insert[7:] == (
+            "新加工序",
+            "VPPS-001",
+            "desc",
+            "",
+            False,
+            "",
+            "",
+            None,
+            "{}",
+            None,
+        )
+
+    def test_create_entry_sets_default_vpps_part_for_process(self, bop_entries_module, bop_mock_conn):
+        _, mc = bop_mock_conn
+        mc.fetchone.side_effect = [
+            {"status": "active"},
+            {"level": 1},
+            {"project_gid": "proj_001"},
+            {"frozen_at": None},
+            {"gid": "entry_gid_002", "entity_gid": "entity_gid_002"},
+            None,
+        ]
+        mc.fetchall.return_value = []
+
+        body = bop_entries_module.CreateEntryBody(
+            version_gid="ver_001",
+            parent_gid="parent_001",
+            node_type="process",
+            sort_order=2,
+            title="新工序",
+            vpps="VPPS-002",
+            vpps_desc="process desc",
+        )
+
+        bop_entries_module.create_entry(body, _u={"gid": "user_001", "name": "Tester"})
+
+        sql_to_params = [
+            (str(call.args[0]), call.args[1] if len(call.args) > 1 else None)
+            for call in mc.execute.call_args_list
+        ]
+        process_insert = next(
+            params
+            for sql, params in sql_to_params
+            if "INSERT INTO workmanship_bop_bop_process" in sql
+        )
+        assert process_insert[1:] == (
+            "proj_001",
+            "ver_001",
+            "01",
+            "新工序",
+            "VPPS-002",
+            "process desc",
+            "",
+            False,
+            "{}",
+            "{}",
+        )
+
+    def test_create_entry_sets_default_ext_for_line_process(self, bop_entries_module, bop_mock_conn):
+        _, mc = bop_mock_conn
+        mc.fetchone.side_effect = [
+            {"status": "active"},
+            {"project_gid": "proj_001"},
+            {"gid": "entry_gid_003", "entity_gid": "entity_gid_003"},
+            None,
+        ]
+        mc.fetchall.return_value = []
+
+        body = bop_entries_module.CreateEntryBody(
+            version_gid="ver_001",
+            node_type="line_process",
+            sort_order=3,
+            title="新线体工艺",
+            vpps="VPPS-003",
+        )
+
+        bop_entries_module.create_entry(body, _u={"gid": "user_001", "name": "Tester"})
+
+        sql_to_params = [
+            (str(call.args[0]), call.args[1] if len(call.args) > 1 else None)
+            for call in mc.execute.call_args_list
+        ]
+        line_insert = next(
+            params
+            for sql, params in sql_to_params
+            if "INSERT INTO workmanship_bop_bop_line" in sql
+        )
+        assert line_insert[1:] == (
+            "proj_001",
+            "01",
+            "新线体工艺",
+            "VPPS-003",
+            "{}",
+        )
+
+    def test_create_entry_sets_default_ext_for_station_process(self, bop_entries_module, bop_mock_conn):
+        _, mc = bop_mock_conn
+        mc.fetchone.side_effect = [
+            {"status": "active"},
+            {"project_gid": "proj_001"},
+            {"gid": "entry_gid_004", "entity_gid": "entity_gid_004"},
+            None,
+        ]
+        mc.fetchall.return_value = []
+
+        body = bop_entries_module.CreateEntryBody(
+            version_gid="ver_001",
+            node_type="station_process",
+            sort_order=4,
+            title="新工位工艺",
+            vpps="VPPS-004",
+        )
+
+        bop_entries_module.create_entry(body, _u={"gid": "user_001", "name": "Tester"})
+
+        sql_to_params = [
+            (str(call.args[0]), call.args[1] if len(call.args) > 1 else None)
+            for call in mc.execute.call_args_list
+        ]
+        station_insert = next(
+            params
+            for sql, params in sql_to_params
+            if "INSERT INTO workmanship_bop_bop_station" in sql
+        )
+        assert station_insert[1:] == (
+            "proj_001",
+            "01",
+            "新工位工艺",
+            "VPPS-004",
+            "{}",
+        )
+
+    def test_create_entry_sets_position_ext_for_operator_process(self, bop_entries_module, bop_mock_conn):
+        _, mc = bop_mock_conn
+        mc.fetchone.side_effect = [
+            {"status": "active"},
+            {"project_gid": "proj_001"},
+            {"gid": "entry_gid_005", "entity_gid": "entity_gid_005"},
+            None,
+        ]
+        mc.fetchall.return_value = []
+
+        body = bop_entries_module.CreateEntryBody(
+            version_gid="ver_001",
+            node_type="operator_process",
+            sort_order=5,
+            title="新岗位工艺",
+            vpps="VPPS-005",
+            position="A",
+        )
+
+        bop_entries_module.create_entry(body, _u={"gid": "user_001", "name": "Tester"})
+
+        sql_to_params = [
+            (str(call.args[0]), call.args[1] if len(call.args) > 1 else None)
+            for call in mc.execute.call_args_list
+        ]
+        operator_insert = next(
+            params
+            for sql, params in sql_to_params
+            if "INSERT INTO workmanship_bop_bop_operator" in sql
+        )
+        assert operator_insert[1:] == (
+            "proj_001",
+            "01",
+            "新岗位工艺",
+            "VPPS-005",
+            '{"position": "A"}',
+        )
 
 class TestVppsAuditSchemaPrefixes:
     """确认所有端点发出的 SQL 都不含裸表名 vpps_operations（必须有 bop. 前缀）。"""

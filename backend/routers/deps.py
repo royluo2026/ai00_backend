@@ -140,8 +140,32 @@ def _derive_org_role(system_role: str) -> str:
     return "member"
 
 
+def get_current_user_claims_only(x_ai00_token: str = Header(alias="X-AI00-Token")) -> dict:
+    """
+    仅验证 JWT 签名并返回 payload 派生的用户信息，不依赖数据库。
+    用于数据库配置等需要在 DB 不可用时仍可操作的管理端点。
+    """
+    try:
+        payload = jwt_service.verify(x_ai00_token)
+    except pyjwt.InvalidTokenError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail=f"Invalid token: {e}")
+
+    system_role = payload.get("system_role", "external")
+    org_role = payload.get("org_role") or _derive_org_role(system_role)
+    return {
+        "gid": payload.get("sub", ""),
+        "system_role": system_role,
+        "org_role": org_role,
+        "team_id": payload.get("team_id") or "",
+        "name": payload.get("name", ""),
+        "email": payload.get("email", ""),
+        "avatar_url": payload.get("avatar_url", ""),
+        "is_active": True,
+    }
+
+
 _LOCAL_USER = {
-    "gid": "local_user",
     "system_role": "member",
     "org_role": "member",
     "team_id": "",

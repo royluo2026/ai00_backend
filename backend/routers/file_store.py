@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -30,6 +31,26 @@ def _mask_key(key: str) -> str:
     if len(key) > 8:
         return key[:4] + "••••" + key[-4:]
     return "•" * len(key)
+
+
+def _system_json_path() -> Path:
+    return Path.home() / '.ai00' / 'config' / 'system.json'
+
+
+def _load_system_json() -> dict:
+    path = _system_json_path()
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+
+
+def _save_system_json(data: dict) -> None:
+    path = _system_json_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
 
 
 def _load_db_config(key: str = "minio_config") -> dict | None:
@@ -164,6 +185,9 @@ def save_config(body: dict, _user: dict = Depends(_WRITE)):
            "secret_key": secret_key, "bucket": bucket, "public_url": public_url}
     try:
         _save_db_config("minio_config", cfg)
+        raw = _load_system_json()
+        raw['minio_config'] = cfg
+        _save_system_json(raw)
         print(f"[file_store] _save_db_config OK", flush=True)
     except Exception as e:
         print(f"[file_store] _save_db_config FAILED: {e}", flush=True)
@@ -224,6 +248,9 @@ def save_ois_config(body: dict, _user: dict = Depends(_WRITE)):
     try:
         print(f"[ois-config] 写入 DB key=ois_config ...", flush=True)
         _save_db_config("ois_config", cfg)
+        raw = _load_system_json()
+        raw['ois_config'] = cfg
+        _save_system_json(raw)
         print(f"[ois-config] 写入 DB 成功", flush=True)
     except Exception as e:
         import traceback

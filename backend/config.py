@@ -12,9 +12,13 @@ App Secret 只在这里，永远不序列化到任何响应体。
     3. 系统环境变量
 """
 import os
+import json
 import logging
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import quote
+
+from urllib.parse import quote
 
 from dotenv import load_dotenv
 
@@ -30,6 +34,50 @@ _FALLBACK_ENV = {
     "DEBUG": "true",
     "FIRST_SUPER_ADMIN_EMAIL": "",
 }
+
+
+def _system_json_path() -> Path:
+    return Path.home() / '.ai00' / 'config' / 'system.json'
+
+
+def _load_system_json() -> dict:
+    path = _system_json_path()
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+
+
+def _cloud_db_url_from_saved_config(cfg: dict) -> str:
+    host = str(cfg.get('host') or '').strip()
+    user = str(cfg.get('user') or '').strip()
+    password = str(cfg.get('password') or '').strip()
+    collab_db = str(cfg.get('collab_db') or '').strip()
+    if not (host and user and password and collab_db):
+        return ''
+    port = int(cfg.get('port') or 2883)
+    return (
+        f"mysql://{quote(user, safe='')}:{quote(password, safe='')}"
+        f"@{host}:{port}/{quote(collab_db, safe='')}"
+    )
+
+
+
+def _load_saved_cloud_db_url() -> str:
+    cfg = _load_system_json().get('cloud_db_config') or {}
+    if not isinstance(cfg, dict):
+        return ''
+    rebuilt = _cloud_db_url_from_saved_config(cfg)
+    if rebuilt:
+        return rebuilt
+    return ''
+
+
+def _load_saved_ois_config() -> dict:
+    cfg = _load_system_json().get('ois_config') or {}
+    return cfg if isinstance(cfg, dict) else {}
 
 
 def _get_with_fallback(key: str) -> str:
@@ -174,7 +222,7 @@ class Settings:
         self.feishu_app_secret        = _require("FEISHU_APP_SECRET")
         self.feishu_redirect_uri      = _require("FEISHU_REDIRECT_URI")
         self.jwt_secret               = _require("JWT_SECRET")
-        self.users_db_url             = _require("USERS_DB_URL")
+        self.users_db_url             = _load_saved_cloud_db_url() or _require("USERS_DB_URL")
         self.jwt_expire_hours         = int(_get_with_fallback("JWT_EXPIRE_HOURS") or "72")
         self.host                     = (_get_with_fallback("HOST") or "0.0.0.0").strip()
         self.port                     = int(_get_with_fallback("PORT") or "8080")
@@ -193,16 +241,17 @@ class Settings:
             _pub = f"{self.minio_endpoint}/{self.minio_bucket}"
         self.minio_public_url = _pub
         # OIS 对象存储（理想汽车内网，可选）— SDK: ois3-sdk-python
-        self.ois_identify            = _get_with_fallback("OIS_IDENTIFY").strip()
-        self.ois_env                 = os.getenv("OIS_ENV",                 "").strip()
-        self.ois_ois3_url            = _get_with_fallback("OIS_OIS3_URL").strip()
-        self.ois_region              = _get_with_fallback("OIS_REGION").strip()
-        self.ois_licloud_appid       = _get_with_fallback("OIS_LICLOUD_APPID").strip()
-        self.ois_idaas_url           = _get_with_fallback("OIS_IDAAS_URL").strip()
-        self.ois_idaas_client_id     = _get_with_fallback("OIS_IDAAS_CLIENT_ID").strip()
-        self.ois_idaas_client_secret = _get_with_fallback("OIS_IDAAS_CLIENT_SECRET").strip()
-        self.ois_idaas_service_id    = _get_with_fallback("OIS_IDAAS_SERVICE_ID").strip()
-        self.ois_public_base_url     = os.getenv("OIS_PUBLIC_BASE_URL",     "").strip()
+        _ois_saved = _load_saved_ois_config()
+        self.ois_identify            = str(_ois_saved.get("identify") or _get_with_fallback("OIS_IDENTIFY")).strip()
+        self.ois_env                 = str(_ois_saved.get("env") or os.getenv("OIS_ENV", "")).strip()
+        self.ois_ois3_url            = str(_ois_saved.get("ois3_url") or _get_with_fallback("OIS_OIS3_URL")).strip()
+        self.ois_region              = str(_ois_saved.get("region") or _get_with_fallback("OIS_REGION")).strip()
+        self.ois_licloud_appid       = str(_ois_saved.get("licloud_appid") or _get_with_fallback("OIS_LICLOUD_APPID")).strip()
+        self.ois_idaas_url           = str(_ois_saved.get("idaas_url") or _get_with_fallback("OIS_IDAAS_URL")).strip()
+        self.ois_idaas_client_id     = str(_ois_saved.get("idaas_client_id") or _get_with_fallback("OIS_IDAAS_CLIENT_ID")).strip()
+        self.ois_idaas_client_secret = str(_ois_saved.get("idaas_client_secret") or _get_with_fallback("OIS_IDAAS_CLIENT_SECRET")).strip()
+        self.ois_idaas_service_id    = str(_ois_saved.get("idaas_service_id") or _get_with_fallback("OIS_IDAAS_SERVICE_ID")).strip()
+        self.ois_public_base_url     = str(_ois_saved.get("public_base_url") or os.getenv("OIS_PUBLIC_BASE_URL", "")).strip()
 
 
 @lru_cache

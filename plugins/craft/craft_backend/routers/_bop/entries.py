@@ -77,6 +77,41 @@ class BopPicUploadBody(BaseModel):
     data_b64: str
 
 
+def _normalize_bop_pic_items(items):
+    out = []
+    for item in items or []:
+        if isinstance(item, dict):
+            pic = dict(item)
+            url = str(pic.get('url') or '').strip()
+            object_key = str(pic.get('object_key') or '').strip().lstrip('/')
+            storage = str(pic.get('storage') or '').strip()
+            if url or object_key:
+                out.append({
+                    'url': url,
+                    'object_key': object_key,
+                    'storage': storage,
+                })
+        elif isinstance(item, str):
+            url = item.strip()
+            if url:
+                out.append({'url': url, 'object_key': '', 'storage': ''})
+    return out
+
+
+def _resolve_bop_pic_items(items):
+    from backend.core import ois_storage as _ois_storage
+
+    resolved = []
+    for pic in _normalize_bop_pic_items(items):
+        if pic.get('storage') == 'ois' and pic.get('object_key'):
+            access_url = _ois_storage.generate_access_url(pic['object_key'])
+            if access_url:
+                resolved.append({**pic, 'url': access_url})
+                continue
+        resolved.append(pic)
+    return resolved
+
+
 class CreateEntryLinkBody(BaseModel):
     entry_gid: str
     link_type: str
@@ -224,7 +259,13 @@ def list_entries(version_gid: str, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(_ENTRY_LIST_SQL, (version_gid, version_gid))
-            return {"data": _rows(cur, _ENTRY_KEYS)}
+            rows = _rows(cur, _ENTRY_KEYS)
+            for row in rows:
+                if row.get('process_flow_pic'):
+                    row['process_flow_pic'] = _resolve_bop_pic_items(row['process_flow_pic'])
+                if row.get('process_chart_pic'):
+                    row['process_chart_pic'] = _resolve_bop_pic_items(row['process_chart_pic'])
+            return {"data": rows}
 
 
 @router.get("/versions/{version_gid}/pbom")
@@ -353,47 +394,59 @@ def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
 
             if entity_info:
                 e_table, link_type, has_vpps_desc, title_col = entity_info
+                version_no = '01'
+                ext_json = json.dumps({})
+                params_json = json.dumps({})
                 cur.execute("SELECT project_gid FROM workmanship_bop_bop_versions WHERE gid=%s", (ver_gid,))
                 ver_row = cur.fetchone()
                 project_gid = ver_row['project_gid'] if ver_row else None
                 if has_vpps_desc:
                     if body.node_type == 'process':
                         cur.execute(
-                            f"INSERT INTO {e_table}(gid, project_gid, bop_version_gid, {title_col}, vpps, vpps_desc)"
-                            f" VALUES (%s,%s,%s,%s,%s,%s)",
-                            (entity_gid, project_gid, ver_gid, body.title, body.vpps, body.vpps_desc)
+                            f"INSERT INTO {e_table}(gid, project_gid, bop_version_gid, version_no, {title_col}, vpps, vpps_desc, vpps_part, part_feed, params, ext)"
+                            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                            (entity_gid, project_gid, ver_gid, version_no, body.title, body.vpps, body.vpps_desc, '', False, params_json, ext_json)
                         )
                     else:
                         cur.execute(
-                            f"INSERT INTO {e_table}(gid, project_gid, {title_col}, vpps, vpps_desc)"
-                            f" VALUES (%s,%s,%s,%s,%s)",
-                            (entity_gid, project_gid, body.title, body.vpps, body.vpps_desc)
+                            f"INSERT INTO {e_table}(gid, project_gid, version_no, {title_col}, vpps, vpps_desc, vpps_part, part_feed, params, ext)"
+                            f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                            (entity_gid, project_gid, version_no, body.title, body.vpps, body.vpps_desc, '', False, params_json, ext_json)
                         )
                 else:
                     if body.node_type == 'operator_process' and body.position:
                         ext_val = json.dumps({'position': body.position})
                         cur.execute(
-                            f"INSERT INTO {e_table}(gid, project_gid, {title_col}, vpps, ext)"
-                            f" VALUES (%s,%s,%s,%s,%s)",
-                            (entity_gid, project_gid, body.title, body.vpps, ext_val)
+                            f"INSERT INTO {e_table}(gid, project_gid, version_no, {title_col}, vpps, ext)"
+                            f" VALUES (%s,%s,%s,%s,%s,%s)",
+                            (entity_gid, project_gid, version_no, body.title, body.vpps, ext_val)
                         )
                     else:
-                        cur.execute(
-                            f"INSERT INTO {e_table}(gid, project_gid, {title_col}, vpps)"
-                            f" VALUES (%s,%s,%s,%s)",
-                            (entity_gid, project_gid, body.title, body.vpps)
-                        )
+                        if body.node_type == 'operation':
+                            cur.execute(
+                                f"INSERT INTO {e_table}(gid, project_gid, version_no, {title_col}, vpps, vpps_desc, vpps_part, part_feed, params, ext)"
+                                f" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                                (entity_gid, project_gid, version_no, body.title, body.vpps, body.vpps_desc, '', False, params_json, ext_json)
+                            )
+                        else:
+                            cur.execute(
+                                f"INSERT INTO {e_table}(gid, project_gid, version_no, {title_col}, vpps, ext)"
+                                f" VALUES (%s,%s,%s,%s,%s,%s)",
+                                (entity_gid, project_gid, version_no, body.title, body.vpps, ext_json)
+                            )
             else:
                 link_type = None
 
             cur.execute(
                 "INSERT INTO workmanship_bop_bop_entries"
                 "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                " title, vpps, vpps_desc, parent_bop_title, child_vpps)"
-                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]')",
+                " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name,"
+                " parent_vpps_name, parent_bop_title, child_vpps, meta, source_entry_gid)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]',%s,%s)",
                 (entry_gid, ver_gid, body.parent_gid, body.node_type,
                  body.sort_order, level, ai00_lv,
-                 body.title, body.vpps, body.vpps_desc, body.parent_bop_title)
+                 body.title, body.vpps, body.vpps_desc, '', False, '', '',
+                 body.parent_bop_title, json.dumps({}), None)
             )
 
             if entity_info:
@@ -450,7 +503,7 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
     if 'process_flow_pic' in data:
         import json as _json
         set_parts.append("process_flow_pic=%s")
-        vals.append(_json.dumps(data['process_flow_pic']))
+        vals.append(_json.dumps(_normalize_bop_pic_items(data['process_flow_pic'])))
     if 'cad_sim_pics' in data:
         import json as _json
         set_parts.append("meta=JSON_SET(IFNULL(meta,'{}'),'$.cad_sim_pics',CAST(%s AS JSON))")
@@ -515,33 +568,74 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
                     conn.commit()  # 确保日志 INSERT 立即提交
             cur.execute(_ENTRY_BY_GID_SQL, (gid,))
             row = cur.fetchone()
-            return {"data": dict(row) if row else {}}
+            data = dict(row) if row else {}
+            if data.get('process_flow_pic'):
+                data['process_flow_pic'] = _resolve_bop_pic_items(data['process_flow_pic'])
+            if data.get('process_chart_pic'):
+                data['process_chart_pic'] = _resolve_bop_pic_items(data['process_chart_pic'])
+            return {"data": data}
 
 
 @router.post("/pics/upload")
 def upload_bop_pic(body: BopPicUploadBody, _u=Depends(_WRITE)):
+    _log.info(
+        "bop pic upload request filename=%s mime=%s b64_len=%s",
+        body.filename,
+        body.mime,
+        len(body.data_b64 or ""),
+    )
     if not body.mime.startswith("image/"):
         raise HTTPException(400, "只允许上传图片文件")
     try:
         data = _b64.b64decode(body.data_b64, validate=True)
     except Exception:
         raise HTTPException(400, "base64 数据格式无效")
-    if len(data) > _BOP_PICS_MAX:
-        raise HTTPException(400, f"图片大小超过 5MB 限制")
     from pathlib import Path as _Path
     ext = _Path(body.filename).suffix.lower() or {
         "image/jpeg": ".jpg", "image/png": ".png",
         "image/gif": ".gif", "image/webp": ".webp",
     }.get(body.mime, ".jpg")
-    # ── MinIO 优先 ─────────────────────────────────────────────────────────────
+    _log.info(
+        "bop pic upload decoded filename=%s bytes=%s ext=%s",
+        body.filename,
+        len(data),
+        ext,
+    )
+    if len(data) > _BOP_PICS_MAX:
+        raise HTTPException(400, f"图片大小超过 5MB 限制")
     from backend.core import storage as _storage
     minio_url = _storage.upload(data, ext, body.mime, prefix="bop_pics")
+    _log.info(
+        "bop pic upload storage result filename=%s url=%s",
+        body.filename,
+        minio_url,
+    )
     if minio_url:
-        return {"url": minio_url}
-    # ── 本地磁盘 fallback ───────────────────────────────────────────────────────
+        payload = {"url": minio_url}
+        from backend.core import ois_storage as _ois_storage
+        ois_cfg = _ois_storage._get_ois_config()
+        public_base = str(ois_cfg.get('public_base_url') or '').rstrip('/')
+        identify = str(ois_cfg.get('identify') or '').strip()
+        if identify:
+            if public_base and minio_url.startswith(public_base + '/'):
+                payload['storage'] = 'ois'
+                payload['object_key'] = minio_url[len(public_base) + 1:]
+            elif not public_base and 'authorization=' in minio_url:
+                try:
+                    object_key = minio_url.split('://', 1)[1].split('/', 2)[2].split('?', 1)[0]
+                    payload['storage'] = 'ois'
+                    payload['object_key'] = object_key
+                except Exception:
+                    pass
+        return payload
     _BOP_PICS_DIR.mkdir(parents=True, exist_ok=True)
     name = _uuid.uuid4().hex + ext
     (_BOP_PICS_DIR / name).write_bytes(data)
+    _log.warning(
+        "bop pic upload fallback to local filename=%s saved_name=%s",
+        body.filename,
+        name,
+    )
     return {"url": f"/static/uploads/bop_pics/{name}"}
 
 @router.delete("/entries/{gid}", status_code=204)
@@ -1572,7 +1666,7 @@ def get_line_operations(
             'title':            r['title'] or '',
             'sort_order':       r['sort_order'],
             'parent_gid':       r['parent_gid'],
-            'process_flow_pic': _parse(r['process_flow_pic']),
+            'process_flow_pic': _resolve_bop_pic_items(_parse(r['process_flow_pic'])),
             'cad_sim_pics':     _parse(r['cad_sim_pics']),
         })
     return {'ok': True, 'data': data}

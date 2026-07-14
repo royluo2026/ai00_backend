@@ -40,25 +40,27 @@ EOF
   echo "[INFO] 已生成 backend/.env.dev（占位配置，请按需修改）"
 fi
 
-source "$ROOT_DIR/.venv/bin/activate"
+if [[ -x "$ROOT_DIR/.venv/Scripts/python.exe" ]]; then
+  VENV_PY="$ROOT_DIR/.venv/Scripts/python.exe"
+elif [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then
+  VENV_PY="$ROOT_DIR/.venv/bin/python"
+else
+  echo "[ERROR] 未找到虚拟环境 Python，可先运行 scripts/bootstrap.sh"
+  exit 1
+fi
 
 export ENV_FILE="$ENV_FILE"
 export PYTHONUNBUFFERED=1
 
-eval "$(python - "$ENV_FILE" <<'PY'
-import json
-import pathlib
-import sys
-
-env_path = pathlib.Path(sys.argv[1])
-for raw in env_path.read_text(encoding='utf-8').splitlines():
-    line = raw.strip()
-    if not line or line.startswith('#') or '=' not in line:
-        continue
-    key, value = line.split('=', 1)
-    print(f'export {key.strip()}={json.dumps(value)}')
-PY
-)"
+while IFS= read -r raw || [[ -n "$raw" ]]; do
+  line="${raw%$'\r'}"
+  line="${line#${line%%[![:space:]]*}}"
+  [[ -z "$line" || "$line" == \#* || "$line" != *=* ]] && continue
+  key="${line%%=*}"
+  value="${line#*=}"
+  key="${key%${key##*[![:space:]]}}"
+  export "${key}=${value}"
+done < "$ENV_FILE"
 
 HOST="${HOST:-0.0.0.0}"
 PORT="${PORT:-8080}"
@@ -67,7 +69,7 @@ if [[ "$HOST" == "0.0.0.0" || "$HOST" == "::" ]]; then
   PROBE_HOST="127.0.0.1"
 fi
 
-nohup python -m uvicorn backend.main:app --host "$HOST" --port "$PORT" > "$OUT_LOG" 2>&1 &
+nohup "$VENV_PY" -m uvicorn backend.main:app --host "$HOST" --port "$PORT" > "$OUT_LOG" 2>&1 &
 NEW_PID=$!
 echo "$NEW_PID" > "$PID_FILE"
 

@@ -27,6 +27,7 @@ from pydantic import BaseModel
 
 from backend.routers.deps import get_current_user_optional
 from backend.core import storage as _storage
+from backend.core import ois_storage as _ois_storage
 
 router = APIRouter(prefix="/api", tags=["uploads"])
 
@@ -49,6 +50,11 @@ class UpdateRequest(BaseModel):
     content: str | None = None    # 纯文本内容（csv / md / txt）
     data_b64: str | None = None   # base64 二进制内容（xlsx）
     file_url: str | None = None   # 原始完整 URL（MinIO 文件更新时传入，用于定位对象键）
+
+
+class OisResolveRequest(BaseModel):
+    object_key: str
+    expire_in_seconds: int = 1800
 
 
 @router.post("/uploads")
@@ -91,7 +97,17 @@ def upload_file(
     # ── MinIO 优先 ────────────────────────────────────────────────────────────
     minio_url = _storage.upload(data, original_ext, req.mime)
     if minio_url:
-        return {"url": minio_url, "name": req.filename, "mime": req.mime}
+        response = {"url": minio_url, "name": req.filename, "mime": req.mime}
+        ois_cfg = _ois_storage._get_ois_config()
+        identify = str(ois_cfg.get("identify") or "").strip()
+        if identify and minio_url.startswith('http'):
+            public_base = str(ois_cfg.get("public_base_url") or '').rstrip('/')
+            if public_base and minio_url.startswith(public_base + '/'):
+                response["storage"] = "ois"
+                response["object_key"] = minio_url[len(public_base) + 1:]
+            else:
+                response["storage"] = "minio"
+        return response
 
     # ── 本地磁盘 fallback ─────────────────────────────────────────────────────
     # 生成唯一文件名
@@ -107,6 +123,20 @@ def upload_file(
         "name": req.filename,
         "mime": req.mime,
     }
+
+
+@router.post("/uploads/ois/resolve")
+def resolve_ois_upload_url(
+    req: OisResolveRequest,
+    _user: dict = Depends(get_current_user_optional),
+):
+    object_key = (req.object_key or '').strip().lstrip('/')
+    if not object_key:
+        raise HTTPException(400, 'object_key 不能为空')
+    url = _ois_storage.generate_access_url(object_key, req.expire_in_seconds)
+    if not url:
+        raise HTTPException(404, '无法解析 OIS 文件访问地址')
+    return {"url": url}
 
 
 @router.put("/uploads/{filename}")

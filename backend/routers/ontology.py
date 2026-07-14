@@ -100,7 +100,7 @@ def _prop_row(r: dict) -> dict:
         "storage_hint":     r.get("storage_hint") or "meta",
         "mapped_column":    r.get("mapped_column"),
         "field_config":     r.get("field_config") or {},
-        "show_in_detail":   r.get("show_in_detail", True),
+        "show_in_detail":   bool(r["show_in_detail"]) if r.get("show_in_detail") is not None else True,
         "detail_order":     r.get("detail_order", 99),
     }
 
@@ -847,7 +847,13 @@ def get_class_schema(node_type: str, _u=Depends(get_current_user)):
                    ORDER BY r.sort_order, r.label_zh""",
                 ancestor_gids,
             )
-            relations = [dict(r) for r in cur.fetchall()]
+            relations = [
+                {
+                    **dict(r),
+                    "show_in_detail": bool(r["show_in_detail"]) if r.get("show_in_detail") is not None else True,
+                }
+                for r in cur.fetchall()
+            ]
 
     return {
         "node_type":  node_type,

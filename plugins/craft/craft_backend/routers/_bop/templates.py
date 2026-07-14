@@ -46,11 +46,12 @@ def save_as_template(src_gid: str, body: SaveAsTemplateBody, _u=Depends(_WRITE))
                 f"INSERT INTO workmanship_bop_bop_versions "
                 f"(gid,version_tag,bop_name,version_family_gid,"
                 f" project_gid,factory_gid,maturity,takt_time,"
-                f" version_type,owner_gid,change_note) "
-                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                f" status,meta,lifecycle_phase,lifecycle_state,visibility,version_type,owner_gid,change_note) "
+                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (new_tmpl_gid, body.template_name, body.template_name, new_tmpl_gid,
                  project_gid, body.factory_gid,
                  src_ver.get('maturity', 'concept'), src_ver.get('takt_time', 60),
+                 'active', json.dumps({}), 'init', json.dumps({}), 'team',
                  'template', user_gid, f'save-as-template from {src_gid}')
             )
             cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (new_tmpl_gid,))

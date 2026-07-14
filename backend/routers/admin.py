@@ -16,20 +16,31 @@ env 变量是启动默认值；super_admin 通过此 API 写入 PG 后生效，
   POST /admin/server-restart → 重启后端进程（NSSM 服务自动重拉）
 """
 import asyncio
+import json
 import os
 import re
+from pathlib import Path
 from typing import Optional
+from urllib.parse import quote
 
+import pymysql
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
 from backend.db.connection import get_conn
 from backend.config import get_settings
-from backend.routers.deps import require_role
+from backend.routers.deps import require_role, get_current_user_claims_only
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 _SUPER_ONLY = require_role("super_admin")
+
+
+def _require_super_claims(current_user: dict = Depends(get_current_user_claims_only)):
+    user_role = current_user.get("org_role") or current_user.get("system_role", "external")
+    if user_role != "super_admin" and current_user.get("system_role") != "super_admin":
+        raise HTTPException(status_code=403, detail="权限不足")
+    return current_user
 
 # 允许通过 API 写入的 key 白名单（防止任意写入敏感字段）
 _WRITABLE_KEYS = {
@@ -60,6 +71,130 @@ def _is_writable(key: str) -> bool:
 class ConfigBody(BaseModel):
     value: str
     description: Optional[str] = ""
+
+
+class CloudDbConfigBody(BaseModel):
+    host: str
+    port: int
+    user: str
+    password: str = ""
+    collab_db: str
+    public_db: str
+
+
+def _system_json_path() -> Path:
+    return Path.home() / '.ai00' / 'config' / 'system.json'
+
+
+def _load_system_json() -> dict:
+    path = _system_json_path()
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+
+
+def _save_system_json(data: dict) -> None:
+    path = _system_json_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+
+
+def _cloud_db_url_from_payload(body: CloudDbConfigBody) -> str:
+    user = quote(body.user, safe='')
+    password = quote(body.password, safe='')
+    db_name = quote(body.collab_db, safe='')
+    return f"mysql://{user}:{password}@{body.host}:{body.port}/{db_name}"
+
+
+def _cloud_db_config_from_system_json() -> dict:
+    raw = _load_system_json()
+    return raw.get('cloud_db_config') or raw.get('CLOUD_DB_CONFIG') or {}
+
+
+@router.get("/cloud-db-config")
+def get_cloud_db_config(_=Depends(_require_super_claims)):
+    cfg = _cloud_db_config_from_system_json()
+    return {
+        "success": True,
+        "data": {
+            "host": cfg.get("host", ""),
+            "port": cfg.get("port", 2883),
+            "user": cfg.get("user", ""),
+            "password_configured": bool(cfg.get("password")),
+            "collab_db": cfg.get("collab_db", ""),
+            "public_db": cfg.get("public_db", ""),
+        },
+    }
+
+
+@router.post("/cloud-db-config")
+def save_cloud_db_config(body: CloudDbConfigBody, current_user=Depends(_require_super_claims)):
+    print(f"[cloud-db-config] save hit role={current_user.get('org_role')} gid={current_user.get('gid')}", flush=True)
+    print(f"[cloud-db-config] save payload host={body.host!r} port={body.port!r} user={body.user!r} collab_db={body.collab_db!r} public_db={body.public_db!r} pwd_len={len(body.password or '')}", flush=True)
+    if not body.host.strip() or not body.user.strip() or not body.collab_db.strip():
+        raise HTTPException(status_code=400, detail="host、user、collab_db 不能为空")
+
+    raw = _load_system_json()
+    existing = raw.get('cloud_db_config') or raw.get('CLOUD_DB_CONFIG') or {}
+    password = body.password if body.password.strip() else existing.get('password', '')
+    cfg = {
+        "host": body.host.strip(),
+        "port": int(body.port or 2883),
+        "user": body.user.strip(),
+        "password": password,
+        "collab_db": body.collab_db.strip(),
+        "public_db": body.public_db.strip() or body.collab_db.strip(),
+        "users_db_url": _cloud_db_url_from_payload(
+            CloudDbConfigBody(
+                host=body.host.strip(),
+                port=int(body.port or 2883),
+                user=body.user.strip(),
+                password=password,
+                collab_db=body.collab_db.strip(),
+                public_db=body.public_db.strip() or body.collab_db.strip(),
+            )
+        ),
+    }
+    raw['cloud_db_config'] = cfg
+    path = _system_json_path()
+    print(f"[cloud-db-config] writing file path={path}", flush=True)
+    try:
+        _save_system_json(raw)
+        print(f"[cloud-db-config] write ok keys={list(raw.keys())}", flush=True)
+    except Exception as e:
+        import traceback
+        print(f"[cloud-db-config] write failed: {e}\n{traceback.format_exc()}", flush=True)
+        raise
+    return {"success": True, "msg": "云端数据库配置已保存"}
+
+
+@router.post("/cloud-db-config/test")
+def test_cloud_db_config(body: CloudDbConfigBody, _=Depends(_require_super_claims)):
+    if not body.host.strip() or not body.user.strip() or not body.collab_db.strip():
+        raise HTTPException(status_code=400, detail="host、user、collab_db 不能为空")
+    try:
+        conn = pymysql.connect(
+            host=body.host.strip(),
+            port=int(body.port or 2883),
+            user=body.user.strip(),
+            password=body.password,
+            database=body.collab_db.strip(),
+            charset='utf8mb4',
+            connect_timeout=8,
+            read_timeout=8,
+            write_timeout=8,
+            cursorclass=pymysql.cursors.DictCursor,
+        )
+        with conn.cursor() as cur:
+            cur.execute('SELECT 1 AS ok')
+            cur.fetchone()
+        conn.close()
+        return {"success": True, "msg": "MySQL 连接成功"}
+    except Exception as e:
+        return {"success": False, "msg": str(e)}
 
 
 # ── 读取 ──────────────────────────────────────────────────────────────────────

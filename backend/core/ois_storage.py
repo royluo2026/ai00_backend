@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import logging
 import uuid
+from urllib.parse import quote
 
 _log = logging.getLogger(__name__)
 
@@ -100,6 +101,37 @@ def _make_client():
         return None, str(e)
 
 
+def generate_access_url(object_key: str, expire_in_seconds: int = 1800) -> str | None:
+    if not is_enabled() or not object_key:
+        return None
+
+    cfg = _get_ois_config()
+    identify = cfg.get("identify", "")
+    if not identify:
+        return None
+
+    client, err = _make_client()
+    if not client:
+        _log.error("OIS 客户端初始化失败: %s", err)
+        return None
+
+    try:
+        public_base = cfg.get("public_base_url", "").rstrip("/")
+        if public_base:
+            return f"{public_base}/{object_key.lstrip('/')}"
+        response = client.generate_pre_signed_url(identify, object_key, expire_in_seconds)
+        if not (hasattr(response, "is_succeed") and response.is_succeed()):
+            code = getattr(response, "code", "?")
+            msg = getattr(response, "message", "?")
+            _log.error("OIS 生成签名 URL 失败: code=%s message=%s", code, msg)
+            return None
+        return getattr(response, "data", None)
+    except Exception as e:
+        _log.error("OIS 生成签名 URL 失败: %s", e)
+        return None
+
+
+
 def upload(data: bytes, ext: str, mime: str, prefix: str = "uploads") -> str | None:
     """上传文件到 OIS，成功返回访问 URL，失败或未配置返回 None。"""
     if not is_enabled():
@@ -108,6 +140,7 @@ def upload(data: bytes, ext: str, mime: str, prefix: str = "uploads") -> str | N
     cfg = _get_ois_config()
     identify = cfg.get("identify", "")
     file_key = f"{prefix}/{uuid.uuid4().hex}{ext}"
+    _log.info("ois upload start identify=%s file_key=%s mime=%s bytes=%s", identify, file_key, mime, len(data))
 
     client, err = _make_client()
     if not client:
@@ -121,17 +154,18 @@ def upload(data: bytes, ext: str, mime: str, prefix: str = "uploads") -> str | N
         if not (hasattr(response, "is_succeed") and response.is_succeed()):
             code = getattr(response, "code", "?")
             msg  = getattr(response, "message", "?")
-            _log.error("OIS 上传失败: code=%s message=%s", code, msg)
+            _log.error("OIS 上传失败: code=%s message=%s file_key=%s", code, msg, file_key)
             return None
 
         uploaded_key = getattr(getattr(response, "data", None), "object_key", file_key)
-
-        public_base = cfg.get("public_base_url", "").rstrip("/")
-        if public_base:
-            return f"{public_base}/{uploaded_key.lstrip('/')}"
-        ois3_url = (cfg.get("ois3_url") or cfg.get("api_base", "")).rstrip("/")
-        return f"{ois3_url}/{identify}/{uploaded_key.lstrip('/')}"
+        _log.info("ois upload success requested_key=%s uploaded_key=%s", file_key, uploaded_key)
+        access_url = generate_access_url(uploaded_key)
+        _log.info("ois upload access url uploaded_key=%s url=%s", uploaded_key, access_url)
+        if access_url:
+            return access_url
+        _log.warning("OIS 上传成功但无法生成访问 URL")
+        return None
 
     except Exception as e:
-        _log.error("OIS 上传失败: %s", e)
+        _log.error("OIS 上传失败: %s | file_key=%s", e, file_key)
         return None

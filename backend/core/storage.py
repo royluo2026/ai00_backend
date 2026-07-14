@@ -175,11 +175,13 @@ def upload(data: bytes, ext: str, mime: str, prefix: str = "") -> str | None:
     mime    MIME 类型，如 "image/jpeg"
     prefix  可选子目录前缀，如 "bop_pics"
     """
+    _log.info("storage upload start prefix=%s ext=%s mime=%s bytes=%s", prefix, ext, mime, len(data))
     # 1. OIS（理想汽车内网对象存储）
     try:
         from backend.core import ois_storage as _ois
         if _ois.is_enabled():
             url = _ois.upload(data, ext, mime, prefix)
+            _log.info("storage upload ois result url=%s", url)
             if url:
                 return url
     except Exception as _e:
@@ -190,6 +192,7 @@ def upload(data: bytes, ext: str, mime: str, prefix: str = "") -> str | None:
         return None
 
     key = _object_key(ext, prefix)
+    _log.info("storage upload using minio key=%s public_url=%s", key, _public_url)
     try:
         _s3.put_object(
             Bucket=_bucket,
