@@ -4,14 +4,14 @@ from typing import Any
 
 
 _HISTORY_DDL = (
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN IF NOT EXISTS batch_status TEXT NOT NULL DEFAULT 'active'",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN IF NOT EXISTS redo_guard_json JSON DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN IF NOT EXISTS touched_refs_json JSON DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN IF NOT EXISTS undone_at DATETIME(6) DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN IF NOT EXISTS undone_by TEXT DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN IF NOT EXISTS redone_at DATETIME(6) DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN IF NOT EXISTS redone_by TEXT DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN IF NOT EXISTS invalidate_reason TEXT DEFAULT NULL",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN batch_status TEXT NOT NULL DEFAULT 'active'",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redo_guard_json JSON DEFAULT NULL",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN touched_refs_json JSON DEFAULT NULL",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN undone_at DATETIME(6) DEFAULT NULL",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN undone_by TEXT DEFAULT NULL",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redone_at DATETIME(6) DEFAULT NULL",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redone_by TEXT DEFAULT NULL",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN invalidate_reason TEXT DEFAULT NULL",
     "CREATE TABLE IF NOT EXISTS workmanship_bop_bop_line_history_state (version_gid CHAR(36) NOT NULL, line_gid CHAR(36) NOT NULL, current_batch_id TEXT DEFAULT NULL, current_direction TEXT NOT NULL DEFAULT 'active', updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), PRIMARY KEY (version_gid, line_gid)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
 )
 
@@ -27,7 +27,13 @@ def can_manage_line_history(user: dict | None, performed_by: str | None) -> bool
 
 def ensure_history_schema(cur) -> None:
     for sql in _HISTORY_DDL:
-        cur.execute(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            # MySQL/OceanBase error 1060 = Duplicate column name (column already exists, safe to skip)
+            if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
+                continue
+            raise
 
 
 def latest_active_batch_sql() -> str:
