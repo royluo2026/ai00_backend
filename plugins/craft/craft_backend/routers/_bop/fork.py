@@ -183,13 +183,14 @@ def fork_version(source_gid: str, body: ForkBody, _u=Depends(_WRITE)):
                 cur.execute(
                     "INSERT INTO workmanship_bop_bop_entries "
                     "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                    " title, vpps, vpps_desc, parent_bop_title, child_vpps,"
-                    " owner_gid, meta) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
+                    " parent_bop_title, child_vpps, owner_gid, meta) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (new_gid, new_ver_gid, new_parent,
                      e['node_type'], e['sort_order'], e.get('level', 0),
                      _AI00_LEVEL.get(e['node_type']),
                      _fval('title'), _fval('vpps'), _fval('vpps_desc'),
+                     '', False, '', '',
                      _fval('parent_bop_title'),
                      json.dumps(e.get('child_vpps') or []),
                      _fval('owner_gid'),

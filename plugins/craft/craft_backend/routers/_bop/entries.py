@@ -27,10 +27,11 @@ from ._constants import (
 from ._helpers import (
     _row, _rows, _not_found,
     _check_version_frozen, _parent_level,
-    _sync_entry_title, _sync_child_vpps,
+    _sync_child_vpps,
     _do_copy, _check_auto_link_rules,
-    _get_line_gid, _log_entry_op,
+    _get_line_gid, _log_entry_op, _check_line_editable,
 )
+from . import _history
 
 _log = logging.getLogger(__name__)
 
@@ -387,6 +388,8 @@ def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
         with conn.cursor() as cur:
             ver_gid = body.get_version_gid()
             _check_version_frozen(cur, ver_gid)
+            if body.parent_gid:
+                _check_line_editable(cur, ver_gid, body.parent_gid, _u)
             level   = _parent_level(cur, body.parent_gid)
             ai00_lv = _AI00_LEVEL.get(body.node_type)
 
@@ -463,13 +466,22 @@ def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
             conn.commit()
             cur.execute(_ENTRY_BY_GID_SQL, (entry_gid,))
             row = cur.fetchone()
+            entry_snapshot = dict(row) if row else {"gid": entry_gid, "title": body.title, "node_type": body.node_type, "parent_gid": body.parent_gid, "vpps": body.vpps}
+            link_snapshot = {
+                "gid": link_gid,
+                "entry_gid": entry_gid,
+                "version_gid": ver_gid,
+                "link_type": link_type,
+                "entity_gid": entity_gid,
+                "is_primary": True,
+            } if entity_info else None
+            owned_snapshot = {"table": e_table, "gid": entity_gid, "title": body.title} if entity_info else None
             # ── 操作日志 ──
             _log_entry_op(cur,
                 version_gid=ver_gid, entry_gid=entry_gid,
                 entry_title=body.title or '',
                 op_type='create_entry', old_state=None,
-                new_state={'title': body.title, 'node_type': body.node_type,
-                           'parent_gid': body.parent_gid, 'vpps': body.vpps},
+                new_state=_history.build_create_entry_snapshot(entry_snapshot, link_snapshot, owned_snapshot),
                 user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
             conn.commit()  # 确保日志 INSERT 立即提交
             # 规则检验（WARN 模式，不阻断保存）
@@ -514,7 +526,9 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT e.version_gid, e.title, e.node_type, v.project_gid,"
-                " e.parent_gid, e.sort_order, e.vpps, e.vpps_desc, e.parent_bop_title "
+                " e.parent_gid, e.sort_order, e.vpps, e.vpps_desc, e.parent_bop_title,"
+                " COALESCE(e.process_flow_pic, '[]') AS process_flow_pic,"
+                " COALESCE(JSON_EXTRACT(e.meta, '$.cad_sim_pics'), JSON_ARRAY()) AS cad_sim_pics "
                 "FROM workmanship_bop_bop_entries e "
                 "JOIN workmanship_bop_bop_versions v ON v.gid = e.version_gid "
                 "WHERE e.gid = %s",
@@ -523,6 +537,7 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
             entry_row = cur.fetchone()
             if entry_row:
                 _check_version_frozen(cur, entry_row['version_gid'])
+                _check_line_editable(cur, entry_row['version_gid'], gid, _u)
             cur.execute(
                 f"UPDATE workmanship_bop_bop_entries SET {', '.join(set_parts)} WHERE gid=%s",
                 vals + [gid]
@@ -554,18 +569,14 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
             conn.commit()
             # ── 操作日志 ──
             if entry_row:
-                _TRACKABLE = ('title', 'parent_gid', 'node_type', 'sort_order',
-                              'vpps', 'vpps_desc', 'parent_bop_title')
-                changed = {k: data[k] for k in _TRACKABLE if k in data}
-                if changed:
-                    old_state = {k: entry_row.get(k) for k in changed}
+                for event in _history.build_entry_log_events(dict(entry_row), data):
                     _log_entry_op(cur,
                         version_gid=entry_row['version_gid'],
-                        entry_gid=gid, entry_title=entry_row['title'] or '',
-                        op_type='update_entry',
-                        old_state=old_state, new_state=changed,
+                        entry_gid=gid, entry_title=(data.get('title') or entry_row['title'] or ''),
+                        op_type=event['op_type'],
+                        old_state=event['old_state'], new_state=event['new_state'],
                         user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
-                    conn.commit()  # 确保日志 INSERT 立即提交
+                conn.commit()  # 确保日志 INSERT 立即提交
             cur.execute(_ENTRY_BY_GID_SQL, (gid,))
             row = cur.fetchone()
             data = dict(row) if row else {}
@@ -653,6 +664,7 @@ def delete_entry(gid: str, _u=Depends(_WRITE)):
             entry_row = cur.fetchone()
             if entry_row:
                 _check_version_frozen(cur, entry_row['version_gid'])
+                _check_line_editable(cur, entry_row['version_gid'], gid, _u)
 
             # 软删除 entry 本身
             cur.execute(
@@ -691,14 +703,28 @@ def delete_entry(gid: str, _u=Depends(_WRITE)):
             if entry_row and entry_row['parent_gid']:
                 _sync_child_vpps(cur, entry_row['parent_gid'], entry_row['version_gid'])
             conn.commit()
+            link_snapshots = [
+                {
+                    "gid": f"link-{idx}",
+                    "entry_gid": gid,
+                    "version_gid": entry_row['version_gid'],
+                    "link_type": lk['link_type'],
+                    "entity_gid": lk['entity_gid'],
+                    "is_primary": True,
+                }
+                for idx, lk in enumerate(links, start=1)
+            ]
+            owned_snapshots = [
+                {"table": _LINK_TARGET_TABLES[lk['link_type']][0], "gid": lk['entity_gid'], "title": entry_row.get('title')}
+                for lk in links if lk['link_type'] in _OWNED_ENTITY_TYPES and _LINK_TARGET_TABLES.get(lk['link_type'])
+            ]
             # ── 操作日志 ──
             if entry_row:
                 _log_entry_op(cur,
                     version_gid=entry_row['version_gid'],
                     entry_gid=gid, entry_title=entry_row.get('title') or '',
                     op_type='delete_entry', new_state=None,
-                    old_state={'title': entry_row.get('title'), 'node_type': entry_row.get('node_type'),
-                               'parent_gid': entry_row.get('parent_gid'), 'vpps': entry_row.get('vpps')},
+                    old_state=_history.build_delete_entry_snapshot(dict(entry_row), link_snapshots, owned_snapshots),
                     user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
                 conn.commit()  # 确保日志 INSERT 立即提交
 
@@ -954,11 +980,13 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         "INSERT INTO workmanship_bop_bop_entries"
                         "(gid, version_gid, parent_gid, node_type,"
                         " sort_order, level, ai00_level,"
-                        " title, vpps, vpps_desc, parent_bop_title, child_vpps)"
-                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]')",
+                        " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
+                        " parent_bop_title, child_vpps)"
+                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]')",
                         (e_gid, version_gid, parent_gid, node_type,
                          sort_val, lv, ai00_lv,
                          title, vpps, vpps_desc,
+                         '', False, '', '',
                          parent_label)
                     )
 
@@ -1350,6 +1378,7 @@ def create_entry_link(body: CreateEntryLinkBody, _u=Depends(_WRITE)):
             if not entry:
                 raise HTTPException(404, "bop_entry 不存在")
             _check_version_frozen(cur, entry['version_gid'])
+            _check_line_editable(cur, entry['version_gid'], body.entry_gid, _u)
 
             gid = str(next_gid())
             user_gid = _u.get('gid') if isinstance(_u, dict) else None
@@ -1361,6 +1390,17 @@ def create_entry_link(body: CreateEntryLinkBody, _u=Depends(_WRITE)):
                 (gid, body.entry_gid, entry['version_gid'], body.link_type,
                  body.entity_gid, body.is_primary, user_gid),
             )
+            _log_entry_op(cur,
+                version_gid=entry['version_gid'],
+                entry_gid=body.entry_gid, entry_title='',
+                op_type='add_link',
+                old_state=None,
+                new_state={
+                    'link_type': body.link_type,
+                    'entity_gid': body.entity_gid,
+                    'is_primary': body.is_primary,
+                },
+                user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
             conn.commit()
     return {"data": {"gid": gid}}
 
@@ -1370,7 +1410,7 @@ def delete_entry_link(gid: str, _u=Depends(_WRITE)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT l.entry_gid, e.version_gid "
+                "SELECT l.entry_gid, e.version_gid, l.link_type, l.entity_gid, l.is_primary, e.title AS entry_title "
                 "FROM workmanship_bop_bop_entry_links l "
                 "JOIN workmanship_bop_bop_entries e ON e.gid = l.entry_gid "
                 "WHERE l.gid=%s",
@@ -1380,6 +1420,18 @@ def delete_entry_link(gid: str, _u=Depends(_WRITE)):
             if not row:
                 _not_found(gid)
             _check_version_frozen(cur, row['version_gid'])
+            _check_line_editable(cur, row['version_gid'], row['entry_gid'], _u)
+            _log_entry_op(cur,
+                version_gid=row['version_gid'],
+                entry_gid=row['entry_gid'], entry_title=row.get('entry_title') or '',
+                op_type='remove_link',
+                old_state={
+                    'link_type': row['link_type'],
+                    'entity_gid': row['entity_gid'],
+                    'is_primary': row['is_primary'],
+                },
+                new_state=None,
+                user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
             cur.execute("DELETE FROM workmanship_bop_bop_entry_links WHERE gid=%s", (gid,))
             conn.commit()
 
@@ -1508,6 +1560,16 @@ def patch_entity_detail(body: EntityPatchBody, _u=Depends(_WRITE)):
 
     with get_conn() as conn:
         with conn.cursor() as cur:
+            cur.execute(
+                "SELECT l.version_gid, l.entry_gid FROM workmanship_bop_bop_entry_links l "
+                "WHERE l.entity_gid=%s AND l.link_type=%s AND l.deleted_at IS NULL "
+                "ORDER BY l.is_primary DESC, l.created_at ASC LIMIT 1",
+                (body.ref_gid, body.link_type),
+            )
+            binding = cur.fetchone()
+            if not binding:
+                raise HTTPException(404, f"实体 {body.ref_gid} 未关联到 BOP 条目")
+            _check_line_editable(cur, binding['version_gid'], binding['entry_gid'], _u)
             cur.execute(f"SELECT 1 FROM {table} WHERE {gid_col}=%s LIMIT 1", (body.ref_gid,))
             if not cur.fetchone():
                 raise HTTPException(404, f"实体 {body.ref_gid} 不存在")
@@ -1755,12 +1817,7 @@ def rollback_entry_history(gid: str, log_gid: str, _u=Depends(_WRITE)):
             if log_row['op_type'] not in ('update_entry', 'create_entry'):
                 raise HTTPException(400, "该操作类型不支持撤销")
 
-            # ── 权限检查：本人 / project_admin / super_admin ──────────────
-            actor_gid  = _u.get('gid', '')
-            actor_role = _u.get('org_role') or _u.get('system_role', 'external')
-            is_own_op  = actor_gid and actor_gid == log_row.get('performed_by')
-            is_admin   = actor_role in ('super_admin', 'project_admin', 'team_admin')
-            if not (is_own_op or is_admin):
+            if not _history.can_manage_line_history(_u, log_row.get('performed_by')):
                 raise HTTPException(403, "无权撤销他人的操作，请联系项目管理员")
             if log_row['rolled_back']:
                 raise HTTPException(400, "该操作已回滚")

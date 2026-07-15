@@ -21,7 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user, require_role, scope_visible_clause
+from backend.routers.deps import get_current_user, require_role, scope_visible_clause, _get_user_grants, _derive_org_role
 from backend.utils.gid import next_gid
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
@@ -69,10 +69,9 @@ class AddMemberBody(BaseModel):
     section_gid: Optional[str] = None
 
 
-class LineAssignmentBody(BaseModel):
-    slot: str                        # 'project_owner' | 'section_lead'
-    section_gid: Optional[str] = None
-    user_gid: Optional[str] = None   # None = clear the slot
+class LineGrantBody(BaseModel):
+    user_gid: Optional[str] = None
+    line_gid: str
 
 
 class CreateVehicleModelBody(BaseModel):
@@ -83,8 +82,23 @@ class CreateVehicleModelBody(BaseModel):
     team_id: Optional[str] = None
 
 
-def _row_to_project(r: dict) -> dict:
-    """将 RealDictRow 序列化为前端需要的字典（统一处理时间戳/None）。"""
+def _get_editable_line_gids(cur, user: dict, project_gid: str) -> set[str]:
+    org_role = user.get("org_role") or _derive_org_role(user.get("system_role", "external"))
+    if org_role == "super_admin":
+        cur.execute(
+            "SELECT gid FROM workmanship_bop_bop_entries WHERE node_type = 'line_process' AND is_deleted = FALSE"
+        )
+        return {r["gid"] for r in cur.fetchall()}
+
+    if _can_manage_project_lines(user, project_gid):
+        cur.execute(
+            "SELECT gid FROM workmanship_bop_bop_entries WHERE node_type = 'line_process' AND is_deleted = FALSE"
+        )
+        return {r["gid"] for r in cur.fetchall()}
+
+    grants = _get_user_grants(user["gid"])
+    return {g["scope_gid"] for g in grants if g["grant_type"] == "section_lead" and g.get("scope_gid")}
+def _row_to_project(r):
     return {
         "gid":               r["gid"],
         "name":              r["name"],
@@ -361,8 +375,9 @@ def list_project_members(gid: str, current_user: dict = Depends(get_current_user
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT pm.gid, pm.user_gid, u.name, u.email, u.avatar_url, "
-                "pm.role, pm.scope_gid, pm.created_at "
+                "pm.role, pm.scope_gid, pm.scope_type, pm.created_at, be.title AS line_title "
                 "FROM workmanship_auth_project_members pm JOIN workmanship_auth_users u ON pm.user_gid = u.gid "
+                "LEFT JOIN workmanship_bop_bop_entries be ON pm.scope_gid = be.gid "
                 "WHERE pm.project_gid = %s ORDER BY pm.created_at",
                 (gid,)
             )
@@ -371,7 +386,8 @@ def list_project_members(gid: str, current_user: dict = Depends(get_current_user
         {
             "gid": r["gid"], "user_gid": r["user_gid"], "name": r["name"],
             "email": r["email"], "avatar_url": r["avatar_url"],
-            "project_role": r["role"], "section_gid": r["scope_gid"],
+            "project_role": r["role"], "scope_gid": r["scope_gid"],
+            "scope_type": r.get("scope_type") or "", "line_title": r.get("line_title") or "",
             "created_at": str(r["created_at"])
         }
         for r in rows
@@ -439,42 +455,44 @@ def get_project_bop_lines(gid: str, current_user: dict = Depends(get_current_use
     ]}
 
 
-@router.put("/{gid}/line-assignment")
-def upsert_line_assignment(gid: str, body: LineAssignmentBody, current_user: dict = Depends(_PROJECT_WRITE)):
-    """插槽式指派 project_owner 或 section_lead。传 user_gid=None 则清空该槽位。"""
+@router.get("/{gid}/line-permissions")
+def get_project_line_permissions(gid: str, current_user: dict = Depends(get_current_user)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid = %s AND is_deleted = FALSE", (gid,))
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="项目不存在")
-            if body.slot == "project_owner":
+            editable = _get_editable_line_gids(cur, current_user, gid)
+    return {"success": True, "data": {"editable_line_gids": sorted(editable)}}
+
+
+@router.put("/{gid}/line-assignment")
+def upsert_line_assignment(gid: str, body: LineGrantBody, current_user: dict = Depends(get_current_user)):
+    """按线体授予或撤销 section_lead grant。传 user_gid=None 则清空该线体管理员。"""
+    if not body.line_gid:
+        raise HTTPException(status_code=400, detail="line_gid 不能为空")
+    if not _can_manage_project_lines(current_user, gid):
+        raise HTTPException(status_code=403, detail="权限不足")
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid = %s AND is_deleted = FALSE", (gid,))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="项目不存在")
+            cur.execute(
+                "SELECT 1 FROM workmanship_bop_bop_entries WHERE gid = %s AND node_type = 'line_process' AND is_deleted = FALSE",
+                (body.line_gid,)
+            )
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="线体不存在")
+            cur.execute(
+                "DELETE FROM workmanship_auth_permission_grants WHERE grant_type = 'section_lead' AND scope_gid = %s",
+                (body.line_gid,)
+            )
+            if body.user_gid:
                 cur.execute(
-                    "DELETE FROM workmanship_auth_project_members WHERE project_gid = %s AND role = 'project_manager'",
-                    (gid,)
+                    "INSERT INTO workmanship_auth_permission_grants (gid, grantee_gid, grant_type, scope_gid, granted_by) "
+                    "VALUES (%s, %s, 'section_lead', %s, %s)",
+                    (str(next_gid()), body.user_gid, body.line_gid, current_user["gid"])
                 )
-                if body.user_gid:
-                    mgid = str(next_gid())
-                    cur.execute(
-                        "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role) "
-                        "VALUES (%s, %s, %s, 'project_manager')",
-                        (mgid, gid, body.user_gid)
-                    )
-            elif body.slot == "section_lead":
-                if not body.section_gid:
-                    raise HTTPException(status_code=400, detail="section_lead 需提供 section_gid")
-                cur.execute(
-                    "DELETE FROM workmanship_auth_project_members "
-                    "WHERE project_gid = %s AND role = 'section_owner' AND scope_gid = %s",
-                    (gid, body.section_gid)
-                )
-                if body.user_gid:
-                    mgid = str(next_gid())
-                    cur.execute(
-                        "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role, scope_type, scope_gid) "
-                        "VALUES (%s, %s, %s, 'section_owner', 'section', %s)",
-                        (mgid, gid, body.user_gid, body.section_gid)
-                    )
-            else:
-                raise HTTPException(status_code=400, detail=f"无效 slot: {body.slot}")
         conn.commit()
     return {"success": True}

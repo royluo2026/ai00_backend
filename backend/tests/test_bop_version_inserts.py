@@ -112,13 +112,48 @@ def test_fork_version_insert_includes_required_defaults(monkeypatch):
     assert result == {'data': {'gid': 'forked'}, 'entries_count': 0}
 
 
-def test_template_version_insert_includes_required_defaults(monkeypatch):
+def test_fork_entry_insert_includes_required_defaults(monkeypatch):
+    cursor = FakeCursor(
+        fetchone_results=[
+            {'gid': 'src', 'project_gid': 'p1', 'factory_gid': 'f1', 'vehicle_model_gid': 'vm1', 'maturity': 'concept', 'takt_time': 60, 'bop_name': '源版本'},
+            {'gid': 'forked'},
+        ],
+        fetchall_results=[[
+            {
+                'gid': 'entry-1', 'parent_gid': None, 'node_type': 'process', 'sort_order': 1,
+                'level': 0, 'ai00_level': 4, 'title': '工序A', 'vpps': None, 'vpps_desc': None,
+                'parent_bop_title': None, 'child_vpps': [], 'owner_gid': None, 'meta': {}
+            }
+        ]],
+    )
+    conn = FakeConn(cursor)
+
+    monkeypatch.setattr(fork, 'get_conn', FakeGetConn(conn))
+    monkeypatch.setattr(fork, 'next_gid', lambda: 'forked-gid')
+
+    body = fork.ForkBody(target_version_tag='V002')
+    fork.fork_version('src', body, DummyUser(gid='user-1'))
+
+    entry_insert_sql, entry_insert_params = next((sql, params) for sql, params in cursor.executed if 'INSERT INTO workmanship_bop_bop_entries' in sql)
+    assert 'vpps_part' in entry_insert_sql
+    assert 'part_feed' in entry_insert_sql
+    assert entry_insert_params[10] == ''
+    assert entry_insert_params[11] is False
+
+
+def test_template_entry_insert_includes_required_defaults(monkeypatch):
     cursor = FakeCursor(
         fetchone_results=[
             {'gid': 'src', 'project_gid': 'p1', 'factory_gid': 'f1', 'vehicle_model_gid': 'vm1', 'maturity': 'concept', 'takt_time': 60},
             {'gid': 'template'},
         ],
-        fetchall_results=[[]],
+        fetchall_results=[[
+            {
+                'gid': 'entry-1', 'parent_gid': None, 'node_type': 'station_process', 'sort_order': 1,
+                'level': 0, 'ai00_level': 2, 'title': '工位A', 'vpps': None, 'vpps_desc': None,
+                'parent_bop_title': None, 'child_vpps': [], 'owner_gid': None, 'meta': {}
+            }
+        ]],
     )
     conn = FakeConn(cursor)
 
@@ -126,11 +161,12 @@ def test_template_version_insert_includes_required_defaults(monkeypatch):
     monkeypatch.setattr(templates, 'next_gid', lambda: 'template-gid')
 
     body = templates.SaveAsTemplateBody(factory_gid='f1', template_name='模板A')
-    result = templates.save_as_template('src', body, DummyUser(gid='user-1'))
+    templates.save_as_template('src', body, DummyUser(gid='user-1'))
 
-    insert_sql, insert_params = next((sql, params) for sql, params in cursor.executed if 'INSERT INTO workmanship_bop_bop_versions' in sql)
-    assert 'status' in insert_sql
-    assert 'meta' in insert_sql
-    assert 'lifecycle_phase' in insert_sql
-    assert 'lifecycle_state' in insert_sql
-    assert result == {'data': {'gid': 'template'}, 'entries_count': 0}
+    entry_insert_sql, entry_insert_params = next((sql, params) for sql, params in cursor.executed if 'INSERT INTO workmanship_bop_bop_entries' in sql)
+    assert 'vpps_part' in entry_insert_sql
+    assert 'part_feed' in entry_insert_sql
+    assert entry_insert_params[10] == ''
+    assert entry_insert_params[11] is False
+
+

@@ -159,6 +159,47 @@ def _parent_level(cur, parent_gid: Optional[str]) -> int:
     return (row['level'] + 1) if row else 0
 
 
+def _get_entry_line_gid(cur, entry_gid: str) -> Optional[str]:
+    cur.execute("""
+        WITH RECURSIVE ancestors AS (
+            SELECT gid, parent_gid, node_type
+            FROM workmanship_bop_bop_entries
+            WHERE gid=%s
+            UNION ALL
+            SELECT e.gid, e.parent_gid, e.node_type
+            FROM workmanship_bop_bop_entries e
+            JOIN ancestors a ON a.parent_gid = e.gid
+        )
+        SELECT gid FROM ancestors WHERE node_type='line_process' LIMIT 1
+    """, (entry_gid,))
+    row = cur.fetchone()
+    return row['gid'] if row else None
+
+
+
+def _check_line_editable(cur, version_gid: str, entry_gid: str, user: dict, allow_copy: bool = False):
+    from backend.routers.deps import _get_user_grants, _derive_org_role
+
+    org_role = user.get('org_role') or _derive_org_role(user.get('system_role', 'external'))
+    if org_role in ('super_admin', 'team_admin', 'project_admin'):
+        return
+
+    cur.execute("SELECT project_gid FROM workmanship_bop_bop_versions WHERE gid=%s", (version_gid,))
+    ver = cur.fetchone()
+    project_gid = ver['project_gid'] if ver else None
+    grants = _get_user_grants(user.get('gid', ''))
+    if project_gid and any(g['grant_type'] == 'project_owner' and g.get('scope_gid') == project_gid for g in grants):
+        return
+
+    line_gid = _get_entry_line_gid(cur, entry_gid)
+    if line_gid and any(g['grant_type'] == 'section_lead' and g.get('scope_gid') == line_gid for g in grants):
+        return
+
+    if allow_copy:
+        return
+    raise HTTPException(403, "当前线体无编辑权限（只读）")
+
+
 def _sync_entry_title(cur, entity_gid: str, new_title: str):
     """实体表 title 变更后，同步到 bop_entries（跳过冻结版本）"""
     cur.execute("""

@@ -83,12 +83,14 @@ def save_as_template(src_gid: str, body: SaveAsTemplateBody, _u=Depends(_WRITE))
                 cur.execute(
                     "INSERT INTO workmanship_bop_bop_entries "
                     "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                    " title, vpps, vpps_desc, parent_bop_title, child_vpps, owner_gid, meta) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
+                    " parent_bop_title, child_vpps, owner_gid, meta) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (new_gid_t, new_tmpl_gid, new_par_t,
                      e['node_type'], e['sort_order'], e.get('level', 0),
                      _AI00_LEVEL.get(e['node_type']),
                      e.get('title'), e.get('vpps'), e.get('vpps_desc'),
+                     '', False, '', '',
                      e.get('parent_bop_title'),
                      json.dumps(e.get('child_vpps') or []),
                      e.get('owner_gid'), json.dumps(e.get('meta') or {}))

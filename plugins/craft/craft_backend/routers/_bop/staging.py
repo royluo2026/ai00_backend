@@ -13,7 +13,7 @@ from backend.db.connection import get_conn
 from backend.utils.gid import next_gid
 
 from ._constants import _WRITE, _READ, _AI00_LEVEL
-from ._helpers import _not_found, _check_version_frozen, _check_frozen_by_version, _parent_level, _sync_child_vpps
+from ._helpers import _not_found, _check_version_frozen, _check_frozen_by_version, _parent_level, _sync_child_vpps, _log_entry_op, _check_line_editable
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
 
@@ -127,6 +127,7 @@ def demote_entry(gid: str, _u=Depends(_WRITE)):
             if not entry:
                 _not_found(gid)
             _check_version_frozen(cur, entry['version_gid'])
+            _check_line_editable(cur, entry['version_gid'], gid, _u)
 
             descendant_gids = []
             queue = [gid]
@@ -161,6 +162,21 @@ def demote_entry(gid: str, _u=Depends(_WRITE)):
                 (staging_gid, entry['version_gid'], entry['node_type'],
                  entry['title'], entry['vpps'], gid, len(descendant_gids), user_gid),
             )
+            _log_entry_op(cur,
+                version_gid=entry['version_gid'],
+                entry_gid=gid, entry_title=entry.get('title') or '',
+                op_type='demote_entry',
+                old_state={
+                    'parent_gid': entry.get('parent_gid'),
+                    'node_type': entry.get('node_type'),
+                    'title': entry.get('title'),
+                    'vpps': entry.get('vpps'),
+                },
+                new_state={
+                    'staging_gid': staging_gid,
+                    'child_count': len(descendant_gids),
+                },
+                user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
             conn.commit()
 
     return {"data": {"staging_gid": staging_gid, "child_count": len(descendant_gids)}}
@@ -179,6 +195,8 @@ def promote_staging(gid: str, body: PromoteBody, _u=Depends(_WRITE)):
                 _not_found(gid)
             version_gid = staging['bop_version_gid']
             _check_version_frozen(cur, version_gid)
+            if body.parent_gid:
+                _check_line_editable(cur, version_gid, body.parent_gid, _u)
 
             result_gid = None
 
@@ -239,6 +257,24 @@ def promote_staging(gid: str, body: PromoteBody, _u=Depends(_WRITE)):
                          staging['title'], staging['vpps']),
                     )
                     result_gid = entry_gid
+
+            _log_entry_op(cur,
+                version_gid=version_gid,
+                entry_gid=result_gid or (staging.get('original_entry_gid') or ''),
+                entry_title=(staging.get('title') or ''),
+                op_type='promote_staging',
+                old_state={
+                    'staging_gid': gid,
+                    'node_type': staging.get('node_type'),
+                    'title': staging.get('title'),
+                    'vpps': staging.get('vpps'),
+                },
+                new_state={
+                    'entry_gid': result_gid,
+                    'parent_gid': body.parent_gid,
+                    'sort_order': body.sort_order,
+                },
+                user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
 
             cur.execute("DELETE FROM workmanship_bop_bop_staging WHERE gid=%s", (gid,))
             conn.commit()

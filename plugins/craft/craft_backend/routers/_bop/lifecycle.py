@@ -14,6 +14,7 @@ from backend.db.connection import get_conn
 from backend.utils.gid import next_gid
 
 from ._constants import _WRITE, _READ
+from . import _history
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
 
@@ -629,6 +630,87 @@ def rollback_to_checkpoint(
                 "restored_entries": len(entries_snap),
                 "restored_links":   len(links_snap),
             }
+
+
+
+
+@router.get("/versions/{gid}/lifecycle/lines/{line_gid}/history")
+def get_line_history(
+    gid: str,
+    line_gid: str,
+    limit: int = Query(50, le=200),
+    _u=Depends(_READ),
+):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            history = _history.fetch_line_history(cur, gid, line_gid, limit)
+            return {
+                "data": history["items"],
+                "latest_active_batch_id": history["latest_active_batch_id"],
+            }
+
+
+
+
+@router.post("/versions/{gid}/lifecycle/lines/{line_gid}/undo")
+def undo_line_history(
+    gid: str,
+    line_gid: str,
+    _u=Depends(_WRITE),
+):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            _history.ensure_history_schema(cur)
+            cur.execute(_history.latest_active_batch_sql(), (gid, line_gid))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(404, "没有可撤销的历史操作")
+            batch_id = row['batch_id']
+            events = _history.fetch_batch_events(cur, gid, line_gid, batch_id)
+            if not events:
+                raise HTTPException(404, "批次历史不存在")
+            for event in reversed(events):
+                _history.apply_history_event(cur, event, direction="undo")
+            _history.mark_batch_status(cur, gid, line_gid, batch_id, "undone", _u.get('gid', ''))
+            conn.commit()
+            return {"batch_id": batch_id, "status": "undone"}
+
+
+@router.post("/versions/{gid}/lifecycle/lines/{line_gid}/redo")
+def redo_line_history(
+    gid: str,
+    line_gid: str,
+    _u=Depends(_WRITE),
+):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            _history.ensure_history_schema(cur)
+            cur.execute(_history.latest_undo_batch_sql(), (gid, line_gid))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(404, "没有可重做的历史操作")
+            batch_id = row['batch_id']
+            events = _history.fetch_batch_events(cur, gid, line_gid, batch_id)
+            if not events:
+                raise HTTPException(404, "批次历史不存在")
+            guard = None
+            if events:
+                guard = {"entries": []}
+                for event in events:
+                    if event.get('entity_gid'):
+                        cur.execute("SELECT updated_at FROM workmanship_bop_bop_entries WHERE gid=%s", (event['entity_gid'],))
+                        ts_row = cur.fetchone()
+                        if ts_row:
+                            guard["entries"].append({"gid": event['entity_gid'], "updated_at": ts_row.get('updated_at')})
+            if not _history.validate_redo_guard(cur, guard):
+                _history.mark_batch_status(cur, gid, line_gid, batch_id, "redo_invalidated", _u.get('gid', ''))
+                conn.commit()
+                raise HTTPException(409, "重做已失效：目标对象在撤销后已被修改")
+            for event in events:
+                _history.apply_history_event(cur, event, direction="redo")
+            _history.mark_batch_status(cur, gid, line_gid, batch_id, "active", _u.get('gid', ''))
+            conn.commit()
+            return {"batch_id": batch_id, "status": "active"}
 
 
 @router.get("/versions/{gid}/lifecycle/lines/{line_gid}/operation-log")
