@@ -77,19 +77,19 @@ CREATE TABLE IF NOT EXISTS bop.bop_versions (
 CREATE INDEX IF NOT EXISTS idx_bop_versions_project ON bop.bop_versions(project_gid);
 
 -- 若 bop.bop_versions 已存在（旧库升级），幂等追加新字段
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS version_no       TEXT;
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS base_version_gid TEXT;
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS description      TEXT;
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS created_by       TEXT;
+ALTER TABLE bop.bop_versions ADD COLUMN version_no       TEXT;
+ALTER TABLE bop.bop_versions ADD COLUMN base_version_gid TEXT;
+ALTER TABLE bop.bop_versions ADD COLUMN description      TEXT;
+ALTER TABLE bop.bop_versions ADD COLUMN created_by       TEXT;
 UPDATE bop.bop_versions SET version_no = version_tag WHERE version_no IS NULL;
 
 -- proj.projects：追加项目类型（取值: 'active'|'gbop'|'history'）
 ALTER TABLE proj.projects
-  ADD COLUMN IF NOT EXISTS project_type TEXT NOT NULL DEFAULT 'active';
+  ADD COLUMN project_type TEXT NOT NULL DEFAULT 'active';
 
 -- work.tasks/work.issues：附件字段（幂等）
-ALTER TABLE work.tasks  ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
-ALTER TABLE work.issues ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
+ALTER TABLE work.tasks  ADD COLUMN attachments JSONB DEFAULT '[]';
+ALTER TABLE work.issues ADD COLUMN attachments JSONB DEFAULT '[]';
 
 
 -- ───────────────────────────────────────────────────────────────────
@@ -166,16 +166,16 @@ CREATE TABLE IF NOT EXISTS bop.bop_entries (
 
 -- 若 bop.bop_entries 已存在（旧库升级），幂等追加/迁移字段
 -- 新增字段
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS title              TEXT;
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS bom_row_owner      TEXT;
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS parent_bop_label   TEXT;
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS ai00_level         SMALLINT;
+ALTER TABLE bop.bop_entries ADD COLUMN title              TEXT;
+ALTER TABLE bop.bop_entries ADD COLUMN bom_row_owner      TEXT;
+ALTER TABLE bop.bop_entries ADD COLUMN parent_bop_label   TEXT;
+ALTER TABLE bop.bop_entries ADD COLUMN ai00_level         SMALLINT;
 -- bom_row_id 语义变更：旧值存的是 meta.code（零件号），新语义同；保留数据，无需迁移
 -- 删除字段（已有库需手动执行，新库 CREATE TABLE 不含这些列）
 -- ALTER TABLE bop.bop_entries DROP COLUMN IF EXISTS bom_row_ver;
 -- ALTER TABLE bop.bop_entries DROP COLUMN IF EXISTS meta;
 -- （meta 建议在数据确认迁移完成后再删，暂时保留）
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS meta JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_entries ADD COLUMN meta JSONB NOT NULL DEFAULT '{}';
 
 CREATE INDEX IF NOT EXISTS idx_bop_ent_version
   ON bop.bop_entries(bop_version_gid) WHERE deleted_at IS NULL;
@@ -405,7 +405,7 @@ CREATE INDEX IF NOT EXISTS idx_bop_links_ref     ON bop.bop_entry_links(ref_gid,
 CREATE INDEX IF NOT EXISTS idx_bop_links_type    ON bop.bop_entry_links(link_type);
 
 -- 现有表幂等追加（已有 bop_entry_links 的库）——必须在 WHERE is_primary 索引之前执行
-ALTER TABLE bop.bop_entry_links ADD COLUMN IF NOT EXISTS is_primary BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE bop.bop_entry_links ADD COLUMN is_primary BOOLEAN NOT NULL DEFAULT FALSE;
 
 CREATE INDEX IF NOT EXISTS idx_bop_links_primary ON bop.bop_entry_links(bop_entry_gid) WHERE is_primary = TRUE;
 -- CTE 聚合优化：GROUP BY entry_gid WHERE version_gid = %s
@@ -521,8 +521,8 @@ CREATE INDEX IF NOT EXISTS idx_craft_rules_list   ON knowledge.craft_rules(list_
 -- ═══════════════════════════════════════════════════════════════════
 
 -- display_id 迁移（已有数据库）
-ALTER TABLE knowledge.knowledge_entries ADD COLUMN IF NOT EXISTS display_id TEXT NOT NULL DEFAULT '';
-ALTER TABLE knowledge.craft_rules        ADD COLUMN IF NOT EXISTS display_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE knowledge.knowledge_entries ADD COLUMN display_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE knowledge.craft_rules        ADD COLUMN display_id TEXT NOT NULL DEFAULT '';
 
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -641,14 +641,14 @@ CREATE INDEX IF NOT EXISTS idx_proj_proc_chart_proj ON bop.bop_process_charts(pr
 
 -- bop.bop_steps：增值工时 / 总工时 / 地面高度需求 / 工艺流程图 / 工艺卡图片
 -- （原 vd_time / total_time / floor_height_need / process_flow_pic / process_chart_pic 节点降级为字段）
-ALTER TABLE bop.bop_steps ADD COLUMN IF NOT EXISTS vd_time             REAL;
-ALTER TABLE bop.bop_steps ADD COLUMN IF NOT EXISTS total_time          REAL;
-ALTER TABLE bop.bop_steps ADD COLUMN IF NOT EXISTS floor_height_need   INTEGER;
-ALTER TABLE bop.bop_steps ADD COLUMN IF NOT EXISTS process_flow_pic    JSONB;
-ALTER TABLE bop.bop_steps ADD COLUMN IF NOT EXISTS process_chart_pic   JSONB;
+ALTER TABLE bop.bop_steps ADD COLUMN vd_time             REAL;
+ALTER TABLE bop.bop_steps ADD COLUMN total_time          REAL;
+ALTER TABLE bop.bop_steps ADD COLUMN floor_height_need   INTEGER;
+ALTER TABLE bop.bop_steps ADD COLUMN process_flow_pic    JSONB;
+ALTER TABLE bop.bop_steps ADD COLUMN process_chart_pic   JSONB;
 
 -- process_flow_pic 同时存在 bop_entries 上（直接写入，无需走 bop_steps 中间表）
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS process_flow_pic  JSONB;
+ALTER TABLE bop.bop_entries ADD COLUMN process_flow_pic  JSONB;
 
 
 -- ───────────────────────────────────────────────────────────────────
@@ -687,12 +687,12 @@ ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS process_flow_pic  JSONB;
 -- ═══════════════════════════════════════════════════════════════════
 -- D-8. vpps_part + part_feed（工序/操作所针对的零件 + 是否涉及上料）
 -- ═══════════════════════════════════════════════════════════════════
-ALTER TABLE bop.bop_entries  ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT '';
-ALTER TABLE bop.bop_entries  ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE bop.bop_steps    ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT '';
-ALTER TABLE bop.bop_steps    ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE bop.bop_process  ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT '';
-ALTER TABLE bop.bop_process  ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE bop.bop_entries  ADD COLUMN vpps_part TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_entries  ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE bop.bop_steps    ADD COLUMN vpps_part TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_steps    ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE bop.bop_process  ADD COLUMN vpps_part TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_process  ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE;
 
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -712,28 +712,28 @@ ALTER TABLE bop.bop_process  ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL
 --     工厂域有自己的稳定编码体系
 --
 -- ── bop.bop_entries ─────────────────────────────────────────────────────
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS vpps_desc TEXT;
+ALTER TABLE bop.bop_entries ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_entries ADD COLUMN vpps_desc TEXT;
 CREATE INDEX IF NOT EXISTS idx_bop_ent_vpps ON bop.bop_entries(vpps) WHERE vpps IS NOT NULL;
 -- 版本条目主查询过滤索引（WHERE version_gid = %s AND is_deleted = FALSE）
 CREATE INDEX IF NOT EXISTS idx_bop_ent_version ON bop.bop_entries(version_gid) WHERE is_deleted = FALSE;
 
 -- ── 工艺过程实体 ─────────────────────────────────────────────────────
 -- bop.bop_steps 已有 vpps TEXT + vpps_desc TEXT ✓
-ALTER TABLE bop.bop_line     ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_station  ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_operator ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.asm_steps    ADD COLUMN IF NOT EXISTS vpps TEXT;
+ALTER TABLE bop.bop_line     ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_station  ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_operator ADD COLUMN vpps TEXT;
+ALTER TABLE bop.asm_steps    ADD COLUMN vpps TEXT;
 
 -- ── 项目资源实体 ─────────────────────────────────────────────────────
-ALTER TABLE bop.bop_equipments    ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_fixtures      ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_tools         ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.project_roles     ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_control_plan  ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_process_charts ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_floor_height  ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE bop.bop_jack_pos      ADD COLUMN IF NOT EXISTS vpps TEXT;
+ALTER TABLE bop.bop_equipments    ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_fixtures      ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_tools         ADD COLUMN vpps TEXT;
+ALTER TABLE bop.project_roles     ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_control_plan  ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_process_charts ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_floor_height  ADD COLUMN vpps TEXT;
+ALTER TABLE bop.bop_jack_pos      ADD COLUMN vpps TEXT;
 
 -- ── 索引（WHERE vpps IS NOT NULL 避免稀疏索引膨胀）────────────────────
 CREATE INDEX IF NOT EXISTS idx_asm_line_proc_vpps    ON bop.bop_line(vpps)           WHERE vpps IS NOT NULL;
@@ -759,10 +759,10 @@ CREATE INDEX IF NOT EXISTS idx_proj_jack_pos_vpps    ON bop.bop_jack_pos(vpps)  
 -- frozen_at:          冻结时间戳，非 NULL 则版本只读，bop_entries.title 已快照
 -- archived_at:        归档时间戳，通过 POST /api/bop/version-families/{gid}/archive 整组归档
 
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS version_family_gid TEXT;
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS bop_name           TEXT NOT NULL DEFAULT '';
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS frozen_at          TIMESTAMPTZ;
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS archived_at        TIMESTAMPTZ;
+ALTER TABLE bop.bop_versions ADD COLUMN version_family_gid TEXT;
+ALTER TABLE bop.bop_versions ADD COLUMN bop_name           TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_versions ADD COLUMN frozen_at          TIMESTAMPTZ;
+ALTER TABLE bop.bop_versions ADD COLUMN archived_at        TIMESTAMPTZ;
 
 -- 已有版本：自成一家（family = 自身 gid）
 UPDATE bop.bop_versions SET version_family_gid = gid WHERE version_family_gid IS NULL;
@@ -799,7 +799,7 @@ CREATE TABLE IF NOT EXISTS factory.factory_lines (
 CREATE INDEX IF NOT EXISTS idx_factory_lines_factory ON factory.factory_lines(factory_gid);
 
 -- 物理工位追加产线归属（仅物理层级内关联，不跨到工艺侧）
-ALTER TABLE factory.factory_stations ADD COLUMN IF NOT EXISTS factory_line_gid TEXT;
+ALTER TABLE factory.factory_stations ADD COLUMN factory_line_gid TEXT;
 CREATE INDEX IF NOT EXISTS idx_factory_sta_line ON factory.factory_stations(factory_line_gid)
   WHERE factory_line_gid IS NOT NULL;
 
@@ -811,8 +811,8 @@ CREATE INDEX IF NOT EXISTS idx_factory_sta_line ON factory.factory_stations(fact
 -- parent_version_gid: fork/branch 的直接来源版本 gid（自引用，无 FK）
 -- change_note:        本次版本变更说明（类比 git commit message）
 
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS parent_version_gid TEXT;
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS change_note        TEXT;
+ALTER TABLE bop.bop_versions ADD COLUMN parent_version_gid TEXT;
+ALTER TABLE bop.bop_versions ADD COLUMN change_note        TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_bop_ver_parent ON bop.bop_versions(parent_version_gid)
   WHERE parent_version_gid IS NOT NULL;
@@ -900,7 +900,7 @@ CREATE INDEX IF NOT EXISTS idx_bop_staging_version ON bop.bop_staging(bop_versio
 -- ═══════════════════════════════════════════════════════════════════
 
 -- I-1. 新增 published_at 字段（发布时间戳）
-ALTER TABLE bop.bop_versions ADD COLUMN IF NOT EXISTS published_at TIMESTAMPTZ;
+ALTER TABLE bop.bop_versions ADD COLUMN published_at TIMESTAMPTZ;
 
 -- I-1b. 修改 status 默认值（旧库可能还是 'draft'）
 ALTER TABLE bop.bop_versions ALTER COLUMN status SET DEFAULT 'active';
@@ -911,20 +911,20 @@ UPDATE bop.bop_versions SET status='baseline' WHERE status='frozen';
 UPDATE bop.bop_versions SET status='M'        WHERE status='released';
 
 -- I-3. bop_entry_links 追加快照字段（冻结时写入关联实体的关键字段快照）
-ALTER TABLE bop.bop_entry_links ADD COLUMN IF NOT EXISTS snapshot_data JSONB;
+ALTER TABLE bop.bop_entry_links ADD COLUMN snapshot_data JSONB;
 
 -- ── 本体驱动存储重构（2026-06-15）：各实体表加 ext JSONB ────────────────────
 -- 动态本体属性（storage_hint='entity_table' 且实体表无对应固定列时）落入 ext
-ALTER TABLE bop.bop_line       ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE bop.bop_station    ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE bop.bop_operator   ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE bop.bop_process    ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE bop.bop_steps      ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_line       ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_station    ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_operator   ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_process    ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_steps      ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
 
-ALTER TABLE factory.factory_stations    ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE factory.factory_equipments  ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE factory.factory_tools       ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE factory.factory_fixtures    ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE factory.factory_stations    ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE factory.factory_equipments  ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE factory.factory_tools       ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE factory.factory_fixtures    ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
 
 -- ── 数据迁移：bop_entries.meta → 实体表 ext（2026-06-15）─────────────────────
 -- 将错误存入 bop_entries.meta 的实体属性迁移到对应实体表的 ext 字段
@@ -1008,10 +1008,10 @@ WHERE l.entity_gid = e.gid AND l.is_primary = TRUE
        OR be.meta ? 'torque_angle_deg' OR be.meta ? 'weld_current_a'
        OR be.meta ? 'adhesive_code' OR be.meta ? 'inspection_method');
 
-ALTER TABLE bop.bop_equipments  ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE bop.bop_fixtures    ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE bop.bop_tools       ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE bop.project_roles   ADD COLUMN IF NOT EXISTS ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_equipments  ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_fixtures    ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.bop_tools       ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE bop.project_roles   ADD COLUMN ext JSONB NOT NULL DEFAULT '{}';
 
 -- ── bop_name 迁移：working 版本的族群名改为项目名（2026-06-16）──────────
 -- template 类型保留原 bop_name 不动
@@ -1026,8 +1026,8 @@ WHERE bv.project_gid = p.gid
 
 -- J-1. bop_versions 追加两列
 ALTER TABLE bop.bop_versions
-  ADD COLUMN IF NOT EXISTS lifecycle_phase TEXT NOT NULL DEFAULT 'init',
-  ADD COLUMN IF NOT EXISTS lifecycle_state JSONB NOT NULL DEFAULT '{}';
+  ADD COLUMN lifecycle_phase TEXT NOT NULL DEFAULT 'init',
+  ADD COLUMN lifecycle_state JSONB NOT NULL DEFAULT '{}';
 -- lifecycle_phase 取值: init | refine | publish_cycle | archived
 
 -- J-2. 阶段时间线表
@@ -1143,7 +1143,7 @@ CREATE INDEX IF NOT EXISTS idx_pbom_diff_ver    ON bop.bop_pbom_diff_queue(bop_v
 CREATE INDEX IF NOT EXISTS idx_pbom_diff_family ON bop.bop_pbom_diff_queue(family_gid);
 
 -- K-3. bop_entries 增加 fork 溯源字段
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS source_entry_gid TEXT DEFAULT NULL;
+ALTER TABLE bop.bop_entries ADD COLUMN source_entry_gid TEXT DEFAULT NULL;
 CREATE INDEX IF NOT EXISTS idx_bop_entries_source ON bop.bop_entries(source_entry_gid) WHERE source_entry_gid IS NOT NULL;
 
 -- K-4. 存量数据迁移：将现有活动版本注册到族群表（DBeaver 执行）

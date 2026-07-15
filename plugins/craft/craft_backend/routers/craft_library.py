@@ -169,10 +169,14 @@ def _ensure_alias_column():
     try:
         with get_conn() as conn:
             with conn.cursor() as cur:
-                cur.execute(
-                    "ALTER TABLE workmanship_tpl_vpps_parts "
-                    "ADD COLUMN IF NOT EXISTS alias JSON NOT NULL DEFAULT (JSON_ARRAY())"
-                )
+                try:
+                    cur.execute(
+                        "ALTER TABLE workmanship_tpl_vpps_parts "
+                        "ADD COLUMN alias JSON NOT NULL DEFAULT (JSON_ARRAY())"
+                    )
+                except Exception as e:
+                    if not (getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060):
+                        raise
             conn.commit()
         _alias_migrated = True
     except Exception as e:

@@ -139,7 +139,7 @@ DO $$ BEGIN
   END IF;
 END $$;
 
-ALTER TABLE bop.bop_entry_links ADD COLUMN IF NOT EXISTS version_gid TEXT;
+ALTER TABLE bop.bop_entry_links ADD COLUMN version_gid TEXT;
 
 -- 回填 version_gid
 UPDATE bop.bop_entry_links l
@@ -165,7 +165,7 @@ ALTER TABLE bop.bop_entries
     DROP COLUMN IF EXISTS history_source_gid;
 
 ALTER TABLE bop.bop_entries
-    ADD COLUMN IF NOT EXISTS child_vpps JSONB NOT NULL DEFAULT '[]';
+    ADD COLUMN child_vpps JSONB NOT NULL DEFAULT '[]';
 
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -195,10 +195,10 @@ BEGIN
     LOOP
         EXECUTE format(
             'ALTER TABLE %s
-                ADD COLUMN IF NOT EXISTS is_deleted  BOOLEAN NOT NULL DEFAULT FALSE,
-                ADD COLUMN IF NOT EXISTS is_archived BOOLEAN NOT NULL DEFAULT FALSE,
-                ADD COLUMN IF NOT EXISTS deleted_at  TIMESTAMPTZ,
-                ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ',
+                ADD COLUMN is_deleted  BOOLEAN NOT NULL DEFAULT FALSE,
+                ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT FALSE,
+                ADD COLUMN deleted_at  TIMESTAMPTZ,
+                ADD COLUMN archived_at TIMESTAMPTZ',
             t
         );
     END LOOP;
@@ -268,9 +268,9 @@ UPDATE bop.bop_entry_links SET link_type = 'bop_operator' WHERE link_type IN ('a
 -- ═══════════════════════════════════════════════════════════════════
 
 ALTER TABLE bop.bop_versions
-    ADD COLUMN IF NOT EXISTS version_type     TEXT NOT NULL DEFAULT 'working',
-    ADD COLUMN IF NOT EXISTS pbom_version_gid TEXT,
-    ADD COLUMN IF NOT EXISTS owner_gid        TEXT;
+    ADD COLUMN version_type     TEXT NOT NULL DEFAULT 'working',
+    ADD COLUMN pbom_version_gid TEXT,
+    ADD COLUMN owner_gid        TEXT;
 
 COMMENT ON COLUMN bop.bop_versions.version_type IS
     'working = 工作版本；template = 工厂模板版本';
@@ -296,8 +296,8 @@ COMMENT ON COLUMN bop.pbom_versions.status IS
 -- ═══════════════════════════════════════════════════════════════════
 
 ALTER TABLE bop.pbom
-    ADD COLUMN IF NOT EXISTS vpps_source      TEXT NOT NULL DEFAULT 'auto',
-    ADD COLUMN IF NOT EXISTS vpps_reported_at TIMESTAMPTZ;
+    ADD COLUMN vpps_source      TEXT NOT NULL DEFAULT 'auto',
+    ADD COLUMN vpps_reported_at TIMESTAMPTZ;
 
 COMMENT ON COLUMN bop.pbom.vpps_source IS
     'auto = 正常；manual = 人工临时值';
@@ -310,8 +310,8 @@ COMMENT ON COLUMN bop.pbom.vpps_reported_at IS
 -- ═══════════════════════════════════════════════════════════════════
 
 ALTER TABLE bop.bop_steps    DROP COLUMN IF EXISTS step_code;
-ALTER TABLE bop.bop_steps    ADD COLUMN IF NOT EXISTS operation_code TEXT NOT NULL DEFAULT '';
-ALTER TABLE bop.bop_operator ADD COLUMN IF NOT EXISTS operator_code  TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_steps    ADD COLUMN operation_code TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_operator ADD COLUMN operator_code  TEXT NOT NULL DEFAULT '';
 
 
 -- ═══════════════════════════════════════════════════════════════════

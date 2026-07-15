@@ -117,14 +117,14 @@ def _ensure_lists_table():
         """,
         "CREATE INDEX IF NOT EXISTS idx_lists_owner ON workmanship_work_lists (owner_type, owner_gid)",
         "CREATE INDEX IF NOT EXISTS idx_lists_item_type ON workmanship_work_lists (item_type)",
-        "ALTER TABLE workmanship_work_lists ADD COLUMN IF NOT EXISTS item_type TEXT NOT NULL DEFAULT 'task'",
-        "ALTER TABLE workmanship_work_tasks  ADD COLUMN IF NOT EXISTS list_gid TEXT",
-        "ALTER TABLE workmanship_work_issues ADD COLUMN IF NOT EXISTS list_gid TEXT",
+        "ALTER TABLE workmanship_work_lists ADD COLUMN item_type TEXT NOT NULL DEFAULT 'task'",
+        "ALTER TABLE workmanship_work_tasks  ADD COLUMN list_gid TEXT",
+        "ALTER TABLE workmanship_work_issues ADD COLUMN list_gid TEXT",
         # Task 5: 附件字段
-        "ALTER TABLE workmanship_work_tasks  ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]'",
-        "ALTER TABLE workmanship_work_issues ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]'",
+        "ALTER TABLE workmanship_work_tasks  ADD COLUMN attachments JSONB DEFAULT '[]'",
+        "ALTER TABLE workmanship_work_issues ADD COLUMN attachments JSONB DEFAULT '[]'",
         # Task 7: factory_sections owner_gid
-        "ALTER TABLE workmanship_factory_factory_sections ADD COLUMN IF NOT EXISTS owner_gid TEXT DEFAULT ''",
+        "ALTER TABLE workmanship_factory_factory_sections ADD COLUMN owner_gid TEXT DEFAULT ''",
         # Task 8: knowledge_entries 补全
         """
         CREATE TABLE IF NOT EXISTS workmanship_know_entries (
@@ -150,11 +150,11 @@ def _ensure_lists_table():
             updated_at     TIMESTAMPTZ DEFAULT NOW()
         )
         """,
-        "ALTER TABLE workmanship_know_entries ADD COLUMN IF NOT EXISTS source_gid TEXT",
-        "ALTER TABLE workmanship_know_entries ADD COLUMN IF NOT EXISTS source_label TEXT DEFAULT ''",
-        "ALTER TABLE workmanship_know_entries ADD COLUMN IF NOT EXISTS maintainer_gid TEXT DEFAULT ''",
-        "ALTER TABLE workmanship_know_entries ADD COLUMN IF NOT EXISTS contributors JSONB DEFAULT '[]'",
-        "ALTER TABLE workmanship_know_entries ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]'",
+        "ALTER TABLE workmanship_know_entries ADD COLUMN source_gid TEXT",
+        "ALTER TABLE workmanship_know_entries ADD COLUMN source_label TEXT DEFAULT ''",
+        "ALTER TABLE workmanship_know_entries ADD COLUMN maintainer_gid TEXT DEFAULT ''",
+        "ALTER TABLE workmanship_know_entries ADD COLUMN contributors JSONB DEFAULT '[]'",
+        "ALTER TABLE workmanship_know_entries ADD COLUMN attachments JSONB DEFAULT '[]'",
         # Task 9: craft_rules 云端表（CREATE 必须在 ALTER 之前）
         """
         CREATE TABLE IF NOT EXISTS workmanship_know_craft_rules (
@@ -175,12 +175,12 @@ def _ensure_lists_table():
         """,
         # knowledge_display_seq + display_id（INSERT 需要）
         "CREATE SEQUENCE IF NOT EXISTS knowledge.knowledge_display_seq START 1",
-        "ALTER TABLE workmanship_know_entries ADD COLUMN IF NOT EXISTS display_id TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_know_entries ADD COLUMN display_id TEXT NOT NULL DEFAULT ''",
         # rules_display_seq + display_id（INSERT 需要；schema.sql 建表时缺 deviation_count/creator_gid，补列）
         "CREATE SEQUENCE IF NOT EXISTS knowledge.rules_display_seq START 1",
-        "ALTER TABLE workmanship_know_craft_rules ADD COLUMN IF NOT EXISTS display_id       TEXT    NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_know_craft_rules ADD COLUMN IF NOT EXISTS deviation_count  INTEGER DEFAULT 0",
-        "ALTER TABLE workmanship_know_craft_rules ADD COLUMN IF NOT EXISTS creator_gid      TEXT    DEFAULT ''",
+        "ALTER TABLE workmanship_know_craft_rules ADD COLUMN display_id       TEXT    NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_know_craft_rules ADD COLUMN deviation_count  INTEGER DEFAULT 0",
+        "ALTER TABLE workmanship_know_craft_rules ADD COLUMN creator_gid      TEXT    DEFAULT ''",
         # Phase 2-B: 工作台标注数据
         """
         CREATE TABLE IF NOT EXISTS workmanship_app_wb_annotations (
@@ -266,33 +266,33 @@ def _ensure_lists_table():
         )
         """,
         # knowledge_items: is_system 列（系统内置条目标记，必须在 INSERT seed 之前）
-        "ALTER TABLE workmanship_know_items ADD COLUMN IF NOT EXISTS is_system BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_know_items ADD COLUMN is_system BOOLEAN NOT NULL DEFAULT FALSE",
         # projects 表字段扩展（2026-05-12）
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS project_code TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS model_year INTEGER",
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS suffix TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS jph REAL",
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE",
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS is_archived BOOLEAN NOT NULL DEFAULT FALSE",
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ",
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ",
-        "ALTER TABLE workmanship_proj_projects ADD COLUMN IF NOT EXISTS share_scope TEXT NOT NULL DEFAULT 'team'",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN project_code TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN model_year INTEGER",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN suffix TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN jph REAL",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN is_deleted BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN deleted_at TIMESTAMPTZ",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN archived_at TIMESTAMPTZ",
+        "ALTER TABLE workmanship_proj_projects ADD COLUMN share_scope TEXT NOT NULL DEFAULT 'team'",
         # 飞书用户 token 存储（用于代表用户访问文档等）
-        "ALTER TABLE workmanship_auth_users ADD COLUMN IF NOT EXISTS feishu_access_token TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_auth_users ADD COLUMN IF NOT EXISTS feishu_refresh_token TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_auth_users ADD COLUMN IF NOT EXISTS feishu_token_expires_at TIMESTAMPTZ",
+        "ALTER TABLE workmanship_auth_users ADD COLUMN feishu_access_token TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_auth_users ADD COLUMN feishu_refresh_token TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_auth_users ADD COLUMN feishu_token_expires_at TIMESTAMPTZ",
         # 飞书 open_id 冗余存储（org sync 用）
-        "ALTER TABLE workmanship_auth_users ADD COLUMN IF NOT EXISTS feishu_open_id TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_auth_users ADD COLUMN feishu_open_id TEXT NOT NULL DEFAULT ''",
         "CREATE INDEX IF NOT EXISTS idx_users_feishu_open_id ON workmanship_auth_users (feishu_open_id) WHERE feishu_open_id != ''",
         # teams: sort_order（飞书部门顺序）
-        "ALTER TABLE workmanship_auth_teams ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE workmanship_auth_teams ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0",
         # 任务画布字段（2026-05-24）
-        "ALTER TABLE workmanship_work_tasks ADD COLUMN IF NOT EXISTS parent_task_gid TEXT DEFAULT NULL",
-        "ALTER TABLE workmanship_work_tasks ADD COLUMN IF NOT EXISTS canvas_x REAL DEFAULT NULL",
-        "ALTER TABLE workmanship_work_tasks ADD COLUMN IF NOT EXISTS canvas_y REAL DEFAULT NULL",
-        "ALTER TABLE workmanship_work_tasks ADD COLUMN IF NOT EXISTS completion INTEGER NOT NULL DEFAULT 0",
-        "ALTER TABLE workmanship_work_tasks ADD COLUMN IF NOT EXISTS node_type TEXT NOT NULL DEFAULT 'normal'",
-        "ALTER TABLE workmanship_work_tasks ADD COLUMN IF NOT EXISTS canvas_icon TEXT NOT NULL DEFAULT 'star'",
+        "ALTER TABLE workmanship_work_tasks ADD COLUMN parent_task_gid TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_work_tasks ADD COLUMN canvas_x REAL DEFAULT NULL",
+        "ALTER TABLE workmanship_work_tasks ADD COLUMN canvas_y REAL DEFAULT NULL",
+        "ALTER TABLE workmanship_work_tasks ADD COLUMN completion INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE workmanship_work_tasks ADD COLUMN node_type TEXT NOT NULL DEFAULT 'normal'",
+        "ALTER TABLE workmanship_work_tasks ADD COLUMN canvas_icon TEXT NOT NULL DEFAULT 'star'",
         # 任务依赖关系表（画布连线）
         """
         CREATE TABLE IF NOT EXISTS work.task_dependencies (
@@ -309,37 +309,37 @@ def _ensure_lists_table():
         "CREATE INDEX IF NOT EXISTS idx_task_deps_source ON work.task_dependencies(source_gid)",
         "CREATE INDEX IF NOT EXISTS idx_task_deps_target ON work.task_dependencies(target_gid)",
         # workmanship_proj_tasks 新列（现役表，旧数据库可能缺失）
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS list_gid             TEXT DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS is_deleted           BOOLEAN NOT NULL DEFAULT FALSE",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS deleted_at           TIMESTAMPTZ DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS scheduled_date       DATE DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS scheduled_start_time TIME DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS time_estimate        INTEGER DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS attachments          JSONB NOT NULL DEFAULT '[]'",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS parent_task_gid      TEXT DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS canvas_x             REAL DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS canvas_y             REAL DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS completion           INTEGER NOT NULL DEFAULT 0",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS node_type            TEXT NOT NULL DEFAULT 'normal'",
-        "ALTER TABLE workmanship_proj_tasks ADD COLUMN IF NOT EXISTS canvas_icon          TEXT NOT NULL DEFAULT 'star'",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN list_gid             TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN is_deleted           BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN deleted_at           TIMESTAMPTZ DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN scheduled_date       DATE DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN scheduled_start_time TIME DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN time_estimate        INTEGER DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN attachments          JSONB NOT NULL DEFAULT '[]'",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN parent_task_gid      TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN canvas_x             REAL DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN canvas_y             REAL DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN completion           INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN node_type            TEXT NOT NULL DEFAULT 'normal'",
+        "ALTER TABLE workmanship_proj_tasks ADD COLUMN canvas_icon          TEXT NOT NULL DEFAULT 'star'",
         # workmanship_proj_issues 新列
-        "ALTER TABLE workmanship_proj_issues ADD COLUMN IF NOT EXISTS scheduled_date      DATE DEFAULT NULL",
-        "ALTER TABLE workmanship_proj_issues ADD COLUMN IF NOT EXISTS attachments         JSONB DEFAULT '[]'",
+        "ALTER TABLE workmanship_proj_issues ADD COLUMN scheduled_date      DATE DEFAULT NULL",
+        "ALTER TABLE workmanship_proj_issues ADD COLUMN attachments         JSONB DEFAULT '[]'",
         # 可见范围统一管理：shared_team_gid 存储具体团队 gid
-        "ALTER TABLE workmanship_work_lists ADD COLUMN IF NOT EXISTS shared_team_gid TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_work_lists ADD COLUMN shared_team_gid TEXT DEFAULT NULL",
         # BOP 版本 visibility 字段
-        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN IF NOT EXISTS visibility TEXT NOT NULL DEFAULT 'team'",
-        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN IF NOT EXISTS shared_team_gid TEXT DEFAULT NULL",
-        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN IF NOT EXISTS shared_project_gid TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN visibility TEXT NOT NULL DEFAULT 'team'",
+        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN shared_team_gid TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN shared_project_gid TEXT DEFAULT NULL",
         # BOP 版本 data_stage 字段（craft-plugin 新增）
-        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN IF NOT EXISTS data_stage TEXT DEFAULT NULL",
-        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN IF NOT EXISTS snapshot_data JSONB DEFAULT NULL",
+        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN data_stage TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_bop_bop_versions ADD COLUMN snapshot_data JSONB DEFAULT NULL",
         # PBOM 版本 visibility 字段
-        "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN IF NOT EXISTS visibility TEXT NOT NULL DEFAULT 'team'",
-        "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN IF NOT EXISTS shared_team_gid TEXT DEFAULT NULL",
-        "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN IF NOT EXISTS shared_project_gid TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN visibility TEXT NOT NULL DEFAULT 'team'",
+        "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN shared_team_gid TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN shared_project_gid TEXT DEFAULT NULL",
         # knowledge_items 补充 project scope 支持
-        "ALTER TABLE workmanship_know_items ADD COLUMN IF NOT EXISTS shared_project_gid TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_know_items ADD COLUMN shared_project_gid TEXT DEFAULT NULL",
         # 系统内置 公共资料 文件夹（固定 GID，幂等）
         """
         INSERT INTO workmanship_know_folders
@@ -376,18 +376,20 @@ def _ensure_lists_table():
                     cur.execute(stmt)
                 conn.commit()
         except Exception as e:
+            if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
+                continue
             logging.getLogger(__name__).warning("_ensure_lists_table stmt failed: %s | %s", stmt[:60], e)
 
     # BOP 加列（独立事务，避免被主 DDL 列表失败拖回滚）
     _bop_alters = [
-        "ALTER TABLE workmanship_bop_bop_entries ADD COLUMN IF NOT EXISTS process_flow_pic JSONB DEFAULT NULL",
-        "ALTER TABLE workmanship_bop_bop_entries ADD COLUMN IF NOT EXISTS process_chart_pic JSONB DEFAULT NULL",
-        "ALTER TABLE workmanship_bop_bop_entries ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_bop_bop_entries ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE",
-        "ALTER TABLE workmanship_bop_bop_steps ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_bop_bop_steps ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE",
-        "ALTER TABLE workmanship_bop_bop_process ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_bop_bop_process ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_bop_bop_entries ADD COLUMN process_flow_pic JSONB DEFAULT NULL",
+        "ALTER TABLE workmanship_bop_bop_entries ADD COLUMN process_chart_pic JSONB DEFAULT NULL",
+        "ALTER TABLE workmanship_bop_bop_entries ADD COLUMN vpps_part TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_bop_bop_entries ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_bop_bop_steps ADD COLUMN vpps_part TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_bop_bop_steps ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_bop_bop_process ADD COLUMN vpps_part TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_bop_bop_process ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE",
     ]
     try:
         with get_conn() as conn:
@@ -477,6 +479,8 @@ def _ensure_bitable_sync_tables():
                     cur.execute(stmt)
                 conn.commit()
         except Exception as e:
+            if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
+                continue
             _log.warning("_ensure_bitable_sync_tables stmt failed: %s | %s", stmt[:60], e)
 
 
@@ -485,7 +489,7 @@ def _ensure_permission_tables():
     from backend.db.connection import get_conn
     ddl = [
         # 1. workmanship_auth_users 新增 org_role 列
-        "ALTER TABLE workmanship_auth_users ADD COLUMN IF NOT EXISTS org_role TEXT DEFAULT NULL",
+        "ALTER TABLE workmanship_auth_users ADD COLUMN org_role TEXT DEFAULT NULL",
         # 2. 数据迁移：旧 system_role → org_role（幂等，只更新 NULL）
         """UPDATE workmanship_auth_users SET org_role = CASE
                WHEN system_role = 'super_admin' THEN 'super_admin'
@@ -509,7 +513,7 @@ def _ensure_permission_tables():
         "CREATE INDEX IF NOT EXISTS idx_grants_grantee    ON workmanship_auth_permission_grants (grantee_gid)",
         "CREATE INDEX IF NOT EXISTS idx_grants_type_scope ON workmanship_auth_permission_grants (grant_type, scope_gid)",
         # 4. workmanship_work_lists 孤儿标记
-        "ALTER TABLE workmanship_work_lists ADD COLUMN IF NOT EXISTS is_orphaned BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_work_lists ADD COLUMN is_orphaned BOOLEAN NOT NULL DEFAULT FALSE",
         # 5. 迁移旧 team_admin 角色 → permission_grants（幂等）
         """INSERT INTO workmanship_auth_permission_grants (gid, grantee_gid, grant_type, scope_gid, granted_by)
            SELECT 'mg_' || gid, gid, 'team_admin', team_id, NULL
@@ -524,6 +528,8 @@ def _ensure_permission_tables():
                     cur.execute(stmt)
                 conn.commit()
         except Exception as e:
+            if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
+                continue
             logging.getLogger(__name__).warning("_ensure_permission_tables stmt failed: %s | %s", stmt[:60], e)
 
 
@@ -654,20 +660,25 @@ def _ensure_gbop_tables():
         )""",
         "CREATE INDEX IF NOT EXISTS idx_vpps_parts_vpps ON workmanship_tpl_vpps_parts(vpps) WHERE vpps IS NOT NULL",
         # 幂等补列：旧表可能缺 parent_vpps
-        "ALTER TABLE workmanship_tpl_vpps_parts ADD COLUMN IF NOT EXISTS parent_vpps TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_tpl_vpps_parts ADD COLUMN parent_vpps TEXT NOT NULL DEFAULT ''",
         # vpps_part + part_feed（工序/操作所针对的零件 + 是否涉及上料）
-        "ALTER TABLE workmanship_tpl_gbop_entries    ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_tpl_gbop_entries    ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE",
-        "ALTER TABLE workmanship_tpl_gbop_processes  ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_tpl_gbop_processes  ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE",
-        "ALTER TABLE workmanship_tpl_gbop_operations ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT ''",
-        "ALTER TABLE workmanship_tpl_gbop_operations ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_tpl_gbop_entries    ADD COLUMN vpps_part TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_tpl_gbop_entries    ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_tpl_gbop_processes  ADD COLUMN vpps_part TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_tpl_gbop_processes  ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE workmanship_tpl_gbop_operations ADD COLUMN vpps_part TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE workmanship_tpl_gbop_operations ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE",
     ]
     try:
         with get_conn() as conn:
             with conn.cursor() as cur:
                 for stmt in ddl:
-                    cur.execute(stmt)
+                    try:
+                        cur.execute(stmt)
+                    except Exception as e:
+                        if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
+                            continue
+                        raise  # let outer catch-all in _ensure_gbop_tables handle it
             conn.commit()
     except Exception as e:
         import logging
@@ -716,8 +727,8 @@ def _ensure_share_tables():
     """幂等建表/加列：read_scope/write_scope + list_shares + item_shares（Phase 2）。"""
     from backend.db.connection import get_conn
     ddl = [
-        "ALTER TABLE workmanship_work_lists ADD COLUMN IF NOT EXISTS read_scope  TEXT NOT NULL DEFAULT 'team'",
-        "ALTER TABLE workmanship_work_lists ADD COLUMN IF NOT EXISTS write_scope TEXT NOT NULL DEFAULT 'personal'",
+        "ALTER TABLE workmanship_work_lists ADD COLUMN read_scope  TEXT NOT NULL DEFAULT 'team'",
+        "ALTER TABLE workmanship_work_lists ADD COLUMN write_scope TEXT NOT NULL DEFAULT 'personal'",
         """UPDATE workmanship_work_lists SET
             read_scope  = CASE visibility WHEN 'public' THEN 'global' WHEN 'private' THEN 'personal' ELSE 'team' END,
             write_scope = CASE visibility WHEN 'public' THEN 'team'   WHEN 'private' THEN 'personal' ELSE 'personal' END
@@ -752,7 +763,12 @@ def _ensure_share_tables():
         with get_conn() as conn:
             with conn.cursor() as cur:
                 for stmt in ddl:
-                    cur.execute(stmt)
+                    try:
+                        cur.execute(stmt)
+                    except Exception as e:
+                        if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
+                            continue
+                        raise  # let outer catch-all in _ensure_gbop_tables handle it
             conn.commit()
     except Exception as e:
         import logging
@@ -956,7 +972,7 @@ async def access_log_middleware(request: Request, call_next):
     level = logging.WARNING if response.status_code >= 400 else logging.DEBUG
     _log.log(level, "[%s] %s %s → %d %dms", req_id, request.method, request.url.path, response.status_code, duration_ms)
     if duration_ms > _SLOW_MS:
-        _log.warning("🐢 SLOW [%s] %s %s → %d %dms", req_id, request.method, request.url.path, response.status_code, duration_ms)
+        _log.warning("SLOW [%s] %s %s -> %d %dms", req_id, request.method, request.url.path, response.status_code, duration_ms)
     response.headers["X-Request-ID"] = req_id
     return response
 

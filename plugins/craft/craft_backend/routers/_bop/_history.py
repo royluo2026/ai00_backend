@@ -4,7 +4,7 @@ from typing import Any
 
 
 _HISTORY_DDL = (
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN batch_status TEXT NOT NULL DEFAULT 'active'",
+    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN batch_status VARCHAR(20) NOT NULL DEFAULT 'active'",
     "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redo_guard_json JSON DEFAULT NULL",
     "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN touched_refs_json JSON DEFAULT NULL",
     "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN undone_at DATETIME(6) DEFAULT NULL",
@@ -12,7 +12,7 @@ _HISTORY_DDL = (
     "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redone_at DATETIME(6) DEFAULT NULL",
     "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redone_by TEXT DEFAULT NULL",
     "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN invalidate_reason TEXT DEFAULT NULL",
-    "CREATE TABLE IF NOT EXISTS workmanship_bop_bop_line_history_state (version_gid CHAR(36) NOT NULL, line_gid CHAR(36) NOT NULL, current_batch_id TEXT DEFAULT NULL, current_direction TEXT NOT NULL DEFAULT 'active', updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), PRIMARY KEY (version_gid, line_gid)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+    "CREATE TABLE IF NOT EXISTS workmanship_bop_bop_line_history_state (version_gid CHAR(36) NOT NULL, line_gid CHAR(36) NOT NULL, current_batch_id TEXT DEFAULT NULL, current_direction VARCHAR(20) NOT NULL DEFAULT 'active', updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), PRIMARY KEY (version_gid, line_gid)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
 )
 
 
@@ -113,6 +113,7 @@ def validate_redo_guard(cur, guard: dict[str, Any] | None) -> bool:
     return True
 
 
+def fetch_line_history(cur, version_gid: str, line_gid: str, limit: int = 50) -> dict[str, Any]:
     ensure_history_schema(cur)
     cur.execute(
         "SELECT gid FROM workmanship_bop_bop_entries WHERE gid=%s AND version_gid=%s AND is_deleted=FALSE",
@@ -164,6 +165,11 @@ def _normalize_pic_list(items: Any) -> list[dict[str, str]]:
 
 def _pic_identity(item: dict[str, str]) -> str:
     return json.dumps(item, ensure_ascii=False, sort_keys=True)
+
+
+def build_entry_log_events(before_entry: dict[str, Any], patch: dict[str, Any]) -> list[dict[str, Any]]:
+    """兼容别名：为 update_entry 的操作日志生成事件列表"""
+    return build_entry_update_steps(before_entry, patch)
 
 
 def build_entry_update_steps(before_entry: dict[str, Any], patch: dict[str, Any]) -> list[dict[str, Any]]:

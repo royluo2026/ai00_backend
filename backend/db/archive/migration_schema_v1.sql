@@ -207,40 +207,40 @@ ALTER SEQUENCE IF EXISTS public.rules_display_seq      SET SCHEMA knowledge;
 -- ALTER TABLE template.gbop ... （已废弃，见步骤8）
 
 -- template.vpps_tools（原 tool_templates）
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS spec JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS team_id TEXT;
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE template.vpps_tools ADD COLUMN category TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN status TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE template.vpps_tools ADD COLUMN spec JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE template.vpps_tools ADD COLUMN team_id TEXT;
+ALTER TABLE template.vpps_tools ADD COLUMN created_at TIMESTAMPTZ DEFAULT NOW();
 
 -- template.vpps_equipments（原 equipment_templates）
-ALTER TABLE template.vpps_equipments ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_equipments ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
-ALTER TABLE template.vpps_equipments ADD COLUMN IF NOT EXISTS spec JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE template.vpps_equipments ADD COLUMN IF NOT EXISTS team_id TEXT;
-ALTER TABLE template.vpps_equipments ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE template.vpps_equipments ADD COLUMN category TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_equipments ADD COLUMN status TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE template.vpps_equipments ADD COLUMN spec JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE template.vpps_equipments ADD COLUMN team_id TEXT;
+ALTER TABLE template.vpps_equipments ADD COLUMN created_at TIMESTAMPTZ DEFAULT NOW();
 
 -- template.vpps_fixtures（原 fixture_templates）
-ALTER TABLE template.vpps_fixtures ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_fixtures ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
-ALTER TABLE template.vpps_fixtures ADD COLUMN IF NOT EXISTS spec JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE template.vpps_fixtures ADD COLUMN IF NOT EXISTS team_id TEXT;
-ALTER TABLE template.vpps_fixtures ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE template.vpps_fixtures ADD COLUMN category TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_fixtures ADD COLUMN status TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE template.vpps_fixtures ADD COLUMN spec JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE template.vpps_fixtures ADD COLUMN team_id TEXT;
+ALTER TABLE template.vpps_fixtures ADD COLUMN created_at TIMESTAMPTZ DEFAULT NOW();
 
 -- template.vpps_parts（原 standard_part_names）
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS standard_name TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS part_category TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS description TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS level TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS vpps_desc_cn TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS vpps TEXT;
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS importance TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS vehicle_model TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS meta JSONB NOT NULL DEFAULT '{}';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS team_id TEXT;
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE template.vpps_parts ADD COLUMN standard_name TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN part_category TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN description TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN level TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN vpps_desc_cn TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN vpps TEXT;
+ALTER TABLE template.vpps_parts ADD COLUMN importance TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN vehicle_model TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN status TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE template.vpps_parts ADD COLUMN meta JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE template.vpps_parts ADD COLUMN team_id TEXT;
+ALTER TABLE template.vpps_parts ADD COLUMN created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE template.vpps_parts ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
 CREATE INDEX IF NOT EXISTS idx_vpps_parts_vpps ON template.vpps_parts(vpps) WHERE vpps IS NOT NULL;
 -- 字段重命名：standard_name → vpps_description
 ALTER TABLE template.vpps_parts RENAME COLUMN standard_name TO vpps_description;
@@ -248,37 +248,37 @@ ALTER TABLE template.vpps_parts RENAME COLUMN standard_name TO vpps_description;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- template.vpps_tools 扩展列（拧紧工具详细规格）
 -- ─────────────────────────────────────────────────────────────────────────────
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS vpps               TEXT;
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS gun_model          TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS matou_part_no      TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS importance         TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS gun_type           TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS wireless           TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS output_square      TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS torque_min         TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS torque_recommended TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS cad_model_no       TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS socket_model       TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS fastener_type      TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS fastener_params    TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS extension_model    TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS socket_cad_no      TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_tools ADD COLUMN IF NOT EXISTS extension_cad_no   TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN vpps               TEXT;
+ALTER TABLE template.vpps_tools ADD COLUMN gun_model          TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN matou_part_no      TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN importance         TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN gun_type           TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN wireless           TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN output_square      TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN torque_min         TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN torque_recommended TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN cad_model_no       TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN socket_model       TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN fastener_type      TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN fastener_params    TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN extension_model    TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN socket_cad_no      TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_tools ADD COLUMN extension_cad_no   TEXT NOT NULL DEFAULT '';
 CREATE INDEX IF NOT EXISTS idx_vpps_tools_vpps ON template.vpps_tools(vpps) WHERE vpps IS NOT NULL;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- template.fastener_spec 扩展列（紧固件详细规格）
 -- ─────────────────────────────────────────────────────────────────────────────
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS fastener_type   TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS thread_spec     TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS model           TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS shank_length    TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS guide_type      TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS guide_length    TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS has_adhesive    TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS drive_size      TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS flange_diameter TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.fastener_spec ADD COLUMN IF NOT EXISTS first_vehicle   TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN fastener_type   TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN thread_spec     TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN model           TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN shank_length    TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN guide_type      TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN guide_length    TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN has_adhesive    TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN drive_size      TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN flange_diameter TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.fastener_spec ADD COLUMN first_vehicle   TEXT NOT NULL DEFAULT '';
 -- 移除旧 UNIQUE 约束（part_no 不再唯一，同零件号可有不同规格）
 ALTER TABLE template.fastener_spec DROP CONSTRAINT IF EXISTS fastener_spec_part_no_key;
 

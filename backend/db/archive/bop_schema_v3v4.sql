@@ -71,7 +71,7 @@ ALTER TABLE bop.bop_entries RENAME COLUMN parent_bop_label TO parent_bop_title;
 
 ALTER TABLE bop.bop_entry_links RENAME COLUMN bop_entry_gid TO entry_gid;
 ALTER TABLE bop.bop_entry_links RENAME COLUMN ref_gid        TO entity_gid;
-ALTER TABLE bop.bop_entry_links ADD COLUMN IF NOT EXISTS version_gid TEXT;
+ALTER TABLE bop.bop_entry_links ADD COLUMN version_gid TEXT;
 
 -- 回填 version_gid（从关联的 bop_entries 中取）
 UPDATE bop.bop_entry_links l
@@ -87,7 +87,7 @@ UPDATE bop.bop_entry_links l
 
 -- 给 bop_steps 追加 step_code（工步编码，原属 asm_steps）
 -- 注：此字段在 V4 阶段会被移除，此处仅为数据迁移过渡
-ALTER TABLE bop.bop_steps ADD COLUMN IF NOT EXISTS step_code TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_steps ADD COLUMN step_code TEXT NOT NULL DEFAULT '';
 
 -- 迁移 asm_steps 存量数据
 INSERT INTO bop.bop_steps (
@@ -109,8 +109,8 @@ DROP TABLE IF EXISTS bop.asm_steps CASCADE;
 -- 1b. 合并 project_roles → bop_operator（岗位统一管理）
 -- ─────────────────────────────────────────────────────────────────────────────
 
-ALTER TABLE bop.bop_operator ADD COLUMN IF NOT EXISTS factory_role_ref_gid TEXT;
-ALTER TABLE bop.bop_operator ADD COLUMN IF NOT EXISTS role_type             TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_operator ADD COLUMN factory_role_ref_gid TEXT;
+ALTER TABLE bop.bop_operator ADD COLUMN role_type             TEXT NOT NULL DEFAULT '';
 
 UPDATE bop.bop_operator o
    SET factory_role_ref_gid = pr.factory_role_ref_gid,
@@ -148,7 +148,7 @@ ALTER TABLE bop.bop_entries
     DROP COLUMN IF EXISTS history_source_gid;
 
 ALTER TABLE bop.bop_entries
-    ADD COLUMN IF NOT EXISTS child_vpps JSONB NOT NULL DEFAULT '[]';
+    ADD COLUMN child_vpps JSONB NOT NULL DEFAULT '[]';
 
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -189,10 +189,10 @@ BEGIN
     LOOP
         EXECUTE format(
             'ALTER TABLE %s
-                 ADD COLUMN IF NOT EXISTS is_deleted  BOOLEAN NOT NULL DEFAULT FALSE,
-                 ADD COLUMN IF NOT EXISTS is_archived BOOLEAN NOT NULL DEFAULT FALSE,
-                 ADD COLUMN IF NOT EXISTS deleted_at  TIMESTAMPTZ,
-                 ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ',
+                 ADD COLUMN is_deleted  BOOLEAN NOT NULL DEFAULT FALSE,
+                 ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT FALSE,
+                 ADD COLUMN deleted_at  TIMESTAMPTZ,
+                 ADD COLUMN archived_at TIMESTAMPTZ',
             t
         );
     END LOOP;
@@ -270,9 +270,9 @@ UPDATE bop.bop_entry_links SET link_type = 'bop_operator'
 -- ─────────────────────────────────────────────────────────────────────────────
 
 ALTER TABLE bop.bop_versions
-    ADD COLUMN IF NOT EXISTS version_type     TEXT NOT NULL DEFAULT 'working',
-    ADD COLUMN IF NOT EXISTS pbom_version_gid TEXT,
-    ADD COLUMN IF NOT EXISTS owner_gid        TEXT;
+    ADD COLUMN version_type     TEXT NOT NULL DEFAULT 'working',
+    ADD COLUMN pbom_version_gid TEXT,
+    ADD COLUMN owner_gid        TEXT;
 
 COMMENT ON COLUMN bop.bop_versions.version_type IS
     'working = 工作版本（必须绑定 pbom_version_gid）；template = 工厂模板版本（pbom_version_gid=NULL）';
@@ -298,8 +298,8 @@ COMMENT ON COLUMN pbom.pbom_versions.status IS
 -- ─────────────────────────────────────────────────────────────────────────────
 
 ALTER TABLE pbom.pbom
-    ADD COLUMN IF NOT EXISTS vpps_source      TEXT NOT NULL DEFAULT 'auto',
-    ADD COLUMN IF NOT EXISTS vpps_reported_at TIMESTAMPTZ;
+    ADD COLUMN vpps_source      TEXT NOT NULL DEFAULT 'auto',
+    ADD COLUMN vpps_reported_at TIMESTAMPTZ;
 
 COMMENT ON COLUMN pbom.pbom.vpps_source IS
     'auto = 正常；manual = 人工临时值，需在所有展示场景加 ⚠ 标志';
@@ -312,7 +312,7 @@ COMMENT ON COLUMN pbom.pbom.vpps_reported_at IS
 -- ─────────────────────────────────────────────────────────────────────────────
 
 ALTER TABLE bop.bop_steps DROP COLUMN IF EXISTS step_code;
-ALTER TABLE bop.bop_steps ADD COLUMN IF NOT EXISTS operation_code TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_steps ADD COLUMN operation_code TEXT NOT NULL DEFAULT '';
 DROP INDEX IF EXISTS bop.idx_bop_steps_step_code;
 
 COMMENT ON COLUMN bop.bop_steps.operation_code IS
@@ -324,7 +324,7 @@ COMMENT ON COLUMN bop.bop_steps.operation_code IS
 -- ─────────────────────────────────────────────────────────────────────────────
 
 ALTER TABLE bop.bop_operator
-    ADD COLUMN IF NOT EXISTS operator_code TEXT NOT NULL DEFAULT '';
+    ADD COLUMN operator_code TEXT NOT NULL DEFAULT '';
 
 COMMENT ON COLUMN bop.bop_operator.operator_code IS
     '岗位编码（原 Excel 字段）';

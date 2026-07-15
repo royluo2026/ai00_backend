@@ -551,11 +551,13 @@ def _get_line_gid(cur, entry_gid: str) -> Optional[str]:
 
 def _log_entry_op(cur, *, version_gid: str, entry_gid: str, entry_title: str,
                   op_type: str, old_state, new_state,
-                  user_gid: str, user_name: str) -> None:
-    """向 bop_line_operation_log 写一条操作记录；失败静默不阻断主事务。"""
+                  user_gid: str, user_name: str) -> tuple[str, str]:
+    """向 bop_line_operation_log 写一条操作记录；失败静默不阻断主事务。
+    返回 (batch_id, line_gid) 供前端刷新操作历史面板。"""
     # 确保表有 old_state / new_state 列
     _ensure_oplog_cols(cur)
     line_gid = _get_line_gid(cur, entry_gid) or entry_gid
+    batch_id = str(next_gid())
     try:
         cur.execute(
             "INSERT INTO workmanship_bop_bop_line_operation_log"
@@ -564,15 +566,16 @@ def _log_entry_op(cur, *, version_gid: str, entry_gid: str, entry_title: str,
             "  performed_by, performed_by_name, performed_at)"
             " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW())",
             (
-                str(next_gid()), version_gid, line_gid, str(next_gid()), op_type,
+                str(next_gid()), version_gid, line_gid, batch_id, op_type,
                 entry_gid, entry_title,
                 json.dumps(old_state, default=str) if old_state is not None else None,
                 json.dumps(new_state, default=str) if new_state is not None else None,
                 user_gid, user_name,
             )
         )
-        _log.debug("oplog ok gid=%s op=%s", entry_gid, op_type)
+        _log.debug("oplog ok gid=%s op=%s batch=%s", entry_gid, op_type, batch_id)
     except Exception as exc:
         import traceback as _tb
         _log.warning("oplog write failed gid=%s op=%s: %s\n%s",
                      entry_gid, op_type, exc, _tb.format_exc())
+    return batch_id, line_gid

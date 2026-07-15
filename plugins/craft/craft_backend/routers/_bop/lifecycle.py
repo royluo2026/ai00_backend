@@ -669,11 +669,39 @@ def undo_line_history(
             events = _history.fetch_batch_events(cur, gid, line_gid, batch_id)
             if not events:
                 raise HTTPException(404, "批次历史不存在")
+            summary = []
+            affected_entries = []
             for event in reversed(events):
                 _history.apply_history_event(cur, event, direction="undo")
+                op_type = event.get("op_type")
+                entity_title = event.get("entity_title") or ""
+                if op_type == "update_entry":
+                    entity_title = event.get("entity_title") or ""
+                elif op_type in ("create_entry", "delete_entry"):
+                    entries = (event.get("old_state") or {}).get("entries", [])
+                    for e in entries:
+                        entity_title = e.get("title", entity_title)
+                        affected_entries.append(e.get("gid"))
+                affected_entries.append(event.get("entity_gid"))
+                summary.append({
+                    "op_type": op_type,
+                    "entity_gid": event.get("entity_gid"),
+                    "entity_title": entity_title,
+                })
             _history.mark_batch_status(cur, gid, line_gid, batch_id, "undone", _u.get('gid', ''))
+            # ── 查询刷新后的操作历史 ──
+            history_data = _history.fetch_line_history(cur, gid, line_gid, limit=50)
             conn.commit()
-            return {"batch_id": batch_id, "status": "undone"}
+            return {
+                "batch_id": batch_id,
+                "status": "undone",
+                "version_gid": gid,
+                "line_gid": line_gid,
+                "summary": summary,
+                "affected_entries": list({e for e in affected_entries if e}),
+                "operation_log": history_data["items"],
+                "latest_active_batch_id": history_data["latest_active_batch_id"],
+            }
 
 
 @router.post("/versions/{gid}/lifecycle/lines/{line_gid}/redo")
@@ -706,11 +734,36 @@ def redo_line_history(
                 _history.mark_batch_status(cur, gid, line_gid, batch_id, "redo_invalidated", _u.get('gid', ''))
                 conn.commit()
                 raise HTTPException(409, "重做已失效：目标对象在撤销后已被修改")
+            summary = []
+            affected_entries = []
             for event in events:
                 _history.apply_history_event(cur, event, direction="redo")
+                op_type = event.get("op_type")
+                entity_title = event.get("entity_title") or ""
+                if op_type in ("create_entry", "delete_entry"):
+                    entries = (event.get("new_state") or {}).get("entries", [])
+                    for e in entries:
+                        entity_title = e.get("title", entity_title)
+                        affected_entries.append(e.get("gid"))
+                affected_entries.append(event.get("entity_gid"))
+                summary.append({
+                    "op_type": op_type,
+                    "entity_gid": event.get("entity_gid"),
+                    "entity_title": entity_title,
+                })
             _history.mark_batch_status(cur, gid, line_gid, batch_id, "active", _u.get('gid', ''))
+            history_data = _history.fetch_line_history(cur, gid, line_gid, limit=50)
             conn.commit()
-            return {"batch_id": batch_id, "status": "active"}
+            return {
+                "batch_id": batch_id,
+                "status": "active",
+                "version_gid": gid,
+                "line_gid": line_gid,
+                "summary": summary,
+                "affected_entries": list({e for e in affected_entries if e}),
+                "operation_log": history_data["items"],
+                "latest_active_batch_id": history_data["latest_active_batch_id"],
+            }
 
 
 @router.get("/versions/{gid}/lifecycle/lines/{line_gid}/operation-log")
@@ -722,12 +775,14 @@ def get_operation_log(
 ):
     with get_conn() as conn:
         with conn.cursor() as cur:
+            _history.ensure_history_schema(cur)
             cur.execute("""
                 SELECT gid, batch_id, op_type, entity_gid, entity_title,
-                       op_seq, performed_by, performed_by_name, performed_at, rolled_back
+                       op_seq, performed_by, performed_by_name, performed_at, rolled_back,
+                       batch_status, undone_at, undone_by, redone_at, redone_by, invalidate_reason
                 FROM workmanship_bop_bop_line_operation_log
                 WHERE version_gid=%s AND line_gid=%s
-                ORDER BY performed_at DESC, op_seq
+                ORDER BY performed_at DESC, op_seq DESC
                 LIMIT %s
             """, (gid, line_gid, limit))
             return {"data": [dict(r) for r in cur.fetchall()]}

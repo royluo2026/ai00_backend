@@ -26,10 +26,10 @@ CREATE TABLE IF NOT EXISTS auth.teams (
 );
 
 -- Migration: 为已有 teams 表补充 config 列
-ALTER TABLE auth.teams ADD COLUMN IF NOT EXISTS config JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE auth.teams ADD COLUMN config JSONB NOT NULL DEFAULT '{}';
 -- Migration: 飞书部门 ID（用于 org 自动同步，NULL = 手动创建的团队）
-ALTER TABLE auth.teams ADD COLUMN IF NOT EXISTS feishu_dept_id TEXT;
-ALTER TABLE auth.teams ADD COLUMN IF NOT EXISTS parent_team_gid TEXT REFERENCES auth.teams(gid) ON DELETE SET NULL;
+ALTER TABLE auth.teams ADD COLUMN feishu_dept_id TEXT;
+ALTER TABLE auth.teams ADD COLUMN parent_team_gid TEXT REFERENCES auth.teams(gid) ON DELETE SET NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_teams_feishu_dept ON auth.teams (feishu_dept_id) WHERE feishu_dept_id IS NOT NULL;
 
 -- 全局系统配置表（飞书凭证、DB 连接串等，热重载）
@@ -119,7 +119,7 @@ DO $$ BEGIN
     END IF;
 END $$;
 
-ALTER TABLE auth.project_members ADD COLUMN IF NOT EXISTS scope_type TEXT NOT NULL DEFAULT 'project';
+ALTER TABLE auth.project_members ADD COLUMN scope_type TEXT NOT NULL DEFAULT 'project';
 
 -- 删除旧的 UNIQUE(project_gid, user_gid) 约束（允许一人在同项目多角色）
 ALTER TABLE auth.project_members DROP CONSTRAINT IF EXISTS project_members_project_gid_user_gid_key;
@@ -190,11 +190,11 @@ CREATE INDEX IF NOT EXISTS idx_projects_team   ON proj.projects (team_id);
 CREATE INDEX IF NOT EXISTS idx_projects_status ON proj.projects (status);
 
 -- Migration: vehicle_models 新增 vehicle_type 字段
-ALTER TABLE proj.vehicle_models ADD COLUMN IF NOT EXISTS vehicle_type TEXT DEFAULT '';
+ALTER TABLE proj.vehicle_models ADD COLUMN vehicle_type TEXT DEFAULT '';
 -- 可选值：纯电MPV / 纯电SUV / 增程SUV / 纯电轿车 / 增程轿车 / 增程MPV
 
 -- Migration: projects 新增目标工厂 FK
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS factory_gid TEXT REFERENCES factory.factories(gid) ON DELETE SET NULL;
+ALTER TABLE proj.projects ADD COLUMN factory_gid TEXT REFERENCES factory.factories(gid) ON DELETE SET NULL;
 
 -- ── eBOM BC ──────────────────────────────────────────────────────
 
@@ -226,46 +226,46 @@ CREATE TABLE IF NOT EXISTS bop.pbom (
 CREATE INDEX IF NOT EXISTS idx_part_entries_snapshot ON bop.pbom (snapshot_gid);
 
 -- vpps：零件号升版时不变的稳定壳标识（工程师指定，来自外部零件管理系统）
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS vpps TEXT;
+ALTER TABLE bop.pbom ADD COLUMN vpps TEXT;
 CREATE INDEX IF NOT EXISTS idx_part_entries_vpps ON bop.pbom(vpps) WHERE vpps IS NOT NULL;
 
 -- PBOM 扩展列（对齐 TC/PLM 导出 Excel 19列）
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS vpps_desc TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS parent_vpps TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS parent_vpps_name TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS bom_row TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS bom_row_label TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS component_id TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS component_type TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS component_version_status TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS purchase_status TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS variable_formula TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS torque TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS torque_importance TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS ownership_user TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT NULL;
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS home TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS configuration TEXT DEFAULT '';
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS parent_bom_row TEXT DEFAULT '';  -- 父级BOM行标识
+ALTER TABLE bop.pbom ADD COLUMN vpps_desc TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN parent_vpps TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN parent_vpps_name TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN bom_row TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN bom_row_label TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN component_id TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN component_type TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN component_version_status TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN purchase_status TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN variable_formula TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN torque TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN torque_importance TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN ownership_user TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN level INTEGER DEFAULT NULL;
+ALTER TABLE bop.pbom ADD COLUMN home TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN configuration TEXT DEFAULT '';
+ALTER TABLE bop.pbom ADD COLUMN parent_bom_row TEXT DEFAULT '';  -- 父级BOM行标识
 -- PBOM 扩展列：CATIA 实例数据 + 变换矩阵 + 限定框 + ECN/FNA
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS catia_occurrence_name TEXT DEFAULT '';  -- catiaOccurrenceName
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS catia_file_name TEXT DEFAULT '';        -- catiaFileName
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS catia_uuid TEXT DEFAULT '';             -- catiaUUID
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS default_matrix TEXT DEFAULT '';         -- 默认变换矩阵
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS abs_matrix TEXT DEFAULT '';             -- 绝对变换矩阵
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS rel_matrix TEXT DEFAULT '';             -- 相对变换矩阵
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS local_bbox TEXT DEFAULT '';             -- 限定框
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS ecn TEXT DEFAULT '';                    -- ECN编码
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS fna TEXT DEFAULT '';                    -- FNA
+ALTER TABLE bop.pbom ADD COLUMN catia_occurrence_name TEXT DEFAULT '';  -- catiaOccurrenceName
+ALTER TABLE bop.pbom ADD COLUMN catia_file_name TEXT DEFAULT '';        -- catiaFileName
+ALTER TABLE bop.pbom ADD COLUMN catia_uuid TEXT DEFAULT '';             -- catiaUUID
+ALTER TABLE bop.pbom ADD COLUMN default_matrix TEXT DEFAULT '';         -- 默认变换矩阵
+ALTER TABLE bop.pbom ADD COLUMN abs_matrix TEXT DEFAULT '';             -- 绝对变换矩阵
+ALTER TABLE bop.pbom ADD COLUMN rel_matrix TEXT DEFAULT '';             -- 相对变换矩阵
+ALTER TABLE bop.pbom ADD COLUMN local_bbox TEXT DEFAULT '';             -- 限定框
+ALTER TABLE bop.pbom ADD COLUMN ecn TEXT DEFAULT '';                    -- ECN编码
+ALTER TABLE bop.pbom ADD COLUMN fna TEXT DEFAULT '';                    -- FNA
 -- PBOM 分析结果列（紧固件主件识别）
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS geo_main_part TEXT DEFAULT '';          -- 几何推测主件
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS ref_main_vpps_desc TEXT DEFAULT '';     -- 参考主件VPPS描述
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS ref_main_vpps TEXT DEFAULT '';          -- 参考主件vpps
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS main_part_consistency TEXT DEFAULT '';  -- 主件一致性状态
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS geo_evidence TEXT DEFAULT '';           -- 推测主件几何依据
-ALTER TABLE bop.pbom ADD COLUMN IF NOT EXISTS lr_side TEXT DEFAULT '';                -- 零件左右侧
+ALTER TABLE bop.pbom ADD COLUMN geo_main_part TEXT DEFAULT '';          -- 几何推测主件
+ALTER TABLE bop.pbom ADD COLUMN ref_main_vpps_desc TEXT DEFAULT '';     -- 参考主件VPPS描述
+ALTER TABLE bop.pbom ADD COLUMN ref_main_vpps TEXT DEFAULT '';          -- 参考主件vpps
+ALTER TABLE bop.pbom ADD COLUMN main_part_consistency TEXT DEFAULT '';  -- 主件一致性状态
+ALTER TABLE bop.pbom ADD COLUMN geo_evidence TEXT DEFAULT '';           -- 推测主件几何依据
+ALTER TABLE bop.pbom ADD COLUMN lr_side TEXT DEFAULT '';                -- 零件左右侧
 -- pbom_versions 扩展：版本名称独立字段（不复用 version_tag）
-ALTER TABLE bop.pbom_versions ADD COLUMN IF NOT EXISTS name TEXT DEFAULT '';
+ALTER TABLE bop.pbom_versions ADD COLUMN name TEXT DEFAULT '';
 -- Migration: project_gid 改为可选（PBOM 版本不一定绑定项目）
 ALTER TABLE bop.pbom_versions ALTER COLUMN project_gid DROP NOT NULL;
 ALTER TABLE bop.pbom_versions ALTER COLUMN project_gid SET DEFAULT NULL;
@@ -363,8 +363,8 @@ CREATE TABLE IF NOT EXISTS template.gbop_entries (
 CREATE INDEX IF NOT EXISTS idx_gbop_entries_version ON template.gbop_entries(version_gid);
 CREATE INDEX IF NOT EXISTS idx_gbop_entries_parent  ON template.gbop_entries(parent_gid);
 CREATE INDEX IF NOT EXISTS idx_gbop_entries_vpps    ON template.gbop_entries(vpps) WHERE vpps IS NOT NULL;
-ALTER TABLE template.gbop_entries ADD COLUMN IF NOT EXISTS vpps_part TEXT    NOT NULL DEFAULT '';
-ALTER TABLE template.gbop_entries ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE template.gbop_entries ADD COLUMN vpps_part TEXT    NOT NULL DEFAULT '';
+ALTER TABLE template.gbop_entries ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- GBOP 工艺卡片（L4 总装工艺独立实体）
 CREATE TABLE IF NOT EXISTS template.gbop_processes (
@@ -390,8 +390,8 @@ CREATE TABLE IF NOT EXISTS template.gbop_processes (
 );
 CREATE INDEX IF NOT EXISTS idx_gbop_processes_version ON template.gbop_processes(version_gid);
 CREATE INDEX IF NOT EXISTS idx_gbop_processes_vpps ON template.gbop_processes(vpps) WHERE vpps IS NOT NULL;
-ALTER TABLE template.gbop_processes ADD COLUMN IF NOT EXISTS vpps_part TEXT    NOT NULL DEFAULT '';
-ALTER TABLE template.gbop_processes ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE template.gbop_processes ADD COLUMN vpps_part TEXT    NOT NULL DEFAULT '';
+ALTER TABLE template.gbop_processes ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- GBOP 操作卡片（L5 总装操作独立实体）
 CREATE TABLE IF NOT EXISTS template.gbop_operations (
@@ -419,8 +419,8 @@ CREATE TABLE IF NOT EXISTS template.gbop_operations (
 CREATE INDEX IF NOT EXISTS idx_gbop_operations_version ON template.gbop_operations(version_gid);
 CREATE INDEX IF NOT EXISTS idx_gbop_operations_process ON template.gbop_operations(process_gid);
 CREATE INDEX IF NOT EXISTS idx_gbop_operations_vpps ON template.gbop_operations(vpps) WHERE vpps IS NOT NULL;
-ALTER TABLE template.gbop_operations ADD COLUMN IF NOT EXISTS vpps_part TEXT    NOT NULL DEFAULT '';
-ALTER TABLE template.gbop_operations ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE template.gbop_operations ADD COLUMN vpps_part TEXT    NOT NULL DEFAULT '';
+ALTER TABLE template.gbop_operations ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- GBOP 节点-实体联结表
 CREATE TABLE IF NOT EXISTS template.gbop_entry_links (
@@ -524,12 +524,12 @@ CREATE TABLE IF NOT EXISTS template.vpps_parts (
 );
 CREATE INDEX IF NOT EXISTS idx_vpps_parts_vpps ON template.vpps_parts(vpps) WHERE vpps IS NOT NULL;
 
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS flex_type             TEXT NOT NULL DEFAULT '待定';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS ref_main_vpps         TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS ref_main_vpps_desc    TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS ref_install_direction TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS ref_static_clearance  TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.vpps_parts ADD COLUMN IF NOT EXISTS ref_install_clearance TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN flex_type             TEXT NOT NULL DEFAULT '待定';
+ALTER TABLE template.vpps_parts ADD COLUMN ref_main_vpps         TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN ref_main_vpps_desc    TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN ref_install_direction TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN ref_static_clearance  TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.vpps_parts ADD COLUMN ref_install_clearance TEXT NOT NULL DEFAULT '';
 
 -- ── 工厂资源 BC ──────────────────────────────────────────────────
 
@@ -696,7 +696,7 @@ CREATE INDEX IF NOT EXISTS idx_view_configs_owner    ON app.view_configs (owner_
 CREATE INDEX IF NOT EXISTS idx_view_configs_module   ON app.view_configs (module);
 CREATE INDEX IF NOT EXISTS idx_view_configs_list_gid ON app.view_configs (list_gid);
 -- 已有实例需执行：
-ALTER TABLE app.view_configs ADD COLUMN IF NOT EXISTS list_gid TEXT DEFAULT NULL;
+ALTER TABLE app.view_configs ADD COLUMN list_gid TEXT DEFAULT NULL;
 
 -- ── 导出模板配置表 ──────────────────────────────────────────────
 -- 存储各模块的 Excel 导出样式模板（JSON 配置，CSS 模拟预览）
@@ -746,14 +746,14 @@ CREATE INDEX IF NOT EXISTS idx_lists_owner ON work.lists (owner_type, owner_gid)
 CREATE INDEX IF NOT EXISTS idx_lists_item_type ON work.lists (item_type);
 
 -- 为已有 lists 表补列（新环境 CREATE TABLE 已含这些列，旧 DB 需手动执行）
-ALTER TABLE work.lists ADD COLUMN IF NOT EXISTS item_type     TEXT NOT NULL DEFAULT 'task';
-ALTER TABLE work.lists ADD COLUMN IF NOT EXISTS creator_gid   TEXT NOT NULL DEFAULT '';
-ALTER TABLE work.lists ADD COLUMN IF NOT EXISTS deleted_at    TIMESTAMPTZ DEFAULT NULL;
-ALTER TABLE work.lists ADD COLUMN IF NOT EXISTS visibility    TEXT NOT NULL DEFAULT 'team'; -- private | project | team | public
-ALTER TABLE work.lists ADD COLUMN IF NOT EXISTS storage_scope TEXT NOT NULL DEFAULT 'cloud';
-ALTER TABLE work.lists ADD COLUMN IF NOT EXISTS project_gid   TEXT DEFAULT NULL;
-ALTER TABLE work.lists ADD COLUMN IF NOT EXISTS read_scope    TEXT DEFAULT NULL;
-ALTER TABLE work.lists ADD COLUMN IF NOT EXISTS write_scope   TEXT DEFAULT NULL;
+ALTER TABLE work.lists ADD COLUMN item_type     TEXT NOT NULL DEFAULT 'task';
+ALTER TABLE work.lists ADD COLUMN creator_gid   TEXT NOT NULL DEFAULT '';
+ALTER TABLE work.lists ADD COLUMN deleted_at    TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE work.lists ADD COLUMN visibility    TEXT NOT NULL DEFAULT 'team'; -- private | project | team | public
+ALTER TABLE work.lists ADD COLUMN storage_scope TEXT NOT NULL DEFAULT 'cloud';
+ALTER TABLE work.lists ADD COLUMN project_gid   TEXT DEFAULT NULL;
+ALTER TABLE work.lists ADD COLUMN read_scope    TEXT DEFAULT NULL;
+ALTER TABLE work.lists ADD COLUMN write_scope   TEXT DEFAULT NULL;
 
 CREATE TABLE IF NOT EXISTS work.tasks (
     gid                 TEXT PRIMARY KEY,
@@ -888,19 +888,19 @@ CREATE INDEX IF NOT EXISTS idx_wb_overrides_wb   ON app.workbench_member_overrid
 CREATE INDEX IF NOT EXISTS idx_wb_overrides_user ON app.workbench_member_overrides (user_gid);
 
 -- 为 work.tasks / work.issues 添加 list_gid 列（已有数据库执行以下迁移）
-ALTER TABLE work.tasks  ADD COLUMN IF NOT EXISTS list_gid TEXT DEFAULT NULL;
-ALTER TABLE work.issues ADD COLUMN IF NOT EXISTS list_gid TEXT DEFAULT NULL;
+ALTER TABLE work.tasks  ADD COLUMN list_gid TEXT DEFAULT NULL;
+ALTER TABLE work.issues ADD COLUMN list_gid TEXT DEFAULT NULL;
 
 -- display_id 迁移（已有数据库）
-ALTER TABLE work.tasks           ADD COLUMN IF NOT EXISTS display_id TEXT NOT NULL DEFAULT '';
-ALTER TABLE work.issues          ADD COLUMN IF NOT EXISTS display_id TEXT NOT NULL DEFAULT '';
-ALTER TABLE template.gbop        ADD COLUMN IF NOT EXISTS display_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE work.tasks           ADD COLUMN display_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE work.issues          ADD COLUMN display_id TEXT NOT NULL DEFAULT '';
+ALTER TABLE template.gbop        ADD COLUMN display_id TEXT NOT NULL DEFAULT '';
 
 -- BOP entries：字段重构（与 bop_schema_v2.sql 保持同步，幂等）
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS ai00_level       SMALLINT;
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS title            TEXT;
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS bom_row_owner    TEXT;
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS parent_bop_label TEXT;
+ALTER TABLE bop.bop_entries ADD COLUMN ai00_level       SMALLINT;
+ALTER TABLE bop.bop_entries ADD COLUMN title            TEXT;
+ALTER TABLE bop.bop_entries ADD COLUMN bom_row_owner    TEXT;
+ALTER TABLE bop.bop_entries ADD COLUMN parent_bop_label TEXT;
 
 -- ══════════════════════════════════════════════════════════════
 -- 流程引擎（Flow Engine）— flows + flow_runs
@@ -1066,8 +1066,8 @@ CREATE TABLE IF NOT EXISTS knowledge.knowledge_items (
 );
 
 -- knowledge_items 新增置顶 / 隐藏字段
-ALTER TABLE knowledge.knowledge_items ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE knowledge.knowledge_items ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE knowledge.knowledge_items ADD COLUMN is_pinned BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE knowledge.knowledge_items ADD COLUMN is_hidden BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- 收藏
 CREATE TABLE IF NOT EXISTS knowledge.knowledge_favorites (
@@ -1124,28 +1124,28 @@ INSERT INTO knowledge.knowledge_items (
 ) ON CONFLICT (gid) DO NOTHING;
 
 -- ── vpps_part + part_feed（工序/操作所针对的零件 + 是否涉及上料）──────────────
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS vpps_part TEXT NOT NULL DEFAULT '';
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS part_feed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE bop.bop_entries ADD COLUMN vpps_part TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_entries ADD COLUMN part_feed BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- ── catia_occurrence_name + parent_vpps_name（TC CSV 扩展列）──────────────────
 -- catia_occurrence_name：零件节点专用，来自 CATIA 装配树实例名称
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS catia_occurrence_name TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_entries ADD COLUMN catia_occurrence_name TEXT NOT NULL DEFAULT '';
 -- parent_vpps_name：父级 VPPS 描述名称（CSV "父级VPPS名称" 列）
-ALTER TABLE bop.bop_entries ADD COLUMN IF NOT EXISTS parent_vpps_name TEXT NOT NULL DEFAULT '';
+ALTER TABLE bop.bop_entries ADD COLUMN parent_vpps_name TEXT NOT NULL DEFAULT '';
 
 -- ── 现有数据库新字段迁移（已有 DB 手动或重建时执行）──────────────────────────
 -- proj.projects 表新增字段：
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS project_code TEXT NOT NULL DEFAULT '';
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS model_year   INTEGER;
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS suffix       TEXT NOT NULL DEFAULT '';
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS jph          REAL;
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS is_deleted   BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS is_archived  BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS deleted_at   TIMESTAMPTZ;
-ALTER TABLE proj.projects ADD COLUMN IF NOT EXISTS archived_at  TIMESTAMPTZ;
+ALTER TABLE proj.projects ADD COLUMN project_code TEXT NOT NULL DEFAULT '';
+ALTER TABLE proj.projects ADD COLUMN model_year   INTEGER;
+ALTER TABLE proj.projects ADD COLUMN suffix       TEXT NOT NULL DEFAULT '';
+ALTER TABLE proj.projects ADD COLUMN jph          REAL;
+ALTER TABLE proj.projects ADD COLUMN is_deleted   BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE proj.projects ADD COLUMN is_archived  BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE proj.projects ADD COLUMN deleted_at   TIMESTAMPTZ;
+ALTER TABLE proj.projects ADD COLUMN archived_at  TIMESTAMPTZ;
 
 -- knowledge.knowledge_items 表新增 is_system 字段：
-ALTER TABLE knowledge.knowledge_items ADD COLUMN IF NOT EXISTS is_system BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE knowledge.knowledge_items ADD COLUMN is_system BOOLEAN NOT NULL DEFAULT FALSE;
 -- 补插系统条目（若 ALTER 之前 INSERT 未执行）：
 INSERT INTO knowledge.knowledge_items (
     gid, folder_gid, scope_type, team_gid, item_type, title, status,
@@ -1184,7 +1184,7 @@ CREATE INDEX IF NOT EXISTS idx_ai_audit_logs_created ON app.ai_audit_logs (creat
 -- CREATE EXTENSION IF NOT EXISTS vector;
 --
 -- Step 2：knowledge_entries 表追加 embedding 列（维度与 embed_model 匹配，默认 768）
--- ALTER TABLE knowledge.knowledge_entries ADD COLUMN IF NOT EXISTS embedding vector(768);
+-- ALTER TABLE knowledge.knowledge_entries ADD COLUMN embedding vector(768);
 --
 -- Step 3：创建 IVFFlat 近似索引（先写入足够数据再执行，空表建索引无意义）
 -- CREATE INDEX IF NOT EXISTS idx_ke_embedding
@@ -1255,25 +1255,25 @@ CREATE INDEX IF NOT EXISTS idx_proj_tasks_deleted ON proj.tasks (deleted_at) WHE
 
 -- ── tasks 补字段（2026-05-25）⚠️ 已有数据库需手动在 DBeaver 执行 ──────────────
 -- 基础字段（旧表可能缺失）
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS list_gid      TEXT DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN list_gid      TEXT DEFAULT NULL;
 -- 软删除
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS is_deleted   BOOLEAN     NOT NULL DEFAULT FALSE;
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS deleted_at   TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN is_deleted   BOOLEAN     NOT NULL DEFAULT FALSE;
+ALTER TABLE proj.tasks ADD COLUMN deleted_at   TIMESTAMPTZ DEFAULT NULL;
 -- 时间线
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS scheduled_date       DATE    DEFAULT NULL;
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS scheduled_start_time TIME    DEFAULT NULL;
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS time_estimate        INTEGER DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN scheduled_date       DATE    DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN scheduled_start_time TIME    DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN time_estimate        INTEGER DEFAULT NULL;
 
 -- ── 任务画布视图字段补充（2026-05-24）──────────────────────────────────────────
 -- ⚠️ 已有数据库需手动在 DBeaver 执行
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS parent_task_gid TEXT DEFAULT NULL;
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS canvas_x        REAL DEFAULT NULL;
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS canvas_y        REAL DEFAULT NULL;
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS completion      INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS node_type       TEXT NOT NULL DEFAULT 'normal';
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS canvas_icon     TEXT NOT NULL DEFAULT 'star';
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS canvas_row_gid  TEXT DEFAULT NULL;
-ALTER TABLE proj.tasks ADD COLUMN IF NOT EXISTS canvas_col_gid  TEXT DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN parent_task_gid TEXT DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN canvas_x        REAL DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN canvas_y        REAL DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN completion      INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE proj.tasks ADD COLUMN node_type       TEXT NOT NULL DEFAULT 'normal';
+ALTER TABLE proj.tasks ADD COLUMN canvas_icon     TEXT NOT NULL DEFAULT 'star';
+ALTER TABLE proj.tasks ADD COLUMN canvas_row_gid  TEXT DEFAULT NULL;
+ALTER TABLE proj.tasks ADD COLUMN canvas_col_gid  TEXT DEFAULT NULL;
 
 -- ── 任务依赖关系表（用于任务画布连线）────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS proj.task_dependencies (
@@ -1378,8 +1378,8 @@ CREATE TABLE IF NOT EXISTS knowledge.onto_axioms (
 );
 
 -- craft_rules 扩展：CEL 表达式 + 绑定类
-ALTER TABLE knowledge.craft_rules ADD COLUMN IF NOT EXISTS expression         TEXT DEFAULT NULL;
-ALTER TABLE knowledge.craft_rules ADD COLUMN IF NOT EXISTS context_class_gid TEXT DEFAULT NULL;
+ALTER TABLE knowledge.craft_rules ADD COLUMN expression         TEXT DEFAULT NULL;
+ALTER TABLE knowledge.craft_rules ADD COLUMN context_class_gid TEXT DEFAULT NULL;
 
 -- ── 外部数据源集成 ────────────────────────────────────────────────────────────
 CREATE SCHEMA IF NOT EXISTS integration;
@@ -1431,17 +1431,17 @@ CREATE TABLE IF NOT EXISTS integration.ext_field_mappings (
 -- ── 本体驱动存储重构（2026-06-15）────────────────────────────────────────────
 -- onto_classes 加实体表字段，消除 _ENTITY_TABLE_MAP 硬编码
 ALTER TABLE knowledge.onto_classes
-    ADD COLUMN IF NOT EXISTS entity_table TEXT DEFAULT NULL;
+    ADD COLUMN entity_table TEXT DEFAULT NULL;
 CREATE INDEX IF NOT EXISTS idx_onto_classes_entity_table
     ON knowledge.onto_classes(entity_table) WHERE entity_table IS NOT NULL;
 
 -- onto_properties 加 storage_hint（seed 代码已在读写此字段）
 ALTER TABLE knowledge.onto_properties
-    ADD COLUMN IF NOT EXISTS storage_hint TEXT NOT NULL DEFAULT 'meta';
+    ADD COLUMN storage_hint TEXT NOT NULL DEFAULT 'meta';
 
 -- onto_relations 加 link_type_binding（seed 代码已在读写此字段）
 ALTER TABLE knowledge.onto_relations
-    ADD COLUMN IF NOT EXISTS link_type_binding TEXT DEFAULT NULL;
+    ADD COLUMN link_type_binding TEXT DEFAULT NULL;
 CREATE INDEX IF NOT EXISTS idx_ext_field_mappings_m ON integration.ext_field_mappings(mapping_gid);
 
 -- ══════════════════════════════════════════════════════════════════════════════
@@ -1451,61 +1451,61 @@ CREATE INDEX IF NOT EXISTS idx_ext_field_mappings_m ON integration.ext_field_map
 
 -- ── onto_classes 扩展 ────────────────────────────────────────────────────────
 ALTER TABLE knowledge.onto_classes
-  ADD COLUMN IF NOT EXISTS abbr TEXT DEFAULT NULL;
+  ADD COLUMN abbr TEXT DEFAULT NULL;
 
 ALTER TABLE knowledge.onto_classes
-  ADD COLUMN IF NOT EXISTS ai00_level INTEGER DEFAULT NULL;
+  ADD COLUMN ai00_level INTEGER DEFAULT NULL;
 
 -- 布局画布层次分组：'inner' | 'middle' | 'outer' | 'station' | 'hidden' | NULL
 ALTER TABLE knowledge.onto_classes
-  ADD COLUMN IF NOT EXISTS display_layer TEXT DEFAULT NULL;
+  ADD COLUMN display_layer TEXT DEFAULT NULL;
 
 ALTER TABLE knowledge.onto_classes
-  ADD COLUMN IF NOT EXISTS stats_priority INTEGER DEFAULT 99;
+  ADD COLUMN stats_priority INTEGER DEFAULT 99;
 
 ALTER TABLE knowledge.onto_classes
-  ADD COLUMN IF NOT EXISTS is_hidden_in_layout BOOLEAN NOT NULL DEFAULT FALSE;
+  ADD COLUMN is_hidden_in_layout BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- 创建子节点时的默认推荐子类型（UI 提示，不约束实际父子关系）
 ALTER TABLE knowledge.onto_classes
-  ADD COLUMN IF NOT EXISTS suggested_child_type TEXT DEFAULT NULL;
+  ADD COLUMN suggested_child_type TEXT DEFAULT NULL;
 
 -- ── onto_properties 扩展 ─────────────────────────────────────────────────────
 -- 'text' | 'number' | 'select' | 'pics' | 'checkbox' | 'textarea'
 ALTER TABLE knowledge.onto_properties
-  ADD COLUMN IF NOT EXISTS field_widget TEXT NOT NULL DEFAULT 'text';
+  ADD COLUMN field_widget TEXT NOT NULL DEFAULT 'text';
 
 ALTER TABLE knowledge.onto_properties
-  ADD COLUMN IF NOT EXISTS field_config JSONB NOT NULL DEFAULT '{}';
+  ADD COLUMN field_config JSONB NOT NULL DEFAULT '{}';
 
 ALTER TABLE knowledge.onto_properties
-  ADD COLUMN IF NOT EXISTS show_in_create_dialog BOOLEAN NOT NULL DEFAULT TRUE;
+  ADD COLUMN show_in_create_dialog BOOLEAN NOT NULL DEFAULT TRUE;
 
 ALTER TABLE knowledge.onto_properties
-  ADD COLUMN IF NOT EXISTS dialog_order INTEGER NOT NULL DEFAULT 99;
+  ADD COLUMN dialog_order INTEGER NOT NULL DEFAULT 99;
 
 -- ── onto_relations 扩展 ──────────────────────────────────────────────────────
 ALTER TABLE knowledge.onto_relations
-  ADD COLUMN IF NOT EXISTS deep_copy_on_fork BOOLEAN NOT NULL DEFAULT FALSE;
+  ADD COLUMN deep_copy_on_fork BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE knowledge.onto_relations
-  ADD COLUMN IF NOT EXISTS shared_on_fork BOOLEAN NOT NULL DEFAULT FALSE;
+  ADD COLUMN shared_on_fork BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE knowledge.onto_relations
-  ADD COLUMN IF NOT EXISTS skip_on_fork BOOLEAN NOT NULL DEFAULT FALSE;
+  ADD COLUMN skip_on_fork BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- snapshot 目标表从 range_class_gid → onto_classes.entity_table 推导，不单独存
 ALTER TABLE knowledge.onto_relations
-  ADD COLUMN IF NOT EXISTS snapshot_on_freeze BOOLEAN NOT NULL DEFAULT FALSE;
+  ADD COLUMN snapshot_on_freeze BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- ── onto_axioms 扩展 ─────────────────────────────────────────────────────────
 ALTER TABLE knowledge.onto_axioms
-  ADD COLUMN IF NOT EXISTS property_gid TEXT DEFAULT NULL;
+  ADD COLUMN property_gid TEXT DEFAULT NULL;
 
 -- ── 知识/规则 语义索引 ───────────────────────────────────────────────────────
 ALTER TABLE knowledge.knowledge_entries
-  ADD COLUMN IF NOT EXISTS onto_class_gid    TEXT DEFAULT NULL,
-  ADD COLUMN IF NOT EXISTS onto_property_gid TEXT DEFAULT NULL;
+  ADD COLUMN onto_class_gid    TEXT DEFAULT NULL,
+  ADD COLUMN onto_property_gid TEXT DEFAULT NULL;
 
 -- ── 索引 ─────────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_know_onto_class ON knowledge.knowledge_entries(onto_class_gid)
@@ -1530,12 +1530,12 @@ ALTER TABLE knowledge.knowledge_entries
 
 -- onto_relations 补 sort_order（关系排序，对应属性已有 sort_order）
 ALTER TABLE knowledge.onto_relations
-  ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0;
+  ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0;
 
 -- onto_properties 补 show_in_detail / detail_order
 -- show_in_detail: 是否在工艺流程图详情面板中显示
 -- detail_order:   详情面板中的显示顺序
 ALTER TABLE knowledge.onto_properties
-  ADD COLUMN IF NOT EXISTS show_in_detail BOOLEAN NOT NULL DEFAULT TRUE;
+  ADD COLUMN show_in_detail BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE knowledge.onto_properties
-  ADD COLUMN IF NOT EXISTS detail_order   INTEGER NOT NULL DEFAULT 99;
+  ADD COLUMN detail_order   INTEGER NOT NULL DEFAULT 99;

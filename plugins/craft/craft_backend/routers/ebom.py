@@ -33,6 +33,16 @@ _WRITE = require_role("super_admin", "team_admin", "project_admin", "member")
 # ── 幂等列补丁（启动时自动执行）─────────────────────────────────
 _migrated = False
 
+def _safe_add_column(cur, sql: str) -> None:
+    """执行 ALTER TABLE ADD COLUMN，忽略列已存在错误（1060）"""
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
+            return
+        raise
+
+
 def _ensure_columns():
     global _migrated
     if _migrated:
@@ -41,8 +51,16 @@ def _ensure_columns():
         with get_conn() as conn:
             with conn.cursor() as cur:
                 # pbom_versions 扩展
-                cur.execute("ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN IF NOT EXISTS name TEXT DEFAULT ''")
-                cur.execute("ALTER TABLE workmanship_bop_pbom_versions ALTER COLUMN project_gid DROP NOT NULL")
+                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN name TEXT DEFAULT ''")
+                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN meta JSON NOT NULL DEFAULT (JSON_OBJECT())")
+                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN project_gid CHAR(36) DEFAULT NULL")
+                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN visibility TEXT DEFAULT 'project'")
+                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN shared_team_gid CHAR(36) DEFAULT NULL")
+                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN shared_project_gid CHAR(36) DEFAULT NULL")
+                try:
+                    cur.execute("ALTER TABLE workmanship_bop_pbom_versions ALTER COLUMN project_gid DROP NOT NULL")
+                except Exception:
+                    pass  # 已可为空或列类型不允许此操作，忽略
                 # pbom 零件扩展列（vpps + 19 列）
                 for col, typ in [
                     ("vpps", "TEXT"),
@@ -75,8 +93,12 @@ def _ensure_columns():
                     ("main_part_consistency", "TEXT DEFAULT ''"),
                     ("geo_evidence", "TEXT DEFAULT ''"),
                     ("lr_side", "TEXT DEFAULT ''"),
+                    # 系统字段（旧表可能缺）
+                    ("vpps_source", "TEXT NOT NULL DEFAULT ('auto')"),
+                    ("is_deleted", "TINYINT(1) NOT NULL DEFAULT 0"),
+                    ("meta", "JSON NOT NULL DEFAULT (JSON_OBJECT())"),
                 ]:
-                    cur.execute(f"ALTER TABLE workmanship_bop_pbom ADD COLUMN IF NOT EXISTS {col} {typ}")
+                    _safe_add_column(cur, f"ALTER TABLE workmanship_bop_pbom ADD COLUMN {col} {typ}")
             conn.commit()
         _migrated = True
     except Exception as e:
@@ -280,9 +302,9 @@ def create_snapshot(body: CreateVersionBody, current_user: dict = Depends(_WRITE
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO workmanship_bop_pbom_versions (gid, project_gid, version_tag, name, source_type) "
-                "VALUES (%s, %s, %s, %s, %s)",
-                (gid, body.project_gid or None, body.version_tag, body.name, body.source_type)
+                "INSERT INTO workmanship_bop_pbom_versions (gid, project_gid, version_tag, name, source_type, status, meta, visibility, shared_team_gid, shared_project_gid) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (gid, body.project_gid or None, body.version_tag, body.name, body.source_type, 'draft', '{}', 'project', None, None)
             )
         conn.commit()
     return {"success": True, "data": {"gid": gid}}
@@ -420,9 +442,10 @@ _INSERT_PART_SQL = (
     "catia_occurrence_name, catia_file_name, catia_uuid, "
     "default_matrix, abs_matrix, rel_matrix, local_bbox, ecn, fna, "
     "geo_main_part, ref_main_vpps_desc, ref_main_vpps, "
-    "main_part_consistency, geo_evidence, lr_side) "
+    "main_part_consistency, geo_evidence, lr_side, "
+    "vpps_source, is_deleted, meta) "
     "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"
-    "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 )
 
 def _part_vals(part_gid, snap_gid, b):
@@ -441,6 +464,7 @@ def _part_vals(part_gid, snap_gid, b):
         b.local_bbox or '', b.ecn or '', b.fna or '',
         b.geo_main_part or '', b.ref_main_vpps_desc or '', b.ref_main_vpps or '',
         b.main_part_consistency or '', b.geo_evidence or '', b.lr_side or '',
+        'auto', 0, '{}',   # vpps_source, is_deleted, meta
     )
 
 

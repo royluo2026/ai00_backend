@@ -20,6 +20,16 @@ router = APIRouter(prefix="/api/bop", tags=["bop"])
 # ── 幂等补丁（首次请求时执行）────────────────────────────────────
 _gbop_migrated = False
 
+def _safe_add_column(cur, sql: str) -> None:
+    """执行 ALTER TABLE ADD COLUMN，忽略列已存在错误（1060）"""
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
+            return
+        raise
+
+
 def _ensure_gbop_tables():
     global _gbop_migrated
     if _gbop_migrated:
@@ -29,9 +39,10 @@ def _ensure_gbop_tables():
         with get_conn() as conn:
             with conn.cursor() as cur:
                 # workmanship_bop_pbom 软删除列（gbop_match_preview 需要）
-                cur.execute(
+                _safe_add_column(
+                    cur,
                     "ALTER TABLE workmanship_bop_pbom "
-                    "ADD COLUMN IF NOT EXISTS is_deleted TINYINT(1) NOT NULL DEFAULT 0"
+                    "ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0"
                 )
                 print("[gbop] is_deleted column OK")
                 # gbop_match_staging 中间表
@@ -58,13 +69,15 @@ def _ensure_gbop_tables():
                 )
                 print("[gbop] gbop_match_staging table OK")
                 # 补列（旧表可能缺少）
-                cur.execute(
+                _safe_add_column(
+                    cur,
                     "ALTER TABLE workmanship_bop_gbop_match_staging "
-                    "ADD COLUMN IF NOT EXISTS extra_entry_gids JSON NOT NULL DEFAULT (JSON_ARRAY())"
+                    "ADD COLUMN extra_entry_gids JSON NOT NULL DEFAULT (JSON_ARRAY())"
                 )
-                cur.execute(
+                _safe_add_column(
+                    cur,
                     "ALTER TABLE workmanship_bop_gbop_match_staging "
-                    "ADD COLUMN IF NOT EXISTS created_entry_gid TEXT"
+                    "ADD COLUMN created_entry_gid TEXT"
                 )
                 print("[gbop] gbop_match_staging columns patched")
             conn.commit()

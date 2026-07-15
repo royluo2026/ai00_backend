@@ -79,6 +79,12 @@ class BopPicUploadBody(BaseModel):
 
 
 def _normalize_bop_pic_items(items):
+    # MySQL JSON 列返回的是字符串，先 parse
+    if isinstance(items, str):
+        try:
+            items = json.loads(items)
+        except Exception:
+            items = []
     out = []
     for item in items or []:
         if isinstance(item, dict):
@@ -262,10 +268,8 @@ def list_entries(version_gid: str, _u=Depends(_READ)):
             cur.execute(_ENTRY_LIST_SQL, (version_gid, version_gid))
             rows = _rows(cur, _ENTRY_KEYS)
             for row in rows:
-                if row.get('process_flow_pic'):
-                    row['process_flow_pic'] = _resolve_bop_pic_items(row['process_flow_pic'])
-                if row.get('process_chart_pic'):
-                    row['process_chart_pic'] = _resolve_bop_pic_items(row['process_chart_pic'])
+                row['process_flow_pic'] = _resolve_bop_pic_items(row.get('process_flow_pic') or [])
+                row['process_chart_pic'] = _resolve_bop_pic_items(row.get('process_chart_pic') or [])
             return {"data": rows}
 
 
@@ -367,7 +371,9 @@ def get_entry(gid: str, _u=Depends(_READ)):
             row = cur.fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="条目不存在")
-    return {"data": dict(row)}
+    data = dict(row)
+    data['process_flow_pic'] = _resolve_bop_pic_items(data.get('process_flow_pic') or [])
+    return {"data": data}
 
 
 @router.post("/entries", status_code=201)
@@ -477,7 +483,7 @@ def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
             } if entity_info else None
             owned_snapshot = {"table": e_table, "gid": entity_gid, "title": body.title} if entity_info else None
             # ── 操作日志 ──
-            _log_entry_op(cur,
+            batch_id, line_gid = _log_entry_op(cur,
                 version_gid=ver_gid, entry_gid=entry_gid,
                 entry_title=body.title or '',
                 op_type='create_entry', old_state=None,
@@ -490,7 +496,14 @@ def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
                 rule_warnings = check_entry_rules(body.node_type, entry_gid)
             except Exception:
                 rule_warnings = []
-            resp = {"data": dict(row) if row else {"gid": entry_gid, "entity_gid": entity_gid}}
+            entry_data = dict(row) if row else {"gid": entry_gid, "entity_gid": entity_gid}
+            entry_data['process_flow_pic'] = _resolve_bop_pic_items(entry_data.get('process_flow_pic') or [])
+            resp = {
+                "data": entry_data,
+                "batch_id": batch_id,
+                "line_gid": line_gid,
+                "version_gid": ver_gid,
+            }
             if rule_warnings:
                 resp["rule_warnings"] = rule_warnings
             return resp
@@ -568,23 +581,30 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
                                          gid, lnk['link_type'], _e)
             conn.commit()
             # ── 操作日志 ──
+            batch_ids = []
+            line_gid = None
             if entry_row:
                 for event in _history.build_entry_log_events(dict(entry_row), data):
-                    _log_entry_op(cur,
+                    batch_id, lg = _log_entry_op(cur,
                         version_gid=entry_row['version_gid'],
                         entry_gid=gid, entry_title=(data.get('title') or entry_row['title'] or ''),
                         op_type=event['op_type'],
                         old_state=event['old_state'], new_state=event['new_state'],
                         user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
+                    batch_ids.append(batch_id)
+                    line_gid = lg
                 conn.commit()  # 确保日志 INSERT 立即提交
             cur.execute(_ENTRY_BY_GID_SQL, (gid,))
             row = cur.fetchone()
             data = dict(row) if row else {}
-            if data.get('process_flow_pic'):
-                data['process_flow_pic'] = _resolve_bop_pic_items(data['process_flow_pic'])
-            if data.get('process_chart_pic'):
-                data['process_chart_pic'] = _resolve_bop_pic_items(data['process_chart_pic'])
-            return {"data": data}
+            data['process_flow_pic'] = _resolve_bop_pic_items(data.get('process_flow_pic') or [])
+            data['process_chart_pic'] = _resolve_bop_pic_items(data.get('process_chart_pic') or [])
+            return {
+                "data": data,
+                "batch_ids": batch_ids,
+                "line_gid": line_gid,
+                "version_gid": entry_row['version_gid'] if entry_row else None,
+            }
 
 
 @router.post("/pics/upload")
@@ -649,7 +669,7 @@ def upload_bop_pic(body: BopPicUploadBody, _u=Depends(_WRITE)):
     )
     return {"url": f"/static/uploads/bop_pics/{name}"}
 
-@router.delete("/entries/{gid}", status_code=204)
+@router.delete("/entries/{gid}", status_code=200)
 def delete_entry(gid: str, _u=Depends(_WRITE)):
     # 自有实体类型（1:1 归属 entry，随 entry 一起软删除）
     _OWNED_ENTITY_TYPES = {'bop_line', 'bop_station', 'bop_process', 'bop_steps', 'bop_operator'}
@@ -720,13 +740,21 @@ def delete_entry(gid: str, _u=Depends(_WRITE)):
             ]
             # ── 操作日志 ──
             if entry_row:
-                _log_entry_op(cur,
+                batch_id, line_gid = _log_entry_op(cur,
                     version_gid=entry_row['version_gid'],
                     entry_gid=gid, entry_title=entry_row.get('title') or '',
                     op_type='delete_entry', new_state=None,
                     old_state=_history.build_delete_entry_snapshot(dict(entry_row), link_snapshots, owned_snapshots),
                     user_gid=_u.get('gid', ''), user_name=_u.get('name', ''))
                 conn.commit()  # 确保日志 INSERT 立即提交
+                return {
+                    "deleted": True,
+                    "gid": gid,
+                    "batch_id": batch_id,
+                    "line_gid": line_gid,
+                    "version_gid": entry_row['version_gid'],
+                }
+            return {"deleted": True, "gid": gid}
 
 
 class PurgeEntriesBody(BaseModel):

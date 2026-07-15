@@ -3,7 +3,7 @@
 -- 在 DBeaver 手动执行
 
 ALTER TABLE bop.gbop_match_staging
-    ADD COLUMN IF NOT EXISTS extra_entry_gids JSONB NOT NULL DEFAULT '[]';
+    ADD COLUMN extra_entry_gids JSONB NOT NULL DEFAULT '[]';
 
 COMMENT ON COLUMN bop.gbop_match_staging.extra_entry_gids IS
     '额外关联的 GBOP entry gid 列表；主操作用 gbop_entry_gid，附加操作存此处';
