@@ -313,14 +313,16 @@ def create_property(body: PropBody, _u=Depends(get_current_user)):
                 "INSERT INTO workmanship_onto_properties"
                 "(gid, class_gid, name, label_zh, prop_kind, data_type, range_class_gid,"
                 " enum_values, required, min_val, max_val, description, sort_order,"
-                " storage_hint, mapped_column, field_config, show_in_detail, detail_order)"
-                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                " storage_hint, mapped_column, field_config, show_in_detail, detail_order,"
+                " field_widget, show_in_create_dialog, dialog_order)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (gid, body.class_gid, body.name, body.label_zh, body.prop_kind,
                  body.data_type, body.range_class_gid,
                  json.dumps(body.enum_values),
                  body.required, body.min_val, body.max_val, body.description, body.sort_order,
                  storage_hint, body.mapped_column, json.dumps(body.field_config),
-                 body.show_in_detail, body.detail_order),
+                 body.show_in_detail, body.detail_order,
+                 getattr(body, 'field_widget', 'text'), True, 99),
             )
             conn.commit()
             cur.execute("SELECT * FROM workmanship_onto_properties WHERE gid = %s", (gid,))
@@ -592,8 +594,8 @@ def sync_props_from_table(gid: str, _u=Depends(get_current_user)):
                     "INSERT INTO workmanship_onto_properties"
                     "(gid, class_gid, name, label_zh, prop_kind, data_type,"
                     " required, sort_order, storage_hint, mapped_column,"
-                    " field_config, show_in_detail, detail_order)"
-                    " VALUES (%s,%s,%s,%s,'data',%s,%s,%s,'entity_table',%s,%s,%s,%s)"
+                    " field_config, field_widget, show_in_detail, detail_order)"
+                    " VALUES (%s,%s,%s,%s,'data',%s,%s,%s,'entity_table',%s,%s,'text',%s,%s)"
                     "",
                     (new_gid, gid, col_name, col_name, onto_type,
                      col_info["is_nullable"] == "NO",
@@ -635,11 +637,11 @@ def sync_props_from_table(gid: str, _u=Depends(get_current_user)):
                 label_zh = f"→{range_cls['label_zh'] or range_cls['name']}"
                 cur.execute(
                     "INSERT INTO workmanship_onto_relations"
-                    "(gid, name, label_zh, domain_class_gid, range_class_gid,"
+                    "(gid, name, label_zh, link_type_binding, domain_class_gid, range_class_gid,"
                     " is_functional, description, sort_order)"
-                    " VALUES (%s,%s,%s,%s,%s,TRUE,%s,%s)"
+                    " VALUES (%s,%s,%s,%s,%s,%s,TRUE,%s,%s)"
                     "",
-                    (_gid(), rel_name, label_zh, gid, range_cls["gid"],
+                    (_gid(), rel_name, label_zh, rel_name, gid, range_cls["gid"],
                      f"FK: {entity_table}.{col} → {ref_full}",
                      (len(added_rels) + 1) * 10)
                 )
@@ -680,8 +682,8 @@ def sync_props_from_table(gid: str, _u=Depends(get_current_user)):
                         "INSERT INTO workmanship_onto_properties"
                         "(gid, class_gid, name, label_zh, prop_kind, data_type,"
                         " required, sort_order, storage_hint, mapped_column,"
-                        " field_config, show_in_detail, detail_order)"
-                        " VALUES (%s,%s,%s,%s,'data','string',FALSE,%s,%s,%s,%s,TRUE,99)"
+                        " field_config, field_widget, show_in_detail, detail_order)"
+                        " VALUES (%s,%s,%s,%s,'data','string',FALSE,%s,%s,%s,%s,'text',TRUE,99)"
                         "",
                         (_gid(), gid, key, key,
                          (len(added) + 1) * 10,
@@ -707,6 +709,7 @@ def sync_props_from_table(gid: str, _u=Depends(get_current_user)):
 class RelBody(BaseModel):
     name: str
     label_zh: str = ""
+    link_type_binding: Optional[str] = None
     domain_class_gid: Optional[str] = None
     range_class_gid: Optional[str] = None
     is_functional: bool = False
@@ -723,10 +726,11 @@ def create_relation(body: RelBody, _u=Depends(get_current_user)):
         with conn.cursor() as cur:
             cur.execute(
                 "INSERT INTO workmanship_onto_relations"
-                "(gid, name, label_zh, domain_class_gid, range_class_gid,"
+                "(gid, name, label_zh, link_type_binding, domain_class_gid, range_class_gid,"
                 " is_functional, inverse_of_gid, description, sort_order, show_in_detail)"
-                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                (gid, body.name, body.label_zh, body.domain_class_gid, body.range_class_gid,
+                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (gid, body.name, body.label_zh, body.link_type_binding or body.name,
+                 body.domain_class_gid, body.range_class_gid,
                  body.is_functional, body.inverse_of_gid, body.description, body.sort_order,
                  body.show_in_detail),
             )
@@ -1246,6 +1250,8 @@ def seed_from_bop(_u=Depends(get_current_user)):
 
     with get_conn() as conn:
         with conn.cursor() as cur:
+            # ── 0. 迁移：补全旧关系的 link_type_binding ───────────────────────────
+            cur.execute("UPDATE workmanship_onto_relations SET link_type_binding = name WHERE link_type_binding IS NULL")
             # ── 1. 类 ──────────────────────────────────────────────────────────
             name_to_gid: dict[str, str] = {}
             for name, label_zh, parent_name, binding, is_abstract, sort_order, color, entity_table in _SEED_CLASSES:
@@ -1287,8 +1293,8 @@ def seed_from_bop(_u=Depends(get_current_user)):
                 cur.execute(
                     "INSERT INTO workmanship_onto_properties"
                     "(gid, class_gid, name, label_zh, prop_kind, data_type,"
-                    " required, min_val, max_val, description, sort_order, storage_hint)"
-                    " VALUES (%s,%s,%s,%s,'data',%s,%s,%s,%s,%s,%s,%s)",
+                    " required, min_val, max_val, description, sort_order, storage_hint, field_widget)"
+                    " VALUES (%s,%s,%s,%s,'data',%s,%s,%s,%s,%s,%s,%s,'text')",
                     (_gid(), cls_gid, prop_name, label_zh, data_type,
                      required, min_val, max_val, desc, sort_order, storage_hint),
                 )
