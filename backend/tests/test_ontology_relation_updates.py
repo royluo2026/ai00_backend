@@ -72,6 +72,11 @@ def test_update_relation_allows_noop_update_when_relation_exists(monkeypatch):
     assert cursor.executed[1][0].startswith('UPDATE workmanship_onto_relations SET show_in_detail=%s WHERE gid=%s')
 
 
+def test_seed_relations_bind_operator_has_person_to_project_roles():
+    has_person = next(rel for rel in ontology._SEED_RELATIONS if rel[0] == 'operator_process' and rel[1] == 'hasPerson')
+    assert has_person[6] == 'project_roles'
+
+
 def test_update_relation_returns_404_when_relation_missing(monkeypatch):
     cursor = FakeCursor(fetchone_results=[None])
     conn = FakeConn(cursor)

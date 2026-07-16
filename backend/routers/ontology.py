@@ -1194,7 +1194,7 @@ _SEED_RELATIONS = [
 
     # ── operator_process（岗位工艺）──────────────────────────────────────
     ("operator_process", "hasStation",  "所属工位", "station_factory", True, "岗位所在实物工位",    "physical_station"),
-    ("operator_process", "hasPerson",   "配置人员", "man",            False, "岗位配置的操作人员",   None),
+    ("operator_process", "hasPerson",   "配置人员", "man",            False, "岗位配置的操作人员",   "project_roles"),
 
     # ── 零件反向关系 ──────────────────────────────────────────────────────
     ("PartEntity", "usedIn", "用于工步", "operation", False, "零件被哪个工步装配", None),
