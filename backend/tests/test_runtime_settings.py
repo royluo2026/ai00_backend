@@ -73,6 +73,27 @@ def test_feishu_redirect_uri_can_point_to_test_public_callback(monkeypatch):
     assert settings.feishu_redirect_uri == 'https://workmanship-backend-test.chehejia.com/auth/feishu/callback'
 
 
+def test_saved_feishu_config_overrides_env(monkeypatch, tmp_path):
+    config_dir = tmp_path / '.ai00' / 'config'
+    config_dir.mkdir(parents=True)
+    (config_dir / 'system.json').write_text(
+        '{"feishu_config": {"app_id": "saved-app-id", "app_secret": "saved-app-secret", "redirect_uri": "https://saved.example.com/callback"}}',
+        encoding='utf-8',
+    )
+    monkeypatch.setattr('backend.config.Path.home', lambda: tmp_path)
+
+    settings = make_settings(
+        monkeypatch,
+        FEISHU_APP_ID='env-app-id',
+        FEISHU_APP_SECRET='env-app-secret',
+        FEISHU_REDIRECT_URI='https://env.example.com/callback',
+    )
+
+    assert settings.feishu_app_id == 'saved-app-id'
+    assert settings.feishu_app_secret == 'saved-app-secret'
+    assert settings.feishu_redirect_uri == 'https://saved.example.com/callback'
+
+
 def test_cloud_db_url_builder_encodes_mysql_credentials():
     from backend.routers.admin import CloudDbConfigBody, _cloud_db_url_from_payload
 

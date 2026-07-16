@@ -87,9 +87,9 @@ def create_team(body: CreateTeamBody, current_user: dict = Depends(get_current_u
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO workmanship_auth_teams (gid, name, is_active, parent_team_gid) "
-                "VALUES (%s, %s, %s, %s)",
-                (gid, body.name, body.is_active, body.parent_team_gid)
+                "INSERT INTO workmanship_auth_teams (gid, name, is_active, parent_team_gid, config) "
+                "VALUES (%s, %s, %s, %s, %s)",
+                (gid, body.name, body.is_active, body.parent_team_gid, '{}')
             )
         conn.commit()
     return {"success": True, "data": {"gid": gid, "name": body.name}}
@@ -177,7 +177,11 @@ def list_team_members(gid: str, current_user: dict = Depends(get_current_user)):
 
 
 class AddMemberBody(BaseModel):
-    user_gid: str
+    user_gid: Optional[str] = None
+    feishu_open_id: Optional[str] = None
+    name: Optional[str] = ""
+    email: Optional[str] = ""
+    avatar_url: Optional[str] = ""
 
 
 @router.post("/{gid}/members", status_code=200)
@@ -186,7 +190,9 @@ def add_team_member(
     body: AddMemberBody,
     current_user: dict = Depends(get_current_user),
 ):
-    """将用户的 team_id 设置为该团队（team_admin 或 super_admin）"""
+    """将用户的 team_id 设置为该团队（team_admin 或 super_admin）。
+    支持 user_gid（已有用户）或 feishu_open_id（自动创建未注册用户）。
+    """
     org_role = current_user.get("org_role") or current_user.get("system_role", "")
     is_super = org_role == "super_admin"
     if not is_super:
@@ -194,11 +200,27 @@ def add_team_member(
         if not any(g["grant_type"] == "team_admin" and g["scope_gid"] == gid for g in grants):
             raise HTTPException(403, "无权添加成员")
 
+    target_gid = body.user_gid
+
+    # 通过 feishu_open_id 查找或创建用户
+    if not target_gid and body.feishu_open_id:
+        from backend.services.user_service import get_or_create
+        user = get_or_create(
+            body.feishu_open_id,
+            body.name or body.feishu_open_id,
+            body.email or "",
+            body.avatar_url or "",
+        )
+        target_gid = user["gid"]
+
+    if not target_gid:
+        raise HTTPException(400, "请提供 user_gid 或 feishu_open_id")
+
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 "UPDATE workmanship_auth_users SET team_id = %s WHERE gid = %s",
-                (gid, body.user_gid),
+                (gid, target_gid),
             )
             if cur.rowcount == 0:
                 raise HTTPException(404, "用户不存在")

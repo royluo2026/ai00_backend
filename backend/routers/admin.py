@@ -114,6 +114,24 @@ def _cloud_db_config_from_system_json() -> dict:
     return raw.get('cloud_db_config') or raw.get('CLOUD_DB_CONFIG') or {}
 
 
+def _sync_feishu_config_to_system_json(key: str, value: str) -> None:
+    mapping = {
+        "FEISHU_APP_ID": "app_id",
+        "FEISHU_APP_SECRET": "app_secret",
+        "FEISHU_REDIRECT_URI": "redirect_uri",
+    }
+    field = mapping.get(key)
+    if not field:
+        return
+    raw = _load_system_json()
+    cfg = raw.get('feishu_config') or {}
+    if not isinstance(cfg, dict):
+        cfg = {}
+    cfg[field] = value
+    raw['feishu_config'] = cfg
+    _save_system_json(raw)
+
+
 @router.get("/cloud-db-config")
 def get_cloud_db_config(_=Depends(_require_super_claims)):
     cfg = _cloud_db_config_from_system_json()
@@ -262,6 +280,7 @@ def set_config(key: str, body: ConfigBody, _=Depends(_SUPER_ONLY)):
                  write_value, body.description),
             )
 
+    _sync_feishu_config_to_system_json(key, write_value)
     # 热重载：清除 lru_cache，下次 get_settings() 重新从 env + DB 读取
     get_settings.cache_clear()
     return {"success": True, "msg": f"配置 {key} 已更新，settings 缓存已清除"}

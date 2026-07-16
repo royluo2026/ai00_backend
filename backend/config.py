@@ -75,6 +75,11 @@ def _load_saved_cloud_db_url() -> str:
     return ''
 
 
+def _load_saved_feishu_config() -> dict:
+    cfg = _load_system_json().get('feishu_config') or {}
+    return cfg if isinstance(cfg, dict) else {}
+
+
 def _load_saved_ois_config() -> dict:
     cfg = _load_system_json().get('ois_config') or {}
     return cfg if isinstance(cfg, dict) else {}
@@ -218,9 +223,10 @@ class Settings:
         }
 
     def __init__(self) -> None:
-        self.feishu_app_id            = _require("FEISHU_APP_ID")
-        self.feishu_app_secret        = _require("FEISHU_APP_SECRET")
-        self.feishu_redirect_uri      = _require("FEISHU_REDIRECT_URI")
+        _feishu_saved = _load_saved_feishu_config()
+        self.feishu_app_id            = str(_feishu_saved.get("app_id") or _require("FEISHU_APP_ID")).strip()
+        self.feishu_app_secret        = str(_feishu_saved.get("app_secret") or _require("FEISHU_APP_SECRET")).strip()
+        self.feishu_redirect_uri      = str(_feishu_saved.get("redirect_uri") or _require("FEISHU_REDIRECT_URI")).strip()
         self.jwt_secret               = _require("JWT_SECRET")
         self.users_db_url             = _load_saved_cloud_db_url() or _require("USERS_DB_URL")
         self.jwt_expire_hours         = int(_get_with_fallback("JWT_EXPIRE_HOURS") or "72")

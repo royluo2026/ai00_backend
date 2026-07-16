@@ -600,11 +600,12 @@ def rollback_to_checkpoint(
                     INSERT INTO workmanship_bop_bop_entries
                       (gid, version_gid, parent_gid, node_type, sort_order, level,
                        ai00_level, title, vpps, vpps_desc, parent_bop_title,
-                       child_vpps, owner_gid, meta, is_deleted, created_at, updated_at)
+                       child_vpps, owner_gid, meta, vpps_part, catia_occurrence_name, parent_vpps_name,
+                       is_deleted, created_at, updated_at)
                     VALUES (%(gid)s,%(version_gid)s,%(parent_gid)s,%(node_type)s,
                             %(sort_order)s,%(level)s,%(ai00_level)s,%(title)s,%(vpps)s,
                             %(vpps_desc)s,%(parent_bop_title)s,%(child_vpps)s,
-                            %(owner_gid)s,%(meta)s,FALSE,NOW(),NOW())
+                            %(owner_gid)s,%(meta)s,'','','',FALSE,NOW(),NOW())
                     ON DUPLICATE KEY UPDATE
                       is_deleted=FALSE, deleted_at=NULL,
                       parent_gid=VALUES(parent_gid), sort_order=VALUES(sort_order),

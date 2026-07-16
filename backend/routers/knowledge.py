@@ -104,19 +104,19 @@ def create_knowledge_entry(body: KnowledgeBody, current_user: dict = Depends(get
                 INSERT INTO workmanship_know_entries (
                     gid, display_id, title, entry_type, status, share_scope, list_gid,
                     source_gid, source_label, maintainer_gid, contributors, attachments,
-                    tags, content_ref, related_part_nos, related_operation_gids, creator_gid
+                    tags, content_ref, content_md, related_part_nos, related_operation_gids, creator_gid
                 ) VALUES (
                     %s, %s,
                     %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s
+                    %s, %s, %s, %s, %s, %s
                 )
                 """,
                 (
                     gid, display_id, body.title, body.entry_type, body.status, body.share_scope, body.list_gid,
                     body.source_gid, body.source_label, body.maintainer_gid,
                     json.dumps(body.contributors), json.dumps(body.attachments),
-                    json.dumps(body.tags), json.dumps(body.content_ref),
+                    json.dumps(body.tags), json.dumps(body.content_ref), '',
                     json.dumps(body.related_part_nos), json.dumps(body.related_operation_gids), uid,
                 ),
             )

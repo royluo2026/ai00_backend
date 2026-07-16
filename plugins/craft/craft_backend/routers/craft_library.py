@@ -446,6 +446,7 @@ def list_part_names(
 
 @router.post("/part_names", status_code=201)
 def create_part_name(body: PartNameBody, current_user: dict = Depends(_WRITE)):
+    _ensure_alias_column()
     if body.flex_type not in _FLEX_TYPE_VALUES:
         raise HTTPException(status_code=422, detail=f"flex_type 必须是 {sorted(_FLEX_TYPE_VALUES)} 之一")
     gid = str(next_gid())
@@ -456,15 +457,16 @@ def create_part_name(body: PartNameBody, current_user: dict = Depends(_WRITE)):
                 "(gid, vpps_description, part_category, description, level, vpps_desc_cn, vpps, "
                 "importance, vehicle_model, parent_vpps, status, meta, team_id, "
                 "flex_type, ref_main_vpps, ref_main_vpps_desc, "
-                "ref_install_direction, ref_static_clearance, ref_install_clearance) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                "ref_install_direction, ref_static_clearance, ref_install_clearance, alias) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (gid, body.vpps_description, body.part_category, body.description,
                  body.level, body.vpps_desc_cn, body.vpps,
                  body.importance, body.vehicle_model, body.parent_vpps, body.status,
                  json.dumps(body.meta, ensure_ascii=False),
                  current_user.get("team_id"),
                  body.flex_type, body.ref_main_vpps, body.ref_main_vpps_desc,
-                 body.ref_install_direction, body.ref_static_clearance, body.ref_install_clearance)
+                 body.ref_install_direction, body.ref_static_clearance, body.ref_install_clearance,
+                 json.dumps([]))
             )
         conn.commit()
     return {"success": True, "data": {"gid": gid}}

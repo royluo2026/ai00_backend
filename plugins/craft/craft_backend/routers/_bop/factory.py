@@ -101,8 +101,8 @@ def create_factory(body: CreateFactoryBody, _u=Depends(_ADMIN)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO workmanship_factory_factories (gid,name,team_id) VALUES (%s,%s,%s)",
-                (gid, body.name, body.team_id)
+                "INSERT INTO workmanship_factory_factories (gid,name,team_id,meta) VALUES (%s,%s,%s,%s)",
+                (gid, body.name, body.team_id, '{}')
             )
             conn.commit()
             cur.execute("SELECT gid,name,team_id,meta,created_at FROM workmanship_factory_factories WHERE gid=%s", (gid,))

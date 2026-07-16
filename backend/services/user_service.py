@@ -64,10 +64,11 @@ def get_or_create(
             cur.execute(
                 """INSERT INTO workmanship_auth_users
                    (gid, feishu_open_id, name, email, avatar_url, system_role, org_role,
-                    feishu_access_token, feishu_refresh_token, feishu_token_expires_at)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    feishu_access_token, feishu_refresh_token, feishu_token_expires_at,
+                    notification_prefs)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (gid, open_id, name, email, avatar_url, role, _role_to_org_role(role),
-                 access_token, refresh_token, expires_at),
+                 access_token, refresh_token, expires_at, '{}'),
             )
             cur.execute("SELECT * FROM workmanship_auth_users WHERE gid=%s", (gid,))
             return dict(cur.fetchone())

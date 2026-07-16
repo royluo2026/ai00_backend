@@ -347,9 +347,11 @@ def promote_task(body: TaskPromoteBody, current_user: dict = Depends(get_current
                     assignee_team_gid, project_gid, status, priority,
                     source_ref, review_date, meeting_level, meeting_doc_link,
                     progress_logs, due_date, plan_start, plan_end,
-                    actual_start, actual_end, share_scope, list_gid
+                    actual_start, actual_end, share_scope, list_gid,
+                    attachments, node_type, canvas_icon
                 ) VALUES (
                     %s, %s,
+                    %s, %s, %s, %s,
                     %s, %s, %s, %s,
                     %s, %s, %s, %s,
                     %s, %s, %s, %s,
@@ -364,6 +366,9 @@ def promote_task(body: TaskPromoteBody, current_user: dict = Depends(get_current
                     body.meeting_doc_link, json.dumps(body.progress_logs),
                     body.due_date, body.plan_start, body.plan_end,
                     body.actual_start, body.actual_end, body.share_scope, body.list_gid,
+                    json.dumps(getattr(body, 'attachments', [])),
+                    getattr(body, 'node_type', 'normal'),
+                    getattr(body, 'canvas_icon', 'star'),
                 ),
             )
     return {"success": True, "data": {"cloud_gid": gid, "local_gid": body.local_gid}}

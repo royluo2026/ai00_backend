@@ -7,6 +7,7 @@ backend/routers/org.py
   POST /api/org/sync-from-feishu   全量同步飞书成员+部门（超管触发）
   GET  /api/org/teams              列出全部团队（含飞书部门映射）
 """
+import json
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional
 from pydantic import BaseModel
@@ -57,6 +58,6 @@ def list_teams(current_user: dict = Depends(get_current_user)):
             )
             rows = cur.fetchall()
     return [
-        {**dict(r), "config": dict(r["config"]) if r["config"] else {}}
+        {**dict(r), "config": json.loads(r["config"]) if isinstance(r["config"], str) else (r["config"] or {})}
         for r in rows
     ]

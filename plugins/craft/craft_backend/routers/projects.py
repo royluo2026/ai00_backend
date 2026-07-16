@@ -82,6 +82,31 @@ class CreateVehicleModelBody(BaseModel):
     team_id: Optional[str] = None
 
 
+def _can_manage_project_lines(user: dict, project_gid: str) -> bool:
+    """超管或项目管理员（project_manager）可以管理项目的线体权限。"""
+    org_role = user.get("org_role") or _derive_org_role(user.get("system_role", "external"))
+    if org_role == "super_admin":
+        return True
+    grants = _get_user_grants(user["gid"])
+    for g in grants:
+        if g.get("grant_type") == "project_admin" and g.get("scope_gid") == project_gid:
+            return True
+    # 也检查 project_members 表
+    try:
+        from backend.db.connection import get_conn
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT 1 FROM workmanship_auth_project_members "
+                    "WHERE project_gid = %s AND user_gid = %s",
+                    (project_gid, user["gid"]),
+                )
+                if cur.fetchone():
+                    return True
+    except: pass
+    return False
+
+
 def _get_editable_line_gids(cur, user: dict, project_gid: str) -> set[str]:
     org_role = user.get("org_role") or _derive_org_role(user.get("system_role", "external"))
     if org_role == "super_admin":
@@ -145,8 +170,8 @@ def create_vehicle_model(body: CreateVehicleModelBody, current_user: dict = Depe
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO workmanship_proj_vehicle_models (gid, name, brand, platform, vehicle_type, team_id) VALUES (%s, %s, %s, %s, %s, %s)",
-                (gid, body.name, body.brand, body.platform, body.vehicle_type, body.team_id or current_user.get("team_id"))
+                "INSERT INTO workmanship_proj_vehicle_models (gid, name, brand, platform, vehicle_type, team_id, meta) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (gid, body.name, body.brand, body.platform, body.vehicle_type, body.team_id or current_user.get("team_id"), '{}')
             )
         conn.commit()
     return {"success": True, "data": {"gid": gid, "name": body.name}}
@@ -223,13 +248,13 @@ def create_project(body: CreateProjectBody, current_user: dict = Depends(_PROJEC
             cur.execute(
                 "INSERT INTO workmanship_proj_projects "
                  "(gid, name, project_code, model_year, suffix, description, status, "
-                 " vehicle_model_gid, team_id, owner_gid, jph, factory_gid) "
-                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                 " vehicle_model_gid, team_id, owner_gid, jph, factory_gid, share_scope, project_type, meta) "
+                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (gid, name, body.project_code.strip(), body.model_year,
                   body.suffix.strip(), body.description, body.status,
                  body.vehicle_model_gid,
                  body.team_id or current_user.get("team_id"), current_user["gid"],
-                 body.jph, body.factory_gid)
+                 body.jph, body.factory_gid, 'team', 'active', '{}')
             )
         conn.commit()
     return {"success": True, "data": {"gid": gid, "name": name}}
@@ -373,25 +398,56 @@ def delete_project(gid: str, current_user: dict = Depends(_ADMIN)):
 def list_project_members(gid: str, current_user: dict = Depends(get_current_user)):
     with get_conn() as conn:
         with conn.cursor() as cur:
+            # 1. 项目成员（project_members 表）
             cur.execute(
                 "SELECT pm.gid, pm.user_gid, u.name, u.email, u.avatar_url, "
                 "pm.role, pm.scope_gid, pm.scope_type, pm.created_at, be.title AS line_title "
                 "FROM workmanship_auth_project_members pm JOIN workmanship_auth_users u ON pm.user_gid = u.gid "
                 "LEFT JOIN workmanship_bop_bop_entries be ON pm.scope_gid = be.gid "
-                "WHERE pm.project_gid = %s ORDER BY pm.created_at",
+                "WHERE pm.project_gid = %s",
                 (gid,)
             )
-            rows = cur.fetchall()
-    return {"success": True, "data": [
-        {
-            "gid": r["gid"], "user_gid": r["user_gid"], "name": r["name"],
-            "email": r["email"], "avatar_url": r["avatar_url"],
-            "project_role": r["role"], "scope_gid": r["scope_gid"],
-            "scope_type": r.get("scope_type") or "", "line_title": r.get("line_title") or "",
-            "created_at": str(r["created_at"])
-        }
-        for r in rows
-    ]}
+            rows = list(cur.fetchall())
+            # 2. 线体管理员（permission_grants 表，项目所有线体）
+            cur.execute(
+                "SELECT pg.gid, pg.grantee_gid AS user_gid, u.name, u.email, u.avatar_url, "
+                "pg.scope_gid, pg.granted_at AS created_at, be.title AS line_title "
+                "FROM workmanship_auth_permission_grants pg JOIN workmanship_auth_users u ON pg.grantee_gid = u.gid "
+                "LEFT JOIN workmanship_bop_bop_entries be ON pg.scope_gid = be.gid "
+                "WHERE pg.grant_type = 'section_lead' AND pg.scope_gid IN ("
+                "  SELECT e.gid FROM workmanship_bop_bop_entries e "
+                "  JOIN workmanship_bop_bop_versions v ON v.gid = e.version_gid "
+                "  WHERE v.project_gid = %s AND v.archived_at IS NULL"
+                ")",
+                (gid,)
+            )
+            grant_rows = cur.fetchall()
+    # 合并，去重 user_gid + scope_gid
+    seen = set()
+    result = []
+    for r in rows:
+        key = (r["user_gid"], r["scope_gid"] or "")
+        if key not in seen:
+            seen.add(key)
+            result.append({
+                "gid": r["gid"], "user_gid": r["user_gid"], "name": r["name"],
+                "email": r["email"], "avatar_url": r["avatar_url"],
+                "project_role": r["role"], "scope_gid": r["scope_gid"],
+                "scope_type": r.get("scope_type") or "", "line_title": r.get("line_title") or "",
+                "created_at": str(r["created_at"])
+            })
+    for r in grant_rows:
+        key = (r["user_gid"], r["scope_gid"] or "")
+        if key not in seen:
+            seen.add(key)
+            result.append({
+                "gid": r["gid"], "user_gid": r["user_gid"], "name": r["name"],
+                "email": r["email"], "avatar_url": r["avatar_url"],
+                "project_role": "section_lead", "scope_gid": r["scope_gid"],
+                "scope_type": "line", "line_title": r.get("line_title") or "",
+                "created_at": str(r["created_at"])
+            })
+    return {"success": True, "data": result}
 
 
 @router.post("/{gid}/members", status_code=201)
@@ -404,9 +460,9 @@ def add_project_member(gid: str, body: AddMemberBody, current_user: dict = Depen
                 raise HTTPException(status_code=404, detail="项目不存在")
             try:
                 cur.execute(
-                    "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role, scope_gid) "
-                    "VALUES (%s, %s, %s, %s, %s)",
-                    (member_gid, gid, body.user_gid, body.project_role, body.section_gid)
+                    "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role, scope_type, scope_gid) "
+                    "VALUES (%s, %s, %s, %s, %s, %s)",
+                    (member_gid, gid, body.user_gid, body.project_role, 'project', body.section_gid)
                 )
             except Exception:
                 raise HTTPException(status_code=409, detail="该用户已是项目成员")
@@ -430,45 +486,36 @@ def remove_project_member(gid: str, member_gid: str, current_user: dict = Depend
 
 @router.get("/{gid}/bop-lines")
 def get_project_bop_lines(gid: str, current_user: dict = Depends(get_current_user)):
-    """返回项目活动 BOP 版本的线体（line_process）列表。"""
+    """返回项目所有活动 BOP 版本的线体，同名合并，附带所有相关 gid。"""
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid FROM workmanship_bop_bop_versions "
-                "WHERE project_gid = %s AND archived_at IS NULL "
-                "ORDER BY created_at DESC LIMIT 1",
-                (gid,)
-            )
-            ver = cur.fetchone()
-            if not ver:
-                return {"success": True, "data": []}
             cur.execute(
                 "SELECT gid, title, sort_order FROM workmanship_bop_bop_entries "
-                "WHERE version_gid = %s AND node_type = 'line_process' AND is_deleted = FALSE "
-                "ORDER BY sort_order , title",
-                (ver["gid"],)
+                "WHERE version_gid IN ("
+                "  SELECT gid FROM workmanship_bop_bop_versions "
+                "  WHERE project_gid = %s AND archived_at IS NULL"
+                ") AND node_type = 'line_process' AND is_deleted = FALSE "
+                "ORDER BY sort_order, title",
+                (gid,)
             )
             rows = cur.fetchall()
-    return {"success": True, "data": [
-        {"gid": r["gid"], "title": r["title"] or "（未命名线体）", "seq_no": r["sort_order"]}
-        for r in rows
-    ]}
-
-
-@router.get("/{gid}/line-permissions")
-def get_project_line_permissions(gid: str, current_user: dict = Depends(get_current_user)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid = %s AND is_deleted = FALSE", (gid,))
-            if not cur.fetchone():
-                raise HTTPException(status_code=404, detail="项目不存在")
-            editable = _get_editable_line_gids(cur, current_user, gid)
-    return {"success": True, "data": {"editable_line_gids": sorted(editable)}}
+    # 按 title 分组：收集所有 gid
+    by_title = {}
+    for r in rows:
+        title = r["title"] or ""
+        if title not in by_title:
+            by_title[title] = {"gid": r["gid"], "title": r["title"] or "（未命名线体）",
+                               "seq_no": r["sort_order"], "all_gids": []}
+        by_title[title]["all_gids"].append(r["gid"])
+    return {"success": True, "data": list(by_title.values())}
 
 
 @router.put("/{gid}/line-assignment")
 def upsert_line_assignment(gid: str, body: LineGrantBody, current_user: dict = Depends(get_current_user)):
-    """按线体授予或撤销 section_lead grant。传 user_gid=None 则清空该线体管理员。"""
+    """按线体授予或撤销 section_lead grant。
+    传入 line_gid 为任意一个线体 gid，会自动找到该项目下所有同名线体 gid 并批量操作。
+    传 user_gid=None 则清空所有同名线体的管理员。
+    """
     if not body.line_gid:
         raise HTTPException(status_code=400, detail="line_gid 不能为空")
     if not _can_manage_project_lines(current_user, gid):
@@ -478,21 +525,41 @@ def upsert_line_assignment(gid: str, body: LineGrantBody, current_user: dict = D
             cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid = %s AND is_deleted = FALSE", (gid,))
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="项目不存在")
+            # 查这条线体的 title
             cur.execute(
-                "SELECT 1 FROM workmanship_bop_bop_entries WHERE gid = %s AND node_type = 'line_process' AND is_deleted = FALSE",
+                "SELECT title FROM workmanship_bop_bop_entries WHERE gid = %s AND node_type = 'line_process'",
                 (body.line_gid,)
             )
-            if not cur.fetchone():
+            row = cur.fetchone()
+            if not row:
                 raise HTTPException(status_code=404, detail="线体不存在")
+            line_title = row["title"]
+            # 找到该项目所有同名线体的 gid
             cur.execute(
-                "DELETE FROM workmanship_auth_permission_grants WHERE grant_type = 'section_lead' AND scope_gid = %s",
-                (body.line_gid,)
+                "SELECT e.gid FROM workmanship_bop_bop_entries e "
+                "JOIN workmanship_bop_bop_versions v ON v.gid = e.version_gid "
+                "WHERE v.project_gid = %s AND v.archived_at IS NULL "
+                "AND e.node_type = 'line_process' AND e.is_deleted = FALSE AND e.title = %s",
+                (gid, line_title)
             )
+            all_line_gids = [r["gid"] for r in cur.fetchall()]
+            if not all_line_gids:
+                raise HTTPException(status_code=404, detail="线体不存在")
+            # 删除所有同名线体的旧 grant
+            ph = ",".join(["%s"] * len(all_line_gids))
+            cur.execute(
+                f"DELETE FROM workmanship_auth_permission_grants WHERE grant_type = 'section_lead' AND scope_gid IN ({ph})",
+                all_line_gids,
+            )
+            # 批量插入新 grant
             if body.user_gid:
+                values_sql = ",".join(["(%s,%s,'section_lead',%s,%s,'')"] * len(all_line_gids))
+                flat = []
+                for lg in all_line_gids:
+                    flat.extend([str(next_gid()), body.user_gid, lg, current_user["gid"]])
                 cur.execute(
-                    "INSERT INTO workmanship_auth_permission_grants (gid, grantee_gid, grant_type, scope_gid, granted_by) "
-                    "VALUES (%s, %s, 'section_lead', %s, %s)",
-                    (str(next_gid()), body.user_gid, body.line_gid, current_user["gid"])
+                    f"INSERT INTO workmanship_auth_permission_grants (gid, grantee_gid, grant_type, scope_gid, granted_by, note) VALUES {values_sql}",
+                    flat,
                 )
         conn.commit()
     return {"success": True}

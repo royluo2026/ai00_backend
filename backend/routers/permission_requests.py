@@ -38,10 +38,10 @@ def create_permission_request(body: PermReqBody, current_user: dict = Depends(ge
         with conn.cursor() as cur:
             cur.execute(
                 """INSERT INTO workmanship_work_permission_requests
-                   (gid, requester_gid, target_type, target_gid, want_permission, message)
-                   VALUES (%s, %s, %s, %s, %s, %s)""",
+                   (gid, requester_gid, target_type, target_gid, want_permission, message, status)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
                 (gid, current_user["gid"], body.target_type, body.target_gid,
-                 body.want_permission, body.message),
+                 body.want_permission, body.message, 'pending'),
             )
             cur.execute("SELECT * FROM workmanship_work_permission_requests WHERE gid = %s", (gid,))
             row = dict(cur.fetchone())
@@ -144,9 +144,9 @@ def _send_notification(cur, user_gid: str, notif_type: str, message: str):
         nid = next_gid()
         cur.execute(
             """INSERT INTO workmanship_work_notifications
-               (gid, user_gid, notif_type, content, is_read, created_at)
-               VALUES (%s, %s, %s, %s, FALSE, NOW())""",
-            (nid, user_gid, notif_type, message),
+               (gid, user_gid, type, title, body, is_read, created_at)
+               VALUES (%s, %s, %s, %s, %s, FALSE, NOW())""",
+            (nid, user_gid, notif_type, message, message),
         )
     except Exception:
         pass

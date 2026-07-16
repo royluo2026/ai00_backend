@@ -36,9 +36,9 @@ def _upsert_team(dept_id: str, name: str, parent_team_gid: str | None = None) ->
             else:
                 gid = new_gid()
                 cur.execute(
-                    """INSERT INTO workmanship_auth_teams (gid, name, feishu_dept_id, parent_team_gid)
-                       VALUES (%s, %s, %s, %s)""",
-                    (gid, name, dept_id, parent_team_gid),
+                    """INSERT INTO workmanship_auth_teams (gid, name, feishu_dept_id, parent_team_gid, config)
+                       VALUES (%s, %s, %s, %s, %s)""",
+                    (gid, name, dept_id, parent_team_gid, '{}'),
                 )
                 return gid
 
@@ -124,16 +124,16 @@ def sync_depts_only_to_db() -> dict:
             oid  = dept["open_id"]
             name = dept["name"] or oid
             if oid not in dept_gid_map:
-                rows_to_insert.append((new_gid(), name, oid))
+                rows_to_insert.append((new_gid(), name, oid, '{}'))
 
         try:
             with get_conn() as conn:
                 with conn.cursor() as cur:
                     if rows_to_insert:
                         cur.executemany(
-                            "INSERT INTO workmanship_auth_teams (gid, name, feishu_dept_id) "
-                            "VALUES (%s, %s, %s) "
-                            "ON DUPLICATE KEY UPDATE name = VALUES(name)",
+                            "INSERT INTO workmanship_auth_teams (gid, name, feishu_dept_id, config) "
+                            "VALUES (%s, %s, %s, %s) "
+                            "ON DUPLICATE KEY UPDATE name = VALUES(name), config = VALUES(config)",
                             rows_to_insert,
                         )
                     # 把本层所有部门的 gid 刷新到 map（含已存在的）
@@ -278,22 +278,8 @@ def sync_all_from_feishu(root_dept_id: str | None = None) -> dict:
 
     _log.info("sync_all_from_feishu done: %s", stats)
 
-    # ── 3. 清除手动添加的团队（feishu_dept_id IS NULL）─────────────────────────
-    manual_cleared = 0
-    try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "UPDATE workmanship_auth_teams SET deleted_at = NOW() "
-                    "WHERE feishu_dept_id IS NULL AND deleted_at IS NULL"
-                )
-                manual_cleared = cur.rowcount
-            conn.commit()
-        if manual_cleared:
-            _log.info("sync_all: cleared %d manual teams", manual_cleared)
-    except Exception as e:
-        _log.warning("sync_all: clear manual teams: %s", e)
-    stats["manual_cleared"] = manual_cleared
+    # ── 3. 保留手动添加的团队（不再删除 feishu_dept_id IS NULL 的团队）───────
+    stats["manual_teams_preserved"] = True
 
     return stats
 

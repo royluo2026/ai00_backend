@@ -106,14 +106,16 @@ def create_rule(body: RuleBody, current_user: dict = Depends(get_current_user)):
                 """
                 INSERT INTO workmanship_know_craft_rules (
                     gid, display_id, code, name, rule_type, enforcement_level, status,
-                    share_scope, list_gid, context_class_gid, rule_definition, creator_gid
+                    share_scope, list_gid, context_class_gid, rule_definition,
+                    applicable_scope, attachments, creator_gid
                 ) VALUES (%s, %s,
-                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     gid, display_id, body.code, body.name, body.rule_type, body.enforcement_level,
                     body.status, body.share_scope, body.list_gid, body.context_class_gid,
-                    json.dumps(body.rule_definition), uid,
+                    json.dumps(body.rule_definition),
+                    json.dumps(getattr(body, 'applicable_scope', {})), json.dumps(getattr(body, 'attachments', [])), uid,
                 ),
             )
         conn.commit()
