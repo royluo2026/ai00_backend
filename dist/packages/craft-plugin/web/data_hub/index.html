@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>资料库</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #1e1e2e; --bg2: #181825; --sidebar-bg: #13131f;
+    --text: #cdd6f4; --text-muted: #6c7086; --accent: #89b4fa;
+    --border: #313244; --hover: #2a2a3d; --active: #2d3561;
+  }
+  [data-theme="light"] {
+    --bg: #eff1f5; --bg2: #e6e9ef; --sidebar-bg: #dce0e8;
+    --text: #4c4f69; --text-muted: #9ca0b0; --accent: #1e66f5;
+    --border: #ccd0da; --hover: #e0e4ef; --active: #c0c8f0;
+  }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+  .layout { display: flex; height: 100%; }
+  .sidebar {
+    width: 180px; flex-shrink: 0; background: var(--sidebar-bg);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    padding: 8px 0; overflow-y: auto;
+  }
+  .sidebar-title {
+    font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--text-muted);
+    text-transform: uppercase; padding: 4px 16px 8px; user-select: none;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+    cursor: pointer; border-radius: 6px; margin: 1px 6px; font-size: 13px;
+    color: var(--text); transition: background .15s;
+  }
+  .nav-item:hover { background: var(--hover); }
+  .nav-item.active { background: var(--active); color: var(--accent); }
+  .nav-item svg { flex-shrink: 0; }
+  .content { flex: 1; overflow: hidden; }
+  .content iframe { width: 100%; height: 100%; border: none; display: block; }
+  .placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; color: var(--text-muted); gap: 12px;
+  }
+  .placeholder svg { opacity: .4; }
+  .placeholder p { font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-title">资料库</div>
+    <div class="nav-item active" data-src="../ebom/ebom.html" onclick="navigate(this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      工程BOM（PBOM）
+    </div>
+    <div class="nav-item" data-src="../factory_resource/factory_resource.html" onclick="navigate(this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 20h20M4 20V10l7-7 7 7v10M9 20v-5h6v5"/>
+      </svg>
+      工厂实物资源
+    </div>
+    <div class="nav-item" data-src="../project/project.html" onclick="navigate(this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+      </svg>
+      项目清单
+    </div>
+    <div class="nav-item" data-src="../md_workspace/md_workspace.html" onclick="navigate(this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+      </svg>
+      MD 文档
+    </div>
+  </div>
+  <div class="content" id="content">
+    <div class="placeholder" id="placeholder">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      </svg>
+      <p>选择左侧分类</p>
+    </div>
+    <iframe id="frame" style="display:none"></iframe>
+  </div>
+</div>
+<script>
+  const frame = document.getElementById('frame');
+  const placeholder = document.getElementById('placeholder');
+
+  function navigate(el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    const src = el.dataset.src;
+    if (!src) return;
+    placeholder.style.display = 'none';
+    frame.style.display = 'block';
+    if (frame.src !== src) frame.src = src;
+  }
+
+  // Auto-load first item
+  const first = document.querySelector('.nav-item[data-src]');
+  if (first) navigate(first);
+
+  // Theme sync from parent (workspace sends { type: 'theme', theme })
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme || 'dark');
+    try { frame.contentWindow?.postMessage({ type: 'theme', theme: theme || 'dark' }, '*'); } catch(_) {}
+  }
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'theme') applyTheme(e.data.theme);
+  });
+  try { applyTheme(window.parent?.document?.documentElement?.getAttribute('data-theme') || 'dark'); } catch(_) {}
+</script>
+</body>
+</html>

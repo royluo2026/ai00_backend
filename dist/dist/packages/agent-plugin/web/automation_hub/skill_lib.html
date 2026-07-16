@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Skill 库</title>
+
+  <link rel="stylesheet" href="/assets/skill_lib-63b2492b.css">
+</head>
+<body>
+<div class="sl-shell">
+
+  <!-- 左：静态过滤器 -->
+  <div class="sl-sidebar">
+    <div class="sl-sidebar-section">
+      <div class="sl-sidebar-label">范围</div>
+      <div class="sl-filter-item active" data-filter-scope="all">
+        <span class="sl-filter-dot"></span>全部
+      </div>
+      <div class="sl-filter-item" data-filter-scope="mine">
+        <span class="sl-filter-dot"></span>我的
+      </div>
+      <div class="sl-filter-item" data-filter-scope="team">
+        <span class="sl-filter-dot"></span>团队
+      </div>
+      <div class="sl-filter-item" data-filter-scope="global">
+        <span class="sl-filter-dot"></span>全局/系统
+      </div>
+    </div>
+    <div class="sl-sidebar-section">
+      <div class="sl-sidebar-label">类型</div>
+      <div class="sl-filter-item active" data-filter-type="all">
+        <span class="sl-filter-dot"></span>全部
+      </div>
+      <div class="sl-filter-item" data-filter-type="prompt">
+        <span class="sl-filter-dot prompt"></span>提示词模板
+      </div>
+      <div class="sl-filter-item" data-filter-type="tool">
+        <span class="sl-filter-dot tool"></span>自定义工具
+      </div>
+      <div class="sl-filter-item" data-filter-type="flow">
+        <span class="sl-filter-dot flow"></span>工作流关联
+      </div>
+    </div>
+    <div class="sl-sidebar-section">
+      <div class="sl-sidebar-label">状态</div>
+      <div class="sl-filter-item active" data-filter-status="all">
+        <span class="sl-filter-dot"></span>全部
+      </div>
+      <div class="sl-filter-item" data-filter-status="active">
+        <span class="sl-filter-dot active-s"></span>激活
+      </div>
+      <div class="sl-filter-item" data-filter-status="draft">
+        <span class="sl-filter-dot draft"></span>草稿
+      </div>
+    </div>
+  </div>
+
+  <!-- 中：主内容区 -->
+  <div class="sl-main">
+    <div class="sl-toolbar">
+      <input class="sl-search" id="slSearch" placeholder="搜索 Skill 名称/描述…">
+      <button class="sl-btn-new" id="slNewBtn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        新建 Skill
+      </button>
+    </div>
+    <div class="sl-grid-wrap">
+      <table class="sl-table">
+        <thead>
+          <tr>
+            <th>标识符</th>
+            <th>显示名</th>
+            <th>类型</th>
+            <th>状态</th>
+            <th>范围</th>
+            <th>描述</th>
+            <th style="width:80px"></th>
+          </tr>
+        </thead>
+        <tbody id="slGridBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- .sl-shell -->
+
+<!-- 新建分步 Modal -->
+<div class="sl-modal-overlay hidden" id="slNewModal">
+  <div class="sl-modal">
+    <div class="sl-modal-header">
+      <span class="sl-modal-title" id="slNewTitle">新建 Skill — 选择类型</span>
+      <button class="sl-modal-close" id="slNewCloseBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="sl-modal-body">
+      <!-- Step 1: 类型选择 -->
+      <div id="slNewStep1">
+        <div class="sl-type-cards">
+          <div class="sl-type-card" data-type="prompt">
+            <div class="sl-type-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+              </svg>
+            </div>
+            <div class="sl-type-card-title">提示词模板</div>
+            <div class="sl-type-card-desc">定义带变量的提示词模板，@触发后展开到输入框</div>
+          </div>
+          <div class="sl-type-card" data-type="tool">
+            <div class="sl-type-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14.7 6.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-2-2a1 1 0 010-1.4l8-8a1 1 0 011.4 0l2 2z"/>
+                <path d="M20 2l-2 2 2 2 2-2z"/>
+              </svg>
+            </div>
+            <div class="sl-type-card-title">自定义工具</div>
+            <div class="sl-type-card-desc">Python 脚本工具，AI 可自动发现并调用</div>
+          </div>
+          <div class="sl-type-card" data-type="flow">
+            <div class="sl-type-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="10 8 16 12 10 16 10 8"/>
+              </svg>
+            </div>
+            <div class="sl-type-card-title">工作流关联</div>
+            <div class="sl-type-card-desc">关联已有流程画布，@触发后启动流程</div>
+          </div>
+        </div>
+      </div>
+      <!-- Step 2: 编辑器 -->
+      <div id="slNewStep2" style="display:none"></div>
+    </div>
+    <div class="sl-modal-footer">
+      <button class="sl-btn secondary" id="slNewCancelBtn">取消</button>
+      <button class="sl-btn ghost" id="slNewBackBtn" style="display:none">上一步</button>
+      <button class="sl-btn primary" id="slNewNextBtn" disabled>下一步</button>
+      <button class="sl-btn primary" id="slNewSaveBtn" style="display:none">创建</button>
+    </div>
+  </div>
+</div>
+
+<!-- 编辑 Modal -->
+<div class="sl-edit-overlay hidden" id="slEditOverlay">
+  <div class="sl-edit-modal">
+    <div class="sl-edit-header">
+      <span class="sl-edit-title" id="slEditTitle">编辑 Skill</span>
+      <div class="sl-edit-actions">
+        <button class="sl-btn ghost" style="font-size:11px;padding:4px 10px" id="slEditTestBtn">测试执行</button>
+        <button class="sl-modal-close" id="slEditCloseBtn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="sl-edit-body" id="slEditBody"></div>
+    <div class="sl-edit-footer">
+      <div class="sl-edit-footer-left">
+        <button class="sl-btn danger" style="font-size:11px;padding:4px 12px" id="slEditDeleteBtn">删除</button>
+        <button class="sl-btn secondary" style="font-size:11px;padding:4px 12px" id="slEditToggleBtn">归档</button>
+      </div>
+      <div class="sl-edit-footer-right">
+        <button class="sl-btn secondary" style="font-size:11px;padding:4px 12px" id="slEditCancelBtn2" onclick="document.getElementById('slEditOverlay').classList.add('hidden')">取消</button>
+        <button class="sl-btn primary" style="font-size:11px;padding:4px 12px" id="slEditSaveBtn">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 测试执行 Modal -->
+<div class="sl-test-overlay hidden" id="slTestOverlay">
+  <div class="sl-test-modal">
+    <div class="sl-test-header">
+      <span class="sl-modal-title" id="slTestTitle">测试执行</span>
+      <button class="sl-modal-close" id="slTestCloseBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="sl-test-body" id="slTestBody"></div>
+    <div style="padding:8px 14px">
+      <div class="sl-label" style="margin-bottom:4px">执行结果</div>
+      <pre class="sl-test-result" id="slTestResult">（点击"执行"按钮查看结果）</pre>
+    </div>
+    <div class="sl-test-footer">
+      <button class="sl-btn secondary" style="font-size:11px" id="slTestCancelBtn">关闭</button>
+      <button class="sl-btn primary"   style="font-size:11px" id="slTestRunBtn">执行</button>
+    </div>
+  </div>
+</div>
+
+<script src="skill_lib.js"></script>
+<script>
+  // Step 2 后退按钮显隐
+  document.getElementById('slNewNextBtn').addEventListener('click', () => {
+    document.getElementById('slNewNextBtn').style.display = 'none';
+    document.getElementById('slNewBackBtn').style.display = '';
+    document.getElementById('slNewSaveBtn').style.display = '';
+  });
+  document.getElementById('slNewBackBtn').addEventListener('click', () => {
+    document.getElementById('slNewNextBtn').style.display = '';
+    document.getElementById('slNewNextBtn').disabled = !document.querySelector('.sl-type-card.selected');
+    document.getElementById('slNewBackBtn').style.display = 'none';
+    document.getElementById('slNewSaveBtn').style.display = 'none';
+  });
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'theme')
+      document.documentElement.setAttribute('data-theme', e.data.theme || 'dark');
+  });
+  try {
+    document.documentElement.setAttribute('data-theme',
+      window.parent?.document?.documentElement?.getAttribute('data-theme') || 'dark');
+  } catch(_) {}
+</script>
+</body>
+</html>

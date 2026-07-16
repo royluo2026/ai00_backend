@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>任务管理</title>
+  
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="/assets/index-a65a5d6c.css">
+  <link rel="stylesheet" href="/assets/list_deps-9b550476.css">
+  <link rel="stylesheet" href="/assets/mention_input-80c09d05.css">
+  <link rel="stylesheet" href="/assets/self_annotation_panel-bceac7d9.css">
+</head>
+<body>
+  <script src="/web/icons.js"></script>
+  <div id="appRoot" style="height:100%;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden"></div>
+
+  <!-- 从模板创建 Step1：选择模板 -->
+  <div class="mini-modal-mask" id="tplPickMask">
+    <div class="mini-modal" style="width:440px">
+      <h3>从模板创建任务</h3>
+      <div id="tplPickList" style="max-height:300px;overflow-y:auto;margin-bottom:4px"></div>
+      <div style="font-size:11px;color:var(--text-faint,#6c7086)" id="tplPickHint">正在加载模板…</div>
+      <div class="mini-modal-btns">
+        <button class="btn-cancel-modal" id="tplPickCancel">取消</button>
+        <button class="btn-confirm-modal" id="tplPickNext" disabled>下一步</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 从模板创建 Step2：填写实例化参数 -->
+  <div class="mini-modal-mask" id="tplInstMask">
+    <div class="mini-modal" style="width:460px;max-height:90vh;overflow-y:auto">
+      <h3 id="tplInstTitle">实例化模板</h3>
+      <div id="tplInstForm" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div class="mini-modal-btns" style="margin-top:14px">
+        <button class="btn-cancel-modal" id="tplInstBack">上一步</button>
+        <button class="btn-cancel-modal" id="tplInstCancel">取消</button>
+        <button class="btn-confirm-modal" id="tplInstConfirm">创建任务</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/web/components/list_sidebar.js"></script>
+  <script src="/web/components/visibility_selector.js"></script>
+  <script src="/web/components/view_manager.js"></script>
+  <script src="/web/components/gantt.js"></script>
+  <script src="/web/components/export_template_editor.js"></script>
+  <script src="/web/components/import_export.js"></script>
+  <script src="/web/components/diff_manager.js"></script>
+  <script src="/web/components/grid_editor.js"></script>
+  <script src="/web/components/entry_thread.js"></script>
+  <script src="/web/components/sidebar_detail_panel.js"></script>
+  <script src="/web/components/overlay_edit_modal.js"></script>
+  <script src="/web/components/list_shell.js"></script>
+  <script src="/web/components/tree_view.js"></script>
+  <script src="/web/components/subscribe_button.js"></script>
+  <script src="/web/components/mention_input.js"></script>
+  <script src="/web/components/attachments_widget.js"></script>
+  <script src="/web/components/feishu_mention_chip.js"></script>
+  <script src="/web/components/data_registry.js"></script>
+  <script src="/web/components/self_annotation_panel.js"></script>
+  <script src="task.js"></script>
+</body>
+</html>

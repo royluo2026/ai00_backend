@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>abs_matrix × local_bbox — 交互讲解</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body { height: 100vh; overflow: hidden; font-family: 'Consolas', 'Courier New', monospace;
+  background: #1e1e2e; color: #cdd6f4; display: flex; }
+
+/* ── 左侧 3D 画布 ── */
+#canvas-wrap { flex: 1; min-width: 0; position: relative; overflow: hidden; }
+#canvas-wrap canvas { display: block; }
+#canvas-overlay {
+  position: absolute; bottom: 14px; left: 14px;
+  font-size: 11px; color: #6c7086; line-height: 1.9; pointer-events: none;
+}
+#aabb-info {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(24,24,37,0.88); border: 1px solid #313244; border-radius: 6px;
+  padding: 8px 12px; font-size: 11px; pointer-events: none; line-height: 2;
+  min-width: 200px; white-space: nowrap;
+}
+
+/* ── 右侧控制面板 ── */
+#panel {
+  width: 400px; flex-shrink: 0;
+  background: #181825; border-left: 1px solid #313244;
+  overflow-y: auto; display: flex; flex-direction: column;
+}
+
+/* ── 段落 ── */
+.section {
+  border-bottom: 1px solid #313244; padding: 12px 14px;
+}
+.sec-title {
+  font-size: 11px; font-weight: 700; color: #6c7086;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
+}
+.sec-title span { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.collapse-btn { cursor: pointer; color: #45475a; font-size: 10px; user-select: none; }
+.collapsible { overflow: hidden; transition: max-height 0.25s; }
+
+/* ── 概念说明 ── */
+.concept-block {
+  font-size: 11px; line-height: 1.9; color: #a6adc8; margin-bottom: 6px;
+}
+.concept-block strong { color: #cdd6f4; }
+.concept-block code {
+  background: #313244; border-radius: 3px; padding: 1px 5px;
+  color: #cba6f7; font-size: 10px;
+}
+.formula-box {
+  background: #1e1e2e; border: 1px solid #313244; border-radius: 5px;
+  padding: 8px 12px; font-size: 11px; margin: 6px 0; line-height: 2;
+  color: #a6adc8;
+}
+
+/* ── 矩阵表格 ── */
+.mat-wrap { overflow-x: auto; }
+.mat-table { border-collapse: separate; border-spacing: 3px; width: 100%; }
+.mat-table td { padding: 0; }
+
+.mat-row-label {
+  font-size: 9px; padding: 0 6px 0 2px; white-space: nowrap;
+  color: #6c7086; vertical-align: middle;
+}
+
+.mat-cell-input {
+  width: 70px; padding: 5px 4px; text-align: center;
+  font-size: 11px; font-family: inherit;
+  border-radius: 3px; border: 1px solid transparent;
+  background: #313244; color: #cdd6f4;
+  transition: border-color 0.12s, background 0.12s;
+  outline: none;
+}
+.mat-cell-input:focus {
+  border-color: var(--row-color); background: #3d3d52;
+}
+.mat-cell-input.dim { background: #252535; color: #45475a; }
+.mat-cell-input.row-x { --row-color: #f38ba8; }
+.mat-cell-input.row-y { --row-color: #a6e3a1; }
+.mat-cell-input.row-z { --row-color: #89b4fa; }
+.mat-cell-input.row-t { --row-color: #f9e2af; }
+.mat-cell-input.row-x:not(.dim) { border-color: rgba(243,139,168,.2); color: #f38ba8; }
+.mat-cell-input.row-y:not(.dim) { border-color: rgba(166,227,161,.2); color: #a6e3a1; }
+.mat-cell-input.row-z:not(.dim) { border-color: rgba(137,180,250,.2); color: #89b4fa; }
+.mat-cell-input.row-t:not(.dim) { border-color: rgba(249,226,175,.2); color: #f9e2af; }
+
+.mat-row-hdr {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; padding: 2px 0 4px; color: #6c7086;
+}
+.row-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── 旋转滑块 ── */
+.slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.slider-label { font-size: 11px; width: 20px; flex-shrink: 0; }
+.slider-row input[type=range] {
+  flex: 1; accent-color: var(--slider-color, #89b4fa);
+  height: 4px;
+}
+.slider-val {
+  font-size: 11px; width: 40px; text-align: right;
+  color: #a6adc8; font-variant-numeric: tabular-nums;
+}
+
+/* ── Bbox 编辑 ── */
+.bbox-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
+.bbox-cell { display: flex; flex-direction: column; gap: 2px; }
+.bbox-cell label { font-size: 9px; color: #6c7086; }
+.bbox-cell input {
+  padding: 4px 6px; font-size: 11px; font-family: inherit;
+  border-radius: 3px; border: 1px solid #313244;
+  background: #313244; color: #cdd6f4; outline: none; width: 100%;
+}
+.bbox-cell input:focus { border-color: #89b4fa; }
+
+/* ── 分析面板 ── */
+.analysis-row {
+  display: flex; justify-content: space-between;
+  padding: 2px 0; font-size: 11px; border-bottom: 1px solid #252535;
+}
+.analysis-key { color: #6c7086; }
+.analysis-val { color: #cdd6f4; font-variant-numeric: tabular-nums; }
+.analysis-val.warn { color: #f38ba8; }
+.analysis-val.ok   { color: #a6e3a1; }
+
+/* ── 快捷预设 ── */
+.preset-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+.preset-btn {
+  padding: 4px 10px; border-radius: 4px; font-size: 11px; font-family: inherit;
+  border: 1px solid #45475a; background: #313244; color: #cdd6f4; cursor: pointer;
+  transition: background .1s;
+}
+.preset-btn:hover { background: #45475a; }
+
+/* ── 显示开关 ── */
+.toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.toggle-row label { font-size: 11px; color: #a6adc8; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.toggle-row input[type=checkbox] { accent-color: #89b4fa; }
+
+/* ── 矩阵行说明条 ── */
+.row-legend-bar {
+  display: flex; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;
+}
+.row-legend-item {
+  display: flex; align-items: center; gap: 5px; font-size: 10px; color: #6c7086;
+}
+.row-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div id="canvas-wrap">
+  <div id="aabb-info"></div>
+  <div id="canvas-overlay">
+    拖拽旋转  |  滚轮缩放  |  右键平移
+  </div>
+</div>
+
+<div id="panel">
+
+  <!-- ── 概念说明 ── -->
+  <div class="section">
+    <div class="sec-title">
+      概念说明
+      <span class="collapse-btn" onclick="toggleSection(this)">▲ 折叠</span>
+    </div>
+    <div class="collapsible" style="max-height:600px">
+      <div class="concept-block">
+        每个零件在 PBOM 里有两组几何数据：
+      </div>
+      <div class="formula-box">
+        <strong style="color:#89b4fa">abs_matrix</strong>（16个数）
+          = 零件的<strong>位置 + 朝向</strong>，4×4 行优先矩阵<br>
+        <strong style="color:#a6e3a1">local_bbox</strong>（6个数）
+          = 零件在<strong>自身坐标系里的形状</strong>（bbox = bounding box 包围盒）
+      </div>
+      <div class="concept-block">
+        <strong>矩阵行的含义（行优先，行向量约定）：</strong>
+      </div>
+      <div class="row-legend-bar">
+        <div class="row-legend-item">
+          <div class="row-legend-dot" style="background:#f38ba8"></div>
+          行0 = 局部X轴在世界的方向
+        </div>
+        <div class="row-legend-item">
+          <div class="row-legend-dot" style="background:#a6e3a1"></div>
+          行1 = 局部Y轴方向
+        </div>
+        <div class="row-legend-item">
+          <div class="row-legend-dot" style="background:#89b4fa"></div>
+          行2 = 局部Z轴方向（螺栓穿入方向）
+        </div>
+        <div class="row-legend-item">
+          <div class="row-legend-dot" style="background:#f9e2af"></div>
+          行3 = 世界坐标位置（平移）
+        </div>
+      </div>
+      <div class="formula-box" style="font-size:10px">
+        变换公式：<code style="color:#cba6f7">world_j = Σ_i  local_i × mat[i×4+j]</code><br>
+        即：world点 = local点（行向量）× 矩阵<br>
+        → 8个局部bbox角点都做这个变换<br>
+        → 取各轴min/max = <strong style="color:#f9e2af">世界 AABB（Axis-Aligned Bounding Box，轴对齐包围盒）</strong>（虚线框）<br>
+        → 旋转后 AABB 会<strong style="color:#f38ba8">"膨胀"</strong>：比 OBB（Oriented Bounding Box，有向包围盒，实线框）更大
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 矩阵编辑 ── -->
+  <div class="section">
+    <div class="sec-title">abs_matrix &nbsp;<span>（点击任意格直接改值）</span></div>
+
+    <div class="mat-wrap">
+      <table class="mat-table" id="matTable">
+        <!-- 表头 -->
+        <tr>
+          <td style="width:80px"></td>
+          <td style="text-align:center;font-size:9px;color:#45475a;padding-bottom:2px">col 0</td>
+          <td style="text-align:center;font-size:9px;color:#45475a;padding-bottom:2px">col 1</td>
+          <td style="text-align:center;font-size:9px;color:#45475a;padding-bottom:2px">col 2</td>
+          <td style="text-align:center;font-size:9px;color:#45475a;padding-bottom:2px">col 3</td>
+        </tr>
+        <!-- 行0：X轴 -->
+        <tr>
+          <td class="mat-row-label" style="color:#f38ba8">行0 = 局部X轴</td>
+          <td><input class="mat-cell-input row-x" data-i="0"  oninput="onMatInput(0 ,this)" onfocus="onRowFocus(0)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-x" data-i="1"  oninput="onMatInput(1 ,this)" onfocus="onRowFocus(0)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-x" data-i="2"  oninput="onMatInput(2 ,this)" onfocus="onRowFocus(0)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-x dim" data-i="3" readonly value="0"></td>
+        </tr>
+        <!-- 行1：Y轴 -->
+        <tr>
+          <td class="mat-row-label" style="color:#a6e3a1">行1 = 局部Y轴</td>
+          <td><input class="mat-cell-input row-y" data-i="4"  oninput="onMatInput(4 ,this)" onfocus="onRowFocus(1)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-y" data-i="5"  oninput="onMatInput(5 ,this)" onfocus="onRowFocus(1)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-y" data-i="6"  oninput="onMatInput(6 ,this)" onfocus="onRowFocus(1)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-y dim" data-i="7" readonly value="0"></td>
+        </tr>
+        <!-- 行2：Z轴 -->
+        <tr>
+          <td class="mat-row-label" style="color:#89b4fa">行2 = 局部Z轴</td>
+          <td><input class="mat-cell-input row-z" data-i="8"  oninput="onMatInput(8 ,this)" onfocus="onRowFocus(2)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-z" data-i="9"  oninput="onMatInput(9 ,this)" onfocus="onRowFocus(2)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-z" data-i="10" oninput="onMatInput(10,this)" onfocus="onRowFocus(2)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-z dim" data-i="11" readonly value="0"></td>
+        </tr>
+        <!-- 行3：平移 -->
+        <tr>
+          <td class="mat-row-label" style="color:#f9e2af">行3 = 世界位置</td>
+          <td><input class="mat-cell-input row-t" data-i="12" oninput="onMatInput(12,this)" onfocus="onRowFocus(3)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-t" data-i="13" oninput="onMatInput(13,this)" onfocus="onRowFocus(3)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-t" data-i="14" oninput="onMatInput(14,this)" onfocus="onRowFocus(3)" onblur="onRowBlur()"></td>
+          <td><input class="mat-cell-input row-t dim" data-i="15" readonly value="1"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 旋转滑块（辅助输入） ── -->
+  <div class="section">
+    <div class="sec-title">旋转角度（快速调整，自动更新矩阵行0-2）</div>
+    <div class="slider-row">
+      <span class="slider-label" style="color:#f38ba8">绕X</span>
+      <input type="range" id="slRx" min="-180" max="180" value="0" style="--slider-color:#f38ba8" oninput="onSliderChange()">
+      <span class="slider-val" id="slRxVal">0°</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label" style="color:#a6e3a1">绕Y</span>
+      <input type="range" id="slRy" min="-180" max="180" value="0" style="--slider-color:#a6e3a1" oninput="onSliderChange()">
+      <span class="slider-val" id="slRyVal">0°</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label" style="color:#89b4fa">绕Z</span>
+      <input type="range" id="slRz" min="-180" max="180" value="0" style="--slider-color:#89b4fa" oninput="onSliderChange()">
+      <span class="slider-val" id="slRzVal">0°</span>
+    </div>
+  </div>
+
+  <!-- ── local_bbox ── -->
+  <div class="section">
+    <div class="sec-title">local_bbox &nbsp;<span>（bounding box 包围盒，自身坐标系下的形状范围）</span></div>
+    <div class="bbox-grid">
+      <div class="bbox-cell"><label>xmin</label><input id="b0" oninput="onBboxInput(0,this)"></div>
+      <div class="bbox-cell"><label>ymin</label><input id="b1" oninput="onBboxInput(1,this)"></div>
+      <div class="bbox-cell"><label>zmin</label><input id="b2" oninput="onBboxInput(2,this)"></div>
+      <div class="bbox-cell"><label>xmax</label><input id="b3" oninput="onBboxInput(3,this)"></div>
+      <div class="bbox-cell"><label>ymax</label><input id="b4" oninput="onBboxInput(4,this)"></div>
+      <div class="bbox-cell"><label>zmax</label><input id="b5" oninput="onBboxInput(5,this)"></div>
+    </div>
+  </div>
+
+  <!-- ── 矩阵分析 ── -->
+  <div class="section">
+    <div class="sec-title">矩阵分析</div>
+    <div id="analysisPanel"></div>
+  </div>
+
+  <!-- ── 快捷预设 ── -->
+  <div class="section">
+    <div class="sec-title">快捷预设</div>
+    <div class="preset-grid">
+      <button class="preset-btn" onclick="applyPreset('identity')">初始（无旋转）</button>
+      <button class="preset-btn" onclick="applyPreset('bolt_z30')">螺栓 Z旋转30°</button>
+      <button class="preset-btn" onclick="applyPreset('bolt_y45')">螺栓 Y旋转45°</button>
+      <button class="preset-btn" onclick="applyPreset('plate')">薄板（宽形）</button>
+      <button class="preset-btn" onclick="applyPreset('plate_rot45')">薄板旋转45°（看膨胀）</button>
+      <button class="preset-btn" onclick="applyPreset('bolt_translated')">平移到远处</button>
+    </div>
+  </div>
+
+  <!-- ── 显示开关 ── -->
+  <div class="section">
+    <div class="sec-title">显示选项</div>
+    <div class="toggle-row">
+      <label><input type="checkbox" id="showOBB" checked onchange="rebuild()"> OBB（Oriented Bounding Box，有向包围盒，实线蓝框）</label>
+    </div>
+    <div class="toggle-row">
+      <label><input type="checkbox" id="showAABB" checked onchange="rebuild()"> AABB（Axis-Aligned Bounding Box，轴对齐包围盒，虚线黄框）</label>
+    </div>
+    <div class="toggle-row">
+      <label><input type="checkbox" id="showAxes" checked onchange="rebuild()"> 坐标轴箭头</label>
+    </div>
+    <div class="toggle-row">
+      <label><input type="checkbox" id="showOrigin" checked onchange="rebuild()"> 位置原点标记</label>
+    </div>
+    <div class="toggle-row">
+      <label><input type="checkbox" id="showWorldOrigin" checked onchange="rebuild()"> 世界原点参照</label>
+    </div>
+  </div>
+
+</div><!-- #panel -->
+
+<script>
+// ============================================================
+// 状态
+// ============================================================
+let mat  = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
+let bbox = [-3,-3,-15, 3,3,15];    // 默认：6×6×30mm 螺栓
+let activeRow = -1;
+let eulerRad = [0, 0, 0];          // Rx Ry Rz，用于滑块同步
+
+// ============================================================
+// Three.js 初始化
+// ============================================================
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+document.getElementById('canvas-wrap').appendChild(renderer.domElement);
+// 画布绝对定位填满父容器（已在 CSS 中设置 position:absolute; inset:0）
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1e1e2e);
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+const dirL = new THREE.DirectionalLight(0xffffff, 0.8);
+dirL.position.set(60, 80, 40);
+scene.add(dirL);
+
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
+let theta = 0.6, phi = 0.8, radius = 110, pivotX = 0, pivotY = 0, pivotZ = 0;
+function updateCamera() {
+  camera.position.set(
+    pivotX + radius * Math.sin(phi) * Math.sin(theta),
+    pivotY + radius * Math.cos(phi),
+    pivotZ + radius * Math.sin(phi) * Math.cos(theta)
+  );
+  camera.lookAt(pivotX, pivotY, pivotZ);
+}
+updateCamera();
+
+// 轨道控制
+let isDown = false, lastX = 0, lastY = 0, rmb = false;
+const cw = document.getElementById('canvas-wrap');
+cw.addEventListener('mousedown', e => { isDown = true; lastX = e.clientX; lastY = e.clientY; rmb = e.button === 2; });
+cw.addEventListener('contextmenu', e => e.preventDefault());
+window.addEventListener('mouseup', () => isDown = false);
+window.addEventListener('mousemove', e => {
+  if (!isDown) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  lastX = e.clientX; lastY = e.clientY;
+  if (rmb) {
+    const side = new THREE.Vector3();
+    camera.getWorldDirection(side);
+    const up = new THREE.Vector3(0, 1, 0);
+    side.crossVectors(up, side).normalize();
+    pivotX -= side.x * dx * 0.15;
+    pivotZ -= side.z * dx * 0.15;
+    pivotY -= dy * 0.15;
+  } else {
+    theta -= dx * 0.005; phi -= dy * 0.005;
+    phi = Math.max(0.05, Math.min(Math.PI - 0.05, phi));
+  }
+  updateCamera();
+});
+cw.addEventListener('wheel', e => {
+  radius *= 1 + e.deltaY * 0.001;
+  radius = Math.max(10, Math.min(600, radius));
+  updateCamera();
+});
+
+// 网格
+const grid = new THREE.GridHelper(200, 20, 0x313244, 0x252535);
+scene.add(grid);
+
+// ============================================================
+// 几何辅助
+// ============================================================
+function worldAABB(m, b) {
+  const [xn,yn,zn,xx,yx,zx] = b;
+  const corners = [[xn,yn,zn,1],[xx,yn,zn,1],[xn,yx,zn,1],[xx,yx,zn,1],
+                   [xn,yn,zx,1],[xx,yn,zx,1],[xn,yx,zx,1],[xx,yx,zx,1]];
+  let wmin = [Infinity,Infinity,Infinity], wmax = [-Infinity,-Infinity,-Infinity];
+  for (const c of corners) {
+    for (let j = 0; j < 3; j++) {
+      const w = c[0]*m[j] + c[1]*m[4+j] + c[2]*m[8+j] + c[3]*m[12+j];
+      if (w < wmin[j]) wmin[j] = w;
+      if (w > wmax[j]) wmax[j] = w;
+    }
+  }
+  return [wmin, wmax];
+}
+
+function getOBBVerts(m, b) {
+  const [xn,yn,zn,xx,yx,zx] = b;
+  return [[xn,yn,zn],[xx,yn,zn],[xn,yx,zn],[xx,yx,zn],
+          [xn,yn,zx],[xx,yn,zx],[xn,yx,zx],[xx,yx,zx]].map(([lx,ly,lz]) => [
+    lx*m[0]+ly*m[4]+lz*m[8]+m[12],
+    lx*m[1]+ly*m[5]+lz*m[9]+m[13],
+    lx*m[2]+ly*m[6]+lz*m[10]+m[14],
+  ]);
+}
+
+function makeOBBWire(m, b, color, opacity=1) {
+  const pts = getOBBVerts(m, b);
+  const edges = [[0,1],[2,3],[4,5],[6,7],[0,2],[1,3],[4,6],[5,7],[0,4],[1,5],[2,6],[3,7]];
+  const verts = [];
+  for (const [a,e] of edges) verts.push(...pts[a], ...pts[e]);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+  return new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color, transparent: opacity<1, opacity }));
+}
+
+function makeOBBSolid(m, b, color, opacity=0.25) {
+  const pts = getOBBVerts(m, b);
+  // 6面，每面2三角
+  const faces = [[0,1,3,2],[4,5,7,6],[0,4,5,1],[2,6,7,3],[0,2,6,4],[1,3,7,5]];
+  const verts = [], normals = [];
+  for (const [a,b,c,d] of faces) {
+    const va = new THREE.Vector3(...pts[a]), vb = new THREE.Vector3(...pts[b]);
+    const vc = new THREE.Vector3(...pts[c]), vd = new THREE.Vector3(...pts[d]);
+    const n = new THREE.Vector3().crossVectors(vb.clone().sub(va), vc.clone().sub(va)).normalize();
+    verts.push(...pts[a], ...pts[b], ...pts[c], ...pts[a], ...pts[c], ...pts[d]);
+    for (let i=0;i<6;i++) normals.push(n.x, n.y, n.z);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), 3));
+  const mat2 = new THREE.MeshPhongMaterial({ color, transparent: true, opacity, side: THREE.DoubleSide, depthWrite: false });
+  return new THREE.Mesh(geo, mat2);
+}
+
+function makeWireAABB(wmin, wmax, color, opacity=0.5) {
+  const cx=(wmin[0]+wmax[0])/2, cy=(wmin[1]+wmax[1])/2, cz=(wmin[2]+wmax[2])/2;
+  const sx=wmax[0]-wmin[0], sy=wmax[1]-wmin[1], sz=wmax[2]-wmin[2];
+  const geo = new THREE.BoxGeometry(sx, sy, sz);
+  const mesh = new THREE.LineSegments(
+    new THREE.EdgesGeometry(geo),
+    new THREE.LineDashedMaterial({ color, dashSize: 2, gapSize: 1.5, transparent: true, opacity })
+  );
+  mesh.position.set(cx, cy, cz);
+  mesh.computeLineDistances();
+  return mesh;
+}
+
+function makeArrow(origin, dir, len, color, bold=false) {
+  const n = new THREE.Vector3(...dir).normalize();
+  return new THREE.ArrowHelper(n, new THREE.Vector3(...origin), len, color, len*0.18, bold ? len*0.10 : len*0.07);
+}
+
+function makeSphere(pos, r, color) {
+  const geo = new THREE.SphereGeometry(r, 16, 16);
+  const mat2 = new THREE.MeshPhongMaterial({ color });
+  const mesh = new THREE.Mesh(geo, mat2);
+  mesh.position.set(...pos);
+  return mesh;
+}
+
+// ============================================================
+// 场景重建
+// ============================================================
+const sceneObjects = [];
+function addToScene(obj) { scene.add(obj); sceneObjects.push(obj); }
+function clearScene() {
+  while (sceneObjects.length) {
+    const o = sceneObjects.pop();
+    scene.remove(o);
+    o.geometry?.dispose();
+    if (o.material?.dispose) o.material.dispose();
+  }
+}
+
+function rebuild() {
+  clearScene();
+
+  const [wmin, wmax] = worldAABB(mat, bbox);
+  const origin = [mat[12], mat[13], mat[14]];
+  const axLen = Math.max(
+    Math.hypot(bbox[3]-bbox[0], bbox[4]-bbox[1], bbox[5]-bbox[2]) * 0.6,
+    20
+  );
+
+  if (document.getElementById('showOBB').checked) {
+    addToScene(makeOBBSolid(mat, bbox, 0x89dceb, 0.22));
+    addToScene(makeOBBWire(mat, bbox, 0x89dceb, 0.9));
+  }
+
+  if (document.getElementById('showAABB').checked) {
+    addToScene(makeWireAABB(wmin, wmax, 0xf9e2af, 0.6));
+  }
+
+  if (document.getElementById('showAxes').checked) {
+    const xBright = activeRow === 0 ? 0xff3366 : 0xf38ba8;
+    const yBright = activeRow === 1 ? 0x33ff66 : 0xa6e3a1;
+    const zBright = activeRow === 2 ? 0x3366ff : 0x89b4fa;
+    addToScene(makeArrow(origin, [mat[0],mat[1],mat[2]], axLen, xBright, activeRow===0));
+    addToScene(makeArrow(origin, [mat[4],mat[5],mat[6]], axLen, yBright, activeRow===1));
+    addToScene(makeArrow(origin, [mat[8],mat[9],mat[10]], axLen, zBright, activeRow===2));
+  }
+
+  if (document.getElementById('showOrigin').checked) {
+    const oBright = activeRow === 3;
+    addToScene(makeSphere(origin, oBright ? 2.5 : 1.8, oBright ? 0xffe066 : 0xf9e2af));
+  }
+
+  if (document.getElementById('showWorldOrigin').checked) {
+    // 世界原点：小灰色十字
+    addToScene(makeArrow([0,0,0], [1,0,0], 12, 0x555555));
+    addToScene(makeArrow([0,0,0], [0,1,0], 12, 0x555555));
+    addToScene(makeArrow([0,0,0], [0,0,1], 12, 0x555555));
+  }
+
+  updateAABBInfo(wmin, wmax);
+  updateAnalysisPanel();
+}
+
+// ============================================================
+// 信息面板
+// ============================================================
+function fmt(v, d=3) { return (Math.round(v*1000)/1000).toFixed(d); }
+function fmtV(v) { return `(${fmt(v[0],2)}, ${fmt(v[1],2)}, ${fmt(v[2],2)})`; }
+
+function updateAABBInfo(wmin, wmax) {
+  const sz = wmax.map((v,i)=>v-wmin[i]);
+  const lsz = [(bbox[3]-bbox[0]), (bbox[4]-bbox[1]), (bbox[5]-bbox[2])];
+  const lVol = lsz[0]*lsz[1]*lsz[2];
+  const wVol = sz[0]*sz[1]*sz[2];
+  const ratio = lVol > 0 ? (wVol/lVol) : 0;
+  const ratioStr = ratio > 1.05 ? `<span style="color:#f38ba8">膨胀 ×${fmt(ratio,2)}</span>` : `<span style="color:#a6e3a1">无膨胀</span>`;
+  document.getElementById('aabb-info').innerHTML = `
+    <div style="color:#6c7086;font-size:10px;margin-bottom:2px">AABB（轴对齐包围盒，虚线黄框）</div>
+    <div>尺寸 ${sz.map(v=>fmt(v,1)).join(' × ')} mm</div>
+    <div>相较 OBB（有向包围盒）：${ratioStr}</div>
+    <div style="color:#6c7086;margin-top:4px;font-size:10px">OBB（有向包围盒，实线蓝框）</div>
+    <div>局部尺寸 ${lsz.map(v=>fmt(v,1)).join(' × ')} mm</div>
+  `;
+}
+
+function updateAnalysisPanel() {
+  const xL = Math.hypot(mat[0],mat[1],mat[2]);
+  const yL = Math.hypot(mat[4],mat[5],mat[6]);
+  const zL = Math.hypot(mat[8],mat[9],mat[10]);
+  const isOrtho = Math.abs(xL-1)<0.02 && Math.abs(yL-1)<0.02 && Math.abs(zL-1)<0.02;
+  const dot_xy = mat[0]*mat[4]+mat[1]*mat[5]+mat[2]*mat[6];
+  const dot_xz = mat[0]*mat[8]+mat[1]*mat[9]+mat[2]*mat[10];
+  const dot_yz = mat[4]*mat[8]+mat[5]*mat[9]+mat[6]*mat[10];
+  const isPerp = Math.abs(dot_xy)<0.02 && Math.abs(dot_xz)<0.02 && Math.abs(dot_yz)<0.02;
+
+  const rows = [
+    ['位置 (行3)', fmtV([mat[12],mat[13],mat[14]])],
+    ['X轴 (行0)', fmtV([mat[0],mat[1],mat[2]])],
+    ['Y轴 (行1)', fmtV([mat[4],mat[5],mat[6]])],
+    ['Z轴 (行2)', fmtV([mat[8],mat[9],mat[10]])],
+    ['X轴长度', `${fmt(xL)} ${Math.abs(xL-1)>0.02?'<span style="color:#f38ba8">≠1 含缩放!</span>':'<span style="color:#a6e3a1">≈1 正常</span>'}`],
+    ['Y轴长度', `${fmt(yL)} ${Math.abs(yL-1)>0.02?'<span style="color:#f38ba8">≠1 含缩放!</span>':'<span style="color:#a6e3a1">≈1 正常</span>'}`],
+    ['Z轴长度', `${fmt(zL)} ${Math.abs(zL-1)>0.02?'<span style="color:#f38ba8">≠1 含缩放!</span>':'<span style="color:#a6e3a1">≈1 正常</span>'}`],
+    ['三轴正交?', isPerp ? '<span style="color:#a6e3a1">是（纯旋转）</span>' : '<span style="color:#f38ba8">否（有剪切）</span>'],
+    ['CATIA正常矩阵?', (isOrtho&&isPerp) ? '<span style="color:#a6e3a1">是</span>' : '<span style="color:#f38ba8">否，可能数据异常</span>'],
+  ];
+
+  document.getElementById('analysisPanel').innerHTML = rows.map(([k,v])=>
+    `<div class="analysis-row"><span class="analysis-key">${k}</span><span class="analysis-val">${v}</span></div>`
+  ).join('');
+}
+
+// ============================================================
+// 输入处理
+// ============================================================
+function syncInputs() {
+  // 矩阵格
+  document.querySelectorAll('.mat-cell-input[data-i]').forEach(inp => {
+    const i = parseInt(inp.dataset.i);
+    if (!inp.readOnly) inp.value = fmt(mat[i]);
+  });
+  // bbox格
+  bbox.forEach((v,i) => { const el = document.getElementById('b'+i); if(el) el.value = fmt(v); });
+}
+
+function onMatInput(idx, el) {
+  const v = parseFloat(el.value);
+  if (isNaN(v)) return;
+  mat[idx] = v;
+  // 更新滑块（如果是旋转部分，尝试反推欧拉角，很粗略）
+  rebuild();
+}
+
+function onBboxInput(idx, el) {
+  const v = parseFloat(el.value);
+  if (!isNaN(v)) bbox[idx] = v;
+  rebuild();
+}
+
+function onRowFocus(row) { activeRow = row; rebuild(); }
+function onRowBlur()     { activeRow = -1; rebuild(); }
+
+// 旋转滑块 → 计算旋转矩阵，写入 mat 行0-2
+function onSliderChange() {
+  const rx = parseFloat(document.getElementById('slRx').value) * Math.PI / 180;
+  const ry = parseFloat(document.getElementById('slRy').value) * Math.PI / 180;
+  const rz = parseFloat(document.getElementById('slRz').value) * Math.PI / 180;
+  document.getElementById('slRxVal').textContent = Math.round(rx*180/Math.PI) + '°';
+  document.getElementById('slRyVal').textContent = Math.round(ry*180/Math.PI) + '°';
+  document.getElementById('slRzVal').textContent = Math.round(rz*180/Math.PI) + '°';
+
+  // 绕Z、绕X、绕Y（ZXY顺序）
+  // 我们用行向量约定：R_combined = Rz × Rx × Ry（行向量，先绕Y再绕X再绕Z）
+  const cx=Math.cos(rx),sx=Math.sin(rx);
+  const cy=Math.cos(ry),sy=Math.sin(ry);
+  const cz=Math.cos(rz),sz=Math.sin(rz);
+
+  // Rz（行优先）：局部X→(cz,sz,0)，局部Y→(-sz,cz,0)，局部Z→(0,0,1)
+  // 最终矩阵 = Ry @ Rx @ Rz（右乘，世界固定轴）
+  // 用Three.js的四元数来计算更可靠
+  const qx = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0), rx);
+  const qy = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), ry);
+  const qz = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), rz);
+  const q = new THREE.Quaternion().multiply(qz).multiply(qx).multiply(qy);
+  const rotMat = new THREE.Matrix4().makeRotationFromQuaternion(q);
+  const el = rotMat.elements; // Three.js列优先
+
+  // 从Three.js列优先转回我们的行优先格式
+  // Three.js m[row][col] = el[col*4+row]
+  // 行优先 mat[row*4+col] = el[col*4+row]
+  // 所以 mat[i] = el[i]（因为数值相同，见分析）
+  mat[0]=el[0]; mat[1]=el[1]; mat[2]=el[2];
+  mat[4]=el[4]; mat[5]=el[5]; mat[6]=el[6];
+  mat[8]=el[8]; mat[9]=el[9]; mat[10]=el[10];
+
+  // 更新矩阵格显示
+  [[0,1,2],[4,5,6],[8,9,10]].flat().forEach(i => {
+    const inp = document.querySelector(`.mat-cell-input[data-i="${i}"]`);
+    if (inp) inp.value = fmt(mat[i]);
+  });
+  rebuild();
+}
+
+// ============================================================
+// 快捷预设
+// ============================================================
+const PRESETS = {
+  identity: {
+    mat: [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1],
+    bbox: [-3,-3,-15, 3,3,15],
+    rx:0, ry:0, rz:0
+  },
+  bolt_z30: {
+    mat: [Math.cos(Math.PI/6), Math.sin(Math.PI/6), 0, 0,
+          -Math.sin(Math.PI/6), Math.cos(Math.PI/6), 0, 0,
+          0, 0, 1, 0,
+          20, 10, 5, 1],
+    bbox: [-3,-3,-15, 3,3,15],
+    rx:0, ry:0, rz:30
+  },
+  bolt_y45: {
+    mat: [Math.cos(Math.PI/4), 0, -Math.sin(Math.PI/4), 0,
+          0, 1, 0, 0,
+          Math.sin(Math.PI/4), 0, Math.cos(Math.PI/4), 0,
+          0, 0, 0, 1],
+    bbox: [-3,-3,-15, 3,3,15],
+    rx:0, ry:45, rz:0
+  },
+  plate: {
+    mat: [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1],
+    bbox: [-30,-20,-2.5, 30,20,2.5],
+    rx:0, ry:0, rz:0
+  },
+  plate_rot45: {
+    mat: [Math.cos(Math.PI/4), Math.sin(Math.PI/4), 0, 0,
+          -Math.sin(Math.PI/4), Math.cos(Math.PI/4), 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1],
+    bbox: [-30,-20,-2.5, 30,20,2.5],
+    rx:0, ry:0, rz:45
+  },
+  bolt_translated: {
+    mat: [Math.cos(Math.PI/6), Math.sin(Math.PI/6), 0, 0,
+          -Math.sin(Math.PI/6), Math.cos(Math.PI/6), 0, 0,
+          0, 0, 1, 0,
+          80, 50, 120, 1],
+    bbox: [-3,-3,-15, 3,3,15],
+    rx:0, ry:0, rz:30
+  },
+};
+
+function applyPreset(name) {
+  const p = PRESETS[name];
+  mat = [...p.mat];
+  bbox = [...p.bbox];
+  document.getElementById('slRx').value = p.rx || 0;
+  document.getElementById('slRy').value = p.ry || 0;
+  document.getElementById('slRz').value = p.rz || 0;
+  document.getElementById('slRxVal').textContent = (p.rx||0)+'°';
+  document.getElementById('slRyVal').textContent = (p.ry||0)+'°';
+  document.getElementById('slRzVal').textContent = (p.rz||0)+'°';
+  syncInputs();
+  rebuild();
+}
+
+// ============================================================
+// 折叠
+// ============================================================
+function toggleSection(btn) {
+  const wrap = btn.closest('.section').querySelector('.collapsible');
+  if (!wrap) return;
+  const open = wrap.style.maxHeight !== '0px';
+  wrap.style.maxHeight = open ? '0px' : '600px';
+  btn.textContent = open ? '▼ 展开' : '▲ 折叠';
+}
+
+// ============================================================
+// 动画循环 + resize
+// ============================================================
+function resize() {
+  const wrap = document.getElementById('canvas-wrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+applyPreset('identity');
+animate();
+</script>
+</body>
+</html>

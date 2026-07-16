@@ -1,0 +1,122 @@
+/* ── CardFrame — 统一卡片容器框架 ────────────────────────────────────────────
+   为所有卡片类型提供：
+     - 网格吸附尺寸调整（右下角 resize 手柄，编辑模式可见）
+     - 弹出为页签按钮（右上角，鼠标悬停可见，编辑模式隐藏）
+     - 编辑/使用两种模式切换
+   内容区（.cf-content）由各卡片类型自行填充。
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── 卡片根容器 ──────────────────────────────────────────────────────────── */
+.cf-card {
+  position: relative;
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border-default, #dcdcdc);
+  border-radius: var(--radius-lg, 10px);
+  overflow: hidden;
+  transition: border-color .15s ease;
+  min-width: 0;
+  min-height: 0;
+  /* grid span 由 JS 通过 inline style 控制 */
+}
+
+.cf-card:hover {
+  border-color: color-mix(in srgb, var(--color-accent, #7b61ff) 40%, var(--border-default, #dcdcdc));
+}
+
+/* ── 内容区 ───────────────────────────────────────────────────────────────── */
+.cf-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 弹出为页签按钮 ───────────────────────────────────────────────────────
+   - 悬浮在卡片右上角
+   - 默认透明，鼠标悬停卡片时淡入
+   - 编辑模式下隐藏（编辑时不允许弹出）
+   ─────────────────────────────────────────────────────────────────────── */
+.cf-popout-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--bg-secondary, #f7f6f3);
+  color: var(--text-faint, #9a9a9a);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .15s, background .15s, color .15s;
+  z-index: 2;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.cf-card:hover .cf-popout-btn {
+  opacity: 1;
+}
+
+.cf-popout-btn:hover {
+  background: color-mix(in srgb, var(--color-accent, #7b61ff) 12%, var(--bg-secondary, #f7f6f3));
+  color: var(--color-accent, #7b61ff);
+}
+
+/* 编辑模式下隐藏弹出按钮 */
+.cf-edit-mode .cf-popout-btn {
+  display: none;
+}
+
+/* ── Resize 手柄 ──────────────────────────────────────────────────────────
+   - 右下角角落
+   - 默认隐藏，编辑模式才显示
+   - se-resize 光标，拖拽时调整 col/row span
+   ─────────────────────────────────────────────────────────────────────── */
+.cf-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  cursor: se-resize;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint, #9a9a9a);
+  background: var(--bg-tertiary, #efefef);
+  border-radius: var(--radius-sm, 4px) 0 var(--radius-lg, 10px) 0;
+  transition: color .15s, background .15s;
+  z-index: 3;
+  padding: 2px;
+}
+
+.cf-resize-handle:hover {
+  color: var(--color-accent, #7b61ff);
+  background: color-mix(in srgb, var(--color-accent, #7b61ff) 15%, var(--bg-tertiary, #efefef));
+}
+
+.cf-edit-mode .cf-resize-handle {
+  display: flex;
+}
+
+/* ── 拖拽 resize 中的状态 ────────────────────────────────────────────────── */
+.cf-resizing {
+  user-select: none;
+  border-color: var(--color-accent, #7b61ff) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent, #7b61ff) 20%, transparent);
+}
+
+/* ── 编辑模式卡片样式 ────────────────────────────────────────────────────── */
+.cf-edit-mode {
+  border-style: dashed;
+}
+
+.cf-edit-mode:hover {
+  border-color: color-mix(in srgb, var(--color-accent, #7b61ff) 55%, var(--border-default, #dcdcdc));
+  border-style: dashed;
+}

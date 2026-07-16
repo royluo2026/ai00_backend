@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>项目看板</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #1e1e2e; --text: #cdd6f4; --text-muted: #6c7086;
+    --accent: #89b4fa; --border: #313244;
+  }
+  [data-theme="light"] {
+    --bg: #eff1f5; --text: #4c4f69; --text-muted: #9ca0b0;
+    --accent: #1e66f5; --border: #ccd0da;
+  }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+  .placeholder {
+    height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px;
+    color: var(--text-muted);
+  }
+  .placeholder-icon { width: 56px; height: 56px; opacity: .35; }
+  .placeholder h2 { font-size: 18px; font-weight: 500; color: var(--text); }
+  .placeholder p  { font-size: 13px; }
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    background: rgba(137,180,250,.12); color: var(--accent);
+    font-size: 12px; font-weight: 500; border: 1px solid rgba(137,180,250,.3);
+  }
+</style>
+</head>
+<body>
+<div class="placeholder">
+  <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+    <rect x="3" y="3" width="5" height="18" rx="1"/>
+    <rect x="10" y="3" width="5" height="12" rx="1"/>
+    <rect x="17" y="3" width="5" height="15" rx="1"/>
+  </svg>
+  <h2>项目看板</h2>
+  <p>按项目聚合的任务 Kanban 视图</p>
+  <span class="badge">开发中</span>
+</div>
+<script>
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'theme')
+      document.documentElement.setAttribute('data-theme', e.data.theme || 'dark');
+  });
+  try { document.documentElement.setAttribute('data-theme', window.parent?.document?.documentElement?.getAttribute('data-theme') || 'dark'); } catch(_) {}
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工艺表格</title>
+
+
+
+
+
+
+  <link rel="stylesheet" href="/assets/index-f61f751a.css">
+  <link rel="stylesheet" href="/assets/app-ui-6f33ba9e.css">
+  <link rel="stylesheet" href="/assets/view_manager-0b5250e9.css">
+  <link rel="stylesheet" href="/assets/import_export-97b455f2.css">
+</head>
+<body>
+
+<!-- 顶部工具栏 -->
+<div class="toolbar">
+  <div class="toolbar-left">
+    <select id="workPlanSelect" class="toolbar-select">
+      <option value="">— 选择工艺方案 —</option>
+    </select>
+    <select id="sectionSelect" class="toolbar-select" disabled>
+      <option value="">— 选择工段 —</option>
+    </select>
+    <button id="btnNewWorkPlan" class="btn btn-primary">+ 新建方案</button>
+    <button id="btnNewSection"  class="btn btn-secondary" disabled>+ 新建工段</button>
+  </div>
+  <div class="toolbar-right">
+    <div class="ie-toolbar-btns">
+      <button id="btnImport" class="ie-toolbar-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        导入
+      </button>
+      <button id="btnExport" class="ie-toolbar-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        导出
+      </button>
+      <button id="btnDiff" class="ie-toolbar-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        对比
+      </button>
+    </div>
+    <button id="btnAddFromStd" class="btn btn-secondary" disabled title="从标准库添加工序">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      从标准库
+    </button>
+    <button id="btnAddWs"  class="btn btn-secondary" disabled>+ 工位</button>
+    <button id="btnAddPost" class="btn btn-secondary" disabled>+ 岗位</button>
+    <button id="btnAddOp"  class="btn btn-secondary" disabled>+ 工序</button>
+  </div>
+</div>
+
+<!-- 视图管理工具栏（ViewManager 注入） -->
+<div id="vmToolbar"></div>
+
+<!-- 主体区域 -->
+<div class="main-layout">
+
+  <!-- 中间表格区 -->
+  <div class="table-wrapper" id="geContainer" style="padding:0"></div>
+
+  <!-- 右侧零件选择器抽屉 -->
+  <div id="partDrawer" class="part-drawer hidden">
+    <div class="drawer-header">
+      <span>零件选择器</span>
+      <button id="btnCloseDrawer" class="btn-icon">✕</button>
+    </div>
+    <div class="drawer-search">
+      <input id="partSearchInput" type="text" placeholder="搜索零件号/名称..." class="search-input">
+      <button id="btnSearchPart" class="btn btn-primary">搜索</button>
+    </div>
+    <div id="partList" class="part-list"></div>
+  </div>
+</div>
+
+<!-- 新建工艺方案对话框 -->
+<div id="dialogWorkPlan" class="dialog-overlay hidden">
+  <div class="dialog">
+    <div class="dialog-title">新建工艺方案</div>
+    <label>方案名称
+      <input id="wpName" type="text" class="dialog-input" placeholder="如：MX-5 整车工艺方案">
+    </label>
+    <label>关联项目GID（可选）
+      <input id="wpProjectGid" type="text" class="dialog-input" placeholder="project_gid">
+    </label>
+    <div class="dialog-actions">
+      <button id="btnCancelWp" class="btn btn-secondary">取消</button>
+      <button id="btnConfirmWp" class="btn btn-primary">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新建工段对话框 -->
+<div id="dialogSection" class="dialog-overlay hidden">
+  <div class="dialog">
+    <div class="dialog-title">新建工段</div>
+    <label>工段名称
+      <input id="secName" type="text" class="dialog-input" placeholder="如：总装1工段">
+    </label>
+    <div class="dialog-actions">
+      <button id="btnCancelSec" class="btn btn-secondary">取消</button>
+      <button id="btnConfirmSec" class="btn btn-primary">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- 添加工位/岗位/工序对话框（复用） -->
+<div id="dialogAdd" class="dialog-overlay hidden">
+  <div class="dialog">
+    <div id="dialogAddTitle" class="dialog-title">添加</div>
+    <div id="dialogAddFields"></div>
+    <div class="dialog-actions">
+      <button id="btnCancelAdd" class="btn btn-secondary">取消</button>
+      <button id="btnConfirmAdd" class="btn btn-primary">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- 从标准库添加工序 对话框 -->
+<div id="dialogStdOp" class="dialog-overlay hidden">
+  <div class="dialog" style="min-width:500px">
+    <div class="dialog-title">从标准库添加工序</div>
+    <input id="stdOpSearch" type="text" class="dialog-input" placeholder="搜索工序名称或编号…" style="margin-bottom:8px">
+    <div id="stdOpList" style="max-height:320px;overflow-y:auto;border:1px solid var(--app-border,#e0e0e0);border-radius:6px;margin-bottom:12px"></div>
+    <div id="stdOpSelected" style="font-size:12px;color:var(--app-text-secondary,#888);min-height:20px"></div>
+    <div class="dialog-actions">
+      <button id="btnCancelStdOp" class="btn btn-secondary">取消</button>
+      <button id="btnConfirmStdOp" class="btn btn-primary" disabled>添加到当前岗位</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drift 差异查看 对话框 -->
+<div id="dialogDrift" class="dialog-overlay hidden">
+  <div class="dialog" style="min-width:480px">
+    <div class="dialog-title">与标准工序的差异</div>
+    <div id="driftContent"></div>
+    <div class="dialog-actions">
+      <button id="btnCancelDrift" class="btn btn-secondary">关闭</button>
+      <button id="btnResetDrift" class="btn btn-primary" disabled>重置选中字段</button>
+    </div>
+  </div>
+</div>
+
+<script src="/web/components/view_manager.js"></script>
+<script src="/web/components/export_template_editor.js"></script>
+<script src="/web/components/import_export.js"></script>
+<script src="/web/components/diff_manager.js"></script>
+<script src="/web/components/grid_editor.js"></script>
+<script src="/web/components/data_registry.js"></script>
+<script src="table.js"></script>
+</body>
+</html>

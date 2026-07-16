@@ -1,0 +1,202 @@
+/**
+ * web/components/subscribe_button.css
+ * ─────────────────────────────────────
+ * SubscribeButton 组件样式
+ */
+
+/* ── 按钮 ─────────────────────────────────────────────────────── */
+.sub-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-faint, #6c7086);
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.sub-btn:hover {
+  color: var(--color-accent, #89b4fa);
+}
+
+.sub-btn.sub-followed {
+  color: var(--color-accent, #89b4fa);
+}
+
+/* ── 遮罩（透明，仅用于点击外部关闭） ──────────────────────────── */
+.sub-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+}
+
+.sub-backdrop.sub-panel-visible {
+  display: block;
+}
+
+/* ── 浮动面板 ──────────────────────────────────────────────────── */
+.sub-panel {
+  display: none;
+  position: fixed;
+  z-index: 9991;
+  width: 200px;
+  background: var(--bg-surface, #24273a);
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  font-size: 13px;
+  color: var(--text-normal, #cdd6f4);
+  overflow: hidden;
+}
+
+.sub-panel.sub-panel-visible {
+  display: block;
+}
+
+/* ── 面板头部 ─────────────────────────────────────────────────── */
+.sub-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 10px 8px;
+  border-bottom: 1px solid var(--border-default, #313244);
+}
+
+.sub-panel-icon {
+  display: flex;
+  align-items: center;
+  color: var(--color-accent, #89b4fa);
+  flex-shrink: 0;
+}
+
+.sub-panel-title {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-normal, #cdd6f4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sub-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-faint, #6c7086);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sub-close-btn:hover {
+  color: var(--text-normal, #cdd6f4);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── 分组标签 ─────────────────────────────────────────────────── */
+.sub-panel-sec {
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted, #a6adc8);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── 条件列表 ─────────────────────────────────────────────────── */
+.sub-cond-list {
+  padding: 2px 8px 6px;
+}
+
+.sub-cond-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 4px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-normal, #cdd6f4);
+  user-select: none;
+}
+
+.sub-cond-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sub-cond-chk {
+  accent-color: var(--color-accent, #89b4fa);
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── 底部按钮 ─────────────────────────────────────────────────── */
+.sub-panel-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border-default, #313244);
+}
+
+.sub-btn-unfollow {
+  background: transparent;
+  border: 1px solid var(--border-default, #313244);
+  color: var(--text-muted, #a6adc8);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sub-btn-unfollow:hover {
+  border-color: #f38ba8;
+  color: #f38ba8;
+}
+
+.sub-btn-save {
+  background: var(--color-accent, #89b4fa);
+  border: none;
+  color: var(--bg-primary, #1e1e2e);
+  border-radius: 5px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.sub-btn-save:hover {
+  opacity: 0.85;
+}
+
+.sub-btn-save:disabled,
+.sub-btn-unfollow:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Light theme overrides ──────────────────────────────────────── */
+[data-theme="light"] .sub-panel {
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .sub-cond-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .sub-close-btn:hover {
+  background: rgba(0, 0, 0, 0.07);
+}

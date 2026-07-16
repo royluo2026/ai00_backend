@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>业务基础信息</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:      #1e1e2e; --bg2:    #181825; --bg3:   #313244; --bg4: #45475a;
+  --text:    #cdd6f4; --muted:  #6c7086; --accent:#89b4fa;
+  --border:  #313244; --hover:  #2a2a3d; --danger:#f38ba8;
+  --success: #a6e3a1; --warn:   #f9e2af;
+}
+[data-theme="light"] {
+  --bg:      #eff1f5; --bg2:    #e6e9ef; --bg3:   #ccd0da; --bg4: #bcc0cc;
+  --text:    #4c4f69; --muted:  #9ca0b0; --accent:#1e66f5;
+  --border:  #ccd0da; --hover:  #e0e4ef; --danger:#d20f39;
+  --success: #40a02b; --warn:   #df8e1d;
+}
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif; font-size: 13px; }
+
+/* ── 整体布局 ── */
+.md-root { display: flex; height: 100%; }
+
+/* ── 左侧导航 ── */
+.md-nav {
+  width: 130px; flex-shrink: 0;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 12px 0;
+}
+.md-nav-title {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: 0 14px 10px;
+}
+.md-nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; cursor: pointer;
+  color: var(--muted); font-size: 12px; font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: color .15s, background .15s;
+  user-select: none;
+}
+.md-nav-item svg { flex-shrink: 0; opacity: .7; }
+.md-nav-item:hover { background: var(--hover); color: var(--text); }
+.md-nav-item.active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent); border-left-color: var(--accent);
+}
+.md-nav-item.active svg { opacity: 1; }
+
+/* ── 右侧内容区 ── */
+.md-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── 工具栏 ── */
+.md-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px; background: var(--bg2); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.md-toolbar-title { font-size: 14px; font-weight: 600; }
+.md-toolbar-desc { font-size: 11px; color: var(--muted); margin-left: 6px; }
+.md-search {
+  height: 28px; padding: 0 10px; width: 200px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); font-size: 12px; outline: none; margin-left: auto;
+}
+.md-search:focus { border-color: var(--accent); }
+.md-btn {
+  height: 28px; padding: 0 12px; border-radius: 4px; border: none; cursor: pointer;
+  font-size: 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap;
+}
+.md-btn-primary { background: var(--accent); color: #1e1e2e; font-weight: 600; }
+.md-btn-primary:hover { filter: brightness(1.1); }
+.md-stat { color: var(--muted); font-size: 11px; }
+
+/* ── 表格 ── */
+.md-table-wrap { flex: 1; overflow: auto; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--bg2); border-bottom: 2px solid var(--border);
+  padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600;
+  color: var(--muted); letter-spacing: .04em; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+tbody tr:hover { background: var(--hover); }
+tbody tr:hover .row-actions { opacity: 1; }
+td { padding: 8px 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+.row-actions { opacity: 0; display: flex; gap: 2px; justify-content: flex-end; transition: opacity .15s; }
+.act-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 4px; border: none; cursor: pointer;
+  background: transparent; color: var(--muted);
+}
+.act-btn:hover { background: var(--bg3); color: var(--text); }
+.act-btn.del:hover { color: var(--danger); }
+.md-empty { display: flex; align-items: center; justify-content: center;
+  height: 100px; color: var(--muted); font-size: 12px; }
+
+/* 状态徽章 */
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.badge-preparing  { background: color-mix(in srgb,var(--muted) 18%,transparent);  color:var(--muted);  }
+.badge-in_progress{ background: color-mix(in srgb,var(--accent) 18%,transparent); color:var(--accent); }
+.badge-completed  { background: color-mix(in srgb,var(--success)18%,transparent); color:var(--success);}
+.badge-archived   { background: color-mix(in srgb,var(--warn) 18%,transparent);   color:var(--warn);   }
+
+/* ── 弹窗 ── */
+.md-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+.md-modal {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 22px 24px; width: 460px; max-width: 95vw;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.md-modal h3 { font-size: 15px; font-weight: 600; }
+.md-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.md-field { display: flex; flex-direction: column; gap: 4px; }
+.md-field.full { grid-column: 1 / -1; }
+.md-field label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+.md-field input, .md-field select, .md-field textarea {
+  height: 32px; padding: 0 10px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); font-size: 13px; outline: none;
+}
+.md-field textarea { height: 56px; padding: 6px 10px; resize: vertical; }
+.md-field input:focus, .md-field select:focus, .md-field textarea:focus { border-color: var(--accent); }
+.md-field input[readonly] { opacity: .6; cursor: default; background: var(--bg3); }
+.md-modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
+.md-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.md-btn-ghost:hover { background: var(--hover); }
+.md-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+/* ── Toast ── */
+.md-toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--bg3); color: var(--text); padding: 8px 16px;
+  border-radius: 6px; font-size: 13px; z-index: 200; pointer-events: none;
+  animation: fade-in .2s ease;
+}
+@keyframes fade-in { from { opacity: 0; transform: translateX(-50%) translateY(6px); } }
+</style>
+</head>
+<body>
+<div class="md-root">
+
+  <!-- 左侧导航 -->
+  <nav class="md-nav">
+    <div class="md-nav-title">业务基础信息</div>
+    <div class="md-nav-item active" data-section="projects">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+      项目
+    </div>
+    <div class="md-nav-item" data-section="vehicle_models">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v5"/><circle cx="16" cy="17" r="2"/><circle cx="7" cy="17" r="2"/>
+        <path d="M14 17h-5"/>
+      </svg>
+      车型
+    </div>
+    <div class="md-nav-item" data-section="factories">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 21V7l7-4v18"/><path d="M21 21V11l-7-4"/><path d="M10 21H3"/><path d="M21 21h-7"/>
+        <line x1="10" y1="7" x2="14" y2="9"/>
+      </svg>
+      工厂
+    </div>
+  </nav>
+
+  <!-- 右侧内容 -->
+  <div class="md-content">
+    <!-- 工具栏 -->
+    <div class="md-toolbar">
+      <span class="md-toolbar-title" id="mdTitle">项目</span>
+      <span class="md-toolbar-desc" id="mdDesc">管理所有项目</span>
+      <input class="md-search" id="mdSearch" type="text" placeholder="搜索…">
+      <span class="md-stat" id="mdStat"></span>
+      <button class="md-btn md-btn-primary" id="mdAddBtn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新建
+      </button>
+    </div>
+
+    <!-- 表格容器 -->
+    <div class="md-table-wrap" id="mdTableWrap">
+      <div class="md-empty" id="mdEmpty" style="display:none">暂无数据</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 通用弹窗 -->
+<div class="md-overlay" id="mdModal" style="display:none">
+  <div class="md-modal">
+    <h3 id="mdModalTitle">新建</h3>
+    <div id="mdFormBody"></div>
+    <hr class="md-divider">
+    <div class="md-modal-footer">
+      <button class="md-btn md-btn-ghost" id="mdModalCancel">取消</button>
+      <button class="md-btn md-btn-primary" id="mdModalOk">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── 工具 ──────────────────────────────────────────────────────────
+function _cf() {
+  try {
+    let w = window;
+    for (let i = 0; i < 6; i++) {
+      if (w._cloudFetch) return w._cloudFetch;
+      if (w.parent === w) break;
+      w = w.parent;
+    }
+  } catch (_) {}
+  return null;
+}
+function _esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function _toast(msg, ms = 2500) {
+  const el = document.createElement('div');
+  el.className = 'md-toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+function _val(id) { return document.getElementById(id)?.value ?? ''; }
+
+// ── 全局共享缓存 ──────────────────────────────────────────────────
+let _vmMap   = {};  // gid → name（车型）
+let _userMap = {};  // gid → name（用户）
+let _factoryMap = {}; // gid → name（工厂）
+const STATUS_LABELS = {
+  preparing:'准备中', in_progress:'进行中', completed:'已完成', archived:'已归档'
+};
+
+// ══════════════════════════════════════════════════════════════════
+// Section 定义
+// ══════════════════════════════════════════════════════════════════
+
+const SECTIONS = {
+
+  // ── 项目 ────────────────────────────────────────────────────────
+  projects: {
+    title: '项目', desc: '管理所有项目基本信息',
+    addLabel: '新建项目',
+
+    async load(cf) {
+      const r = await cf('/api/projects');
+      return r?.data || [];
+    },
+
+    cols: [
+      { label:'项目名称', key:'name', width:'20%',
+        render: r => `<span style="color:var(--accent)">${_esc(r.name||'—')}</span>` },
+      { label:'代号',     key:'project_code', width:'9%',  render: r => _esc(r.project_code||'—') },
+      { label:'年款',     key:'model_year',   width:'7%',  align:'center', render: r => r.model_year||'—' },
+      { label:'状态',     key:'status',       width:'9%',
+        render: r => `<span class="badge badge-${r.status||'preparing'}">${_esc(STATUS_LABELS[r.status]||r.status)}</span>` },
+      { label:'项目经理', key:'owner_name',   width:'10%', render: r => _esc(r.owner_name||'—') },
+      { label:'车型',     key:'vm',           width:'9%',
+        render: r => _esc(r.vehicle_model_gid ? (_vmMap[r.vehicle_model_gid]||r.vehicle_model_gid) : '—') },
+      { label:'目标工厂', key:'factory',     width:'9%',
+        render: r => _esc(r.factory_gid ? (_factoryMap[r.factory_gid]||r.factory_gid) : '—') },
+      { label:'JPH',      key:'jph',          width:'6%',  align:'right', render: r => r.jph??'—' },
+      { label:'描述',     key:'description',  width:'auto',render: r => _esc(r.description||'—') },
+    ],
+
+    formHtml() {
+      const vmOpts = Object.entries(_vmMap).map(([g,n]) =>
+        `<option value="${_esc(g)}">${_esc(n)}</option>`).join('');
+      const userOpts = Object.entries(_userMap).map(([g,n]) =>
+        `<option value="${_esc(g)}">${_esc(n)}</option>`).join('');
+      const factoryOpts = Object.entries(_factoryMap).map(([g,n]) =>
+        `<option value="${_esc(g)}">${_esc(n)}</option>`).join('');
+      return `<div class="md-form-grid">
+        <div class="md-field full">
+          <label>项目名称（自动生成）</label>
+          <input id="fNamePreview" type="text" readonly placeholder="填写代号后自动生成">
+        </div>
+        <div class="md-field">
+          <label>项目代号 *</label>
+          <input id="fCode" type="text" placeholder="如 X11、P72">
+        </div>
+        <div class="md-field">
+          <label>年款（2000–2099）</label>
+          <input id="fYear" type="number" min="2000" max="2099" step="1" placeholder="如 2025">
+        </div>
+        <div class="md-field">
+          <label>后缀</label>
+          <input id="fSuffix" type="text" placeholder="如 A、SOP">
+        </div>
+        <div class="md-field">
+          <label>JPH（台·小时）</label>
+          <input id="fJph" type="number" step="0.1" min="0" placeholder="如 60">
+        </div>
+        <div class="md-field">
+          <label>状态</label>
+          <select id="fStatus">
+            <option value="preparing">准备中</option>
+            <option value="in_progress">进行中</option>
+            <option value="completed">已完成</option>
+            <option value="archived">已归档</option>
+          </select>
+        </div>
+        <div class="md-field">
+          <label>车型</label>
+          <select id="fVm"><option value="">— 无 —</option>${vmOpts}</select>
+        </div>
+        <div class="md-field">
+          <label>目标工厂</label>
+          <select id="fFactory"><option value="">— 无 —</option>${factoryOpts}</select>
+        </div>
+        <div class="md-field">
+          <label>项目经理</label>
+          <select id="fOwner"><option value="">— 未指定 —</option>${userOpts}</select>
+        </div>
+        <div class="md-field full">
+          <label>描述</label>
+          <textarea id="fDesc" placeholder="项目简介…"></textarea>
+        </div>
+      </div>`;
+    },
+
+    fillForm(p) {
+      document.getElementById('fCode').value   = p?.project_code || '';
+      document.getElementById('fYear').value   = p?.model_year   ?? '';
+      document.getElementById('fSuffix').value = p?.suffix       || '';
+      document.getElementById('fJph').value    = p?.jph          ?? '';
+      document.getElementById('fStatus').value = p?.status       || 'preparing';
+      document.getElementById('fVm').value     = p?.vehicle_model_gid || '';
+      document.getElementById('fFactory').value= p?.factory_gid  || '';
+      document.getElementById('fOwner').value  = p?.owner_gid    || '';
+      document.getElementById('fDesc').value   = p?.description  || '';
+      _syncProjectName();
+      ['fCode','fYear','fSuffix'].forEach(id =>
+        document.getElementById(id).addEventListener('input', _syncProjectName));
+    },
+
+    readForm() {
+      const code = _val('fCode').trim();
+      if (!code) { _toast('项目代号不能为空'); return null; }
+      const yearRaw = _val('fYear').trim();
+      const year = yearRaw ? parseInt(yearRaw, 10) : null;
+      if (year !== null && (isNaN(year) || year < 2000 || year > 2099)) {
+        _toast('年款须为 2000–2099 之间的年份'); return null;
+      }
+      return {
+        project_code:      code,
+        model_year:        year,
+        suffix:            _val('fSuffix').trim(),
+        jph:               parseFloat(_val('fJph')) || null,
+        status:            _val('fStatus'),
+        vehicle_model_gid: _val('fVm') || null,
+        factory_gid:       _val('fFactory') || null,
+        owner_gid:         _val('fOwner') || null,
+        description:       _val('fDesc').trim(),
+      };
+    },
+
+    async create(cf, body) { return cf('/api/projects', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/projects/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/projects/${gid}`, { method:'DELETE' }); },
+
+    searchFn(r, q) {
+      return (r.name||'').toLowerCase().includes(q)
+          || (r.project_code||'').toLowerCase().includes(q)
+          || (r.owner_name||'').toLowerCase().includes(q);
+    },
+  },
+
+  // ── 车型 ────────────────────────────────────────────────────────
+  vehicle_models: {
+    title: '车型', desc: '管理车辆平台与型号',
+    addLabel: '新建车型',
+
+    async load(cf) {
+      const r = await cf('/api/projects/vehicle_models');
+      return r?.data || [];
+    },
+
+    cols: [
+      { label:'名称',   key:'name',         width:'25%', render: r => `<strong>${_esc(r.name)}</strong>` },
+      { label:'品牌',   key:'brand',        width:'18%', render: r => _esc(r.brand||'—') },
+      { label:'平台',   key:'platform',     width:'18%', render: r => _esc(r.platform||'—') },
+      { label:'车型类型', key:'vehicle_type', width:'auto',render: r => _esc(r.vehicle_type||'—') },
+    ],
+
+    formHtml() {
+      const VEHICLE_TYPES = ['纯电MPV','纯电SUV','增程SUV','纯电轿车','增程轿车','增程MPV'];
+      const vtOpts = VEHICLE_TYPES.map(t => `<option value="${_esc(t)}">${_esc(t)}</option>`).join('');
+      return `<div class="md-form-grid">
+        <div class="md-field full">
+          <label>车型名称 *</label>
+          <input id="fVmName" type="text" placeholder="如 X11 EV">
+        </div>
+        <div class="md-field">
+          <label>品牌</label>
+          <input id="fVmBrand" type="text" placeholder="如 某某汽车">
+        </div>
+        <div class="md-field">
+          <label>平台</label>
+          <input id="fVmPlatform" type="text" placeholder="如 MEB、EPA2">
+        </div>
+        <div class="md-field">
+          <label>车型类型</label>
+          <select id="fVmType"><option value="">— 无 —</option>${vtOpts}</select>
+        </div>
+      </div>`;
+    },
+
+    fillForm(r) {
+      document.getElementById('fVmName').value     = r?.name     || '';
+      document.getElementById('fVmBrand').value    = r?.brand    || '';
+      document.getElementById('fVmPlatform').value = r?.platform || '';
+      document.getElementById('fVmType').value     = r?.vehicle_type || '';
+    },
+
+    readForm() {
+      const name = _val('fVmName').trim();
+      if (!name) { _toast('车型名称不能为空'); return null; }
+      return { name, brand: _val('fVmBrand').trim(), platform: _val('fVmPlatform').trim(), vehicle_type: _val('fVmType').trim() };
+    },
+
+    async create(cf, body) { return cf('/api/projects/vehicle_models', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/projects/vehicle_models/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/projects/vehicle_models/${gid}`, { method:'DELETE' }); },
+
+    searchFn(r, q) {
+      return (r.name||'').toLowerCase().includes(q)
+          || (r.brand||'').toLowerCase().includes(q)
+          || (r.platform||'').toLowerCase().includes(q)
+          || (r.vehicle_type||'').toLowerCase().includes(q);
+    },
+  },
+
+  // ── 工厂 ────────────────────────────────────────────────────────
+  factories: {
+    title: '工厂', desc: '管理生产工厂与车间',
+    addLabel: '新建工厂',
+
+    async load(cf) {
+      const r = await cf('/api/bop/factories');
+      return r?.data || [];
+    },
+
+    cols: [
+      { label:'工厂名称', key:'name', width:'40%', render: r => `<strong>${_esc(r.name)}</strong>` },
+      { label:'创建时间', key:'created_at', width:'auto',
+        render: r => r.created_at ? new Date(r.created_at).toLocaleDateString('zh-CN') : '—' },
+    ],
+
+    formHtml() {
+      return `<div class="md-form-grid">
+        <div class="md-field full">
+          <label>工厂名称 *</label>
+          <input id="fFactoryName" type="text" placeholder="如 总装车间、焊装工厂">
+        </div>
+      </div>`;
+    },
+
+    fillForm(r) {
+      document.getElementById('fFactoryName').value = r?.name || '';
+    },
+
+    readForm() {
+      const name = _val('fFactoryName').trim();
+      if (!name) { _toast('工厂名称不能为空'); return null; }
+      return { name };
+    },
+
+    async create(cf, body) { return cf('/api/bop/factories', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/bop/factories/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/bop/factories/${gid}`, { method:'DELETE' }); },
+
+    searchFn(r, q) { return (r.name||'').toLowerCase().includes(q); },
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════
+// 状态 & 运行时
+// ══════════════════════════════════════════════════════════════════
+let _section = 'projects';
+let _rows    = [];
+let _editGid = null;
+let _query   = '';
+
+function _syncProjectName() {
+  const code   = _val('fCode').trim();
+  const year   = _val('fYear').trim();
+  const suffix = _val('fSuffix').trim();
+  const parts  = [code, year, suffix].filter(Boolean);
+  const el = document.getElementById('fNamePreview');
+  if (el) el.value = parts.join('-') || code;
+}
+
+// ── 加载共享缓存 ──────────────────────────────────────────────────
+async function _loadShared() {
+  const cf = _cf();
+  if (!cf) return;
+  try {
+    const [vmRes, userRes, factoryRes] = await Promise.all([
+      cf('/api/projects/vehicle_models').catch(() => null),
+      cf('/users/').catch(() => null),
+      cf('/api/bop/factories').catch(() => null),
+    ]);
+    (vmRes?.data || []).forEach(v => { _vmMap[v.gid] = v.name; });
+    const users = userRes?.data || userRes || [];
+    users.forEach(u => { _userMap[u.gid] = u.name || u.email || u.gid; });
+    (factoryRes?.data || []).forEach(f => { _factoryMap[f.gid] = f.name; });
+  } catch (_) {}
+}
+
+// ── 加载当前分区数据 ──────────────────────────────────────────────
+async function _load() {
+  const cf = _cf();
+  const sec = SECTIONS[_section];
+  if (!cf || !sec) { _rows = []; _render(); return; }
+  try {
+    _rows = await sec.load(cf);
+    // 车型更新时同步缓存
+    if (_section === 'vehicle_models') {
+      _vmMap = {};
+      _rows.forEach(v => { _vmMap[v.gid] = v.name; });
+    }
+    _render();
+  } catch (e) {
+    _toast('加载失败：' + (e.message || e));
+  }
+}
+
+// ── 渲染表格 ──────────────────────────────────────────────────────
+function _render() {
+  const sec    = SECTIONS[_section];
+  const wrap   = document.getElementById('mdTableWrap');
+  const empty  = document.getElementById('mdEmpty');
+  const stat   = document.getElementById('mdStat');
+
+  // 清除旧表
+  wrap.querySelectorAll('table').forEach(t => t.remove());
+  empty.style.display = 'none';
+
+  const filtered = _query
+    ? _rows.filter(r => sec.searchFn(r, _query))
+    : _rows;
+
+  stat.textContent = `共 ${_rows.length} 条`;
+
+  if (!filtered.length) { empty.style.display = ''; return; }
+
+  const table = document.createElement('table');
+
+  // 表头
+  const thead = document.createElement('thead');
+  const htr   = document.createElement('tr');
+  sec.cols.forEach(c => {
+    const th = document.createElement('th');
+    th.style.width = c.width || 'auto';
+    if (c.align) th.style.textAlign = c.align;
+    th.textContent = c.label;
+    htr.appendChild(th);
+  });
+  // 操作列
+  const thAct = document.createElement('th');
+  thAct.style.width = '72px'; thAct.style.textAlign = 'right';
+  thAct.textContent = '操作';
+  htr.appendChild(thAct);
+  thead.appendChild(htr); table.appendChild(thead);
+
+  // 表体
+  const tbody = document.createElement('tbody');
+  filtered.forEach(row => {
+    const tr = document.createElement('tr');
+    sec.cols.forEach(c => {
+      const td = document.createElement('td');
+      if (c.align) td.style.textAlign = c.align;
+      td.innerHTML = c.render(row);
+      tr.appendChild(td);
+    });
+    // 操作
+    const tdAct = document.createElement('td');
+    tdAct.innerHTML = `<div class="row-actions">
+      <button class="act-btn edit-btn" title="编辑" data-gid="${_esc(row.gid)}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
+      <button class="act-btn del del-btn" title="删除" data-gid="${_esc(row.gid)}" data-name="${_esc(row.name||row.gid)}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+        </svg>
+      </button>
+    </div>`;
+    tr.appendChild(tdAct);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrap.insertBefore(table, empty);
+
+  // 事件
+  tbody.querySelectorAll('.edit-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const r = _rows.find(x => x.gid === btn.dataset.gid);
+      if (r) _openModal(r);
+    })
+  );
+  tbody.querySelectorAll('.del-btn').forEach(btn =>
+    btn.addEventListener('click', () => _deleteRow(btn.dataset.gid, btn.dataset.name))
+  );
+}
+
+// ── 切换分区 ──────────────────────────────────────────────────────
+function _switchSection(key) {
+  _section = key;
+  _query   = '';
+  document.getElementById('mdSearch').value = '';
+  document.querySelectorAll('.md-nav-item').forEach(el =>
+    el.classList.toggle('active', el.dataset.section === key)
+  );
+  const sec = SECTIONS[key];
+  document.getElementById('mdTitle').textContent = sec.title;
+  document.getElementById('mdDesc').textContent  = sec.desc;
+  _load();
+}
+
+// ── 弹窗 ──────────────────────────────────────────────────────────
+function _openModal(row) {
+  const sec = SECTIONS[_section];
+  _editGid  = row?.gid || null;
+  document.getElementById('mdModalTitle').textContent = _editGid
+    ? `编辑${sec.title}` : `新建${sec.title}`;
+  document.getElementById('mdFormBody').innerHTML = sec.formHtml();
+  if (row) sec.fillForm(row); else sec.fillForm(null);
+  document.getElementById('mdModal').style.display = '';
+  document.querySelector('.md-modal input')?.focus();
+}
+
+function _closeModal() {
+  document.getElementById('mdModal').style.display = 'none';
+  _editGid = null;
+}
+
+async function _saveModal() {
+  const sec  = SECTIONS[_section];
+  const body = sec.readForm();
+  if (!body) return;
+  const cf = _cf();
+  if (!cf) { _toast('未连接云端'); return; }
+  try {
+    if (_editGid) {
+      await sec.update(cf, _editGid, body);
+      _toast('已更新');
+    } else {
+      await sec.create(cf, body);
+      _toast('已创建');
+    }
+    _closeModal();
+    await _load();
+  } catch (e) {
+    _toast('保存失败：' + (e.message || e));
+  }
+}
+
+async function _deleteRow(gid, name) {
+  if (!confirm(`确定要删除「${name}」吗？`)) return;
+  const cf = _cf();
+  if (!cf) { _toast('未连接云端'); return; }
+  try {
+    await SECTIONS[_section].remove(cf, gid);
+    _toast('已删除');
+    await _load();
+  } catch (e) {
+    _toast('删除失败：' + (e.message || e));
+  }
+}
+
+// ── 事件绑定 ──────────────────────────────────────────────────────
+document.querySelectorAll('.md-nav-item').forEach(el =>
+  el.addEventListener('click', () => _switchSection(el.dataset.section))
+);
+document.getElementById('mdAddBtn').addEventListener('click', () => _openModal(null));
+document.getElementById('mdModalCancel').addEventListener('click', _closeModal);
+document.getElementById('mdModalOk').addEventListener('click', _saveModal);
+document.getElementById('mdModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) _closeModal();
+});
+document.getElementById('mdSearch').addEventListener('input', e => {
+  _query = e.target.value.trim().toLowerCase();
+  _render();
+});
+
+// ── 主题同步 ──────────────────────────────────────────────────────
+function _syncTheme() {
+  try {
+    let w = window;
+    for (let i = 0; i < 6; i++) {
+      const t = w.document?.documentElement?.getAttribute('data-theme');
+      if (t) { document.documentElement.setAttribute('data-theme', t); return; }
+      if (w.parent === w) break;
+      w = w.parent;
+    }
+  } catch (_) {}
+}
+_syncTheme();
+window.addEventListener('message', e => { if (e.data?.type === 'theme-change') _syncTheme(); });
+
+// ── 初始化 ────────────────────────────────────────────────────────
+(async () => {
+  await _loadShared();
+  await _load();
+})();
+</script>
+</body>
+</html>

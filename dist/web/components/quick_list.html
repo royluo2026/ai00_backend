@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>快速清单</title>
+  
+  <style>
+    :root {
+      --bg: #1e1e2e; --bg2: #181825; --surface: #24273a;
+      --text: #cdd6f4; --muted: #a6adc8; --border: #313244;
+      --accent: #89b4fa; --danger: #f38ba8;
+    }
+    [data-theme="light"] {
+      --bg: #eff1f5; --bg2: #e6e9ef; --surface: #dce0e8;
+      --text: #4c4f69; --muted: #8c8fa1; --border: #bcc0cc;
+      --accent: #1e66f5; --danger: #d20f39;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      background: var(--bg); color: var(--text); font-size: 13px;
+    }
+
+    #qlWrap { height: 100%; display: flex; flex-direction: column; }
+
+    /* ── 页签栏 ── */
+    .ql-tab-bar {
+      display: flex; align-items: flex-end; gap: 1px;
+      padding: 4px 6px 0; background: var(--bg2);
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .ql-tab {
+      min-width: 26px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px 4px 0 0; font-size: 11px; font-weight: 600;
+      cursor: pointer; color: var(--muted); padding: 0 7px; user-select: none;
+      border: 1px solid transparent; border-bottom: none; background: transparent;
+      transition: color .1s;
+    }
+    .ql-tab.active {
+      background: var(--bg); color: var(--text);
+      border-color: var(--border); margin-bottom: -1px; height: 23px;
+    }
+    .ql-tab:not(.active):hover { color: var(--text); background: rgba(255,255,255,.04); }
+    .ql-tab-add {
+      min-width: 20px; height: 20px; margin-bottom: 1px; margin-left: 2px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: 1px dashed var(--border);
+      border-radius: 4px; cursor: pointer; color: var(--muted);
+      font-size: 14px; line-height: 1; padding: 0;
+      transition: border-color .1s, color .1s;
+    }
+    .ql-tab-add:hover { border-color: var(--accent); color: var(--accent); }
+    .ql-tab-add:disabled { opacity: .3; cursor: not-allowed; }
+
+    /* ── TLS 挂载区（占剩余高度）── */
+    #qlRoot { flex: 1; min-height: 0; overflow: hidden; }
+
+    /* ── TLS header：隐藏标题，单行按钮 ── */
+    #qlRoot .col-title    { display: none !important; }
+    #qlRoot .col-btn-more { display: none !important; }
+    #qlRoot .col-header   { padding: 4px 8px !important; min-height: unset !important; }
+    #qlRoot .col-toolbar  {
+      justify-content: flex-start !important;
+      overflow: visible !important;
+    }
+    /* 隐藏分页条 */
+    #qlRoot .tls-page-bar { display: none !important; }
+
+    /* ── 页签显示视图名 ── */
+    .ql-tab {
+      max-width: 90px; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    /* ── 新建页签设置界面 ── */
+    .ql-setup {
+      height: 100%; display: flex; flex-direction: column;
+      align-items: stretch; justify-content: center;
+      padding: 20px 16px; gap: 8px;
+    }
+    .ql-setup-hint { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 4px; }
+    .ql-setup-label { font-size: 11px; color: var(--muted); }
+    .ql-setup-inp {
+      width: 100%; background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 5px; color: var(--text); font-size: 12px; padding: 5px 8px;
+    }
+    .ql-setup-inp:focus { outline: none; border-color: var(--accent); }
+    .ql-setup-confirm {
+      width: 100%; padding: 6px; border-radius: 5px; margin-top: 4px;
+      background: var(--accent); border: none; color: #1e1e2e;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    [data-theme="light"] .ql-setup-confirm { color: #fff; }
+
+    /* ── 统一设置浮窗 ── */
+    .ql-settings-panel {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 7px; box-shadow: 0 6px 20px rgba(0,0,0,.35);
+      padding: 6px 0; min-width: 190px;
+    }
+    .ql-sp-hdr {
+      font-size: 10px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .5px;
+      padding: 2px 12px 4px;
+    }
+    .ql-sp-body { padding: 0 10px 6px; display: flex; flex-direction: column; gap: 4px; }
+    .ql-sp-row { display: flex; align-items: center; gap: 6px; }
+    .ql-sp-lbl { font-size: 11px; color: var(--muted); flex-shrink: 0; width: 28px; }
+    .ql-sp-sel {
+      flex: 1; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 4px; color: var(--text); font-size: 11px; padding: 3px 5px;
+    }
+    .ql-sp-sel:focus { outline: none; border-color: var(--accent); }
+    .ql-sp-confirm {
+      width: 100%; padding: 4px; border-radius: 4px; margin-top: 2px;
+      background: var(--accent); border: none; color: #1e1e2e;
+      font-size: 11px; font-weight: 600; cursor: pointer;
+    }
+    [data-theme="light"] .ql-sp-confirm { color: #fff; }
+    .ql-sp-sep { height: 1px; background: var(--border); margin: 2px 0; }
+    .ql-sp-link {
+      width: 100%; padding: 6px 12px; background: transparent; border: none;
+      color: var(--text); font-size: 12px; cursor: pointer; text-align: left;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .ql-sp-link:hover { background: rgba(137,180,250,.08); color: var(--accent); }
+    [data-theme="light"] .ql-sp-link:hover { background: rgba(30,102,245,.06); }
+
+    /* ── 页签右键菜单 ── */
+    .ql-tab-ctx-menu {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.3);
+      padding: 4px 0; min-width: 120px;
+    }
+    .ql-ctx-item {
+      padding: 6px 14px; font-size: 12px; cursor: pointer; color: var(--text);
+    }
+    .ql-ctx-item:hover { background: rgba(137,180,250,.08); }
+    .ql-ctx-item.danger { color: var(--danger); }
+
+    /* ── 行尾操作按钮 ── */
+    .ql-act-btn {
+      width: 20px; height: 20px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 4px; cursor: pointer; color: var(--muted); padding: 0;
+      transition: background .1s, border-color .1s, color .1s;
+    }
+    .ql-act-btn:hover:not(:disabled) {
+      background: rgba(137,180,250,.12); border-color: var(--accent); color: var(--accent);
+    }
+    .ql-act-btn.ql-danger:hover:not(:disabled) {
+      background: rgba(243,139,168,.1); border-color: var(--danger); color: var(--danger);
+    }
+    .ql-act-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── 状态徽标 ── */
+    .ql-badge {
+      display: inline-block; padding: 1px 5px; border-radius: 3px;
+      font-size: 10px; white-space: nowrap; line-height: 1.5;
+    }
+    .ql-s-open,.ql-s-todo    { background:rgba(108,112,134,.2); color:#9ca0b0; }
+    .ql-s-in_progress        { background:rgba(137,180,250,.15); color:#89b4fa; }
+    .ql-s-completed,.ql-s-closed { background:rgba(166,227,161,.12); color:#a6e3a1; }
+    .ql-s-blocked            { background:rgba(243,139,168,.12); color:#f38ba8; }
+    [data-theme="light"] .ql-s-open,[data-theme="light"] .ql-s-todo  { background:rgba(76,79,105,.1); color:#8c8fa1; }
+    [data-theme="light"] .ql-s-in_progress  { background:rgba(30,102,245,.1); color:#1e66f5; }
+    [data-theme="light"] .ql-s-completed,[data-theme="light"] .ql-s-closed { background:rgba(64,160,43,.1); color:#40a02b; }
+    [data-theme="light"] .ql-s-blocked      { background:rgba(210,15,57,.1); color:#d20f39; }
+  </style>
+  <link rel="stylesheet" href="/assets/tree_list_shell-da642102.css">
+</head>
+<body>
+<div id="qlWrap">
+  <div class="ql-tab-bar" id="qlTabBar"></div>
+  <div id="qlRoot"></div>
+</div>
+
+<script src="/web/components/view_manager.js"></script>
+<script src="/web/components/tree_list_shell.js"></script>
+<script>
+'use strict';
+
+// ── 存储键 ────────────────────────────────────────────────────
+const _SLOTS_KEY  = 'ql_slots';
+const _ACTIVE_KEY = 'ql_active';
+
+// ── 类型与列定义 ──────────────────────────────────────────────
+const ALL_TYPES = [
+  { value: 'task',      label: '任务',        color: '#89b4fa' },
+  { value: 'issue',     label: '问题',        color: '#f38ba8' },
+  { value: 'knowledge', label: '知识',        color: '#a6e3a1' },
+  { value: 'bop_entry', label: 'BOP工艺条目', color: '#cba6f7' },
+  { value: 'pbom_part', label: 'PBOM零件',    color: '#fab387' },
+];
+
+// 需要强制选择版本（不能选"全部"）的类型
+const VERSIONED_TYPES = new Set(['bop_entry', 'pbom_part']);
+
+const TYPE_COLUMNS = {
+  task: [
+    { key: 'title',    label: '标题',   defaultOn: true  },
+    { key: 'status',   label: '状态',   defaultOn: true,  width: 72 },
+    { key: 'priority', label: '优先级', defaultOn: false, width: 60 },
+    { key: 'due_date', label: '截止',   defaultOn: false, width: 88 },
+    { key: 'owner',    label: '负责人', defaultOn: false, width: 70 },
+  ],
+  issue: [
+    { key: 'title',    label: '标题',   defaultOn: true  },
+    { key: 'status',   label: '状态',   defaultOn: true,  width: 72 },
+    { key: 'severity', label: '严重度', defaultOn: false, width: 60 },
+    { key: 'category', label: '分类',   defaultOn: false, width: 80 },
+    { key: 'owner',    label: '负责人', defaultOn: false, width: 70 },
+  ],
+  knowledge: [
+    { key: 'title',    label: '标题',   defaultOn: true  },
+    { key: 'category', label: '分类',   defaultOn: false, width: 80 },
+  ],
+  bop_entry: [
+    { key: 'title',          label: '节点名',    defaultOn: true  },
+    { key: 'node_type',      label: '节点类型',  defaultOn: true,  width: 72 },
+    { key: 'seq_no',         label: '序号',      defaultOn: true,  width: 52 },
+    { key: 'vpps',           label: 'VPPS',     defaultOn: false, width: 110 },
+    { key: 'vpps_desc',      label: 'VPPS描述',  defaultOn: false },
+    { key: 'level',          label: '层级',      defaultOn: false, width: 48 },
+    { key: 'ai00_level',     label: 'AI00层级',  defaultOn: false, width: 64 },
+    { key: 'bom_row_id',     label: 'BOM行ID',   defaultOn: false, width: 90 },
+    { key: 'bom_row_label',  label: 'BOM行标签', defaultOn: false },
+    { key: 'bom_row_owner',  label: 'BOM行负责人',defaultOn: false },
+    { key: 'vpps_part',      label: 'VPPS零件',  defaultOn: false, width: 110 },
+    { key: 'part_feed',      label: '上料方式',  defaultOn: false, width: 72 },
+    { key: 'owner_gid',      label: '负责人',    defaultOn: false, width: 70 },
+    { key: 'link_status',    label: '关联状态',  defaultOn: false, width: 72 },
+  ],
+  pbom_part: [
+    { key: 'name',                     label: '名称',      defaultOn: true  },
+    { key: 'part_no',                  label: '件号',      defaultOn: true,  width: 110 },
+    { key: 'quantity',                 label: '数量',      defaultOn: true,  width: 52 },
+    { key: 'unit',                     label: '单位',      defaultOn: false, width: 48 },
+    { key: 'component_type',           label: '组件类型',  defaultOn: false, width: 80 },
+    { key: 'component_id',             label: '组件ID',    defaultOn: false, width: 100 },
+    { key: 'vpps',                     label: 'VPPS',     defaultOn: false, width: 110 },
+    { key: 'vpps_desc',                label: 'VPPS描述',  defaultOn: false },
+    { key: 'material',                 label: '材料',      defaultOn: false },
+    { key: 'component_version_status', label: '版本状态',  defaultOn: false, width: 72 },
+    { key: 'purchase_status',          label: '采购状态',  defaultOn: false, width: 72 },
+    { key: 'torque',                   label: '扭矩',      defaultOn: false, width: 70 },
+    { key: 'torque_importance',        label: '扭矩重要度',defaultOn: false, width: 80 },
+    { key: 'variable_formula',         label: '变量公式',  defaultOn: false },
+    { key: 'ownership_user',           label: '责任人',    defaultOn: false, width: 70 },
+    { key: 'level',                    label: '层级',      defaultOn: false, width: 48 },
+    { key: 'home',                     label: '归属',      defaultOn: false },
+    { key: 'configuration',            label: '配置',      defaultOn: false },
+    { key: 'parent_vpps',              label: '父VPPS',   defaultOn: false, width: 110 },
+    { key: 'parent_vpps_name',         label: '父VPPS名称',defaultOn: false },
+    { key: 'bom_row',                  label: 'BOM行',     defaultOn: false },
+    { key: 'bom_row_label',            label: 'BOM行标签', defaultOn: false },
+  ],
+};
+
+const PARENT_FIELD_BY_TYPE = {
+  task:      '__none__',
+  issue:     '__none__',
+  knowledge: '__none__',
+  bop_entry: 'parent_bop_gid',
+  pbom_part: 'parent_gid',
+};
+
+const DETAIL_FIELDS_BY_TYPE = {
+  task:      [{ key:'title', label:'标题' }, { key:'status', label:'状态' }, { key:'priority', label:'优先级' }, { key:'due_date', label:'截止日期' }],
+  issue:     [{ key:'title', label:'标题' }, { key:'status', label:'状态' }, { key:'severity', label:'严重度' }],
+  knowledge: [{ key:'title', label:'标题' }, { key:'category', label:'分类' }],
+  bop_entry: [{ key:'title', label:'节点名' }, { key:'node_type', label:'节点类型' }, { key:'seq_no', label:'序号' }, { key:'level', label:'层级' }, { key:'ai00_level', label:'AI00层级' }, { key:'vpps', label:'VPPS' }, { key:'vpps_desc', label:'VPPS描述' }, { key:'vpps_part', label:'VPPS零件' }, { key:'part_feed', label:'上料方式' }, { key:'bom_row_id', label:'BOM行ID' }, { key:'link_status', label:'关联状态' }],
+  pbom_part: [{ key:'name', label:'名称' }, { key:'part_no', label:'件号' }, { key:'quantity', label:'数量' }, { key:'unit', label:'单位' }, { key:'component_type', label:'组件类型' }, { key:'component_id', label:'组件ID' }, { key:'material', label:'材料' }, { key:'vpps', label:'VPPS' }, { key:'vpps_desc', label:'VPPS描述' }, { key:'purchase_status', label:'采购状态' }, { key:'torque', label:'扭矩' }, { key:'torque_importance', label:'扭矩重要度' }, { key:'ownership_user', label:'责任人' }],
+};
+
+const NODE_TYPE_LABELS = {
+  line_process: '线体', station_process: '工位', operator_process: '岗位',
+  operation: '工序', tool: '工具', fixture: '工装', equipment: '设备',
+  role: '岗位角色', knowledge: '知识', rule: '规则',
+  physical_station: '实体工位',
+};
+
+const TYPE_API = {
+  task:      { list: t => `/api/lists?item_type=${t}`, data: '/api/tasks'             },
+  issue:     { list: t => `/api/lists?item_type=${t}`, data: '/api/issues'            },
+  knowledge: { list: t => `/api/lists?item_type=${t}`, data: '/api/knowledge/entries' },
+  bop_entry: { list: () => '/api/bop/versions'                                         },
+  pbom_part: { list: () => '/api/ebom/snapshots'                                       },
+};
+const STATUS_LABELS   = { open:'待处理', todo:'待办', in_progress:'进行中', inprogress:'进行中', completed:'已完成', closed:'已关闭', blocked:'阻塞' };
+const PRIORITY_LABELS = { high:'高', medium:'中', low:'低', normal:'普通' };
+const SEVERITY_LABELS = { critical:'严重', high:'高', medium:'中', low:'低' };
+
+// ── 主题 ──────────────────────────────────────────────────────
+function _applyTheme(t) { document.documentElement.setAttribute('data-theme', t || 'dark'); }
+try {
+  _applyTheme(window.parent?.document?.documentElement?.getAttribute('data-theme')
+    || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'));
+} catch { _applyTheme('dark'); }
+window.addEventListener('message', e => {
+  if (e.data?.type === 'theme') _applyTheme(e.data.theme);
+  if (e.data?.type === 'ql:add-slot') _addSlot();
+});
+
+// ── 状态 ──────────────────────────────────────────────────────
+const _cf = () => window._cloudFetch || window.parent?._cloudFetch;
+let _currentType = '';
+let _tls = null;
+let _activeSlot = 0;
+
+// ── 持久化 ────────────────────────────────────────────────────
+function _getSlots() {
+  try { return JSON.parse(localStorage.getItem(_SLOTS_KEY) || '[]'); } catch { return []; }
+}
+function _saveSlots(s) { localStorage.setItem(_SLOTS_KEY, JSON.stringify(s)); }
+function _getActive() { const n = parseInt(localStorage.getItem(_ACTIVE_KEY) || '0'); return isNaN(n) ? 0 : n; }
+function _saveActive(i) { localStorage.setItem(_ACTIVE_KEY, String(i)); }
+
+// ── 页签栏渲染 ────────────────────────────────────────────────
+function _renderTabBar() {
+  const slots = _getSlots();
+  const bar   = document.getElementById('qlTabBar');
+  bar.innerHTML = '';
+
+  slots.forEach((s, i) => {
+    const tab = document.createElement('div');
+    tab.className = 'ql-tab' + (i === _activeSlot ? ' active' : '');
+    // 显示视图名 → 类型名 → 占位符（不再显示数字）
+    const typeLabel = ALL_TYPES.find(t => t.value === s.type)?.label || '';
+    tab.textContent = s.viewName || typeLabel || '新清单';
+    tab.title       = `[${i + 1}] ${s.listName || typeLabel || '未配置'}`;
+    tab.addEventListener('click', () => _switchSlot(i));
+    tab.addEventListener('contextmenu', e => { e.preventDefault(); _showTabCtxMenu(e, i); });
+    bar.appendChild(tab);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className   = 'ql-tab-add';
+  addBtn.textContent = '+';
+  addBtn.title       = '添加快速清单';
+  addBtn.disabled    = slots.length >= 5;
+  addBtn.addEventListener('click', _addSlot);
+  bar.appendChild(addBtn);
+}
+
+function _showTabCtxMenu(e, idx) {
+  document.querySelector('.ql-tab-ctx-menu')?.remove();
+  const slots = _getSlots();
+  const items = [];
+  if (slots.length > 1) items.push({ label: '删除此页签', danger: true });
+
+  if (!items.length) return;
+
+  const menu = document.createElement('div');
+  menu.className = 'ql-tab-ctx-menu';
+  menu.innerHTML = items.map((it, i) =>
+    `<div class="ql-ctx-item${it.danger ? ' danger' : ''}" data-i="${i}">${it.label}</div>`
+  ).join('');
+  menu.style.cssText = `position:fixed;z-index:9999;left:${e.clientX}px;top:${e.clientY}px`;
+  document.body.appendChild(menu);
+
+  menu.querySelectorAll('.ql-ctx-item').forEach(el => {
+    el.addEventListener('click', () => {
+      menu.remove();
+      const action = items[+el.dataset.i];
+      if (action.danger) _deleteSlot(idx);
+    });
+  });
+  setTimeout(() => {
+    document.addEventListener('mousedown', function h(ev) {
+      if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('mousedown', h); }
+    });
+  }, 0);
+}
+
+function _deleteSlot(idx) {
+  const slots = _getSlots();
+  if (slots.length <= 1) return;
+  slots.splice(idx, 1);
+  _saveSlots(slots);
+  if (_activeSlot >= slots.length) _activeSlot = slots.length - 1;
+  _saveActive(_activeSlot);
+  _renderTabBar();
+  _initSlot();
+}
+
+function _switchSlot(idx) {
+  if (idx === _activeSlot) return;
+  _activeSlot = idx;
+  _saveActive(idx);
+  _renderTabBar();
+  _initSlot();
+}
+
+function _addSlot() {
+  const slots = _getSlots();
+  if (slots.length >= 5) return;
+  slots.push({ type: '', listGid: '', listName: '', viewName: '' });
+  _saveSlots(slots);
+  _activeSlot = slots.length - 1;
+  _saveActive(_activeSlot);
+  _renderTabBar();
+  _initSlot();
+}
+
+// ── 初始化当前槽 ──────────────────────────────────────────────
+async function _initSlot() {
+  const root = document.getElementById('qlRoot');
+  root.innerHTML = '';
+  _tls = null;
+
+  let slots = _getSlots();
+  if (!slots.length) {
+    slots = [{ type: '', listGid: '', listName: '', viewName: '' }];
+    _saveSlots(slots);
+    _activeSlot = 0;
+    _renderTabBar();
+  }
+  if (_activeSlot >= slots.length) { _activeSlot = slots.length - 1; _saveActive(_activeSlot); }
+
+  const slot = slots[_activeSlot];
+  if (!slot.type) { _renderSetup(root, slot); return; }
+
+  _currentType = slot.type;
+  const typeInfo  = ALL_TYPES.find(t => t.value === slot.type) || ALL_TYPES[0];
+  const typeCols  = TYPE_COLUMNS[slot.type] || TYPE_COLUMNS.task;
+  const isVersioned = VERSIONED_TYPES.has(slot.type);
+
+  _tls = new TreeListShell({
+    mountEl:          root,
+    title:            slot.viewName || '快速清单',
+    forcedItemType:   slot.type,
+    itemTypes:        [typeInfo],
+    listGid:          slot.listGid || null,
+    showListSelector: false,
+    compactToolbar:   true,
+    columns:          typeCols.filter(c => c.defaultOn !== false),
+    allColumns:       typeCols,
+    parentField:      PARENT_FIELD_BY_TYPE[slot.type] || '__none__',
+    detailMode:       isVersioned ? 'readonly' : 'editable',
+    detailFields:     DETAIL_FIELDS_BY_TYPE[slot.type] || [],
+    moduleId:         'ql_s' + _activeSlot,
+    onLoadLists:      _onLoadLists,
+    onLoadData:       _onLoadData,
+    onSave:           isVersioned ? null : _onSave,
+    onViewChange: name => {
+      const ss = _getSlots();
+      if (ss[_activeSlot]) { ss[_activeSlot].viewName = name; _saveSlots(ss); }
+      _renderTabBar();
+    },
+    cellRenderer:     _makeCellRenderer(slot.type),
+    rowActions:       isVersioned ? null : r => _makeRowActions(r),
+  });
+
+  await _tls.init();
+
+  // 在工具栏末尾追加齿轮按钮（仅管数据来源配置）
+  const settingsBtn = document.createElement('button');
+  settingsBtn.className = 'col-btn ql-settings-btn';
+  settingsBtn.title = '数据来源';
+  settingsBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+  settingsBtn.addEventListener('click', e => { e.stopPropagation(); _openSettingsPanel(settingsBtn); });
+  _tls._toolbarEl.appendChild(settingsBtn);
+}
+
+// ── 新建页签设置界面 ──────────────────────────────────────────
+function _renderSetup(root, slot) {
+  root.innerHTML = `
+    <div class="ql-setup">
+      <div class="ql-setup-hint">选择数据来源</div>
+      <div class="ql-setup-label">类型</div>
+      <select id="qlSetupType" class="ql-setup-inp">
+        ${ALL_TYPES.map(t => `<option value="${t.value}">${t.label}</option>`).join('')}
+      </select>
+      <div class="ql-setup-label">版本 / 清单 <span id="qlSetupListHint" style="color:var(--danger);font-size:10px;"></span></div>
+      <select id="qlSetupList" class="ql-setup-inp">
+        <option value="">（全部）</option>
+      </select>
+      <button class="ql-setup-confirm" id="qlSetupOk">确定</button>
+    </div>`;
+
+  const typeEl = root.querySelector('#qlSetupType');
+  const listEl = root.querySelector('#qlSetupList');
+  const hintEl = root.querySelector('#qlSetupListHint');
+
+  function _updateHint() {
+    if (hintEl) hintEl.textContent = VERSIONED_TYPES.has(typeEl.value) ? '（必选）' : '';
+  }
+
+  _loadSetupLists(typeEl.value, listEl);
+  _updateHint();
+  typeEl.addEventListener('change', () => { _loadSetupLists(typeEl.value, listEl); _updateHint(); });
+
+  root.querySelector('#qlSetupOk').addEventListener('click', () => {
+    const type      = typeEl.value;
+    const listGid   = listEl.value;
+    const listName  = listGid ? (listEl.options[listEl.selectedIndex]?.text || '') : '';
+    const slots     = _getSlots();
+    slots[_activeSlot] = { type, listGid, listName, viewName: '' };
+    _saveSlots(slots);
+    _renderTabBar();
+    _initSlot();
+  });
+}
+
+async function _loadSetupLists(type, listEl, selectedGid = '') {
+  listEl.innerHTML = '<option value="">（加载中…）</option>';
+  const cf = _cf();
+  const versioned = VERSIONED_TYPES.has(type);
+  if (!cf) {
+    listEl.innerHTML = versioned ? '' : '<option value="">（全部）</option>';
+    return;
+  }
+  try {
+    const url = TYPE_API[type]?.list?.(type);
+    if (!url) { listEl.innerHTML = versioned ? '' : '<option value="">（全部）</option>'; return; }
+    const res = await cf(url);
+    const raw = res?.data || [];
+
+    let lists;
+    if (type === 'bop_entry') {
+      lists = raw.map(v => ({ gid: v.gid, name: (v.bop_name || v.version_tag || v.gid) + (v.status && v.status !== 'active' ? ` [${v.status}]` : '') }));
+    } else if (type === 'pbom_part') {
+      lists = raw.map(v => ({ gid: v.gid, name: v.name || v.version_tag || v.gid }));
+    } else {
+      lists = raw;
+    }
+
+    const allOpt = versioned ? '' : '<option value="">（全部）</option>';
+    listEl.innerHTML = allOpt + lists.map(l =>
+      `<option value="${_esc(l.gid)}"${l.gid === selectedGid ? ' selected' : ''}>${_esc(l.name)}</option>`
+    ).join('');
+  } catch {
+    listEl.innerHTML = versioned ? '' : '<option value="">（全部）</option>';
+  }
+}
+
+// ── 单元格渲染器工厂 ──────────────────────────────────────────
+function _makeCellRenderer(type) {
+  if (type === 'bop_entry') {
+    return {
+      node_type: r => _tlsHe(NODE_TYPE_LABELS[r.node_type] || r.node_type || ''),
+    };
+  }
+  if (type === 'pbom_part') {
+    return {
+      quantity: r => r.quantity != null ? String(r.quantity) : '',
+    };
+  }
+  return {
+    status: r => {
+      if (_currentType === 'knowledge') return _tlsHe((r.category || '') + '');
+      const k = (r.status || 'open').toLowerCase().replace(/\s/g, '_');
+      return `<span class="ql-badge ql-s-${k}">${STATUS_LABELS[k] || r.status || ''}</span>`;
+    },
+    priority: r => PRIORITY_LABELS[r.priority] || r.priority || '',
+    severity: r => SEVERITY_LABELS[r.severity] || r.severity || '',
+  };
+}
+
+// ── 数据来源浮窗 ──────────────────────────────────────────────
+function _openSettingsPanel(anchorEl) {
+  document.querySelector('.ql-settings-panel')?.remove();
+  const slot = (_getSlots())[_activeSlot] || {};
+
+  const typeOpts = ALL_TYPES.map(t =>
+    `<option value="${_esc(t.value)}"${t.value === slot.type ? ' selected' : ''}>${_esc(t.label)}</option>`
+  ).join('');
+
+  const panel = document.createElement('div');
+  panel.className = 'ql-settings-panel';
+  panel.innerHTML = `
+    <div class="ql-sp-hdr">数据来源</div>
+    <div class="ql-sp-body">
+      <div class="ql-sp-row">
+        <span class="ql-sp-lbl">类型</span>
+        <select id="qlSpType" class="ql-sp-sel">${typeOpts}</select>
+      </div>
+      <div class="ql-sp-row">
+        <span class="ql-sp-lbl">版本</span>
+        <select id="qlSpList" class="ql-sp-sel"><option value="">（加载中…）</option></select>
+      </div>
+      <button class="ql-sp-confirm" id="qlSpOk">确定</button>
+    </div>`;
+
+  const rect = anchorEl.getBoundingClientRect();
+  const pw = 190;
+  let left = rect.left;
+  if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+  panel.style.cssText = `position:fixed;z-index:9999;left:${left}px;top:${rect.bottom + 4}px;width:${pw}px`;
+  document.body.appendChild(panel);
+
+  const typeEl = panel.querySelector('#qlSpType');
+  const listEl = panel.querySelector('#qlSpList');
+  _loadSetupLists(typeEl.value, listEl, slot.listGid);
+  typeEl.addEventListener('change', () => _loadSetupLists(typeEl.value, listEl, ''));
+
+  panel.querySelector('#qlSpOk').addEventListener('click', () => {
+    const type     = typeEl.value;
+    const listGid  = listEl.value;
+    if (VERSIONED_TYPES.has(type) && !listGid) {
+      listEl.style.borderColor = 'var(--danger)';
+      return;
+    }
+    listEl.style.borderColor = '';
+    const listName = listGid ? (listEl.options[listEl.selectedIndex]?.text || '') : '';
+    const ss = _getSlots();
+    if (ss[_activeSlot]) {
+      const changed = type !== ss[_activeSlot].type || listGid !== ss[_activeSlot].listGid;
+      ss[_activeSlot] = { ...ss[_activeSlot], type, listGid, listName };
+      if (changed) ss[_activeSlot].viewName = '';
+      _saveSlots(ss);
+      panel.remove();
+      if (changed) { _renderTabBar(); _initSlot(); }
+    }
+  });
+
+  setTimeout(() => {
+    document.addEventListener('mousedown', function h(ev) {
+      if (!panel.contains(ev.target)) { panel.remove(); document.removeEventListener('mousedown', h); }
+    });
+  }, 0);
+}
+
+// ── 数据加载 ──────────────────────────────────────────────────
+async function _onLoadLists(itemType) {
+  _currentType = itemType;
+  const cf = _cf();
+  if (!cf) return [];
+  try {
+    const url = TYPE_API[itemType]?.list?.(itemType);
+    if (!url) return [];
+    const res = await cf(url);
+    const raw = res?.data || [];
+    if (itemType === 'bop_entry') {
+      return raw.map(v => ({ gid: v.gid, name: (v.bop_name || v.version_tag || v.gid) + (v.status && v.status !== 'active' ? ` [${v.status}]` : '') }));
+    }
+    if (itemType === 'pbom_part') {
+      return raw.map(v => ({ gid: v.gid, name: v.name || v.version_tag || v.gid }));
+    }
+    return raw;
+  } catch { return []; }
+}
+
+async function _onLoadData(itemType, listGid) {
+  _currentType = itemType;
+  const cf = _cf();
+  if (!cf) return [];
+  try {
+    let url;
+    if (itemType === 'bop_entry') {
+      if (!listGid) return [];
+      url = `/api/bop/versions/${listGid}/entries`;
+    } else if (itemType === 'pbom_part') {
+      if (!listGid) return [];
+      url = `/api/ebom/snapshots/${listGid}/parts`;
+    } else {
+      const base = TYPE_API[itemType]?.data || `/api/${itemType}s`;
+      url = listGid ? `${base}?list_gid=${listGid}` : base;
+    }
+    const res = await cf(url);
+    return res?.data || res || [];
+  } catch { return []; }
+}
+
+async function _onSave(updated) {
+  if (VERSIONED_TYPES.has(_currentType)) return null;
+  const cf   = _cf();
+  if (!cf) return null;
+  const base = TYPE_API[_currentType]?.data;
+  if (!base) return null;
+  try {
+    const res = await cf(base, { method: 'PUT', body: { ...updated } });
+    return res?.data || updated;
+  } catch (e) { throw e; }
+}
+
+// ── 行尾按钮 ──────────────────────────────────────────────────
+function _makeRowActions(row) {
+  if (row._isGroup) return null;
+  if (VERSIONED_TYPES.has(_currentType)) return null;
+  const cf = _cf();
+  if (!cf) return null;
+
+  if (_currentType === 'task' && row.status !== 'completed') {
+    const btn = document.createElement('button');
+    btn.className = 'ql-act-btn';
+    btn.title = '标记完成';
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      btn.disabled = true;
+      try {
+        await cf('/api/tasks', { method: 'PUT', body: { gid: row.gid, status: 'completed' } });
+        await _tls?.refreshItems?.();
+      } catch { btn.disabled = false; }
+    });
+    return btn;
+  }
+
+  if (_currentType === 'issue' && row.status !== 'closed') {
+    const btn = document.createElement('button');
+    btn.className = 'ql-act-btn ql-danger';
+    btn.title = '关闭问题';
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      btn.disabled = true;
+      try {
+        await cf('/api/issues', { method: 'PUT', body: { gid: row.gid, status: 'closed' } });
+        await _tls?.refreshItems?.();
+      } catch { btn.disabled = false; }
+    });
+    return btn;
+  }
+
+  return null;
+}
+
+// ── 键盘快捷键 1-5 切换页签 ──────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target?.tagName) || e.target?.isContentEditable) return;
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 5) {
+    const slots = _getSlots();
+    if (num - 1 < slots.length && num - 1 !== _activeSlot) {
+      _switchSlot(num - 1);
+      e.preventDefault();
+    }
+  }
+});
+
+// ── 工具函数 ──────────────────────────────────────────────────
+function _esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function _tlsHe(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── 启动 ──────────────────────────────────────────────────────
+_activeSlot = _getActive();
+{
+  const initSlots = _getSlots();
+  if (!initSlots.length) {
+    _saveSlots([{ type: '', listGid: '', listName: '', viewName: '' }]);
+    _activeSlot = 0; _saveActive(0);
+  } else if (_activeSlot >= initSlots.length) {
+    _activeSlot = 0; _saveActive(0);
+  }
+}
+_renderTabBar();
+_initSlot();
+</script>
+</body>
+</html>

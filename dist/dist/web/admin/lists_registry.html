@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>清单注册表</title>
+<style>
+:root {
+  --bg-primary:   #ffffff;
+  --bg-secondary: #f7f6f3;
+  --bg-tertiary:  #efefef;
+  --text-normal:  #2e2e2e;
+  --text-muted:   #6e6e6e;
+  --text-faint:   #9a9a9a;
+  --border:       #dcdcdc;
+  --accent:       #7b61ff;
+  --accent-h:     #6951e0;
+  --radius:       6px;
+  --font-mono:    'Consolas','JetBrains Mono','Fira Code',monospace;
+}
+:root[data-theme="dark"] {
+  --bg-primary:   #1e1e2e;
+  --bg-secondary: #181825;
+  --bg-tertiary:  #313244;
+  --text-normal:  #cdd6f4;
+  --text-muted:   #a6adc8;
+  --text-faint:   #6c7086;
+  --border:       #313244;
+  --accent:       #89b4fa;
+  --accent-h:     #7ba8f0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg-secondary);color:var(--text-normal);
+  height:100vh;overflow:hidden;display:flex;flex-direction:column;
+}
+
+/* ── toolbar ── */
+.toolbar{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 16px;background:var(--bg-primary);
+  border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
+}
+.toolbar-title{font-size:15px;font-weight:700;color:var(--text-normal);margin-right:4px;}
+.toolbar-sub{font-size:12px;color:var(--text-faint);}
+.toolbar-spacer{flex:1;}
+input[type=text]{
+  padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--bg-secondary);color:var(--text-normal);font-size:12px;
+  outline:none;width:150px;
+}
+input[type=text]:focus{border-color:var(--accent);}
+.btn{
+  padding:5px 12px;border-radius:var(--radius);font-size:12px;cursor:pointer;
+  border:1px solid var(--border);background:transparent;color:var(--text-muted);
+  display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-accent:hover{background:var(--accent-h);color:#fff;}
+
+/* ── multi-select dropdown ── */
+.ms-wrap{position:relative;display:inline-block;}
+.ms-btn{
+  padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--bg-secondary);color:var(--text-muted);font-size:12px;
+  cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;
+  transition:all .15s;user-select:none;min-width:80px;
+}
+.ms-btn:hover,.ms-btn.open{border-color:var(--accent);color:var(--text-normal);}
+.ms-btn.has-sel{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--bg-secondary));}
+.ms-caret{font-size:9px;margin-left:auto;opacity:.6;}
+.ms-panel{
+  position:absolute;top:calc(100% + 4px);left:0;min-width:160px;
+  background:var(--bg-primary);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,0,0,.15);
+  z-index:200;padding:4px 0;display:none;
+}
+.ms-panel.open{display:block;}
+.ms-item{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px;cursor:pointer;font-size:12px;color:var(--text-normal);
+  transition:background .1s;
+}
+.ms-item:hover{background:var(--bg-tertiary);}
+.ms-item input[type=checkbox]{
+  width:13px;height:13px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;
+}
+.ms-sep{margin:3px 0;border:none;border-top:1px solid var(--border);}
+.ms-actions{
+  display:flex;gap:0;border-top:1px solid var(--border);
+  padding:4px 8px;justify-content:space-between;
+}
+.ms-action-btn{
+  font-size:10px;padding:2px 8px;border:none;background:transparent;
+  color:var(--text-faint);cursor:pointer;border-radius:3px;
+}
+.ms-action-btn:hover{color:var(--accent);background:var(--bg-tertiary);}
+
+/* ── table ── */
+.tbl-wrap{flex:1;overflow:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg-primary);}
+thead{position:sticky;top:0;z-index:5;}
+thead th{
+  background:var(--bg-secondary);color:var(--text-faint);
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  padding:8px 10px;border-bottom:1px solid var(--border);
+  white-space:nowrap;text-align:left;
+}
+tbody td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+tbody tr:hover td{background:color-mix(in srgb,var(--accent) 4%,var(--bg-primary));}
+tr.domain-sep td{
+  background:var(--bg-secondary);color:var(--text-faint);
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  padding:5px 10px 4px;border-bottom:1px solid var(--border);
+}
+.tbl-name{font-family:var(--font-mono);font-size:11px;color:var(--text-normal);font-weight:600;white-space:nowrap;}
+.tbl-parent{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);}
+.tbl-fields{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);line-height:1.6;}
+.tbl-mono{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);}
+
+/* category badge */
+.cat-badge{display:inline-block;font-size:9px;padding:1px 7px;border-radius:10px;font-weight:600;white-space:nowrap;}
+.cat-agg{background:rgba(137,180,250,.18);color:#89b4fa;}
+.cat-fk {background:rgba(166,227,161,.18);color:#a6e3a1;}
+.cat-ref{background:rgba(250,179,135,.18);color:#fab387;}
+.cat-sys{background:rgba(108,112,134,.18);color:#a6adc8;}
+
+/* usage badge */
+.use-badge{display:inline-block;font-size:9px;padding:1px 7px;border-radius:10px;font-weight:600;white-space:nowrap;}
+.use-ref  {background:rgba(116,199,236,.18);color:#74c7ec;}
+.use-tpl  {background:rgba(203,166,247,.18);color:#cba6f7;}
+.use-std  {background:rgba(166,227,161,.18);color:#a6e3a1;}
+.use-attr {background:rgba(250,179,135,.18);color:#fab387;}
+.use-other{background:rgba(108,112,134,.15);color:#a6adc8;}
+
+/* status select */
+.status-sel{
+  font-size:11px;padding:2px 6px;border:1px solid var(--border);
+  border-radius:var(--radius);background:var(--bg-secondary);
+  color:var(--text-normal);cursor:pointer;outline:none;
+}
+.status-sel:focus{border-color:var(--accent);}
+
+/* usage cell */
+.usage-wrap{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.usage-custom{
+  font-size:10px;color:var(--text-muted);outline:none;
+  border-bottom:1px dashed var(--border);min-width:40px;max-width:100px;
+}
+.usage-custom:focus{border-color:var(--accent);color:var(--text-normal);}
+
+/* note cell */
+.note-cell{
+  min-width:140px;max-width:220px;word-break:break-all;
+  color:var(--text-muted);outline:none;border-radius:3px;padding:1px 3px;
+}
+.note-cell:focus{background:color-mix(in srgb,var(--accent) 8%,var(--bg-primary));color:var(--text-normal);}
+.note-cell:empty::before{content:"双击编辑…";color:var(--text-faint);font-style:italic;}
+
+/* custom row */
+tr.custom-row td{background:color-mix(in srgb,var(--accent) 5%,transparent);}
+tr.custom-row td[contenteditable]{outline:none;cursor:text;border-radius:3px;}
+tr.custom-row td[contenteditable]:focus{background:color-mix(in srgb,var(--accent) 10%,var(--bg-primary));}
+.del-btn{
+  display:none;width:20px;height:20px;border:none;background:transparent;
+  border-radius:4px;cursor:pointer;color:var(--text-faint);font-size:12px;
+  align-items:center;justify-content:center;transition:all .15s;
+}
+.del-btn:hover{background:rgba(243,139,168,.2);color:#f38ba8;}
+tr.custom-row:hover .del-btn{display:inline-flex;}
+</style>
+</head>
+<body>
+<script src="/web/icons.js"></script>
+
+<!-- toolbar -->
+<div class="toolbar">
+  <span class="toolbar-title">清单注册表</span>
+  <span class="toolbar-sub">DB 表牵引 &middot; 共 44 张表</span>
+  <div class="toolbar-spacer"></div>
+  <input type="text" id="searchInput" placeholder="搜索表名 / 含义…">
+  <!-- multi-select filters -->
+  <div class="ms-wrap" id="msCat"></div>
+  <div class="ms-wrap" id="msDomain"></div>
+  <div class="ms-wrap" id="msStatus"></div>
+  <div class="ms-wrap" id="msUsage"></div>
+  <button class="btn btn-accent" id="btnAddRow">
+    <svg class="icon" width="13" height="13"><use href="#icon-plus"/></svg>
+    新增行
+  </button>
+  <button class="btn" id="btnExport">
+    <svg class="icon" width="13" height="13"><use href="#icon-download"/></svg>
+    导出快照
+  </button>
+</div>
+
+<!-- table -->
+<div class="tbl-wrap">
+<table id="regTable">
+  <thead>
+    <tr>
+      <th style="width:185px">表名</th>
+      <th style="width:110px">对应清单 / 模块</th>
+      <th style="width:110px">领域</th>
+      <th style="width:88px">类别</th>
+      <th style="width:120px">聚合根</th>
+      <th style="width:170px">子实体</th>
+      <th style="width:100px">用途</th>
+      <th style="width:170px">业务含义</th>
+      <th style="width:130px">关联父表</th>
+      <th style="width:230px">主要字段</th>
+      <th style="width:78px">状态</th>
+      <th style="width:190px">备注</th>
+      <th style="width:32px"></th>
+    </tr>
+  </thead>
+  <tbody id="regBody"></tbody>
+</table>
+</div>
+
+<script>
+// ── 常量 ──────────────────────────────────────────────────────────────────
+const CAT_AGG = '聚合根拥有子实体';
+const CAT_FK  = '外键关联GID';
+const CAT_REF = '引用GID';
+const CAT_SYS = '系统工具';
+
+const USE_REF  = '信息引用';
+const USE_TPL  = '模板清单';
+const USE_STD  = '标准清单';
+const USE_ATTR = '属性清单';
+const USE_OTHER= '其他';
+
+const NCOLS = 13;
+
+// ── 全44张表静态数据 ──────────────────────────────────────────────────────
+const LISTS = [
+  // ── 系统域 ──
+  { id:'teams', domain:'系统域', name:'teams', listName:'组织管理',
+    category:CAT_AGG, aggregate:'Team', entities:'users(team_id 软关联)',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'团队（逻辑租户隔离单位）', parent:'—',
+    fields:'gid, name, is_active, config(JSONB)', status:'active', note:'' },
+  { id:'users', domain:'系统域', name:'users', listName:'用户管理',
+    category:CAT_FK, aggregate:'User', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'全局用户（飞书身份 + 系统角色）', parent:'teams',
+    fields:'gid, feishu_open_id, name, email, avatar_url, system_role, external_subtype, team_id, is_active, notification_prefs', status:'active', note:'' },
+  { id:'system_config', domain:'系统域', name:'system_config', listName:'系统配置',
+    category:CAT_SYS, aggregate:'—', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'全局热重载配置（飞书凭证、能力备注等）', parent:'—',
+    fields:'key(PK), value, description, updated_at', status:'active', note:'' },
+  { id:'auth_pending', domain:'系统域', name:'auth_pending', listName:'—（内部）',
+    category:CAT_SYS, aggregate:'—', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'OAuth 登录状态轮询（state→jwt，10 min 过期）', parent:'—',
+    fields:'state(PK), jwt, error, expires_at', status:'active', note:'' },
+  { id:'view_configs', domain:'系统域', name:'view_configs', listName:'视图管理（各模块内）',
+    category:CAT_FK, aggregate:'ViewConfig', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'用户自定义视图（字段显隐 / 顺序 / 筛选 / 排序）', parent:'users',
+    fields:'gid, name, module, owner_gid, is_shared, config(JSONB)', status:'active', note:'' },
+  { id:'export_templates', domain:'系统域', name:'export_templates', listName:'导出模板编辑器',
+    category:CAT_FK, aggregate:'ExportTemplate', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'Excel 导出样式模板（列宽、表头色等）', parent:'users',
+    fields:'gid, name, module, owner_gid, is_shared, config(JSONB)', status:'active', note:'' },
+  { id:'workbench_configs', domain:'系统域', name:'workbench_configs', listName:'工作台',
+    category:CAT_AGG, aggregate:'WorkbenchConfig', entities:'workbench_member_overrides',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'多工作台配置（个人或团队，每 owner 最多 3 个）', parent:'users / teams',
+    fields:'gid, owner_type, owner_gid, name, sort_order, widgets(JSONB)', status:'active', note:'' },
+  { id:'workbench_member_overrides', domain:'系统域', name:'workbench_member_overrides', listName:'工作台（个性化）',
+    category:CAT_REF, aggregate:'WorkbenchConfig', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'团队工作台的成员个性化覆盖', parent:'workbench_configs, users',
+    fields:'gid, workbench_gid, user_gid, widgets(JSONB)', status:'active', note:'' },
+
+  // ── 项目域 ──
+  { id:'vehicle_models', domain:'项目域', name:'vehicle_models', listName:'车型清单',
+    category:CAT_FK, aggregate:'VehicleModel', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'车型（项目归属的产品对象）', parent:'teams',
+    fields:'gid, name, brand, platform, team_id, meta', status:'active', note:'' },
+  { id:'projects', domain:'项目域', name:'projects', listName:'项目清单',
+    category:CAT_AGG, aggregate:'Project', entities:'project_members',
+    usage:USE_REF, usageCustom:'',
+    meaning:'项目（工艺开发主体，含状态 / 范围 / 负责人）', parent:'vehicle_models, teams, users',
+    fields:'gid, name, description, status, vehicle_model_gid, team_id, owner_gid, share_scope', status:'active', note:'' },
+  { id:'project_members', domain:'项目域', name:'project_members', listName:'项目成员（项目详情内）',
+    category:CAT_REF, aggregate:'Project', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'项目成员（project_role: member/admin/viewer）', parent:'projects, users',
+    fields:'gid, project_gid, user_gid, project_role, section_gid', status:'active', note:'' },
+
+  // ── 工艺域（旧）──
+  { id:'work_plans', domain:'工艺域（旧）', name:'work_plans', listName:'工艺计划清单（旧）',
+    category:CAT_AGG, aggregate:'WorkPlan', entities:'sections, operation_flat',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工艺计划（旧五层根节点，已被 BOP 五层替代）', parent:'projects',
+    fields:'gid, name, project_gid, status, version, share_scope', status:'legacy', note:'bop_versions 替代，暂保留兼容' },
+  { id:'sections', domain:'工艺域（旧）', name:'sections', listName:'工段清单（旧）',
+    category:CAT_AGG, aggregate:'WorkPlan', entities:'operation_flat',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工段（旧：工艺计划→工段→工序）', parent:'work_plans',
+    fields:'gid, name, work_plan_gid, sort_order, is_locked, locked_by', status:'legacy', note:'已被 factory_sections / bop_posts 替代' },
+  { id:'operation_flat', domain:'工艺域（旧）', name:'operation_flat', listName:'工艺清单（旧）',
+    category:CAT_REF, aggregate:'WorkPlan', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工序平铺（旧结构，含工位/岗位/标准工序引用）', parent:'sections, work_plans',
+    fields:'gid, section_gid, work_plan_gid, workstation_gid, post_gid, seq_no, op_code, op_name, std_op_gid, standard_time, parts, tools', status:'legacy', note:'已被 bop_operations 替代' },
+
+  // ── 工艺域（BOP 五层）──
+  { id:'bop_versions', domain:'工艺域（BOP五层）', name:'bop_versions', listName:'BOP 画布（版本选择）',
+    category:CAT_AGG, aggregate:'BopVersion', entities:'bop_posts, bop_operations, bop_steps, operation_resources, step_resources',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'BOP 版本（项目 + 车型 + 工厂的工艺方案根节点）', parent:'projects, factories, vehicle_models',
+    fields:'gid, project_gid, factory_gid, vehicle_model_gid, version_tag, maturity, takt_time, status', status:'active', note:'' },
+  { id:'bop_posts', domain:'工艺域（BOP五层）', name:'bop_posts', listName:'BOP 画布（岗位层）',
+    category:CAT_AGG, aggregate:'BopVersion', entities:'bop_operations',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'岗位（工位内人员岗位，第二层）', parent:'bop_versions, factory_stations',
+    fields:'gid, bop_version_gid, station_gid, post_code, post_name, head_count, sort_order', status:'active', note:'' },
+  { id:'bop_operations', domain:'工艺域（BOP五层）', name:'bop_operations', listName:'BOP 画布（工序层）/ 工艺清单',
+    category:CAT_AGG, aggregate:'BopVersion', entities:'bop_steps, operation_resources',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工序（第三层，含标准工序克隆 + drift 追踪）', parent:'bop_posts, bop_versions',
+    fields:'gid, post_gid, bop_version_gid, op_code, op_name, seq_no, standard_time, std_op_gid, clone_source_version, drift_fields(JSONB), parts(JSONB)', status:'active', note:'' },
+  { id:'bop_steps', domain:'工艺域（BOP五层）', name:'bop_steps', listName:'BOP 画布（工步层）',
+    category:CAT_AGG, aggregate:'BopVersion', entities:'step_resources',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工步（第四层，工序的细化步骤）', parent:'bop_operations',
+    fields:'gid, operation_gid, step_code, step_name, seq_no, standard_time, notes', status:'active', note:'' },
+  { id:'operation_resources', domain:'工艺域（BOP五层）', name:'operation_resources', listName:'BOP 画布（工序资源）',
+    category:CAT_REF, aggregate:'BopVersion', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工序资源规格（画布层：工具 / 夹具 / 设备需求）', parent:'bop_operations',
+    fields:'gid, operation_gid, resource_type, spec_name, spec_params(JSONB), qty', status:'active', note:'' },
+  { id:'step_resources', domain:'工艺域（BOP五层）', name:'step_resources', listName:'BOP 画布（工步资源）',
+    category:CAT_REF, aggregate:'BopVersion', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工步资源规格（清单层：工具 / 夹具 / 设备需求）', parent:'bop_steps',
+    fields:'gid, step_gid, resource_type, spec_name, spec_params(JSONB), qty', status:'active', note:'' },
+
+  // ── eBOM 域 ──
+  { id:'bom_snapshots', domain:'eBOM域', name:'bom_snapshots', listName:'EBOM 清单（版本选择）',
+    category:CAT_AGG, aggregate:'BomSnapshot', entities:'part_entries, part_model_instances',
+    usage:USE_REF, usageCustom:'',
+    meaning:'eBOM 快照（项目某时刻的物料清单版本）', parent:'projects',
+    fields:'gid, project_gid, version_tag, source_type, status', status:'active', note:'' },
+  { id:'part_entries', domain:'eBOM域', name:'part_entries', listName:'EBOM 清单（零件树）',
+    category:CAT_AGG, aggregate:'BomSnapshot', entities:'part_model_instances',
+    usage:USE_REF, usageCustom:'',
+    meaning:'零件条目（快照内树形零件清单节点，自引用 parent_gid）', parent:'bom_snapshots',
+    fields:'gid, snapshot_gid, part_no, name, quantity, unit, material, parent_gid', status:'active', note:'' },
+  { id:'part_model_instances', domain:'eBOM域', name:'part_model_instances', listName:'EBOM 清单（3D 模型）',
+    category:CAT_REF, aggregate:'BomSnapshot', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'零件 3D 模型实例（坐标变换，关联零件条目）', parent:'part_entries',
+    fields:'gid, part_entry_gid, model_file_path, transform(JSONB)', status:'partial', note:'3D 模型读写能力待完善' },
+
+  // ── 知识域 ──
+  { id:'std_operations', domain:'知识域', name:'std_operations', listName:'标准工序库',
+    category:CAT_FK, aggregate:'StdOperation', entities:'—',
+    usage:USE_STD, usageCustom:'',
+    meaning:'标准工序库（可克隆到 BOP，version 字段用于 drift 追踪）', parent:'teams, users',
+    fields:'gid, code(UNIQUE), name, status, standard_time, steps(JSONB), required_tools(JSONB), version, share_scope', status:'active', note:'' },
+  { id:'tool_templates', domain:'知识域', name:'tool_templates', listName:'工艺元素库（工具）',
+    category:CAT_FK, aggregate:'ToolTemplate', entities:'physical_tools',
+    usage:USE_STD, usageCustom:'',
+    meaning:'工具模板库（工具种类 / 规格定义）', parent:'teams',
+    fields:'gid, name, category, status, spec(JSONB)', status:'active', note:'' },
+  { id:'equipment_templates', domain:'知识域', name:'equipment_templates', listName:'工艺元素库（设备）',
+    category:CAT_FK, aggregate:'EquipmentTemplate', entities:'physical_equipments',
+    usage:USE_STD, usageCustom:'',
+    meaning:'设备模板库（设备种类 / 规格定义）', parent:'teams',
+    fields:'gid, name, category, status, spec(JSONB)', status:'active', note:'' },
+  { id:'fixture_templates', domain:'知识域', name:'fixture_templates', listName:'工艺元素库（夹具）',
+    category:CAT_FK, aggregate:'FixtureTemplate', entities:'physical_fixtures',
+    usage:USE_STD, usageCustom:'',
+    meaning:'夹具模板库（夹具种类 / 规格定义）', parent:'teams',
+    fields:'gid, name, category, status, spec(JSONB)', status:'active', note:'' },
+  { id:'standard_fasteners', domain:'知识域', name:'standard_fasteners', listName:'工艺元素库（紧固件）',
+    category:CAT_FK, aggregate:'StandardFastener', entities:'—',
+    usage:USE_STD, usageCustom:'',
+    meaning:'标准紧固件库（件号唯一，含料号 / 规格 / 材料）', parent:'teams',
+    fields:'gid, part_no(UNIQUE), name, spec, material, status', status:'active', note:'' },
+  { id:'standard_part_names', domain:'知识域', name:'standard_part_names', listName:'工艺元素库（零件名）',
+    category:CAT_FK, aggregate:'StandardPartName', entities:'—',
+    usage:USE_STD, usageCustom:'',
+    meaning:'标准零件名称库（规范命名，防歧义）', parent:'teams',
+    fields:'gid, standard_name, part_category, description', status:'active', note:'' },
+
+  // ── 工厂域 ──
+  { id:'factories', domain:'工厂域', name:'factories', listName:'工厂资源（工厂列表）',
+    category:CAT_AGG, aggregate:'Factory', entities:'factory_sections, factory_stations',
+    usage:USE_REF, usageCustom:'',
+    meaning:'工厂（物理工厂实体，含工段 / 工位）', parent:'teams',
+    fields:'gid, name, team_id, meta', status:'active', note:'' },
+  { id:'factory_sections', domain:'工厂域', name:'factory_sections', listName:'工厂资源（工段）',
+    category:CAT_AGG, aggregate:'Factory', entities:'factory_stations',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工段（工厂内物理区域，画布中大矩形）', parent:'factories',
+    fields:'gid, name, factory_gid, sort_order, color, canvas_x/y/w/h', status:'active', note:'' },
+  { id:'factory_stations', domain:'工厂域', name:'factory_stations', listName:'工厂资源（工位）',
+    category:CAT_FK, aggregate:'Factory', entities:'—',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'工位（独立站位如 TB01L/TB01R，含节拍 / 人机高度）', parent:'factory_sections',
+    fields:'gid, code, name, factory_section_gid, canvas_x/y, takt_time, height_mm', status:'active', note:'' },
+  { id:'factory_layout_templates', domain:'工厂域', name:'factory_layout_templates', listName:'工厂资源（布局模板库）',
+    category:CAT_FK, aggregate:'FactoryLayoutTemplate', entities:'—',
+    usage:USE_TPL, usageCustom:'',
+    meaning:'工厂布局模板（产线积木，保存一组工位相对坐标）', parent:'factories, teams',
+    fields:'gid, name, factory_gid, team_id, stations(JSONB)', status:'active', note:'' },
+  { id:'physical_tools', domain:'工厂域', name:'physical_tools', listName:'工厂资源（实物工具）',
+    category:CAT_REF, aggregate:'ToolTemplate', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'实物工具（资产编号唯一，关联工具模板）', parent:'tool_templates, teams',
+    fields:'gid, asset_no(UNIQUE), template_gid, status', status:'active', note:'' },
+  { id:'physical_equipments', domain:'工厂域', name:'physical_equipments', listName:'工厂资源（实物设备）',
+    category:CAT_REF, aggregate:'EquipmentTemplate', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'实物设备（资产编号唯一，关联设备模板）', parent:'equipment_templates, teams',
+    fields:'gid, asset_no(UNIQUE), template_gid, status', status:'active', note:'' },
+  { id:'physical_fixtures', domain:'工厂域', name:'physical_fixtures', listName:'工厂资源（实物夹具）',
+    category:CAT_REF, aggregate:'FixtureTemplate', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'实物夹具（资产编号唯一，关联夹具模板）', parent:'fixture_templates, teams',
+    fields:'gid, asset_no(UNIQUE), template_gid, status', status:'active', note:'' },
+
+  // ── 协作域 ──
+  { id:'collab_sessions', domain:'协作域', name:'collab_sessions', listName:'—（内部锁定）',
+    category:CAT_REF, aggregate:'CollabSession', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'协同编辑会话（多人编辑工段时的锁定会话）', parent:'sections, users',
+    fields:'gid, section_gid, owner_gid, status, participants(JSONB), ended_at', status:'partial', note:'实时协同能力待完善' },
+  { id:'approval_orders', domain:'协作域', name:'approval_orders', listName:'审批管理',
+    category:CAT_REF, aggregate:'ApprovalOrder', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'审批单（工艺变更 / 偏差 / 范围升级等流程）', parent:'projects, users',
+    fields:'gid, project_gid, order_type, title, applicant_gid, reviewer_gid, status, content(JSONB), opinions(JSONB), share_scope', status:'active', note:'' },
+  { id:'follows', domain:'协作域', name:'follows', listName:'关注 / 订阅（各模块内）',
+    category:CAT_REF, aggregate:'Follow', entities:'notifications(触发)',
+    usage:USE_ATTR, usageCustom:'',
+    meaning:'关注（订阅任务/问题/项目等，条件式通知）', parent:'users',
+    fields:'gid, user_gid, item_type, item_gid, item_title, notify_on(JSONB)', status:'active', note:'notify_on 已从 TEXT 迁移至 JSONB 数组' },
+  { id:'notifications', domain:'协作域', name:'notifications', listName:'通知中心',
+    category:CAT_REF, aggregate:'Notification', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'通知（状态变更 / @提及 / 关注触发的消息）', parent:'users',
+    fields:'gid, user_gid, type, item_type, item_gid, title, body, is_read', status:'active', note:'' },
+
+  // ── 任务域 ──
+  { id:'tasks', domain:'任务域', name:'tasks', listName:'任务清单',
+    category:CAT_REF, aggregate:'Task', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'任务（本地 SQLite + 云端 PG 双存储，可提升到云端）', parent:'projects, users',
+    fields:'gid, title, description, owner_gid, owner_user_gid, assignee_team_gid, project_gid, status, priority, due_date, share_scope, template_item_gid', status:'active', note:'提升后本地记录补充 migrated_to_cloud_gid' },
+  { id:'task_templates', domain:'任务域', name:'task_templates', listName:'任务模板管理',
+    category:CAT_AGG, aggregate:'TaskTemplate', entities:'task_template_items',
+    usage:USE_TPL, usageCustom:'',
+    meaning:'任务模板（项目标准内容清单，可批量实例化）', parent:'users',
+    fields:'gid, name, description, scope, owner_gid, version, is_active', status:'active', note:'' },
+  { id:'task_template_items', domain:'任务域', name:'task_template_items', listName:'任务模板条目（模板详情内）',
+    category:CAT_REF, aggregate:'TaskTemplate', entities:'—',
+    usage:USE_TPL, usageCustom:'',
+    meaning:'任务模板条目（含变量插值，支持偏移天数）', parent:'task_templates',
+    fields:'gid, template_gid, title_pattern, description, priority, assignee_role, due_offset_days, sort_order', status:'active', note:'' },
+
+  // ── 问题域 ──
+  { id:'issues', domain:'问题域', name:'issues', listName:'问题清单',
+    category:CAT_REF, aggregate:'Issue', entities:'—',
+    usage:USE_REF, usageCustom:'',
+    meaning:'问题（本地 SQLite + 云端 PG 双存储，含八大要素字段）', parent:'projects, users',
+    fields:'gid, title, description, severity, status, owner_gid, owner_user_gid, assignee_team_gid, project_gid, tracking_refs(JSONB), occurrence_root_cause, escape_root_cause, interim_action, permanent_action', status:'active', note:'与 tasks 同理双存储' },
+];
+
+// ── Multi-Select 组件 ─────────────────────────────────────────────────────
+class MultiSelect {
+  constructor(containerId, options, placeholder, onChange) {
+    this.el = document.getElementById(containerId);
+    this.options = options;   // [{value, label}]
+    this.placeholder = placeholder;
+    this.onChange = onChange;
+    this.selected = new Set();
+    this._build();
+  }
+
+  _build() {
+    this.btn = document.createElement('div');
+    this.btn.className = 'ms-btn';
+    this.btn.innerHTML = `<span class="ms-label">${this.placeholder}</span><span class="ms-caret">▾</span>`;
+
+    this.panel = document.createElement('div');
+    this.panel.className = 'ms-panel';
+
+    // 全选/全清 actions
+    const actions = document.createElement('div');
+    actions.className = 'ms-actions';
+    const btnAll = document.createElement('button');
+    btnAll.className = 'ms-action-btn';
+    btnAll.textContent = '全选';
+    btnAll.onclick = (e) => { e.stopPropagation(); this.options.forEach(o => this.selected.add(o.value)); this._refresh(); this.onChange(); };
+    const btnNone = document.createElement('button');
+    btnNone.className = 'ms-action-btn';
+    btnNone.textContent = '清空';
+    btnNone.onclick = (e) => { e.stopPropagation(); this.selected.clear(); this._refresh(); this.onChange(); };
+    actions.appendChild(btnAll);
+    actions.appendChild(btnNone);
+    this.panel.appendChild(actions);
+
+    const sep = document.createElement('hr');
+    sep.className = 'ms-sep';
+    this.panel.appendChild(sep);
+
+    // option checkboxes
+    this.checkboxes = [];
+    this.options.forEach(opt => {
+      const item = document.createElement('label');
+      item.className = 'ms-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = opt.value;
+      cb.addEventListener('change', () => {
+        if (cb.checked) this.selected.add(opt.value);
+        else this.selected.delete(opt.value);
+        this._refresh();
+        this.onChange();
+      });
+      item.appendChild(cb);
+      item.appendChild(document.createTextNode(opt.label || opt.value));
+      this.panel.appendChild(item);
+      this.checkboxes.push(cb);
+    });
+
+    this.el.appendChild(this.btn);
+    this.el.appendChild(this.panel);
+
+    this.btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = this.panel.classList.contains('open');
+      document.querySelectorAll('.ms-panel.open').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.ms-btn.open').forEach(b => b.classList.remove('open'));
+      if (!isOpen) {
+        this.panel.classList.add('open');
+        this.btn.classList.add('open');
+      }
+    });
+  }
+
+  _refresh() {
+    this.checkboxes.forEach(cb => { cb.checked = this.selected.has(cb.value); });
+    const n = this.selected.size;
+    const label = this.btn.querySelector('.ms-label');
+    if (n === 0) {
+      label.textContent = this.placeholder;
+      this.btn.classList.remove('has-sel');
+    } else if (n === this.options.length) {
+      label.textContent = this.placeholder + '（全部）';
+      this.btn.classList.remove('has-sel');
+    } else {
+      label.textContent = this.placeholder + `（${n}）`;
+      this.btn.classList.add('has-sel');
+    }
+  }
+
+  getValues() { return this.selected; }  // empty Set = no filter
+}
+
+// close panels on outside click
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ms-panel.open').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.ms-btn.open').forEach(b => b.classList.remove('open'));
+});
+
+// ── 本地持久化 ─────────────────────────────────────────────────────────────
+const NOTE_KEY   = 'lists.notes';
+const STATUS_KEY = 'lists.statuses';
+const USAGE_KEY  = 'lists.usages';
+const CUSTOM_KEY = 'lists.custom_rows';
+
+function loadNotes()    { try { return JSON.parse(localStorage.getItem(NOTE_KEY)   || '{}'); } catch { return {}; } }
+function loadStatuses() { try { return JSON.parse(localStorage.getItem(STATUS_KEY) || '{}'); } catch { return {}; } }
+function loadUsages()   { try { return JSON.parse(localStorage.getItem(USAGE_KEY)  || '{}'); } catch { return {}; } }
+function loadCustoms()  { try { return JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]'); } catch { return []; } }
+function saveNotes(o)    { localStorage.setItem(NOTE_KEY,   JSON.stringify(o)); }
+function saveStatuses(o) { localStorage.setItem(STATUS_KEY, JSON.stringify(o)); }
+function saveUsages(o)   { localStorage.setItem(USAGE_KEY,  JSON.stringify(o)); }
+function saveCustoms(a)  { localStorage.setItem(CUSTOM_KEY, JSON.stringify(a)); }
+
+async function persistNote(id, value) {
+  const notes = loadNotes(); notes[id] = value; saveNotes(notes);
+  try {
+    const cf = window._cloudFetch || window.parent?._cloudFetch || window.parent?.parent?._cloudFetch;
+    if (cf) await cf('/admin/config', { method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ key:`lists.${id}.note`, value }) });
+  } catch {}
+}
+
+async function loadRemoteNotes() {
+  try {
+    const cf = window._cloudFetch || window.parent?._cloudFetch || window.parent?.parent?._cloudFetch;
+    if (!cf) return;
+    const res = await cf('/admin/config?prefix=lists.');
+    if (res?.items) {
+      const notes = loadNotes();
+      res.items.forEach(item => {
+        const m = item.key.match(/^lists\.(.+)\.note$/);
+        if (m) notes[m[1]] = item.value;
+      });
+      saveNotes(notes);
+    }
+  } catch {}
+}
+
+// ── badge helpers ──────────────────────────────────────────────────────────
+const CAT_META = {
+  [CAT_AGG]:{ cls:'cat-agg', label:'聚合根' },
+  [CAT_FK]: { cls:'cat-fk',  label:'外键关联' },
+  [CAT_REF]:{ cls:'cat-ref', label:'引用GID' },
+  [CAT_SYS]:{ cls:'cat-sys', label:'系统工具' },
+};
+const USE_META = {
+  [USE_REF]: { cls:'use-ref',  label:'信息引用' },
+  [USE_TPL]: { cls:'use-tpl',  label:'模板清单' },
+  [USE_STD]: { cls:'use-std',  label:'标准清单' },
+  [USE_ATTR]:{ cls:'use-attr', label:'属性清单' },
+  [USE_OTHER]:{ cls:'use-other',label:'其他' },
+};
+function catBadge(v) {
+  const m = CAT_META[v] || { cls:'cat-sys', label:v };
+  return `<span class="cat-badge ${m.cls}" title="${esc(v)}">${m.label}</span>`;
+}
+function useBadge(v) {
+  const m = USE_META[v] || { cls:'use-other', label: v||'其他' };
+  return `<span class="use-badge ${m.cls}">${m.label}</span>`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── build rows ─────────────────────────────────────────────────────────────
+function buildRows() {
+  const notes    = loadNotes();
+  const statuses = loadStatuses();
+  const usages   = loadUsages();
+  const customs  = loadCustoms();
+  const base = LISTS.map(r => ({
+    ...r,
+    note:        notes[r.id]    !== undefined ? notes[r.id]    : r.note,
+    status:      statuses[r.id] !== undefined ? statuses[r.id] : r.status,
+    usage:       usages[r.id]?.usage       !== undefined ? usages[r.id].usage       : r.usage,
+    usageCustom: usages[r.id]?.usageCustom !== undefined ? usages[r.id].usageCustom : r.usageCustom,
+    custom: false,
+  }));
+  return [...base, ...customs.map(r => ({ ...r, custom: true }))];
+}
+
+// ── multi-select filter instances ──────────────────────────────────────────
+let msCat, msDomain, msStatus, msUsage;
+
+// ── render ─────────────────────────────────────────────────────────────────
+let _rows = [];
+
+function renderTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const selCat    = msCat.getValues();
+  const selDomain = msDomain.getValues();
+  const selStatus = msStatus.getValues();
+  const selUsage  = msUsage.getValues();
+
+  _rows = buildRows();
+  const body = document.getElementById('regBody');
+  body.innerHTML = '';
+  let lastDomain = null;
+
+  _rows.forEach((r, idx) => {
+    const matchQ = !q ||
+      r.name.toLowerCase().includes(q) ||
+      (r.meaning||'').toLowerCase().includes(q) ||
+      (r.aggregate||'').toLowerCase().includes(q) ||
+      (r.entities||'').toLowerCase().includes(q);
+    if (!matchQ) return;
+    if (selCat.size    > 0 && !selCat.has(r.category))  return;
+    if (selDomain.size > 0 && !selDomain.has(r.domain)) return;
+    if (selStatus.size > 0 && !selStatus.has(r.status)) return;
+    if (selUsage.size  > 0 && !selUsage.has(r.usage))   return;
+
+    if (!r.custom && r.domain !== lastDomain) {
+      lastDomain = r.domain;
+      const sep = document.createElement('tr');
+      sep.className = 'domain-sep';
+      sep.innerHTML = `<td colspan="${NCOLS}">${esc(r.domain)}</td>`;
+      body.appendChild(sep);
+    }
+
+    const statusOpts = ['active','partial','planned','legacy']
+      .map(s => `<option value="${s}"${r.status===s?' selected':''}>${s}</option>`).join('');
+    const usageOpts  = [USE_REF, USE_TPL, USE_STD, USE_ATTR, USE_OTHER]
+      .map(u => `<option value="${u}"${r.usage===u?' selected':''}>${u}</option>`).join('');
+
+    const tr = document.createElement('tr');
+    if (r.custom) tr.className = 'custom-row';
+
+    const isOther = r.usage === USE_OTHER;
+
+    if (r.custom) {
+      const catOpts = [CAT_AGG, CAT_FK, CAT_REF, CAT_SYS]
+        .map(c => `<option value="${c}"${r.category===c?' selected':''}>${c}</option>`).join('');
+      tr.innerHTML = `
+        <td><span class="tbl-name" contenteditable="true"
+          onblur="saveCustom(${idx},'name',this.innerText)">${esc(r.name)}</span></td>
+        <td contenteditable="true"
+          onblur="saveCustom(${idx},'listName',this.innerText)">${esc(r.listName||'')}</td>
+        <td contenteditable="true"
+          onblur="saveCustom(${idx},'domain',this.innerText)">${esc(r.domain)}</td>
+        <td><select class="status-sel" style="font-size:10px"
+          onchange="saveCustom(${idx},'category',this.value)">${catOpts}</select></td>
+        <td><span class="tbl-mono" contenteditable="true"
+          onblur="saveCustom(${idx},'aggregate',this.innerText)">${esc(r.aggregate||'')}</span></td>
+        <td><span class="tbl-mono" contenteditable="true"
+          onblur="saveCustom(${idx},'entities',this.innerText)">${esc(r.entities||'')}</span></td>
+        <td><select class="status-sel" style="font-size:10px"
+          onchange="saveCustom(${idx},'usage',this.value)">${usageOpts}</select></td>
+        <td contenteditable="true"
+          onblur="saveCustom(${idx},'meaning',this.innerText)">${esc(r.meaning||'')}</td>
+        <td><span class="tbl-parent" contenteditable="true"
+          onblur="saveCustom(${idx},'parent',this.innerText)">${esc(r.parent||'')}</span></td>
+        <td><span class="tbl-fields" contenteditable="true"
+          onblur="saveCustom(${idx},'fields',this.innerText)">${esc(r.fields||'')}</span></td>
+        <td><select class="status-sel"
+          onchange="saveCustom(${idx},'status',this.value)">${statusOpts}</select></td>
+        <td class="note-cell" contenteditable="true"
+          onblur="saveCustom(${idx},'note',this.innerText)">${esc(r.note||'')}</td>
+        <td><button class="del-btn" onclick="deleteCustom(${idx})" title="删除此行">✕</button></td>
+      `;
+    } else {
+      const usageCell = isOther
+        ? `<div class="usage-wrap">${useBadge(r.usage)}<span class="usage-custom" contenteditable="true"
+              title="自定义说明" onblur="onUsageCustomBlur('${r.id}',this.innerText)">${esc(r.usageCustom)}</span></div>`
+        : `<div class="usage-wrap">${useBadge(r.usage)}</div>`;
+      tr.innerHTML = `
+        <td><span class="tbl-name">${esc(r.name)}</span></td>
+        <td>${esc(r.listName)}</td>
+        <td>${esc(r.domain)}</td>
+        <td>${catBadge(r.category)}</td>
+        <td><span class="tbl-mono">${esc(r.aggregate)}</span></td>
+        <td><span class="tbl-mono">${esc(r.entities)}</span></td>
+        <td>
+          <select class="status-sel" style="font-size:10px;margin-bottom:3px"
+            onchange="onUsageChange('${r.id}',this.value,this)">${usageOpts}</select>
+          ${isOther ? `<div style="margin-top:2px"><span class="usage-custom" contenteditable="true"
+            title="填写自定义说明" onblur="onUsageCustomBlur('${r.id}',this.innerText)">${esc(r.usageCustom)}</span></div>` : ''}
+        </td>
+        <td>${esc(r.meaning)}</td>
+        <td><span class="tbl-parent">${esc(r.parent)}</span></td>
+        <td><span class="tbl-fields">${esc(r.fields)}</span></td>
+        <td><select class="status-sel"
+          onchange="onStatusChange('${r.id}',this.value)">${statusOpts}</select></td>
+        <td class="note-cell" contenteditable="true"
+          onblur="onNoteBlur('${r.id}',this.innerText)">${esc(r.note)}</td>
+        <td></td>
+      `;
+    }
+    body.appendChild(tr);
+  });
+}
+
+// ── event handlers ─────────────────────────────────────────────────────────
+window.onStatusChange = function(id, value) {
+  const s = loadStatuses(); s[id] = value; saveStatuses(s);
+};
+window.onNoteBlur = function(id, text) { persistNote(id, text.trim()); };
+window.onUsageChange = function(id, value, selectEl) {
+  const u = loadUsages();
+  if (!u[id]) u[id] = {};
+  u[id].usage = value;
+  saveUsages(u);
+  // toggle custom input visibility without full re-render
+  const td = selectEl.closest('td');
+  let existing = td.querySelector('.usage-custom');
+  if (value === USE_OTHER) {
+    if (!existing) {
+      const div = document.createElement('div');
+      div.style.marginTop = '2px';
+      const span = document.createElement('span');
+      span.className = 'usage-custom';
+      span.contentEditable = 'true';
+      span.title = '填写自定义说明';
+      span.setAttribute('onblur', `onUsageCustomBlur('${id}',this.innerText)`);
+      div.appendChild(span);
+      td.appendChild(div);
+    }
+  } else {
+    if (existing) existing.parentElement.remove();
+  }
+};
+window.onUsageCustomBlur = function(id, text) {
+  const u = loadUsages();
+  if (!u[id]) u[id] = {};
+  u[id].usageCustom = text.trim();
+  saveUsages(u);
+};
+window.saveCustom = function(idx, field, value) {
+  const customs = loadCustoms();
+  const ci = idx - LISTS.length;
+  if (ci < 0 || ci >= customs.length) return;
+  customs[ci][field] = value.trim !== undefined ? value.trim() : value;
+  saveCustoms(customs);
+};
+window.deleteCustom = function(idx) {
+  const customs = loadCustoms();
+  customs.splice(idx - LISTS.length, 1);
+  saveCustoms(customs);
+  renderTable();
+};
+
+document.getElementById('btnAddRow').addEventListener('click', () => {
+  const customs = loadCustoms();
+  customs.push({ id:'custom_'+Date.now(), domain:'', name:'', listName:'',
+    category:CAT_REF, aggregate:'', entities:'',
+    usage:USE_OTHER, usageCustom:'',
+    meaning:'', parent:'', fields:'', status:'planned', note:'', custom:true });
+  saveCustoms(customs);
+  renderTable();
+  document.querySelector('.tbl-wrap').scrollTop = 999999;
+});
+
+document.getElementById('searchInput').addEventListener('input', renderTable);
+
+// ── Export snapshot ─────────────────────────────────────────────────────────
+async function exportSnapshot() {
+  const btn = document.getElementById('btnExport');
+  btn.textContent = '导出中…';
+  btn.disabled = true;
+
+  try {
+    await loadRemoteNotes();
+
+    const now    = new Date().toLocaleString('zh-CN', { hour12: false });
+    const rows   = buildRows();   // static + localStorage overrides + customs
+
+    // 按 domain 分组（同 renderTable 的分组顺序）
+    const groups = {};
+    const domainOrder = [];
+    rows.forEach(r => {
+      const d = r.domain || '自定义';
+      if (!groups[d]) { groups[d] = []; domainOrder.push(d); }
+      groups[d].push(r);
+    });
+
+    const esc = s => String(s || '').replace(/\|/g, '｜').replace(/\n/g, ' ');
+
+    const lines = [
+      '# 清单注册表快照',
+      '',
+      `> 导出时间：${now}`,
+      `> 共 ${rows.length} 张表`,
+      '',
+    ];
+
+    for (const domain of domainOrder) {
+      lines.push(`## ${domain}`, '');
+      lines.push('| 表名 | 对应清单 | 聚合根 | 业务含义 | 状态 | 备注 |');
+      lines.push('|-----|---------|------|---------|------|------|');
+      groups[domain].forEach(r => {
+        lines.push(`| ${esc(r.name)} | ${esc(r.listName)} | ${esc(r.aggregate)} | ${esc(r.meaning)} | ${esc(r.status)} | ${esc(r.note)} |`);
+      });
+      lines.push('');
+    }
+
+    const md = lines.join('\n');
+
+    const eAPI = window.electronAPI || window.parent?.electronAPI;
+    if (eAPI?.writeTextFile) {
+      let p = decodeURIComponent(window.location.pathname);
+      if (/^\/[A-Za-z]:\//.test(p)) p = p.slice(1);
+      const dir = p.replace(/[^/\\]+$/, '');
+      await eAPI.writeTextFile(dir + 'lists_snapshot.md', md);
+      btn.textContent = '✓ 已导出';
+    } else {
+      await navigator.clipboard.writeText(md);
+      btn.textContent = '✓ 已复制';
+    }
+  } catch (e) {
+    console.error('[export]', e);
+    btn.textContent = '导出失败';
+  } finally {
+    setTimeout(() => {
+      btn.innerHTML = '<svg class="icon" width="13" height="13"><use href="#icon-download"/></svg> 导出快照';
+      btn.disabled = false;
+    }, 2000);
+  }
+}
+
+document.getElementById('btnExport').addEventListener('click', exportSnapshot);
+
+// ── init ───────────────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const theme = localStorage.getItem('system.theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch {}
+
+  // build multi-select filters
+  msCat = new MultiSelect('msCat', [
+    { value:CAT_AGG, label:'聚合根拥有子实体' },
+    { value:CAT_FK,  label:'外键关联GID' },
+    { value:CAT_REF, label:'引用GID' },
+    { value:CAT_SYS, label:'系统工具' },
+  ], '类别', renderTable);
+
+  msDomain = new MultiSelect('msDomain', [
+    { value:'系统域' },{ value:'项目域' },
+    { value:'工艺域（旧）' },{ value:'工艺域（BOP五层）' },
+    { value:'eBOM域' },{ value:'知识域' },{ value:'工厂域' },
+    { value:'协作域' },{ value:'任务域' },{ value:'问题域' },
+  ], '领域', renderTable);
+
+  msStatus = new MultiSelect('msStatus', [
+    { value:'active' },{ value:'partial' },{ value:'planned' },{ value:'legacy' },
+  ], '状态', renderTable);
+
+  msUsage = new MultiSelect('msUsage', [
+    { value:USE_REF,  label:'信息引用' },
+    { value:USE_TPL,  label:'模板清单' },
+    { value:USE_STD,  label:'标准清单' },
+    { value:USE_ATTR, label:'属性清单' },
+    { value:USE_OTHER,label:'其他' },
+  ], '用途', renderTable);
+
+  await loadRemoteNotes();
+  renderTable();
+})();
+</script>
+</body>
+</html>

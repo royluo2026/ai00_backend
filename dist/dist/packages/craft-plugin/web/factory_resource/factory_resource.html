@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>工厂实物资源</title>
+  
+  
+  <link rel="stylesheet" href="/assets/factory_resource-b6aeb719.css">
+  <link rel="stylesheet" href="/assets/list_deps-9b550476.css">
+</head>
+<body>
+  <script src="/web/icons.js"></script>
+  <!-- 外层横排：左侧类型侧边栏 + 右侧 ListShell -->
+  <div class="fr-shell-body">
+    <!-- 左侧资源类型侧边栏 -->
+    <div id="fr-type-sidebar" class="ls-sidebar">
+      <div class="fr-type-item active" data-tab="tool">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        工具
+      </div>
+      <div class="fr-type-item" data-tab="equipment">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        设备
+      </div>
+      <div class="fr-type-item" data-tab="fixture">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        工装
+      </div>
+    </div>
+
+    <!-- ListShell 挂载点 -->
+    <div id="appRoot" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden"></div>
+  </div>
+
+  <script src="/web/components/scope_badge.js"></script>
+  <script src="/web/components/list_sidebar.js"></script>
+  <script src="/web/components/view_manager.js"></script>
+  <script src="/web/components/export_template_editor.js"></script>
+  <script src="/web/components/import_export.js"></script>
+  <script src="/web/components/diff_manager.js"></script>
+  <script src="/web/components/grid_editor.js"></script>
+  <script src="/web/components/entry_thread.js"></script>
+  <script src="/web/components/sidebar_detail_panel.js"></script>
+  <script src="/web/components/overlay_edit_modal.js"></script>
+  <script src="/web/components/attachments_widget.js"></script>
+  <script src="/web/components/list_shell.js"></script>
+  <script src="/web/components/data_registry.js"></script>
+  <script src="/web/components/tree_view.js"></script>
+  <script src="factory_resource.js"></script>
+</body>
+</html>

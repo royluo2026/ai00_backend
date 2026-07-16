@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>工艺元素模板</title>
+  
+  
+  
+  <link rel="stylesheet" href="/assets/craft_element_lib-b4f98ab2.css">
+  <link rel="stylesheet" href="/assets/list_deps-9b550476.css">
+  <link rel="stylesheet" href="/assets/self_annotation_panel-bceac7d9.css">
+</head>
+<body>
+  <script src="/web/icons.js"></script>
+
+  <!-- 外层横排：左侧类型侧边栏 + 右侧 ListShell -->
+  <div class="ce-shell-body">
+    <!-- 左侧：元素类型导航 -->
+    <div class="ls-sidebar" id="elem-type-sidebar">
+      <button class="sub-tab active" data-tab="tool">工具模板</button>
+      <button class="sub-tab" data-tab="equipment">设备模板</button>
+      <button class="sub-tab" data-tab="fixture">工装模板</button>
+      <button class="sub-tab" data-tab="fastener">标准紧固件</button>
+      <button class="sub-tab" data-tab="partname">标准零件名</button>
+      <div class="ls-sidebar-sep"></div>
+      <button class="sub-tab" data-tab="annotated" id="cel-annot-tab"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V6h1a2 2 0 000-4H8a2 2 0 000 4h1v4.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24z"/></svg> 已标注</button>
+    </div>
+    <!-- ListShell 挂载点 -->
+    <div id="appRoot" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden"></div>
+  </div>
+
+  <script src="/web/components/scope_badge.js"></script>
+  <script src="/web/components/list_sidebar.js"></script>
+  <script src="/web/components/view_manager.js"></script>
+  <script src="/web/components/export_template_editor.js"></script>
+  <script src="/web/components/import_export.js"></script>
+  <script src="/web/components/diff_manager.js"></script>
+  <script src="/web/components/grid_editor.js"></script>
+  <script src="/web/components/entry_thread.js"></script>
+  <script src="/web/components/sidebar_detail_panel.js"></script>
+  <script src="/web/components/overlay_edit_modal.js"></script>
+  <script src="/web/components/attachments_widget.js"></script>
+  <script src="/web/components/list_shell.js"></script>
+  <script src="/web/components/tree_view.js"></script>
+  <script src="/web/components/self_annotation_panel.js"></script>
+  <script src="craft_element_lib.js"></script>
+</body>
+</html>

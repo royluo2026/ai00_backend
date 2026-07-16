@@ -1,0 +1,329 @@
+/* ========================================================================
+   内容树 — 侧边栏叶页样式（Catppuccin 风格，继承主题变量）
+   ======================================================================== */
+
+:root, [data-theme="dark"] {
+  --ct-bg:         #1e1e2e;
+  --ct-bg2:        #181825;
+  --ct-hover:      rgba(69,71,90,0.5);
+  --ct-active:     rgba(137,180,250,0.18);
+  --ct-border:     #313244;
+  --ct-text:       #cdd6f4;
+  --ct-muted:      #6c7086;
+  --ct-accent:     #89b4fa;
+  --ct-danger:     #f38ba8;
+  --ct-radius:     5px;
+}
+[data-theme="light"] {
+  --ct-bg:         #eff1f5;
+  --ct-bg2:        #e6e9ef;
+  --ct-hover:      rgba(204,208,218,0.5);
+  --ct-active:     rgba(30,102,245,0.12);
+  --ct-border:     #ccd0da;
+  --ct-text:       #4c4f69;
+  --ct-muted:      #9ca0b0;
+  --ct-accent:     #1e66f5;
+  --ct-danger:     #d20f39;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--ct-bg);
+  color: var(--ct-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+               "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-size: 13px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+/* ── 顶栏 ─────────────────────────────────────────────── */
+#ct-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--ct-border);
+  flex-shrink: 0;
+}
+#ct-search-input {
+  flex: 1;
+  background: var(--ct-bg2);
+  border: 1px solid var(--ct-border);
+  border-radius: var(--ct-radius);
+  color: var(--ct-text);
+  font-size: 12px;
+  font-family: inherit;
+  padding: 4px 8px;
+  outline: none;
+}
+#ct-search-input::placeholder { color: var(--ct-muted); }
+#ct-search-input:focus { border-color: var(--ct-accent); }
+
+.ct-hdr-btn {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  border-radius: var(--ct-radius);
+  color: var(--ct-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .12s, color .12s;
+}
+.ct-hdr-btn:hover { background: var(--ct-hover); color: var(--ct-text); }
+
+/* ── 树主体 ────────────────────────────────────────────── */
+#ct-tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0 8px;
+}
+#ct-tree::-webkit-scrollbar { width: 4px; }
+#ct-tree::-webkit-scrollbar-track { background: transparent; }
+#ct-tree::-webkit-scrollbar-thumb { background: var(--ct-border); border-radius: 2px; }
+
+/* ── 分组 ────────────────────────────────────────────── */
+.ct-group { margin-bottom: 2px; }
+
+.ct-group-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 6px;
+  cursor: pointer;
+  border-radius: var(--ct-radius);
+  color: var(--ct-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  transition: background .1s, color .1s;
+}
+.ct-group-header:hover { background: var(--ct-hover); color: var(--ct-text); }
+.ct-group-header:hover .ct-group-actions { opacity: 1; }
+
+.ct-group-chevron {
+  flex-shrink: 0;
+  transition: transform .15s;
+  color: var(--ct-muted);
+}
+.ct-group.collapsed .ct-group-chevron { transform: rotate(-90deg); }
+
+.ct-group-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ct-group-count {
+  font-size: 10px;
+  opacity: 0.55;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.ct-group-actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity .1s;
+}
+.ct-group-act-btn {
+  width: 18px;
+  height: 18px;
+  background: none;
+  border: none;
+  color: var(--ct-muted);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .1s, color .1s;
+}
+.ct-group-act-btn:hover { background: var(--ct-hover); color: var(--ct-text); }
+
+.ct-group-items {
+  padding: 0 4px;
+  overflow: hidden;
+}
+.ct-group.collapsed .ct-group-items { display: none; }
+
+/* ── 条目 ────────────────────────────────────────────── */
+.ct-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
+  border-radius: var(--ct-radius);
+  cursor: pointer;
+  transition: background .1s;
+  position: relative;
+}
+.ct-item:hover { background: var(--ct-hover); }
+.ct-item.active { background: var(--ct-active); }
+.ct-item:hover .ct-item-remove { opacity: 1; }
+
+.ct-item-icon {
+  flex-shrink: 0;
+  color: var(--ct-muted);
+  display: flex;
+  align-items: center;
+}
+
+.ct-item-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--ct-text);
+}
+
+.ct-item-remove {
+  opacity: 0;
+  width: 16px;
+  height: 16px;
+  background: none;
+  border: none;
+  color: var(--ct-muted);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .1s, color .1s, opacity .1s;
+}
+.ct-item-remove:hover { background: var(--ct-hover); color: var(--ct-danger); }
+
+/* ── 空状态 / 提示 ──────────────────────────────────── */
+.ct-empty {
+  text-align: center;
+  padding: 16px 12px;
+  color: var(--ct-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.ct-empty-icon { opacity: 0.4; margin-bottom: 6px; }
+
+.ct-group-empty {
+  padding: 6px 10px;
+  color: var(--ct-muted);
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* ── 新建分组占位输入 ────────────────────────────────── */
+.ct-group-name-input {
+  flex: 1;
+  background: var(--ct-bg2);
+  border: 1px solid var(--ct-accent);
+  border-radius: 3px;
+  color: var(--ct-text);
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 2px 5px;
+  outline: none;
+  min-width: 0;
+}
+
+/* ── 拖拽目标指示 ────────────────────────────────────── */
+.ct-group-items.drag-over { outline: 2px dashed var(--ct-accent); border-radius: var(--ct-radius); }
+
+/* ── 右键菜单 ─────────────────────────────────────────── */
+#ct-ctx-menu {
+  position: fixed;
+  background: var(--ct-bg2);
+  border: 1px solid var(--ct-border);
+  border-radius: var(--ct-radius);
+  padding: 4px 0;
+  z-index: 9999;
+  min-width: 150px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.4);
+  font-size: 12.5px;
+}
+#ct-ctx-menu.hidden { display: none; }
+.ct-ctx-item {
+  padding: 6px 14px;
+  cursor: pointer;
+  color: var(--ct-text);
+  white-space: nowrap;
+  transition: background .1s;
+}
+.ct-ctx-item:hover { background: var(--ct-hover); }
+.ct-ctx-item.danger { color: var(--ct-danger); }
+.ct-ctx-sep { height: 1px; background: var(--ct-border); margin: 3px 0; }
+
+/* ── 添加内容对话框 ────────────────────────────────────── */
+#ct-add-dlg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#ct-add-dlg.hidden { display: none; }
+.ct-add-dlg-box {
+  background: var(--ct-bg2);
+  border: 1px solid var(--ct-border);
+  border-radius: 8px;
+  width: 340px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
+}
+.ct-add-dlg-hdr {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--ct-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+.ct-add-dlg-close {
+  background: none;
+  border: none;
+  color: var(--ct-muted);
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-size: 13px;
+}
+.ct-add-dlg-close:hover { background: var(--ct-hover); color: var(--ct-text); }
+.ct-add-dlg-body { flex: 1; overflow-y: auto; padding: 8px; }
+.ct-add-section-title {
+  font-size: 10px;
+  color: var(--ct-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 6px 8px 4px;
+}
+.ct-add-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--ct-radius);
+  cursor: pointer;
+  color: var(--ct-text);
+  font-size: 12.5px;
+  transition: background .1s;
+}
+.ct-add-item:hover { background: var(--ct-hover); }
+.ct-add-item svg { flex-shrink: 0; color: var(--ct-muted); }
+.ct-add-item-sub { font-size: 10px; color: var(--ct-muted); }

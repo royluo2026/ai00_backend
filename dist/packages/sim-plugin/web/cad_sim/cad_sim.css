@@ -1,0 +1,1018 @@
+/* cad_sim — 数模仿真页面样式（Catppuccin Mocha 暗色 / Latte 亮色） */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #1e1e2e;
+  --surface:     #181825;
+  --surface2:    #11111b;
+  --overlay:     #313244;
+  --text:        #cdd6f4;
+  --text-muted:  #6c7086;
+  --text-dim:    #45475a;
+  --border:      #313244;
+  --accent:      #89b4fa;
+  --accent2:     #74c7ec;
+  --green:       #a6e3a1;
+  --yellow:      #f9e2af;
+  --red:         #f38ba8;
+  --mauve:       #cba6f7;
+  --toolbar-h:   44px;
+  --sidebar-w:   220px;
+  --tree-w:      260px;
+  --panel-h:     180px;
+  --radius:      6px;
+}
+
+[data-theme="light"] {
+  --bg:         #eff1f5;
+  --surface:    #e6e9ef;
+  --surface2:   #dce0e8;
+  --overlay:    #ccd0da;
+  --text:       #4c4f69;
+  --text-muted: #9ca0b0;
+  --text-dim:   #bcc0cc;
+  --border:     #ccd0da;
+  --accent:     #1e66f5;
+  --accent2:    #04a5e5;
+  --green:      #40a02b;
+  --yellow:     #df8e1d;
+  --red:        #d20f39;
+  --mauve:      #8839ef;
+}
+
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; font-size: 13px; }
+
+/* ── 顶部工具栏 ─────────────────────────────────────────────────── */
+.cs-toolbar {
+  height: var(--toolbar-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  flex-shrink: 0;
+}
+.cs-toolbar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 8px;
+}
+.cs-toolbar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+.cs-toolbar-spacer { flex: 1; }
+
+/* ── 按钮 ──────────────────────────────────────────────────────── */
+.cs-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: var(--radius);
+  font-size: 12px; font-weight: 500; cursor: pointer; border: none;
+  background: var(--overlay); color: var(--text);
+  transition: background .15s, opacity .15s;
+  white-space: nowrap;
+}
+.cs-btn:hover { background: var(--text-dim); }
+.cs-btn.primary { background: var(--accent); color: var(--surface2); }
+.cs-btn.primary:hover { opacity: .85; }
+.cs-btn.danger  { background: var(--red);   color: #fff; }
+.cs-btn.danger:hover  { opacity: .85; }
+.cs-btn svg { flex-shrink: 0; }
+
+/* ── 主体三栏布局 ──────────────────────────────────────────────── */
+.cs-body {
+  display: flex;
+  height: calc(100vh - var(--toolbar-h) - 40px);
+  overflow: hidden;
+}
+
+/* ── 左侧数模库 + 任务栏 ────────────────────────────────────────── */
+.cs-sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.cs-sidebar-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+.cs-sidebar-section + .cs-sidebar-section { border-top: 1px solid var(--border); }
+.cs-sidebar-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px 6px;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .05em; flex-shrink: 0;
+}
+.cs-sidebar-hdr button {
+  background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 2px;
+  display: flex; align-items: center; border-radius: 4px;
+}
+.cs-sidebar-hdr button:hover { color: var(--text); background: var(--overlay); }
+.cs-sidebar-list { flex: 1; overflow-y: auto; padding: 4px 6px; }
+
+.cs-model-item, .cs-task-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 8px; border-radius: var(--radius); cursor: pointer;
+  color: var(--text); transition: background .12s;
+}
+.cs-model-item:hover, .cs-task-item:hover { background: var(--overlay); }
+.cs-model-item.active, .cs-task-item.active { background: rgba(137,180,250,.15); color: var(--accent); }
+.cs-model-item .name, .cs-task-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.cs-model-item .badge { font-size: 10px; padding: 1px 5px; border-radius: 10px; background: var(--overlay); color: var(--text-muted); }
+
+.cs-task-status {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: var(--text-dim);
+}
+.cs-task-status.preparing { background: var(--text-muted); }
+.cs-task-status.in_progress { background: var(--yellow); }
+.cs-task-status.completed { background: var(--green); }
+.cs-task-status.failed { background: var(--red); }
+
+/* ── 中部结构树面板 ─────────────────────────────────────────────── */
+.cs-tree-panel {
+  width: var(--tree-w);
+  flex-shrink: 0;
+  background: var(--surface2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.cs-tree-hdr {
+  padding: 8px 10px 6px;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .05em;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; gap: 6px;
+}
+.cs-tree-body { flex: 1; overflow-y: auto; padding: 4px 0; }
+.cs-tree-hint { padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px; }
+
+/* ── AssemblyTree 组件样式 ──────────────────────────────────────── */
+.at-root, .at-children { list-style: none; padding: 0; margin: 0; }
+.at-children { padding-left: 14px; }
+.at-item { }
+.at-node {
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px 8px; cursor: pointer;
+  border-radius: 4px; transition: background .1s;
+  user-select: none;
+}
+.at-node:hover { background: var(--overlay); }
+.at-node.at-selected { background: rgba(137,180,250,.15); color: var(--accent); }
+.at-node.at-checked .at-check { opacity: 1; color: var(--accent); }
+.at-arrow { display: flex; align-items: center; color: var(--text-muted); width: 14px; flex-shrink: 0; }
+.at-arrow-placeholder { display: inline-block; width: 12px; }
+.at-check { display: flex; align-items: center; color: var(--text-dim); opacity: 0; width: 14px; flex-shrink: 0; transition: opacity .1s; }
+.at-node:hover .at-check { opacity: .5; }
+.at-icon { display: flex; align-items: center; color: var(--text-muted); flex-shrink: 0; }
+.at-label { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.at-empty { padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px; }
+
+/* ── 3D 视图区 ───────────────────────────────────────────────────── */
+.cs-viewer-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  position: relative;
+}
+.cs-viewer-toolbar {
+  height: 36px; display: flex; align-items: center; gap: 6px;
+  padding: 0 10px; background: var(--surface); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cs-viewer-toolbar .cs-btn { padding: 3px 8px; font-size: 11px; }
+.cs-viewer-body { flex: 1; position: relative; overflow: hidden; }
+#viewer3dContainer {
+  width: 100%; height: 100%;
+}
+.v3d-unavailable {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; color: var(--text-muted);
+}
+.v3d-unavail-msg { font-size: 12px; text-align: center; max-width: 240px; line-height: 1.5; }
+
+/* 工序着色图例 */
+.cs-color-legend {
+  position: absolute; bottom: 10px; left: 10px;
+  background: rgba(24,24,37,.8); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 8px 10px; font-size: 11px;
+  display: none; flex-direction: column; gap: 5px;
+}
+.cs-color-legend.visible { display: flex; }
+.cs-legend-item { display: flex; align-items: center; gap: 7px; }
+.cs-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── 底部分析面板 ────────────────────────────────────────────────── */
+.cs-bottom-panel {
+  height: var(--panel-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.cs-panel-hdr {
+  height: 34px; display: flex; align-items: center; gap: 8px;
+  padding: 0 12px; background: var(--surface2); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cs-panel-tabs { display: flex; gap: 2px; }
+.cs-panel-tab {
+  padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;
+  color: var(--text-muted); background: none; border: none;
+  transition: background .12s, color .12s;
+}
+.cs-panel-tab:hover { background: var(--overlay); color: var(--text); }
+.cs-panel-tab.active { background: var(--overlay); color: var(--accent); }
+.cs-panel-body { flex: 1; overflow-y: auto; padding: 10px 14px; }
+
+/* 几何属性 */
+.cs-geo-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px;
+}
+.cs-geo-item { display: flex; flex-direction: column; gap: 2px; }
+.cs-geo-label { font-size: 11px; color: var(--text-muted); }
+.cs-geo-value { font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* 干涉检测结果 */
+.cs-interference-hint { color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.cs-pair-row {
+  display: flex; align-items: center; gap: 8px; padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.cs-pair-row .parts { flex: 1; font-size: 12px; }
+.cs-pair-badge {
+  font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 500;
+  background: rgba(243,139,168,.15); color: var(--red);
+}
+
+/* OCCT 状态提示 */
+.cs-occt-banner {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; background: rgba(249,226,175,.08);
+  border-bottom: 1px solid rgba(249,226,175,.15); font-size: 12px; color: var(--yellow);
+}
+.cs-occt-banner.hidden { display: none; }
+
+/* 仿真任务创建弹窗 */
+.cs-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.cs-modal-overlay.hidden { display: none; }
+.cs-modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px; width: 420px; max-width: 90vw;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.cs-modal-title { font-size: 15px; font-weight: 600; }
+.cs-field { display: flex; flex-direction: column; gap: 5px; }
+.cs-field label { font-size: 11px; color: var(--text-muted); }
+.cs-field input, .cs-field select, .cs-field textarea {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); font-size: 13px; padding: 6px 10px; outline: none;
+  transition: border-color .15s;
+}
+.cs-field input:focus, .cs-field select:focus, .cs-field textarea:focus {
+  border-color: var(--accent);
+}
+.cs-modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* 工序选择器 */
+.cs-op-selector { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.cs-op-selector select {
+  background: var(--overlay); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); padding: 3px 8px; font-size: 12px; outline: none;
+}
+.cs-op-nav { display: flex; gap: 4px; }
+.cs-op-nav button {
+  background: var(--overlay); border: none; border-radius: 4px;
+  color: var(--text); padding: 3px 7px; cursor: pointer; font-size: 11px;
+}
+.cs-op-nav button:hover { background: var(--text-dim); }
+
+/* Loading 遮罩 */
+.cs-loading {
+  position: absolute; inset: 0; background: rgba(24,24,37,.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; flex-direction: column; gap: 10px;
+}
+.cs-loading.hidden { display: none; }
+.cs-spinner {
+  width: 32px; height: 32px; border: 3px solid var(--overlay);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.cs-loading-text { font-size: 13px; color: var(--text-muted); }
+
+/* 空状态 */
+.cs-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; gap: 10px; color: var(--text-muted);
+}
+.cs-empty svg { opacity: .2; }
+.cs-empty-msg { font-size: 12px; }
+
+/* ── BOP 树节点类型样式 ─────────────────────────────────────────── */
+.at-node[data-node-type="station_process"] .at-label { font-weight: 600; }
+.at-node[data-node-type="line_process"] .at-label { color: var(--mauve); font-weight: 600; }
+
+/* ── VisMockup 状态横幅 ──────────────────────────────────────────── */
+.cs-vm-banner {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; background: rgba(137,180,250,.08);
+  border-bottom: 1px solid rgba(137,180,250,.2);
+  font-size: 12px; color: var(--accent);
+  flex-shrink: 0;
+}
+.cs-vm-banner.cs-vm-banner-error {
+  background: rgba(243,139,168,.08);
+  border-color: rgba(243,139,168,.2);
+  color: var(--red);
+}
+.cs-vm-banner.hidden { display: none; }
+
+/* VisMockup 状态指示点 + 标签 */
+.cs-vm-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  background: var(--text-dim); transition: background .3s;
+}
+.cs-vm-label {
+  font-size: 11px; color: var(--text-muted); white-space: nowrap;
+}
+
+/* ── BOP 结构树面板（左侧，替代旧 cs-sidebar + cs-tree-panel）──── */
+.cs-bop-panel {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cs-bop-hdr {
+  padding: 8px 10px 6px;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .05em;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* 版本选择器行 */
+.cs-bop-ver-row {
+  display: flex; align-items: center; gap: 4px;
+  padding: 6px 8px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cs-bop-ver-sel {
+  flex: 1; min-width: 0;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text);
+  font-size: 11px; padding: 4px 6px; outline: none;
+}
+.cs-bop-ver-sel:focus { border-color: var(--accent); }
+
+/* 手动 GID 输入行 */
+.cs-bop-manual-row {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 8px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cs-bop-manual-row.hidden { display: none; }
+.cs-bop-gid-input {
+  flex: 1; min-width: 0;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text);
+  font-size: 11px; padding: 4px 6px; outline: none;
+}
+.cs-bop-gid-input:focus { border-color: var(--accent); }
+.cs-bop-toggle-manual {
+  display: block; width: 100%;
+  background: none; border: none; border-bottom: 1px solid var(--border);
+  color: var(--text-muted); font-size: 10px; text-align: left;
+  padding: 3px 8px; cursor: pointer; flex-shrink: 0;
+}
+.cs-bop-toggle-manual:hover { color: var(--accent); }
+
+/* 版本状态徽标 */
+.cs-bop-ver-status {
+  padding: 2px 8px; font-size: 11px; text-align: center; flex-shrink: 0;
+}
+.cs-bop-ver-status.hidden { display: none; }
+.cs-bop-ver-active   { color: var(--green); }
+.cs-bop-ver-baseline { color: var(--accent); }
+.cs-bop-ver-M        { color: var(--mauve); }
+.cs-bop-ver-archived { color: var(--text-muted); }
+
+/* loading / empty 状态 */
+.cs-bop-loading {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; font-size: 12px; color: var(--text-muted);
+  flex-shrink: 0;
+}
+.cs-bop-loading.hidden { display: none; }
+.cs-bop-empty {
+  padding: 20px 12px; text-align: center;
+  font-size: 12px; color: var(--text-muted);
+}
+.cs-bop-empty.hidden { display: none; }
+
+/* BOP 树体 */
+.cs-bop-tree-body {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 4px 0;
+}
+
+/* BOP 树节点行 */
+.cs-bop-row { }
+
+.cs-bop-node {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 8px; cursor: pointer;
+  border-radius: 4px; transition: background .1s;
+  user-select: none; min-height: 24px;
+}
+.cs-bop-node:hover { background: var(--overlay); }
+.cs-bop-node.active {
+  background: rgba(137,180,250,.15);
+  color: var(--accent);
+}
+.cs-bop-toggle {
+  width: 12px; text-align: center; font-size: 9px;
+  color: var(--text-muted); flex-shrink: 0; cursor: pointer;
+  transition: transform .1s;
+}
+.cs-bop-leaf { width: 12px; color: var(--text-dim); flex-shrink: 0; }
+.cs-bop-label {
+  flex: 1; font-size: 12px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.cs-bop-seq {
+  font-size: 10px; padding: 1px 5px; border-radius: 8px;
+  background: var(--overlay); color: var(--text-muted);
+  flex-shrink: 0; font-variant-numeric: tabular-nums;
+}
+.cs-bop-part-badge {
+  font-size: 10px; padding: 1px 5px; border-radius: 8px;
+  background: var(--overlay);
+  color: var(--text-muted); flex-shrink: 0;
+  font-variant-numeric: tabular-nums; margin-left: 2px;
+  display: inline-flex; align-items: center; gap: 1px;
+}
+/* 扫描后：全部匹配 */
+.cs-bop-part-badge.cs-bop-badge-full {
+  background: color-mix(in srgb, var(--green) 15%, transparent);
+}
+/* 扫描后：部分匹配 */
+.cs-bop-part-badge.cs-bop-badge-partial {
+  background: color-mix(in srgb, var(--yellow) 15%, transparent);
+}
+/* 扫描后：无匹配 */
+.cs-bop-part-badge.cs-bop-badge-none {
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+}
+
+/* 节点类型颜色 */
+.cs-bop-type-line_process      .cs-bop-label { color: var(--mauve); font-weight: 600; }
+.cs-bop-type-station_process   .cs-bop-label { font-weight: 600; }
+.cs-bop-type-operator_process  .cs-bop-label { color: var(--accent2); }
+.cs-bop-type-operation         .cs-bop-label { color: var(--text); }
+.cs-bop-type-pbom_part         .cs-bop-label { color: var(--text-muted); font-size: 11px; }
+.cs-bop-type-knowledge         .cs-bop-label { color: var(--green); }
+.cs-bop-type-rule              .cs-bop-label { color: var(--yellow); }
+
+/* 子节点容器 */
+.cs-bop-children { }
+
+/* ── VisMockup 结构树面板 ─────────────────────────────────────────────────── */
+.cs-vis-panel {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.cs-vis-hdr {
+  padding: 8px 10px 6px;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .05em;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; gap: 6px;
+}
+.cs-vis-tree-body {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 4px 0;
+}
+.cs-vis-node {
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px 6px 3px 0; cursor: pointer;
+  border-radius: 4px; transition: background .1s;
+  user-select: none; min-height: 22px;
+}
+.cs-vis-node:hover { background: var(--overlay); }
+.cs-vis-node.cs-vis-active {
+  background: rgba(137,180,250,.15); color: var(--accent);
+}
+.cs-vis-node.cs-vis-hidden .cs-vis-label { opacity: .35; text-decoration: line-through; }
+.cs-vis-node.cs-vis-hidden .cs-vis-eye   { opacity: .35; }
+.cs-vis-toggle {
+  width: 14px; text-align: center; font-size: 9px;
+  color: var(--text-muted); flex-shrink: 0; cursor: pointer;
+}
+.cs-vis-leaf { color: var(--text-dim); cursor: default; }
+.cs-vis-eye {
+  display: flex; align-items: center; flex-shrink: 0;
+  color: var(--text-muted); padding: 1px; border-radius: 3px;
+  transition: color .1s, background .1s;
+}
+.cs-vis-eye:hover { color: var(--accent); background: var(--overlay); }
+.cs-vis-label {
+  flex: 1; font-size: 11px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cs-vis-catia {
+  font-size: 10px; color: var(--accent2); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 80px;
+  flex-shrink: 0; opacity: .85;
+}
+.cs-vis-node.cs-vis-hidden .cs-vis-catia { opacity: .25; }
+.cs-vis-more-row {
+  font-size: 10px; color: var(--text-dim); cursor: pointer; user-select: none;
+  padding: 2px 0;
+}
+.cs-vis-more-row:hover { color: var(--accent); }
+
+/* ── VM 结构树：合成分区（模型 / 备选层次结构）───────────────────────────── */
+.cs-vis-section { margin-bottom: 2px; }
+.cs-vis-section-hdr {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 6px; cursor: pointer; user-select: none;
+  border-radius: 4px; background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  letter-spacing: .03em; text-transform: uppercase;
+  position: sticky; top: 0; z-index: 1;
+}
+.cs-vis-section-hdr:hover { background: var(--overlay); color: var(--text); }
+.cs-vis-section-hdr .cs-vis-toggle {
+  color: var(--text-dim); font-size: 8px;
+}
+.cs-vis-section-label { flex: 1; }
+.cs-vis-section-count {
+  font-size: 10px; font-weight: 400;
+  color: var(--text-dim); background: var(--overlay);
+  padding: 1px 5px; border-radius: 8px; min-width: 18px; text-align: center;
+}
+.cs-vis-section-empty {
+  font-size: 11px; color: var(--text-dim); padding: 6px 22px;
+  font-style: italic;
+}
+
+/* ── 右键上下文菜单 ───────────────────────────────────────────────────────── */
+.cs-ctx-menu {
+  position: fixed; z-index: 9999;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 4px 0;
+  min-width: 120px; box-shadow: 0 6px 24px rgba(0,0,0,.35);
+}
+.cs-ctx-item {
+  padding: 5px 14px; font-size: 12px; cursor: pointer;
+  color: var(--text); white-space: nowrap; transition: background .1s;
+}
+.cs-ctx-item:hover { background: var(--overlay); color: var(--accent); }
+.cs-ctx-sep { height: 1px; background: var(--border); margin: 3px 0; }
+
+/* ── 元数据弹窗 ───────────────────────────────────────────────────────────── */
+.cs-meta-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center;
+}
+.cs-meta-dialog {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; width: 500px; max-width: 92vw; max-height: 70vh;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.cs-meta-title {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px 8px; font-size: 13px; font-weight: 600;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.cs-meta-close {
+  background: none; border: none; cursor: pointer; color: var(--text-muted);
+  font-size: 14px; padding: 2px 6px; border-radius: 4px;
+}
+.cs-meta-close:hover { background: var(--overlay); color: var(--text); }
+.cs-meta-catia {
+  padding: 4px 14px 6px; font-size: 11px; color: var(--accent2);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.cs-meta-body {
+  overflow-y: auto; padding: 8px 14px 12px; flex: 1;
+}
+.cs-meta-row {
+  display: flex; gap: 12px; padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04); font-size: 12px;
+}
+.cs-meta-key {
+  width: 200px; flex-shrink: 0;
+  color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cs-meta-val {
+  flex: 1; color: var(--text);
+  overflow-wrap: break-word; word-break: break-all;
+}
+.cs-meta-section-hdr {
+  font-size: 10px; font-weight: 600; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 10px 0 4px; border-top: 1px solid var(--border); margin-top: 4px;
+}
+.cs-meta-section-hdr:first-child { border-top: none; padding-top: 4px; margin-top: 0; }
+.cs-meta-matrix {
+  font-family: 'Consolas', 'Menlo', monospace;
+  font-size: 10.5px; color: var(--text);
+  background: var(--surface2); border-radius: var(--radius);
+  padding: 8px 10px; line-height: 1.7;
+  display: flex; flex-direction: column; gap: 0;
+  overflow-x: auto;
+}
+.cs-mat-row { white-space: pre; display: block; }
+
+/* ── VisMockup 占位区 ────────────────────────────────────────────── */
+.cs-vm-placeholder {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; color: var(--text-muted);
+  background: var(--bg);
+  pointer-events: none;
+}
+.cs-vm-placeholder p { font-size: 12px; text-align: center; max-width: 280px; line-height: 1.5; }
+
+/* ── 通用辅助 ────────────────────────────────────────────────────── */
+.cs-btn-xs {
+  padding: 3px 6px !important;
+  font-size: 11px !important;
+}
+
+/* ── VM 测试命令条 ───────────────────────────────────────────────── */
+.cs-cmd-bar {
+  height: 40px;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.cs-cmd-bar::-webkit-scrollbar { height: 3px; }
+.cs-cmd-bar::-webkit-scrollbar-thumb { background: var(--overlay); border-radius: 2px; }
+
+.cs-cmd-bar-label {
+  font-size: 10px; font-weight: 600; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: .06em;
+  white-space: nowrap; flex-shrink: 0; margin-right: 4px;
+}
+.cs-cmd-sep { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; margin: 0 4px; }
+.cs-cmd-result {
+  font-size: 11px; color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 280px; flex-shrink: 0;
+}
+.cs-cmd-result.ok  { color: var(--green); }
+.cs-cmd-result.err { color: var(--red); }
+
+/* ═══════════════════════════════════════════════════════════════
+   底部详情面板  cs-dp-*
+   ═══════════════════════════════════════════════════════════════ */
+
+.cs-dp {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: var(--dp-h, 240px);
+  max-height: 55vh;
+  min-height: 0;
+}
+/* 关闭时只显示把手 */
+.cs-dp:not(.open) {
+  height: auto !important;
+  max-height: none;
+  min-height: 0;
+}
+.cs-dp:not(.open) .cs-dp-resize,
+.cs-dp:not(.open) .cs-dp-header,
+.cs-dp:not(.open) .cs-dp-body { display: none; }
+.cs-dp.open .cs-dp-handle       { display: none; }
+
+/* 把手条 */
+.cs-dp-handle {
+  height: 26px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .12s;
+}
+.cs-dp-handle:hover { background: rgba(137,180,250,.06); }
+.cs-dp-grip {
+  width: 28px; height: 3px;
+  border-radius: 2px;
+  background: var(--text-dim);
+  transition: background .12s;
+}
+.cs-dp-handle:hover .cs-dp-grip { background: var(--accent); }
+.cs-dp-handle-label {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cs-dp-handle:hover .cs-dp-handle-label { color: var(--text); }
+
+/* 拖拽调高条 */
+.cs-dp-resize {
+  height: 3px;
+  cursor: ns-resize;
+  background: transparent;
+  flex-shrink: 0;
+  transition: background .12s;
+}
+.cs-dp-resize:hover,
+.cs-dp-resize.active { background: var(--accent); }
+
+/* 面板头部 */
+.cs-dp-header {
+  height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 7px;
+  border-bottom: 1px solid var(--border);
+}
+.cs-dp-source-tag {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--overlay);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.cs-dp-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cs-dp-close {
+  width: 20px; height: 20px;
+  border: none; border-radius: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; font-size: 12px;
+  transition: background .1s, color .1s;
+}
+.cs-dp-close:hover { background: var(--overlay); color: var(--text); }
+
+/* 面板主体 */
+.cs-dp-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  min-height: 0;
+}
+.cs-dp-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+/* 内容双栏 */
+.cs-dp-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+.cs-dp-content.hidden { display: none; }
+
+.cs-dp-left {
+  width: 220px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 10px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--overlay) transparent;
+}
+.cs-dp-left::-webkit-scrollbar { width: 4px; }
+.cs-dp-left::-webkit-scrollbar-thumb { background: var(--overlay); border-radius: 2px; }
+
+.cs-dp-divider {
+  width: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.cs-dp-right {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--overlay) transparent;
+  min-width: 0;
+}
+.cs-dp-right::-webkit-scrollbar { width: 4px; }
+.cs-dp-right::-webkit-scrollbar-thumb { background: var(--overlay); border-radius: 2px; }
+
+/* 字段行 */
+.cs-dp-section-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 6px;
+  margin-top: 10px;
+}
+.cs-dp-section-title:first-child { margin-top: 0; }
+.cs-dp-field-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+.cs-dp-field-label {
+  color: var(--text-muted);
+  min-width: 52px;
+  flex-shrink: 0;
+}
+.cs-dp-field-val {
+  color: var(--text);
+  word-break: break-all;
+  font-size: 11px;
+}
+.cs-dp-field-val.mono { font-family: monospace; font-size: 10px; }
+
+/* NT 类型徽标 */
+.cs-dp-nt-badge {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #1e1e2e;
+  display: inline-block;
+}
+
+/* 零件表格 */
+.cs-dp-parts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.cs-dp-parts-table th {
+  text-align: left;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 0 8px 5px 0;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+.cs-dp-parts-table td {
+  padding: 4px 8px 4px 0;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+}
+.cs-dp-parts-table td.mono { font-family: monospace; font-size: 10px; color: var(--text-muted); }
+
+/* 空状态 */
+.cs-dp-empty-hint {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* 元数据加载按钮 */
+.cs-dp-meta-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  margin-top: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--overlay);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .1s, color .1s, border-color .1s;
+}
+.cs-dp-meta-btn:hover {
+  background: var(--overlay);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+/* 亮色 */
+[data-theme="light"] .cs-dp { background: var(--surface); }
+[data-theme="light"] .cs-dp-handle:hover { background: rgba(30,102,245,.05); }
+[data-theme="light"] .cs-dp-resize:hover,
+[data-theme="light"] .cs-dp-resize.active { background: var(--accent); }
+
+/* ── 详情面板左侧树 ──────────────────────────────────────────── */
+.cs-dp-tree {
+  width: 240px;
+  min-width: 120px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--overlay) transparent;
+}
+.cs-dp-tree::-webkit-scrollbar { width: 4px; }
+.cs-dp-tree::-webkit-scrollbar-thumb { background: var(--overlay); border-radius: 2px; }
+
+.cs-dp-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text);
+  user-select: none;
+  transition: background .1s;
+  min-height: 24px;
+  white-space: nowrap;
+}
+.cs-dp-tree-item:hover { background: var(--overlay); }
+.cs-dp-tree-item.selected { background: rgba(137,180,250,.15); color: var(--accent); }
+
+.cs-dp-tree-toggle {
+  width: 13px;
+  height: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 9px;
+  color: var(--text-muted);
+  transition: transform .15s;
+}
+.cs-dp-tree-toggle.expanded { transform: rotate(90deg); }
+.cs-dp-tree-toggle.leaf { visibility: hidden; }
+
+.cs-dp-tree-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.cs-dp-tree-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cs-dp-tree-partbadge {
+  font-size: 9px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--overlay);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 1px;
+}
+.cs-dp-tree-partbadge.cs-bop-badge-full    { background: color-mix(in srgb, var(--green)  15%, transparent); }
+.cs-dp-tree-partbadge.cs-bop-badge-partial { background: color-mix(in srgb, var(--yellow) 15%, transparent); }
+.cs-dp-tree-partbadge.cs-bop-badge-none    { background: color-mix(in srgb, var(--red)    12%, transparent); }
+

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GBOP 树形视图</title>
+  
+  
+  <link rel="stylesheet" href="/assets/index-51203900.css">
+  <link rel="stylesheet" href="/assets/main-921414fe.css">
+</head>
+<body>
+  <!-- 工具栏 -->
+  <div class="lv-toolbar" id="lvToolbar">
+    <span class="lv-toolbar-title" id="lvVersionLabel">GBOP 树形视图</span>
+
+    <!-- 版本选择器 -->
+    <select class="lv-select" id="lvVersionSelect" style="min-width:140px;margin-left:6px">
+      <option value="">选择版本…</option>
+    </select>
+
+    <div class="lv-toolbar-sep"></div>
+
+    <!-- 共用：类型筛选 -->
+    <div class="lv-filter-wrap" id="lvTypeFilterWrap">
+      <button class="lv-btn lv-btn-sm" id="lvTypeFilterBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        类型筛选
+      </button>
+      <div class="lv-dropdown" id="lvTypeDropdown" style="display:none"></div>
+    </div>
+
+    <!-- 共用：线体筛选 -->
+    <div class="lv-filter-wrap" id="lvLevel1FilterWrap">
+      <button class="lv-btn lv-btn-sm" id="lvLevel1Btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/>
+        </svg>
+        系统筛选
+      </button>
+      <div class="lv-dropdown" id="lvLevel1Dropdown" style="display:none"></div>
+    </div>
+
+    <!-- 共用：搜索 -->
+    <input class="lv-search" id="lvSearch" type="search" placeholder="搜索节点…">
+
+    <div class="lv-toolbar-sep" id="lvColumnsSep"></div>
+
+    <!-- 列视图专用：层级深度 -->
+    <label class="lv-toolbar-label" id="lvMaxDepthWrap">最深层级
+      <select class="lv-select" id="lvMaxDepth">
+        <option value="1">第1级</option>
+        <option value="2">第2级</option>
+        <option value="3" selected>第3级</option>
+        <option value="4">第4级</option>
+        <option value="5">第5级</option>
+        <option value="99">全部</option>
+      </select>
+    </label>
+
+    <!-- 列视图专用：展开/折叠 -->
+    <button class="lv-btn lv-btn-sm" id="lvExpandAll" title="展开全部">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+        <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+      </svg>
+      展开全部
+    </button>
+    <button class="lv-btn lv-btn-sm" id="lvCollapseAll" title="折叠全部">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+        <line x1="10" y1="14" x2="3" y2="21"/><line x1="21" y1="3" x2="14" y2="10"/>
+      </svg>
+      折叠全部
+    </button>
+
+    <!-- 列视图专用：缩放滑块 -->
+    <label class="lv-toolbar-label" id="lvZoomWrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="range" class="lv-zoom-range" id="lvZoomRange" min="5" max="200" value="100">
+      <span id="lvZoomPct">100%</span>
+    </label>
+
+    <!-- 列视图专用：新建节点 -->
+    <button class="lv-btn lv-btn-sm" id="lvAddNode" title="新建节点">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      新建节点
+    </button>
+
+    <div class="lv-toolbar-sep"></div>
+
+    <!-- 切换到清单视图 -->
+    <button class="lv-btn lv-btn-sm" id="lvGoList" title="打开清单视图">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/>
+        <rect x="3" y="17" width="18" height="4" rx="1"/>
+      </svg>
+      清单视图
+    </button>
+
+    <!-- 共用：保存视图、刷新 -->
+    <button class="lv-btn lv-btn-sm" id="lvSaveView" title="保存当前视图设置">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/>
+        <polyline points="7 3 7 8 15 8"/>
+      </svg>
+      保存视图
+    </button>
+    <button class="lv-btn lv-btn-sm" id="lvRefresh" title="刷新">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+      </svg>
+    </button>
+    <button class="lv-btn lv-btn-sm" id="lvThemeToggle" title="切换亮色模式">
+      <svg id="lvThemeIcon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <span id="lvThemeLabel">亮色</span>
+    </button>
+
+  </div>
+
+  <!-- 画布/列 主体 -->
+  <div class="lv-body-wrap">
+    <div class="lv-columns-wrap" id="lvColumnsWrap">
+      <!-- Miller Columns -->
+      <div class="lv-columns" id="lvColumns"></div>
+    </div>
+
+    <!-- 右侧覆盖面板（方案A：覆盖列区域，不压缩列） -->
+    <div class="lv-overlay-panel hidden" id="lvOverlayPanel">
+      <div class="lv-op-hdr">
+        <span class="lv-op-title" id="lvOpTitle">节点详情</span>
+        <div class="lv-op-hdr-actions">
+          <button class="lv-op-hdr-btn lv-op-pin" id="lvOpPin" title="固定面板">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/>
+            </svg>
+          </button>
+          <button class="lv-op-hdr-btn lv-op-sb-toggle-inline" id="lvOpSbToggle" title="切换边栏">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="3" x2="3" y2="21"/><line x1="21" y1="3" x2="21" y2="21"/><line x1="9" y1="3" x2="9" y2="21"/>
+            </svg>
+          </button>
+          <button class="lv-op-close" id="lvOpClose">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="lv-op-body" id="lvOpBody"></div>
+    </div>
+
+    <!-- 右侧边栏 -->
+    <div class="lv-sidebar collapsed" id="lvSidebar">
+      <div class="lv-sb-tabs" id="lvSbTabs">
+        <button class="lv-sb-tab active" data-tab="links">子节点</button>
+      </div>
+      <div class="lv-sb-body" id="lvSbBody">
+        <div class="lv-sb-empty">点击卡片查看子节点</div>
+      </div>
+      <div id="lvDntWrap" style="display:none;flex:1;min-height:0;overflow:hidden"></div>
+    </div>
+    <button class="lv-sb-toggle" id="lvSbToggle" title="展开边栏">◀</button>
+  </div>
+
+  <!-- 统计弹出框（单例，移入 body 避免被 overflow:hidden 裁剪）-->
+  <div class="lv-stats-popover" id="lvStatsPopover" style="display:none"></div>
+
+  <!-- 小详情浮动弹窗（保留备用） -->
+  <div class="lv-detail-popover" id="lvDetailPopover" style="display:none">
+    <div class="lv-dp-hdr">
+      <span class="lv-dp-title" id="lvDpTitle">节点详情</span>
+      <button class="lv-dp-close" id="lvDpClose">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="lv-dp-body" id="lvDpBody"></div>
+  </div>
+
+  <!-- 右键菜单 -->
+  <div class="lv-ctx-menu" id="lvCtxMenu" style="display:none">
+    <div class="lv-ctx-item" data-action="open_detail">打开详情</div>
+    <div class="lv-ctx-item" data-action="add_child">添加子节点</div>
+    <div class="lv-ctx-item" data-action="detail_modal">打开详情弹窗</div>
+    <div class="lv-ctx-sep"></div>
+    <div class="lv-ctx-item" data-action="rename">重命名</div>
+    <div class="lv-ctx-item lv-ctx-danger" data-action="delete">删除节点</div>
+  </div>
+
+  <!-- Toast -->
+  <div class="lv-toast" id="lvToast" style="display:none"></div>
+
+  <script src="/web/components/miller_columns.js"></script>
+  <script src="/web/shared/lv_utils.js"></script>
+  <script src="lineage.js"></script>
+</body>
+</html>

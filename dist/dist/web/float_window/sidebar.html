@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快捷侧边栏</title>
+    
+  <link rel="stylesheet" href="/assets/sidebar-a66ad160.css">
+</head>
+<body>
+    <script src="/web/icons.js"></script>
+    <!-- 拖拽标题栏 -->
+    <div class="drag-header">
+        <div class="title">快捷操作</div>
+        <div class="header-tools">
+            <button id="pinBtn" title="置顶锁定"><svg class="icon" width="14" height="14"><use href="#icon-pin"/></svg></button>
+            <button id="snapBtn" title="贴边隐藏"><svg class="icon" width="14" height="14"><use href="#icon-clip"/></svg></button>
+            <button id="closeBtn" title="关闭">×</button>
+        </div>
+    </div>
+
+    <!-- 功能菜单 -->
+    <div class="sidebar-menu">
+        <div class="menu-item" onclick="window.electronAPI?.openSettings?.()"><svg class="icon" width="15" height="15"><use href="#icon-settings"/></svg> 系统设置</div>
+        <div class="menu-item" onclick="window.electronAPI?.broadcastTheme?.(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')"><svg class="icon" width="15" height="15"><use href="#icon-contrast"/></svg> 切换主题</div>
+        <div class="menu-item" onclick="window.electronAPI?.showMain?.()"><svg class="icon" width="15" height="15"><use href="#icon-monitor"/></svg> 显示主窗口</div>
+        <div class="menu-item" onclick="window.electronAPI?.hideToTray?.()"><svg class="icon" width="15" height="15"><use href="#icon-inbox"/></svg> 最小化托盘</div>
+    </div>
+
+    <script src="sidebar.js"></script>
+</body>
+</html>

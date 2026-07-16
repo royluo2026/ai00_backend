@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>知识库</title>
+
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #1e1e2e; --bg2: #181825; --bar-bg: #13131f;
+    --text: #cdd6f4; --text-muted: #6c7086; --accent: #89b4fa;
+    --border: #313244; --hover: #2a2a3d; --active: #2d3561;
+  }
+  [data-theme="light"] {
+    --bg: #eff1f5; --bg2: #e6e9ef; --bar-bg: #dce0e8;
+    --text: #4c4f69; --text-muted: #9ca0b0; --accent: #1e66f5;
+    --border: #ccd0da; --hover: #e0e4ef; --active: #c0c8f0;
+  }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+</style>
+  <link rel="stylesheet" href="/assets/index-2b43d2a2.css">
+  <link rel="stylesheet" href="/assets/self_annotation_panel-bceac7d9.css">
+</head>
+<body>
+<div class="kh-root">
+
+  <!-- ── Left1 导航树 ────────────────────────────────────────── -->
+  <div class="kh-left1" id="khLeft1">
+    <div class="kh-nav-header">
+      <span>知识库</span>
+      <button class="kh-collapse-btn" id="khCollapseLeft1" title="折叠导航">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      </button>
+    </div>
+    <div class="kh-nav-scroll" id="khNavScroll"></div>
+  </div>
+
+  <!-- ── 分隔条 1（左侧包含展开按钮容器）────────────────────── -->
+  <div class="kh-divider-wrap">
+    <button class="kh-expand-btn hidden" id="khExpandLeft1" title="展开导航">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+    </button>
+    <div class="kh-divider" id="khDiv1"></div>
+  </div>
+
+  <!-- ── Left2 文件列表 ─────────────────────────────────────── -->
+  <div class="kh-left2" id="khLeft2">
+    <div class="kh-list-header">
+      <input class="kh-list-search" id="khSearchInput" type="text" placeholder="搜索文件…" />
+      <button class="kh-collapse-btn" id="khCollapseLeft2" title="折叠文件列表">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      </button>
+    </div>
+    <div class="kh-list-toolbar">
+      <button class="kh-list-tbtn" id="khGroupBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+        分组
+      </button>
+      <button class="kh-list-tbtn" id="khSortBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+        排序
+      </button>
+      <button class="kh-list-add-btn" id="khAddBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        添加
+      </button>
+    </div>
+    <div class="kh-list-scroll" id="khListScroll"></div>
+  </div>
+
+  <!-- ── 分隔条 2 ───────────────────────────────────────────── -->
+  <div class="kh-divider-wrap">
+    <button class="kh-expand-btn hidden" id="khExpandLeft2" title="展开文件列表">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+    </button>
+    <div class="kh-divider" id="khDiv2"></div>
+  </div>
+
+  <!-- ── Center 内容区 ──────────────────────────────────────── -->
+  <div class="kh-center" id="khCenter">
+    <div class="kh-center-head">
+      <span class="kh-center-title" id="khCenterTitle">—</span>
+    </div>
+    <div class="kh-center-body" id="khCenterBody">
+      <div class="kh-center-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <p>选择左侧文件以开始</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 分隔条 3 ───────────────────────────────────────────── -->
+  <div class="kh-divider-wrap">
+    <div class="kh-divider" id="khDiv3"></div>
+    <button class="kh-expand-btn kh-expand-right hidden" id="khExpandRight" title="展开评论">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+    </button>
+  </div>
+
+  <!-- ── Right 评论区 ───────────────────────────────────────── -->
+  <div class="kh-right kh-collapsed" id="khRight">
+    <div class="kh-right-header">
+      <div style="display:flex;align-items:center;gap:6px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        评论
+      </div>
+      <button class="kh-pin-btn" id="khPinRight" title="固定评论区">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="17" x2="12" y2="22"/>
+          <path d="M5 17h14v-1.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V6h1a2 2 0 000-4H8a2 2 0 000 4h1v4.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24z"/>
+        </svg>
+      </button>
+      <button class="kh-collapse-btn" id="khCollapseRight" title="关闭评论区">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+      </button>
+    </div>
+    <div class="kh-right-body" id="khRightBody">
+      <div class="kh-right-placeholder">选择条目后查看评论</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── 依赖脚本 ────────────────────────────────────────────── -->
+<script src="/web/components/entry_thread.js"></script>
+<script src="/web/components/visibility_selector.js"></script>
+<script src="../assets/lib/marked.min.js"></script>
+<!-- ContainerModes（懒加载，按需引入） -->
+<script src="../container_card/modes/mode_markdown.js"></script>
+<script src="../container_card/modes/mode_webview.js"></script>
+<script src="../container_card/modes/mode_pdf.js"></script>
+<script src="../container_card/modes/mode_richtext.js"></script>
+<!-- 主控制器 -->
+<script src="/web/components/self_annotation_panel.js"></script>
+<script src="knowledge_hub.js"></script>
+</body>
+</html>

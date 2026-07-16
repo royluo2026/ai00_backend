@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>系统能力</title>
+  <script src="/web/icons.js"></script>
+  <style>
+    :root {
+      --bg-primary:#1e1e2e; --bg-secondary:#181825; --bg-surface:#24273a; --bg-tertiary:#313244;
+      --text-normal:#cdd6f4; --text-muted:#a6adc8; --text-faint:#6c7086;
+      --border-default:#313244; --color-accent:#89b4fa;
+      --color-green:#a6e3a1; --color-orange:#fab387; --color-gray:#585b70;
+    }
+    [data-theme="light"] {
+      --bg-primary:#eff1f5; --bg-secondary:#e6e9ef; --bg-surface:#dce0e8; --bg-tertiary:#bcc0cc;
+      --text-normal:#4c4f69; --text-muted:#8c8fa1; --text-faint:#9ca0b0;
+      --border-default:#bcc0cc; --color-accent:#1e66f5;
+      --color-green:#40a02b; --color-orange:#fe640b; --color-gray:#7c7f93;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg-primary); color:var(--text-normal); font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; font-size:13px; height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+    .page-header { display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid var(--border-default); flex-shrink:0; }
+    .page-title { font-size:15px; font-weight:600; }
+    .toolbar { display:flex; align-items:center; gap:8px; padding:8px 20px; border-bottom:1px solid var(--border-default); flex-shrink:0; flex-wrap:wrap; }
+    .search-input { padding:5px 10px; border:1px solid var(--border-default); border-radius:6px; background:var(--bg-surface); color:var(--text-normal); font-size:12px; width:200px; outline:none; }
+    .search-input:focus { border-color:var(--color-accent); }
+    .filter-select { padding:5px 8px; border:1px solid var(--border-default); border-radius:6px; background:var(--bg-surface); color:var(--text-normal); font-size:12px; outline:none; cursor:pointer; }
+    .btn-add-row { padding:5px 12px; background:var(--color-accent); color:#fff; border:none; border-radius:6px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:5px; }
+    .btn-add-row:hover { opacity:.85; }
+    .stat-text { font-size:12px; color:var(--text-faint); margin-left:auto; }
+    .table-wrap { flex:1; overflow:auto; padding:0 20px 20px; }
+    table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    colgroup col:nth-child(1) { width:110px; }
+    colgroup col:nth-child(2) { width:170px; }
+    colgroup col:nth-child(3) { width:200px; }
+    colgroup col:nth-child(4) { width:170px; }
+    colgroup col:nth-child(5) { width:190px; }
+    colgroup col:nth-child(6) { width:150px; }
+    colgroup col:nth-child(7) { width:80px; }
+    colgroup col:nth-child(8) { width:220px; }
+    colgroup col:nth-child(9) { width:36px; }
+    thead th { position:sticky; top:0; background:var(--bg-secondary); padding:8px 10px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); border-bottom:1px solid var(--border-default); white-space:nowrap; z-index:2; }
+    tbody tr { border-bottom:1px solid var(--border-default); }
+    tbody tr:hover { background:var(--bg-surface); }
+    tbody td { padding:7px 10px; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
+    tbody td.wrap { white-space:normal; word-break:break-all; }
+    tbody tr.custom-row { background:color-mix(in srgb,var(--color-accent) 5%,transparent); }
+    .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:500; }
+    .badge-active  { background:color-mix(in srgb,var(--color-green)  20%,transparent); color:var(--color-green);  }
+    .badge-partial { background:color-mix(in srgb,var(--color-orange) 20%,transparent); color:var(--color-orange); }
+    .badge-planned { background:color-mix(in srgb,var(--color-gray)   30%,transparent); color:var(--text-muted);   }
+    .mono { font-family:"Cascadia Code","Consolas","Fira Mono",monospace; font-size:11px; color:var(--color-accent); }
+    .note-cell        { cursor:text; min-height:20px; }
+    .note-cell:hover  { background:var(--bg-tertiary); border-radius:4px; }
+    .note-cell.editing { outline:1px solid var(--color-accent); border-radius:4px; cursor:text; white-space:normal; }
+    .custom-cell      { cursor:text; }
+    .status-cell      { cursor:pointer; user-select:none; }
+    .del-btn { display:none; width:22px; height:22px; border:none; background:transparent; color:var(--text-faint); cursor:pointer; font-size:13px; border-radius:4px; }
+    .del-btn:hover { background:rgba(243,139,168,.2); color:#f38ba8; }
+    tbody tr.custom-row:hover .del-btn { display:inline-flex; align-items:center; justify-content:center; }
+    .saving-dot { width:6px; height:6px; border-radius:50%; background:var(--color-orange); display:inline-block; margin-left:4px; vertical-align:middle; animation:pulse .8s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <svg class="icon" width="18" height="18"><use href="#icon-settings"/></svg>
+    <span class="page-title">系统能力 — 活文档</span>
+    <span id="savingIndicator" style="display:none;margin-left:8px">
+      <span class="saving-dot"></span>
+      <span style="font-size:11px;color:var(--text-muted);margin-left:4px">保存中…</span>
+    </span>
+  </div>
+  <div class="toolbar">
+    <input class="search-input" id="searchInput" placeholder="搜索能力名称 / 说明…" />
+    <select class="filter-select" id="categoryFilter"><option value="">全部分类</option></select>
+    <select class="filter-select" id="statusFilter">
+      <option value="">全部状态</option>
+      <option value="active">active</option>
+      <option value="partial">partial</option>
+      <option value="planned">planned</option>
+    </select>
+    <button class="btn-add-row" id="btnAddRow">
+      <svg class="icon" width="13" height="13"><use href="#icon-plus"/></svg>
+      新增行
+    </button>
+    <button class="btn-add-row" id="btnExport" style="background:var(--bg-tertiary);color:var(--text-muted);border:1px solid var(--border-default);">
+      <svg class="icon" width="13" height="13"><use href="#icon-download"/></svg>
+      导出快照
+    </button>
+    <span class="stat-text" id="statText"></span>
+  </div>
+  <div class="table-wrap">
+    <table id="capTable">
+      <colgroup><col/><col/><col/><col/><col/><col/><col/><col/><col/></colgroup>
+      <thead>
+        <tr>
+          <th>分类</th><th>能力名称</th><th>说明</th><th>实现原理</th>
+          <th>代码位置</th><th>应用模块</th><th>状态</th><th>改进意见</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="capBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // theme sync — localStorage 兜底 + postMessage 实时切换
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'theme') document.documentElement.setAttribute('data-theme', e.data.theme);
+    });
+    (function(){ const t=localStorage.getItem('system.theme'); if(t) document.documentElement.setAttribute('data-theme',t); })();
+
+    // ── 静态数据 ───────────────────────────────────────────────────────────────
+    const CAPABILITIES = [
+      // 清单+数据库
+      { id:'view_manager',        category:'清单+数据库', name:'视图控制(ViewManager)',       description:'字段显隐/排序/筛选/分组，视图保存与团队共享',     principle:'前端状态+云端view_configs持久化',              code_location:'web/components/view_manager.js',          applied_in:'工艺表格,BOM,工厂资源,任务,问题',  status:'active'  },
+      { id:'import_export',       category:'清单+数据库', name:'导入导出(ImportExport)',      description:'Excel导入/导出，模板管理，飞书电子表格导出',       principle:'前端读取/openpyxl生成，飞书Sheets API',         code_location:'web/components/import_export.js',         applied_in:'工艺表格,BOM,工厂资源,标准工序库', status:'partial' },
+      { id:'diff_manager',        category:'清单+数据库', name:'数据对比(DiffManager)',       description:'两数据集逐行diff，导出带色Excel/飞书表格',         principle:'前端纯JS diff算法+openpyxl着色',               code_location:'web/components/diff_manager.js',          applied_in:'工艺表格,BOM,工厂资源,任务,问题',  status:'active'  },
+      { id:'grid_editor',         category:'清单+数据库', name:'表格编辑(GridEditor)',        description:'虚拟滚动可编辑表格，右键菜单，批量编辑',           principle:'div模拟表格+事件委托',                          code_location:'web/components/grid_editor.js',           applied_in:'工艺表格,BOM,工厂资源,任务,问题',  status:'active'  },
+      { id:'clone_drift',         category:'清单+数据库', name:'标准工序克隆+Drift追踪',     description:'BOP工序克隆自标准库，偏差自动标记',               principle:'克隆时记录clone_source_version，对比检测drift', code_location:'backend/routers/std_op.py,bop.py',        applied_in:'BOP编辑,工艺表格',                 status:'active'  },
+      { id:'task_template_inst',  category:'清单+数据库', name:'任务模板实例化',             description:'任务模板批量创建任务，支持变量和指派',             principle:'模板+实例化API，参数映射',                      code_location:'backend/routers/task_templates.py',       applied_in:'任务管理',                         status:'active'  },
+      { id:'data_registry',       category:'清单+数据库', name:'数据注册协议(DataRegistry)',  description:'各模块标准接口注册，工作台消费行数/能力chips',     principle:'postMessage通信+父窗口中继_drRegistry',        code_location:'web/components/data_registry.js',         applied_in:'工作台,各模块',                    status:'active'  },
+      { id:'report',              category:'清单+数据库', name:'报表能力',                   description:'自定义报表生成，多维聚合',                         principle:'待规划',                                       code_location:'-',                                       applied_in:'-',                                status:'planned' },
+      { id:'global_search',       category:'清单+数据库', name:'全局搜索',                   description:'跨模块全文搜索',                                   principle:'待规划',                                       code_location:'-',                                       applied_in:'-',                                status:'planned' },
+      // 沟通协作
+      { id:'approval_flow',       category:'沟通协作',   name:'审批流',                     description:'多级审批，状态流转，飞书消息通知',                 principle:'approval_orders表+飞书IM推送',                 code_location:'backend/routers/approval.py',             applied_in:'审批中心',                         status:'active'  },
+      { id:'at_mention',          category:'沟通协作',   name:'@提及分享',                  description:'@用户触发通知，评论/描述中嵌入',                   principle:'MentionInput组件+mentions API写通知表',         code_location:'backend/routers/mentions.py',             applied_in:'任务管理,问题管理',                status:'active'  },
+      { id:'subscribe',           category:'沟通协作',   name:'订阅关注',                   description:'关注条目，多条件通知（状态/评论/分配等），铃铛UI', principle:'follows表+notify_on JSONB数组+follow_trigger',  code_location:'backend/routers/follows.py',              applied_in:'任务管理,问题管理,工作台',         status:'partial' },
+      { id:'notification',        category:'沟通协作',   name:'通知管理',                   description:'通知列表，已读/未读，类型分级',                     principle:'notifications表+轮询API',                      code_location:'backend/routers/notifications.py',        applied_in:'工作台,全局',                      status:'partial' },
+      { id:'feishu_im',           category:'沟通协作',   name:'飞书聊天对接',               description:'直接发送飞书消息，群推送',                         principle:'待规划',                                       code_location:'-',                                       applied_in:'-',                                status:'planned' },
+      // 定制工作流
+      { id:'local_sqlite',        category:'定制工作流', name:'本地SQLite存储',             description:'离线数据本地持久化，任务/问题双存储',              principle:'SQLAlchemy ORM + SQLite文件',                  code_location:'app/infra_local/persistence/',             applied_in:'任务管理,问题管理',                status:'active'  },
+      { id:'cloud_pg',            category:'定制工作流', name:'云端PG存储',                 description:'团队协作数据云端持久化',                           principle:'psycopg2连接池+RealDictCursor',                 code_location:'backend/db/connection.py',                 applied_in:'所有云端模块',                     status:'active'  },
+      { id:'data_promotion',      category:'定制工作流', name:'本地→云端数据提升',          description:'本地记录提升为云端共享记录',                       principle:'promotion API+migrated_to_cloud_gid标记',       code_location:'backend/routers/promotion.py',            applied_in:'任务管理,问题管理',                status:'active'  },
+      { id:'personal_config',     category:'定制工作流', name:'个人配置本地存储',           description:'主题/导航/视图等个人偏好',                         principle:'localStorage+Python config文件',               code_location:'web/bridge.js + localStorage',            applied_in:'全局',                             status:'partial' },
+      { id:'team_config',         category:'定制工作流', name:'团队配置云端存储',           description:'团队级别共享配置，模块开关，默认范围',             principle:'teams.config JSONB列+PATCH /teams/{gid}/config', code_location:'backend/routers/teams.py',                applied_in:'组织管理',                         status:'active'  },
+      { id:'rbac',                category:'定制工作流', name:'权限控制(RBAC)',              description:'角色权限门控，7级角色，模块级控制',               principle:'require_role依赖注入+前端_ROLE_PERMS映射',      code_location:'backend/routers/deps.py',                 applied_in:'全局',                             status:'active'  },
+      { id:'workbench_widget',    category:'定制工作流', name:'多工作台 + Widget化',        description:'个人/团队多工作台，Tab切换，4种Widget画布，成员个性化覆盖', principle:'workbench_configs+workbench_member_overrides表，postMessage DR集成', code_location:'web/workbench/workbench.js,backend/routers/workbenches.py', applied_in:'工作台', status:'active' },
+      { id:'role_settings',       category:'定制工作流', name:'角色后台设置',               description:'超管在线分配用户角色和团队',                       principle:'PATCH /users/{gid}/role + 前端表单',            code_location:'web/org_mgmt/org_mgmt.js',                applied_in:'组织管理',                         status:'partial' },
+      { id:'admin_doc',           category:'定制工作流', name:'超管活文档',                 description:'系统能力+清单注册活文档，在线标注状态和改进意见',   principle:'静态数据+system_config持久化备注',              code_location:'web/admin/capabilities.html,lists_registry.html', applied_in:'组织管理',                   status:'active'  },
+      // 规则控制
+      { id:'rule_lib',            category:'规则控制',   name:'规则库',                     description:'工艺规则CRUD，关联BOP和工序',                     principle:'craft_rules表+规则匹配查询',                   code_location:'backend/routers/craft.py',                applied_in:'规则管理',                         status:'active'  },
+      { id:'rule_engine',         category:'规则控制',   name:'规则引擎',                   description:'规则自动检查，实时触发',                           principle:'待规划',                                       code_location:'-',                                       applied_in:'-',                                status:'partial' },
+      { id:'rule_formation',      category:'规则控制',   name:'规则形成机制',               description:'规则从实践中提炼，版本追踪',                       principle:'待规划',                                       code_location:'-',                                       applied_in:'-',                                status:'planned' },
+      { id:'rule_scope',          category:'规则控制',   name:'规则管控范围',               description:'规则适用车型/工段/工序范围配置',                   principle:'rule_scope字段+过滤逻辑',                      code_location:'-',                                       applied_in:'规则管理',                         status:'partial' },
+      // 知识管理
+      { id:'md_rw',               category:'知识管理',   name:'MD文档读写',                 description:'Markdown格式知识文档，本地或云端存储',             principle:'Electron fs.promises+Marked渲染',              code_location:'web/knowledge/',                          applied_in:'知识库,MD文档',                    status:'partial' },
+      { id:'ai_context',          category:'知识管理',   name:'AI上下文提供',               description:'为AI提供规则/BOM/工序上下文',                     principle:'待规划',                                       code_location:'-',                                       applied_in:'AI助手',                           status:'planned' },
+      { id:'feishu_doc',          category:'知识管理',   name:'飞书文档读写',               description:'同步飞书云文档到本地知识库',                       principle:'待规划',                                       code_location:'-',                                       applied_in:'知识库',                           status:'planned' },
+      // AI协作
+      { id:'cli_interface',       category:'AI协作',     name:'CLI接口',                    description:'命令行调用AI能力，脚本集成',                       principle:'待规划',                                       code_location:'-',                                       applied_in:'-',                                status:'planned' },
+      { id:'ai_chat',             category:'AI协作',     name:'AI沟通界面',                 description:'工艺助手对话，多模式（规则/BOM/工序）',             principle:'Claude API+上下文注入',                        code_location:'web/ai/',                                 applied_in:'工作台',                           status:'partial' },
+      { id:'ai_permission',       category:'AI协作',     name:'AI权限管理',                 description:'AI操作授权，数据访问范围控制',                     principle:'待规划',                                       code_location:'-',                                       applied_in:'-',                                status:'planned' },
+      { id:'ai_skill_mkt',        category:'AI协作',     name:'AI Skill市场',               description:'可插拔AI技能模块，团队共享',                       principle:'待规划',                                       code_location:'-',                                       applied_in:'-',                                status:'planned' },
+      // 特殊能力
+      { id:'craft_canvas',        category:'特殊能力',   name:'工艺画布',                   description:'可视化工艺流程图，节点拖拽，BOP关联',              principle:'Canvas渲染+节点数据模型',                      code_location:'web/canvas/',                             applied_in:'工艺画布',                         status:'partial' },
+      { id:'bop_five_layer',      category:'特殊能力',   name:'BOP五层结构',                description:'版本/工段/工位/工序/工步五层层级管理',             principle:'bop_versions/posts/operations/steps表',        code_location:'backend/routers/bop.py',                  applied_in:'工艺表格,工艺画布',                status:'active'  },
+      { id:'std_op_drift',        category:'特殊能力',   name:'标准工序Drift追踪',          description:'克隆工序偏离标准时自动标记和提示',                 principle:'clone_source_version+drift_fields字段对比',    code_location:'backend/routers/std_op.py',               applied_in:'工艺表格,标准工序库',              status:'active'  },
+    ];
+
+    // ── 自定义行（localStorage） ──────────────────────────────────────────────
+    const CUSTOM_KEY = 'capabilities.custom_rows';
+    let _customRows = [];
+
+    function loadCustomRows() {
+      try { _customRows = JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]'); } catch { _customRows = []; }
+    }
+    function saveCustomRows() {
+      localStorage.setItem(CUSTOM_KEY, JSON.stringify(_customRows));
+    }
+
+    // ── 状态 ──────────────────────────────────────────────────────────────────
+    const STATUS_CYCLE = ['active', 'partial', 'planned'];
+    let _notes   = {};
+    let _statuses = {};   // id → status override from system_config
+    let _filtered = [];
+
+    function allRows() { return [...CAPABILITIES, ..._customRows]; }
+
+    // ── Cloud fetch ───────────────────────────────────────────────────────────
+    function cf(path, opts) {
+      const fn = window.parent?._cloudFetch || window._cloudFetch || window.parent?.parent?._cloudFetch;
+      if (!fn) return Promise.reject(new Error('no _cloudFetch'));
+      return fn(path, opts);
+    }
+
+    async function loadNotes() {
+      try {
+        const res = await cf('/admin/config');
+        if (res?.data) {
+          res.data.forEach(row => {
+            const mn = row.key?.match(/^capabilities\.(.+)\.note$/);
+            const ms = row.key?.match(/^capabilities\.(.+)\.status$/);
+            if (mn) _notes[mn[1]]    = row.value || '';
+            if (ms) _statuses[ms[1]] = row.value || '';
+          });
+        }
+      } catch (_) {}
+    }
+
+    // ── Save note (cloud) ─────────────────────────────────────────────────────
+    let _saveTimer = null;
+    function _showSaving() { document.getElementById('savingIndicator').style.display = ''; }
+    function _hideSaving() { document.getElementById('savingIndicator').style.display = 'none'; }
+
+    async function saveNote(id, value) {
+      _notes[id] = value;
+      _showSaving();
+      clearTimeout(_saveTimer);
+      _saveTimer = setTimeout(async () => {
+        try {
+          await cf(`/admin/config/capabilities.${id}.note`, {
+            method: 'PUT',
+            body: JSON.stringify({ value: value || ' ', description: `capability ${id} note` }),
+          });
+        } catch (e) { console.warn('[capabilities] save note failed:', e.message); }
+        finally { _hideSaving(); }
+      }, 600);
+    }
+
+    async function saveStatus(id, value) {
+      const cap = CAPABILITIES.find(c => c.id === id);
+      if (cap) cap.status = value;
+      try {
+        await cf(`/admin/config/capabilities.${id}.status`, {
+          method: 'PUT',
+          body: JSON.stringify({ value, description: `capability ${id} status` }),
+        });
+      } catch (_) {}
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────
+    function badgeHtml(status) {
+      const cls = status === 'active' ? 'badge-active' : status === 'partial' ? 'badge-partial' : 'badge-planned';
+      return `<span class="badge ${cls}">${status}</span>`;
+    }
+    function _he(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function render() {
+      const body = document.getElementById('capBody');
+      body.innerHTML = '';
+      _filtered.forEach(cap => {
+        const isCustom = !!cap._custom;
+        const status   = isCustom ? cap.status : (_statuses[cap.id] || cap.status);
+        const note     = isCustom ? (cap.note || '') : (_notes[cap.id] || '');
+        const tr = document.createElement('tr');
+        if (isCustom) tr.classList.add('custom-row');
+
+        if (isCustom) {
+          // All cells editable for custom rows
+          tr.innerHTML = `
+            <td class="custom-cell wrap" data-id="${cap.id}" data-field="category" contenteditable="true" title="分类">${_he(cap.category)}</td>
+            <td class="custom-cell wrap" data-id="${cap.id}" data-field="name"     contenteditable="true">${_he(cap.name)}</td>
+            <td class="custom-cell wrap" data-id="${cap.id}" data-field="description" contenteditable="true">${_he(cap.description)}</td>
+            <td class="custom-cell wrap" data-id="${cap.id}" data-field="principle"   contenteditable="true">${_he(cap.principle)}</td>
+            <td class="custom-cell mono wrap" data-id="${cap.id}" data-field="code_location" contenteditable="true">${_he(cap.code_location)}</td>
+            <td class="custom-cell wrap" data-id="${cap.id}" data-field="applied_in" contenteditable="true">${_he(cap.applied_in)}</td>
+            <td class="status-cell" data-id="${cap.id}">${badgeHtml(status)}</td>
+            <td class="custom-cell note-cell wrap" data-id="${cap.id}" data-field="note" contenteditable="true">${_he(note)}</td>
+            <td><button class="del-btn" data-id="${cap.id}" title="删除此行">✕</button></td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td>${_he(cap.category)}</td>
+            <td><strong>${_he(cap.name)}</strong></td>
+            <td class="wrap" title="${_he(cap.description)}">${_he(cap.description)}</td>
+            <td class="wrap" title="${_he(cap.principle)}">${_he(cap.principle)}</td>
+            <td class="mono wrap" title="${_he(cap.code_location)}">${_he(cap.code_location)}</td>
+            <td title="${_he(cap.applied_in)}">${_he(cap.applied_in)}</td>
+            <td class="status-cell" data-id="${cap.id}" title="点击切换状态">${badgeHtml(status)}</td>
+            <td class="note-cell wrap" contenteditable="false" data-id="${cap.id}">${_he(note)}</td>
+            <td></td>
+          `;
+        }
+        body.appendChild(tr);
+      });
+      document.getElementById('statText').textContent = `${_filtered.length} / ${allRows().length} 条`;
+      bindCellEvents();
+    }
+
+    function bindCellEvents() {
+      // Note cells for regular rows (dblclick to edit)
+      body.querySelectorAll('.note-cell:not([contenteditable="true"])').forEach(cell => {
+        cell.addEventListener('dblclick', () => {
+          cell.contentEditable = 'true';
+          cell.classList.add('editing');
+          cell.focus();
+          const range = document.createRange(); range.selectNodeContents(cell); range.collapse(false);
+          const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        });
+        cell.addEventListener('blur', async () => {
+          cell.contentEditable = 'false';
+          cell.classList.remove('editing');
+          await saveNote(cell.dataset.id, cell.textContent.trim());
+        });
+        cell.addEventListener('keydown', e => {
+          if (e.key === 'Escape') { cell.blur(); }
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cell.blur(); }
+        });
+      });
+
+      // Custom cells (always editable, single click)
+      document.querySelectorAll('.custom-cell').forEach(cell => {
+        cell.addEventListener('blur', () => {
+          const id    = cell.dataset.id;
+          const field = cell.dataset.field;
+          const val   = cell.textContent.trim();
+          const row = _customRows.find(r => r.id === id);
+          if (row) { row[field] = val; saveCustomRows(); }
+        });
+        cell.addEventListener('keydown', e => {
+          if (e.key === 'Escape') { cell.blur(); }
+          if (e.key === 'Enter' && !e.shiftKey && cell.dataset.field !== 'description' && cell.dataset.field !== 'note') {
+            e.preventDefault(); cell.blur();
+          }
+        });
+      });
+
+      // Status cells
+      document.querySelectorAll('.status-cell').forEach(cell => {
+        cell.addEventListener('click', async () => {
+          const id  = cell.dataset.id;
+          const row = allRows().find(c => c.id === id);
+          if (!row) return;
+          const idx = STATUS_CYCLE.indexOf(row.status);
+          row.status = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+          cell.innerHTML = badgeHtml(row.status);
+          if (row._custom) saveCustomRows();
+          else await saveStatus(id, row.status);
+        });
+      });
+
+      // Delete buttons (custom rows only)
+      document.querySelectorAll('.del-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          _customRows = _customRows.filter(r => r.id !== id);
+          saveCustomRows();
+          applyFilter();
+        });
+      });
+    }
+
+    // Use body ref for note-cell query
+    let body;
+
+    // ── Add row ───────────────────────────────────────────────────────────────
+    function addRow() {
+      const id = 'c_' + Date.now();
+      const row = { id, _custom:true, category:'', name:'', description:'', principle:'', code_location:'', applied_in:'', status:'planned', note:'' };
+      _customRows.push(row);
+      saveCustomRows();
+      applyFilter();
+      // Focus first cell of new row
+      setTimeout(() => {
+        const newRow = document.querySelector(`[data-id="${id}"]`);
+        if (newRow) {
+          newRow.scrollIntoView({ behavior:'smooth', block:'nearest' });
+          newRow.focus();
+        }
+      }, 50);
+    }
+
+    // ── Filter ────────────────────────────────────────────────────────────────
+    function applyFilter() {
+      const q      = document.getElementById('searchInput').value.trim().toLowerCase();
+      const cat    = document.getElementById('categoryFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      _filtered = allRows().filter(c => {
+        if (cat && c.category !== cat) return false;
+        if (status && c.status !== status) return false;
+        if (q && !c.name.toLowerCase().includes(q) && !c.description.toLowerCase().includes(q)
+                 && !c.id.includes(q) && !(c.applied_in||'').toLowerCase().includes(q)) return false;
+        return true;
+      });
+      render();
+    }
+
+    // ── Export snapshot ───────────────────────────────────────────────────────
+    async function exportSnapshot() {
+      const btn = document.getElementById('btnExport');
+      btn.textContent = '导出中…';
+      btn.disabled = true;
+
+      try {
+        // 确保最新备注已加载
+        await loadNotes();
+
+        const now = new Date().toLocaleString('zh-CN', { hour12: false });
+        const rows = allRows();
+
+        // 按 category 分组
+        const groups = {};
+        rows.forEach(cap => {
+          const cat = cap.category || '自定义';
+          if (!groups[cat]) groups[cat] = [];
+          const status = cap._custom ? cap.status : (_statuses[cap.id] || cap.status);
+          const note   = cap._custom ? (cap.note || '') : (_notes[cap.id] || '');
+          groups[cat].push({ cap, status, note });
+        });
+
+        const lines = [
+          '# 系统能力快照',
+          '',
+          `> 导出时间：${now}`,
+          `> 共 ${rows.length} 条`,
+          '',
+        ];
+
+        for (const [cat, items] of Object.entries(groups)) {
+          lines.push(`## ${cat}`, '');
+          lines.push('| 能力名称 | 应用模块 | 状态 | 改进意见 |');
+          lines.push('|---------|---------|------|---------|');
+          items.forEach(({ cap, status, note }) => {
+            const name      = (cap.name        || '').replace(/\|/g, '｜');
+            const appliedIn = (cap.applied_in   || '').replace(/\|/g, '｜');
+            const noteEsc   = (note             || '').replace(/\|/g, '｜').replace(/\n/g, ' ');
+            lines.push(`| ${name} | ${appliedIn} | ${status} | ${noteEsc} |`);
+          });
+          lines.push('');
+        }
+
+        const md = lines.join('\n');
+
+        // 写入同目录
+        const eAPI = window.electronAPI || window.parent?.electronAPI;
+        if (eAPI?.writeTextFile) {
+          let p = decodeURIComponent(window.location.pathname);
+          if (/^\/[A-Za-z]:\//.test(p)) p = p.slice(1); // Windows: /D:/ → D:/
+          const dir = p.replace(/[^/\\]+$/, '');
+          await eAPI.writeTextFile(dir + 'capabilities_snapshot.md', md);
+          btn.textContent = '✓ 已导出';
+        } else {
+          // 降级：复制到剪贴板
+          await navigator.clipboard.writeText(md);
+          btn.textContent = '✓ 已复制';
+        }
+      } catch (e) {
+        console.error('[export]', e);
+        btn.textContent = '导出失败';
+      } finally {
+        setTimeout(() => {
+          btn.innerHTML = '<svg class="icon" width="13" height="13"><use href="#icon-download"/></svg> 导出快照';
+          btn.disabled = false;
+        }, 2000);
+      }
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    async function init() {
+      body = document.getElementById('capBody');
+      loadCustomRows();
+
+      const cats = [...new Set(CAPABILITIES.map(c => c.category))];
+      const sel  = document.getElementById('categoryFilter');
+      cats.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+
+      document.getElementById('searchInput').addEventListener('input', applyFilter);
+      document.getElementById('categoryFilter').addEventListener('change', applyFilter);
+      document.getElementById('statusFilter').addEventListener('change', applyFilter);
+      document.getElementById('btnAddRow').addEventListener('click', addRow);
+      document.getElementById('btnExport').addEventListener('click', exportSnapshot);
+
+      await loadNotes();
+      applyFilter();
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  </script>
+</body>
+</html>

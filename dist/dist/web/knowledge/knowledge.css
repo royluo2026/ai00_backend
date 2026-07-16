@@ -1,0 +1,10 @@
+/* knowledge.css — 模块专属样式（公共样式已移至 list_shell.css）*/
+
+/* ── Tag chips（知识条目标签显示）── */
+.tag-chip {
+  background: rgba(137,180,250,.15);
+  color: var(--color-accent, #89b4fa);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
+}

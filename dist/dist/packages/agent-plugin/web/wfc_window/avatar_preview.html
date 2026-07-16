@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>小柔头像选择</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1e1e2e; color: #cdd6f4;
+    font-family: system-ui, -apple-system, sans-serif; font-size: 13px;
+    padding: 32px;
+  }
+  h1 { font-size: 17px; color: #89b4fa; margin-bottom: 6px; }
+  .subtitle { color: #585b70; font-size: 12px; margin-bottom: 28px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .card {
+    background: #181825; border: 2px solid #313244;
+    border-radius: 10px; padding: 20px 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .card:hover { border-color: #585b70; background: #1e1e2e; }
+  .card.selected { border-color: #89b4fa; background: #1e2035; }
+  .card-label { font-size: 12px; font-weight: 600; color: #cdd6f4; }
+  .card-desc { font-size: 10px; color: #585b70; text-align: center; line-height: 1.5; }
+  .previews { display: flex; align-items: center; gap: 14px; }
+  .preview-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .preview-wrap span { font-size: 9px; color: #45475a; }
+  .av64 { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+  .av28 { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+  .copy-box { margin-top: 24px; background: #181825; border: 1px solid #313244; border-radius: 8px; padding: 14px; }
+  .copy-box h2 { font-size: 12px; color: #89b4fa; margin-bottom: 8px; }
+  .copy-box pre { font-size: 10.5px; color: #9399b2; white-space: pre-wrap; word-break: break-all; max-height: 180px; overflow-y: auto; line-height: 1.6; }
+</style>
+</head>
+<body>
+<h1>小柔 头像选择</h1>
+<p class="subtitle">点击选择，下方显示 SVG 代码。</p>
+<div class="grid" id="grid"></div>
+<div class="copy-box">
+  <h2>选中的 SVG</h2>
+  <pre id="out">点击上方卡片选择…</pre>
+</div>
+<script>
+const A = [
+
+// ── 1. 丸子头·点眼微笑 ───────────────────────────────────
+{
+  id:'bun1', label:'丸子头 A',
+  desc:'圆点眼 + 淡腮红，温柔自然',
+  svg:`<svg viewBox="0 0 40 40" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="#F5DEB3"/>
+  <!-- 头发 -->
+  <ellipse cx="20" cy="17" rx="14" ry="12" fill="#5C3D2E"/>
+  <!-- 双丸子 -->
+  <circle cx="10" cy="10" r="6" fill="#5C3D2E"/>
+  <circle cx="30" cy="10" r="6" fill="#5C3D2E"/>
+  <!-- 脸 -->
+  <ellipse cx="20" cy="26" rx="12" ry="13" fill="#FAEBD7"/>
+  <!-- 刘海 -->
+  <path d="M7 20 Q9 12 20 13 Q31 12 33 20 Q29 16 20 16.5 Q11 16 7 20Z" fill="#5C3D2E"/>
+  <!-- 腮红 -->
+  <ellipse cx="12" cy="28" rx="3.5" ry="2" fill="#F4A7A7" opacity="0.45"/>
+  <ellipse cx="28" cy="28" rx="3.5" ry="2" fill="#F4A7A7" opacity="0.45"/>
+  <!-- 眼睛：简单圆点 -->
+  <circle cx="16" cy="26" r="1.8" fill="#3B2A1A"/>
+  <circle cx="24" cy="26" r="1.8" fill="#3B2A1A"/>
+  <!-- 高光：一个小白点 -->
+  <circle cx="16.7" cy="25.3" r="0.65" fill="white"/>
+  <circle cx="24.7" cy="25.3" r="0.65" fill="white"/>
+  <!-- 嘴 -->
+  <path d="M17 30.5 Q20 33 23 30.5" stroke="#C07070" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>`,
+},
+
+// ── 2. 丸子头·弯眼 ───────────────────────────────────────
+{
+  id:'bun2', label:'丸子头 B',
+  desc:'弯月眼，笑眯眯，元气感',
+  svg:`<svg viewBox="0 0 40 40" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="#D4E8F0"/>
+  <ellipse cx="20" cy="17" rx="14" ry="12" fill="#4A3020"/>
+  <circle cx="10" cy="10" r="6" fill="#4A3020"/>
+  <circle cx="30" cy="10" r="6" fill="#4A3020"/>
+  <ellipse cx="20" cy="26" rx="12" ry="13" fill="#FFF0DC"/>
+  <path d="M7 20 Q9 12 20 13 Q31 12 33 20 Q29 16 20 16.5 Q11 16 7 20Z" fill="#4A3020"/>
+  <ellipse cx="12" cy="28" rx="3.5" ry="2" fill="#FFB5B5" opacity="0.5"/>
+  <ellipse cx="28" cy="28" rx="3.5" ry="2" fill="#FFB5B5" opacity="0.5"/>
+  <!-- 弯眼 -->
+  <path d="M13.5 25.5 Q16 23 18.5 25.5" stroke="#3B2A1A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M21.5 25.5 Q24 23 26.5 25.5" stroke="#3B2A1A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M17 30 Q20 32.5 23 30" stroke="#C07070" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>`,
+},
+
+// ── 3. 短发·点眼 ─────────────────────────────────────────
+{
+  id:'short', label:'短发·清爽',
+  desc:'短发，圆点眼，简洁利落',
+  svg:`<svg viewBox="0 0 40 40" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="#EEE0CC"/>
+  <ellipse cx="20" cy="16" rx="14" ry="11" fill="#6B4423"/>
+  <ellipse cx="20" cy="26" rx="12" ry="13" fill="#FAEBD7"/>
+  <path d="M7 20 Q8 11 20 12 Q32 11 33 20 Q30 15 20 16 Q10 15 7 20Z" fill="#6B4423"/>
+  <ellipse cx="8" cy="26" rx="2" ry="2.5" fill="#FAEBD7"/>
+  <ellipse cx="32" cy="26" rx="2" ry="2.5" fill="#FAEBD7"/>
+  <ellipse cx="12" cy="28" rx="3" ry="1.8" fill="#F4A7A7" opacity="0.4"/>
+  <ellipse cx="28" cy="28" rx="3" ry="1.8" fill="#F4A7A7" opacity="0.4"/>
+  <circle cx="16" cy="26" r="1.8" fill="#3B2A1A"/>
+  <circle cx="24" cy="26" r="1.8" fill="#3B2A1A"/>
+  <circle cx="16.7" cy="25.3" r="0.65" fill="white"/>
+  <circle cx="24.7" cy="25.3" r="0.65" fill="white"/>
+  <path d="M17 31 Q20 33.5 23 31" stroke="#C07070" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>`,
+},
+
+// ── 4. 短发·弯眼 ─────────────────────────────────────────
+{
+  id:'short2', label:'短发·暖棕',
+  desc:'暖棕短发，弯眼笑容，温柔感',
+  svg:`<svg viewBox="0 0 40 40" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="#F5E6D0"/>
+  <ellipse cx="20" cy="16" rx="14" ry="11" fill="#8B5A2B"/>
+  <ellipse cx="20" cy="26" rx="12" ry="13" fill="#FFF0DC"/>
+  <path d="M7 20 Q8 11 20 12 Q32 11 33 20 Q30 15.5 20 16.5 Q10 15.5 7 20Z" fill="#8B5A2B"/>
+  <ellipse cx="8" cy="26" rx="2" ry="2.5" fill="#FFF0DC"/>
+  <ellipse cx="32" cy="26" rx="2" ry="2.5" fill="#FFF0DC"/>
+  <ellipse cx="12" cy="28.5" rx="3.2" ry="1.8" fill="#F4B8B8" opacity="0.45"/>
+  <ellipse cx="28" cy="28.5" rx="3.2" ry="1.8" fill="#F4B8B8" opacity="0.45"/>
+  <path d="M13.5 26 Q16 23.5 18.5 26" stroke="#3B2A1A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M21.5 26 Q24 23.5 26.5 26" stroke="#3B2A1A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M17 31 Q20 33.5 23 31" stroke="#C07070" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>`,
+},
+
+// ── 5. 马尾·点眼 ─────────────────────────────────────────
+{
+  id:'pony', label:'马尾·活泼',
+  desc:'侧马尾，圆点眼，活泼感',
+  svg:`<svg viewBox="0 0 40 40" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="#E8F4E8"/>
+  <ellipse cx="20" cy="16" rx="14" ry="11" fill="#5A3A1A"/>
+  <!-- 马尾 -->
+  <path d="M31 15 Q38 19 36 30 Q34 35 31 33 Q34 28 32 22 Q31 18 28 16Z" fill="#5A3A1A"/>
+  <ellipse cx="20" cy="26" rx="12" ry="13" fill="#FFF5E6"/>
+  <path d="M7 20 Q8 11 20 12 Q32 11 33 20 Q30 15.5 20 16.5 Q10 15.5 7 20Z" fill="#5A3A1A"/>
+  <ellipse cx="8" cy="26" rx="2" ry="2.5" fill="#FFF5E6"/>
+  <ellipse cx="11.5" cy="28.5" rx="3" ry="1.8" fill="#F4A7A7" opacity="0.4"/>
+  <ellipse cx="28" cy="28.5" rx="3" ry="1.8" fill="#F4A7A7" opacity="0.4"/>
+  <circle cx="16" cy="26" r="1.8" fill="#3B2A1A"/>
+  <circle cx="24" cy="26" r="1.8" fill="#3B2A1A"/>
+  <circle cx="16.7" cy="25.3" r="0.65" fill="white"/>
+  <circle cx="24.7" cy="25.3" r="0.65" fill="white"/>
+  <path d="M17 31 Q20 33.5 23 31" stroke="#C07070" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>`,
+},
+
+// ── 6. 双辫·软紫 ─────────────────────────────────────────
+{
+  id:'braid', label:'双辫·软紫',
+  desc:'浅紫发色，圆点眼，清新',
+  svg:`<svg viewBox="0 0 40 40" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="#EAE0F5"/>
+  <ellipse cx="20" cy="16" rx="14" ry="11" fill="#6A5080"/>
+  <ellipse cx="20" cy="26" rx="12" ry="13" fill="#FFF0FA"/>
+  <path d="M7 20 Q8 11 20 12 Q32 11 33 20 Q30 15.5 20 16.5 Q10 15.5 7 20Z" fill="#6A5080"/>
+  <!-- 两侧编辫 -->
+  <ellipse cx="7" cy="24" rx="2.2" ry="4" fill="#6A5080"/>
+  <ellipse cx="7" cy="31" rx="2" ry="3.5" fill="#6A5080"/>
+  <ellipse cx="33" cy="24" rx="2.2" ry="4" fill="#6A5080"/>
+  <ellipse cx="33" cy="31" rx="2" ry="3.5" fill="#6A5080"/>
+  <ellipse cx="11.5" cy="28.5" rx="3" ry="1.8" fill="#E8A0D0" opacity="0.45"/>
+  <ellipse cx="28.5" cy="28.5" rx="3" ry="1.8" fill="#E8A0D0" opacity="0.45"/>
+  <circle cx="16" cy="26" r="1.8" fill="#3B2060"/>
+  <circle cx="24" cy="26" r="1.8" fill="#3B2060"/>
+  <circle cx="16.7" cy="25.3" r="0.65" fill="white"/>
+  <circle cx="24.7" cy="25.3" r="0.65" fill="white"/>
+  <path d="M17 31 Q20 33.5 23 31" stroke="#A060A0" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>`,
+},
+
+// ── 7. 丸子·黑发 ─────────────────────────────────────────
+{
+  id:'bun_dark', label:'黑发丸子',
+  desc:'黑发，米肤，弯眼微笑',
+  svg:`<svg viewBox="0 0 40 40" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="#E8E0D8"/>
+  <ellipse cx="20" cy="17" rx="14" ry="12" fill="#2A1F1A"/>
+  <circle cx="10" cy="10" r="6" fill="#2A1F1A"/>
+  <circle cx="30" cy="10" r="6" fill="#2A1F1A"/>
+  <ellipse cx="20" cy="26" rx="12" ry="13" fill="#FFF5EE"/>
+  <path d="M7 20 Q9 12 20 13 Q31 12 33 20 Q29 16 20 16.5 Q11 16 7 20Z" fill="#2A1F1A"/>
+  <ellipse cx="12" cy="28.5" rx="3.2" ry="1.8" fill="#F4A7A7" opacity="0.4"/>
+  <ellipse cx="28" cy="28.5" rx="3.2" ry="1.8" fill="#F4A7A7" opacity="0.4"/>
+  <path d="M13.5 25.5 Q16 23 18.5 25.5" stroke="#2A1F1A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M21.5 25.5 Q24 23 26.5 25.5" stroke="#2A1F1A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M17 30.5 Q20 33 23 30.5" stroke="#B06060" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>`,
+},
+
+// ── 8. 短发·弯眼·深色底 ──────────────────────────────────
+{
+  id:'dark_bg', label:'深色底·清新',
+  desc:'深色背景，浅肤色脸，对比感强',
+  svg:`<svg viewBox="0 0 40 40" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="20" fill="#313244"/>
+  <ellipse cx="20" cy="16" rx="14" ry="11" fill="#89B4FA"/>
+  <ellipse cx="20" cy="26" rx="12" ry="13" fill="#FFF0DC"/>
+  <path d="M7 20 Q8 11 20 12 Q32 11 33 20 Q30 15.5 20 16.5 Q10 15.5 7 20Z" fill="#89B4FA"/>
+  <ellipse cx="8" cy="26" rx="2" ry="2.5" fill="#FFF0DC"/>
+  <ellipse cx="32" cy="26" rx="2" ry="2.5" fill="#FFF0DC"/>
+  <ellipse cx="12" cy="28.5" rx="3" ry="1.8" fill="#F4A7C0" opacity="0.5"/>
+  <ellipse cx="28" cy="28.5" rx="3" ry="1.8" fill="#F4A7C0" opacity="0.5"/>
+  <path d="M13.5 26 Q16 23.5 18.5 26" stroke="#2A2A3A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M21.5 26 Q24 23.5 26.5 26" stroke="#2A2A3A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M17 31 Q20 33.5 23 31" stroke="#C07090" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+</svg>`,
+},
+
+];
+
+const grid = document.getElementById('grid');
+A.forEach(av => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="previews">
+      <div class="preview-wrap"><div class="av64">${av.svg}</div><span>64px</span></div>
+      <div class="preview-wrap"><div class="av28">${av.svg}</div><span>28px</span></div>
+    </div>
+    <div class="card-label">${av.label}</div>
+    <div class="card-desc">${av.desc}</div>
+  `;
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    document.getElementById('out').textContent = av.svg.trim();
+  });
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>

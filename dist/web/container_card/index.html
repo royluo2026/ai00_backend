@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>内容详情</title>
+  
+  <link rel="stylesheet" href="/assets/index-95c48af8.css">
+</head>
+<body class="cc-page">
+  <!-- ── 标题栏 ─────────────────────────────────────────────── -->
+  <div id="ccToolbar">
+    <button class="cc-toolbar-back" id="ccBackBtn" title="返回">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      返回
+    </button>
+    <span class="cc-toolbar-title" id="ccTitle">内容详情</span>
+    <div class="cc-toolbar-actions" id="ccToolbarActions"></div>
+  </div>
+
+  <!-- ── 主内容区 ────────────────────────────────────────────── -->
+  <div id="ccBody"></div>
+
+  <!-- ── Mode 脚本 ──────────────────────────────────────────── -->
+  <script src="/web/components/draw_primitives.js"></script>
+  <script src="/web/components/entry_thread.js"></script>
+  <script src="../assets/lib/marked.min.js"></script>
+  <script src="modes/container_item_detail.js"></script>
+  <script src="modes/mode_markdown.js"></script>
+  <script src="modes/mode_image_gallery.js"></script>
+  <script src="modes/mode_text_image.js"></script>
+  <script src="modes/mode_webview.js"></script>
+  <script src="modes/mode_pdf.js"></script>
+  <script src="modes/mode_spreadsheet.js"></script>
+  <script src="modes/mode_field_detail.js"></script>
+  <script src="modes/mode_script.js"></script>
+  <script src="modes/mode_richtext.js"></script>
+  <script src="viewer.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+/* std_op_lib.css — ListShell 版（旧卡片布局 CSS 已清除）*/
+
+/* ── 基础重置 ─────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { overflow: hidden; }
+
+/* ── 状态 badge ────────────────────────────────────────────────── */
+.badge         { padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+.badge-draft   { background: rgba(108,112,134,.2);  color: var(--text-muted, #a6adc8); }
+.badge-active  { background: rgba(166,227,161,.15); color: var(--color-success, #a6e3a1); }
+.badge-deprecated { background: rgba(243,139,168,.15); color: var(--color-danger, #f38ba8); }
+
+/* ── 操作按钮（行内）───────────────────────────────────────────── */
+.btn-sm   { padding: 3px 8px; font-size: 12px; }
+.btn-ghost  { background: transparent; color: var(--text-normal, #cdd6f4); border: 1px solid var(--border-default, #313244); border-radius: 5px; padding: 5px 12px; cursor: pointer; font-size: 13px; }
+.btn-ghost:hover { background: rgba(255,255,255,.05); }
+.btn-danger { background: rgba(243,139,168,.15); color: var(--color-danger, #f38ba8); border: 1px solid var(--color-danger, #f38ba8); border-radius: 5px; padding: 5px 12px; cursor: pointer; font-size: 13px; }
+
+/* ── 新建工序弹窗（body 兄弟节点，position:fixed）────────────────── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.modal-overlay.hidden { display: none; }
+.modal { background: var(--bg-secondary, #181825); border: 1px solid var(--border-default, #313244); border-radius: 10px; padding: 24px; width: 360px; }
+.modal-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text-normal, #cdd6f4); }
+.modal label { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; font-size: 12px; color: var(--text-muted, #a6adc8); }
+.modal input, .modal select { background: var(--bg-primary, #1e1e2e); color: var(--text-normal, #cdd6f4); border: 1px solid var(--border-default, #313244); border-radius: 5px; padding: 7px 10px; font-size: 13px; width: 100%; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.btn-primary { background: var(--color-accent, #89b4fa); color: var(--bg-primary, #1e1e2e); border: none; border-radius: 5px; padding: 6px 14px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.btn-primary:hover { opacity: .85; }
+
+/* ── 分组标题行 ──────────────────────────────────────────────── */
+.vm-group-header-row td {
+  background: rgba(137,180,250,.06) !important;
+  color: var(--color-accent, #89b4fa);
+  border-top: 1px solid var(--border-default, #313244);
+}
+[data-theme="light"] .vm-group-header-row td {
+  background: rgba(30,102,245,.05) !important;
+}
+
+/* ── ViewManager 工具栏覆盖 ─────────────────────────────────── */
+.ls-vm-bar .vm-toolbar {
+  padding: 6px 14px;
+  background: var(--bg-secondary, #181825);
+  border-bottom: 1px solid var(--border-default, #313244);
+}
+.ls-vm-bar .vm-panel { z-index: 100; background: var(--bg-secondary, #181825); border-color: var(--border-default, #313244); color: var(--text-normal, #cdd6f4); }
+.ls-vm-bar .vm-panel-title { color: var(--text-muted, #a6adc8); border-color: var(--border-default, #313244); }
+.ls-vm-bar .vm-panel-footer { border-color: var(--border-default, #313244); }
+.ls-vm-bar .vm-btn,
+.ls-vm-bar .app-btn { background: transparent; color: var(--text-normal, #cdd6f4); border-color: var(--border-default, #313244); }
+.ls-vm-bar .app-btn:hover { background: rgba(255,255,255,.06); }
+.ls-vm-bar .app-btn-primary { background: var(--color-accent, #89b4fa); color: var(--bg-primary, #1e1e2e); border-color: var(--color-accent, #89b4fa); }
+.ls-vm-bar .vm-badge { background: var(--color-accent, #89b4fa); }
+.ls-vm-bar .vm-field-row label,
+.ls-vm-bar .vm-view-item-name { color: var(--text-normal, #cdd6f4); }
+.ls-vm-bar .vm-view-item.active { background: rgba(137,180,250,.15); color: var(--color-accent, #89b4fa); }
+.ls-vm-bar .vm-view-item:hover { background: rgba(255,255,255,.05); }
+.ls-vm-bar .vm-sel-sm,
+.ls-vm-bar .vm-inp-sm { background: var(--bg-primary, #1e1e2e); border-color: var(--border-default, #313244); color: var(--text-normal, #cdd6f4); }
+.ls-vm-bar .vm-icon-btn { color: var(--text-muted, #a6adc8); }
+.ls-vm-bar .vm-icon-btn:hover { background: rgba(255,255,255,.08); color: var(--text-normal, #cdd6f4); }
+
+[data-theme="light"] .ls-vm-bar .app-btn:hover  { background: rgba(0,0,0,.06); }
+[data-theme="light"] .ls-vm-bar .vm-view-item:hover { background: rgba(0,0,0,.05); }
+[data-theme="light"] .ls-vm-bar .vm-icon-btn:hover  { background: rgba(0,0,0,.08); color: var(--text-normal, #4c4f69); }

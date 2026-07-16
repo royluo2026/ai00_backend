@@ -1,0 +1,312 @@
+/* ─────────────────────────────────────────────────────────
+   GanttView  —  通用甘特图组件样式
+   ───────────────────────────────────────────────────────── */
+
+.gantt-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  font-size: 13px;
+  user-select: none;
+}
+
+/* 顶部工具栏 */
+.gantt-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--gantt-border, #313244);
+  flex-shrink: 0;
+  background: var(--gantt-surface, #181825);
+}
+
+.gantt-toolbar-label {
+  font-size: 12px;
+  color: var(--gantt-text-muted, #a6adc8);
+  margin-right: 4px;
+}
+
+.gantt-zoom-btn {
+  padding: 2px 10px;
+  font-size: 11px;
+  border: 1px solid var(--gantt-border, #313244);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--gantt-text-muted, #a6adc8);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+.gantt-zoom-btn:hover { background: var(--gantt-hover, rgba(255,255,255,.06)); color: var(--gantt-text, #cdd6f4); }
+.gantt-zoom-btn.active { background: var(--gantt-accent, #89b4fa); border-color: var(--gantt-accent, #89b4fa); color: #fff; }
+
+.gantt-nav-btn {
+  padding: 2px 8px;
+  font-size: 13px;
+  border: 1px solid var(--gantt-border, #313244);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--gantt-text-muted, #a6adc8);
+  cursor: pointer;
+}
+.gantt-nav-btn:hover { background: var(--gantt-hover, rgba(255,255,255,.06)); color: var(--gantt-text, #cdd6f4); }
+
+.gantt-today-btn {
+  padding: 2px 10px;
+  font-size: 11px;
+  border: 1px solid var(--gantt-border, #313244);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--gantt-text-muted, #a6adc8);
+  cursor: pointer;
+  margin-left: 4px;
+}
+.gantt-today-btn:hover { background: var(--gantt-hover, rgba(255,255,255,.06)); color: var(--gantt-text, #cdd6f4); }
+
+.gantt-date-label {
+  font-size: 12px;
+  color: var(--gantt-text-muted, #a6adc8);
+  min-width: 120px;
+  text-align: center;
+}
+
+/* 主体区域 */
+.gantt-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 左侧标签列 */
+.gantt-labels {
+  flex-shrink: 0;
+  width: 200px;
+  border-right: 1px solid var(--gantt-border, #313244);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gantt-labels-header {
+  height: 40px;
+  border-bottom: 1px solid var(--gantt-border, #313244);
+  background: var(--gantt-surface, #181825);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gantt-text-muted, #a6adc8);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  flex-shrink: 0;
+}
+
+.gantt-labels-rows {
+  flex: 1;
+  overflow-y: hidden;
+}
+
+.gantt-label-row {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--gantt-row-border, rgba(49,50,68,.5));
+  font-size: 12px;
+  color: var(--gantt-text, #cdd6f4);
+  overflow: hidden;
+}
+
+.gantt-label-row:hover {
+  background: var(--gantt-hover, rgba(255,255,255,.03));
+}
+
+.gantt-label-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.gantt-label-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* 右侧时间轴区 */
+.gantt-chart {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.gantt-chart-scroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 时间轴表头 */
+.gantt-timeline-header {
+  flex-shrink: 0;
+  height: 40px;
+  position: relative;
+  border-bottom: 1px solid var(--gantt-border, #313244);
+  background: var(--gantt-surface, #181825);
+}
+
+.gantt-header-cell {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--gantt-text-muted, #a6adc8);
+  border-right: 1px solid var(--gantt-border, #313244);
+  font-weight: 500;
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.gantt-header-cell.today-col {
+  color: var(--gantt-accent, #89b4fa);
+  font-weight: 700;
+}
+
+/* 甘特图行区域 */
+.gantt-rows-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.gantt-row-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 36px;
+  border-bottom: 1px solid var(--gantt-row-border, rgba(49,50,68,.5));
+}
+
+.gantt-row-bg:hover { background: var(--gantt-hover, rgba(255,255,255,.02)); }
+.gantt-row-bg.alt { background: var(--gantt-alt-row, rgba(0,0,0,.12)); }
+
+/* 竖向网格线 */
+.gantt-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--gantt-grid, rgba(49,50,68,.4));
+}
+
+.gantt-grid-line.today-line {
+  background: var(--gantt-accent, #89b4fa);
+  opacity: 0.7;
+  width: 2px;
+  z-index: 2;
+}
+
+/* 甘特条 */
+.gantt-bar {
+  position: absolute;
+  height: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.1s;
+  z-index: 3;
+}
+.gantt-bar:hover { opacity: 0.85; filter: brightness(1.1); }
+
+/* 计划条 */
+.gantt-bar-plan {
+  background: var(--gantt-accent, #89b4fa);
+  opacity: 0.7;
+  top: 7px;
+}
+
+/* 实际条 */
+.gantt-bar-actual {
+  background: #a6e3a1;
+  opacity: 0.85;
+  top: 17px;
+}
+
+/* 今日为止完成标记（实际 > 计划 时超出部分） */
+.gantt-bar-actual.overrun {
+  background: #f38ba8;
+}
+
+/* 甘特条 tooltip */
+.gantt-bar-tip {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gantt-tooltip-bg, #24273a);
+  border: 1px solid var(--gantt-border, #313244);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--gantt-text, #cdd6f4);
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+}
+
+.gantt-bar-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--gantt-border, #313244);
+}
+
+/* 空状态 */
+.gantt-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gantt-text-muted, #a6adc8);
+  font-size: 13px;
+}
+
+/* 图例 */
+.gantt-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 12px;
+  font-size: 11px;
+  color: var(--gantt-text-muted, #a6adc8);
+  margin-left: auto;
+}
+
+.gantt-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.gantt-legend-swatch {
+  width: 20px;
+  height: 8px;
+  border-radius: 2px;
+}

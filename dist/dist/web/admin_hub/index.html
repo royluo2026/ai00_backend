@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>管理中心</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #1e1e2e; --bg2: #181825; --sidebar-bg: #13131f;
+    --text: #cdd6f4; --text-muted: #6c7086; --accent: #89b4fa;
+    --border: #313244; --hover: #2a2a3d; --active: #2d3561;
+  }
+  [data-theme="light"] {
+    --bg: #eff1f5; --bg2: #e6e9ef; --sidebar-bg: #dce0e8;
+    --text: #4c4f69; --text-muted: #9ca0b0; --accent: #1e66f5;
+    --border: #ccd0da; --hover: #e0e4ef; --active: #c0c8f0;
+  }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+  .layout { display: flex; height: 100%; }
+  .sidebar {
+    width: 180px; flex-shrink: 0; background: var(--sidebar-bg);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    padding: 8px 0; overflow-y: auto;
+  }
+  .sidebar-title {
+    font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--text-muted);
+    text-transform: uppercase; padding: 4px 16px 8px; user-select: none;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+    cursor: pointer; border-radius: 6px; margin: 1px 6px; font-size: 13px;
+    color: var(--text); transition: background .15s;
+  }
+  .nav-item:hover { background: var(--hover); }
+  .nav-item.active { background: var(--active); color: var(--accent); }
+  .nav-item svg { flex-shrink: 0; }
+  .content { flex: 1; overflow: hidden; }
+  .content iframe { width: 100%; height: 100%; border: none; display: block; }
+  .placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; color: var(--text-muted); gap: 12px;
+  }
+  .placeholder svg { opacity: .4; }
+  .placeholder p { font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-title">管理中心</div>
+    <div id="sidebarNav"></div>
+  </div>
+  <div class="content" id="content">
+    <div class="placeholder" id="placeholder">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <p>选择左侧分类</p>
+    </div>
+    <iframe id="frame" style="display:none"></iframe>
+  </div>
+</div>
+<script>
+  const frame       = document.getElementById('frame');
+  const placeholder = document.getElementById('placeholder');
+
+  const NAV_DEFS = [
+    { id:'admin_bug_tracker',   label:'开发看板',  src:'../admin/bug_tracker.html',
+      icon:'<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>' },
+    { id:'admin_approval',      label:'审批中心', src:'../approval/approval_view.html',
+      icon:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>' },
+    { id:'admin_org',           label:'组织管理',  src:'../org_mgmt/org_mgmt.html',
+      icon:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>' },
+    { id:'admin_capabilities',  label:'系统能力',  src:'../admin/capabilities.html',
+      icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>' },
+    { id:'admin_lists',         label:'清单注册',  src:'../admin/lists_registry.html',
+      icon:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>' },
+    { id:'admin_feature_flags', label:'功能开关',  src:'../admin/feature_flags.html',
+      icon:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>' },
+    { id:'admin_ai_audit',      label:'AI 审计',   src:'../admin/ai_audit.html',
+      icon:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>' },
+    { id:'admin_task_planning',   label:'任务规划',  src:'../admin/task_planning.html',
+      icon:'<circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/>' },
+  ];
+
+  function _meetsVisibility(level) {
+    const u = window.parent?._authUser;
+    const role = u?.system_role || u?.org_role || u?.role || 'member';
+    const rank = { super_admin:3, team_admin:2, project_admin:1, rule_admin:1, knowledge_admin:1, member:0, external:0 };
+    const r = rank[role] ?? 0;
+    if (level === 'super_admin') return r >= 3;
+    if (level === 'team_admin')  return r >= 2;
+    return true;
+  }
+
+  // iframe 加载完成后同步主题（解决时序竞争）
+  frame.addEventListener('load', () => {
+    const theme = document.documentElement.dataset.theme || 'dark';
+    try { frame.contentWindow?.postMessage({ type: 'theme', theme }, '*'); } catch(_) {}
+  });
+
+  function navigate(el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    const src = el.dataset.src;
+    console.log('[AdminHub] navigate called, src=', src, 'frame.src=', frame.src);
+    if (!src) { console.warn('[AdminHub] no src, abort'); return; }
+    placeholder.style.display = 'none';
+    frame.style.display = 'block';
+    if (frame.src !== src) {
+      console.log('[AdminHub] setting frame.src =', src);
+      frame.src = src;
+    } else {
+      console.log('[AdminHub] same src, postMessage theme only');
+      const theme = document.documentElement.dataset.theme || 'dark';
+      try { frame.contentWindow?.postMessage({ type: 'theme', theme }, '*'); } catch(_) {}
+    }
+  }
+
+  function renderNav() {
+    const flags   = window.parent?._featureFlags || {};
+    const container = document.getElementById('sidebarNav');
+
+    // 清空前记住当前激活项的 src，重建后恢复高亮（避免功能开关保存时跳页）
+    const activeSrc = container.querySelector('.nav-item.active')?.dataset.src || null;
+
+    container.innerHTML = '';
+    console.log('[AdminHub] renderNav, featureFlags=', flags);
+
+    NAV_DEFS.forEach(def => {
+      const ff = flags[def.id];
+      if (ff?.visibility && !_meetsVisibility(ff.visibility)) {
+        console.log('[AdminHub] hidden by flag:', def.id);
+        return;
+      }
+
+      const div = document.createElement('div');
+      div.className = 'nav-item';
+      div.dataset.src = def.src;
+      div.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">${def.icon}</svg>${def.label}`;
+      div.addEventListener('click', () => { console.log('[AdminHub] nav-item clicked:', def.id); navigate(div); });
+      container.appendChild(div);
+      console.log('[AdminHub] rendered nav item:', def.id, def.src);
+    });
+
+    // 恢复之前激活的项；若没有（首次加载）则跳转第一项
+    if (activeSrc) {
+      const prev = container.querySelector(`.nav-item[data-src="${CSS.escape(activeSrc)}"]`);
+      if (prev) { prev.classList.add('active'); return; }
+    }
+    const first = container.querySelector('.nav-item');
+    if (first) navigate(first);
+  }
+
+  // 监听 feature-flags-changed，重新渲染侧边栏，并中继到主窗口
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'theme') applyTheme(e.data.theme);
+    if (e.data?.type === 'feature-flags-changed') {
+      renderNav();
+      // 只有来自子 iframe 才向父窗口中继，避免父窗口广播→子→父死循环
+      if (e.source !== window.parent) {
+        try { window.parent?.postMessage({ type: 'feature-flags-changed' }, '*'); } catch(_) {}
+      }
+    }
+  });
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme || 'dark');
+    try { frame.contentWindow?.postMessage({ type: 'theme', theme: theme || 'dark' }, '*'); } catch(_) {}
+  }
+
+  // 先设主题再渲染导航，确保iframe加载时admin_hub自身已有data-theme
+  try { applyTheme(window.parent?.document?.documentElement?.dataset?.theme); } catch(_) {}
+  renderNav();
+</script>
+</body>
+</html>

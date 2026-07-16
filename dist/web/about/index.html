@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #1e1e2e;
+      --bg-card:     #313244;
+      --border:      #45475a;
+      --text-normal: #cdd6f4;
+      --text-muted:  #a6adc8;
+      --text-faint:  #6c7086;
+      --accent:      #89b4fa;
+      --green:       #a6e3a1;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text-normal);
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      -webkit-app-region: no-drag;
+      user-select: none;
+    }
+
+    /* ── 标题栏 ── */
+    .titlebar {
+      height: 32px;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 8px;
+      -webkit-app-region: drag;
+      flex-shrink: 0;
+    }
+    .titlebar-close {
+      -webkit-app-region: no-drag;
+      width: 24px; height: 24px;
+      border: none; background: none; cursor: pointer;
+      color: var(--text-faint);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .1s, color .1s;
+    }
+    .titlebar-close:hover { background: rgba(243,139,168,.18); color: #f38ba8; }
+
+    /* ── 内容 ── */
+    .body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 36px 32px;
+      gap: 0;
+    }
+
+    /* logo */
+    .logo-wrap {
+      width: 72px; height: 72px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+      flex-shrink: 0;
+    }
+    .logo-wrap svg { opacity: .9; }
+
+    /* 产品名 */
+    .product-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-normal);
+      letter-spacing: .02em;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    /* 版本徽标 */
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(137,180,250,.12);
+      border: 1px solid rgba(137,180,250,.25);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      letter-spacing: .03em;
+    }
+    .version-badge svg { opacity: .7; }
+
+    /* 分隔线 */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 22px;
+      opacity: .5;
+    }
+
+    /* 简介 */
+    .desc {
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 340px;
+      margin-bottom: 24px;
+    }
+
+    /* 技术标签行 */
+    .tech-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .tech-tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-faint);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    /* 版权 */
+    .copyright {
+      font-size: 11px;
+      color: var(--text-faint);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="titlebar">
+    <button class="titlebar-close" id="closeBtn" title="关闭">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
+           stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <line x1="1" y1="1" x2="9" y2="9"/>
+        <line x1="9" y1="1" x2="1" y2="9"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="body">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect x="4" y="4" width="32" height="32" rx="8"
+              fill="none" stroke="#89b4fa" stroke-width="2"/>
+        <text x="20" y="27" text-anchor="middle"
+              font-family="-apple-system,Segoe UI,system-ui,sans-serif"
+              font-size="18" font-weight="800" fill="#89b4fa">A</text>
+        <circle cx="32" cy="8" r="4" fill="#a6e3a1"/>
+      </svg>
+    </div>
+
+    <div class="product-name">柔性智能业务基座</div>
+
+    <div class="version-badge">
+      <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 4v4l2.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <span id="versionText">v5.0.0</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="desc">
+      面向制造业的柔性智能业务基座，集成工艺管理、
+      知识库、任务协同与 AI 辅助决策能力，
+      帮助企业快速构建和迭代业务流程。
+    </div>
+
+    <div class="tech-row">
+      <span class="tech-tag">Electron</span>
+      <span class="tech-tag">FastAPI</span>
+      <span class="tech-tag">PostgreSQL</span>
+      <span class="tech-tag">飞书 OAuth</span>
+      <span class="tech-tag">Claude AI</span>
+    </div>
+
+    <div class="copyright" id="copyrightText">
+      Copyright © 2025 AI00 Team · All rights reserved
+    </div>
+
+  </div>
+
+  <script>
+    'use strict';
+    document.getElementById('closeBtn').addEventListener('click', () => window.close());
+
+    // 读版本号
+    window.electronAPI?.getConfig?.().then(cfg => {
+      if (cfg?.version) {
+        document.getElementById('versionText').textContent = 'v' + cfg.version;
+      }
+    }).catch(() => {});
+
+    // 版权年份动态
+    const year = new Date().getFullYear();
+    const cp = document.getElementById('copyrightText');
+    cp.textContent = cp.textContent.replace('2025', year === 2025 ? '2025' : `2025–${year}`);
+  </script>
+</body>
+</html>
