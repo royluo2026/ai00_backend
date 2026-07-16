@@ -245,12 +245,12 @@ def scope_visible_clause(current_user: dict,
         pk_col = f"{prefix}gid"
     sql = (
         f"(share_scope = 'global' "
-        f"OR (share_scope = 'team' AND {team_col} = %s) "
-        f"OR (share_scope = 'project' AND {pk_col} IN "
+        f"OR (share_scope IN ('team','project') AND {pk_col} IN "
         f"  (SELECT project_gid FROM workmanship_auth_project_members WHERE user_gid = %s)) "
+        f"OR (share_scope = 'team' AND {team_col} = %s) "
         f"OR (share_scope = 'local' AND {owner_col} = %s))"
     )
-    return sql, [tid, uid, uid]
+    return sql, [uid, tid, uid]
 
 
 def task_scope_clauses(uid: str, team_id: str, alias: str = "t") -> tuple[str, list]:

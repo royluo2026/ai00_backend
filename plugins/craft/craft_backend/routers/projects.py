@@ -71,7 +71,7 @@ class AddMemberBody(BaseModel):
 
 class LineGrantBody(BaseModel):
     user_gid: Optional[str] = None
-    line_gid: str
+    line_gid: Optional[str] = None
 
 
 class CreateVehicleModelBody(BaseModel):
