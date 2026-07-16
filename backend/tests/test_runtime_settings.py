@@ -65,6 +65,14 @@ def test_cors_allow_origins_splits_csv(monkeypatch):
     ]
 
 
+def test_feishu_redirect_uri_can_point_to_test_public_callback(monkeypatch):
+    settings = make_settings(
+        monkeypatch,
+        FEISHU_REDIRECT_URI='https://workmanship-backend-test.chehejia.com/auth/feishu/callback',
+    )
+    assert settings.feishu_redirect_uri == 'https://workmanship-backend-test.chehejia.com/auth/feishu/callback'
+
+
 def test_cloud_db_url_builder_encodes_mysql_credentials():
     from backend.routers.admin import CloudDbConfigBody, _cloud_db_url_from_payload
 
@@ -221,6 +229,7 @@ def test_cors_allow_origins_defaults_cover_local_and_legacy_clients(monkeypatch)
     assert settings.cors_allow_origins == [
         'http://127.0.0.1:5173',
         'http://localhost:5173',
+        'https://workmanship-web-test.chehejia.com',
         'app://root',
         'null',
     ]

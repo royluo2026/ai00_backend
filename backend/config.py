@@ -30,7 +30,7 @@ _FALLBACK_ENV = {
     "PORT": "8080",
     "PUBLIC_URL": "",
     "BACKEND_BASE_URL": "",
-    "CORS_ALLOW_ORIGINS": "http://127.0.0.1:5173,http://localhost:5173,app://root,null",
+    "CORS_ALLOW_ORIGINS": "http://127.0.0.1:5173,http://localhost:5173,https://workmanship-web-test.chehejia.com,app://root,null",
     "DEBUG": "true",
     "FIRST_SUPER_ADMIN_EMAIL": "",
 }
@@ -229,7 +229,7 @@ class Settings:
         self.debug                    = (_get_with_fallback("DEBUG") or "false").lower() == "true"
         self.public_url               = _get_with_fallback("PUBLIC_URL").rstrip("/")
         self.backend_base_url         = _get_with_fallback("BACKEND_BASE_URL").rstrip("/")
-        self.cors_allow_origins       = _get_csv_list("CORS_ALLOW_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173,app://root,null")
+        self.cors_allow_origins       = _get_csv_list("CORS_ALLOW_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173,https://workmanship-web-test.chehejia.com,app://root,null")
         self.first_super_admin_email  = (_get_with_fallback("FIRST_SUPER_ADMIN_EMAIL") or "").strip().lower()
         # MinIO（可选）
         self.minio_endpoint   = os.getenv("MINIO_ENDPOINT",   "").strip().rstrip("/")

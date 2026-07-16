@@ -16,23 +16,39 @@ def test_start_backend_uses_env_file_host_and_port():
     assert 'elif [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then' in text
 
 
-def test_dockerfile_uses_tracked_runtime_env_file():
+def test_dockerfile_requires_runtime_env_file_in_container():
     text = (REPO_ROOT / 'backend' / 'Dockerfile').read_text(encoding='utf-8')
-    assert 'ENV ENV_FILE=/chj/app/backend/.env.test.example' in text
+    assert 'ENV ENV_FILE=' not in text
     assert 'SERVICE_PORT' not in text
+    assert "assert env_file, 'ENV_FILE is required for container runtime'" in text
     assert 'load_dotenv(env_file, override=True)' in text
     assert "uvicorn.run('backend.main:app'" in text
 
 
-def test_gunicorn_bind_reads_host_and_port_from_env_file():
-    text = (REPO_ROOT / 'backend' / 'gunicorn.conf.py').read_text(encoding='utf-8')
-    assert 'import os' in text
-    assert 'from dotenv import load_dotenv' in text
-    assert 'env_file = os.getenv("ENV_FILE", "").strip()' in text
-    assert 'load_dotenv(env_file, override=False)' in text
-    assert 'host = os.getenv("HOST", "0.0.0.0")' in text
-    assert 'port = int(os.getenv("PORT", "8080") or "8080")' in text
-    assert 'bind             = f"{host}:{port}"' in text
+def test_prepare_test_runtime_env_generates_placeholder_runtime_env():
+    text = (REPO_ROOT / 'scripts' / 'prepare_test_runtime_env.sh').read_text(encoding='utf-8')
+    assert 'TARGET_ENV="$ROOT_DIR/backend/.env.test.runtime"' in text
+    assert 'if [[ -f "$TARGET_ENV" ]]; then' in text
+    assert 'FEISHU_REDIRECT_URI=https://workmanship-backend-test.chehejia.com/auth/feishu/callback' in text
+    assert 'PUBLIC_URL=https://workmanship-backend-test.chehejia.com' in text
+    assert 'CORS_ALLOW_ORIGINS=https://workmanship-web-test.chehejia.com,http://127.0.0.1:5173,http://localhost:5173,app://root,null' in text
+    assert 'OIS_IDAAS_CLIENT_SECRET=' in text
+    assert 'sed -i "s|^JWT_SECRET=.*|JWT_SECRET=你的真实密钥|" "$TARGET_ENV"' in text
+    assert 'ENV_FILE=$TARGET_ENV gunicorn backend.main:app -c backend/gunicorn.conf.py' in text
+
+
+def test_patch_test_runtime_env_supports_flag_based_secret_updates():
+    text = (REPO_ROOT / 'scripts' / 'patch_test_runtime_env.sh').read_text(encoding='utf-8')
+    assert 'TARGET_ENV="$ROOT_DIR/backend/.env.test.runtime"' in text
+    assert 'if [[ ! -f "$TARGET_ENV" ]]; then' in text
+    assert '--jwt-secret VALUE' in text
+    assert '--users-db-url VALUE' in text
+    assert '--ois-idaas-client-secret VALUE' in text
+    assert 'sed -i "s|^${key}=.*|${key}=${escaped}|" "$TARGET_ENV"' in text
+    assert 'patch_key JWT_SECRET "$2"' in text
+    assert 'patch_key USERS_DB_URL "$2"' in text
+    assert 'patch_key OIS_IDAAS_CLIENT_SECRET "$2"' in text
+    assert '已更新运行时配置文件' in text
 
 
 def test_bootstrap_skips_unusable_python_shims_and_checks_python():

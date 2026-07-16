@@ -237,7 +237,13 @@ def get_class_full(gid: str, _u=Depends(get_current_user)):
                 " ORDER BY sort_order, label_zh",
                 (gid,),
             )
-            relations = [dict(r) for r in cur.fetchall()]
+            relations = [
+                {
+                    **dict(r),
+                    "show_in_detail": bool(r["show_in_detail"]) if r.get("show_in_detail") is not None else True,
+                }
+                for r in cur.fetchall()
+            ]
 
             cur.execute(
                 "SELECT * FROM workmanship_onto_axioms WHERE class_gid = %s",
@@ -750,11 +756,15 @@ def update_relation(gid: str, body: dict, _u=Depends(get_current_user)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
+                "SELECT 1 FROM workmanship_onto_relations WHERE gid=%s LIMIT 1",
+                (gid,),
+            )
+            if not cur.fetchone():
+                raise HTTPException(404, "关系不存在")
+            cur.execute(
                 f"UPDATE workmanship_onto_relations SET {sets} WHERE gid=%s",
                 vals,
             )
-            if cur.rowcount == 0:
-                raise HTTPException(404, "关系不存在")
             conn.commit()
     return {"ok": True}
 
