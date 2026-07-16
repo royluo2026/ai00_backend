@@ -514,10 +514,24 @@ def get_project_bop_lines(gid: str, current_user: dict = Depends(get_current_use
 def upsert_line_assignment(gid: str, body: LineGrantBody, current_user: dict = Depends(get_current_user)):
     """按线体授予或撤销 section_lead grant。
     传入 line_gid 为任意一个线体 gid，会自动找到该项目下所有同名线体 gid 并批量操作。
-    传 user_gid=None 则清空所有同名线体的管理员。
+    line_gid 为空时表示项目级操作（项目经理）。
+    传 user_gid=None 则清空管理员。
     """
     if not body.line_gid:
-        raise HTTPException(status_code=400, detail="line_gid 不能为空")
+        # 项目级管理员（项目经理）
+        if not _can_manage_project_lines(current_user, gid):
+            raise HTTPException(status_code=403, detail="权限不足")
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM workmanship_auth_project_members WHERE project_gid=%s AND role='project_manager'", (gid,))
+                if body.user_gid:
+                    cur.execute(
+                        "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role, scope_type, scope_gid) "
+                        "VALUES (%s, %s, %s, 'project_manager', 'project', NULL)",
+                        (str(next_gid()), gid, body.user_gid),
+                    )
+            conn.commit()
+        return {"success": True}
     if not _can_manage_project_lines(current_user, gid):
         raise HTTPException(status_code=403, detail="权限不足")
     with get_conn() as conn:
@@ -551,7 +565,12 @@ def upsert_line_assignment(gid: str, body: LineGrantBody, current_user: dict = D
                 f"DELETE FROM workmanship_auth_permission_grants WHERE grant_type = 'section_lead' AND scope_gid IN ({ph})",
                 all_line_gids,
             )
-            # 批量插入新 grant
+            # 也清理旧的 project_members（之后重新写入）
+            cur.execute(
+                f"DELETE FROM workmanship_auth_project_members WHERE project_gid = %s AND scope_gid IN ({ph})",
+                [gid] + all_line_gids,
+            )
+            # 批量插入新 grant + 同步到 project_members
             if body.user_gid:
                 values_sql = ",".join(["(%s,%s,'section_lead',%s,%s,'')"] * len(all_line_gids))
                 flat = []
@@ -561,5 +580,14 @@ def upsert_line_assignment(gid: str, body: LineGrantBody, current_user: dict = D
                     f"INSERT INTO workmanship_auth_permission_grants (gid, grantee_gid, grant_type, scope_gid, granted_by, note) VALUES {values_sql}",
                     flat,
                 )
+                # 同步写入 project_members（让 scope_visible_clause 看到）
+                try:
+                    cur.execute(
+                        "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role, scope_type, scope_gid) "
+                        "VALUES (%s, %s, %s, 'section_lead', 'line', %s)",
+                        (str(next_gid()), gid, body.user_gid, all_line_gids[0]),
+                    )
+                except Exception:
+                    pass  # 已存在则跳过
         conn.commit()
     return {"success": True}
