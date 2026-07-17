@@ -1,8 +1,0 @@
-{
-  "backendByEnv": {
-    "dev": "",
-    "test": "https://workmanship-backend-test.chehejia.com",
-    "staging": "https://workmanship-backend-staging.chehejia.com",
-    "prod": "https://workmanship-backend.chehejia.com"
-  }
-}
