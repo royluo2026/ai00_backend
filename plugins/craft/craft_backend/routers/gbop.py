@@ -2245,8 +2245,8 @@ def station_autolink(bop_gid: str, body: StationAutolinkBody = StationAutolinkBo
                         cur.execute(
                             "INSERT INTO workmanship_bop_bop_entries"
                             "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                            " title, vpps, vpps_desc, child_vpps)"
-                            " VALUES (%s,%s,%s,'process',%s,%s,4,%s,%s,%s,'[]')",
+                            " title, vpps, vpps_desc, child_vpps, meta)"
+                            " VALUES (%s,%s,%s,'process',%s,%s,4,%s,%s,%s,'[]','{}')",
                             (proc_entry_gid, bop_gid, station_gid,
                              proc_entry.get('seq_no') or 0,
                              station_level + 1,
@@ -2281,8 +2281,8 @@ def station_autolink(bop_gid: str, body: StationAutolinkBody = StationAutolinkBo
                             cur.execute(
                                 "INSERT INTO workmanship_bop_bop_entries"
                                 "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                                " title, vpps, vpps_desc, child_vpps)"
-                                " VALUES (%s,%s,%s,'operation',%s,%s,5,%s,%s,%s,'[]')",
+                                " title, vpps, vpps_desc, child_vpps, meta)"
+                                " VALUES (%s,%s,%s,'operation',%s,%s,5,%s,%s,%s,'[]','{}')",
                                 (op_entry_gid, bop_gid, proc_entry_gid,
                                  op_entry.get('seq_no') or 0,
                                  station_level + 2,
@@ -2326,8 +2326,8 @@ def station_autolink(bop_gid: str, body: StationAutolinkBody = StationAutolinkBo
                                     cur.execute(
                                         "INSERT INTO workmanship_bop_bop_entries"
                                         "(gid, version_gid, parent_gid, node_type, sort_order,"
-                                        " level, ai00_level, title, vpps, vpps_desc, child_vpps)"
-                                        " VALUES (%s,%s,%s,'part',0,%s,6,%s,%s,%s,'[]')",
+                                        " level, ai00_level, title, vpps, vpps_desc, child_vpps, meta)"
+                                        " VALUES (%s,%s,%s,'part',0,%s,6,%s,%s,%s,'[]','{}')",
                                         (part_entry_gid, bop_gid, op_entry_gid,
                                          station_level + 3,
                                          part_title, part_vpps or None, part_title)

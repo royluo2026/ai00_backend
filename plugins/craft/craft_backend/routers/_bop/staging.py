@@ -250,8 +250,8 @@ def promote_staging(gid: str, body: PromoteBody, _u=Depends(_WRITE)):
                     cur.execute(
                         "INSERT INTO workmanship_bop_bop_entries "
                         "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level, "
-                        " title, vpps) "
-                        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                        " title, vpps, meta) "
+                        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'{}')",
                         (entry_gid, version_gid, body.parent_gid,
                          staging['node_type'], body.sort_order, level, ai00_lv,
                          staging['title'], staging['vpps']),

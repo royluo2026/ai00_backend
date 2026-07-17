@@ -370,8 +370,8 @@ def smart_fork_version(source_gid: str, body: SmartForkBody, _u=Depends(_WRITE))
                         cur.execute(
                             "INSERT INTO workmanship_bop_bop_entries "
                             "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                            " title, vpps, parent_bop_title, child_vpps) "
-                            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                            " title, vpps, parent_bop_title, child_vpps, meta) "
+                            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'{}')",
                             (new_gid, new_ver_gid, new_parent,
                              e['node_type'], e['sort_order'], e.get('level', 0),
                              ai00_lv,
@@ -531,8 +531,8 @@ def smart_fork_version(source_gid: str, body: SmartForkBody, _u=Depends(_WRITE))
                         cur.execute(
                             "INSERT INTO workmanship_bop_bop_entries "
                             "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                            " title, vpps, parent_bop_title, child_vpps) "
-                            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                            " title, vpps, parent_bop_title, child_vpps, meta) "
+                            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'{}')",
                             (new_gid, new_ver_gid, new_parent,
                              nt, e['sort_order'], e.get('level', 0),
                              _AI00_LEVEL.get(nt),

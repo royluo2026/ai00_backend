@@ -338,8 +338,8 @@ def _do_copy(version_gid: str, src_gid: str, set_gbop_source: bool,
                 cur.execute(
                     "INSERT INTO workmanship_bop_bop_entries "
                     "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
-                    " title, vpps, vpps_desc, parent_bop_title, child_vpps) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    " title, vpps, vpps_desc, parent_bop_title, child_vpps, meta) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'{}')",
                     (new_gid, version_gid, new_parent,
                      r['node_type'], r['sort_order'], r.get('level', 0),
                      _AI00_LEVEL.get(r['node_type']),

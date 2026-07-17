@@ -342,8 +342,8 @@ def gbop_auto_link(bop_gid: str, _u=Depends(_WRITE)):
                 cur.execute(
                     "INSERT INTO workmanship_bop_bop_entries "
                     "(gid, version_gid, node_type, sort_order, level, ai00_level,"
-                    " title, vpps, vpps_desc, child_vpps) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    " title, vpps, vpps_desc, child_vpps, meta) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'{}')",
                     (new_entry_gid, bop_gid,
                      gbop_entry['node_type'], gbop_entry['sort_order'],
                      gbop_entry.get('level', 0), gbop_entry.get('ai00_level', 5),
@@ -415,8 +415,8 @@ def gbop_auto_link(bop_gid: str, _u=Depends(_WRITE)):
                     cur.execute(
                         "INSERT INTO workmanship_bop_bop_entries "
                         "(gid, version_gid, node_type, sort_order, level, ai00_level,"
-                        " title, vpps, vpps_desc, child_vpps) "
-                        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                        " title, vpps, vpps_desc, child_vpps, meta) "
+                        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'{}')",
                         (extra_entry_gid, bop_gid,
                          extra_ge['node_type'], extra_ge['sort_order'],
                          extra_ge.get('level', 0), extra_ge.get('ai00_level', 5),

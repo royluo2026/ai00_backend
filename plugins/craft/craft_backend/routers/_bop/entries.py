@@ -51,6 +51,7 @@ class CreateEntryBody(BaseModel):
     vpps_desc:        Optional[str] = None
     parent_bop_title: Optional[str] = None
     position:         Optional[str] = None  # operator_process 位置 A-F → bop_operator.ext.position
+    meta:             Optional[dict] = None  # 创建时携带的 meta 初始值
 
     def get_version_gid(self) -> str:
         return self.bop_version_gid or self.version_gid
@@ -66,6 +67,7 @@ class UpdateEntryBody(BaseModel):
     parent_bop_title: Optional[str]   = None
     process_flow_pic: Optional[list]  = None
     cad_sim_pics:     Optional[list]  = None
+    meta:             Optional[dict]  = None
 
 
 class ImportTcBody(BaseModel):
@@ -455,7 +457,7 @@ def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
                 (entry_gid, ver_gid, body.parent_gid, body.node_type,
                  body.sort_order, level, ai00_lv,
                  body.title, body.vpps, body.vpps_desc, '', False, '', '',
-                 body.parent_bop_title, json.dumps({}), None)
+                 body.parent_bop_title, json.dumps(body.meta or {}), None)
             )
 
             if entity_info:
@@ -529,7 +531,12 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
         import json as _json
         set_parts.append("process_flow_pic=%s")
         vals.append(_json.dumps(_normalize_bop_pic_items(data['process_flow_pic'])))
-    if 'cad_sim_pics' in data:
+    if 'meta' in data:
+        import json as _json
+        # 前端传来的 meta 是完整合并后的对象，整体覆盖 meta JSON 列
+        set_parts.append("meta=CAST(%s AS JSON)")
+        vals.append(_json.dumps(data['meta']))
+    elif 'cad_sim_pics' in data:
         import json as _json
         set_parts.append("meta=JSON_SET(IFNULL(meta,'{}'),'$.cad_sim_pics',CAST(%s AS JSON))")
         vals.append(_json.dumps(data['cad_sim_pics']))
@@ -564,17 +571,18 @@ def update_entry(gid: str, body: UpdateEntryBody, _u=Depends(_WRITE)):
                 )
                 lnk = cur.fetchone()
                 if lnk:
-                    _ENTITY_TITLE_TABLES = {
-                        'bop_line': 'workmanship_bop_bop_line',
-                        'bop_station': 'workmanship_bop_bop_station',
-                        'bop_process': 'workmanship_bop_bop_process',
-                        'bop_steps': 'workmanship_bop_bop_steps',
-                        'bop_operator': 'workmanship_bop_bop_operator',
+                    _ENTITY_SYNC = {
+                        'bop_line':     ('workmanship_bop_bop_line',     'title'),
+                        'bop_station':  ('workmanship_bop_bop_station',  'title'),
+                        'bop_process':  ('workmanship_bop_bop_process',  'name'),
+                        'bop_steps':    ('workmanship_bop_bop_steps',    'title'),
+                        'bop_operator': ('workmanship_bop_bop_operator', 'title'),
                     }
-                    t = _ENTITY_TITLE_TABLES.get(lnk['link_type'])
-                    if t:
+                    sync = _ENTITY_SYNC.get(lnk['link_type'])
+                    if sync:
+                        t, col = sync
                         try:
-                            cur.execute(f"UPDATE {t} SET title=%s WHERE gid=%s",
+                            cur.execute(f"UPDATE {t} SET {col}=%s WHERE gid=%s",
                                         (data['title'], lnk['entity_gid']))
                         except Exception as _e:
                             _log.warning("entity title sync skipped for gid=%s link_type=%s: %s",
@@ -979,10 +987,10 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                                  r.get('headcount', 1))
                             )
                         elif node_type == 'process':
-                            # bop_process 有 bop_version_gid NOT NULL + vpps_desc
+                            # bop_process 有 bop_version_gid NOT NULL + vpps_desc，name 列（非 title）
                             cur.execute(
                                 "INSERT IGNORE INTO workmanship_bop_bop_process"
-                                "(gid, project_gid, bop_version_gid, title, vpps, vpps_desc)"
+                                "(gid, project_gid, bop_version_gid, name, vpps, vpps_desc)"
                                 " VALUES (%s,%s,%s,%s,%s,%s)",
                                 (ent_gid, project_gid, version_gid, title, vpps, vpps_desc)
                             )
@@ -1009,8 +1017,8 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         "(gid, version_gid, parent_gid, node_type,"
                         " sort_order, level, ai00_level,"
                         " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
-                        " parent_bop_title, child_vpps)"
-                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]')",
+                        " parent_bop_title, child_vpps, meta)"
+                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]','{}')",
                         (e_gid, version_gid, parent_gid, node_type,
                          sort_val, lv, ai00_lv,
                          title, vpps, vpps_desc,
@@ -1257,11 +1265,20 @@ def auto_link_entries(version_gid: str, body: AutoLinkBody = AutoLinkBody(), _u=
                         else:
                             entity_gid = str(next_gid())
                             title = e['title'] or '（未命名）'
-                            cur.execute(
-                                f"INSERT INTO {table} "
-                                f"(gid, project_gid, title, vpps) VALUES (%s,%s,%s,%s)",
-                                (entity_gid, project_gid, title, entry_vpps or None),
-                            )
+                            # bop_process 用 name 列且需要 bop_version_gid
+                            if table == 'workmanship_bop_bop_process':
+                                cur.execute(
+                                    f"INSERT INTO {table} "
+                                    f"(gid, project_gid, bop_version_gid, name, vpps)"
+                                    f" VALUES (%s,%s,%s,%s,%s)",
+                                    (entity_gid, project_gid, version_gid, title, entry_vpps or None),
+                                )
+                            else:
+                                cur.execute(
+                                    f"INSERT INTO {table} "
+                                    f"(gid, project_gid, title, vpps) VALUES (%s,%s,%s,%s)",
+                                    (entity_gid, project_gid, title, entry_vpps or None),
+                                )
                             entry_result['link_action'] = 'created'
                             entry_result['message'] = f'新建 stub 实体 {entity_gid[:8]}…'
 
@@ -1604,8 +1621,8 @@ def patch_entity_detail(body: EntityPatchBody, _u=Depends(_WRITE)):
 
             cur.execute(
                 "SELECT column_name FROM information_schema.columns "
-                "WHERE table_schema=%s AND table_name=%s",
-                tuple(table.split('.')) if '.' in table else ('public', table),
+                "WHERE table_schema=DATABASE() AND table_name=%s",
+                (table,),
             )
             real_cols = {r['column_name'] for r in cur.fetchall()}
             fields = {k: v for k, v in fields.items() if k in real_cols}

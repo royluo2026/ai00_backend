@@ -797,10 +797,10 @@ class LayoutDetailPanel {
     this._currentRow = null;
     this._show();
     this._renderEmptyTree();
-    this._propsBody.innerHTML = '';
-    this._relsBody.innerHTML = '';
-    this._rulesBody.innerHTML = '';
-    this._knowBody.innerHTML = '';
+    if (this._propsBody) this._propsBody.innerHTML = '';
+    if (this._relsBody) this._relsBody.innerHTML = '';
+    if (this._rulesBody) this._rulesBody.innerHTML = '';
+    if (this._knowBody) this._knowBody.innerHTML = '';
     this._renderDetailEmpty();
   }
 
@@ -2113,6 +2113,7 @@ class LayoutDetailPanel {
   // ── 列5：知识 ─────────────────────────────────────────────────────────────
 
   async _renderKnowledge(gid) {
+    if (!this._knowBody) return;
     this._knowBody.innerHTML = '';
     try {
       const resp = await this._cf(
@@ -2718,6 +2719,7 @@ class LayoutDetailPanel {
   // ── 列2：关系 ─────────────────────────────────────────────────────────────
 
   async _renderRels(gid) {
+    if (!this._relsBody) return;
     this._relsBody.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:8px">加载中…</div>';
     const data = this._getLineageData();
     const lineGrantSet = data?.lineGrantSet || new Set();
@@ -3400,6 +3402,7 @@ class LayoutDetailPanel {
   // ── 列5：知识 ─────────────────────────────────────────────────────────────
 
   async _renderKnowledge(gid) {
+    if (!this._knowBody) return;
     this._knowBody.innerHTML = '';
     try {
       const resp = await this._cf(
@@ -3728,10 +3731,10 @@ class LayoutDetailPanel {
       // 重绘树（空选中态）
       if (this._verSlot || this._lineSlot || this._treeBody) {
         this._renderTree(null);
-        this._propsBody.innerHTML = '';
-        this._relsBody.innerHTML  = '';
-        this._rulesBody.innerHTML = '';
-        this._knowBody.innerHTML  = '';
+        if (this._propsBody) this._propsBody.innerHTML = '';
+        if (this._relsBody) this._relsBody.innerHTML  = '';
+        if (this._rulesBody) this._rulesBody.innerHTML = '';
+        if (this._knowBody) this._knowBody.innerHTML  = '';
         this._renderDetailEmpty();
       }
       return;

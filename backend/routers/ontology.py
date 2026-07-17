@@ -407,7 +407,7 @@ def list_db_tables(_u=Depends(get_current_user)):
             cur.execute("""
                 SELECT TABLE_NAME AS table_name
                 FROM information_schema.TABLES
-                WHERE TABLE_SCHEMA = 'ai00'
+                WHERE TABLE_SCHEMA = DATABASE()
                   AND TABLE_TYPE = 'BASE TABLE'
                 ORDER BY TABLE_NAME
             """)
@@ -481,7 +481,7 @@ def list_class_individuals(gid: str, limit: int = 20, _u=Depends(get_current_use
                 table_part = entity_table.split(".", 1)[-1]
                 cur.execute("""
                     SELECT COLUMN_NAME AS column_name FROM information_schema.COLUMNS
-                    WHERE TABLE_SCHEMA='ai00' AND TABLE_NAME=%s
+                    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s
                 """, (table_part,))
                 cols = {r["column_name"] for r in cur.fetchall()}
 
@@ -501,7 +501,7 @@ def list_class_individuals(gid: str, limit: int = 20, _u=Depends(get_current_use
                 elif "deleted_at" in cols:
                     where = "WHERE deleted_at IS NULL"
 
-                select_sql = ", ".join(f'"{c}"' for c in display_cols)
+                select_sql = ", ".join(f'`{c}`' for c in display_cols)
                 cur.execute(
                     f"SELECT {select_sql} FROM {entity_table} {where}"
                     f" ORDER BY gid DESC LIMIT %s",
@@ -559,7 +559,7 @@ def sync_props_from_table(gid: str, _u=Depends(get_current_user)):
                        DATA_TYPE   AS data_type,
                        IS_NULLABLE AS is_nullable
                 FROM information_schema.COLUMNS
-                WHERE TABLE_SCHEMA = 'ai00' AND TABLE_NAME = %s
+                WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s
                 ORDER BY ORDINAL_POSITION
             """, (table_part,))
             db_cols = {r["column_name"]: dict(r) for r in cur.fetchall()}
@@ -1183,7 +1183,6 @@ _SEED_RELATIONS = [
     ("operation", "needsTool",     "需求工具",   "tool_need",        False, "工步工具需求",             "project_tools"),
     ("operation", "needsFixture",  "需求工装",   "fixture_need",     False, "工步工装需求",             "project_tooling"),
     ("operation", "needsRole",     "需求岗位",   "man",              False, "工步岗位需求",             "project_roles"),
-    ("operation", "usesPart",      "装配零件",   "PartEntity",       False, "工步装配的零件",           "pbom_part"),
     ("operation", "hasIssue",      "关联问题",   "issue",            False, "工步关联的问题",           "issue"),
     ("operation", "hasTask",       "关联任务",   "standard_task",    False, "工步关联的任务",           "task_std"),
     ("operation", "hasKnowledge",  "引用知识",   "knowledge_node",   False, "工步引用的知识条目",       "knowledge"),
@@ -1422,7 +1421,7 @@ def _get_real_cols(cur, entity_table: str) -> set:
     table_part = entity_table.split(".", 1)[-1]
     cur.execute(
         "SELECT COLUMN_NAME AS column_name FROM information_schema.COLUMNS"
-        " WHERE TABLE_SCHEMA='ai00' AND TABLE_NAME=%s",
+        " WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s",
         (table_part,),
     )
     return {r["column_name"] for r in cur.fetchall()}
@@ -1460,7 +1459,7 @@ def get_entity_props(entry_gid: str, _u=Depends(get_current_user)):
             if not select_cols:
                 return {"data": {}, "node_type": node_type, "entity_gid": entity_gid}
 
-            cols_sql = ", ".join(f'"{c}"' for c in select_cols)
+            cols_sql = ", ".join(f'`{c}`' for c in select_cols)
             cur.execute(f"SELECT {cols_sql} FROM {entity_table} WHERE gid=%s", (entity_gid,))
             entity = cur.fetchone()
             if not entity:
@@ -1486,6 +1485,24 @@ def get_entity_props(entry_gid: str, _u=Depends(get_current_user)):
                     for db_k, val in ext_val.items():
                         prop_name = db_key_to_prop.get(db_k, db_k)
                         data[prop_name] = val
+
+    # ── 无实体表的节点类型：从 bop_entries.meta 读取 ──
+    if not entity_table:
+        try:
+            cur.execute("SELECT meta FROM workmanship_bop_bop_entries WHERE gid=%s", (entry_gid,))
+            entry_row = cur.fetchone()
+            if entry_row and entry_row["meta"]:
+                entry_meta = entry_row["meta"]
+                if isinstance(entry_meta, str):
+                    try: entry_meta = _json.loads(entry_meta)
+                    except: entry_meta = {}
+                if isinstance(entry_meta, dict):
+                    for k, v in entry_meta.items():
+                        prop_name = db_key_to_prop.get(k, k)
+                        if prop_name not in data:
+                            data[prop_name] = v
+        except Exception:
+            pass  # meta 查询失败不影响整体响应
 
     return {"data": data, "node_type": node_type, "entity_gid": entity_gid}
 
@@ -1549,20 +1566,24 @@ def patch_entity_props(entry_gid: str, body: dict, _u=Depends(get_current_user))
             if errors:
                 raise HTTPException(422, {"validation_errors": errors})
 
-            # ── 字段分类：prop_name → db_key，路由到固定列或 ext ───────────────
+            # ── 字段分类：prop_name → db_key，路由到固定列或 ext；兜底写 entry.meta ──
             fixed_updates: dict = {}
             ext_updates: dict = {}
+            meta_fallbacks: dict = {}
             for prop_name, v in body.items():
                 if prop_name in _ENTITY_PROP_DENY or prop_name.startswith("_"):
                     continue
                 p = prop_map.get(prop_name)
                 if p and p.get("storage_hint") == "derived":
-                    continue  # 派生属性只读，不允许直接写入
+                    continue
                 db_key = p["db_key"] if p else prop_name
                 if db_key in real_cols:
                     fixed_updates[db_key] = v
                 elif has_ext:
                     ext_updates[db_key] = v
+                else:
+                    # 实体表无此列 → 兜底写入 bop_entries.meta（通过 ontology 属性名作为 key）
+                    meta_fallbacks[prop_name] = v
 
             # ── CEL 规则校验（commit 前）──────────────────────────────────────
             try:
@@ -1579,7 +1600,7 @@ def patch_entity_props(entry_gid: str, body: dict, _u=Depends(get_current_user))
 
             # ── 写入 ──────────────────────────────────────────────────────────
             if fixed_updates:
-                sets = ", ".join(f'"{k}"=%s' for k in fixed_updates)
+                sets = ", ".join(f'`{k}`=%s' for k in fixed_updates)
                 vals = list(fixed_updates.values()) + [entity_gid]
                 cur.execute(f"UPDATE {entity_table} SET {sets}, updated_at=NOW() WHERE gid=%s", vals)
 
@@ -1596,6 +1617,21 @@ def patch_entity_props(entry_gid: str, body: dict, _u=Depends(get_current_user))
                         f"     updated_at=NOW()"
                         f" WHERE gid=%s",
                         (k, _json.dumps(v, ensure_ascii=False), entity_gid),
+                    )
+
+            for prop_name, v in meta_fallbacks.items():
+                if v is None:
+                    cur.execute(
+                        "UPDATE workmanship_bop_bop_entries SET meta = meta - %s, updated_at=NOW() WHERE gid=%s",
+                        (prop_name, entry_gid),
+                    )
+                else:
+                    cur.execute(
+                        "UPDATE workmanship_bop_bop_entries"
+                        " SET meta = JSON_SET(IFNULL(meta,'{}'), CONCAT('$.', %s), CAST(%s AS JSON)),"
+                        "     updated_at=NOW()"
+                        " WHERE gid=%s",
+                        (prop_name, _json.dumps(v, ensure_ascii=False), entry_gid),
                     )
 
             conn.commit()
@@ -1641,7 +1677,7 @@ def schema_diff(_u=Depends(get_current_user)):
                 cur.execute(
                     f"SELECT TABLE_NAME AS table_name, COLUMN_NAME AS column_name"
                     f" FROM information_schema.COLUMNS"
-                    f" WHERE TABLE_SCHEMA='ai00' AND TABLE_NAME IN ({ph})",
+                    f" WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ({ph})",
                     list(mysql_tables),
                 )
                 for col_row in cur.fetchall():
