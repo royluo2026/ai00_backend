@@ -934,11 +934,9 @@ class LayoutMode {
     }
     mainRow.appendChild(titleDiv);
 
-    // 工位高度（最右侧）
+    // 工位高度（最右侧） — 仅从实体表 entity_data 读取
     const heightVal = row.entity_data?.height_mm
       ?? row.entity_data?.height
-      ?? row.meta?.height_mm
-      ?? row.meta?.height
       ?? null;
     const heightEl = document.createElement('div');
     heightEl.style.cssText = 'flex-shrink:0;font-size:10px;color:var(--subtext0,#a6adc8);text-align:right;white-space:nowrap';
@@ -1272,7 +1270,7 @@ class LayoutMode {
 
     // 工位高度
     const row0 = ms.items[0].row;
-    const heightVal = row0.entity_data?.height_mm ?? row0.entity_data?.height ?? row0.meta?.height_mm ?? row0.meta?.height ?? null;
+    const heightVal = row0.entity_data?.height_mm ?? row0.entity_data?.height ?? null;
     const heightEl = document.createElement('div');
     heightEl.style.cssText = 'flex-shrink:0;font-size:10px;color:var(--subtext0,#a6adc8);white-space:nowrap';
     heightEl.textContent = heightVal != null ? '高度：' + String(heightVal) + 'mm' : '高度：NA';

@@ -474,17 +474,17 @@ async function _loadLineGrants() {
 }
 
 function _flattenMeta(rows) {
-  // meta 列已废弃，兼容旧数据：将 meta.title 提升到顶层
+  // 兼容旧数据：将 meta.title 提升到顶层，但保留 meta 供属性面板读取
   return rows.map(r => {
     if (r.meta && typeof r.meta === 'object') {
       if (!r.title && r.meta.title) r.title = r.meta.title;
     } else if (typeof r.meta === 'string') {
       try {
         const m = JSON.parse(r.meta);
+        r.meta = m;
         if (!r.title && m.title) r.title = m.title;
       } catch { /* ignore */ }
     }
-    delete r.meta;
     return r;
   });
 }
@@ -4501,6 +4501,7 @@ async function init() {
       toast: _toast,
       patchEntry: _patchEntry,
       reloadData: _reload,
+      preserveLayoutView: () => { if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true; },
       getLineageData: () => _buildLineageData ? _buildLineageData() : null,
       getVersionInfo: () => {
         const all = _verMgr?.allVersions || [];

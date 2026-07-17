@@ -205,12 +205,13 @@ class LayoutDetailPanel {
    * @param {Function}    opts.getLineageData - () => { rowByGid, childMap, statsMap, versionGid }
    * @param {Function}    opts.onNodeActivate - (gid) => void  节点树点击时通知主视图高亮定位
    */
-  constructor({ containerEl, cf, toast, patchEntry, reloadData, getLineageData, onNodeActivate, getVersionInfo, onVersionChange }) {
+  constructor({ containerEl, cf, toast, patchEntry, reloadData, preserveLayoutView, getLineageData, onNodeActivate, getVersionInfo, onVersionChange }) {
     this._el = containerEl;
     this._cf = cf;
     this._toast = toast;
     this._patchEntry = patchEntry;
     this._reloadData = reloadData;
+    this._preserveLayoutView = preserveLayoutView || (() => {});
     this._getLineageData = getLineageData || (() => null);
     this._onNodeActivate  = onNodeActivate  || null;
     this._getVersionInfo  = getVersionInfo  || null;
@@ -797,10 +798,10 @@ class LayoutDetailPanel {
     this._currentRow = null;
     this._show();
     this._renderEmptyTree();
-    if (this._propsBody) this._propsBody.innerHTML = '';
-    if (this._relsBody) this._relsBody.innerHTML = '';
-    if (this._rulesBody) this._rulesBody.innerHTML = '';
-    if (this._knowBody) this._knowBody.innerHTML = '';
+    this._propsBody.innerHTML = '';
+    this._relsBody.innerHTML = '';
+    this._rulesBody.innerHTML = '';
+    this._knowBody.innerHTML = '';
     this._renderDetailEmpty();
   }
 
@@ -1242,51 +1243,37 @@ class LayoutDetailPanel {
     const data = this._getLineageData();
     const allChildren = Array.from(data?.childMap?.get(gid) || []);
 
-    // 预解析：找出所有 SUM(prop) / COUNT(prop) 等聚合调用
+    // 先收集所有聚合调用并异步求值
     const aggRe = /\b(SUM|COUNT|AVG|MAX|MIN)\s*\(\s*(\w+)\s*\)/gi;
-    let expression = expr;
-    const promises = [];
-    const replacements = [];
-
+    const pending = [];  // { idx, func, prop }
     let m;
     while ((m = aggRe.exec(expr)) !== null) {
-      const func = m[1].toUpperCase();
-      const prop = m[2];
-      const idx = replacements.length;
-      const children = allChildren.filter(c => c.node_type); // 所有子节点
-      if (func === 'COUNT') {
-        expression = expression.replace(aggRe, String(children.length));
-        aggRe.lastIndex = 0; // reset for next match
-      } else {
-        const ph = `__AGG_${idx}__`;
-        expression = expression.replace(m[0], ph);
-        aggRe.lastIndex = 0;
-        promises.push(
-          this._fetchChildPropValues(children, prop).then(values => {
-            if (!values.length) return { idx, val: 0 };
-            switch (func) {
-              case 'SUM': return { idx, val: values.reduce((a,b)=>a+b,0) };
-              case 'AVG': return { idx, val: values.reduce((a,b)=>a+b,0) / values.length };
-              case 'MAX': return { idx, val: Math.max(...values) };
-              case 'MIN': return { idx, val: Math.min(...values) };
-              default: return { idx, val: 0 };
-            }
-          })
-        );
-        replacements.push({ ph, idx });
+      pending.push({ idx: pending.length, func: m[1].toUpperCase(), prop: m[2] });
+    }
+
+    // 并行求所有聚合值
+    const aggResults = await Promise.all(pending.map(async p => {
+      if (p.func === 'COUNT') return { idx: p.idx, val: allChildren.length };
+      const values = await this._fetchChildPropValues(allChildren, p.prop);
+      if (!values.length) return { idx: p.idx, val: 0 };
+      switch (p.func) {
+        case 'SUM': return { idx: p.idx, val: values.reduce((a,b)=>a+b,0) };
+        case 'AVG': return { idx: p.idx, val: values.reduce((a,b)=>a+b,0) / values.length };
+        case 'MAX': return { idx: p.idx, val: Math.max(...values) };
+        case 'MIN': return { idx: p.idx, val: Math.min(...values) };
+        default: return { idx: p.idx, val: 0 };
       }
-    }
+    }));
 
-    if (promises.length) {
-      const results = await Promise.all(promises);
-      results.forEach(r => {
-        const rep = replacements.find(x => x.idx === r.idx);
-        if (rep) expression = expression.replace(rep.ph, r.val);
-      });
-    }
+    // 替换所有聚合调用为计算结果
+    const resultMap = new Map(aggResults.map(r => [r.idx, r.val]));
+    aggRe.lastIndex = 0;
+    let ri = 0;
+    const expression = expr.replace(aggRe, () => String(resultMap.get(ri++) ?? 0));
 
-    // 安全求值：只允许数字 + - * / ( )
+    // 安全求值
     const safe = expression.replace(/[^0-9+\-*/().\s]/g, '');
+    if (!safe.trim()) return null;
     try {
       const result = Function('"use strict"; return (' + safe + ')')();
       return typeof result === 'number' ? Math.round(result * 100) / 100 : null;
@@ -1351,7 +1338,9 @@ class LayoutDetailPanel {
         if (p._src === 'derived') {
           const dVal = derivedVals[p.name];
           const cfg = typeof p.field_config === 'string' ? JSON.parse(p.field_config) : (p.field_config || {});
-          const formula = `${cfg.aggregate || ''}(${cfg.child_node_type || ''}.${cfg.child_property || ''})`;
+          const formula = cfg.expr
+            ? cfg.expr
+            : `${cfg.aggregate || ''}(${cfg.child_node_type || ''}.${cfg.child_property || ''})`;
           html += `<div class="ll-props-row">
             <span class="ll-props-key" title="${_he(p.description)}">${_he(p.label_zh || p.name)}</span>
             <div class="ll-props-val ll-props-derived-wrap">
@@ -1361,7 +1350,10 @@ class LayoutDetailPanel {
           </div>`;
           continue;
         }
-        const val = p._src === 'entity' ? (entityVals[p.name] ?? '') : (metaVals[p.name] ?? '');
+        // entity_table 属性只从实体表读取，meta 属性从 bop_entries.meta 读取
+        const val = p._src === 'entity'
+          ? (entityVals[p.name] ?? '')
+          : (metaVals[p.name] ?? '');
         const reqClass = p.required ? ' req' : '';
         let inputHtml = '';
         if (p.data_type === 'enum' && p.enum_values?.length) {
@@ -1401,24 +1393,30 @@ class LayoutDetailPanel {
           else if (dtype === 'boolean') { val = val === 'true' ? true : val === 'false' ? false : null; }
 
           try {
+            // 统一走 entity-props PATCH（后端自动路由到实体表列/ext/bop_entries.meta）
+            await this._cf(`/api/bop/entries/${encodeURIComponent(gid)}/entity-props`, {
+              method: 'PATCH', body: JSON.stringify({ [propName]: val }),
+            });
             if (src === 'entity') {
-              await this._cf(`/api/bop/entries/${encodeURIComponent(gid)}/entity-props`, {
-                method: 'PATCH', body: JSON.stringify({ [propName]: val }),
-              });
               entityVals[propName] = val;
+              // 同步更新 row.entity_data，使布局卡片立即显示新值
+              if (row.entity_data && typeof row.entity_data === 'object') {
+                row.entity_data[propName] = val;
+              }
             } else {
-              const newMeta = { ...(typeof row.meta === 'object' ? row.meta : {}), [propName]: val };
-              if (val === null) delete newMeta[propName];
-              await this._patchEntry(gid, { meta: newMeta });
-              row.meta = newMeta;
+              metaVals[propName] = val;
             }
           } catch (e) {
             this._toast?.('保存失败: ' + (e?.message || e), 'error');
           }
+          // 保存后立即刷新属性面板 + 布局卡片（保持画面焦点不变）
+          this._renderProps(gid, data.rowByGid.get(gid) || row);
+          this._preserveLayoutView();
+          this._reloadData?.();
         };
         inp.addEventListener('blur', save);
         inp.addEventListener('change', save);
-        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
       });
 
     } catch (e) {
@@ -2113,7 +2111,6 @@ class LayoutDetailPanel {
   // ── 列5：知识 ─────────────────────────────────────────────────────────────
 
   async _renderKnowledge(gid) {
-    if (!this._knowBody) return;
     this._knowBody.innerHTML = '';
     try {
       const resp = await this._cf(
@@ -2641,7 +2638,9 @@ class LayoutDetailPanel {
         if (p._src === 'derived') {
           const dVal = derivedVals[p.name];
           const cfg = typeof p.field_config === 'string' ? JSON.parse(p.field_config) : (p.field_config || {});
-          const formula = `${cfg.aggregate || ''}(${cfg.child_node_type || ''}.${cfg.child_property || ''})`;
+          const formula = cfg.expr
+            ? cfg.expr
+            : `${cfg.aggregate || ''}(${cfg.child_node_type || ''}.${cfg.child_property || ''})`;
           html += `<div class="ll-props-row">
             <span class="ll-props-key" title="${_he(p.description)}">${_he(p.label_zh || p.name)}</span>
             <div class="ll-props-val ll-props-derived-wrap">
@@ -2651,7 +2650,10 @@ class LayoutDetailPanel {
           </div>`;
           continue;
         }
-        const val = p._src === 'entity' ? (entityVals[p.name] ?? '') : (metaVals[p.name] ?? '');
+        // entity_table 属性只从实体表读取，meta 属性从 bop_entries.meta 读取
+        const val = p._src === 'entity'
+          ? (entityVals[p.name] ?? '')
+          : (metaVals[p.name] ?? '');
         const reqClass = p.required ? ' req' : '';
         let inputHtml = '';
         if (p.data_type === 'enum' && p.enum_values?.length) {
@@ -2691,24 +2693,30 @@ class LayoutDetailPanel {
           else if (dtype === 'boolean') { val = val === 'true' ? true : val === 'false' ? false : null; }
 
           try {
+            // 统一走 entity-props PATCH（后端自动路由到实体表列/ext/bop_entries.meta）
+            await this._cf(`/api/bop/entries/${encodeURIComponent(gid)}/entity-props`, {
+              method: 'PATCH', body: JSON.stringify({ [propName]: val }),
+            });
             if (src === 'entity') {
-              await this._cf(`/api/bop/entries/${encodeURIComponent(gid)}/entity-props`, {
-                method: 'PATCH', body: JSON.stringify({ [propName]: val }),
-              });
               entityVals[propName] = val;
+              // 同步更新 row.entity_data，使布局卡片立即显示新值
+              if (row.entity_data && typeof row.entity_data === 'object') {
+                row.entity_data[propName] = val;
+              }
             } else {
-              const newMeta = { ...(typeof row.meta === 'object' ? row.meta : {}), [propName]: val };
-              if (val === null) delete newMeta[propName];
-              await this._patchEntry(gid, { meta: newMeta });
-              row.meta = newMeta;
+              metaVals[propName] = val;
             }
           } catch (e) {
             this._toast?.('保存失败: ' + (e?.message || e), 'error');
           }
+          // 保存后立即刷新属性面板 + 布局卡片（保持画面焦点不变）
+          this._renderProps(gid, data.rowByGid.get(gid) || row);
+          this._preserveLayoutView();
+          this._reloadData?.();
         };
         inp.addEventListener('blur', save);
         inp.addEventListener('change', save);
-        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
       });
 
     } catch (e) {
@@ -2719,7 +2727,6 @@ class LayoutDetailPanel {
   // ── 列2：关系 ─────────────────────────────────────────────────────────────
 
   async _renderRels(gid) {
-    if (!this._relsBody) return;
     this._relsBody.innerHTML = '<div style="color:var(--surface2);font-size:11px;padding:8px">加载中…</div>';
     const data = this._getLineageData();
     const lineGrantSet = data?.lineGrantSet || new Set();
@@ -3402,7 +3409,6 @@ class LayoutDetailPanel {
   // ── 列5：知识 ─────────────────────────────────────────────────────────────
 
   async _renderKnowledge(gid) {
-    if (!this._knowBody) return;
     this._knowBody.innerHTML = '';
     try {
       const resp = await this._cf(
@@ -3731,10 +3737,10 @@ class LayoutDetailPanel {
       // 重绘树（空选中态）
       if (this._verSlot || this._lineSlot || this._treeBody) {
         this._renderTree(null);
-        if (this._propsBody) this._propsBody.innerHTML = '';
-        if (this._relsBody) this._relsBody.innerHTML  = '';
-        if (this._rulesBody) this._rulesBody.innerHTML = '';
-        if (this._knowBody) this._knowBody.innerHTML  = '';
+        this._propsBody.innerHTML = '';
+        this._relsBody.innerHTML  = '';
+        this._rulesBody.innerHTML = '';
+        this._knowBody.innerHTML  = '';
         this._renderDetailEmpty();
       }
       return;
