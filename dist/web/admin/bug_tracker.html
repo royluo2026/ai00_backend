@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>开发沟通看板</title>
+<script src="/web/components/entry_thread.js"></script>
+<script src="/web/components/attachments_widget.js"></script>
+<script src="/web/components/overlay_edit_modal.js"></script>
+
+<style>
+:root {
+  --bg:        #ffffff;
+  --bg2:       #f7f6f3;
+  --bg3:       #efefef;
+  --text:      #2e2e2e;
+  --muted:     #6e6e6e;
+  --faint:     #9a9a9a;
+  --border:    #dcdcdc;
+  --accent:    #2563eb;
+  --accent-h:  #1d4ed8;
+  --radius:    6px;
+  --mono:      'Consolas','JetBrains Mono','Fira Code',monospace;
+}
+:root[data-theme="dark"] {
+  --bg:        #1e1e2e;
+  --bg2:       #181825;
+  --bg3:       #313244;
+  --text:      #cdd6f4;
+  --muted:     #a6adc8;
+  --faint:     #6c7086;
+  --border:    #313244;
+  --accent:    #89b4fa;
+  --accent-h:  #7ba8f0;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;
+  background: var(--bg2); color: var(--text);
+  height: 100vh; overflow: hidden; display: flex; flex-direction: column; font-size: 13px;
+}
+
+/* ── toolbar ── */
+.toolbar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 8px 14px; background: var(--bg);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.toolbar-title { font-size: 14px; font-weight: 700; color: var(--text); margin-right: 2px; }
+.toolbar-count { font-size: 11px; color: var(--faint); }
+.spacer { flex: 1; }
+.tb-input {
+  padding: 4px 9px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg2); color: var(--text); font-size: 12px; outline: none; width: 160px;
+}
+.tb-input:focus { border-color: var(--accent); }
+.tb-sel {
+  padding: 4px 8px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg2); color: var(--text); font-size: 12px; outline: none; cursor: pointer;
+}
+.btn {
+  padding: 4px 11px; border-radius: var(--radius); font-size: 12px; cursor: pointer;
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+  display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: var(--accent-h); color: #fff; }
+.btn-active { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb,var(--accent) 10%,var(--bg)); }
+
+/* ── layout ── */
+.body-wrap { display: flex; flex: 1; overflow: hidden; }
+
+/* ── table area ── */
+.tbl-area { flex: 1; overflow: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; background: var(--bg); table-layout: fixed; }
+thead { position: sticky; top: 0; z-index: 5; }
+thead th {
+  background: var(--bg2); color: var(--faint); font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .04em;
+  padding: 7px 8px; border-bottom: 1px solid var(--border);
+  white-space: nowrap; text-align: left; user-select: none; cursor: pointer;
+}
+thead th:hover { color: var(--text); }
+thead th.sort-active { color: var(--accent); }
+.sort-arrow { font-size: 9px; margin-left: 3px; }
+tbody td {
+  padding: 6px 8px; border-bottom: 1px solid var(--border);
+  vertical-align: middle; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+tbody tr { cursor: pointer; transition: background .1s; }
+tbody tr:hover td { background: color-mix(in srgb,var(--accent) 4%,var(--bg)); }
+tbody tr.selected td { background: color-mix(in srgb,var(--accent) 9%,var(--bg)); }
+tbody tr td.wrap-cell { white-space: normal; word-break: break-all; line-height: 1.5; }
+
+/* column widths */
+.col-id    { width: 84px; }
+.col-type  { width: 68px; }
+.col-prio  { width: 70px; }
+.col-mod   { width: 80px; }
+.col-uid   { width: 90px; }
+.col-page  { width: 120px; }
+.col-seq   { width: 48px; }
+.col-title { width: 360px; }
+.col-stat  { width: 76px; }
+.col-ucfm  { width: 76px; }
+.col-files { width: 130px; }
+.col-cmt   { width: 130px; }
+.col-aiq   { width: 130px; }
+.col-cmt2  { width: 76px; }
+.col-links { width: 100px; }
+
+/* links */
+.lk-icon {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 2px 4px; border-radius: 4px; cursor: pointer;
+  transition: background .15s; vertical-align: middle;
+}
+.lk-icon:hover { background: var(--bg3); }
+.lk-icon svg { flex-shrink: 0; }
+.lk-web  { color: #2563eb; }
+.lk-file { color: #16a34a; }
+.lk-ob   { color: #7c3aed; }
+.lk-tooltip {
+  display: none; position: absolute; z-index: 700;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 10px; box-shadow: 0 4px 16px rgba(0,0,0,.25);
+  font-size: 11px; max-width: 320px; word-break: break-all;
+  white-space: normal; pointer-events: none;
+}
+.lk-icon:hover .lk-tooltip { display: block; }
+
+/* entry styles moved to overlay_edit_modal.css (scoped under .rem-overlay) */
+
+.badge {
+  display: inline-block; padding: 1px 7px; border-radius: 10px;
+  font-size: 10px; font-weight: 600; white-space: nowrap;
+}
+.b-bug  { background: rgba(239,68,68,.15); color: #ef4444; }
+.b-adj  { background: rgba(249,115,22,.15); color: #f97316; }
+.b-req  { background: rgba(34,197,94,.15); color: #16a34a; }
+.b-p0   { background: rgba(239,68,68,.18); color: #dc2626; }
+.b-p1   { background: rgba(249,115,22,.18); color: #ea580c; }
+.b-p2   { background: rgba(234,179,8,.18); color: #ca8a04; }
+.b-p3   { background: rgba(107,114,128,.18); color: #6b7280; }
+.b-pending  { background: rgba(107,114,128,.18); color: #6b7280; }
+.b-doing    { background: rgba(59,130,246,.18); color: #2563eb; }
+.b-done     { background: rgba(34,197,94,.18); color: #16a34a; }
+.b-hold     { background: rgba(234,179,8,.18); color: #ca8a04; }
+.b-norepro  { background: rgba(139,92,246,.18); color: #7c3aed; }
+.b-verify   { background: rgba(245,158,11,.18);  color: #d97706; }
+/* AI反馈 */
+.b-ai-none    { background: rgba(107,114,128,.18); color: #6b7280; }
+.b-ai-fixed   { background: rgba(34,197,94,.18);   color: #16a34a; }
+.b-ai-updated { background: rgba(59,130,246,.18);   color: #2563eb; }
+.b-ai-changed { background: rgba(249,115,22,.18);   color: #ea580c; }
+.b-ai-skip    { background: rgba(139,92,246,.18);   color: #7c3aed; }
+.b-ai-norepro { background: rgba(236,72,153,.18);   color: #db2777; }
+/* 用户确认 */
+.b-uc-none { background: rgba(107,114,128,.18); color: #6b7280; }
+.b-uc-ok   { background: rgba(34,197,94,.18);   color: #16a34a; }
+.b-uc-fail { background: rgba(239,68,68,.18);   color: #ef4444; }
+.b-uc-deploy { background: rgba(59,130,246,.18);  color: #2563eb; }
+.b-uc-beta   { background: rgba(168,85,247,.18);  color: #9333ea; }
+
+/* 内联状态选择 */
+.inline-sel-wrap {
+  position: fixed; z-index: 600;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 5px 7px; box-shadow: 0 6px 20px rgba(0,0,0,.28);
+  display: flex; flex-direction: column; gap: 3px; min-width: 90px;
+}
+.pick-opt {
+  cursor: pointer; display: block; text-align: center;
+  transition: transform .1s, filter .1s;
+}
+.pick-opt:hover { filter: brightness(1.1); transform: translateX(2px); }
+.pick-active { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cell-inline { cursor: pointer; }
+.cell-inline:hover .badge { filter: brightness(1.08); }
+
+/* ── side panel (UI索引) ── */
+.ref-panel {
+  width: 320px; flex-shrink: 0; background: var(--bg);
+  border-right: 1px solid var(--border); overflow-y: auto;
+  display: none; flex-direction: column;
+}
+.ref-panel.open { display: flex; }
+.ref-header {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  font-size: 12px; font-weight: 700; color: var(--text); flex-shrink: 0;
+}
+.ref-search {
+  padding: 6px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.ref-search input {
+  width: 100%; padding: 4px 8px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--bg2); color: var(--text);
+  font-size: 11px; outline: none;
+}
+.ref-search input:focus { border-color: var(--accent); }
+.ref-section { padding: 0; }
+.ref-section-hdr {
+  padding: 5px 14px 3px; font-size: 10px; font-weight: 700; color: var(--faint);
+  text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--bg); z-index: 2;
+}
+.ref-item {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 6px 14px; border-bottom: 1px solid color-mix(in srgb,var(--border) 50%,transparent);
+  cursor: pointer; transition: background .1s;
+}
+.ref-item:hover { background: var(--bg2); }
+.ref-uid {
+  font-family: var(--mono); font-size: 10px; color: var(--accent);
+  white-space: nowrap; min-width: 80px; font-weight: 600;
+}
+.ref-name { font-size: 11px; color: var(--text); flex: 1; }
+.ref-type { font-size: 10px; color: var(--faint); white-space: nowrap; }
+.ref-count {
+  font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent);
+  background: rgba(59,130,246,.12); border-radius: 10px; padding: 1px 7px;
+  min-width: 22px; text-align: center; white-space: nowrap;
+}
+.ref-item.cat-nav  { border-left: 3px solid #89b4fa; }
+.ref-item.cat-list { border-left: 3px solid #a6e3a1; }
+.ref-item.cat-bop  { border-left: 3px solid #fab387; }
+.ref-item.cat-std  { border-left: 3px solid #cba6f7; }
+.ref-item.cat-wb   { border-left: 3px solid #74c7ec; }
+.ref-item.cat-org  { border-left: 3px solid #f38ba8; }
+.ref-item.cat-comp { border-left: 3px solid #a6e3a1; }
+.ref-item.cat-pt   { border-left: 3px solid #f9e2af; }
+
+/* modal styles moved to overlay_edit_modal.css */
+
+/* ── 分组表头 ── */
+tr.grp-hdr td {
+  background: var(--bg2); padding: 5px 10px; cursor: pointer;
+  border-bottom: 1px solid var(--border); user-select: none;
+}
+tr.grp-hdr:hover td { background: color-mix(in srgb,var(--accent) 6%,var(--bg2)); }
+.grp-title { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--muted); }
+.grp-arrow { font-size: 9px; transition: transform .15s; display: inline-block; }
+.grp-arrow.collapsed { transform: rotate(-90deg); }
+.grp-count { font-size: 10px; color: var(--faint); font-weight: 400; }
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 200px; color: var(--faint); gap: 8px;
+}
+.empty-state p { font-size: 13px; }
+</style>
+  <link rel="stylesheet" href="/assets/bug_tracker-f2c1aaa9.css">
+</head>
+<body>
+<!-- toolbar -->
+<div class="toolbar">
+  <span class="toolbar-title">开发沟通看板</span>
+  <span class="toolbar-count" id="countLabel"></span>
+  <div class="spacer"></div>
+  <input class="tb-input" id="searchInput" placeholder="搜索主题 / 详情…" oninput="render()">
+  <select class="tb-sel" id="fType" onchange="render()">
+    <option value="">全部类型</option>
+    <option value="bug">bug</option>
+    <option value="调整">调整</option>
+    <option value="新需求">新需求</option>
+  </select>
+  <select class="tb-sel" id="fPrio" onchange="render()">
+    <option value="">全部优先级</option>
+    <option value="P0-紧急">P0-紧急</option>
+    <option value="P1-高">P1-高</option>
+    <option value="P2-中">P2-中</option>
+    <option value="P3-低">P3-低</option>
+  </select>
+  <select class="tb-sel" id="fStatus" onchange="render()">
+    <option value="">全部状态</option>
+    <option value="待处理">待处理</option>
+    <option value="进行中">进行中</option>
+    <option value="待验证">待验证</option>
+    <option value="已完成">已完成</option>
+    <option value="已搁置">已搁置</option>
+    <option value="无法复现">无法复现</option>
+  </select>
+  <button class="btn" onclick="loadData()" title="从云端/本地重新加载">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+  </button>
+  <button class="btn btn-primary" onclick="openNew()">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    新增
+  </button>
+  <button class="btn" id="btnRef" onclick="toggleRef()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    UI索引
+  </button>
+  <button class="btn" onclick="openStandalone()" title="弹出为独立窗口（不随主系统重启）">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    弹出
+  </button>
+</div>
+
+<div class="body-wrap">
+  <!-- UI索引 side panel (left) -->
+  <div class="ref-panel" id="refPanel">
+    <div class="ref-header">UI 元素索引</div>
+    <div class="ref-search"><input id="refSearch" placeholder="搜索 ID / 名称…" oninput="renderRef()"></div>
+    <div id="refBody"></div>
+  </div>
+
+  <!-- table -->
+  <div class="tbl-area" id="tblArea">
+    <table id="mainTable">
+      <colgroup>
+        <col class="col-id"><col class="col-type"><col class="col-prio"><col class="col-seq">
+        <col class="col-title"><col class="col-uid">
+        <col class="col-links">
+        <col class="col-stat"><col class="col-ucfm">
+        <col class="col-files"><col class="col-cmt2"><col class="col-cmt"><col class="col-aiq">
+        <col class="col-mod"><col class="col-page">
+      </colgroup>
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- edit modal provided by RowEditModal component -->
+
+<script>
+// ── 数据 ──────────────────────────────────────────────────────────────────────
+const LS_KEY = 'bug_tracker.items';
+let _items   = [];
+let _modal   = null;  // RowEditModal instance
+
+// 优先级：本地 JSON 文件（Electron）> localStorage
+const _ea = () => window.electronAPI || window.parent?.electronAPI || window.parent?.parent?.electronAPI;
+
+async function loadData() {
+  try {
+    const ea = _ea();
+    if (ea?.readTracker) {
+      const raw = await ea.readTracker();
+      if (raw) {
+        _items = JSON.parse(raw);
+        localStorage.setItem(LS_KEY, raw);
+        await _preloadEntriesFromDB();
+        render();
+        return;
+      }
+    }
+  } catch(e) { console.warn('tracker file read failed', e); }
+  // fallback localStorage
+  try { _items = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { _items = []; }
+  await _preloadEntriesFromDB();
+  render();
+}
+
+async function _preloadEntriesFromDB() {
+  // entries 存储在 bug_tracker.json 中，无需从 DB 加载
+}
+
+async function saveData() {
+  // ═══ 写盘前先读盘合并，防止覆盖外部修改（如 Claude 直接编辑 JSON）═══
+  try {
+    const ea = _ea();
+    if (ea?.readTracker) {
+      const diskRaw = await ea.readTracker();
+      if (diskRaw) {
+        const diskItems = JSON.parse(diskRaw);
+        if (Array.isArray(diskItems)) _mergeFromDisk(diskItems);
+      }
+    }
+  } catch(e) { /* 读盘失败静默跳过，不阻塞保存 */ }
+
+  const json = JSON.stringify(_items, null, 2);
+  localStorage.setItem(LS_KEY, json);
+  try {
+    const ea = _ea();
+    if (ea?.writeTracker) await ea.writeTracker(json);
+  } catch(e) { console.warn('tracker file write failed', e); }
+}
+
+/** 将盘上条目合并到内存 _items，保留外部新增的 entries 和字段更新 */
+function _mergeFromDisk(diskItems) {
+  for (const di of diskItems) {
+    const mi = _items.find(it => it.id === di.id);
+    if (!mi) continue;
+
+    // ── 合并 entries：盘上多出来的条目（Claude 新增的）追加到内存 ──
+    const memEntries = mi.entries || [];
+    const memIds = new Set(memEntries.map(e => e.id));
+    for (const de of (di.entries || [])) {
+      if (!memIds.has(de.id)) {
+        // 新条目 → 直接追加
+        // AI 条目若无 parent_id，自动挂到最近一条 human 条目下（禁止 AI 创建主题卡片）
+        if (de.author === 'ai' && !de.parent_id) {
+          const lastHuman = [...memEntries].reverse().find(e => e.author === 'human');
+          if (lastHuman) de.parent_id = lastHuman.id;
+        }
+        memEntries.push(de);
+      } else {
+        // 已存在条目：AI 写的条目，其 ai_status / read_by_human 以盘上为准
+        const me = memEntries.find(e => e.id === de.id);
+        if (me && de.author === 'ai') {
+          me.ai_status = de.ai_status;
+          if (de.read_by_human !== undefined) me.read_by_human = de.read_by_human;
+        }
+      }
+    }
+    mi.entries = memEntries;
+
+    // ── 自动标记：盘上有 AI 回复条目 → 所有 human 条目 AI 已读 ──
+    const hasAiReply = memEntries.some(e => e.author === 'ai' && e.section === 'detail');
+    if (hasAiReply) {
+      memEntries.forEach(e => { if (e.author === 'human') e.ai_status = 'read'; });
+    }
+
+    // ── 合并 item 级字段：以盘上为准（直接编辑 JSON 的场景）──
+    if (di.ai_question && di.ai_question !== mi.ai_question) {
+      mi.ai_question = di.ai_question;
+    }
+    if (di.ai_status && di.ai_status !== mi.ai_status) {
+      mi.ai_status = di.ai_status;
+    }
+    if (di.updated_at) mi.updated_at = di.updated_at;
+  }
+}
+
+/** 弹出为独立 Electron 窗口 */
+async function openStandalone() {
+  const ea = _ea();
+  if (ea?.openTrackerWindow) {
+    await ea.openTrackerWindow();
+  } else {
+    alert('独立窗口仅在 Electron 桌面端可用');
+  }
+}
+
+// ── ID 生成 ───────────────────────────────────────────────────────────────────
+function _genId() {
+  const nums = _items.map(i => parseInt(i.id) || 0);
+  const next = nums.length ? Math.max(...nums) + 1 : 1;
+  return String(next).padStart(7, '0');
+}
+
+// ── 序号自动回收与补位 ──────────────────────────────────────────────────────
+/** 释放已完成/已搁置条目的 seq，并将其余条目重新编号为连续 1,2,3... */
+function _reindexSeqs() {
+  // 释放：已完成/已搁置 → seq = null
+  const RELEASE_STATUSES = ['已完成', '已搁置'];
+  for (const it of _items) {
+    if (it.seq != null && RELEASE_STATUSES.includes(it.status)) {
+      it.seq = null;
+      it.updated_at = new Date().toISOString();
+    }
+  }
+  // 补位：活跃条目（有 seq 的）按 seq 升序重新编号 1,2,3...N
+  const active = _items
+    .map((it, i) => ({ i, seq: it.seq }))
+    .filter(x => x.seq != null)
+    .sort((a, b) => a.seq - b.seq);
+  active.forEach((x, idx) => {
+    const newSeq = idx + 1;
+    if (newSeq > 10) {
+      // cap: items beyond position 10 lose their seq
+      if (_items[x.i].seq != null) {
+        _items[x.i].seq = null;
+        _items[x.i].updated_at = new Date().toISOString();
+      }
+    } else if (_items[x.i].seq !== newSeq) {
+      _items[x.i].seq = newSeq;
+      _items[x.i].updated_at = new Date().toISOString();
+    }
+  });
+}
+
+// ── 渲染 ──────────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+const TYPE_CLS  = { 'bug':'b-bug', '调整':'b-adj', '新需求':'b-req' };
+const PRIO_CLS  = { 'P0-紧急':'b-p0', 'P1-高':'b-p1', 'P2-中':'b-p2', 'P3-低':'b-p3' };
+const STAT_CLS  = { '待处理':'b-pending', '进行中':'b-doing', '待验证':'b-verify', '已完成':'b-done', '已搁置':'b-hold', '无法复现':'b-norepro' };
+const AI_CLS    = { '待处理':'b-ai-none', '已修复':'b-ai-fixed', '已更新':'b-ai-updated', '方案变更':'b-ai-changed', '无需修改':'b-ai-skip', '无法复现':'b-ai-norepro' };
+const UC_CLS    = { '待确认':'b-uc-none', '✓已验证':'b-uc-ok', '✗有问题':'b-uc-fail', '部署时验证':'b-uc-deploy', '内测时验证':'b-uc-beta' };
+
+const STATUS_OPTS = [['待处理','待处理'],['进行中','进行中'],['待验证','待验证'],['已完成','已完成'],['已搁置','已搁置'],['无法复现','无法复现']];
+const AI_OPTS     = [['待处理','待处理'],['已修复','已修复'],['已更新','已更新'],['方案变更','方案变更'],['无需修改','无需修改'],['无法复现','无法复现']];
+const UC_OPTS     = [['待确认','待确认'],['✓已验证','✓已验证'],['✗有问题','✗有问题'],['部署时验证','部署时验证'],['内测时验证','内测时验证']];
+
+// ── 内联状态选择（badge 点选面板，单次点击即选）────────────────────────────────
+let _inlineWrap = null;
+
+function showInlineSel(e, idx, field, opts, clsMap) {
+  e.stopPropagation();
+  if (_inlineWrap) { _inlineWrap.remove(); _inlineWrap = null; }
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  const wrap = document.createElement('div');
+  wrap.className = 'inline-sel-wrap';
+  // 防止超出右边界
+  const panelW = 110;
+  const left = Math.min(rect.left, window.innerWidth - panelW - 8);
+  wrap.style.left = left + 'px';
+  wrap.style.top  = rect.bottom + 4 + 'px';
+
+  const cur = _items[idx][field] || (field === 'user_confirm' ? '待确认' : '待处理');
+  opts.forEach(([v]) => {
+    const span = document.createElement('span');
+    span.className = 'badge pick-opt ' + (clsMap[v] || 'b-pending') + (v === cur ? ' pick-active' : '');
+    span.textContent = v;
+    span.addEventListener('mousedown', async (ev) => {
+      ev.preventDefault(); ev.stopPropagation();
+      // 状态改为“已完成”必须先验证为 ✓已验证
+      if (field === 'status' && v === '已完成' && _items[idx].user_confirm !== '✓已验证') {
+        alert('请先将"已确认"设为"✓已验证"再完成。');
+        wrap.remove(); _inlineWrap = null;
+        return;
+      }
+      _items[idx][field] = v;
+      _items[idx].updated_at = new Date().toISOString();
+      if (field === 'status') _reindexSeqs();  // release seq when status changes
+      wrap.remove(); _inlineWrap = null;
+      render();              // 先刷新，不等存储
+      await saveData();
+    });
+    wrap.appendChild(span);
+  });
+
+  document.body.appendChild(wrap);
+  _inlineWrap = wrap;
+
+  setTimeout(() => {
+    function close(ev) {
+      if (!wrap.contains(ev.target)) {
+        wrap.remove(); _inlineWrap = null;
+        document.removeEventListener('mousedown', close);
+      }
+    }
+    document.addEventListener('mousedown', close);
+  }, 0);
+}
+
+// ── 序号选择（1-10，唯一，插入中间自动+1）──────────────────────────────────
+function showSeqSel(e, idx) {
+  e.stopPropagation();
+  if (_inlineWrap) { _inlineWrap.remove(); _inlineWrap = null; }
+
+  const rect = e.currentTarget.getBoundingClientRect();
+  const wrap = document.createElement('div');
+  wrap.className = 'inline-sel-wrap';
+  wrap.style.left = Math.min(rect.left, window.innerWidth - 60 - 8) + 'px';
+  wrap.style.top  = rect.bottom + 4 + 'px';
+  wrap.style.flexDirection = 'row';
+  wrap.style.flexWrap = 'wrap';
+  wrap.style.gap = '3px';
+  wrap.style.minWidth = '240px';
+  wrap.style.maxWidth = '280px';
+
+  const cur = _items[idx].seq;
+
+  // "空" 按钮
+  const clearBtn = document.createElement('span');
+  clearBtn.className = 'badge pick-opt b-pending' + (cur == null ? ' pick-active' : '');
+  clearBtn.textContent = '×';
+  clearBtn.style.padding = '3px 8px';
+  clearBtn.addEventListener('mousedown', async (ev) => {
+    ev.preventDefault(); ev.stopPropagation();
+    _items[idx].seq = null;
+    _items[idx].updated_at = new Date().toISOString();
+    wrap.remove(); _inlineWrap = null;
+    _reindexSeqs();
+    await saveData();
+    render();
+  });
+  wrap.appendChild(clearBtn);
+
+  for (let n = 1; n <= 10; n++) {
+    const span = document.createElement('span');
+    span.className = 'badge pick-opt' + (n === cur ? ' pick-active' : '');
+    span.textContent = n;
+    span.style.padding = '3px 8px';
+    span.style.minWidth = '26px';
+    span.style.textAlign = 'center';
+    if (n === cur) {
+      span.style.background = 'var(--accent)';
+      span.style.color = '#fff';
+    }
+    span.addEventListener('mousedown', async (ev) => {
+      ev.preventDefault(); ev.stopPropagation();
+      // 碰撞处理：如果有人占了这个号，把它及后续号都+1
+      const takenIdx = _items.findIndex((it, i) => i !== idx && it.seq === n);
+      if (takenIdx >= 0) {
+        // 收集所有 seq >= n 的其他条目，按 seq 降序处理避免覆盖
+        const toShift = _items
+          .map((it, i) => ({ i, seq: it.seq }))
+          .filter(x => x.i !== idx && x.seq != null && x.seq >= n)
+          .sort((a, b) => b.seq - a.seq);
+        for (const x of toShift) {
+          const newSeq = x.seq + 1;
+          _items[x.i].seq = newSeq <= 10 ? newSeq : null;
+        }
+      }
+      _items[idx].seq = n;
+      _items[idx].updated_at = new Date().toISOString();
+      wrap.remove(); _inlineWrap = null;
+      _reindexSeqs();
+      await saveData();
+      render();
+    });
+    wrap.appendChild(span);
+  }
+
+  document.body.appendChild(wrap);
+  _inlineWrap = wrap;
+
+  setTimeout(() => {
+    function close(ev) {
+      if (!wrap.contains(ev.target)) {
+        wrap.remove(); _inlineWrap = null;
+        document.removeEventListener('mousedown', close);
+      }
+    }
+    document.addEventListener('mousedown', close);
+  }, 0);
+}
+
+// ── 分组折叠状态（已完成/已搁置默认收起）────────────────────────────────────
+const _collapsed = new Set(['待验证', '已搁置', '已完成']);
+const GROUP_ORDER = ['进行中', '待处理', '待验证', '已搁置', '已完成', '无法复现'];
+
+function toggleGroup(status) {
+  _collapsed.has(status) ? _collapsed.delete(status) : _collapsed.add(status);
+  render();
+}
+
+// ── 排序 ──────────────────────────────────────────────────────────────────────
+const LS_SORT_KEY = 'bug_tracker.sort';
+let _sortField = localStorage.getItem(LS_SORT_KEY + '.field') || 'id';
+let _sortDir   = localStorage.getItem(LS_SORT_KEY + '.dir')   || 'desc';
+
+const SORT_FIELDS = {
+  'id': 'id', 'type': 'type', 'priority': 'priority', 'module': 'module',
+  'ui_id': 'ui_id', 'page': 'page', 'seq': 'seq', 'title': 'title',
+  'ai_status': 'ai_status', 'user_confirm': 'user_confirm', 'status': 'status',
+  'files': 'files', 'comment': 'comment', 'ai_question': 'ai_question', 'commit': 'commit'
+};
+
+const PRIO_ORDER = { 'P0-紧急':0, 'P1-高':1, 'P2-中':2, 'P3-低':3 };
+
+function _cmp(a, b, field) {
+  let va = (a[field] || ''), vb = (b[field] || '');
+  if (field === 'seq') {
+    // 有值排前，空值排后；同有值时按数值升序
+    const ha = a.seq != null, hb = b.seq != null;
+    if ( ha && !hb) return -1;
+    if (!ha &&  hb) return 1;
+    if (!ha && !hb) return 0;
+    va = a.seq; vb = b.seq;
+  }
+  if (field === 'id' || field === 'seq') { va = parseInt(va)||0; vb = parseInt(vb)||0; }
+  else if (field === 'priority') { va = PRIO_ORDER[va] ?? 99; vb = PRIO_ORDER[vb] ?? 99; }
+  else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+  if (va < vb) return -1;
+  if (va > vb) return 1;
+  return 0;
+}
+
+function sortBy(field) {
+  if (_sortField === field) {
+    _sortDir = _sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    _sortField = field;
+    _sortDir = 'asc';
+  }
+  localStorage.setItem(LS_SORT_KEY + '.field', _sortField);
+  localStorage.setItem(LS_SORT_KEY + '.dir', _sortDir);
+  render();
+}
+
+function badge(v, map) {
+  const cls = map[v] || 'b-pending';
+  return `<span class="badge ${cls}">${esc(v)}</span>`;
+}
+
+const LINK_ICONS = {
+  web: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/></svg>`,
+  file: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`,
+  obsidian: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 12 12 22 2 12"/></svg>`,
+};
+
+function _detectLinkType(url) {
+  const u = (url || '').trim().toLowerCase();
+  if (u.startsWith('obsidian://')) return 'obsidian';
+  if (u.startsWith('file://') || u.match(/^[a-z]:[\\/]/i) || u.startsWith('/')) return 'file';
+  return 'web';
+}
+
+function _renderLinks(links) {
+  if (!Array.isArray(links) || !links.length) return '<span style="color:var(--faint);font-size:10px">-</span>';
+  return links.map((l, i) => {
+    const type = l.type || _detectLinkType(l.url);
+    const icon = LINK_ICONS[type] || LINK_ICONS['web'];
+    const cls = type === 'web' ? 'lk-web' : type === 'file' ? 'lk-file' : 'lk-ob';
+    const url = l.url || '';
+    const title = l.title || url;
+    const tip = `${type} | ${title}`;
+    return `<span class="lk-icon ${cls}" data-lk-idx="${i}" data-lk-type="${esc(type)}" data-lk-url="${esc(url)}" title="${esc(tip)}">
+      ${icon}
+      <span class="lk-tooltip">${tip}</span>
+    </span>`;
+  }).join('');
+}
+
+/** 打开链接（Electron shell）*/
+function openLink(e, type, url) {
+  e.stopPropagation();
+  if (!url) return;
+  // try top-level electronAPI first (most reliable for iframes)
+  const ea = window.top?.electronAPI || window.parent?.electronAPI || window.electronAPI;
+  if (type === 'file') {
+    if (ea?.openPath) { ea.openPath(url); return; }
+  } else {
+    if (ea?.openExternal) { ea.openExternal(url); return; }
+  }
+  // fallback
+  window.open(url, '_blank');
+}
+
+function _renderThead() {
+  const fields = [
+    ['id','ID'], ['type','类型'], ['priority','优先级'], ['seq','序号'],
+    ['title','主题'], ['ui_id','UI_ID'],
+    ['links','链接'],
+    ['status','状态'], ['user_confirm','已确认'],
+    ['files','涉及文件'], ['commit','commit'],
+    ['comment','最新评论(人)'], ['ai_question','最新反馈（AI）'],
+    ['module','模块'], ['page','具体页面']
+  ];
+  const arrow = _sortDir === 'asc' ? '▲' : '▼';
+  const h = fields.map(([f,label]) => {
+    const cls = f === _sortField ? ' sort-active' : '';
+    const ar  = f === _sortField ? `<span class="sort-arrow">${arrow}</span>` : '';
+    return `<th class="${cls}" onclick="sortBy('${f}')">${label}${ar}</th>`;
+  }).join('');
+  document.getElementById('thead').innerHTML = `<tr>${h}</tr>`;
+}
+
+function render() {
+  _renderThead();
+
+  const q       = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const fType   = document.getElementById('fType')?.value   || '';
+  const fPrio   = document.getElementById('fPrio')?.value   || '';
+  const fStatus = document.getElementById('fStatus')?.value || '';
+
+  const filtered = _items.filter(it => {
+    if (fType   && it.type     !== fType)   return false;
+    if (fPrio   && it.priority !== fPrio)   return false;
+    if (fStatus && it.status   !== fStatus) return false;
+    if (q) {
+      // search: title + detail + module + ui_id + page + entries content + old fields
+      const entriesText = (it.entries || []).map(e => e.content || '').join(' ');
+      const hay = [
+        (it.title||''),(it.detail||''),(it.module||''),(it.ui_id||''),(it.page||''),
+        (it.comment||''),(it.ai_question||''),(it.history||''), entriesText
+      ].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const tbody = document.getElementById('tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="15"><div class="empty-state"><p>暂无条目</p></div></td></tr>`;
+    document.getElementById('countLabel').textContent = `共 ${_items.length} 条`;
+    return;
+  }
+
+  // 按状态分组，按 GROUP_ORDER 排序
+  const groups = {};
+  GROUP_ORDER.forEach(s => { groups[s] = []; });
+  filtered.forEach(it => {
+    const s = it.status || '待处理';
+    if (!groups[s]) groups[s] = [];
+    groups[s].push(it);
+  });
+
+  let html = '';
+  GROUP_ORDER.forEach(status => {
+    const rows = groups[status];
+    if (!rows || !rows.length) return;
+    const collapsed = _collapsed.has(status);
+    const arrowCls = collapsed ? 'grp-arrow collapsed' : 'grp-arrow';
+    html += `<tr class="grp-hdr" onclick="toggleGroup('${status}')">
+      <td colspan="15">
+        <div class="grp-title">
+          <span class="${arrowCls}">▼</span>
+          ${badge(status, STAT_CLS)}
+          <span class="grp-count">${rows.length} 条</span>
+        </div>
+      </td>
+    </tr>`;
+    if (!collapsed) {
+      // 组内排序
+      const sf = _sortField, sd = _sortDir;
+      rows.sort((a,b) => sd === 'asc' ? _cmp(a,b,sf) : _cmp(b,a,sf));
+      rows.forEach(it => {
+        const realIdx = _items.indexOf(it);
+        html += `<tr data-idx="${realIdx}" onclick="if(!event.target.closest('.lk-icon'))openEdit(${realIdx})">
+          <td><code style="font-family:var(--mono);font-size:10px;color:var(--accent)">${esc(it.id||'')}</code></td>
+          <td>${badge(it.type||'', TYPE_CLS)}</td>
+          <td>${badge(it.priority||'', PRIO_CLS)}</td>
+          <td class="cell-inline" style="text-align:center" onclick="showSeqSel(event,${realIdx})">
+            <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:${it.seq ? 'var(--accent)' : 'var(--faint)'}">${it.seq || '-'}</span>
+          </td>
+          <td style="font-weight:500">${esc(it.title||'')}</td>
+          <td><code style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(it.ui_id||'')}</code></td>
+          <td style="position:relative">${_renderLinks(it.links)}</td>
+          <td class="cell-inline" onclick="showInlineSel(event,${realIdx},'status',STATUS_OPTS,STAT_CLS)">${badge(it.status||'待处理', STAT_CLS)}</td>
+          <td class="cell-inline" onclick="showInlineSel(event,${realIdx},'user_confirm',UC_OPTS,UC_CLS)">${badge(it.user_confirm||'待确认', UC_CLS)}</td>
+          <td style="font-size:10px;color:var(--muted)">${esc(it.files||'')}</td>
+          <td><code style="font-family:var(--mono);font-size:10px;color:var(--faint)">${esc(it.commit||'')}</code></td>
+          <td style="font-size:11px">${esc(it.comment||'')}</td>
+          <td style="font-size:11px;color:var(--muted)">${esc(it.ai_question||'')}</td>
+          <td>${esc(it.module||'')}</td>
+          <td>${esc(it.page||'')}</td>
+        </tr>`;
+      });
+    }
+  });
+  tbody.innerHTML = html;
+
+  document.getElementById('countLabel').textContent =
+    filtered.length === _items.length
+      ? `共 ${_items.length} 条`
+      : `显示 ${filtered.length} / ${_items.length} 条`;
+
+  // 刷新 UI 索引面板的统计数据
+  if (_refOpen) renderRef();
+}
+
+// ── RowEditModal ──────────────────────────────────────────────────────────────
+
+const BT_COLUMNS = [
+  { field: 'title',       label: '主题',       type: 'text',      placeholder: '简短描述问题或需求' },
+  { field: 'status',      label: '状态',       type: 'enum',      options: [['待处理','待处理'],['进行中','进行中'],['已完成','已完成'],['已搁置','已搁置'],['无法复现','无法复现']] },
+  { field: 'user_confirm',label: '用户确认',    type: 'enum',      options: [['待确认','待确认'],['✓已验证','✓已验证'],['✗有问题','✗有问题']] },
+  { field: 'type',        label: '类型',       type: 'enum',      options: [['bug','bug'],['调整','调整'],['新需求','新需求']] },
+  { field: 'priority',    label: '优先级',     type: 'enum',      options: [['P1-高','P1-高'],['P0-紧急','P0-紧急'],['P2-中','P2-中'],['P3-低','P3-低']] },
+  { field: 'seq',         label: '序号',       type: 'enum',      options: [['','(无)'],['1','1'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['10','10']] },
+  { field: 'commit',      label: '完成 commit', type: 'text',     placeholder: '如：abc1234' },
+  { field: 'module',      label: '模块',       type: 'text',      datalist: 'module',     placeholder: '输入或选择模块…' },
+  { field: 'links',       label: '链接',       type: 'links' },
+  { field: 'attachments', label: '附件',       type: 'attachments' },
+  { field: 'ui_id',       label: 'UI_ID',      type: 'text',      datalist: 'ui_id',      placeholder: '输入或选择 UI_ID…', advanced: true },
+  { field: 'page',        label: '具体页面',    type: 'text',      datalist: 'page',       placeholder: '输入或选择页面…',   advanced: true },
+  { field: 'files',       label: '涉及文件',    type: 'text',      placeholder: '如：web/bop/bop.js', advanced: true },
+  { field: 'ai_status',   label: 'AI反馈',     type: 'enum',      options: [['待处理','待处理'],['已修复','已修复'],['已更新','已更新'],['方案变更','方案变更'],['无需修改','无需修改'],['无法复现','无法复现']], advanced: true },
+  { field: 'id',          label: 'ID',         type: 'readonly',  advanced: true },
+];
+
+const BT_DATALISTS = {
+  module: [{value:'BOP清单'},{value:'任务管理'},{value:'问题管理'},{value:'项目管理'},{value:'知识库'},{value:'规则管理'},{value:'工艺规划画布'},{value:'流程画布'},{value:'工作台'},{value:'工艺元素库'},{value:'标准作业库'},{value:'工厂实物清单'},{value:'EBOM'},{value:'工艺表'},{value:'组织管理'},{value:'审批'},{value:'悬浮窗'},{value:'超管后台'},{value:'通用组件'},{value:'认证登录'},{value:'AI助手'},{value:'导入导出'},{value:'视图管理'},{value:'容器卡片'}],
+  ui_id:  [{value:'P-MAIN · 主窗口 · MainWin'},{value:'P-LOGIN · 登录页 · Login'},{value:'P-SETTING · 设置 · Settings'},{value:'P-TRACKER · 开发看板 · BugTracker'},{value:'P-WB · 工作台 · Workbench'},{value:'P-TASK · 任务清单 · TaskList'},{value:'P-ISS · 问题清单 · IssueList'},{value:'P-PROJ · 项目清单 · ProjList'},{value:'P-BOP · BOP清单 · BOP'},{value:'P-EBOM · PBOM清单 · PBOM'},{value:'P-CRAFT · 工艺表格 · CraftTable'},{value:'P-CELM · 工艺元素库 · CraftElem'},{value:'P-STDOP · 标准作业库 · GBOP'},{value:'P-FACT · 工厂资源 · FactoryRes'},{value:'P-KNOW · 知识清单 · KnowList'},{value:'P-RULE · 规则管理 · RuleMgmt'},{value:'P-CANVAS · 工艺画布 · Canvas'},{value:'P-FLOW · 流程画布 · FlowCanvas'},{value:'P-ORG · 组织管理 · OrgMgmt'},{value:'P-APPROVAL · 审批中心 · Approval'},{value:'P-ADMIN · 管理中心 · AdminHub'},{value:'EL-LS · 清单壳 · ListShell'},{value:'EL-GRID · 表格编辑器 · GridEditor'},{value:'EL-VM · 视图管理器 · ViewManager'},{value:'EL-SIDEBAR · 清单侧边栏 · ListSidebar'},{value:'EL-RDP · 详情滑窗 · RDP'},{value:'EL-TREE · 结构树 · TreeView'},{value:'EL-REM · 编辑弹窗 · REM'},{value:'EL-ETHREAD · 沟通线程 · EntryThread'},{value:'EL-ATTACH · 附件管理 · AttachWidget'},{value:'EL-CC · 容器卡片 · ContainerCard'},{value:'EL-IEP · 导入导出 · ImportExport'},{value:'EL-DIFF · 对比分析 · DiffManager'},{value:'EL-MENTION · @提及 · MentionInput'},{value:'EL-SUB · 订阅铃铛 · SubscribeBtn'},{value:'EL-GANTT · 甘特图 · GanttChart'},{value:'EL-NAV · 导航管理器 · NavManager'},{value:'EL-TAB · 页签管理器 · TabManager'},{value:'EL-THEME · 主题管理器 · ThemeManager'},{value:'PT-LIST · 清单类型 · ListType'},{value:'PT-CANVAS · 画布类型 · CanvasType'},{value:'PT-WB · 工作台导航 · WBType'},{value:'PT-CARD · 卡片类型 · CardType'},{value:'PT-WEB · 网页类型 · WebType'},{value:'PT-TREE · 结构树类型 · TreeType'},{value:'PT-FLOAT · 悬浮窗类型 · FloatType'}],
+  page:   [{value:'主窗口/导航框架'},{value:'登录页'},{value:'设置'},{value:'任务清单'},{value:'问题清单'},{value:'项目管理'},{value:'BOP清单'},{value:'工艺表'},{value:'工艺元素库'},{value:'标准作业库'},{value:'规则管理'},{value:'知识库'},{value:'EBOM'},{value:'工厂实物清单'},{value:'工艺规划画布'},{value:'流程画布'},{value:'工作台'},{value:'悬浮窗'},{value:'组织管理'},{value:'超管后台'},{value:'审批'}],
+};
+
+function _initModal() {
+  _modal = new RowEditModal({
+    columns: BT_COLUMNS,
+    entryMode: 'ai',
+    items: _items,
+    getItemEntries: (it) => {
+      if (it.entries && it.entries.length) return it.entries;
+      const migrated = EntryThread.migrate(it);
+      if (migrated.length) { it.entries = migrated; return migrated; }
+      return [];
+    },
+    getItemAttachments: (it) => it.attachments || [],
+    getItemTitle: (it) => it.title || '',
+    entryIssueId: 'id',
+    isCloud: false,
+    itemType: 'bug_tracker',
+    showDelete: true,
+    datalists: BT_DATALISTS,
+    onNew: () => {
+      _modal?.close().then(() => {
+        _modal.setItems(_items);
+        _modal.openNew({ type: 'bug', priority: 'P1-高', status: '待处理', ai_status: '待处理', user_confirm: '待确认' });
+      });
+    },
+    extraFooterButtons: [{
+      html: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制指令`,
+      onclick: () => { _copyIssueInstruction(); },
+    }],
+    onSave: async (data) => {
+      const idx = data._idx;
+      const oldFields = EntryThread.entriesToOldFields(data._entries || []);
+      const item = {
+        id:           data._isNew ? _genId() : (_items[idx]?.id || ''),
+        type:         data.type,
+        priority:     data.priority,
+        status:       data.status,
+        ai_status:    data.ai_status,
+        user_confirm: data.user_confirm,
+        module:       (data.module || '').trim(),
+        ui_id:        (data.ui_id || '').trim(),
+        page:         (data.page || '').trim(),
+        files:        (data.files || '').trim(),
+        seq:          data.seq ? parseInt(data.seq) : null,
+        title:        (data.title || '').trim(),
+        detail:       oldFields.detail,
+        comment:      oldFields.comment || (_items[idx]?.comment || ''),
+        ai_question:  oldFields.ai_question || (_items[idx]?.ai_question || ''),
+        commit:       (data.commit || '').trim(),
+        links:        data.links || [],
+        attachments:  data.attachments || [],
+        history:      oldFields.history,
+        entries:      data._entries || [],
+        created_at:   data._isNew ? new Date().toISOString() : (_items[idx]?.created_at || new Date().toISOString()),
+        updated_at:   new Date().toISOString(),
+      };
+      if (!item.title) return null;
+      // seq collision
+      if (item.seq != null) {
+        const toShift = _items
+          .map((it, i) => ({ i, seq: it.seq }))
+          .filter(x => x.i !== idx && x.seq != null && x.seq >= item.seq)
+          .sort((a, b) => b.seq - a.seq);
+        for (const x of toShift) {
+          const newSeq = x.seq + 1;
+          _items[x.i].seq = newSeq <= 10 ? newSeq : null;
+          _items[x.i].updated_at = new Date().toISOString();
+        }
+      }
+      if (data._isNew) {
+        _items.unshift(item);
+      } else {
+        _items[idx] = item;
+      }
+      _reindexSeqs();
+      // entries 随 JSON 主存储持久化
+      await saveData();
+      render();
+      return item;
+    },
+    onDelete: async (item) => {
+      const idx = _items.indexOf(item);
+      if (idx >= 0) _items.splice(idx, 1);
+      await saveData();
+      render();
+    },
+  });
+}
+
+function openNew() {
+  if (!_modal) _initModal();
+  _modal.setItems(_items);
+  _modal.openNew({
+    type: 'bug', priority: 'P1-高', status: '待处理',
+    ai_status: '待处理', user_confirm: '待确认',
+  });
+}
+
+function openEdit(idx) {
+  if (!_modal) _initModal();
+  _modal.setItems(_items);
+  _modal.openAtIndex(idx);
+}
+
+/** Copy issue-level AI instruction */
+function _copyIssueInstruction() {
+  // 直接从 REM 实例获取当前编辑的条目
+  const it = _modal?._currentItem;
+  const issueId = it?.id || '?';
+  const text = '请读dev\\bug_tracker.json的（' + issueId + '号）问题的卡片。并执行相应动作，完成之后：\n'
+    + '1. 更新 dev\\bug_tracker.json 里该卡片的 ai_status 字段\n'
+    + '2. 对每条 human 条目分别追加回复卡片（section:"detail", author:"ai", author_name:"Claude", parent_id:该human条目的id），说明该条的处理结果。不要新建主题卡片，只回复已有卡片\n'
+    + '注意只改 ai_status，不要把卡片移到历史区\n'
+    + '⚠️ JSON 可能被 Electron 自动保存并发写入。写文件前先读盘确认未被外部修改，若内容有变请合并后再写，避免覆盖用户的并发编辑。';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      const st = document.querySelector('.rem-save-status');
+      if (st) { st.textContent = '已复制指令'; setTimeout(() => { st.textContent = '已保存'; }, 1500); }
+    }).catch(() => {});
+  }
+}
+
+// ── UI索引 panel ──────────────────────────────────────────────────────────────
+let _refOpen = false;
+
+const UI_INDEX = [
+  // ── 具体页面 ─────────────────────────────────────────────────────────────
+  { id:'P-MAIN',    name:'主窗口 · MainWin',      type:'导航框架',  cat:'cat-nav',  desc:'MainWindow — 标题栏+左侧导航+标签页+状态栏' },
+  { id:'P-LOGIN',   name:'登录页 · Login',         type:'独立窗口',  cat:'cat-nav',  desc:'LoginWindow — 飞书OAuth / 本地离线两种模式' },
+  { id:'P-SETTING', name:'设置 · Settings',        type:'独立窗口',  cat:'cat-nav',  desc:'SettingsWindow — 主题/快捷键/数据库/飞书/插件/清单等12个面板' },
+  { id:'P-TRACKER', name:'开发沟通看板 · BugTracker', type:'独立窗口', cat:'cat-nav', desc:'BugTracker — 独立弹出，直接读写 JSON 不依赖后端' },
+  { id:'P-DBLOG',   name:'调试日志 · DebugLog',    type:'独立窗口',  cat:'cat-nav',  desc:'DebugLogWindow — 带 DevTools 的调试窗口' },
+  { id:'P-WB',      name:'工作台 · Workbench',     type:'工作台导航', cat:'cat-wb',  desc:'Workbench — 多工作台(个人/团队)，触发/容器/流程画布 widget' },
+  { id:'P-TASK',    name:'任务清单 · TaskList',     type:'清单类型',  cat:'cat-list', desc:'Task — ListShell + 甘特图视图' },
+  { id:'P-ISS',     name:'问题清单 · IssueList',    type:'清单类型',  cat:'cat-list', desc:'Issue — ListShell + 视图管理' },
+  { id:'P-PROJ',    name:'项目清单 · ProjList',     type:'清单类型',  cat:'cat-list', desc:'Project — 项目清单页' },
+  { id:'P-BOP',     name:'BOP工艺清单 · BOP',       type:'清单类型',  cat:'cat-bop',  desc:'BOP — 35列定义，GBOP导入，版本属性，结构树/甘特图视图' },
+  { id:'P-EBOM',    name:'PBOM清单 · PBOM',         type:'清单类型',  cat:'cat-bop',  desc:'PBOM — 快照面板 + ListShell + 零件编辑' },
+  { id:'P-CRAFT',   name:'工艺表格 · CraftTable',   type:'清单类型',  cat:'cat-bop',  desc:'CraftTable — GridEditor + 工艺方案/工段弹窗 + 零件抽屉' },
+  { id:'P-CELM',    name:'工艺元素模板 · CraftElem', type:'清单类型', cat:'cat-bop',  desc:'CraftElement — 工艺元素库，标准清单页' },
+  { id:'P-STDOP',   name:'标准作业库 · GBOP',        type:'清单类型', cat:'cat-std',  desc:'StdOpLib — GBOP 标准操作库，ListShell' },
+  { id:'P-FACT',    name:'工厂实物资源 · FactoryRes', type:'清单类型', cat:'cat-bop',  desc:'FactoryResource — 工具/设备/工装三栏 + GridEditor + RDP' },
+  { id:'P-KNOW',    name:'知识清单 · KnowList',      type:'清单类型',  cat:'cat-std',  desc:'Knowledge — ListShell, rowClick→容器卡片' },
+  { id:'P-RULE',    name:'规则管理 · RuleMgmt',      type:'清单类型',  cat:'cat-std',  desc:'Rule — ListShell + 激活/暂停/背离操作 + 背离弹窗' },
+  { id:'P-CANVAS',  name:'工艺规划画布 · Canvas',    type:'画布类型',  cat:'cat-std',  desc:'CanvasShell — 元素面板+画布+模板库+连线层+图层管理' },
+  { id:'P-FLOW',    name:'流程画布 · FlowCanvas',    type:'画布类型',  cat:'cat-std',  desc:'FlowEditor — Drawflow.js, 拖拽节点+执行+历史+调试' },
+  { id:'P-AUTO-CANVAS', name:'自动化画布 · AutoCanvas', type:'画布类型', cat:'cat-std', desc:'AutoCanvas — 自动化流程画布变体' },
+  { id:'P-CC',      name:'内容详情页 · CardViewer',  type:'网页类型',  cat:'cat-wb',   desc:'ContainerCard — 全屏渲染容器卡片(markdown/图片/PDF/webview等)' },
+  { id:'P-MD',      name:'MD文档 · MDWorkspace',     type:'网页类型',  cat:'cat-wb',   desc:'MDWorkspace — Markdown 文档编辑工作区' },
+  { id:'P-KANBAN',  name:'项目看板 · Kanban',        type:'清单类型',  cat:'cat-list', desc:'Kanban — 项目看板视图' },
+  { id:'P-ORG',     name:'组织管理 · OrgMgmt',       type:'管理页面',  cat:'cat-org',  desc:'OrgMgmt — 团队管理/用户角色/项目成员/团队配置4个Tab' },
+  { id:'P-APPROVAL',name:'审批中心 · Approval',      type:'管理页面',  cat:'cat-org',  desc:'Approval — 审批实例与任务管理' },
+  { id:'P-ADMIN',   name:'管理中心 · AdminHub',      type:'管理页面',  cat:'cat-org',  desc:'AdminHub — 系统能力/清单注册/功能开关/开发看板/组织/审批' },
+  { id:'P-CAP',     name:'系统能力 · Capabilities',  type:'管理页面',  cat:'cat-org',  desc:'Capabilities — 36条静态能力清单，双击编辑' },
+  { id:'P-LISTS',   name:'清单注册 · ListRegistry',  type:'管理页面',  cat:'cat-org',  desc:'ListRegistry — 18条数据清单，持久化 system_config' },
+  { id:'P-FFLAGS',  name:'功能开关 · FeatureFlags',  type:'管理页面',  cat:'cat-org',  desc:'FeatureFlags — 系统功能开关管理' },
+  { id:'P-SKILL',   name:'Skill库 · SkillLib',       type:'清单类型',  cat:'cat-std',  desc:'SkillLib — 自动化 Skill 库页面' },
+  { id:'P-AI-SET',  name:'AI设置 · AISettings',      type:'管理页面',  cat:'cat-std',  desc:'AISettings — AI 相关配置页' },
+  // ── 通用组件 ─────────────────────────────────────────────────────────────
+  { id:'EL-LS',     name:'清单类型壳 · ListShell',       type:'核心组件', cat:'cat-comp', desc:'ListShell — 统一三栏壳(侧栏+Grid+RDP+视图标签栏)' },
+  { id:'EL-GRID',   name:'表格编辑器 · GridEditor',      type:'核心组件', cat:'cat-comp', desc:'GridEditor — 可编辑数据表格，支持排序/统计/行点击' },
+  { id:'EL-VM',     name:'视图管理器 · ViewManager',     type:'核心组件', cat:'cat-comp', desc:'ViewManager — 视图增删改查(grid/gantt/tree/card/report)' },
+  { id:'EL-SIDEBAR',name:'清单侧边栏 · ListSidebar',     type:'核心组件', cat:'cat-comp', desc:'ListSidebar — 左侧清单选择器，支持右键菜单' },
+  { id:'EL-RDP',    name:'行详情侧边滑窗 · RDP',  type:'核心组件', cat:'cat-comp', desc:'RowDetailPanel — 右侧滑出可折叠行详情编辑面板' },
+  { id:'EL-TREE',   name:'结构树视图 · TreeView',        type:'核心组件', cat:'cat-comp', desc:'TreeView — 层级树形视图组件，支持 parentField 构建' },
+  { id:'EL-TREESHELL', name:'结构树壳 · TreeShell',      type:'核心组件', cat:'cat-comp', desc:'TreeShell — 结构树类型页面布局壳' },
+  { id:'EL-HUB',    name:'Hub页签管理 · HubShell',       type:'核心组件', cat:'cat-comp', desc:'HubShell — 二级页签管理器，溢出面板' },
+  { id:'EL-CC',     name:'容器卡片 · ContainerCard',     type:'核心组件', cat:'cat-comp', desc:'ContainerCard — 多mode卡片(row_detail/md/img/pdf/webview/script等9种)' },
+  { id:'EL-REM',    name:'行详情覆盖弹窗 · REM',  type:'弹窗组件', cat:'cat-comp', desc:'RowEditModal — 居中覆盖弹窗，含沟通线程+附件+上下条导航' },
+  { id:'EL-ETHREAD',name:'条目沟通线程 · EntryThread',   type:'弹窗组件', cat:'cat-comp', desc:'EntryThread — 结构化人/AI沟通评论线程' },
+  { id:'EL-ATTACH', name:'附件管理 · AttachWidget',      type:'弹窗组件', cat:'cat-comp', desc:'AttachmentsWidget — 附件上传/预览/删除管理' },
+  { id:'EL-IEP',    name:'导入导出 · ImportExport',      type:'工具组件', cat:'cat-comp', desc:'ImportExportManager — 通用导入导出(XLSX/CSV)' },
+  { id:'EL-DIFF',   name:'对比分析 · DiffManager',       type:'工具组件', cat:'cat-comp', desc:'DiffManager — 通用数据对比分析(Step1/Step2 modal)' },
+  { id:'EL-MENTION',name:'@提及输入 · MentionInput',     type:'工具组件', cat:'cat-comp', desc:'MentionInput — textarea + @触发搜索下拉' },
+  { id:'EL-SUB',    name:'订阅铃铛 · SubscribeBtn',      type:'工具组件', cat:'cat-comp', desc:'SubscribeButton — 多条件订阅/通知面板' },
+  { id:'EL-GANTT',  name:'甘特图 · GanttChart',          type:'视图组件', cat:'cat-comp', desc:'GanttChart — 甘特图视图渲染' },
+  { id:'EL-DREG',   name:'数据注册器 · DataRegistry',    type:'工具组件', cat:'cat-comp', desc:'DataRegistry — 注册数据清单，广播 postMessage' },
+  { id:'EL-SCOPE',  name:'范围标签 · ScopeBadge',        type:'工具组件', cat:'cat-comp', desc:'ScopeBadge — 存储范围(local/cloud)可视化标签' },
+  { id:'EL-TPLEDIT',name:'模板编辑器 · TplEditor',       type:'工具组件', cat:'cat-comp', desc:'ExportTemplateEditor — 导出模板编辑器' },
+  { id:'EL-CANVAS', name:'画布壳 · CanvasShell',         type:'画布组件', cat:'cat-comp', desc:'CanvasShell — 统一画布(网格吸附+卡片+连线+图层)' },
+  { id:'EL-CONN',   name:'画布连线层 · ConnLayer',       type:'画布组件', cat:'cat-comp', desc:'ConnectionLayer — SVG 卡片间连线' },
+  { id:'EL-CLAYER', name:'画布图层 · LayerMgr',          type:'画布组件', cat:'cat-comp', desc:'LayerManager — 画布图层显隐管理' },
+  { id:'EL-CSEARCH',name:'画布搜索 · CanvasSearch',      type:'画布组件', cat:'cat-comp', desc:'CanvasSearch — 画布卡片搜索' },
+  { id:'EL-CTPL',   name:'画布模板 · CanvasTpl',         type:'画布组件', cat:'cat-comp', desc:'CanvasTemplate — 系统预设+用户自定义画布模板' },
+  { id:'EL-GSYS',   name:'网格吸附 · GridSystem',        type:'画布组件', cat:'cat-comp', desc:'GridSystem — 拖拽吸附网格系统' },
+  { id:'EL-CFRAME', name:'卡片框架 · CardFrame',         type:'画布组件', cat:'cat-comp', desc:'CardFrame — 可拖拽调整大小的卡片包装器' },
+  { id:'EL-WS',     name:'工作区引擎 · WorkspaceEngine', type:'核心组件', cat:'cat-comp', desc:'WorkspaceEngine — Obsidian风格标签页/分栏工作区' },
+  { id:'EL-FSHELL', name:'悬浮卡片窗口 · FloatShell',    type:'窗口组件', cat:'cat-comp', desc:'FloatShell — 无边框alwaysOnTop悬浮窗，内嵌iframe' },
+  { id:'EL-FBALL',  name:'悬浮球 · FloatBall',           type:'窗口组件', cat:'cat-comp', desc:'FloatBall — 右下角64x64悬浮球按钮' },
+  { id:'EL-SIDEBAR-R', name:'快捷侧边栏 · QuickSidebar', type:'窗口组件', cat:'cat-comp', desc:'QuickSidebar — 左侧300px无边框快捷操作面板' },
+  { id:'EL-DRAWPRIM',name:'SVG绘图标注 · DrawPrimitives',type:'工具组件', cat:'cat-comp', desc:'DrawPrimitives — SVG 绘图标注(矩形/椭圆/文字/箭头)' },
+  { id:'EL-NAV',    name:'导航管理器 · NavManager',      type:'核心组件', cat:'cat-comp', desc:'NavManager — 左侧图标导航栏+更多模块面板' },
+  { id:'EL-TAB',    name:'页签管理器 · TabManager',      type:'核心组件', cat:'cat-comp', desc:'TabManager — 标签页生命周期(打开/关闭/切换/弹出)' },
+  { id:'EL-CMDP',   name:'命令面板 · CmdPalette',        type:'工具组件', cat:'cat-comp', desc:'CmdPalette — Ctrl+P 命令面板' },
+  { id:'EL-THEME',  name:'主题管理器 · ThemeManager',    type:'工具组件', cat:'cat-comp', desc:'ThemeManager — 明暗主题同步(broadcast+storage+postMessage)' },
+  { id:'EL-CARD-MD',name:'Markdown模式 · ModeMD',        type:'卡片模式', cat:'cat-comp', desc:'ModeMarkdown — MD读写(预览/编辑切换,Ctrl+S保存)' },
+  { id:'EL-CARD-IMG',name:'图片画廊模式 · ModeImg',      type:'卡片模式', cat:'cat-comp', desc:'ModeImageGallery — 多图预览+SVG标注+localStorage持久化' },
+  { id:'EL-CARD-WV',name:'网页嵌入模式 · ModeWebview',   type:'卡片模式', cat:'cat-comp', desc:'ModeWebview — Electron webview嵌入任意http/https URL' },
+  { id:'EL-CARD-PDF',name:'PDF预览模式 · ModePDF',       type:'卡片模式', cat:'cat-comp', desc:'ModePDF — Chromium原生PDF渲染' },
+  { id:'EL-CARD-SCRIPT',name:'脚本编辑模式 · ModeScript',type:'卡片模式', cat:'cat-comp', desc:'ModeScript — Monaco Editor懒加载脚本读写' },
+  // ── 页面类型模板 ─────────────────────────────────────────────────────────
+  { id:'PT-NAV',    name:'导航页签 · NavTab',     type:'页面类型', cat:'cat-pt', desc:'顶部一级导航容器，下方嵌入子页面' },
+  { id:'PT-LIST',   name:'清单类型 · ListType',    type:'页面类型', cat:'cat-pt', desc:'ListShell：左侧清单选择器+视图标签栏+GridEditor+右侧详情面板' },
+  { id:'PT-CANVAS', name:'画布类型 · CanvasType',  type:'页面类型', cat:'cat-pt', desc:'CanvasShell：左侧元素面板+中央画布+右侧模板库+连线层' },
+  { id:'PT-WB',     name:'工作台导航 · WBType',    type:'页面类型', cat:'cat-pt', desc:'卡片网格吸附布局，编辑/使用两种模式' },
+  { id:'PT-CARD',   name:'卡片类型 · CardType',    type:'页面类型', cat:'cat-pt', desc:'ContainerCard：触发/容器多mode，可调大小吸附，可转页签' },
+  { id:'PT-WEB',    name:'网页类型 · WebType',     type:'页面类型', cat:'cat-pt', desc:'ContainerCard 全屏页签渲染(网页类型=容器卡片转Tab)' },
+  { id:'PT-MODAL',  name:'弹窗类型 · ModalType',   type:'页面类型', cat:'cat-pt', desc:'.modal-overlay 非全屏覆盖层(设置/编辑/确认等)' },
+  { id:'PT-FLOAT',  name:'悬浮窗类型 · FloatType', type:'页面类型', cat:'cat-pt', desc:'alwaysOnTop 无边框悬浮窗(浮球/侧边栏/悬浮卡片/底部条)' },
+  { id:'PT-TREE',   name:'结构树类型 · TreeType',  type:'页面类型', cat:'cat-pt', desc:'TreeShell：版本选择器+树形列表，适用于BOP/BOM/组织架构' },
+  { id:'PT-CAD',    name:'数模预览类型 · CADType', type:'页面类型', cat:'cat-pt', desc:'左侧结构树+右侧3D数模预览(待规划)' },
+];
+
+function renderRef() {
+  const q = (document.getElementById('refSearch')?.value || '').toLowerCase();
+  const filtered = q
+    ? UI_INDEX.filter(u => u.id.toLowerCase().includes(q) || u.name.includes(q) || (u.desc||'').includes(q))
+    : UI_INDEX;
+
+  const pages = filtered.filter(u => u.id.startsWith('P-'));
+  const comps  = filtered.filter(u => u.id.startsWith('EL-'));
+  const types  = filtered.filter(u => u.id.startsWith('PT-'));
+
+  function row(u) {
+    // 统计该 UI_ID 对应的条目中，status != '已完成' 的数量
+    const cnt = _items.filter(it => (it.ui_id||'').includes(u.id) && it.status !== '已完成').length;
+    const cntHtml = cnt > 0 ? `<span class="ref-count">${cnt}</span>` : '';
+    return `<div class="ref-item ${u.cat}" onclick="insertUid('${u.id}','${u.name.replace(/'/g,"\\'")}')">
+      <span class="ref-uid">${u.id}</span>
+      <span class="ref-name">${esc(u.name)}</span>
+      <span class="ref-type">${esc(u.type)}</span>
+      ${cntHtml}
+    </div>`;
+  }
+
+  let html = '';
+  if (pages.length) { html += `<div class="ref-section-hdr">具体页面</div>` + pages.map(row).join(''); }
+  if (comps.length)  { html += `<div class="ref-section-hdr">通用组件</div>` + comps.map(row).join(''); }
+  if (types.length)  { html += `<div class="ref-section-hdr">页面类型模板</div>` + types.map(row).join(''); }
+  document.getElementById('refBody').innerHTML = html || `<div style="padding:20px;color:var(--faint);font-size:12px">无匹配结果</div>`;
+}
+
+function insertUid(id, name) {
+  const input = document.querySelector('[data-rem-field="ui_id"]');
+  if (!input) return;
+  const label = name || id;
+  const cur = input.value.trim();
+  input.value = cur ? (cur + ' / ' + label) : label;
+  input.focus();
+}
+
+function toggleRef() {
+  _refOpen = !_refOpen;
+  document.getElementById('refPanel').classList.toggle('open', _refOpen);
+  document.getElementById('btnRef').classList.toggle('btn-active', _refOpen);
+  if (_refOpen) renderRef();
+}
+
+// ── init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  // event delegation for link icon clicks (data attributes instead of inline onclick)
+  document.addEventListener('click', (e) => {
+    const icon = e.target.closest('.lk-icon');
+    if (!icon) return;
+    const type = icon.dataset.lkType;
+    const url = icon.dataset.lkUrl;
+    if (type && url) openLink(e, type, url);
+  });
+});
+
+// theme sync — localStorage 兜底 + postMessage 实时切换 + storage 跨窗口同步
+window.addEventListener('message', e => {
+  if (e.data?.type === 'theme') {
+    document.documentElement.setAttribute('data-theme', e.data.theme || 'dark');
+  }
+});
+window.addEventListener('storage', e => {
+  if (e.key === 'system.theme' && e.newValue) {
+    document.documentElement.setAttribute('data-theme', e.newValue);
+  }
+});
+(function syncTheme() {
+  const t = localStorage.getItem('system.theme');
+  document.documentElement.setAttribute('data-theme', t || 'dark');
+})();
+</script>
+</body>
+</html>

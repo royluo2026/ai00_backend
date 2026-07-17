@@ -1,0 +1,393 @@
+/* 工艺表格视图样式 */
+:root {
+  --bg-primary: #1e1e2e;
+  --bg-secondary: #181825;
+  --bg-surface: #313244;
+  --bg-overlay: #45475a;
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+  --text-muted: #6c7086;
+  --accent: #89b4fa;
+  --accent-hover: #74c7ec;
+  --border: #45475a;
+  --error: #f38ba8;
+  --warning: #fab387;
+  --success: #a6e3a1;
+  --row-hover: rgba(137,180,250,0.08);
+  --sticky-bg: #1e1e2e;
+  --toolbar-h: 48px;
+}
+
+[data-theme="light"] {
+  --bg-primary: #eff1f5;
+  --bg-secondary: #e6e9ef;
+  --bg-surface: #ccd0da;
+  --bg-overlay: #bcc0cc;
+  --text-primary: #4c4f69;
+  --text-secondary: #5c5f77;
+  --text-muted: #9ca0b0;
+  --accent: #1e66f5;
+  --accent-hover: #04a5e5;
+  --border: #bcc0cc;
+  --row-hover: rgba(30,102,245,0.07);
+  --sticky-bg: #eff1f5;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Toolbar ─────────────────────────── */
+.toolbar {
+  height: var(--toolbar-h);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toolbar-select {
+  height: 28px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 12px;
+  cursor: pointer;
+  min-width: 160px;
+}
+.toolbar-select:focus { outline: none; border-color: var(--accent); }
+
+/* ─── Buttons ──────────────────────────── */
+.btn {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-secondary);
+  border-color: var(--accent);
+}
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+.btn-secondary:hover:not(:disabled) { background: var(--bg-overlay); }
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+}
+.btn-icon:hover { color: var(--text-primary); }
+
+/* ─── Main Layout ───────────────────────── */
+.main-layout {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── Table ──────────────────────────────── */
+.table-wrapper {
+  flex: 1;
+  overflow: auto;
+}
+.craft-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.craft-table th {
+  position: sticky;
+  top: 0;
+  background: var(--sticky-bg);
+  border-bottom: 2px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  z-index: 1;
+}
+.craft-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.craft-table tbody tr:hover { background: var(--row-hover); }
+.craft-table .empty-row td {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px;
+}
+
+/* ── Column widths ── */
+.col-ws   { width: 90px; }
+.col-post { width: 80px; }
+.col-code { width: 80px; }
+.col-name { width: 200px; }
+.col-time { width: 90px; }
+.col-imp  { width: 72px; }
+.col-nudd { width: 56px; }
+.col-parts{ width: auto; }
+.col-tools{ width: 120px; }
+
+/* ── Inline edit ── */
+td[contenteditable="true"] {
+  outline: 2px solid var(--accent);
+  border-radius: 2px;
+  background: var(--bg-surface);
+  white-space: normal;
+  overflow: visible;
+}
+.importance-critical { color: var(--error); font-weight: 600; }
+.importance-normal   { color: var(--text-secondary); }
+.nudd-badge {
+  display: inline-block;
+  background: var(--warning);
+  color: var(--bg-secondary);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.part-chip {
+  display: inline-block;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 6px;
+  margin: 1px 2px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.part-chip:hover { border-color: var(--accent); }
+.bind-btn {
+  background: none;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.bind-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tool-tag {
+  display: inline-block;
+  background: var(--bg-overlay);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+/* ─── Part Drawer ──────────────────────── */
+.part-drawer {
+  width: 300px;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width 0.2s;
+}
+.part-drawer.hidden { width: 0; overflow: hidden; border: none; }
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 13px;
+}
+.drawer-search {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.search-input {
+  flex: 1;
+  height: 28px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+.search-input:focus { outline: none; border-color: var(--accent); }
+.part-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+.part-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.part-item:hover { background: var(--row-hover); }
+.part-item .part-no { font-weight: 600; font-size: 12px; }
+.part-item .part-name { color: var(--text-secondary); font-size: 11px; margin-top: 2px; }
+.part-item .part-fastener {
+  display: inline-block;
+  background: var(--warning);
+  color: var(--bg-secondary);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+/* ─── Dialogs ──────────────────────────── */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.dialog-overlay.hidden { display: none; }
+.dialog {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dialog-title { font-size: 15px; font-weight: 700; }
+.dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.dialog-input {
+  height: 32px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+.dialog-input:focus { outline: none; border-color: var(--accent); }
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* 分组标题行 — 使用本模块 CSS 变量 */
+.vm-group-header-row td {
+  background: rgba(137,180,250,.06) !important;
+  color: var(--accent);
+  border-top: 1px solid var(--border);
+}
+[data-theme="light"] .vm-group-header-row td {
+  background: rgba(30,102,245,.05) !important;
+}
+
+/* ViewManager toolbar override for this module */
+#vmToolbar .vm-toolbar {
+  padding: 6px 14px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+#vmToolbar .vm-panel { z-index: 100; }
+#vmToolbar .vm-btn,
+#vmToolbar .app-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+#vmToolbar .app-btn:hover { background: rgba(255,255,255,.06); }
+[data-theme="light"] #vmToolbar .app-btn:hover { background: rgba(0,0,0,.06); }
+#vmToolbar .app-btn-primary { background: var(--accent); color: #1e1e2e; border-color: var(--accent); }
+#vmToolbar .vm-badge { background: var(--accent); }
+#vmToolbar .vm-panel { background: var(--bg-secondary); border-color: var(--border); color: var(--text-primary); }
+#vmToolbar .vm-panel-title { color: var(--text-muted); border-color: var(--border); }
+#vmToolbar .vm-panel-footer { border-color: var(--border); }
+#vmToolbar .vm-field-row label,
+#vmToolbar .vm-view-item-name { color: var(--text-primary); }
+#vmToolbar .vm-view-item.active { background: rgba(137,180,250,.15); color: var(--accent); }
+#vmToolbar .vm-view-item:hover { background: rgba(255,255,255,.05); }
+[data-theme="light"] #vmToolbar .vm-view-item:hover { background: rgba(0,0,0,.05); }
+#vmToolbar .vm-sel-sm,
+#vmToolbar .vm-inp-sm {
+  background: var(--bg-primary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+#vmToolbar .vm-icon-btn { color: var(--text-muted); }
+#vmToolbar .vm-icon-btn:hover { background: rgba(255,255,255,.08); color: var(--text-primary); }
+[data-theme="light"] #vmToolbar .vm-icon-btn:hover { background: rgba(0,0,0,.08); }
+
+/* ── 克隆状态徽标 ──────────────────────────────────────────── */
+.clone-badge {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: monospace;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.clone-badge--clean {
+  color: var(--text-muted, #6c7086);
+  background: transparent;
+}
+.clone-badge--drift {
+  color: var(--warning, #fab387);
+  background: color-mix(in srgb, var(--warning, #fab387) 12%, transparent);
+}
+.clone-badge--updated {
+  color: var(--accent, #89b4fa);
+  background: color-mix(in srgb, var(--accent, #89b4fa) 12%, transparent);
+}
+[data-theme="light"] .clone-badge--clean   { color: #9ca0b0; }
+[data-theme="light"] .clone-badge--drift   { color: #d97706; background: rgba(217,119,6,.1); }
+[data-theme="light"] .clone-badge--updated { color: #1e66f5; background: rgba(30,102,245,.1); }

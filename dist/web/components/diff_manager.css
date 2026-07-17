@@ -1,0 +1,607 @@
+/**
+ * web/components/diff_manager.css
+ * ─────────────────────────────────
+ * 通用数据对比分析工具样式
+ * 与 import_export.css 变量体系一致，深浅色自适应
+ */
+
+/* ── 遮罩层 ────────────────────────────────────────────────────────────────── */
+.dm-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 2100;
+  align-items: center;
+  justify-content: center;
+}
+.dm-overlay.dm-show {
+  display: flex;
+}
+
+/* ── 主体 modal ─────────────────────────────────────────────────────────────── */
+.dm-modal {
+  background: var(--bg-surface, #24273a);
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 12px;
+  width: 880px;
+  max-width: 97vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* ── modal 头部 ─────────────────────────────────────────────────────────────── */
+.dm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border-default, #313244);
+  flex-shrink: 0;
+}
+.dm-modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-normal, #cdd6f4);
+}
+.dm-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #a6adc8);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  padding: 0;
+}
+.dm-modal-close:hover {
+  background: var(--bg-tertiary, #313244);
+  color: var(--text-normal, #cdd6f4);
+}
+
+/* ── 步骤指示条（复用 ie-steps 风格） ─────────────────────────────────────── */
+.dm-steps {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px 10px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-default, #313244);
+  background: var(--bg-secondary, #181825);
+}
+.dm-step {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-faint, #6c7086);
+}
+.dm-step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-tertiary, #313244);
+  border: 2px solid var(--border-default, #313244);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--text-muted, #a6adc8);
+}
+.dm-step.active .dm-step-dot {
+  background: var(--color-accent, #89b4fa);
+  border-color: var(--color-accent, #89b4fa);
+  color: var(--bg-primary, #1e1e2e);
+}
+.dm-step.done .dm-step-dot {
+  background: #a6e3a1;
+  border-color: #a6e3a1;
+  color: var(--bg-primary, #1e1e2e);
+}
+.dm-step.active .dm-step-label,
+.dm-step.done .dm-step-label {
+  color: var(--text-normal, #cdd6f4);
+}
+.dm-step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-default, #313244);
+  margin: 0 8px;
+  min-width: 20px;
+}
+
+/* ── modal 内容区 ─────────────────────────────────────────────────────────── */
+.dm-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  min-height: 0;
+}
+
+/* ── modal 底部 ─────────────────────────────────────────────────────────────── */
+.dm-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-default, #313244);
+  flex-shrink: 0;
+  background: var(--bg-secondary, #181825);
+}
+
+/* ── Step 1：来源选择双列面板 ────────────────────────────────────────────── */
+.dm-source-grid {
+  display: flex;
+  gap: 16px;
+}
+.dm-source-panel {
+  flex: 1;
+  background: var(--bg-secondary, #181825);
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 8px;
+  padding: 14px;
+}
+.dm-source-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted, #a6adc8);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.dm-source-panel-a .dm-source-panel-title { color: #60a5fa; }
+.dm-source-panel-b .dm-source-panel-title { color: #4ade80; }
+
+.dm-field-group {
+  margin-bottom: 10px;
+}
+.dm-field-group:last-child { margin-bottom: 0; }
+.dm-field-group label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted, #a6adc8);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.dm-select,
+.dm-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  background: var(--bg-primary, #1e1e2e);
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 6px;
+  color: var(--text-normal, #cdd6f4);
+  font-size: 12px;
+  outline: none;
+}
+.dm-select:focus,
+.dm-input:focus {
+  border-color: var(--color-accent, #89b4fa);
+}
+
+/* Excel 上传区域 */
+.dm-upload-zone {
+  border: 2px dashed var(--border-default, #313244);
+  border-radius: 6px;
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-size: 12px;
+  color: var(--text-muted, #a6adc8);
+}
+.dm-upload-zone:hover,
+.dm-upload-zone.dragover {
+  border-color: var(--color-accent, #89b4fa);
+  background: rgba(137, 180, 250, 0.05);
+}
+.dm-upload-zone.has-file {
+  border-color: #a6e3a1;
+  color: #a6e3a1;
+}
+.dm-upload-input { display: none; }
+
+/* 匹配键行 */
+.dm-match-key-row {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-secondary, #181825);
+  border-radius: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-default, #313244);
+}
+.dm-match-key-row label {
+  font-size: 12px;
+  color: var(--text-muted, #a6adc8);
+  white-space: nowrap;
+  font-weight: 500;
+}
+.dm-match-key-row .dm-select {
+  flex: 1;
+  max-width: 260px;
+}
+
+/* ── 通用按钮 ────────────────────────────────────────────────────────────── */
+.dm-btn {
+  padding: 7px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+.dm-btn:hover { opacity: 0.85; }
+.dm-btn-primary {
+  background: var(--color-accent, #89b4fa);
+  color: var(--bg-primary, #1e1e2e);
+}
+.dm-btn-ghost {
+  background: var(--bg-tertiary, #313244);
+  color: var(--text-normal, #cdd6f4);
+}
+.dm-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 小幽灵按钮（工具栏内） */
+.dm-btn-sm {
+  padding: 4px 12px;
+  border-radius: 5px;
+  border: 1px solid var(--border-default, #313244);
+  cursor: pointer;
+  font-size: 12px;
+  background: transparent;
+  color: var(--text-normal, #cdd6f4);
+  transition: border-color 0.12s, background 0.12s;
+}
+.dm-btn-sm:hover {
+  border-color: var(--color-accent, #89b4fa);
+  background: rgba(137, 180, 250, 0.08);
+}
+.dm-btn-sm.active {
+  background: var(--color-accent, #89b4fa);
+  color: var(--bg-primary, #1e1e2e);
+  border-color: var(--color-accent, #89b4fa);
+  font-weight: 500;
+}
+
+/* 下拉菜单按钮 */
+.dm-dropdown-wrap {
+  position: relative;
+  display: inline-block;
+}
+.dm-dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--bg-surface, #24273a);
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 7px;
+  padding: 4px;
+  min-width: 160px;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.dm-dropdown-menu.show { display: block; }
+.dm-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-normal, #cdd6f4);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.dm-dropdown-item:hover {
+  background: rgba(137, 180, 250, 0.1);
+  color: var(--color-accent, #89b4fa);
+}
+
+/* ── Step 2：差异摘要条 ─────────────────────────────────────────────────── */
+.dm-summary-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-secondary, #181825);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.dm-summary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dm-badge-added   { background: rgba(166, 227, 161, 0.18); color: #a6e3a1; }
+.dm-badge-removed { background: rgba(243, 139, 168, 0.18); color: #f38ba8; }
+.dm-badge-modified{ background: rgba(249, 226, 175, 0.18); color: #f9e2af; }
+.dm-badge-same    { background: rgba(108, 112, 134, 0.15); color: #a6adc8; }
+
+/* ── Step 2：视图工具栏 ─────────────────────────────────────────────────── */
+.dm-view-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.dm-view-group {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-secondary, #181825);
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 6px;
+  padding: 2px;
+}
+.dm-only-diff-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted, #a6adc8);
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 8px;
+}
+.dm-only-diff-label input[type="checkbox"] {
+  accent-color: var(--color-accent, #89b4fa);
+}
+.dm-toolbar-spacer { flex: 1; }
+
+/* ── Unified diff 表格 ──────────────────────────────────────────────────── */
+.dm-diff-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 8px;
+}
+.dm-diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.dm-diff-table th {
+  background: var(--bg-secondary, #181825);
+  border-bottom: 2px solid var(--border-default, #313244);
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--text-muted, #a6adc8);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.dm-diff-table th.dm-status-th {
+  width: 36px;
+  text-align: center;
+}
+.dm-diff-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(49, 50, 68, 0.4);
+  vertical-align: middle;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dm-diff-table .dm-status-cell {
+  text-align: center;
+  font-size: 14px;
+  width: 36px;
+  border-left: 3px solid transparent;
+}
+
+/* 行状态着色（左侧 3px 彩条 + 背景） */
+.dm-diff-table tr.dm-added td { background: #dcfce7; color: #166534; }
+.dm-diff-table tr.dm-added .dm-status-cell { border-left-color: #4ade80; }
+.dm-diff-table tr.dm-removed td { background: #fee2e2; color: #991b1b; }
+.dm-diff-table tr.dm-removed .dm-status-cell { border-left-color: #f87171; }
+.dm-diff-table tr.dm-modified td { background: #fef3c7; color: #92400e; }
+.dm-diff-table tr.dm-modified .dm-status-cell { border-left-color: #fbbf24; }
+
+/* 深色主题覆盖（使用半透明色，与 CSS 变量背景混合） */
+@media not print {
+  :root:not([data-theme="light"]) .dm-diff-table tr.dm-added td {
+    background: rgba(74, 222, 128, 0.12);
+    color: #86efac;
+  }
+  :root:not([data-theme="light"]) .dm-diff-table tr.dm-removed td {
+    background: rgba(248, 113, 113, 0.12);
+    color: #fca5a5;
+  }
+  :root:not([data-theme="light"]) .dm-diff-table tr.dm-modified td {
+    background: rgba(251, 191, 36, 0.10);
+    color: #fde68a;
+  }
+}
+
+/* 变更字段单元格加粗 */
+.dm-diff-table td.dm-changed {
+  font-weight: 700;
+}
+:root:not([data-theme="light"]) .dm-diff-table td.dm-changed {
+  background: rgba(251, 191, 36, 0.20) !important;
+}
+[data-theme="light"] .dm-diff-table td.dm-changed {
+  background: #fef08a !important;
+}
+
+/* 隐藏相同行（只看差异模式） */
+.dm-hide-same .dm-diff-table tr.dm-same {
+  display: none;
+}
+
+/* ── Side-by-side 视图 ──────────────────────────────────────────────────── */
+.dm-sbs-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 8px;
+}
+.dm-sbs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.dm-sbs-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 1px solid var(--border-default, #313244);
+}
+.dm-sbs-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(49, 50, 68, 0.4);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A侧标题行 */
+.dm-sbs-header-a {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+/* B侧标题行 */
+.dm-sbs-header-b {
+  background: #14532d;
+  color: #86efac;
+}
+/* 分隔列 */
+.dm-sbs-divider {
+  width: 3px;
+  background: var(--border-default, #313244);
+  padding: 0 !important;
+}
+
+/* A侧/B侧数据单元格 */
+.dm-cell-a { max-width: 200px; }
+.dm-cell-b { max-width: 200px; }
+.dm-cell-changed { font-weight: 700; }
+
+/* Side-by-side 行着色 */
+:root:not([data-theme="light"]) .dm-sbs-table tr.dm-added .dm-cell-b {
+  background: rgba(74, 222, 128, 0.12);
+  color: #86efac;
+}
+:root:not([data-theme="light"]) .dm-sbs-table tr.dm-removed .dm-cell-a {
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+}
+:root:not([data-theme="light"]) .dm-sbs-table tr.dm-modified .dm-cell-a,
+:root:not([data-theme="light"]) .dm-sbs-table tr.dm-modified .dm-cell-b {
+  background: rgba(251, 191, 36, 0.10);
+  color: #fde68a;
+}
+:root:not([data-theme="light"]) .dm-sbs-table tr.dm-modified .dm-cell-changed {
+  background: rgba(251, 191, 36, 0.22) !important;
+}
+
+[data-theme="light"] .dm-sbs-table tr.dm-added .dm-cell-b {
+  background: #dcfce7; color: #166534;
+}
+[data-theme="light"] .dm-sbs-table tr.dm-removed .dm-cell-a {
+  background: #fee2e2; color: #991b1b;
+}
+[data-theme="light"] .dm-sbs-table tr.dm-modified .dm-cell-a,
+[data-theme="light"] .dm-sbs-table tr.dm-modified .dm-cell-b {
+  background: #fef3c7; color: #92400e;
+}
+[data-theme="light"] .dm-sbs-table tr.dm-modified .dm-cell-changed {
+  background: #fef08a !important;
+}
+
+/* 隐藏相同行 */
+.dm-hide-same .dm-sbs-table tr.dm-same {
+  display: none;
+}
+
+/* 状态图标列（Side-by-side 中） */
+.dm-sbs-status {
+  width: 28px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted, #a6adc8);
+  padding: 7px 4px !important;
+}
+
+/* ── 加载中提示 ─────────────────────────────────────────────────────────── */
+.dm-loading {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--text-muted, #a6adc8);
+  font-size: 13px;
+}
+
+/* ── 错误提示 ────────────────────────────────────────────────────────────── */
+.dm-error {
+  color: #f38ba8;
+  font-size: 13px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(243, 139, 168, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(243, 139, 168, 0.3);
+}
+
+/* ── 工具栏集成按钮（模块工具栏中的"对比"按钮，复用 ie-toolbar-btn 风格） ── */
+.dm-toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-default, #313244);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-normal, #cdd6f4);
+  cursor: pointer;
+  font-size: 12px;
+  transition: border-color 0.12s, background 0.12s;
+}
+.dm-toolbar-btn:hover {
+  border-color: var(--color-accent, #89b4fa);
+  background: rgba(137, 180, 250, 0.08);
+}
+
+/* ── 飞书电子表格输入区 ─────────────────────────────────────────────────── */
+.dm-lark-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--bg-secondary, #181825);
+  border-radius: 6px;
+  border: 1px solid var(--border-default, #313244);
+}

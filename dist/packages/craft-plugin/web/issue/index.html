@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>问题管理</title>
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="/assets/index-4b2022c5.css">
+  <link rel="stylesheet" href="/assets/list_deps-9b550476.css">
+  <link rel="stylesheet" href="/assets/mention_input-80c09d05.css">
+  <link rel="stylesheet" href="/assets/self_annotation_panel-bceac7d9.css">
+</head>
+<body>
+  <script src="/web/icons.js"></script>
+  <div id="appRoot" style="height:100%;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden"></div>
+
+  <!-- BOP 工序选择器 modal -->
+  <div class="mini-modal-mask" id="bopPickerMask">
+    <div class="mini-modal" style="width:440px;max-height:80vh;display:flex;flex-direction:column">
+      <h3 style="margin:0 0 10px;display:flex;align-items:center;justify-content:space-between">
+        选择关联工序
+        <button id="bopPickerClear" style="font-size:11px;padding:3px 10px;background:var(--bg-tertiary,#313244);border:none;border-radius:5px;color:var(--text-muted,#a6adc8);cursor:pointer">清除关联</button>
+      </h3>
+      <input id="bopPickerSearch" placeholder="搜索工序名称…" autocomplete="off"
+        style="margin-bottom:8px;padding:7px 10px;background:var(--bg-secondary,#181825);border:1px solid var(--border-default,#313244);border-radius:6px;color:var(--text-normal,#cdd6f4);font-size:13px;outline:none">
+      <div id="bopPickerList" style="flex:1;overflow-y:auto;min-height:200px;max-height:360px"></div>
+      <div class="mini-modal-btns" style="margin-top:10px">
+        <button class="btn-cancel-modal" id="bopPickerCancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/web/components/list_sidebar.js"></script>
+  <script src="/web/components/scope_badge.js"></script>
+  <script src="/web/components/visibility_selector.js"></script>
+  <script src="/web/components/view_manager.js"></script>
+  <script src="/web/components/export_template_editor.js"></script>
+  <script src="/web/components/import_export.js"></script>
+  <script src="/web/components/diff_manager.js"></script>
+  <script src="/web/components/grid_editor.js"></script>
+  <script src="/web/components/entry_thread.js"></script>
+  <script src="/web/components/sidebar_detail_panel.js"></script>
+  <script src="/web/components/overlay_edit_modal.js"></script>
+  <script src="/web/components/list_shell.js"></script>
+  <script src="/web/components/tree_view.js"></script>
+  <script src="/web/components/subscribe_button.js"></script>
+  <script src="/web/components/mention_input.js"></script>
+  <script src="/web/components/attachments_widget.js"></script>
+  <script src="/web/components/feishu_mention_chip.js"></script>
+  <script src="/web/components/data_registry.js"></script>
+  <script src="/web/components/self_annotation_panel.js"></script>
+  <script src="issue.js"></script>
+</body>
+</html>

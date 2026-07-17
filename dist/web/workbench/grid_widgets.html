@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>可拖拽功能宫格</title>
+  
+  <!-- 拖拽核心库（无依赖、轻量） -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <link rel="stylesheet" href="/assets/grid_widgets-495043d4.css">
+</head>
+<body>
+  <script src="/web/icons.js"></script>
+  <div class="widgets-container">
+    <!-- 可拖拽宫格容器 -->
+    <div class="widget-grid" id="widgetGrid">
+      <!-- 1. AI 对话 -->
+      <div class="widget-item widget-medium" data-id="ai_chat">
+        <div class="widget-header">
+          <span class="widget-title"><svg class="icon" width="15" height="15"><use href="#icon-robot"/></svg> AI 工艺助手</span>
+          <div class="widget-actions">
+            <button class="action-btn resize-btn" title="切换大小">⬜</button>
+            <button class="action-btn maximize-btn" title="最大化/还原">⬛</button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="ai-chat-box">
+            <p>问：帮我生成焊接工艺参数</p>
+            <p class="reply"><svg class="icon" width="13" height="13"><use href="#icon-robot"/></svg> 推荐参数：电流180A，电压24V，速度35cm/min</p>
+            <input type="text" placeholder="输入问题..." disabled>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 工艺文档 -->
+      <div class="widget-item widget-small" data-id="docs">
+        <div class="widget-header">
+          <span class="widget-title"><svg class="icon" width="15" height="15"><use href="#icon-doc"/></svg> 工艺文档</span>
+          <div class="widget-actions">
+            <button class="action-btn resize-btn" title="切换大小">⬜</button>
+            <button class="action-btn maximize-btn" title="最大化/还原">⬛</button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="doc-item">BOP 工艺标准手册.pdf</div>
+          <div class="doc-item">设备操作规程.docx</div>
+        </div>
+      </div>
+
+      <!-- 3. 待办任务 -->
+      <div class="widget-item widget-small" data-id="todo">
+        <div class="widget-header">
+          <span class="widget-title"><svg class="icon" width="15" height="15"><use href="#icon-check-circle"/></svg> 待办任务</span>
+          <div class="widget-actions">
+            <button class="action-btn resize-btn" title="切换大小">⬜</button>
+            <button class="action-btn maximize-btn" title="最大化/还原">⬛</button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="todo-item"><input type="checkbox"> 完成画布审核</div>
+          <div class="todo-item"><input type="checkbox"> 更新知识库</div>
+        </div>
+      </div>
+
+      <!-- 4. 飞书通知 -->
+      <div class="widget-item widget-small" data-id="feishu">
+        <div class="widget-header">
+          <span class="widget-title"><svg class="icon" width="15" height="15"><use href="#icon-mail"/></svg> 飞书通知</span>
+          <div class="widget-actions">
+            <button class="action-btn resize-btn" title="切换大小">⬜</button>
+            <button class="action-btn maximize-btn" title="最大化/还原">⬛</button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="msg-item">工艺组：新任务已分配</div>
+          <div class="msg-time">10:30</div>
+        </div>
+      </div>
+
+      <!-- 5. 工艺知识库 -->
+      <div class="widget-item widget-medium" data-id="knowledge">
+        <div class="widget-header">
+          <span class="widget-title"><svg class="icon" width="15" height="15"><use href="#icon-knowledge"/></svg> 工艺知识库</span>
+          <div class="widget-actions">
+            <button class="action-btn resize-btn" title="切换大小">⬜</button>
+            <button class="action-btn maximize-btn" title="最大化/还原">⬛</button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="knowledge-tag">焊接工艺</div>
+          <div class="knowledge-tag">装配标准</div>
+          <div class="knowledge-tag">质检规范</div>
+          <p>最新收录：12 篇专业工艺文档</p>
+        </div>
+      </div>
+
+      <!-- 6. 项目笔记 -->
+      <div class="widget-item widget-large" data-id="notes">
+        <div class="widget-header">
+          <span class="widget-title"><svg class="icon" width="15" height="15"><use href="#icon-note"/></svg> 项目笔记</span>
+          <div class="widget-actions">
+            <button class="action-btn resize-btn" title="切换大小">⬜</button>
+            <button class="action-btn maximize-btn" title="最大化/还原">⬛</button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <textarea placeholder="记录项目关键信息..." disabled>今日完成：画布协同功能调试
+待优化：拖拽布局持久化</textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="grid_widgets.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+/* ── GridSystem — 统一网格布局系统 ───────────────────────────────────────────
+   供工作台、画布、悬浮窗共用。
+   GridSystem JS 会在容器上添加 .gs-container 并通过 CSS 变量控制参数。
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.gs-container {
+  display: grid;
+  grid-template-columns: repeat(var(--gs-cols, 12), 1fr);
+  grid-auto-rows: var(--gs-row-height, 80px);
+  gap: var(--gs-gap, 12px);
+  position: relative;
+  /* align-items 保持默认 stretch，让卡片填满所占的 grid 行高 */
+}
+
+/* ── 网格叠层 ────────────────────────────────────────────────────────────────
+   background-image / background-size / background-position
+   由 JS _updateOverlay() 用精确像素值写入 inline style（参考线对齐间隙中线）。
+   此处只声明定位和过渡，不设 background-*。
+   pointer-events: none 保证永远不干扰卡片交互。
+   ─────────────────────────────────────────────────────────────────────────── */
+.gs-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity .25s ease;
+}

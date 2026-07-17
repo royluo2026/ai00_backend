@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>清单导航</title>
+  <style>
+    :root {
+      --bg-primary: #1e1e2e; --bg-secondary: #181825; --bg-surface: #24273a;
+      --text-normal: #cdd6f4; --text-muted: #a6adc8; --text-faint: #6c7086;
+      --border-default: #313244; --color-accent: #89b4fa;
+    }
+    [data-theme="light"] {
+      --bg-primary: #eff1f5; --bg-secondary: #e6e9ef; --bg-surface: #dce0e8;
+      --text-normal: #4c4f69; --text-muted: #8c8fa1; --text-faint: #9ca0b0;
+      --border-default: #bcc0cc; --color-accent: #1e66f5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      background: var(--bg-secondary);
+      color: var(--text-normal);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-size: 13px;
+    }
+    .ln-header {
+      padding: 8px 8px 4px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .ln-btn-new {
+      width: 100%; padding: 5px 8px;
+      background: transparent;
+      border: 1px dashed var(--border-default);
+      border-radius: 5px;
+      color: var(--text-muted);
+      cursor: pointer; font-size: 12px;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .ln-btn-new:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .ln-scroll {
+      flex: 1; overflow-y: auto; padding: 4px;
+    }
+    .ln-scroll::-webkit-scrollbar { width: 4px; }
+    .ln-scroll::-webkit-scrollbar-track { background: transparent; }
+    .ln-scroll::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
+    .ln-item {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 8px; border-radius: 5px; cursor: pointer; user-select: none;
+    }
+    .ln-item:hover { background: rgba(255,255,255,.05); }
+    .ln-item.active { background: rgba(137,180,250,.12); }
+    [data-theme="light"] .ln-item:hover { background: rgba(0,0,0,.04); }
+    [data-theme="light"] .ln-item.active { background: rgba(30,102,245,.08); }
+    .ln-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .ln-name {
+      flex: 1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: var(--text-muted);
+    }
+    .ln-item.active .ln-name { color: var(--color-accent); }
+    .ln-badge {
+      font-size: 10px; padding: 1px 4px; border-radius: 3px; flex-shrink: 0;
+    }
+    .ln-badge.local { background: rgba(108,112,134,.2); color: #9ca0b0; }
+    .ln-badge.cloud { background: rgba(137,180,250,.15); color: #89b4fa; }
+    [data-theme="light"] .ln-badge.cloud { color: #1e66f5; background: rgba(30,102,245,.1); }
+    .ln-all {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 8px; border-radius: 5px; cursor: pointer; margin-bottom: 2px;
+    }
+    .ln-all:hover { background: rgba(255,255,255,.05); }
+    .ln-all.active { background: rgba(137,180,250,.12); }
+    [data-theme="light"] .ln-all:hover { background: rgba(0,0,0,.04); }
+    [data-theme="light"] .ln-all.active { background: rgba(30,102,245,.08); }
+    .ln-all-name { font-size: 12px; color: var(--text-muted); }
+    .ln-all.active .ln-all-name { color: var(--color-accent); }
+    .ln-empty { font-size: 12px; color: var(--text-faint); padding: 8px; }
+    .ln-err   { font-size: 11px; color: #f38ba8; padding: 8px; }
+  </style>
+</head>
+<body>
+<div class="ln-header">
+  <button class="ln-btn-new" id="btnNew">
+    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+      <line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/>
+    </svg>
+    新建清单
+  </button>
+</div>
+<div class="ln-scroll" id="scroll"></div>
+
+<script>
+'use strict';
+const _params   = new URLSearchParams(location.search);
+const _itemType = _params.get('itemType') || 'task';
+let   _lists    = [];
+let   _selected = null;   // null = "全部"
+let   _loading  = false;
+
+// ── 主题 ─────────────────────────────────────────────────────
+function _applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t || 'dark');
+}
+// 初始主题（跟随系统或父窗口）
+try {
+  const pTheme = window.parent?.document?.documentElement?.getAttribute('data-theme');
+  _applyTheme(pTheme || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'));
+} catch (_) { _applyTheme('dark'); }
+
+// ── 消息监听 ──────────────────────────────────────────────────
+window.addEventListener('message', e => {
+  const m = e.data;
+  if (!m) return;
+  if (m.type === 'theme')        { _applyTheme(m.theme); }
+  if (m.type === 'ls:nav:sync')  { _selected = (m.gid === undefined ? null : m.gid); _render(); }
+  if (m.type === 'ls:nav:reload'){ _load(); }
+});
+
+// ── 加载清单 ──────────────────────────────────────────────────
+async function _load() {
+  if (_loading) return;
+  _loading = true;
+
+  // 云端清单（via cloudFetch）
+  try {
+    const cf = window._cloudFetch || window.parent?._cloudFetch;
+    if (cf) {
+      const res = await cf(`/api/lists?item_type=${_itemType}`);
+      _lists = (res?.data || []).map(l => ({ ...l, scope: 'cloud' }));
+    }
+  } catch (e) {
+    console.warn('[list_nav] 云端清单加载失败:', e);
+  }
+
+  _loading = false;
+  _render();
+  // 通知父窗口 leaf 已就绪，父窗口会回传当前选中 gid
+  window.parent?.postMessage({ type: 'ls:nav:ready', itemType: _itemType }, '*');
+}
+
+// ── 渲染 ──────────────────────────────────────────────────────
+function _render() {
+  const el = document.getElementById('scroll');
+  el.innerHTML = '';
+
+  // 全部
+  const allEl = document.createElement('div');
+  allEl.className = 'ln-all' + (_selected === null ? ' active' : '');
+  allEl.innerHTML =
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--text-faint)">' +
+    '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>' +
+    '<line x1="8" y1="18" x2="21" y2="18"/>' +
+    '<circle cx="3" cy="6" r="1" fill="currentColor"/>' +
+    '<circle cx="3" cy="12" r="1" fill="currentColor"/>' +
+    '<circle cx="3" cy="18" r="1" fill="currentColor"/></svg>' +
+    '<span class="ln-all-name">全部</span>';
+  allEl.addEventListener('click', () => _select(null));
+  el.appendChild(allEl);
+
+  if (!_lists.length) {
+    const empty = document.createElement('div');
+    empty.className = 'ln-empty';
+    empty.textContent = _loading ? '加载中…' : '暂无清单';
+    el.appendChild(empty);
+    return;
+  }
+
+  _lists.forEach(list => {
+    const item = document.createElement('div');
+    item.className = 'ln-item' + (_selected === list.gid ? ' active' : '');
+    const color = list.color || '#6c7086';
+    const badge = list.scope === 'local'
+      ? '<span class="ln-badge local">本地</span>'
+      : '<span class="ln-badge cloud">云</span>';
+    item.innerHTML =
+      `<div class="ln-dot" style="background:${color}"></div>` +
+      `<span class="ln-name">${_esc(list.name || list.title || '')}</span>` +
+      badge;
+    item.addEventListener('click', () => _select(list.gid));
+    el.appendChild(item);
+  });
+}
+
+function _renderErr(msg) {
+  const el = document.getElementById('scroll');
+  el.innerHTML = `<div class="ln-err">${msg}</div>`;
+}
+
+function _esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function _select(gid) {
+  _selected = gid;
+  _render();
+  window.parent?.postMessage({ type: 'ls:nav', itemType: _itemType, gid }, '*');
+}
+
+// 新建清单按钮 → 委托给父窗口处理（与 ListSidebar 的新建逻辑对接）
+document.getElementById('btnNew').addEventListener('click', () => {
+  window.parent?.postMessage({ type: 'ls:nav:new', itemType: _itemType }, '*');
+});
+
+_load();
+</script>
+</body>
+</html>

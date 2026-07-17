@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>画布</title>
+  
+  
+  
+  <link rel="stylesheet" href="/assets/canvas_shell-7a12799f.css">
+</head>
+<body class="cs-body">
+  <script src="/web/icons.js"></script>
+
+  <!-- ── 顶部工具栏 ──────────────────────────────────────────────────── -->
+  <header class="cs-toolbar" id="csToolbar">
+    <div class="cs-tb-left">
+      <button class="cs-tb-btn cs-tb-icon-btn" id="csToggleLeft" title="切换元素面板">
+        <svg class="icon" width="14" height="14"><use href="#icon-apps"/></svg>
+      </button>
+      <span class="cs-canvas-name" id="csCanvasName">画布</span>
+      <span class="cs-unsaved-dot hidden" id="csUnsavedDot" title="有未保存更改"></span>
+    </div>
+
+    <div class="cs-tb-center">
+      <div id="csSearchBar"></div>
+    </div>
+
+    <div class="cs-tb-right">
+      <!-- 编辑/保存/取消 -->
+      <div id="csModeBar"></div>
+
+      <!-- 图层 -->
+      <button class="cs-tb-btn" id="csLayerBtn" title="图层管理">
+        <svg class="icon" width="13" height="13"><use href="#icon-canvas"/></svg>
+        图层
+      </button>
+
+      <!-- 网格设置 -->
+      <button class="cs-tb-btn cs-tb-icon-btn" id="csGridSettingsBtn" title="网格设置">
+        <svg class="icon" width="13" height="13"><use href="#icon-settings"/></svg>
+      </button>
+
+      <!-- 缩放控件 -->
+      <div class="cs-zoom-group">
+        <button class="cs-tb-btn cs-tb-btn-sm" id="csZoomOut" title="缩小">−</button>
+        <button class="cs-zoom-label" id="csZoomLabel" title="点击重置为 100%">100%</button>
+        <button class="cs-tb-btn cs-tb-btn-sm" id="csZoomIn" title="放大">+</button>
+        <button class="cs-tb-btn cs-tb-btn-sm" id="csZoomFit" title="适配画面">
+          <svg class="icon" width="12" height="12"><use href="#icon-inbox"/></svg>
+        </button>
+      </div>
+
+      <!-- 画布类型扩展操作区 -->
+      <div id="csTypeActions" class="cs-type-actions"></div>
+
+      <button class="cs-tb-btn cs-tb-icon-btn" id="csToggleRight" title="切换模板库">
+        <svg class="icon" width="14" height="14"><use href="#icon-book-open"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── 网格设置面板（fixed 定位，JS 控制位置）──────────────────────── -->
+  <div class="cs-gs-panel hidden" id="csGsPanel">
+    <div class="cs-gs-title">网格设置</div>
+    <div class="cs-gs-row">
+      <label class="cs-gs-label">列数</label>
+      <input class="cs-gs-input" type="number" id="csGsCols" min="4" max="48" step="1">
+    </div>
+    <div class="cs-gs-row">
+      <label class="cs-gs-label">行高 px</label>
+      <input class="cs-gs-input" type="number" id="csGsRowH" min="60" max="200" step="10">
+    </div>
+    <div class="cs-gs-row">
+      <label class="cs-gs-label">间距 px</label>
+      <input class="cs-gs-input" type="number" id="csGsGap" min="4" max="32" step="2">
+    </div>
+    <div class="cs-gs-row">
+      <label class="cs-gs-label">点透明度</label>
+      <input class="cs-gs-range" type="range" id="csGsOpacity" min="0.1" max="1" step="0.05">
+      <span class="cs-gs-val" id="csGsOpacityVal"></span>
+    </div>
+    <div class="cs-gs-row">
+      <label class="cs-gs-label">点颜色</label>
+      <input class="cs-gs-color" type="color" id="csGsColor">
+    </div>
+    <div class="cs-gs-actions">
+      <button class="cs-btn-ghost cs-btn-sm" id="csGsPanelClose">关闭</button>
+      <button class="cs-btn-accent cs-btn-sm" id="csGsPanelApply">应用</button>
+    </div>
+  </div>
+
+  <!-- ── 图层面板（fixed 定位）────────────────────────────────────────── -->
+  <div class="cs-layer-panel hidden" id="csLayerPanel">
+    <div class="cs-layer-panel-hdr">
+      <span>图层</span>
+      <button class="cs-btn-ghost cs-btn-sm" id="csLayerAddBtn">
+        <svg class="icon" width="11" height="11"><use href="#icon-plus"/></svg>
+        新增
+      </button>
+    </div>
+    <div id="csLayerList" class="cs-layer-list"></div>
+  </div>
+
+  <!-- ── 主区域：三列 ─────────────────────────────────────────────────── -->
+  <div class="cs-main" id="csMain">
+
+    <!-- 左侧：元素调色板 -->
+    <div class="cs-side-panel" id="csLeftPanel">
+      <div class="cs-panel-hdr">元素</div>
+      <div class="cs-palette" id="csPalette">
+        <div class="cs-palette-empty">暂无元素类型<br>等待画布类型注册</div>
+      </div>
+    </div>
+
+    <!-- 中央：视口（pan/zoom） -->
+    <div class="cs-viewport" id="csViewport">
+      <div class="cs-world" id="csWorld">
+        <!-- GridSystem 将挂载到此容器 -->
+        <div class="cs-grid-host" id="csGridHost"></div>
+        <!-- SVG 叠层由 JS 注入 -->
+      </div>
+      <!-- 视口空提示 -->
+      <div class="cs-viewport-empty hidden" id="csViewportEmpty">
+        <svg class="icon" width="36" height="36" style="opacity:.25"><use href="#icon-canvas"/></svg>
+        <p>从左侧拖入元素或从模板库创建卡片</p>
+      </div>
+    </div>
+
+    <!-- 右侧：模板库 -->
+    <div class="cs-side-panel cs-side-panel-right" id="csRightPanel">
+      <div class="cs-panel-hdr">模板库</div>
+      <div class="cs-template-list" id="csTemplateList">
+        <div class="cs-palette-empty">暂无模板</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 底部：卡片详情面板 ─────────────────────────────────────────── -->
+  <div class="cs-bottom-panel" id="csBottomPanel">
+    <div class="cs-bottom-hdr">
+      <span class="cs-bottom-type-tag" id="csBottomTypeTag"></span>
+      <span class="cs-bottom-card-name" id="csBottomCardName">卡片详情</span>
+      <div class="cs-bottom-meta" id="csBottomMeta"></div>
+      <button class="cs-bottom-close-btn" id="csBottomClose" title="关闭详情">✕</button>
+    </div>
+    <div class="cs-bottom-body" id="csBottomBody">
+      <div class="cs-bottom-props" id="csBottomProps"></div>
+      <div class="cs-bottom-divider"></div>
+      <div class="cs-bottom-ext" id="csBottomExt"></div>
+    </div>
+  </div>
+
+  <!-- ── 通用文本输入 Modal ────────────────────────────────────────── -->
+  <div class="cs-modal-overlay hidden" id="csInputModal">
+    <div class="cs-modal cs-modal-sm">
+      <div class="cs-modal-hdr">
+        <span class="cs-modal-title" id="csInputModalTitle">输入</span>
+        <button class="cs-modal-close" id="csInputModalClose">✕</button>
+      </div>
+      <div class="cs-modal-body" style="display:flex;flex-direction:column;gap:12px;">
+        <input type="text" id="csInputModalField"
+          style="width:100%;box-sizing:border-box;padding:8px 10px;background:var(--bg-secondary);
+                 border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);
+                 font-size:13px;outline:none;">
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="cs-btn-ghost" id="csInputModalCancel">取消</button>
+          <button class="cs-btn-accent" id="csInputModalOk">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 通用确认 Modal ────────────────────────────────────────────── -->
+  <div class="cs-modal-overlay hidden" id="csConfirmModal">
+    <div class="cs-modal cs-modal-sm">
+      <div class="cs-modal-hdr">
+        <span class="cs-modal-title" id="csConfirmModalTitle">确认</span>
+      </div>
+      <div class="cs-modal-body" style="display:flex;flex-direction:column;gap:12px;">
+        <p id="csConfirmModalMsg" style="margin:0;font-size:13px;color:var(--text-normal);"></p>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="cs-btn-ghost" id="csConfirmModalCancel">取消</button>
+          <button class="cs-btn-accent" id="csConfirmModalOk"
+            style="background:var(--color-danger,#f38ba8);border-color:var(--color-danger,#f38ba8);">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/web/components/grid_system.js"></script>
+  <script src="/web/components/card_frame.js"></script>
+  <script src="canvas_connection.js"></script>
+  <script src="canvas_layers.js"></script>
+  <script src="canvas_search.js"></script>
+  <script src="canvas_template.js"></script>
+  <script src="canvas_shell.js"></script>
+</body>
+</html>

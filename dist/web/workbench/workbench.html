@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工作台</title>
+  
+  
+  
+  
+  <link rel="stylesheet" href="/assets/workbench-6c968e92.css">
+  <link rel="stylesheet" href="/assets/app-ui-6f33ba9e.css">
+  <link rel="stylesheet" href="/assets/view_manager-0b5250e9.css">
+  <link rel="stylesheet" href="/assets/tree_list_shell-da642102.css">
+</head>
+<body class="wb-body" tabindex="-1">
+  <script src="/web/icons.js"></script>
+
+  <!-- ── 面板区 ───────────────────────────────────────────────── -->
+  <main class="wb-panels" id="wbPanels">
+
+    <!-- 左列：[1] 今日待办 + [2] 内容树（并排） -->
+    <div class="wb-col wb-col-left">
+
+      <!-- [1] 今日待办 -->
+      <section class="wb-panel" id="wb-panel-1" data-panel="1">
+        <div class="wb-panel-header">
+          <span class="wb-panel-num">[1]</span>
+          <span class="wb-panel-title">今日待办</span>
+          <div class="wb-panel-hdr-actions">
+            <span class="wb-panel-count" id="wb-count-1"></span>
+            <button class="wb-p1-settings-btn" id="wb-p1-settings-btn" title="面板设置">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </button>
+            <button class="wb-p1-new-item-btn" id="wb-p1-new-item" title="新建 (N)">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="wb-panel-filter hidden" id="wb-filter-1">
+          <input type="text" class="wb-filter-input" placeholder="筛选…" id="wb-filter-input-1" autocomplete="off">
+        </div>
+        <div class="wb-panel-body" id="wb-body-1">
+          <div id="wb-p1-today" style="height:100%;overflow-y:auto;"></div>
+        </div>
+      </section>
+
+      <!-- 今日 / 内容树 分割条 -->
+      <div class="wb-col-inner-splitter" id="wbSplitterInner" title="拖拽调整宽度（双击重置）"></div>
+
+      <!-- [2] 内容树 -->
+      <section class="wb-panel" id="wb-panel-2" data-panel="2">
+        <div class="wb-panel-header">
+          <span class="wb-panel-num">[2]</span>
+          <span class="wb-panel-title">文件树</span>
+          <div class="wb-panel-hdr-actions">
+            <span class="wb-panel-count" id="wb-count-2"></span>
+            <button class="wb-p1-settings-btn" id="wb-p2-settings-btn" title="面板设置">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </button>
+            <button class="wb-p1-settings-btn wb-p2-new-btn" id="wb-p2-new-btn" title="新建文件 (N)">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="wb-panel-body wb-p2-panel-body" id="wb-body-2">
+          <div class="wb-p2-search-bar">
+            <input type="text" class="wb-p2-search-input" id="wb-p2-search"
+              placeholder="搜索所有文件…" autocomplete="off" spellcheck="false">
+          </div>
+          <div id="wb-p2-tree" style="flex:1;min-height:0;overflow-y:auto;"></div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- 左/中列分割条 -->
+    <div class="wb-col-splitter" id="wbSplitterLeft" title="拖拽调整宽度（双击重置）"></div>
+
+    <!-- 中列：[3] 查看器（内有内容/关联内层 tab 条） -->
+    <div class="wb-col wb-col-mid">
+      <section class="wb-panel wb-panel-full wb-panel-tabbed" id="wb-panel-3" data-panel="3">
+        <div class="wb-panel-header">
+            <span class="wb-panel-num">[3]</span>
+          <span class="wb-panel-title">查看器</span>
+          <div class="wb-panel-hdr-actions">
+            <span class="wb-panel-count" id="wb-count-3"></span>
+          </div>
+        </div>
+
+        <!-- [3] 上下文详情 pane -->
+        <div class="wb-panel-filter hidden" id="wb-filter-3">
+          <input type="text" class="wb-filter-input" placeholder="筛选项目…" id="wb-filter-input-3" autocomplete="off">
+        </div>
+        <div class="wb-pane" id="wb-pane-3">
+          <!-- 内层 tab 条（有清单 tab 时显示） -->
+          <div class="wb-p3-tabs hidden" id="wb-p3-tabs"></div>
+          <!-- 上部：上下文内容区（默认 tab：我的主业务） -->
+          <div class="wb-panel-body wb-p3-ctx-body" id="wb-body-3">
+            <div class="wb-loading">加载中…</div>
+          </div>
+          <!-- 上部：清单 TLS（清单 tab 激活时显示，替换 ctx-body） -->
+          <div id="wb-p3-tls" style="display:none;flex:1;min-height:0;overflow:hidden;"></div>
+          <!-- 下部：详情条（始终可见，点击标题栏开关） -->
+          <div class="wb-detail-strip" id="wb-p3-detail">
+            <div class="wb-detail-toggle" id="wb-p3-detail-toggle">
+              <svg class="wb-detail-chevron" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3,2 7,5 3,8"/>
+              </svg>
+              <span class="wb-detail-label">详情</span>
+              <span class="wb-detail-cur-title" id="wb-p3-detail-title"></span>
+            </div>
+            <div class="wb-detail-body" id="wb-p3-detail-body"></div>
+          </div>
+        </div>
+
+        <!-- [4] 条目链接 pane -->
+        <div class="wb-pane hidden" id="wb-pane-4">
+          <!-- 链接 tab 条 -->
+          <div class="wb-link-tabbar" id="wbLinkTabbar">
+            <div class="wb-link-tabs" id="wbLinkTabs"></div>
+            <span class="wb-link-hint" id="wbLinkHint">Tab 切换链接</span>
+          </div>
+          <!-- 链接渲染区 -->
+          <div class="wb-link-viewer" id="wbLinkViewer">
+            <div class="wb-empty">在 [1] 或 [3] 中选中含链接的条目</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 日历列（可折叠）：App 面板在上，日历在下 -->
+    <div class="wb-col wb-col-cal" id="wbColCal">
+
+      <!-- [A] App 面板 -->
+      <section class="wb-panel wb-panel-app" id="wb-panel-app">
+        <div class="wb-panel-header">
+          <span class="wb-panel-num">[A]</span>
+          <span class="wb-panel-title">App</span>
+        </div>
+        <div class="wb-app-grid" id="wbAppGrid"></div>
+      </section>
+
+      <section class="wb-panel wb-panel-full" id="wb-panel-cal">
+        <div class="wb-panel-header">
+          <span class="wb-panel-num">[C]</span>
+          <span class="wb-panel-title">日历</span>
+        </div>
+        <div class="wb-panel-body wb-cal-body" id="wbCalBody"></div>
+      </section>
+    </div>
+
+    <!-- 右侧通知栏：[4][5][6]（默认关闭） -->
+    <div class="wb-col wb-col-right" id="wbColRight">
+
+      <section class="wb-panel" id="wb-panel-4" data-panel="4">
+        <div class="wb-panel-header">
+          <span class="wb-panel-num">[4]</span>
+          <span class="wb-panel-title">我关注的</span>
+          <div class="wb-panel-hdr-actions">
+            <span class="wb-panel-count" id="wb-count-4"></span>
+          </div>
+        </div>
+        <div class="wb-panel-body" id="wb-body-4">
+          <div class="wb-loading">加载中…</div>
+        </div>
+      </section>
+
+      <section class="wb-panel" id="wb-panel-5" data-panel="5">
+        <div class="wb-panel-header">
+          <span class="wb-panel-num">[5]</span>
+          <span class="wb-panel-title">变更预警</span>
+          <div class="wb-panel-hdr-actions">
+            <span class="wb-panel-count" id="wb-count-5"></span>
+          </div>
+        </div>
+        <div class="wb-panel-body" id="wb-body-5">
+          <div class="wb-loading">加载中…</div>
+        </div>
+      </section>
+
+      <section class="wb-panel" id="wb-panel-6" data-panel="6">
+        <div class="wb-panel-header">
+          <span class="wb-panel-num">[6]</span>
+          <span class="wb-panel-title">项目状态</span>
+          <div class="wb-panel-hdr-actions">
+            <span class="wb-panel-count" id="wb-count-6"></span>
+          </div>
+        </div>
+        <div class="wb-panel-body" id="wb-body-6">
+          <div class="wb-loading">加载中…</div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- ── 底部状态栏 ──────────────────────────────────────────── -->
+  <footer class="wb-statusbar" id="wbStatusbar">
+    <div class="wb-sb-panels">
+      <button class="wb-sb-panel-btn" data-panel="1">1 今日</button>
+      <button class="wb-sb-panel-btn" data-panel="2">2 文件树</button>
+      <button class="wb-sb-panel-btn" data-panel="3">3 查看器</button>
+      <button class="wb-sb-cal-btn" id="wbCalBtn">C 日历</button>
+      <button class="wb-sb-panel-btn" id="wbAppBtn">A App</button>
+      <span class="wb-sb-divider">│</span>
+      <button class="wb-sb-panel-btn" data-panel="4">
+        4 关注<span class="wb-sb-badge" id="wb-badge-4"></span>
+      </button>
+      <button class="wb-sb-panel-btn" data-panel="5">
+        5 预警<span class="wb-sb-badge" id="wb-badge-5"></span>
+      </button>
+      <button class="wb-sb-panel-btn" data-panel="6">
+        6 状态<span class="wb-sb-badge" id="wb-badge-6"></span>
+      </button>
+    </div>
+    <div class="wb-sb-sep"></div>
+    <div class="wb-sb-actions" id="wbSbActions"></div>
+    <button class="wb-sb-action wb-sb-ai-btn" id="wbAiBallToggleBtn" title="小柔 AI 助手 (R)">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span>R 小柔</span>
+    </button>
+    <button class="wb-sb-action" id="wbRefreshBtn" title="刷新数据" style="margin-left:4px">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+    </button>
+  </footer>
+
+  <!-- ── 面板1 新建条目 Modal ──────────────────────────────────── -->
+  <div class="wb-modal-overlay hidden" id="wbNewItemModal">
+    <div class="wb-modal wb-modal-new-item">
+      <div class="wb-modal-header">
+        <span class="wb-modal-title">新建条目</span>
+        <button class="wb-modal-close" id="wbNiClose">✕</button>
+      </div>
+      <div class="wb-modal-body">
+        <div class="wb-ni-row">
+          <label class="wb-ni-label">域</label>
+          <select id="wbNiDomain" class="wb-ni-select"></select>
+        </div>
+        <div class="wb-ni-row" id="wbNiListRow">
+          <label class="wb-ni-label">清单</label>
+          <select id="wbNiList" class="wb-ni-select"></select>
+        </div>
+        <div id="wbNiFields"></div>
+        <div id="wbNiBopHint" class="wb-ni-bop-hint hidden">
+          BOP 域不支持快速新建，请前往
+          <button class="wb-ni-bop-link" id="wbNiBopLink">BOP 版本视图</button> 创建节点。
+        </div>
+        <div class="wb-ni-error hidden" id="wbNiError"></div>
+      </div>
+      <div class="wb-modal-footer">
+        <button class="wb-btn-ghost" id="wbNiCancel">取消</button>
+        <button class="wb-btn-accent" id="wbNiSubmit">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 通用文本输入 Modal ──────────────────────────────────── -->
+  <div class="wb-modal-overlay hidden" id="wbInputModal">
+    <div class="wb-modal wb-modal-sm">
+      <div class="wb-modal-header">
+        <span class="wb-modal-title" id="wbInputModalTitle">输入</span>
+        <button class="wb-modal-close" id="wbInputModalClose">✕</button>
+      </div>
+      <div class="wb-modal-body" style="display:flex;flex-direction:column;gap:12px;">
+        <input type="text" id="wbInputModalField"
+          style="width:100%;box-sizing:border-box;padding:8px 10px;background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);font-size:14px;outline:none;">
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="wb-btn-ghost" id="wbInputModalCancel">取消</button>
+          <button class="wb-btn-accent" id="wbInputModalOk">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 通用确认 Modal ──────────────────────────────────────── -->
+  <div class="wb-modal-overlay hidden" id="wbConfirmModal">
+    <div class="wb-modal wb-modal-sm">
+      <div class="wb-modal-header">
+        <span class="wb-modal-title" id="wbConfirmModalTitle">确认</span>
+      </div>
+      <div class="wb-modal-body" style="display:flex;flex-direction:column;gap:12px;">
+        <p id="wbConfirmModalMsg" style="margin:0;font-size:14px;color:var(--text-normal);"></p>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="wb-btn-ghost" id="wbConfirmModalCancel">取消</button>
+          <button class="wb-btn-accent" id="wbConfirmModalOk"
+            style="background:var(--color-danger,#f38ba8);border-color:var(--color-danger,#f38ba8);">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 日历日期 Popover ────────────────────────────────────── -->
+  <div class="wb-cal-popover hidden" id="wbCalPopover">
+    <div class="wb-cal-pop-hdr">
+      <span class="wb-cal-pop-date" id="wbCalPopDate"></span>
+      <button class="wb-cal-pop-close" id="wbCalPopClose">✕</button>
+    </div>
+    <div class="wb-cal-pop-body" id="wbCalPopBody"></div>
+  </div>
+
+  <!-- ── 日程右键菜单 ──────────────────────────────────────── -->
+  <div class="wb-evt-ctx-menu hidden" id="wbEvtCtxMenu"></div>
+
+  <!-- ── 编辑日程 Modal（仅 organizer） ───────────────────── -->
+  <div class="wb-modal-overlay hidden" id="wbEvtEditModal">
+    <div class="wb-modal wb-modal-sm">
+      <div class="wb-modal-header">
+        <span class="wb-modal-title">编辑日程</span>
+        <button class="wb-modal-close" id="wbEvtEditClose">✕</button>
+      </div>
+      <div class="wb-modal-body" style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;">标题</label>
+          <input id="wbEvtEditSummary" type="text"
+            style="width:100%;box-sizing:border-box;padding:8px 10px;background:var(--bg-secondary);
+                   border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);
+                   font-size:14px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;">描述</label>
+          <textarea id="wbEvtEditDesc" rows="4"
+            style="width:100%;box-sizing:border-box;padding:8px 10px;background:var(--bg-secondary);
+                   border:1px solid var(--border-default);border-radius:6px;color:var(--text-normal);
+                   font-size:13px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+        </div>
+        <div id="wbEvtEditErr" style="font-size:12px;color:var(--color-red,#f38ba8);min-height:16px;"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="wb-btn-ghost" id="wbEvtEditCancel">取消</button>
+          <button class="wb-btn-accent" id="wbEvtEditSave">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AI 悬浮球（小柔）────────────────────────────────────── -->
+  <div class="wb-float-ball" id="wbFloatBall" title="小柔 AI 助手">
+    <svg viewBox="0 0 32 32" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="16" fill="#CBA6F7"/>
+      <text x="16" y="21" text-anchor="middle" font-size="15"
+        font-family="system-ui,sans-serif" font-weight="600" fill="#fff">柔</text>
+    </svg>
+    <span class="wb-fb-badge" id="wbFbBadge" style="display:none">0</span>
+  </div>
+
+  <!-- ── AI 聊天窗 ────────────────────────────────────────────── -->
+  <div class="wb-float-chat" id="wbFloatChat" style="display:none">
+    <div class="wb-fc-hdr" id="wbFcHdr">
+      <div class="wb-fc-tabs">
+        <button class="wb-fc-tab active" data-tab="chat">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          AI 对话
+        </button>
+        <button class="wb-fc-tab" data-tab="skill">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Skill
+        </button>
+        <button class="wb-fc-tab" data-tab="topic">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          话题
+        </button>
+      </div>
+      <button class="wb-fc-close" id="wbFcClose" title="关闭">
+        <svg width="9" height="9" viewBox="0 0 10 10">
+          <line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </button>
+    </div>
+    <div class="wb-fc-body">
+      <!-- 对话 pane -->
+      <div class="wb-fc-pane" id="wbFcPaneChat">
+        <div class="wb-fc-ctx-bar" id="wbFcCtxBar"></div>
+        <div class="wb-fc-msgs" id="wbFcMsgs">
+          <div class="wb-fc-empty">向小柔发送消息，获取 AI 辅助</div>
+        </div>
+        <div class="wb-fc-input-row">
+          <textarea class="wb-fc-inp" id="wbFcInp" placeholder="问小柔…" rows="2"></textarea>
+          <button class="wb-fc-send" id="wbFcSend">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!-- Skill 库 pane -->
+      <div class="wb-fc-pane hidden" id="wbFcPaneSkill">
+        <div class="wb-fc-skill-body" id="wbFcSkillBody">
+          <div class="wb-fc-empty">加载 Skill 库中…</div>
+        </div>
+      </div>
+      <!-- 话题 pane -->
+      <div class="wb-fc-pane hidden" id="wbFcPaneTopic">
+        <div class="wb-fc-topic-body" id="wbFcTopicBody">
+          <div class="wb-fc-empty">暂无近期话题</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 面板2 设置浮层 ──────────────────────────────────────── -->
+  <div class="wb-p1-settings-pop hidden" id="wbP2SettingsPop" style="min-width:192px">
+    <div class="wb-p1-sp-section">
+      <div class="wb-p1-sp-hdr">显示的大标题</div>
+      <div class="wb-p1-sp-body">
+        <label class="wb-p1-sp-item"><input type="checkbox" class="wb-p2-sec" value="recent"><span>最近文件</span></label>
+        <label class="wb-p1-sp-item"><input type="checkbox" class="wb-p2-sec" value="favorites"><span>收藏的文件</span></label>
+        <label class="wb-p1-sp-item"><input type="checkbox" class="wb-p2-sec" value="pub_project"><span>项目</span></label>
+        <label class="wb-p1-sp-item"><input type="checkbox" class="wb-p2-sec" value="pub_knowledge"><span>知识</span></label>
+      </div>
+    </div>
+    <div class="wb-p1-sp-divider"></div>
+    <div class="wb-p1-sp-section">
+      <div class="wb-p1-sp-hdr">项目筛选 <span style="font-weight:400;opacity:.6">（不选=全部）</span></div>
+      <div class="wb-p1-sp-body" id="wbP2SpProjects">
+        <span class="wb-p1-sp-loading">加载中…</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 面板1 设置浮层 ──────────────────────────────────────── -->
+  <div class="wb-p1-settings-pop hidden" id="wbP1SettingsPop">
+    <div class="wb-p1-sp-section">
+      <div class="wb-p1-sp-hdr">条目来源</div>
+      <div class="wb-p1-sp-body" id="wbP1SrcBody"><!-- 由 JS 动态填充 --></div>
+    </div>
+    <div class="wb-p1-sp-divider"></div>
+    <div class="wb-p1-sp-section">
+      <div class="wb-p1-sp-hdr">分组方式</div>
+      <div class="wb-p1-sp-body">
+        <label class="wb-p1-sp-item"><input type="radio" name="p1-group" value="date"><span>日期</span></label>
+        <label class="wb-p1-sp-item"><input type="radio" name="p1-group" value="domain"><span>领域</span></label>
+        <label class="wb-p1-sp-item"><input type="radio" name="p1-group" value="priority"><span>优先级</span></label>
+        <label class="wb-p1-sp-item"><input type="radio" name="p1-group" value="status"><span>状态</span></label>
+      </div>
+    </div>
+    <div class="wb-p1-sp-divider"></div>
+    <div class="wb-p1-sp-section">
+      <div class="wb-p1-sp-hdr">排序方式</div>
+      <div class="wb-p1-sp-body">
+        <label class="wb-p1-sp-item"><input type="radio" name="p1-sort" value="scheduled_date"><span>计划日</span></label>
+        <label class="wb-p1-sp-item"><input type="radio" name="p1-sort" value="priority"><span>优先级</span></label>
+        <label class="wb-p1-sp-item"><input type="radio" name="p1-sort" value="status"><span>状态</span></label>
+        <label class="wb-p1-sp-item"><input type="radio" name="p1-sort" value="title"><span>标题</span></label>
+      </div>
+    </div>
+    <div class="wb-p1-sp-divider"></div>
+    <div class="wb-p1-sp-section">
+      <div class="wb-p1-sp-hdr">状态筛选</div>
+      <div class="wb-p1-sp-body">
+        <label class="wb-p1-sp-item"><input type="checkbox" class="wb-p1-sf" value="pending"><span>待办 / 待处理</span></label>
+        <label class="wb-p1-sp-item"><input type="checkbox" class="wb-p1-sf" value="progress"><span>进行中</span></label>
+        <label class="wb-p1-sp-item"><input type="checkbox" class="wb-p1-sf" value="done"><span>已完成</span></label>
+        <label class="wb-p1-sp-item"><input type="checkbox" class="wb-p1-sf" value="closed"><span>已关闭 / 取消</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 面板2 新建 type picker ─────────────────────────── -->
+  <div class="mf-type-picker" id="wbTypePicker" hidden></div>
+
+  <!-- ── 面板2 新建 Modal ────────────────────────────────── -->
+  <div class="mf-modal-overlay" id="wbCreateModalOverlay" hidden>
+    <div class="mf-modal">
+      <div class="mf-modal-hdr">
+        <span class="mf-modal-hdr-icon" id="wbCreateModalIcon"></span>
+        <span class="mf-modal-hdr-title" id="wbCreateModalTitle">新建</span>
+        <button class="mf-btn-icon mf-modal-close" id="wbCreateModalClose">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="mf-modal-body" id="wbCreateModalBody"></div>
+      <div class="mf-modal-footer">
+        <button class="mf-btn-secondary" id="wbCreateModalCancel">取消</button>
+        <button class="mf-btn-primary" id="wbCreateModalSubmit">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/web/components/view_manager.js"></script>
+  <script src="/web/components/tree_list_shell.js"></script>
+  <script src="/web/components/visibility_selector.js"></script>
+  <script src="/web/components/feishu_mention_chip.js"></script>
+  <script src="../assets/lib/marked.min.js"></script>
+  <script src="workbench.js"></script>
+</body>
+</html>

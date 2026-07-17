@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>VPPS 管理</title>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:      #1e1e2e; --bg2:    #181825; --bg3:   #313244; --bg4: #45475a;
+  --text:    #cdd6f4; --muted:  #6c7086; --accent:#89b4fa;
+  --border:  #313244; --hover:  #2a2a3d; --danger:#f38ba8;
+  --success: #a6e3a1; --warn:   #f9e2af;
+}
+[data-theme="light"] {
+  --bg:      #eff1f5; --bg2:    #e6e9ef; --bg3:   #ccd0da; --bg4: #bcc0cc;
+  --text:    #4c4f69; --muted:  #9ca0b0; --accent:#1e66f5;
+  --border:  #ccd0da; --hover:  #e0e4ef; --danger:#d20f39;
+  --success: #40a02b; --warn:   #df8e1d;
+}
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif; font-size: 13px; }
+
+/* ── 整体布局 ── */
+.md-root { display: flex; height: 100%; }
+
+/* ── 左侧导航 ── */
+.md-nav {
+  width: 150px; flex-shrink: 0;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 12px 0;
+}
+.md-nav-title {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: 0 14px 10px;
+}
+.md-nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; cursor: pointer;
+  color: var(--muted); font-size: 12px; font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: color .15s, background .15s;
+  user-select: none;
+}
+.md-nav-item svg { flex-shrink: 0; opacity: .7; }
+.md-nav-item:hover { background: var(--hover); color: var(--text); }
+.md-nav-item.active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent); border-left-color: var(--accent);
+}
+.md-nav-item.active svg { opacity: 1; }
+
+/* ── 右侧内容区（TLS 挂载点） ── */
+.md-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+#tlsMount { flex: 1; overflow: hidden; min-height: 0; }
+
+/* ── 弹窗 ── */
+.md-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+.md-modal {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 22px 24px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.md-modal h3 { font-size: 15px; font-weight: 600; }
+.md-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.md-field { display: flex; flex-direction: column; gap: 4px; }
+.md-field.full { grid-column: 1 / -1; }
+.md-field label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+.md-field input, .md-field select, .md-field textarea {
+  height: 32px; padding: 0 10px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); font-size: 13px; outline: none;
+}
+.md-field textarea { height: 56px; padding: 6px 10px; resize: vertical; }
+.md-field input:focus, .md-field select:focus, .md-field textarea:focus { border-color: var(--accent); }
+.md-field input[readonly] { opacity: .6; cursor: default; background: var(--bg3); }
+.md-modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
+.md-btn {
+  height: 28px; padding: 0 12px; border-radius: 4px; border: none; cursor: pointer;
+  font-size: 12px; display: flex; align-items: center; gap: 4px; white-space: nowrap;
+}
+.md-btn-primary { background: var(--accent); color: #1e1e2e; font-weight: 600; }
+.md-btn-primary:hover { filter: brightness(1.1); }
+.md-btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.md-btn-ghost:hover { background: var(--hover); }
+.md-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+/* ── 导入预览 ── */
+.import-preview { max-height: 300px; overflow: auto; margin-top: 8px; }
+.import-preview table { font-size: 11px; min-width: 100%; border-collapse: collapse; }
+.import-preview td, .import-preview th {
+  padding: 4px 8px; border-bottom: 1px solid var(--border);
+}
+.import-preview thead th { background: var(--bg2); font-weight: 600; }
+.import-stat { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ── Toast ── */
+.md-toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--bg3); color: var(--text); padding: 8px 16px;
+  border-radius: 6px; font-size: 13px; z-index: 200; pointer-events: none;
+  animation: fade-in .2s ease;
+}
+@keyframes fade-in { from { opacity: 0; transform: translateX(-50%) translateY(6px); } }
+</style>
+  <link rel="stylesheet" href="/assets/tree_list_shell-da642102.css">
+</head>
+<body>
+<div class="md-root">
+
+  <!-- 左侧导航 -->
+  <nav class="md-nav">
+    <div class="md-nav-title">工艺元素库</div>
+    <div class="md-nav-item active" data-section="vpps_parts">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      VPPS 零件
+    </div>
+    <div class="md-nav-item" data-section="fastener_spec">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+      </svg>
+      标准件规格
+    </div>
+    <div class="md-nav-item" data-section="vpps_tools">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+      </svg>
+      VPPS 工具
+    </div>
+    <div class="md-nav-item" data-section="vpps_fixtures">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+      VPPS 工装
+    </div>
+    <div class="md-nav-item" data-section="vpps_equipments">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-8l-2 4h12l-2-4z"/>
+        <circle cx="12" cy="14" r="3"/>
+      </svg>
+      VPPS 设备
+    </div>
+  </nav>
+
+  <!-- 右侧：TLS 挂载点 -->
+  <div class="md-content">
+    <div id="tlsMount"></div>
+  </div>
+
+</div>
+
+<!-- 通用弹窗（新建/编辑） -->
+<div class="md-overlay" id="mdModal" style="display:none">
+  <div class="md-modal">
+    <h3 id="mdModalTitle">新建</h3>
+    <div id="mdFormBody"></div>
+    <hr class="md-divider">
+    <div class="md-modal-footer">
+      <button class="md-btn md-btn-ghost" id="mdModalCancel">取消</button>
+      <button class="md-btn md-btn-primary" id="mdModalOk">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 导入弹窗 -->
+<div class="md-overlay" id="importModal" style="display:none">
+  <div class="md-modal" style="width:600px;">
+    <h3 id="importModalTitle">导入数据</h3>
+    <div id="importBody">
+      <div class="md-field full">
+        <label>选择文件（.xlsx 或 .csv）</label>
+        <input id="importFileInput" type="file" accept=".xlsx,.csv"
+          style="height:auto;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);">
+      </div>
+      <div id="importPreviewArea"></div>
+    </div>
+    <hr class="md-divider">
+    <div class="md-modal-footer">
+      <button class="md-btn md-btn-ghost" id="importCancel">取消</button>
+      <button class="md-btn md-btn-primary" id="importConfirm" disabled>确认导入</button>
+    </div>
+  </div>
+</div>
+
+<script src="/web/components/view_manager.js"></script>
+<script src="/web/components/tree_list_shell.js"></script>
+<script>
+'use strict';
+
+// ── 工具 ──────────────────────────────────────────────────────────
+function _cf() {
+  try {
+    let w = window;
+    for (let i = 0; i < 6; i++) {
+      if (w._cloudFetch) return w._cloudFetch;
+      if (w.parent === w) break;
+      w = w.parent;
+    }
+  } catch (_) {}
+  return null;
+}
+function _esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function _toast(msg, ms = 2500) {
+  const el = document.createElement('div');
+  el.className = 'md-toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+function _val(id) { return document.getElementById(id)?.value ?? ''; }
+
+// ── 状态标签 ──────────────────────────────────────────────────────
+const STATUS_LABELS = {
+  draft:'草稿', active:'启用', deprecated:'已废弃', obsolete:'已废弃'
+};
+
+function _specSummary(spec) {
+  if (!spec || typeof spec !== 'object') return '—';
+  const entries = Object.entries(spec);
+  if (!entries.length) return '—';
+  return entries.slice(0, 3).map(([k,v]) => `${k}:${v}`).join(', ') + (entries.length > 3 ? '…' : '');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// Section 定义
+// ══════════════════════════════════════════════════════════════════
+
+const SECTIONS = {
+
+  // ── VPPS Parts（标准零件名） ────────────────────────────────────
+  vpps_parts: {
+    title: 'VPPS 零件', desc: '标准零件名称库',
+    addLabel: '新建零件名',
+
+    async load(cf) {
+      const r = await cf('/api/craft_lib/part_names');
+      return r?.data || [];
+    },
+
+    importFields: ['vpps_description', 'level', 'vpps_desc_cn', 'vpps', 'part_category', 'importance', 'vehicle_model', 'parent_vpps', 'ref_main_vpps_desc', 'ref_main_vpps', 'status', 'description'],
+    importLabels: { vpps_description:'VPPS描述', level:'层级', vpps_desc_cn:'VPPS中文描述', vpps:'VPPS', part_category:'VPPS属性', importance:'重要度', vehicle_model:'车型', parent_vpps:'父级VPPS', ref_main_vpps_desc:'参考主件', ref_main_vpps:'参考主件VPPS', status:'状态', description:'描述' },
+
+    formHtml() {
+      return `<div class="md-form-grid">
+        <div class="md-field full">
+          <label>VPPS描述 *</label>
+          <input id="fVppsDesc" type="text" placeholder="VPPS描述">
+        </div>
+        <div class="md-field">
+          <label>层级</label>
+          <input id="fLevel" type="text" placeholder="如 L1, L2">
+        </div>
+        <div class="md-field">
+          <label>VPPS 编号</label>
+          <input id="fVpps" type="text" placeholder="VPPS编号">
+        </div>
+        <div class="md-field">
+          <label>VPPS属性</label>
+          <input id="fPartCat" type="text" placeholder="VPPS属性">
+        </div>
+        <div class="md-field">
+          <label>父级VPPS</label>
+          <input id="fParentVpps" type="text" placeholder="父级VPPS编号">
+        </div>
+        <div class="md-field">
+          <label>参考主件</label>
+          <input id="fRefMainVppsDesc" type="text" placeholder="参考主件描述">
+        </div>
+        <div class="md-field">
+          <label>参考主件VPPS</label>
+          <input id="fRefMainVpps" type="text" placeholder="参考主件VPPS编号">
+        </div>
+        <div class="md-field full">
+          <label>VPPS 中文描述</label>
+          <input id="fVppsDescCn" type="text" placeholder="VPPS中文描述">
+        </div>
+        <div class="md-field">
+          <label>重要度</label>
+          <input id="fImportancePart" type="text" placeholder="如 高、中、低">
+        </div>
+        <div class="md-field">
+          <label>车型</label>
+          <input id="fVehicle" type="text" placeholder="车型代号，多个用逗号分隔">
+        </div>
+        <div class="md-field full">
+          <label>描述</label>
+          <textarea id="fPartDesc" placeholder="零件描述…"></textarea>
+        </div>
+      </div>`;
+    },
+
+    fillForm(r) {
+      document.getElementById('fVppsDesc').value = r?.vpps_description || '';
+      document.getElementById('fLevel').value = r?.level || '';
+      document.getElementById('fVpps').value = r?.vpps || '';
+      document.getElementById('fPartCat').value = r?.part_category || '';
+      document.getElementById('fParentVpps').value = r?.parent_vpps || '';
+      document.getElementById('fRefMainVppsDesc').value = r?.ref_main_vpps_desc || '';
+      document.getElementById('fRefMainVpps').value = r?.ref_main_vpps || '';
+      document.getElementById('fVppsDescCn').value = r?.vpps_desc_cn || '';
+      document.getElementById('fImportancePart').value = r?.importance || '';
+      document.getElementById('fVehicle').value = r?.vehicle_model || '';
+      document.getElementById('fPartDesc').value = r?.description || '';
+    },
+
+    readForm() {
+      const desc = _val('fVppsDesc').trim();
+      if (!desc) { _toast('VPPS描述不能为空'); return null; }
+      return {
+        vpps_description: desc,
+        level: _val('fLevel').trim(),
+        vpps: _val('fVpps').trim() || null,
+        vpps_desc_cn: _val('fVppsDescCn').trim(),
+        part_category: _val('fPartCat').trim(),
+        parent_vpps: _val('fParentVpps').trim(),
+        ref_main_vpps_desc: _val('fRefMainVppsDesc').trim(),
+        ref_main_vpps: _val('fRefMainVpps').trim(),
+        importance: _val('fImportancePart').trim(),
+        vehicle_model: _val('fVehicle').trim(),
+        description: _val('fPartDesc').trim(),
+      };
+    },
+
+    async create(cf, body) { return cf('/api/craft_lib/part_names', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/craft_lib/part_names/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/craft_lib/part_names/${gid}`, { method:'DELETE' }); },
+
+    buildImportBody(row) {
+      const raw = row._raw || row;
+      const vppsDesc = row.vpps_description || raw['VPPS描述'] || raw['VPPS中文描述'] || row.vpps_desc_cn || '';
+      const FIXED_KEYS = new Set([
+        'vpps_description','level','vpps_desc_cn','vpps','part_category',
+        'importance','vehicle_model','parent_vpps','ref_main_vpps_desc','ref_main_vpps','status','description',
+        'VPPS描述','层级','VPPS中文描述','VPPS','VPPS NO','VPPS编号',
+        'VPPS属性','分类','零件类别','重要度','车型','父级VPPS','父级vpps','父级','参考主件','参考主件VPPS','状态','描述',
+      ]);
+      const meta = {};
+      if (raw && typeof raw === 'object') {
+        Object.entries(raw).forEach(([k, v]) => {
+          if (FIXED_KEYS.has(k)) return;
+          const val = v != null ? String(v).trim() : '';
+          if (val) meta[k] = val;
+        });
+      }
+      return {
+        vpps_description: vppsDesc,
+        level: row.level || raw['层级'] || '',
+        vpps_desc_cn: row.vpps_desc_cn || raw['VPPS中文描述'] || '',
+        vpps: row.vpps || raw['VPPS'] || raw['VPPS NO'] || raw['VPPS编号'] || null,
+        part_category: row.part_category || raw['VPPS属性'] || raw['分类'] || raw['零件类别'] || '',
+        importance: row.importance || raw['重要度'] || '',
+        vehicle_model: row.vehicle_model || raw['车型'] || '',
+        parent_vpps: row.parent_vpps || raw['父级VPPS'] || raw['父级vpps'] || raw['父级'] || '',
+        ref_main_vpps_desc: row.ref_main_vpps_desc || raw['参考主件'] || '',
+        ref_main_vpps: row.ref_main_vpps || raw['参考主件VPPS'] || '',
+        status: row.status || raw['状态'] || 'active',
+        description: row.description || raw['描述'] || '',
+        meta,
+      };
+    },
+    importRequiredFn(body) {
+      return !!(body.vpps_description || body.vpps_desc_cn || body.vpps);
+    },
+    async importOne(cf, body) { return cf('/api/craft_lib/part_names', { method:'POST', body: JSON.stringify(body) }); },
+  },
+
+  // ── 标准件规格（fastener_spec） ───────────────────────────────
+  fastener_spec: {
+    title: '标准件规格', desc: '标准紧固件规格库',
+    addLabel: '新建标准件',
+
+    async load(cf) {
+      const r = await cf('/api/craft_lib/fasteners');
+      return r?.data || [];
+    },
+
+    importFields: ['fastener_type','part_no','name','thread_spec','model','shank_length',
+      'guide_type','guide_length','has_adhesive','drive_size','flange_diameter','first_vehicle'],
+    importLabels: {
+      fastener_type:'紧固件类型', part_no:'零件号', name:'产品名称',
+      thread_spec:'螺纹规格', model:'型号', shank_length:'螺栓头下杆长l (mm)',
+      guide_type:'导向', guide_length:'导向长度(mm)', has_adhesive:'是否带胶',
+      drive_size:'驱动尺寸(mm)', flange_diameter:'法兰直径dc (mm)', first_vehicle:'首次使用车型',
+    },
+
+    formHtml() {
+      return `<div class="md-form-grid">
+        <div class="md-field">
+          <label>紧固件类型</label>
+          <input id="fFastType" type="text" placeholder="如 螺栓、螺母">
+        </div>
+        <div class="md-field">
+          <label>零件号</label>
+          <input id="fFastPartNo" type="text" placeholder="零件号">
+        </div>
+        <div class="md-field">
+          <label>产品名称</label>
+          <input id="fFastName" type="text" placeholder="产品名称">
+        </div>
+        <div class="md-field">
+          <label>螺纹规格</label>
+          <input id="fFastThread" type="text" placeholder="如 M8x1.25">
+        </div>
+        <div class="md-field">
+          <label>型号</label>
+          <input id="fFastModel" type="text" placeholder="型号">
+        </div>
+        <div class="md-field">
+          <label>螺栓头下杆长l (mm)</label>
+          <input id="fFastShank" type="text" placeholder="杆长">
+        </div>
+        <div class="md-field">
+          <label>导向</label>
+          <input id="fFastGuide" type="text" placeholder="导向类型">
+        </div>
+        <div class="md-field">
+          <label>导向长度(mm)</label>
+          <input id="fFastGuideLen" type="text" placeholder="导向长度">
+        </div>
+        <div class="md-field">
+          <label>是否带胶</label>
+          <input id="fFastAdhesive" type="text" placeholder="是/否">
+        </div>
+        <div class="md-field">
+          <label>驱动尺寸(mm)</label>
+          <input id="fFastDrive" type="text" placeholder="驱动尺寸">
+        </div>
+        <div class="md-field">
+          <label>法兰直径dc (mm)</label>
+          <input id="fFastFlange" type="text" placeholder="法兰直径">
+        </div>
+        <div class="md-field">
+          <label>首次使用车型</label>
+          <input id="fFastVehicle" type="text" placeholder="车型代号">
+        </div>
+      </div>`;
+    },
+
+    fillForm(r) {
+      document.getElementById('fFastType').value = r?.fastener_type || '';
+      document.getElementById('fFastPartNo').value = r?.part_no || '';
+      document.getElementById('fFastName').value = r?.name || '';
+      document.getElementById('fFastThread').value = r?.thread_spec || '';
+      document.getElementById('fFastModel').value = r?.model || '';
+      document.getElementById('fFastShank').value = r?.shank_length || '';
+      document.getElementById('fFastGuide').value = r?.guide_type || '';
+      document.getElementById('fFastGuideLen').value = r?.guide_length || '';
+      document.getElementById('fFastAdhesive').value = r?.has_adhesive || '';
+      document.getElementById('fFastDrive').value = r?.drive_size || '';
+      document.getElementById('fFastFlange').value = r?.flange_diameter || '';
+      document.getElementById('fFastVehicle').value = r?.first_vehicle || '';
+    },
+
+    readForm() {
+      return {
+        fastener_type: _val('fFastType').trim(),
+        part_no: _val('fFastPartNo').trim(),
+        name: _val('fFastName').trim(),
+        thread_spec: _val('fFastThread').trim(),
+        model: _val('fFastModel').trim(),
+        shank_length: _val('fFastShank').trim(),
+        guide_type: _val('fFastGuide').trim(),
+        guide_length: _val('fFastGuideLen').trim(),
+        has_adhesive: _val('fFastAdhesive').trim(),
+        drive_size: _val('fFastDrive').trim(),
+        flange_diameter: _val('fFastFlange').trim(),
+        first_vehicle: _val('fFastVehicle').trim(),
+      };
+    },
+
+    async create(cf, body) { return cf('/api/craft_lib/fasteners', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/craft_lib/fasteners/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/craft_lib/fasteners/${gid}`, { method:'DELETE' }); },
+
+    buildImportBody(row) {
+      return {
+        fastener_type: row.fastener_type || '',
+        part_no: row.part_no || '',
+        name: row.name || '',
+        thread_spec: row.thread_spec || '',
+        model: row.model || '',
+        shank_length: row.shank_length || '',
+        guide_type: row.guide_type || '',
+        guide_length: row.guide_length || '',
+        has_adhesive: row.has_adhesive || '',
+        drive_size: row.drive_size || '',
+        flange_diameter: row.flange_diameter || '',
+        first_vehicle: row.first_vehicle || '',
+      };
+    },
+    async importOne(cf, body) { return cf('/api/craft_lib/fasteners', { method:'POST', body: JSON.stringify(body) }); },
+  },
+
+  // ── VPPS Tools（工具模板） ──────────────────────────────────────
+  vpps_tools: {
+    title: 'VPPS 工具', desc: '拧紧工具模板库',
+    addLabel: '新建工具',
+
+    async load(cf) {
+      const r = await cf('/api/craft_lib/tools');
+      return r?.data || [];
+    },
+
+    importFields: ['vpps','name','gun_model','matou_part_no','importance','gun_type',
+      'wireless','output_square','torque_min','torque_recommended','cad_model_no',
+      'socket_model','fastener_type','fastener_params','extension_model','socket_cad_no','extension_cad_no'],
+    importLabels: {
+      vpps:'VPPS', name:'VPPS描述', gun_model:'枪型号', matou_part_no:'马头货号',
+      importance:'重要度', gun_type:'枪形式', wireless:'有线/无线',
+      output_square:'输出方头In.', torque_min:'扭矩下限', torque_recommended:'推荐扭矩（不含）',
+      cad_model_no:'数模号', socket_model:'套筒型号', fastener_type:'对手紧固件类型',
+      fastener_params:'对手紧固件参数', extension_model:'接杆型号',
+      socket_cad_no:'套筒数模号', extension_cad_no:'接杆数模号',
+    },
+
+    formHtml() {
+      return `<div class="md-form-grid">
+        <div class="md-field">
+          <label>VPPS</label>
+          <input id="fToolVpps" type="text" placeholder="VPPS编号">
+        </div>
+        <div class="md-field">
+          <label>VPPS描述</label>
+          <input id="fToolName" type="text" placeholder="工具描述">
+        </div>
+        <div class="md-field">
+          <label>枪型号</label>
+          <input id="fToolGunModel" type="text" placeholder="枪型号">
+        </div>
+        <div class="md-field">
+          <label>马头货号</label>
+          <input id="fToolMatou" type="text" placeholder="马头货号">
+        </div>
+        <div class="md-field">
+          <label>重要度</label>
+          <input id="fToolImportance" type="text" placeholder="如 高、中、低">
+        </div>
+        <div class="md-field">
+          <label>枪形式</label>
+          <input id="fToolGunType" type="text" placeholder="枪形式">
+        </div>
+        <div class="md-field">
+          <label>有线/无线</label>
+          <input id="fToolWireless" type="text" placeholder="有线 或 无线">
+        </div>
+        <div class="md-field">
+          <label>输出方头In.</label>
+          <input id="fToolSquare" type="text" placeholder="输出方头尺寸">
+        </div>
+        <div class="md-field">
+          <label>扭矩下限</label>
+          <input id="fToolTorqueMin" type="text" placeholder="扭矩下限值">
+        </div>
+        <div class="md-field">
+          <label>推荐扭矩（不含）</label>
+          <input id="fToolTorqueRec" type="text" placeholder="推荐扭矩值">
+        </div>
+        <div class="md-field">
+          <label>数模号</label>
+          <input id="fToolCadNo" type="text" placeholder="数模号">
+        </div>
+        <div class="md-field">
+          <label>套筒型号</label>
+          <input id="fToolSocket" type="text" placeholder="套筒型号">
+        </div>
+        <div class="md-field">
+          <label>对手紧固件类型</label>
+          <input id="fToolFastType" type="text" placeholder="紧固件类型">
+        </div>
+        <div class="md-field">
+          <label>对手紧固件参数</label>
+          <input id="fToolFastParams" type="text" placeholder="紧固件参数">
+        </div>
+        <div class="md-field">
+          <label>接杆型号</label>
+          <input id="fToolExt" type="text" placeholder="接杆型号">
+        </div>
+        <div class="md-field">
+          <label>套筒数模号</label>
+          <input id="fToolSocketCad" type="text" placeholder="套筒数模号">
+        </div>
+        <div class="md-field">
+          <label>接杆数模号</label>
+          <input id="fToolExtCad" type="text" placeholder="接杆数模号">
+        </div>
+      </div>`;
+    },
+
+    fillForm(r) {
+      document.getElementById('fToolVpps').value = r?.vpps || '';
+      document.getElementById('fToolName').value = r?.name || '';
+      document.getElementById('fToolGunModel').value = r?.gun_model || '';
+      document.getElementById('fToolMatou').value = r?.matou_part_no || '';
+      document.getElementById('fToolImportance').value = r?.importance || '';
+      document.getElementById('fToolGunType').value = r?.gun_type || '';
+      document.getElementById('fToolWireless').value = r?.wireless || '';
+      document.getElementById('fToolSquare').value = r?.output_square || '';
+      document.getElementById('fToolTorqueMin').value = r?.torque_min || '';
+      document.getElementById('fToolTorqueRec').value = r?.torque_recommended || '';
+      document.getElementById('fToolCadNo').value = r?.cad_model_no || '';
+      document.getElementById('fToolSocket').value = r?.socket_model || '';
+      document.getElementById('fToolFastType').value = r?.fastener_type || '';
+      document.getElementById('fToolFastParams').value = r?.fastener_params || '';
+      document.getElementById('fToolExt').value = r?.extension_model || '';
+      document.getElementById('fToolSocketCad').value = r?.socket_cad_no || '';
+      document.getElementById('fToolExtCad').value = r?.extension_cad_no || '';
+    },
+
+    readForm() {
+      return {
+        vpps: _val('fToolVpps').trim() || null,
+        name: _val('fToolName').trim(),
+        gun_model: _val('fToolGunModel').trim(),
+        matou_part_no: _val('fToolMatou').trim(),
+        importance: _val('fToolImportance').trim(),
+        gun_type: _val('fToolGunType').trim(),
+        wireless: _val('fToolWireless').trim(),
+        output_square: _val('fToolSquare').trim(),
+        torque_min: _val('fToolTorqueMin').trim(),
+        torque_recommended: _val('fToolTorqueRec').trim(),
+        cad_model_no: _val('fToolCadNo').trim(),
+        socket_model: _val('fToolSocket').trim(),
+        fastener_type: _val('fToolFastType').trim(),
+        fastener_params: _val('fToolFastParams').trim(),
+        extension_model: _val('fToolExt').trim(),
+        socket_cad_no: _val('fToolSocketCad').trim(),
+        extension_cad_no: _val('fToolExtCad').trim(),
+      };
+    },
+
+    async create(cf, body) { return cf('/api/craft_lib/tools', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/craft_lib/tools/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/craft_lib/tools/${gid}`, { method:'DELETE' }); },
+
+    buildImportBody(row) {
+      return {
+        vpps: row.vpps || null,
+        name: row.name || '',
+        gun_model: row.gun_model || '',
+        matou_part_no: row.matou_part_no || '',
+        importance: row.importance || '',
+        gun_type: row.gun_type || '',
+        wireless: row.wireless || '',
+        output_square: row.output_square || '',
+        torque_min: row.torque_min || '',
+        torque_recommended: row.torque_recommended || '',
+        cad_model_no: row.cad_model_no || '',
+        socket_model: row.socket_model || '',
+        fastener_type: row.fastener_type || '',
+        fastener_params: row.fastener_params || '',
+        extension_model: row.extension_model || '',
+        socket_cad_no: row.socket_cad_no || '',
+        extension_cad_no: row.extension_cad_no || '',
+      };
+    },
+    async importOne(cf, body) { return cf('/api/craft_lib/tools', { method:'POST', body: JSON.stringify(body) }); },
+  },
+
+  // ── VPPS Fixtures（工装模板） ───────────────────────────────────
+  vpps_fixtures: {
+    title: 'VPPS 工装', desc: '标准工装模板库',
+    addLabel: '新建工装',
+
+    async load(cf) {
+      const r = await cf('/api/craft_lib/fixtures');
+      return r?.data || [];
+    },
+
+    importFields: ['name', 'category', 'spec'],
+    importLabels: { name:'名称', category:'分类', spec:'规格(JSON)' },
+
+    formHtml() {
+      return `<div class="md-form-grid">
+        <div class="md-field full">
+          <label>名称 *</label>
+          <input id="fFixtureName" type="text" placeholder="工装名称">
+        </div>
+        <div class="md-field">
+          <label>分类</label>
+          <input id="fFixtureCat" type="text" placeholder="如 焊接夹具、装配定位">
+        </div>
+        <div class="md-field full">
+          <label>规格（JSON 对象，可选）</label>
+          <textarea id="fFixtureSpec" placeholder='{"size":"800x600mm"}'></textarea>
+        </div>
+      </div>`;
+    },
+
+    fillForm(r) {
+      document.getElementById('fFixtureName').value = r?.name || '';
+      document.getElementById('fFixtureCat').value = r?.category || '';
+      document.getElementById('fFixtureSpec').value = r?.spec ? JSON.stringify(r.spec, null, 2) : '';
+    },
+
+    readForm() {
+      const name = _val('fFixtureName').trim();
+      if (!name) { _toast('名称不能为空'); return null; }
+      let spec = {};
+      const specRaw = _val('fFixtureSpec').trim();
+      if (specRaw) { try { spec = JSON.parse(specRaw); } catch (_) { _toast('规格 JSON 格式错误'); return null; } }
+      return { name, category: _val('fFixtureCat').trim(), spec };
+    },
+
+    async create(cf, body) { return cf('/api/craft_lib/fixtures', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/craft_lib/fixtures/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/craft_lib/fixtures/${gid}`, { method:'DELETE' }); },
+
+    buildImportBody(row) {
+      let spec = {};
+      if (row.spec) { try { spec = typeof row.spec === 'string' ? JSON.parse(row.spec) : row.spec; } catch (_) {} }
+      return { name: row.name || '', category: row.category || '', spec };
+    },
+    async importOne(cf, body) { return cf('/api/craft_lib/fixtures', { method:'POST', body: JSON.stringify(body) }); },
+  },
+
+  // ── VPPS Equipments（设备模板） ─────────────────────────────────
+  vpps_equipments: {
+    title: 'VPPS 设备', desc: '标准设备模板库',
+    addLabel: '新建设备',
+
+    async load(cf) {
+      const r = await cf('/api/craft_lib/equipments');
+      return r?.data || [];
+    },
+
+    importFields: ['name', 'category', 'spec'],
+    importLabels: { name:'名称', category:'分类', spec:'规格(JSON)' },
+
+    formHtml() {
+      return `<div class="md-form-grid">
+        <div class="md-field full">
+          <label>名称 *</label>
+          <input id="fEquipName" type="text" placeholder="设备名称">
+        </div>
+        <div class="md-field">
+          <label>分类</label>
+          <input id="fEquipCat" type="text" placeholder="如 机器人、拧紧设备">
+        </div>
+        <div class="md-field full">
+          <label>规格（JSON 对象，可选）</label>
+          <textarea id="fEquipSpec" placeholder='{"payload":"10kg","reach":"1400mm"}'></textarea>
+        </div>
+      </div>`;
+    },
+
+    fillForm(r) {
+      document.getElementById('fEquipName').value = r?.name || '';
+      document.getElementById('fEquipCat').value = r?.category || '';
+      document.getElementById('fEquipSpec').value = r?.spec ? JSON.stringify(r.spec, null, 2) : '';
+    },
+
+    readForm() {
+      const name = _val('fEquipName').trim();
+      if (!name) { _toast('名称不能为空'); return null; }
+      let spec = {};
+      const specRaw = _val('fEquipSpec').trim();
+      if (specRaw) { try { spec = JSON.parse(specRaw); } catch (_) { _toast('规格 JSON 格式错误'); return null; } }
+      return { name, category: _val('fEquipCat').trim(), spec };
+    },
+
+    async create(cf, body) { return cf('/api/craft_lib/equipments', { method:'POST', body: JSON.stringify(body) }); },
+    async update(cf, gid, body) { return cf(`/api/craft_lib/equipments/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
+    async remove(cf, gid) { return cf(`/api/craft_lib/equipments/${gid}`, { method:'DELETE' }); },
+
+    buildImportBody(row) {
+      let spec = {};
+      if (row.spec) { try { spec = typeof row.spec === 'string' ? JSON.parse(row.spec) : row.spec; } catch (_) {} }
+      return { name: row.name || '', category: row.category || '', spec };
+    },
+    async importOne(cf, body) { return cf('/api/craft_lib/equipments', { method:'POST', body: JSON.stringify(body) }); },
+  },
+};
+
+// ── TLS 每个 section 的列定义 ─────────────────────────────────────
+const SECTION_COLS = {
+  vpps_parts: [
+    { key:'level',            label:'层级',      type:'text', width: 60  },
+    { key:'vpps',             label:'VPPS',      type:'text', width: 100 },
+    { key:'vpps_description', label:'VPPS描述',  type:'text', width: 220 },
+    { key:'part_category',    label:'VPPS属性',  type:'text', width: 120 },
+    { key:'parent_vpps',      label:'父级VPPS',   type:'text', width: 100 },
+    { key:'ref_main_vpps_desc',label:'参考主件',   type:'text', width: 160 },
+    { key:'ref_main_vpps',    label:'参考主件VPPS',type:'text', width: 110 },
+    { key:'vpps_desc_cn',     label:'中文描述',  type:'text', width: 160 },
+    { key:'importance',       label:'重要度',    type:'text', width: 80  },
+    { key:'vehicle_model',    label:'车型',      type:'text', width: 120 },
+    { key:'status',           label:'状态',      type:'text', width: 80  },
+  ],
+  fastener_spec: [
+    { key:'fastener_type',   label:'紧固件类型',   type:'text', width: 100 },
+    { key:'part_no',         label:'零件号',       type:'text', width: 100 },
+    { key:'name',            label:'产品名称',     type:'text', width: 150 },
+    { key:'thread_spec',     label:'螺纹规格',     type:'text', width: 80  },
+    { key:'model',           label:'型号',         type:'text', width: 80  },
+    { key:'shank_length',    label:'杆长l(mm)',    type:'text', width: 80  },
+    { key:'guide_type',      label:'导向',         type:'text', width: 70  },
+    { key:'guide_length',    label:'导向长度(mm)', type:'text', width: 90  },
+    { key:'has_adhesive',    label:'是否带胶',     type:'text', width: 80  },
+    { key:'drive_size',      label:'驱动尺寸(mm)', type:'text', width: 90  },
+    { key:'flange_diameter', label:'法兰直径(mm)', type:'text', width: 90  },
+    { key:'first_vehicle',   label:'首次使用车型', type:'text', width: 100 },
+  ],
+  vpps_tools: [
+    { key:'vpps',               label:'VPPS',        type:'text', width: 80  },
+    { key:'name',               label:'VPPS描述',    type:'text', width: 150 },
+    { key:'gun_model',          label:'枪型号',      type:'text', width: 100 },
+    { key:'matou_part_no',      label:'马头货号',    type:'text', width: 100 },
+    { key:'importance',         label:'重要度',      type:'text', width: 70  },
+    { key:'gun_type',           label:'枪形式',      type:'text', width: 80  },
+    { key:'wireless',           label:'有线/无线',   type:'text', width: 80  },
+    { key:'output_square',      label:'输出方头',    type:'text', width: 80  },
+    { key:'torque_min',         label:'扭矩下限',    type:'text', width: 80  },
+    { key:'torque_recommended', label:'推荐扭矩',    type:'text', width: 80  },
+    { key:'cad_model_no',       label:'数模号',      type:'text', width: 100 },
+    { key:'socket_model',       label:'套筒型号',    type:'text', width: 90  },
+    { key:'fastener_type',      label:'紧固件类型',  type:'text', width: 100 },
+    { key:'fastener_params',    label:'紧固件参数',  type:'text', width: 100 },
+    { key:'extension_model',    label:'接杆型号',    type:'text', width: 90  },
+    { key:'socket_cad_no',      label:'套筒数模号',  type:'text', width: 100 },
+    { key:'extension_cad_no',   label:'接杆数模号',  type:'text', width: 100 },
+  ],
+  vpps_fixtures: [
+    { key:'name',     label:'名称', type:'text', width: 200 },
+    { key:'category', label:'分类', type:'text', width: 150 },
+    { key:'status',   label:'状态', type:'text', width: 80  },
+    { key:'spec',     label:'规格', type:'text', width: 200 },
+  ],
+  vpps_equipments: [
+    { key:'name',     label:'名称', type:'text', width: 200 },
+    { key:'category', label:'分类', type:'text', width: 150 },
+    { key:'status',   label:'状态', type:'text', width: 80  },
+    { key:'spec',     label:'规格', type:'text', width: 200 },
+  ],
+};
+
+// ── 默认显示列（精简，其余通过字段配置面板开启）─────────────────
+const SECTION_DEFAULT_COLS = {
+  vpps_parts:     ['level','vpps','vpps_description','part_category','parent_vpps','status'],
+  fastener_spec:  ['fastener_type','part_no','name','thread_spec','model','shank_length'],
+  vpps_tools:     ['vpps','name','gun_model','importance','gun_type','wireless','torque_min','torque_recommended'],
+  vpps_fixtures:  ['name','category','status','spec'],
+  vpps_equipments:['name','category','status','spec'],
+};
+
+// ══════════════════════════════════════════════════════════════════
+// 状态 & 运行时
+// ══════════════════════════════════════════════════════════════════
+let _section = 'vpps_parts';
+let _tls = null;
+let _editGid = null;
+let _importParsedRows = [];
+// 原始行数据缓存（gid→row），供编辑时取回原始对象（含 spec 等对象类型字段）
+let _rawRowsMap = {};
+
+// ── 当前 section 切换 ─────────────────────────────────────────────
+async function _switchSection(key) {
+  _section = key;
+  document.querySelectorAll('.md-nav-item').forEach(el =>
+    el.classList.toggle('active', el.dataset.section === key)
+  );
+  // 销毁旧 TLS
+  const mount = document.getElementById('tlsMount');
+  mount.innerHTML = '';
+  _tls = null;
+  _rawRowsMap = {};
+  await _initTls(key);
+}
+
+// ── 初始化 TLS ────────────────────────────────────────────────────
+async function _initTls(key) {
+  const sec = SECTIONS[key];
+  const allCols = SECTION_COLS[key];
+  const defaultKeys = SECTION_DEFAULT_COLS[key];
+  // 默认显示列 = defaultKeys 对应的 col 对象
+  const defaultCols = defaultKeys.map(k => allCols.find(c => c.key === k)).filter(Boolean);
+  const mount = document.getElementById('tlsMount');
+
+  _tls = new TreeListShell({
+    mountEl:      mount,
+    title:        sec.title,
+    forcedItemType: key,
+    parentField:  key === 'vpps_parts' ? 'parent_vpps' : 'level',
+    onLoadLists:  async () => [{ gid: '__all__', name: sec.title }],
+    onLoadData:   async (type, listGid) => {
+      const cf = _cf();
+      if (!cf) return [];
+      try {
+        const rows = await sec.load(cf);
+        // 缓存原始行（供编辑时使用）
+        _rawRowsMap = {};
+        rows.forEach(r => { if (r.gid) _rawRowsMap[r.gid] = r; });
+        // 对 spec 字段做展示转换
+        if (key === 'vpps_fixtures' || key === 'vpps_equipments') {
+          return rows.map(r => ({ ...r, spec: _specSummary(r.spec) }));
+        }
+        return rows;
+      } catch (e) {
+        _toast('加载失败：' + (e.message || e));
+        return [];
+      }
+    },
+    columns:      defaultCols,
+    allColumns:   allCols,
+    showListSelector: false,
+    detailMode:   'readonly',
+    detailFields: allCols.map(c => ({ key: c.key, label: c.label })),
+    rowTitle:     (row) => row.name || row.vpps_description || row.vpps || '详情',
+    rowContextMenu: (row) => [
+      {
+        label: '编辑',
+        onClick: (p) => { const rawRow = _rawRowsMap[p.gid] || p; _openModal(rawRow); },
+      },
+      { separator: true },
+      {
+        label: '删除',
+        danger: true,
+        onClick: (p) => _deleteRow(p.gid, p.name || p.vpps_description || p.gid),
+      },
+    ],
+    categoryField: key === 'vpps_parts' ? 'part_category'
+                 : key === 'vpps_tools' ? 'gun_type'
+                 : key === 'fastener_spec' ? 'fastener_type'
+                 : 'category',
+    moduleId:     'vpps_section_' + key,
+    extraToolbarBtns: [
+      {
+        html: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="feat-label">导入</span>`,
+        title: '导入数据',
+        onClick: () => _openImportModal(),
+      },
+      {
+        html: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="feat-label">${sec.addLabel || '新建'}</span>`,
+        title: sec.addLabel || '新建',
+        onClick: () => _openModal(null),
+      },
+    ],
+  });
+
+  await _tls.init();
+}
+
+// ── 新建/编辑弹窗 ────────────────────────────────────────────────
+function _openModal(row) {
+  const sec = SECTIONS[_section];
+  _editGid  = row?.gid || null;
+  document.getElementById('mdModalTitle').textContent = _editGid
+    ? `编辑${sec.title}` : sec.addLabel;
+  document.getElementById('mdFormBody').innerHTML = sec.formHtml();
+  if (row) sec.fillForm(row); else sec.fillForm(null);
+  document.getElementById('mdModal').style.display = '';
+  document.querySelector('#mdFormBody input')?.focus();
+}
+
+function _closeModal() {
+  document.getElementById('mdModal').style.display = 'none';
+  _editGid = null;
+}
+
+async function _saveModal() {
+  const sec  = SECTIONS[_section];
+  const body = sec.readForm();
+  if (!body) return;
+  const cf = _cf();
+  if (!cf) { _toast('未连接云端'); return; }
+  try {
+    if (_editGid) {
+      await sec.update(cf, _editGid, body);
+      _toast('已更新');
+    } else {
+      await sec.create(cf, body);
+      _toast('已创建');
+    }
+    _closeModal();
+    await _tls?.refresh();
+  } catch (e) {
+    _toast('保存失败：' + (e.message || e));
+  }
+}
+
+async function _deleteRow(gid, name) {
+  if (!confirm(`确定要删除「${name}」吗？`)) return;
+  const cf = _cf();
+  if (!cf) { _toast('未连接云端'); return; }
+  try {
+    await SECTIONS[_section].remove(cf, gid);
+    _toast('已删除');
+    await _tls?.refresh();
+  } catch (e) {
+    _toast('删除失败：' + (e.message || e));
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 导入功能（xlsx / csv）
+// ══════════════════════════════════════════════════════════════════
+
+function _openImportModal() {
+  _importParsedRows = [];
+  document.getElementById('importFileInput').value = '';
+  document.getElementById('importPreviewArea').innerHTML = '';
+  document.getElementById('importConfirm').disabled = true;
+  const sec = SECTIONS[_section];
+  document.getElementById('importModalTitle').textContent = `导入${sec.title}`;
+  document.getElementById('importModal').style.display = '';
+}
+
+function _closeImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  _importParsedRows = [];
+}
+
+async function _handleFileSelect(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'csv') {
+    await _parseCSV(file);
+  } else if (ext === 'xlsx') {
+    await _parseXLSX(file);
+  } else {
+    _toast('仅支持 .xlsx 和 .csv 文件');
+  }
+}
+
+async function _parseCSV(file) {
+  const text = await file.text();
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) { _toast('CSV 文件为空或只有表头'); return; }
+  const headers = _splitCSVLine(lines[0]);
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = _splitCSVLine(lines[i]);
+    const obj = {};
+    headers.forEach((h, idx) => { obj[h.trim()] = vals[idx]?.trim() || ''; });
+    rows.push(obj);
+  }
+  _showImportPreview(headers, rows);
+}
+
+function _splitCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+      else { inQuotes = !inQuotes; }
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current); current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+async function _parseXLSX(file) {
+  const cf = _cf();
+  if (!cf) { _toast('未连接云端，无法解析 Excel'); return; }
+  const buf = await file.arrayBuffer();
+  const b64 = _arrayBufferToBase64(buf);
+  try {
+    const res = await cf('/api/import-export/import/parse-excel', {
+      method: 'POST',
+      body: JSON.stringify({ file_b64: b64, filename: file.name }),
+    });
+    if (!res?.data?.headers?.length) { _toast('Excel 解析无数据'); return; }
+    const headers = res.data.headers;
+    const rows = (res.data.rows || []).map(arr => {
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = arr[i] ?? ''; });
+      return obj;
+    });
+    if (!rows.length) { _toast('Excel 解析无有效数据行'); return; }
+    _showImportPreview(headers, rows);
+  } catch (e) {
+    _toast('解析失败：' + (e.message || e));
+  }
+}
+
+function _arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.byteLength; i++) { binary += String.fromCharCode(bytes[i]); }
+  return btoa(binary);
+}
+
+function _showImportPreview(headers, rows) {
+  const sec = SECTIONS[_section];
+  const fields = sec.importFields;
+  const labels = sec.importLabels;
+
+  const aliasMap = {};
+  fields.forEach(f => {
+    aliasMap[f.toLowerCase()] = f;
+    const lbl = (labels[f] || '').toLowerCase();
+    if (lbl) aliasMap[lbl] = f;
+  });
+  const EXTRA_ALIASES = {
+    'vpps描述': 'vpps_description', 'vpps中文描述': 'vpps_desc_cn',
+    'vpps no': 'vpps', 'vpps编号': 'vpps', 'vpps': 'vpps',
+    '层级': 'level', 'vpps属性': 'part_category', '分类': 'part_category', '零件类别': 'part_category',
+    '重要度': 'importance', '车型': 'vehicle_model', '状态': 'status',
+    '描述': 'description', '编号': 'code', '名称': 'name',
+    '扭矩重要度': 'torque_importance', '父级vpps': 'parent_vpps', '父级': 'parent_vpps',
+    '枪型号': 'gun_model', '马头货号': 'matou_part_no', '枪形式': 'gun_type',
+    '有线/无线': 'wireless', '有线无线': 'wireless',
+    '输出方头in.': 'output_square', '输出方头': 'output_square',
+    '扭矩下限': 'torque_min', '推荐扭矩（不含）': 'torque_recommended', '推荐扭矩': 'torque_recommended',
+    '数模号': 'cad_model_no', '套筒型号': 'socket_model',
+    '对手紧固件类型': 'fastener_type', '紧固件类型': 'fastener_type',
+    '对手紧固件参数': 'fastener_params', '紧固件参数': 'fastener_params',
+    '接杆型号': 'extension_model', '套筒数模号': 'socket_cad_no', '接杆数模号': 'extension_cad_no',
+    '产品名称': 'name', '螺纹规格': 'thread_spec', '型号': 'model',
+    '螺栓头下杆长l (mm)': 'shank_length', '螺栓头下杆长': 'shank_length', '杆长': 'shank_length',
+    '导向': 'guide_type', '导向长度(mm)': 'guide_length', '导向长度': 'guide_length',
+    '是否带胶': 'has_adhesive', '驱动尺寸(mm)': 'drive_size', '驱动尺寸': 'drive_size',
+    '法兰直径dc (mm)': 'flange_diameter', '法兰直径': 'flange_diameter',
+    '首次使用车型': 'first_vehicle',
+    '规格': 'spec', '规格(json)': 'spec',
+    '零件号': 'part_no',
+  };
+  Object.entries(EXTRA_ALIASES).forEach(([k, v]) => { if (!aliasMap[k.toLowerCase()]) aliasMap[k.toLowerCase()] = v; });
+
+  const mapping = {};
+  headers.forEach(h => {
+    const hLower = h.trim().toLowerCase();
+    const fk = aliasMap[hLower];
+    if (fk && !mapping[fk]) mapping[fk] = h;
+  });
+
+  _importParsedRows = rows.map(r => {
+    const obj = { _raw: r };
+    fields.forEach(f => {
+      const hdr = mapping[f];
+      obj[f] = hdr ? String(r[hdr] ?? '').trim() : '';
+    });
+    return obj;
+  }).filter(r => fields.some(f => r[f] && String(r[f]).trim()));
+
+  const area = document.getElementById('importPreviewArea');
+  const mappedFields = fields.filter(f => mapping[f]);
+  const unmappedFields = fields.filter(f => !mapping[f]);
+
+  if (!_importParsedRows.length) {
+    let hint = '<div class="import-stat" style="color:var(--danger)">';
+    if (!mappedFields.length) {
+      hint += '列头无法匹配任何字段。请确保 Excel 列头包含：' +
+        fields.map(f => labels[f] || f).join('、');
+    } else {
+      hint += '所有行为空（已映射字段无有效数据）。';
+    }
+    hint += '</div>';
+    area.innerHTML = hint;
+    document.getElementById('importConfirm').disabled = true;
+    return;
+  }
+
+  let html = '';
+  if (unmappedFields.length && mappedFields.length) {
+    html += `<div class="import-stat">已映射 ${mappedFields.length}/${fields.length} 个字段` +
+      `（未映射：${unmappedFields.map(f => labels[f]||f).join('、')}）</div>`;
+  }
+  html += `<div class="import-stat">已识别 <strong>${_importParsedRows.length}</strong> 条有效记录，预览前 10 条：</div>`;
+  html += '<div class="import-preview"><table><thead><tr>';
+  mappedFields.forEach(f => { html += `<th>${_esc(labels[f]||f)}</th>`; });
+  html += '</tr></thead><tbody>';
+  _importParsedRows.slice(0, 10).forEach(r => {
+    html += '<tr>';
+    mappedFields.forEach(f => { html += `<td>${_esc(String(r[f]||''))}</td>`; });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  area.innerHTML = html;
+  document.getElementById('importConfirm').disabled = false;
+}
+
+async function _doImport() {
+  const cf = _cf();
+  const sec = SECTIONS[_section];
+  if (!cf || !_importParsedRows.length) return;
+
+  document.getElementById('importConfirm').disabled = true;
+  document.getElementById('importConfirm').textContent = '导入中…';
+
+  let ok = 0, fail = 0, lastErr = '';
+  for (const row of _importParsedRows) {
+    const body = sec.buildImportBody(row);
+    const requiredCheck = sec.importRequiredFn
+      ? sec.importRequiredFn(body)
+      : !!body[sec.importFields[0]];
+    if (!requiredCheck) { fail++; lastErr = '必填字段为空'; continue; }
+    try {
+      await sec.importOne(cf, body);
+      ok++;
+    } catch (e) {
+      fail++;
+      lastErr = e.message || '未知错误';
+    }
+  }
+
+  let msg = `导入完成：成功 ${ok} 条`;
+  if (fail) msg += `，失败 ${fail} 条`;
+  if (fail && lastErr) msg += `（${lastErr}）`;
+  _toast(msg, 4000);
+  _closeImportModal();
+  document.getElementById('importConfirm').textContent = '确认导入';
+  document.getElementById('importConfirm').disabled = false;
+  await _tls?.refresh();
+}
+
+// ── 事件绑定 ──────────────────────────────────────────────────────
+document.querySelectorAll('.md-nav-item').forEach(el =>
+  el.addEventListener('click', () => _switchSection(el.dataset.section))
+);
+
+document.getElementById('mdModalCancel').addEventListener('click', _closeModal);
+document.getElementById('mdModalOk').addEventListener('click', _saveModal);
+document.getElementById('mdModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) _closeModal();
+});
+
+document.getElementById('importCancel').addEventListener('click', _closeImportModal);
+document.getElementById('importModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) _closeImportModal();
+});
+document.getElementById('importConfirm').addEventListener('click', _doImport);
+document.getElementById('importFileInput').addEventListener('change', _handleFileSelect);
+
+// ── 主题同步 ──────────────────────────────────────────────────────
+function _syncTheme() {
+  try {
+    let w = window;
+    for (let i = 0; i < 6; i++) {
+      const t = w.document?.documentElement?.getAttribute('data-theme');
+      if (t) { document.documentElement.setAttribute('data-theme', t); return; }
+      if (w.parent === w) break;
+      w = w.parent;
+    }
+  } catch (_) {}
+}
+_syncTheme();
+window.addEventListener('message', e => { if (e.data?.type === 'theme-change') _syncTheme(); });
+
+// ── 初始化 ────────────────────────────────────────────────────────
+(async () => {
+  await _switchSection('vpps_parts');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none"
+     xmlns="http://www.w3.org/2000/svg">
+  <!-- 圆角方块背景 -->
+  <rect x="3" y="3" width="58" height="58" rx="16" fill="#181825"/>
+  <!-- A 字母 -->
+  <path d="M14 52 L32 10 L50 52"
+        stroke="#89b4fa" stroke-width="6"
+        stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+  <line x1="20" y1="38" x2="44" y2="38"
+        stroke="#89b4fa" stroke-width="6" stroke-linecap="round"/>
+  <!-- 右上角紫点 -->
+  <circle cx="52" cy="12" r="5" fill="#cba6f7"/>
+</svg>

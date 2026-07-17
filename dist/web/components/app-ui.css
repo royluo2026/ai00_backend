@@ -1,0 +1,271 @@
+/* ======================================
+   系统通用原生UI组件库
+   基于CSS变量实现明暗主题自动切换
+   四大核心组件：按钮 / 卡片 / 输入框 / 下拉框
+ ====================================== */
+
+/* 全局重置 & 基础变量 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ===================== 明暗主题 CSS 变量（自动适配） ===================== */
+:root {
+  /* 浅色主题 */
+  --app-bg: #f7f6f3;
+  --app-surface: #ffffff;
+  --app-border: #e2e2e2;
+  --app-text-primary: #1a1a1a;
+  --app-text-secondary: #6a6a6a;
+  --app-accent: #5c37ff;
+  --app-accent-hover: #4b2ed1;
+  --app-hover: #eeeeee;
+  --app-active: #dddddd;
+  --app-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --app-radius: 8px;
+  --app-radius-lg: 12px;
+}
+
+:root.theme-dark {
+  /* 深色主题 */
+  --app-bg: #252525;
+  --app-surface: #1a1a1a;
+  --app-border: #444444;
+  --app-text-primary: #e0e0e0;
+  --app-text-secondary: #a0a0a0;
+  --app-accent: #7d5cff;
+  --app-accent-hover: #967bff;
+  --app-hover: #333333;
+  --app-active: #444444;
+  --app-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 全局布局 */
+body {
+  background: var(--app-bg);
+  color: var(--app-text-primary);
+  transition: all 0.2s ease;
+}
+
+/* ===================== 1. 按钮组件 ===================== */
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--app-radius);
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+/* 主按钮 */
+.app-btn-primary {
+  background: var(--app-accent);
+  color: #fff;
+}
+.app-btn-primary:hover {
+  background: var(--app-accent-hover);
+}
+
+/* 次按钮 */
+.app-btn-secondary {
+  background: var(--app-hover);
+  color: var(--app-text-primary);
+}
+.app-btn-secondary:hover {
+  background: var(--app-active);
+}
+
+/* 边框按钮 */
+.app-btn-outline {
+  background: transparent;
+  border: 1px solid var(--app-border);
+  color: var(--app-text-primary);
+}
+.app-btn-outline:hover {
+  background: var(--app-hover);
+  border-color: var(--app-accent);
+}
+
+/* 文字按钮 */
+.app-btn-text {
+  background: transparent;
+  color: var(--app-accent);
+  padding: 8px 12px;
+}
+.app-btn-text:hover {
+  background: var(--app-hover);
+}
+
+/* 禁用状态 */
+.app-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 小尺寸按钮 */
+.app-btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* ===================== 2. 卡片组件 ===================== */
+.app-card {
+  background: var(--app-surface);
+  border-radius: var(--app-radius-lg);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.app-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* 卡片标题 */
+.app-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--app-text-primary);
+}
+
+/* 卡片描述 */
+.app-card-desc {
+  font-size: 14px;
+  color: var(--app-text-secondary);
+  line-height: 1.5;
+}
+
+/* 卡片底部操作栏 */
+.app-card-footer {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ===================== 3. 输入框组件 ===================== */
+.app-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.app-input-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-text-primary);
+}
+
+.app-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  color: var(--app-text-primary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.app-input:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 2px rgba(92, 55, 255, 0.2);
+}
+
+.app-input::placeholder {
+  color: var(--app-text-secondary);
+}
+
+/* 禁用输入框 */
+.app-input:disabled {
+  background: var(--app-hover);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ===================== 4. 下拉框组件 ===================== */
+.app-select {
+  position: relative;
+  width: 100%;
+}
+
+.app-select-trigger {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  color: var(--app-text-primary);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-select-trigger:focus {
+  border-color: var(--app-accent);
+}
+
+.app-select-trigger::after {
+  content: "▼";
+  font-size: 10px;
+  color: var(--app-text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.app-select-trigger.active::after {
+  transform: rotate(180deg);
+}
+
+.app-select-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow);
+  overflow: hidden;
+  z-index: 999;
+  display: none;
+}
+
+.app-select-options.show {
+  display: block;
+}
+
+.app-select-option {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--app-text-primary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.app-select-option:hover {
+  background: var(--app-hover);
+}
+
+.app-select-option.active {
+  background: var(--app-accent);
+  color: #fff;
+}

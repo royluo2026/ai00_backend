@@ -1,0 +1,17 @@
+/* craft_element_lib.css — 模块专属样式（公共样式已移至 list_shell.css）*/
+
+/* ── 外层布局（类型侧边栏 + ListShell 并排）── */
+.ce-shell-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+
+/* ── 类型切换按钮（左侧侧边栏 sub-tab 按钮）── */
+.sub-tab {
+  display: block; width: 100%;
+  padding: 9px 16px; border: none; background: none;
+  color: var(--text-muted, #a6adc8); font-size: 13px; text-align: left;
+  cursor: pointer; transition: background .15s, color .15s;
+}
+.sub-tab:hover:not(.active) { background: rgba(255,255,255,.05); color: var(--text-normal, #cdd6f4); }
+.sub-tab.active { background: rgba(137,180,250,.12); color: var(--color-accent, #89b4fa); font-weight: 500; border-left: 2px solid var(--color-accent, #89b4fa); }
+
+[data-theme="light"] .sub-tab:hover:not(.active) { background: rgba(0,0,0,.05); color: var(--text-normal, #4c4f69); }
+[data-theme="light"] .sub-tab.active { background: rgba(30,102,245,.10); color: var(--color-accent, #1e66f5); border-left-color: var(--color-accent, #1e66f5); }

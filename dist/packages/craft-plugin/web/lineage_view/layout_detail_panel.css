@@ -1,0 +1,149 @@
+/* =====================================================================
+   layout_detail_panel.css  —  左侧详情面板 + 详情浮层抽屉
+   ===================================================================== */
+
+/* ── 面板：左侧全高 ─────────────────────────────────── */
+.ll-detail-panel {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 320px;
+  border-right: 1px solid var(--surface1, #45475a);
+  border-radius: 0;
+  background: var(--surface0, #313244);
+  box-shadow: 2px 0 16px rgba(0,0,0,.25);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  /* 默认折叠，不设 display:none 保证 toggle 按钮可见 */
+  transform: translateX(-100%);
+}
+.ll-detail-panel.open { transform: translateX(0); }
+
+/* toggle 按钮（右边缘，对齐右侧面板 toggle top:60px） */
+.ll-dp-panel-toggle {
+  position: absolute;
+  right: -18px; top: 60px;
+  width: 18px; height: 36px;
+  border: 1px solid var(--surface1, #45475a);
+  border-left: none; border-radius: 0 4px 4px 0;
+  background: var(--surface0, #313244);
+  color: var(--subtext0, #a6adc8);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; padding: 0; z-index: 31;
+  transition: background .12s, color .12s;
+}
+.ll-dp-panel-toggle:hover { background: var(--surface1,#45475a); color: var(--text,#cdd6f4); }
+
+/* 把手条（折叠时） */
+.ll-dp-handle-bar { display: none; }
+
+/* 列容器垂直堆叠 */
+.ll-dp-columns {
+  display: flex; flex-direction: column;
+  overflow: hidden; flex: 1; min-height: 0;
+}
+.ll-dp-col { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.ll-dp-col-body { flex: 1; overflow-y: auto; min-height: 0; }
+
+.ll-dp-col-tree     { flex: none; height: var(--ll-tree-h, 40%); width: 100%; min-height: 120px; }
+.ll-dp-col-props    { flex: 1; width: 100%; min-height: 100px; }
+
+/* 垂直分割条 */
+.ll-dp-v-divider {
+  height: 4px;
+  flex-shrink: 0;
+  cursor: ns-resize;
+  background: var(--surface1, #45475a);
+  transition: background 0.15s;
+}
+.ll-dp-v-divider:hover,
+.ll-dp-v-divider.active {
+  background: var(--blue, #89b4fa);
+}
+:root[data-lv-theme="light"] .ll-dp-v-divider { background: #ccd0da; }
+:root[data-lv-theme="light"] .ll-dp-v-divider:hover,
+:root[data-lv-theme="light"] .ll-dp-v-divider.active { background: #1e66f5; }
+
+/* 隐藏不需要的列 */
+.ll-dp-col-detail, .ll-dp-col-rels, .ll-dp-col-rules, .ll-dp-col-know,
+.ll-dp-columns .ll-dp-col-divider { display: none !important; }
+
+/* ── col header ── */
+.ll-dp-col-hdr {
+  background: var(--crust,#181825) !important;
+  border-bottom: 1px solid var(--surface0,#313244) !important;
+  flex-shrink: 0; height: 28px;
+  display: flex; align-items: center; padding: 0 10px;
+  font-size: 11px; font-weight: 600; color: var(--subtext0,#a6adc8);
+}
+
+.ll-dp-col-tree, .ll-dp-col-props,
+.ll-dp-col-detail, .ll-dp-col-rels, .ll-dp-col-rules, .ll-dp-col-know
+{ background: var(--mantle,#181825); }
+
+/* ── 关系 ── */
+.ll-rg-hdr { background: var(--crust,#181825) !important; border-bottom: 1px solid var(--surface0,#313244) !important; }
+.ll-rg-hdr:hover { background: rgba(137,180,250,.05) !important; }
+.ll-ri:hover { background: rgba(137,180,250,.06) !important; }
+.ll-ri.sel   { background: rgba(137,180,250,.1) !important; }
+
+/* ── 详情抽屉（从左侧面板右侧向右弹出，底部对齐） ── */
+.ll-det-drawer {
+  position: fixed;
+  left: 320px;
+  bottom: 0;
+  width: 380px;
+  height: 55vh;
+  background: var(--surface0,#313244);
+  border: 1px solid var(--surface1,#45475a);
+  border-left: none;
+  border-radius: 0 8px 0 0;
+  box-shadow: 4px -4px 16px rgba(0,0,0,.25);
+  z-index: 32;
+  display: flex; flex-direction: column;
+  transform: translateX(-100%);
+  display: none;
+  opacity: 1; pointer-events: auto;
+  transition: none;
+}
+.ll-det-drawer.open {
+  transform: translateX(0);
+  display: flex;
+}
+.ll-det-drawer-hdr {
+  display: flex; align-items: center; padding: 8px 12px;
+  border-bottom: 1px solid var(--surface1,#45475a); flex-shrink: 0; gap: 6px;
+}
+.ll-det-drawer-title { font-size: 13px; font-weight: 600; color: var(--text,#cdd6f4); flex: 1; }
+.ll-det-drawer-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.ll-det-drawer-body { flex: 1; overflow-y: auto; padding: 12px; }
+.ll-det-drawer-foot {
+  display: flex; justify-content: flex-end; gap: 6px;
+  padding: 8px 12px; border-top: 1px solid var(--surface1,#45475a); flex-shrink: 0;
+}
+
+/* 搜索 */
+.ll-det-search { display: flex; align-items: center; gap: 5px; background: var(--surface0,#313244); border: 1px solid var(--surface1,#45475a); border-radius: 5px; padding: 3px 7px; }
+.ll-det-search input { background: transparent; border: none; outline: none; font-size: 12px; color: var(--text,#cdd6f4); flex: 1; }
+.ll-det-search:focus-within { border-color: var(--blue,#89b4fa); }
+.ll-det-sr-results { max-height: 200px; overflow-y: auto; }
+.ll-det-sr-item { display: flex; align-items: center; gap: 6px; padding: 5px 10px; cursor: pointer; font-size: 11px; color: var(--subtext1,#a6adc8); }
+.ll-det-sr-item:hover { background: rgba(137,180,250,.06); }
+.ll-det-sr-item.sel  { background: rgba(137,180,250,.1); color: var(--blue,#89b4fa); }
+.ll-det-sr-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ll-det-sr-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ll-det-sr-sub  { font-size: 10px; color: var(--surface2,#585b70); }
+.ll-det-sr-tag  { font-size: 9px; padding: 0 5px; border-radius: 3px; background: rgba(137,220,235,.12); color: var(--teal,#94e2d5); flex-shrink: 0; }
+.ll-det-sr-src { font-size: 9px; color: var(--surface2,#585b70); flex-shrink: 0; }
+
+/* ── 亮色 ── */
+:root[data-lv-theme="light"] .ll-detail-panel { background: #eff1f5; border-right-color: #ccd0da; }
+:root[data-lv-theme="light"] .ll-dp-panel-toggle { background: #eff1f5; border-color: #ccd0da; }
+:root[data-lv-theme="light"] .ll-dp-col-hdr { background: var(--mantle,#e6e9ef) !important; border-bottom-color: var(--surface0,#ccd0da) !important; color: var(--subtext0,#6c6f85) !important; }
+:root[data-lv-theme="light"] .ll-dp-col-tree, :root[data-lv-theme="light"] .ll-dp-col-props,
+:root[data-lv-theme="light"] .ll-dp-col-detail, :root[data-lv-theme="light"] .ll-dp-col-rels,
+:root[data-lv-theme="light"] .ll-dp-col-rules, :root[data-lv-theme="light"] .ll-dp-col-know { background: #fff; }
+:root[data-lv-theme="light"] .ll-rg-hdr { background: var(--mantle,#e6e9ef) !important; }
+:root[data-lv-theme="light"] .ll-det-drawer { background: #eff1f5; border-color: #ccd0da; }
+:root[data-lv-theme="light"] .ll-det-drawer-hdr, :root[data-lv-theme="light"] .ll-det-drawer-foot { background: var(--mantle,#e6e9ef); border-color: #ccd0da; }

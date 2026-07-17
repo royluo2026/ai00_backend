@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>审批中心</title>
+    
+  <link rel="stylesheet" href="/assets/approval-292f9789.css">
+</head>
+<body>
+<script src="/web/icons.js"></script>
+<div class="approval-container">
+    <div class="toolbar">
+        <span class="toolbar-title"><svg class="icon" width="15" height="15"><use href="#icon-check-circle"/></svg> 审批中心</span>
+        <button class="btn btn-sm" id="btn-refresh">刷新</button>
+    </div>
+
+    <div class="layout">
+        <!-- 左侧列表 -->
+        <div class="list-panel">
+            <div class="panel-hdr">审批单列表</div>
+            <div class="order-list" id="order-list">
+                <div class="empty-tip">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 右侧详情 -->
+        <div class="detail-panel">
+            <div class="panel-hdr">
+                <span id="detail-title">请选择审批单</span>
+            </div>
+            <div id="detail-body" class="detail-body">
+                <div class="empty-tip">从左侧选择一条审批单查看详情</div>
+            </div>
+
+            <!-- 操作区 -->
+            <div class="action-area" id="action-area" style="display:none">
+                <div class="flow-steps" id="flow-steps"></div>
+                <textarea id="approval-remark" placeholder="审批意见（驳回必填）"></textarea>
+                <div class="btn-row">
+                    <button class="btn btn-success" id="btn-approve"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg> 通过</button>
+                    <button class="btn btn-danger"  id="btn-reject"><svg class="icon" width="14" height="14"><use href="#icon-x"/></svg> 驳回</button>
+                    <button class="btn btn-outline" id="btn-withdraw">撤回</button>
+                </div>
+            </div>
+
+            <!-- 意见记录 -->
+            <div class="opinions-area" id="opinions-area" style="display:none">
+                <div class="panel-hdr">审批意见</div>
+                <div id="opinions-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="approval.js"></script>
+</body>
+</html>

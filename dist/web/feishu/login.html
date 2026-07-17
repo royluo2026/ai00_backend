@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>飞书登录 - 工艺系统</title>
+  
+  <link rel="stylesheet" href="/assets/feishu-ba922168.css">
+</head>
+<body>
+  <script src="/web/icons.js"></script>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="feishu-logo"><svg class="icon" width="48" height="48" style="opacity:0.7"><use href="#icon-mail"/></svg></div>
+      <h1 class="login-title">飞书授权登录</h1>
+      <p class="login-desc">使用飞书扫码，快速登录聊天与文档系统</p>
+
+      <!-- 扫码区域 -->
+      <div class="qrcode-container">
+        <div class="qrcode-placeholder">飞书扫码区域</div>
+      </div>
+
+      <!-- 登录按钮 -->
+      <button class="login-btn" id="loginBtn">确认登录</button>
+      <div class="login-status" id="statusText">请使用飞书扫码授权</div>
+    </div>
+  </div>
+
+  <script src="feishu.js"></script>
+</body>
+</html>

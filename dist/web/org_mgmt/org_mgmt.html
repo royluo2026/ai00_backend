@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>组织管理</title>
+  
+  
+  <script src="/web/icons.js"></script>
+  <link rel="stylesheet" href="/assets/org_mgmt-ae67f5fc.css">
+  <link rel="stylesheet" href="/assets/main-921414fe.css">
+</head>
+<body>
+
+<div class="org-layout">
+  <!-- 顶部标题栏 -->
+  <div class="org-header">
+    <h2 class="org-title">
+      <svg class="icon" width="18" height="18"><use href="#icon-org"/></svg>
+      组织管理
+    </h2>
+    <div class="org-tabs">
+      <button class="org-tab active" data-tab="struct">组织架构</button>
+      <button class="org-tab" data-tab="members">项目成员</button>
+    </div>
+  </div>
+
+  <!-- 主内容区 -->
+  <div class="org-content">
+
+    <!-- ── Tab 1: 组织架构（两栏） ─────────────────────────────── -->
+    <div class="org-panel org-panel-split active" id="panel-struct">
+
+      <!-- 左侧：团队树 -->
+      <div class="struct-tree" id="struct-tree">
+        <div class="struct-tree-hdr">
+          <span class="struct-tree-title">团队列表</span>
+          <button class="btn-ghost btn-sm" id="btn-sync-feishu">
+            <svg class="icon" width="13" height="13"><use href="#icon-refresh"/></svg> 从飞书同步组织架构
+          </button>
+        </div>
+        <div id="sync-result-banner" class="sync-banner hidden"></div>
+        <div id="struct-tree-body" class="struct-tree-body"></div>
+      </div>
+
+      <!-- 右侧：团队详情 -->
+      <div class="struct-detail" id="struct-detail">
+        <div class="empty-hint" id="struct-detail-empty">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px;opacity:.3"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <div>请在左侧选择团队</div>
+        </div>
+
+        <div id="struct-detail-form" class="hidden">
+          <!-- 标题行 + 操作按钮 -->
+          <div class="struct-detail-hdr">
+            <input type="text" id="struct-name-input" class="struct-name-input" placeholder="团队名称" />
+            <span id="struct-type-badge" class="struct-type-badge"></span>
+            <button class="btn-primary btn-sm" id="struct-save-btn">
+              <svg class="icon" width="13" height="13"><use href="#icon-check"/></svg> 保存
+            </button>
+            <button class="btn-danger-sm" id="struct-delete-btn">删除</button>
+          </div>
+
+          <!-- 成员（含角色） -->
+          <div class="struct-members-section">
+            <div class="struct-section-title">
+              <span id="struct-members-count">成员</span>
+              <button class="btn-ghost btn-sm" id="struct-add-member-btn">
+                <svg class="icon" width="12" height="12"><use href="#icon-plus"/></svg> 添加成员
+              </button>
+            </div>
+            <div id="struct-members-list" class="struct-members-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tab 2: 项目成员 ─────────────────────────────────────── -->
+    <div class="org-panel hidden" id="panel-members">
+
+      <!-- 子标签切换 -->
+      <div class="pm-subtab-bar">
+        <button class="pm-subtab active" data-view="config">项目配置</button>
+        <button class="pm-subtab" data-view="matrix">总览矩阵</button>
+        <button class="btn-ghost btn-sm" id="btn-refresh-matrix" style="margin-left:auto">
+          <svg class="icon" width="13" height="13"><use href="#icon-refresh"/></svg> 刷新矩阵
+        </button>
+      </div>
+
+      <!-- 项目配置视图 -->
+      <div class="pm-view active" id="pm-view-config">
+        <div class="pm-config-toolbar">
+          <select id="filter-project" class="form-select">
+            <option value="">— 选择项目 —</option>
+          </select>
+        </div>
+        <div id="pm-config-body" class="pm-config-body">
+          <div class="empty-hint">请在上方选择项目</div>
+        </div>
+      </div>
+
+      <!-- 总览矩阵视图 -->
+      <div class="pm-view hidden" id="pm-view-matrix">
+        <div id="pm-matrix-wrap" class="pm-matrix-wrap">
+          <div class="empty-hint">点击右上角"刷新矩阵"加载数据</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── 全局弹窗 ─────────────────────────────────────────────── -->
+
+    <!-- 添加团队成员 -->
+    <div class="modal-overlay hidden" id="modal-add-team-member">
+      <div class="modal">
+        <div class="modal-header">
+          <span>添加团队成员</span>
+          <button class="modal-close" id="btn-close-team-member-modal">
+            <svg class="icon" width="16" height="16"><use href="#icon-x"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label">搜索用户</label>
+          <div class="user-search-wrap">
+            <input type="text" id="search-team-member-input" class="form-input" placeholder="输入姓名搜索…" autocomplete="off" />
+            <div id="search-team-member-results" class="user-search-results hidden"></div>
+          </div>
+          <div id="search-team-member-selected" class="user-search-selected hidden"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" id="btn-cancel-team-member">取消</button>
+          <button class="btn-primary" id="btn-confirm-team-member">添加</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 修改用户角色 -->
+    <div class="modal-overlay hidden" id="modal-edit-role">
+      <div class="modal">
+        <div class="modal-header">
+          <span>修改用户角色</span>
+          <button class="modal-close" id="btn-close-role-modal">
+            <svg class="icon" width="16" height="16"><use href="#icon-x"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="user-info-preview" id="role-user-preview"></div>
+          <label class="form-label">系统角色</label>
+          <select id="select-new-role" class="form-select">
+            <option value="team_admin">团队管理员</option>
+            <option value="project_admin">项目管理员</option>
+            <option value="rule_admin">规则管理员</option>
+            <option value="knowledge_admin">知识管理员</option>
+            <option value="member">成员</option>
+            <option value="external">外部</option>
+          </select>
+          <div id="external-subtype-row" class="hidden">
+            <label class="form-label" style="margin-top:10px">外部子类型</label>
+            <select id="select-ext-subtype" class="form-select">
+              <option value="">无</option>
+              <option value="outsource">外包（拥有 member 权限）</option>
+              <option value="rd">研发</option>
+              <option value="factory">工厂</option>
+              <option value="supplier">供应商</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" id="btn-cancel-role">取消</button>
+          <button class="btn-primary" id="btn-confirm-role">保存</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end org-content -->
+</div><!-- end org-layout -->
+
+<script src="/web/common.js"></script>
+<script src="org_mgmt.js"></script>
+</body>
+</html>

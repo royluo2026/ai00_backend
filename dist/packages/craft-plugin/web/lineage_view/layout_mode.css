@@ -1,0 +1,1257 @@
+/* =====================================================================
+   layout_mode.css  —  BOP Lineage 布局模式画布样式
+   ===================================================================== */
+
+/* ── 画布容器 ─────────────────────────────────────────────────── */
+.lv-layout-canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background: var(--base, #1e1e2e);
+  min-height: 0;
+}
+
+/* ── viewport 包装层 ──────────────────────────────────────────── */
+.ll-layout-main {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── 视口 ──────────────────────────────────────────────────────── */
+.ll-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  cursor: default;
+  /* 背景网格由 .ll-world 的 CSS 背景处理 */
+}
+.ll-viewport:active {
+  cursor: default;
+}
+
+/* ── 世界坐标 ──────────────────────────────────────────────────── */
+.ll-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  /* 背景网点 — 点状而非线状网格，尺寸随 world 动态变化 */
+  background-image: radial-gradient(circle, rgba(69, 71, 90, 0.3) 1.2px, transparent 1.2px);
+  background-size: 40px 40px;
+}
+
+/* ── 线框 ──────────────────────────────────────────────────────── */
+.ll-line-box {
+  position: absolute;
+  border: 2px solid var(--surface2, #585b70);
+  border-radius: 10px;
+  background: rgba(49, 50, 68, 0.5);
+  padding: 0;
+  overflow: visible;
+  transition: box-shadow 0.15s;
+  min-width: 100px;
+  min-height: 80px;
+}
+.ll-line-box:hover {
+  box-shadow: 0 0 12px rgba(137, 180, 250, 0.15);
+}
+
+/* 编辑模式下可拖动的线框 */
+.ll-line-box.ll-draggable {
+  cursor: move;
+  border-color: var(--yellow, #f9e2af);
+  border-style: dashed;
+}
+.ll-line-box.ll-draggable:hover {
+  border-color: var(--blue, #89b4fa);
+  border-style: solid;
+}
+
+/* 线框标题 */
+.ll-line-title {
+  position: absolute;
+  top: -14px;
+  left: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--subtext0, #a6adc8);
+  background: var(--base, #1e1e2e);
+  padding: 0 6px;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 3px;
+  letter-spacing: 0.03em;
+}
+
+/* ── 工位布局区域（线框内） ────────────────────────────────── */
+.ll-line-layout {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 60px;
+}
+
+/* ── 岗位分组框 ──────────────────────────────────────────── */
+.ll-op-group-frame {
+  position: absolute;
+  border: 1.5px dashed rgba(137, 180, 250, 0.35);
+  border-radius: 8px;
+  background: rgba(137, 180, 250, 0.04);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 拖拽重挂载：有效落点高亮 ──────────────────────────────── */
+.ll-drop-target {
+  outline: 2px dashed rgba(250, 179, 135, 0.45);
+  outline-offset: 2px;
+  transition: outline-color 0.15s, background 0.15s;
+}
+.ll-drop-target-hovered {
+  outline: 2px solid var(--peach, #fab387) !important;
+  outline-offset: 3px;
+  background: rgba(250, 179, 135, 0.12) !important;
+}
+
+/* ── 同级排序落点高亮 ────────────────────────────────────── */
+.ll-reorder-target {
+  outline: 2px dashed rgba(148, 226, 213, 0.45);
+  outline-offset: 2px;
+  transition: outline-color 0.15s, background 0.15s;
+}
+.ll-reorder-target-hovered {
+  outline: 2px solid var(--teal, #94e2d5) !important;
+  outline-offset: 3px;
+  background: rgba(148, 226, 213, 0.12) !important;
+}
+
+/* ── 拖拽重挂载：ghost 卡片 ─────────────────────────────── */
+.ll-reparent-ghost {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.75;
+  border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  border: 1.5px solid var(--blue, #89b4fa);
+  background: var(--surface0, #313244);
+  transform: rotate(1.5deg) scale(0.96);
+  overflow: hidden;
+}
+
+/* ── 工位中心卡片（固定框风格 ─ 与线框一致） ──────────────────── */
+.ll-station-card {
+  position: absolute;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 2px solid var(--surface2, #585b70);
+  box-sizing: border-box;
+  background: rgba(49, 50, 68, 0.75);
+  padding: 8px 10px 8px 10px;
+  min-width: 100px;
+  min-height: 50px;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  z-index: 2;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.ll-station-card:hover {
+  border-color: var(--blue, #89b4fa);
+  box-shadow: 0 0 12px rgba(137, 180, 250, 0.15);
+}
+/* 布局视图只用 active-node（蓝框）和 active-child（淡蓝框） */
+.ll-station-card.active-node {
+  border-color: var(--blue, #89b4fa);
+  box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.25),
+              0 0 16px rgba(137, 180, 250, 0.2);
+  background: rgba(49, 50, 68, 0.85);
+}
+.ll-station-card.active-child {
+  border-color: rgba(137, 180, 250, 0.75);
+  box-shadow: 0 0 0 1px rgba(137, 180, 250, 0.35), 0 0 8px rgba(137, 180, 250, 0.15);
+}
+
+/* ── L/R/M 侧边区分：保留徽标颜色，边框统一用默认色 ────────────── */
+
+/* 编辑模式下可拖动的工位卡片 */
+.ll-station-card.ll-draggable {
+  cursor: move;
+  border-color: var(--yellow, #f9e2af);
+  border-style: dashed;
+}
+.ll-station-card.ll-draggable:hover {
+  border-color: var(--blue, #89b4fa);
+  border-style: solid;
+}
+
+/* ── 车流方向箭头 ────────────────────────────────────────────── */
+.ll-flow-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  line-height: 1;
+  color: var(--subtext0, #a6adc8);
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+  background: rgba(30, 30, 46, 0.7);
+  border-radius: 5px;
+  padding: 4px 6px;
+}
+.ll-flow-arrow-start { left: 6px; }
+.ll-flow-arrow-end   { right: 6px; }
+.ll-flow-arrow.ll-flow-arrow-editable {
+  opacity: 0.8;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 0.15s, opacity 0.15s, background 0.15s;
+}
+.ll-flow-arrow.ll-flow-arrow-editable:hover {
+  color: var(--blue, #89b4fa);
+  background: rgba(49, 50, 68, 0.95);
+  opacity: 1;
+}
+
+/* 工位主内容区（左侧，flex:1） */
+.ll-station-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+/* 工位右侧设备/工具统计 */
+.ll-station-stats {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  margin-left: 6px;
+}
+.ll-station-stat-row {
+  font-size: 9px;
+  color: var(--subtext0, #a6adc8);
+  white-space: nowrap;
+}
+
+/* 工位标题 */
+.ll-station-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text, #cdd6f4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+/* 工位子标题（类型缩写 + seq_no） */
+.ll-station-sub {
+  font-size: 9px;
+  color: var(--subtext0, #a6adc8);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* L/R/M 徽标 — 绝对定位，位置由展开方向决定 */
+.ll-station-lrm {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  display: inline-block;
+  position: absolute;
+  left: 6px;
+}
+/* 向上展开（L/M/none）：徽标在左下角 */
+.ll-station-lrm.lrm-pos-bottom { bottom: 5px; }
+/* 向下展开（R）：徽标在左上角 */
+.ll-station-lrm.lrm-pos-top    { top: 5px; }
+.ll-station-lrm.lrm-L {
+  background: rgba(137, 180, 250, 0.2);
+  color: var(--blue, #89b4fa);
+}
+.ll-station-lrm.lrm-R {
+  background: rgba(196, 160, 120, 0.18);
+  color: #c4a078;
+}
+.ll-station-lrm.lrm-M {
+  background: rgba(148, 226, 213, 0.25);
+  color: var(--teal, #94e2d5);
+}
+
+/* ── 工位展开方向提示 ──────────────────────────────────────── */
+.ll-station-dir-hint {
+  font-size: 8px;
+  font-weight: 600;
+  margin-top: 1px;
+  opacity: 0.7;
+  letter-spacing: 0.02em;
+}
+.ll-station-dir-hint.hint-up {
+  color: var(--blue, #89b4fa);
+}
+.ll-station-dir-hint.hint-down {
+  color: var(--red, #f38ba8);
+}
+
+/* ── 工位展开方向提示 ──────────────────────────────────────── */
+.ll-station-dir-hint {
+  font-size: 8px;
+  font-weight: 600;
+  margin-top: 1px;
+  opacity: 0.7;
+  letter-spacing: 0.02em;
+}
+.ll-station-dir-hint.hint-up {
+  color: var(--blue, #89b4fa);
+}
+.ll-station-dir-hint.hint-down {
+  color: var(--red, #f38ba8);
+}
+
+/* ── 工位卡片标题颜色与徽标一致 ────────────────────────── */
+.station-side-L .ll-station-title { color: var(--blue, #89b4fa); }
+.station-side-R .ll-station-title { color: #c4a078; }
+.station-side-M .ll-station-title { color: var(--teal, #94e2d5); }
+
+/* ── 线性层容器（已废弃，保留兼容） ────────────────────────── */
+
+/* ── 线性层通用卡片 ──────────────────────────────────────────────── */
+.ll-ring-card {
+  position: absolute;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid var(--surface2, #585b70);
+  background: var(--surface0, #313244);
+  padding: 5px 6px;
+  box-sizing: border-box;
+  min-width: 80px;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  z-index: 3;
+  font-size: 10px;
+  pointer-events: auto;
+  line-height: 1.2;
+}
+.ll-ring-card:hover {
+  border-color: var(--blue, #89b4fa);
+}
+.ll-ring-card.active-node {
+  border-color: var(--blue, #89b4fa);
+  box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.25);
+}
+.ll-ring-card.active-child {
+  border-color: rgba(137, 180, 250, 0.75);
+  box-shadow: 0 0 0 1px rgba(137, 180, 250, 0.3);
+}
+
+/* 编辑模式下可拖动的环内卡片 */
+.ll-ring-card.ll-draggable {
+  cursor: move;
+  border-color: var(--yellow, #f9e2af);
+  border-style: dashed;
+}
+
+/* 已复制的工序卡片（Ctrl+C） */
+.ll-ring-card.ll-copied {
+  border-color: var(--green, #a6e3a1);
+  border-style: dashed;
+  outline: 1px dashed var(--green, #a6e3a1);
+  outline-offset: 2px;
+}
+[data-lv-theme="light"] .ll-ring-card.ll-copied {
+  border-color: #40a02b;
+  outline-color: #40a02b;
+}
+
+.ll-ring-card-type {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 3px;
+  border-radius: 2px;
+  color: #fff;
+  display: inline-block;
+  line-height: 1.3;
+  margin-bottom: 1px;
+}
+
+.ll-ring-card-title {
+  font-size: 10px;
+  color: var(--text, #cdd6f4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+
+/* ── 紧凑型卡片（设备/工具） ────────────────────────────────── */
+.ll-compact-card {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 5px;
+  min-width: 40px;
+  max-width: 90px;
+}
+.ll-compact-card .ll-ring-card-type {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+.ll-compact-card .ll-ring-card-title {
+  font-size: 9px;
+  max-width: 60px;
+}
+
+/* ── 空工位提示 ──────────────────────────────────────────────── */
+.ll-empty-station {
+  position: absolute;
+  font-size: 10px;
+  color: var(--overlay0, #6c7086);
+  text-align: center;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* ── 无工位线体提示 ────────────────────────────────────────── */
+.ll-line-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 11px;
+  color: var(--overlay0, #6c7086);
+}
+
+/* ── 缩放控件（非工具栏，画布内右下角） ────────────────────── */
+.ll-zoom-controls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.22;
+  transition: opacity 0.2s;
+}
+.ll-zoom-controls:hover { opacity: 0.85; }
+.ll-zoom-label {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--subtext0, #a6adc8);
+  line-height: 1;
+  user-select: none;
+}
+.ll-zoom-slider {
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 3px;
+  height: 72px;
+  border-radius: 2px;
+  background: var(--surface2, #585b70);
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+}
+.ll-zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--subtext0, #a6adc8);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ll-zoom-controls:hover .ll-zoom-slider::-webkit-slider-thumb {
+  background: var(--blue, #89b4fa);
+}
+.ll-zoom-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: none;
+  border-radius: 50%;
+  background: var(--subtext0, #a6adc8);
+  cursor: pointer;
+}
+.ll-zoom-controls:hover .ll-zoom-slider::-moz-range-thumb {
+  background: var(--blue, #89b4fa);
+}
+[data-lv-theme="light"] .ll-zoom-label { color: var(--subtext0, #6c6f85); }
+[data-lv-theme="light"] .ll-zoom-slider { background: var(--surface2, #bcc0cc); }
+
+/* ── 拖拽幽灵 ────────────────────────────────────────────────── */
+.ll-drag-ghost {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.6;
+  border-radius: 6px;
+  border: 2px dashed var(--blue, #89b4fa);
+  background: rgba(49, 50, 68, 0.8);
+  transition: none;
+}
+
+/* ── 选中线框 ────────────────────────────────────────────────── */
+.ll-line-box.ll-line-selected {
+  border-color: var(--blue, #89b4fa);
+  box-shadow: 0 0 16px rgba(137, 180, 250, 0.25);
+}
+
+/* ── 行排列 ──────────────────────────────────────────────────── */
+.ll-layout-row {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── 列排列 ──────────────────────────────────────────────────── */
+.ll-layout-col {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── 线体滚轮导航（左下角） ───────────────────────────────────────── */
+.ll-line-wheel {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  bottom: auto;
+  z-index: 25;
+  width: 168px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  user-select: none;
+}
+.ll-wheel-item {
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.ll-wheel-prev,
+.ll-wheel-next {
+  font-size: 11px;
+  line-height: 24px;
+  height: 24px;
+  opacity: 0.35;
+  color: var(--subtext0, #a6adc8);
+  transition: opacity 0.12s;
+}
+.ll-wheel-prev:hover,
+.ll-wheel-next:hover { opacity: 0.65; }
+.ll-wheel-current {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 34px;
+  height: 34px;
+  opacity: 0.95;
+  color: var(--blue, #89b4fa);
+  transition: opacity 0.12s;
+}
+.ll-wheel-current:hover { opacity: 1; }
+.ll-wheel-item:empty { display: none; }
+
+/* 多选过滤徽标 */
+.ll-wheel-badge {
+  font-size: 11px;
+  line-height: 22px;
+  height: 22px;
+  padding: 0 4px;
+  color: var(--subtext0, #a6adc8);
+  opacity: 0.45;
+  user-select: none;
+  white-space: nowrap;
+}
+.ll-wheel-badge::before {
+  content: '·';
+  color: var(--blue, #89b4fa);
+  margin-right: 4px;
+  opacity: 1;
+  font-size: 16px;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+/* 亮色覆盖 */
+[data-lv-theme="light"] .ll-wheel-current { color: var(--blue, #1e66f5); }
+[data-lv-theme="light"] .ll-wheel-prev,
+[data-lv-theme="light"] .ll-wheel-next    { color: var(--subtext0, #6c6f85); }
+[data-lv-theme="light"] .ll-wheel-badge   { color: var(--subtext0, #6c6f85); }
+[data-lv-theme="light"] .ll-wheel-badge::before { color: var(--blue, #1e66f5); }
+
+/* ── 线体多选菜单 ────────────────────────────────────────── */
+.ll-line-picker {
+  position: fixed;
+  z-index: 9999;
+  background: var(--mantle, #181825);
+  border: 1px solid var(--surface1, #45475a);
+  border-radius: 8px;
+  min-width: 180px;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+  overflow: hidden;
+}
+.ll-lp-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px 5px;
+  border-bottom: 1px solid var(--surface1, #45475a);
+  flex-shrink: 0;
+}
+.ll-lp-title {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--subtext0, #a6adc8);
+  user-select: none;
+}
+.ll-lp-btn {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--surface2, #585b70);
+  background: transparent;
+  color: var(--subtext1, #bac2de);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.ll-lp-btn:hover { background: var(--surface1, #45475a); }
+.ll-lp-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 3px 0;
+}
+.ll-lp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text, #cdd6f4);
+  user-select: none;
+}
+.ll-lp-item:hover { background: var(--surface0, #313244); }
+.ll-lp-item input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--blue, #89b4fa);
+}
+.ll-lp-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 亮色 */
+.ll-line-picker[data-lv-theme="light"] {
+  background: var(--latte-base, #eff1f5);
+  border-color: #ccd0da;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.ll-line-picker[data-lv-theme="light"] .ll-lp-header { border-color: #ccd0da; }
+.ll-line-picker[data-lv-theme="light"] .ll-lp-title  { color: #6c6f85; }
+.ll-line-picker[data-lv-theme="light"] .ll-lp-btn    { color: #4c4f69; border-color: #bcc0cc; }
+.ll-line-picker[data-lv-theme="light"] .ll-lp-btn:hover { background: #e6e9ef; }
+.ll-line-picker[data-lv-theme="light"] .ll-lp-item   { color: #4c4f69; }
+.ll-line-picker[data-lv-theme="light"] .ll-lp-item:hover { background: #e6e9ef; }
+
+/* ── 缩略图导航（隐藏）──────────────────────────────────── */
+.ll-minimap {
+  display: none;
+}
+.ll-minimap-header {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--subtext0, #a6adc8);
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--surface2, #585b70);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  user-select: none;
+}
+.ll-minimap-header-title {
+  cursor: move;
+  flex: 1;
+}
+.ll-minimap-toggle {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid var(--surface2, #585b70);
+  background: transparent;
+  color: var(--subtext0, #a6adc8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.ll-minimap-toggle:hover {
+  background: var(--surface1, #45475a);
+  color: var(--text, #cdd6f4);
+}
+/* 折叠状态 */
+.ll-minimap.collapsed .ll-minimap-body-wrap {
+  display: none;
+}
+.ll-minimap.collapsed {
+  width: auto;
+  max-height: none;
+}
+.ll-minimap-body-wrap {
+  flex: 1;
+  overflow: auto;
+  scrollbar-width: none;
+  position: relative;
+  min-height: 120px;
+}
+.ll-minimap-body-wrap::-webkit-scrollbar {
+  display: none;
+}
+.ll-minimap-body {
+  position: relative;
+  transform-origin: 0 0;
+  cursor: pointer;
+}
+.ll-minimap-rect {
+  position: absolute;
+  border-radius: 3px;
+  border: 1px solid rgba(137, 180, 250, 0.4);
+  background: rgba(137, 180, 250, 0.12);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.ll-minimap-rect:hover {
+  background: rgba(137, 180, 250, 0.25);
+  border-color: var(--blue, #89b4fa);
+}
+.ll-minimap-rect.active {
+  background: rgba(137, 180, 250, 0.35);
+  border-color: var(--blue, #89b4fa);
+  border-width: 2px;
+}
+.ll-minimap-rect-label {
+  font-size: 8px;
+  color: rgba(205, 214, 244, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 3px;
+  line-height: 1.2;
+  pointer-events: none;
+  text-align: center;
+  width: 100%;
+}
+.ll-minimap-viewport {
+  position: absolute;
+  border: 1.5px dashed rgba(250, 179, 135, 0.6);
+  background: rgba(250, 179, 135, 0.06);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* ── 车俯视图 ────────────────────────────────────────────────── */
+.ll-car-wrap {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+}
+
+/* ── 岗位编号占位框 ──────────────────────────────────────────── */
+.ll-op-slot {
+  position: absolute;
+  width: 22px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(88, 91, 112, 0.55);
+  background: rgba(30, 30, 46, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--subtext0, #a6adc8);
+  pointer-events: all;
+  cursor: pointer;
+  z-index: 2;
+  user-select: none;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.ll-op-slot:hover {
+  background: rgba(203, 166, 247, 0.25);
+  border-color: var(--mauve, #cba6f7);
+  color: var(--mauve, #cba6f7);
+}
+.ll-op-slot.ll-slot-active {
+  background: var(--mauve, #cba6f7);
+  border-color: var(--mauve, #cba6f7);
+  color: #1e1e2e;  /* 始终深色，不跟随主题变白 */
+}
+
+/* 已被岗位占用的位置 → 浅紫色背景 */
+.ll-op-slot.ll-op-slot-occupied {
+  background: rgba(203, 166, 247, 0.18);
+  border-color: rgba(203, 166, 247, 0.55);
+  color: var(--mauve, #cba6f7);
+}
+.ll-op-slot.ll-op-slot-occupied.ll-slot-active {
+  background: var(--mauve, #cba6f7);
+  border-color: var(--mauve, #cba6f7);
+  color: #1e1e2e;
+}
+
+/* 岗位位置徽标（A/B/C/D/E/F） */
+.ll-op-pos-badge {
+  font-size: 9px;
+  font-weight: 700;
+  background: var(--mauve, #cba6f7);
+  color: var(--base, #1e1e2e);
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 位置高亮的岗位环形卡片 */
+.ll-ring-card.ll-op-highlight {
+  outline: 2px solid var(--mauve, #cba6f7);
+  outline-offset: 1px;
+  background: rgba(203, 166, 247, 0.1);
+}
+
+/* LOD 模式下隐藏车图和占位 */
+.ll-world.ll-lod .ll-car-wrap,
+.ll-world.ll-lod .ll-op-slot {
+  opacity: 0;
+  visibility: hidden;
+}
+/* 缩放低于阈值时：隐藏工位和子卡片细节，线框简化，标题反缩放保持可读 */
+.ll-world.ll-lod .ll-station-card,
+.ll-world.ll-lod .ll-ring-card,
+.ll-world.ll-lod .ll-line-layout {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.ll-world .ll-station-card,
+.ll-world .ll-ring-card,
+.ll-world .ll-line-layout {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.ll-world.ll-lod .ll-line-box {
+  border: 1px solid rgba(88, 91, 112, 0.4);
+  background: rgba(49, 50, 68, 0.25);
+  border-radius: 6px;
+  min-width: 0;
+  min-height: 0;
+  transition: border 0.25s ease, background 0.25s ease, border-radius 0.25s ease;
+}
+.ll-world.ll-lod .ll-line-box.ll-line-selected {
+  border-color: var(--blue, #89b4fa);
+  box-shadow: 0 0 16px rgba(137, 180, 250, 0.25);
+}
+.ll-world.ll-lod .ll-line-box:hover {
+  box-shadow: none;
+}
+.ll-world.ll-lod .ll-line-title {
+  /* 反缩放：保持标题视觉大小不变 */
+  font-size: calc(12px / var(--ll-zoom));
+  /* 居中于线框 */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  padding: 0 4px;
+  max-width: none;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--subtext0, #a6adc8);
+  border-radius: 2px;
+}
+
+/* ── 搜索命中高亮 ────────────────────────────────────────────────── */
+.ll-search-hit.ll-station-card {
+  border-color: var(--yellow, #f9e2af) !important;
+  box-shadow: 0 0 10px rgba(249, 226, 175, 0.2);
+}
+.ll-search-hit.ll-ring-card {
+  border-color: var(--yellow, #f9e2af) !important;
+  box-shadow: 0 0 8px rgba(249, 226, 175, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Catppuccin Latte 亮色主题（布局模式，[data-lv-theme="light"]）
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 画布背景 */
+[data-lv-theme="light"] .lv-layout-canvas {
+  background: #ffffff;
+}
+
+/* ── 背景网格（点颜色） */
+[data-lv-theme="light"] .ll-world {
+  background-image: none;
+}
+
+/* ── 线框 */
+[data-lv-theme="light"] .ll-line-box {
+  background: rgba(204, 208, 218, 0.1);
+}
+[data-lv-theme="light"] .ll-line-box:hover {
+  box-shadow: 0 0 12px rgba(30, 102, 245, 0.1);
+}
+[data-lv-theme="light"] .ll-line-box.ll-line-selected {
+  box-shadow: 0 0 16px rgba(30, 102, 245, 0.2);
+}
+
+/* ── 拖拽落点高亮 */
+[data-lv-theme="light"] .ll-drop-target-hovered {
+  background: rgba(254, 100, 11, 0.1) !important;
+}
+[data-lv-theme="light"] .ll-reorder-target-hovered {
+  background: rgba(23, 146, 153, 0.1) !important;
+}
+
+/* ── 工位中心卡片 */
+[data-lv-theme="light"] .ll-station-card {
+  background: rgba(255, 255, 255, 0.85);
+}
+[data-lv-theme="light"] .ll-station-card:hover {
+  box-shadow: 0 0 12px rgba(30, 102, 245, 0.12);
+}
+[data-lv-theme="light"] .ll-station-card.active-node {
+  box-shadow: 0 0 0 2px rgba(30, 102, 245, 0.3),
+              0 0 16px rgba(30, 102, 245, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+}
+[data-lv-theme="light"] .ll-station-card.active-child {
+  border-color: rgba(30, 102, 245, 0.6);
+  box-shadow: 0 0 0 1px rgba(30, 102, 245, 0.3), 0 0 8px rgba(30, 102, 245, 0.1);
+}
+
+/* ── L/R/M 徽标背景色 */
+[data-lv-theme="light"] .ll-station-lrm.lrm-L {
+  background: rgba(30, 102, 245, 0.15);
+}
+[data-lv-theme="light"] .ll-station-lrm.lrm-M {
+  background: rgba(23, 146, 153, 0.2);
+}
+
+/* ── 车流方向箭头背景 */
+[data-lv-theme="light"] .ll-flow-arrow {
+  background: rgba(239, 241, 245, 0.8);
+}
+[data-lv-theme="light"] .ll-flow-arrow.ll-flow-arrow-editable:hover {
+  background: rgba(188, 192, 204, 0.9);
+}
+
+/* ── 拖拽幽灵 */
+[data-lv-theme="light"] .ll-drag-ghost {
+  background: rgba(204, 208, 218, 0.8);
+}
+
+/* ── 环内（ring）卡片 */
+[data-lv-theme="light"] .ll-ring-card {
+  background: rgba(255, 255, 255, 0.8);
+}
+[data-lv-theme="light"] .ll-ring-card.active-node {
+  box-shadow: 0 0 0 2px rgba(30, 102, 245, 0.25);
+}
+[data-lv-theme="light"] .ll-ring-card.active-child {
+  box-shadow: 0 0 0 1px rgba(30, 102, 245, 0.25);
+}
+
+/* ── 缩略图导航（右上角） */
+[data-lv-theme="light"] .ll-minimap {
+  background: rgba(239, 241, 245, 0.98);
+  box-shadow: 0 4px 16px rgba(76, 79, 105, 0.25);
+}
+[data-lv-theme="light"] .ll-minimap-rect {
+  border-color: rgba(30, 102, 245, 0.4);
+  background: rgba(30, 102, 245, 0.1);
+}
+[data-lv-theme="light"] .ll-minimap-rect:hover {
+  background: rgba(30, 102, 245, 0.2);
+}
+[data-lv-theme="light"] .ll-minimap-rect.active {
+  background: rgba(30, 102, 245, 0.3);
+}
+[data-lv-theme="light"] .ll-minimap-rect-label {
+  color: rgba(76, 79, 105, 0.85);
+}
+[data-lv-theme="light"] .ll-minimap-viewport {
+  border-color: rgba(254, 100, 11, 0.7);
+  background: rgba(254, 100, 11, 0.06);
+}
+
+/* ── 岗位编号占位框 */
+[data-lv-theme="light"] .ll-op-slot {
+  border-color: rgba(172, 176, 190, 0.6);
+  background: rgba(239, 241, 245, 0.9);
+}
+
+/* ── LOD 模式简化线框 */
+[data-lv-theme="light"] .ll-world.ll-lod .ll-line-box {
+  border-color: rgba(172, 176, 190, 0.5);
+  background: rgba(188, 192, 204, 0.2);
+}
+[data-lv-theme="light"] .ll-world.ll-lod .ll-line-box.ll-line-selected {
+  box-shadow: 0 0 16px rgba(30, 102, 245, 0.2);
+}
+
+/* ── 搜索命中高亮（亮色版） */
+[data-lv-theme="light"] .ll-search-hit.ll-station-card {
+  box-shadow: 0 0 10px rgba(223, 142, 29, 0.2);
+}
+[data-lv-theme="light"] .ll-search-hit.ll-ring-card {
+  box-shadow: 0 0 8px rgba(223, 142, 29, 0.2);
+}
+
+/* ── 岗位分组框 */
+[data-lv-theme="light"] .ll-op-group-frame {
+  border-color: rgba(30, 102, 245, 0.3);
+  background: rgba(30, 102, 245, 0.03);
+}
+/* ── 布局视图卡片悬浮 + 按钮 ─────────────────────────────────── */
+.lv-fbtn-left { left: -9px; top: 50%; transform: translateY(-50%); }
+
+.ll-station-card:hover .lv-fbtn,
+.ll-ring-card:hover .lv-fbtn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 右侧新建兄弟工位按钮（编辑模式专用） */
+.ll-station-card:hover .ll-add-sib-btn {
+  opacity: 1 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   多项目对比模式样式（方案三）
+══════════════════════════════════════════════════════════════════ */
+
+/* 共用工位卡 */
+.ll-station-shared {
+  border-color: #179299 !important;
+  background: rgba(23, 146, 153, 0.06);
+}
+.ll-station-shared .ll-station-title {
+  color: var(--teal, #94e2d5);
+}
+
+/* 工位卡右上角项目色点 */
+.ll-station-project-dots {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.ll-pdot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 多项目工序容器（替代同心环，垂直列出） */
+.ll-mp-op-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  pointer-events: auto;
+}
+
+/* 单项目工序段 */
+.ll-mp-op-seg {
+  border-left: 2px solid;
+  border-radius: 3px;
+  padding: 2px 5px 4px 5px;
+  background: rgba(0,0,0,0.15);
+}
+[data-lv-theme="light"] .ll-mp-op-seg {
+  background: rgba(255,255,255,0.7);
+}
+
+/* 工序段标题行（项目标签 + 统计） */
+.ll-mp-op-seg-hd {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 3px 3px 3px;
+  border-radius: 2px 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 岗位行 */
+.ll-mp-op-item {
+  font-size: 9px;
+  padding: 1px 3px;
+  color: var(--text, #cdd6f4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-lv-theme="light"] .ll-mp-op-item {
+  color: var(--text, #4c4f69);
+}
+
+/* 工序行（缩进） */
+.ll-mp-proc-item {
+  font-size: 9px;
+  padding: 1px 3px 1px 10px;
+  color: var(--subtext0, #a6adc8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-lv-theme="light"] .ll-mp-proc-item {
+  color: var(--subtext0, #6c6f85);
+}
+
+/* 项目间分隔线 */
+.ll-mp-seg-div {
+  border-top: 1px solid var(--surface1, #313244);
+  margin: 3px 0;
+}
+[data-lv-theme="light"] .ll-mp-seg-div {
+  border-top-color: var(--surface1, #bcc0cc);
+}
+
+/* 多项目车周：每项目独占一行 */
+.ll-mp-car-row {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+}
+.ll-mp-car-label {
+  font-size: 9px;
+  font-weight: 700;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* 工具栏对比按钮包装 */
+.lv-compare-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.lv-compare-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 200;
+  min-width: 220px;
+  background: var(--mantle, #181825);
+  border: 1px solid var(--surface1, #313244);
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  max-height: 300px;
+  overflow-y: auto;
+}
+[data-lv-theme="light"] .lv-compare-menu {
+  background: #fff;
+  border-color: var(--surface1, #bcc0cc);
+}
+.lv-compare-menu-item {
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text, #cdd6f4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.lv-compare-menu-item:hover {
+  background: var(--surface0, #313244);
+}
+[data-lv-theme="light"] .lv-compare-menu-item:hover {
+  background: var(--surface0, #ccd0da);
+}
+.lv-compare-menu-item.active {
+  color: var(--green, #a6e3a1);
+}
+[data-lv-theme="light"] .lv-compare-menu-item.active {
+  color: #40a02b;
+}
+.lv-compare-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.lv-compare-menu-empty {
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--subtext0, #a6adc8);
+}
+
+/* ── 卡片标题内联编辑输入框 ─────────────────────────────────── */
+.ll-title-input {
+  /* 覆盖父容器的 -webkit-line-clamp 截断，确保 input 完整显示 */
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  overflow: visible !important;
+}
+

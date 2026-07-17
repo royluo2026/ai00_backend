@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>BOP 工艺清单</title>
+  
+  
+  <link rel="stylesheet" href="/assets/bop-3c346c2b.css">
+  <link rel="stylesheet" href="/assets/list_deps-9b550476.css">
+</head>
+<body>
+  <script src="/web/icons.js"></script>
+
+  <!-- ListShell 挂载点 -->
+  <div id="appRoot" style="height:100vh;display:flex;flex-direction:column;overflow:hidden"></div>
+
+  <!-- ═══ 新建版本 Modal ═══ -->
+  <div id="modal-new-version" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-title">新建 BOP 版本</div>
+      <input type="hidden" id="inp-ver-family-gid" value="" />
+
+      <!-- 1. 项目（必填，第一步） -->
+      <label>所属项目 <span class="req">*</span>
+        <select id="inp-ver-project">
+          <option value="">— 加载中… —</option>
+        </select>
+      </label>
+
+      <!-- 2. 工厂（只读，从项目自动读取） -->
+      <label>关联工厂
+        <input id="inp-ver-factory-display" type="text" readonly placeholder="选择项目后自动填入"
+               style="background:var(--surface0,#313244);color:var(--subtext0,#a6adc8);cursor:default" />
+        <input type="hidden" id="inp-ver-factory" />
+      </label>
+
+      <!-- 3. 版本标签 -->
+      <label>版本标签 <span class="req">*</span>
+        <input id="inp-ver-tag" type="text" placeholder="如 V1.0、Rev-A" />
+      </label>
+
+      <!-- 4. BOP 名称：自动生成预览 + 后缀 -->
+      <label>名称后缀（可选）
+        <input id="inp-ver-bop-suffix" type="text" placeholder="如：设计评审版（可留空）" />
+      </label>
+      <div class="modal-hint" id="inp-ver-bop-preview" style="margin-top:-6px">
+        将生成：<span id="inp-ver-bop-preview-text" style="color:var(--color-accent,#89b4fa)">请先选择项目</span>
+      </div>
+      <input type="hidden" id="inp-ver-bop-name" />
+
+      <div id="inp-ver-family-hint" class="modal-hint hidden" style="color:var(--color-accent,#89b4fa)">将加入现有版本族，BOP名称已锁定</div>
+
+      <!-- 5. JPH（从项目自动读取） -->
+      <label>JPH
+        <input id="inp-ver-takt" type="number" min="0" readonly placeholder="选择项目后自动填入"
+               style="background:var(--surface0,#313244);color:var(--subtext0,#a6adc8);cursor:default" />
+      </label>
+
+      <!-- 6. 关联 PBOM 版本（可选） -->
+      <label>关联 PBOM 版本
+        <select id="inp-ver-pbom">
+          <option value="">— 请先选择项目 —</option>
+        </select>
+      </label>
+      <div class="modal-hint" id="inp-ver-pbom-hint" style="color:var(--color-warn,#f9e2af);display:none">
+        当前项目下暂无「已就绪」PBOM 版本，可创建版本后再关联。
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-new-version">取消</button>
+        <button id="btn-confirm-new-version" class="btn-primary">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 手工新建根节点 Modal ═══ -->
+  <div id="modal-new-root" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-title">新建根节点</div>
+      <label>节点类型 <span class="req">*</span>
+        <select id="inp-root-type">
+          <option value="factory_bop">总装 BOP</option>
+          <option value="line_process">产线工艺</option>
+          <option value="line_process">线体工艺</option>
+          <option value="station_process">工位工艺</option>
+          <option value="process" selected>总装工序</option>
+          <option value="part">零部件</option>
+        </select>
+      </label>
+      <label>名称 <span class="req">*</span>
+        <input id="inp-root-title" type="text" placeholder="节点名称" />
+      </label>
+      <label>序号
+        <input id="inp-root-seq" type="number" value="0" min="0" />
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-new-root">取消</button>
+        <button id="btn-confirm-new-root" class="btn-primary">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TC CSV 导入 Modal ═══ -->
+  <div id="modal-import-tc" class="modal-overlay hidden">
+    <div class="modal modal-wide">
+      <div class="modal-title">TC CSV 导入</div>
+      <p class="modal-hint">支持从 TC/PLM 导出的标准 CSV，格式说明：<br>
+        列顺序：<code>Level, BOM行, 零组件类型, 零组件ID, 零组件名称, 父级, 所有权用户</code><br>
+        父子关系由「父级」列匹配「BOM行」确定，自动过滤含 PFMEA 的行和未识别类型
+      </p>
+      <label>选择 CSV 文件
+        <input id="inp-tc-file" type="file" accept=".csv,.txt" />
+      </label>
+      <div id="tc-preview" class="bop-import-preview hidden">
+        <div class="bop-import-preview-title">预览（前 20 行）：</div>
+        <div id="tc-preview-table"></div>
+        <div id="tc-preview-count" class="bop-import-count"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-import-tc">取消</button>
+        <button id="btn-confirm-import-tc" class="btn-primary" disabled>导入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BOP Fork Modal ═══ -->
+  <div id="modal-fork-bop" class="modal-overlay hidden">
+    <div class="modal modal-wide">
+      <div class="modal-title">BOP Fork / 克隆</div>
+
+      <!-- 来源版本 -->
+      <label>来源版本 <span class="req">*</span>
+        <select id="inp-fork-src-version">
+          <option value="">-- 选择来源 BOP 版本 --</option>
+        </select>
+      </label>
+
+      <div class="modal-section-sep"></div>
+
+      <!-- 目标版本 -->
+      <div class="modal-section-title">目标版本</div>
+      <label>版本标签 <span class="req">*</span>
+        <input id="inp-fork-tag" type="text" placeholder="如 V2.0、X12-Rev-A" />
+      </label>
+      <label>BOP名称（留空则继承来源）
+        <input id="inp-fork-bop-name" type="text" placeholder="如 X12总装整车BOP" />
+      </label>
+      <label>加入版本族
+        <select id="inp-fork-family">
+          <option value="">-- 自成新版本族 --</option>
+        </select>
+      </label>
+      <label>变更说明
+        <input id="inp-fork-change-note" type="text" placeholder="如 从X11 fork，适配X12新工位布局" />
+      </label>
+
+      <div class="modal-section-sep"></div>
+
+      <!-- 预设 -->
+      <div class="modal-section-title">Fork 预设</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <select id="inp-fork-preset" style="flex:1">
+          <option value="">-- 手动配置 --</option>
+          <optgroup label="系统预设">
+            <option value="__new_model">新车型衍生</option>
+            <option value="__iteration">版本迭代</option>
+            <option value="__structure">结构复制</option>
+            <option value="__full_clone">完整克隆</option>
+          </optgroup>
+          <optgroup id="fork-preset-custom-group" label="自定义预设"></optgroup>
+        </select>
+        <button id="btn-fork-save-preset" class="btn-ghost" style="white-space:nowrap">保存预设</button>
+        <button id="btn-fork-delete-preset" class="btn-ghost" style="display:none;white-space:nowrap">删除预设</button>
+      </div>
+
+      <div class="modal-section-sep"></div>
+
+      <!-- 节点类型过滤 -->
+      <div class="modal-section-title">
+        节点类型过滤
+        <span style="font-size:11px;color:var(--color-text3);margin-left:6px">不勾 = 全部类型</span>
+      </div>
+      <div id="fork-node-types" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+
+      <div class="modal-section-sep"></div>
+
+      <!-- 字段规则 -->
+      <div class="modal-section-title">
+        字段规则
+        <span style="font-size:11px;color:var(--color-text3);margin-left:6px">inherit = 继承值，reset = 清空</span>
+      </div>
+      <div id="fork-field-rules" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px"></div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-fork-bop">取消</button>
+        <button id="btn-confirm-fork-bop" class="btn-primary">执行 Fork</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 编辑节点 Modal ═══ -->
+  <div id="modal-edit-entry" class="modal-overlay hidden">
+    <div class="modal modal-wide">
+      <div class="modal-title">编辑节点</div>
+      <input type="hidden" id="inp-edit-gid" />
+      <label>节点类型
+        <select id="inp-edit-type">
+          <option value="factory_bop">总装工厂BOP</option>
+          <option value="line_process">总装线体工艺</option>
+          <option value="station_process">总装工位工艺</option>
+          <option value="operator_process">总装岗位工艺</option>
+          <option value="man">人</option>
+          <option value="station_factory">工位（工厂）</option>
+          <option value="process" selected>总装工序</option>
+          <option value="equipment_factory">设备（工厂）</option>
+          <option value="tool_factory">工具（工厂）</option>
+          <option value="equipment_need">设备（需求）</option>
+          <option value="fixture_factory">工装（工厂）</option>
+          <option value="operation">总装操作（Product）</option>
+          <option value="issue">问题</option>
+          <option value="standard_task">标准任务</option>
+          <option value="non_standard_task">非标任务</option>
+          <option value="contral_plan">控制计划</option>
+          <option value="process_chart">工艺卡</option>
+          <option value="knowledge">知识</option>
+          <option value="rule">规则</option>
+          <option value="part">零部件</option>
+          <option value="non_standard_part">非标件</option>
+          <option value="standard_part">标准件</option>
+          <option value="support_material">辅料</option>
+          <option value="tool_need">工具（需求）</option>
+          <option value="fixture_need">工装（需求）</option>
+          <option value="floor_height_factory">地面高度（现有）</option>
+          <option value="jack_pos">人机姿态</option>
+        </select>
+      </label>
+      <label>名称 <span class="req">*</span>
+        <input id="inp-edit-title" type="text" />
+      </label>
+      <label>VPPS壳
+        <input id="inp-edit-vpps" type="text" placeholder="工程师指定，如 VP-LINE-01" />
+      </label>
+      <label>VPPS描述
+        <input id="inp-edit-vpps-desc" type="text" placeholder="VPPS 描述" />
+      </label>
+      <label>序号
+        <input id="inp-edit-seq" type="number" min="0" />
+      </label>
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-edit-entry">取消</button>
+        <button id="btn-confirm-edit-entry" class="btn-primary">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 添加子节点 Modal ═══ -->
+  <div id="modal-add-child" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-title">添加子节点</div>
+      <input type="hidden" id="inp-child-parent-gid" />
+      <label>节点类型 <span class="req">*</span>
+        <select id="inp-child-type">
+          <option value="process" selected>总装工序</option>
+          <option value="operation">总装操作（Product）</option>
+          <option value="man">人</option>
+          <option value="station_factory">工位（工厂）</option>
+          <option value="equipment_factory">设备（工厂）</option>
+          <option value="equipment_need">设备（需求）</option>
+          <option value="fixture_factory">工装（工厂）</option>
+          <option value="fixture_need">工装（需求）</option>
+          <option value="tool_factory">工具（工厂）</option>
+          <option value="tool_need">工具（需求）</option>
+          <option value="part">零部件</option>
+          <option value="standard_part">标准件</option>
+          <option value="non_standard_part">非标件</option>
+          <option value="support_material">辅料</option>
+          <option value="floor_height_factory">地面高度（现有）</option>
+          <option value="jack_pos">人机姿态</option>
+        </select>
+      </label>
+      <label>名称 <span class="req">*</span>
+        <input id="inp-child-title" type="text" placeholder="子节点名称" />
+      </label>
+      <label>VPPS壳
+        <input id="inp-child-vpps" type="text" placeholder="工程师指定，如 VP-LINE-01" />
+      </label>
+      <label>VPPS描述
+        <input id="inp-child-vpps-desc" type="text" placeholder="VPPS 描述" />
+      </label>
+      <label>序号
+        <input id="inp-child-seq" type="number" value="0" min="0" />
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-add-child">取消</button>
+        <button id="btn-confirm-add-child" class="btn-primary">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 从GBOP导入 Modal ═══ -->
+  <div id="modal-import-gbop" class="modal-overlay hidden">
+    <div class="modal modal-wide">
+      <div class="modal-title">从GBOP导入</div>
+      <p class="modal-hint">选择 GBOP 版本，将其全部条目导入当前版本。<br>
+        导入后每个条目的 <code>gbop_source_gid</code> 将记录来源，便于后续 DiffManager 对比。</p>
+      <label>选择 GBOP 来源版本
+        <select id="inp-copy-gbop-version">
+          <option value="">-- 选择 GBOP 版本 --</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-import-gbop">取消</button>
+        <button id="btn-confirm-import-gbop" class="btn-primary">导入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 建立实体关联 Modal ═══ -->
+  <div id="modal-auto-link" class="modal-overlay hidden">
+    <div class="modal modal-wider">
+      <div class="modal-title">建立实体关联</div>
+      <p class="modal-hint">
+        将 bop_entries 中的节点与对应的业务实体表建立 <code>bop_entry_links(is_primary=TRUE)</code>。
+        步骤之间可独立执行，<strong>已建关联的条目自动跳过</strong>（幂等）。
+      </p>
+
+      <!-- 步骤操作 -->
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <button id="btn-al-preview" class="btn-ghost" style="flex:1">预览待处理条目</button>
+        <button id="btn-al-step-a" class="btn-primary" style="flex:1">Step A：工艺节点 → 建 stub 实体</button>
+        <button id="btn-al-step-b" class="btn-primary" style="flex:1">Step B：零件节点 → 匹配 PBOM</button>
+      </div>
+
+      <!-- 统计汇总 -->
+      <div id="al-summary" class="al-summary hidden"></div>
+
+      <!-- 条目明细列表 -->
+      <div id="al-items-wrap" class="hidden" style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:5px">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--bg);position:sticky;top:0">
+              <th style="padding:4px 6px;text-align:left;width:40px">序号</th>
+              <th style="padding:4px 6px;text-align:left;width:70px">类型</th>
+              <th style="padding:4px 6px;text-align:left">名称</th>
+              <th style="padding:4px 6px;text-align:left;width:90px">bom_row_id</th>
+              <th style="padding:4px 6px;text-align:left;width:60px">状态</th>
+              <th style="padding:4px 6px;text-align:left">信息</th>
+            </tr>
+          </thead>
+          <tbody id="al-items-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-auto-link">关闭</button>
+      </div>
+    </div>
+  </div>
+  <div id="modal-edit-version" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-title">编辑版本属性</div>
+      <input type="hidden" id="inp-editver-gid" />
+      <label>BOP名称
+        <input id="inp-editver-bop-name" type="text" placeholder="如 X11总装整车BOP" />
+      </label>
+      <label>版本标签 <span class="req">*</span>
+        <input id="inp-editver-tag" type="text" placeholder="如 V1.0、Rev-A" />
+      </label>
+      <label>成熟度
+        <select id="inp-editver-maturity">
+          <option value="concept">概念 (Concept)</option>
+          <option value="planned">计划 (Planned)</option>
+          <option value="released">发布 (Released)</option>
+          <option value="frozen">冻结 (Frozen)</option>
+        </select>
+      </label>
+      <label>节拍时间 (s)
+        <input id="inp-editver-takt" type="number" value="60" min="0" />
+      </label>
+      <label>状态
+        <select id="inp-editver-status">
+          <option value="draft">草稿</option>
+          <option value="review">审核中</option>
+          <option value="approved">已批准</option>
+          <option value="obsolete">已废弃</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button class="btn-ghost" data-close-modal="modal-edit-version">取消</button>
+        <button id="btn-confirm-edit-version" class="btn-primary">保存</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="/web/components/grid_editor.js"></script>
+  <script src="/web/components/view_manager.js"></script>
+  <script src="/web/components/list_sidebar.js"></script>
+  <script src="/web/components/entry_thread.js"></script>
+  <script src="/web/components/sidebar_detail_panel.js"></script>
+  <script src="/web/components/tree_view.js"></script>
+  <script src="/web/components/overlay_edit_modal.js"></script>
+  <script src="/web/components/list_shell.js"></script>
+  <script src="bop.js"></script>
+</body>
+</html>

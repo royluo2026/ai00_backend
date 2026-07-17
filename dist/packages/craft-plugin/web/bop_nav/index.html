@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>车型工序导航卡</title>
+  
+  
+  <script>
+    (function() {
+      var t = localStorage.getItem('bn:theme') || 'dark';
+      if (t === 'light') document.documentElement.setAttribute('data-lv-theme', 'light');
+    })();
+  </script>
+  <link rel="stylesheet" href="/assets/index-12f76b82.css">
+  <link rel="stylesheet" href="/assets/lineage-169cb532.css">
+</head>
+<body>
+
+  <!-- ══ 工具栏 ══ -->
+  <div class="lv-toolbar" id="bnToolbar">
+
+    <!-- PBOM 版本选择器 -->
+    <div class="lv-version-picker">
+      <div class="lv-vp-select-wrap">
+        <button class="lv-vp-select" id="bnVerBtn">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+          </svg>
+          <span id="bnVerLabel">— 选择 PBOM 版本 —</span>
+          <svg class="lv-vp-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="lv-vp-menu" id="bnVerMenu" style="display:none;min-width:280px"></div>
+      </div>
+    </div>
+
+    <div class="lv-toolbar-sep"></div>
+
+    <!-- 状态过滤 Tabs -->
+    <div class="bn-filter-tabs" id="bnFilterTabs">
+      <button class="bn-ftab active" data-f="all">全部</button>
+      <button class="bn-ftab" data-f="unmatched">未匹配</button>
+      <button class="bn-ftab" data-f="matched">已匹配</button>
+      <button class="bn-ftab" data-f="multi">多匹配</button>
+      <button class="bn-ftab" data-f="skipped">已跳过</button>
+      <button class="bn-ftab" data-f="pending">待处理</button>
+    </div>
+
+    <div class="lv-toolbar-sep"></div>
+
+    <!-- 搜索 -->
+    <input class="lv-search" id="bnSearch" type="search" placeholder="搜索零件…">
+
+    <div class="lv-toolbar-sep"></div>
+
+    <!-- 提交按钮 -->
+    <button class="lv-btn lv-btn-sm bn-submit" id="bnSubmit" disabled>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      提交
+    </button>
+
+    <!-- Auto-Link -->
+    <button class="lv-btn lv-btn-sm bn-autolink" id="bnAutoLink" title="根据 VPPS 自动匹配 GBOP 工序/操作">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+      </svg>
+      Auto-Link
+    </button>
+
+    <!-- Auto-Link 提交确认（有未提交绑定时才可用） -->
+    <button class="lv-btn lv-btn-sm bn-alconfirm" id="bnAutoLinkConfirm"
+            title="确认 Auto-Link 结果" style="display:none">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      确认绑定
+    </button>
+
+    <div class="lv-toolbar-sep"></div>
+
+    <!-- 视图切换 -->
+    <div class="bn-view-toggle" id="bnViewToggle">
+      <button class="bn-vtab active" data-v="part">零件视图</button>
+      <button class="bn-vtab" data-v="process">工序视图</button>
+    </div>
+
+    <div class="lv-toolbar-sep"></div>
+
+    <!-- 刷新 -->
+    <button class="lv-btn lv-btn-sm" id="bnRefresh" title="刷新">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+      </svg>
+    </button>
+
+    <!-- 主题切换 -->
+    <button class="lv-btn lv-btn-sm" id="bnTheme">
+      <svg id="bnThemeIcon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <span id="bnThemeLabel">亮色</span>
+    </button>
+  </div>
+
+  <!-- ══ 主体：Miller Columns + 操作选择面板 + 右侧边栏 ══ -->
+  <div class="lv-body-wrap">
+
+    <div class="lv-columns-wrap" id="bnColumnsWrap">
+      <div class="lv-columns" id="bnColumns"></div>
+    </div>
+
+    <!-- 右侧操作选择面板（与 lineage 的 overlay panel 相同结构） -->
+    <div class="lv-overlay-wrap" id="bnOverlayWrap">
+      <div class="lv-overlay-panel hidden" id="bnPanel">
+        <div class="lv-op-hdr">
+          <span class="lv-op-title" id="bnPanelTitle">操作选择</span>
+          <div class="lv-op-hdr-actions">
+            <button class="lv-op-close" id="bnPanelClose">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="lv-op-body" id="bnPanelBody"></div>
+        <div class="bn-panel-footer">
+          <button class="bn-btn-skip"    id="bnBtnSkip">跳过此零件</button>
+          <button class="bn-btn-confirm" id="bnBtnConfirm">确认选择</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧边栏 -->
+    <div class="lv-sidebar lv-sidebar-open" id="bnSidebar">
+
+      <!-- 规则判定 -->
+      <div class="lv-cpanel" id="bnRulePanel">
+        <div class="lv-cpanel-hdr" id="bnRuleHdr">
+          <button class="lv-cpanel-toggle" id="bnRuleToggle" title="折叠规则判定">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+          </button>
+          <span class="lv-cpanel-title">规则判定</span>
+          <span class="lv-cpanel-summary" id="bnRuleSummary">正常</span>
+        </div>
+        <div class="lv-cpanel-body" id="bnRuleBody">
+          <div class="lv-cpanel-empty">暂无提示</div>
+        </div>
+      </div>
+
+      <!-- 参考信息 -->
+      <div class="lv-cpanel" id="bnRefPanel">
+        <div class="lv-cpanel-hdr" id="bnRefHdr">
+          <button class="lv-cpanel-toggle" id="bnRefToggle" title="折叠参考信息">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+          </button>
+          <span class="lv-cpanel-title">参考信息</span>
+          <span class="lv-cpanel-summary" id="bnRefSummary">–</span>
+        </div>
+        <div class="lv-cpanel-body" id="bnRefBody">
+          <div class="lv-cpanel-empty">知识库接入后显示</div>
+        </div>
+      </div>
+
+      <!-- 分割条 -->
+      <div class="lv-panel-divider" id="bnPanelDivider"></div>
+
+      <!-- 关联面板 -->
+      <div class="lv-assoc" id="bnAssoc">
+        <div class="lv-assoc-tabs" id="bnAssocTabs"></div>
+        <div class="lv-assoc-unlinked" id="bnAssocUnlinked" style="display:none"></div>
+        <div class="lv-assoc-body" id="bnAssocBody"></div>
+      </div>
+
+    </div>
+    <button class="lv-sb-toggle" id="bnSbToggle" title="折叠边栏">▶</button>
+
+  </div>
+
+  <!-- Toast -->
+  <div class="lv-toast" id="bnToast" style="display:none"></div>
+
+  <script src="/web/components/miller_columns.js"></script>
+  <script src="../lineage_view/assoc_panel.js"></script>
+  <script src="bop_nav.js"></script>
+</body>
+</html>

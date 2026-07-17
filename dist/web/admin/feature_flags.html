@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>功能开关</title>
+  <script src="/web/icons.js"></script>
+  <style>
+    :root {
+      --bg-primary:#1e1e2e; --bg-secondary:#181825; --bg-surface:#24273a; --bg-tertiary:#313244;
+      --text-normal:#cdd6f4; --text-muted:#a6adc8; --text-faint:#6c7086;
+      --border-default:#313244; --color-accent:#89b4fa;
+      --color-green:#a6e3a1; --color-orange:#fab387; --color-red:#f38ba8;
+      --color-yellow:#f9e2af; --color-gray:#585b70;
+    }
+    [data-theme="light"] {
+      --bg-primary:#eff1f5; --bg-secondary:#e6e9ef; --bg-surface:#dce0e8; --bg-tertiary:#bcc0cc;
+      --text-normal:#4c4f69; --text-muted:#8c8fa1; --text-faint:#9ca0b0;
+      --border-default:#bcc0cc; --color-accent:#1e66f5;
+      --color-green:#40a02b; --color-orange:#fe640b; --color-red:#d20f39;
+      --color-yellow:#df8e1d; --color-gray:#7c7f93;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg-primary); color:var(--text-normal); font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; font-size:13px; height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+    .page-header { display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid var(--border-default); flex-shrink:0; }
+    .page-title { font-size:15px; font-weight:600; }
+    .toolbar { display:flex; align-items:center; gap:8px; padding:8px 20px; border-bottom:1px solid var(--border-default); flex-shrink:0; flex-wrap:wrap; }
+    .search-input { padding:5px 10px; border:1px solid var(--border-default); border-radius:6px; background:var(--bg-surface); color:var(--text-normal); font-size:12px; width:200px; outline:none; }
+    .search-input:focus { border-color:var(--color-accent); }
+    .filter-select { padding:5px 8px; border:1px solid var(--border-default); border-radius:6px; background:var(--bg-surface); color:var(--text-normal); font-size:12px; outline:none; cursor:pointer; }
+    .stat-text { font-size:12px; color:var(--text-faint); margin-left:auto; }
+    .saving-badge { padding:3px 8px; border-radius:4px; background:color-mix(in srgb,var(--color-green) 20%,transparent); color:var(--color-green); font-size:11px; font-weight:500; display:none; }
+    .saving-badge.visible { display:inline-block; }
+    .table-wrap { flex:1; overflow:auto; padding:0 20px 20px; }
+    table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    colgroup col:nth-child(1) { width:64px; }
+    colgroup col:nth-child(2) { width:auto; }
+    colgroup col:nth-child(3) { width:180px; }
+    colgroup col:nth-child(4) { width:180px; }
+    thead th { position:sticky; top:0; background:var(--bg-secondary); padding:8px 10px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); border-bottom:1px solid var(--border-default); white-space:nowrap; z-index:2; }
+    tbody tr { border-bottom:1px solid var(--border-default); }
+    tbody tr:hover { background:var(--bg-surface); }
+    tbody td { padding:6px 10px; vertical-align:middle; overflow:hidden; text-overflow:ellipsis; font-size:12px; }
+    .feat-name { font-weight:500; }
+    .feat-navid { font-size:11px; color:var(--text-faint); display:block; margin-top:1px; }
+    .feat-select { padding:4px 8px; border:1px solid var(--border-default); border-radius:5px; background:var(--bg-surface); color:var(--text-normal); font-size:12px; outline:none; cursor:pointer; width:100%; max-width:170px; }
+    .feat-select:focus { border-color:var(--color-accent); }
+    /* 可见性颜色 */
+    .vis-all        { border-color:var(--color-green);  color:var(--color-green);  background:color-mix(in srgb,var(--color-green)  10%,var(--bg-surface)); }
+    .vis-member     { border-color:var(--color-accent); color:var(--color-accent); background:color-mix(in srgb,var(--color-accent) 10%,var(--bg-surface)); }
+    .vis-team_admin { border-color:var(--color-orange); color:var(--color-orange); background:color-mix(in srgb,var(--color-orange) 10%,var(--bg-surface)); }
+    .vis-super_admin{ border-color:var(--color-red);    color:var(--color-red);    background:color-mix(in srgb,var(--color-red)    10%,var(--bg-surface)); }
+    /* 可用性颜色（偏淡） */
+    .ava-all        { border-color:var(--color-gray); }
+    .ava-member     { border-color:var(--color-accent); opacity:.8; }
+    .ava-team_admin { border-color:var(--color-orange); opacity:.8; }
+    .ava-super_admin{ border-color:var(--color-red);    opacity:.8; }
+    .cat-badge { display:inline-block; padding:1px 6px; border-radius:3px; font-size:10px; font-weight:600; letter-spacing:.04em; }
+    .cat-admin     { background:color-mix(in srgb,var(--color-orange) 15%,transparent); color:var(--color-orange); }
+    .cat-app       { background:color-mix(in srgb,var(--color-green)  15%,transparent); color:var(--color-green); }
+    .cat-statusbar { background:color-mix(in srgb,var(--color-yellow) 15%,transparent); color:var(--color-yellow); }
+    .cat-settings  { background:color-mix(in srgb,#cba6f7            15%,transparent); color:#cba6f7; }
+  </style>
+</head>
+<body>
+  <div class="page-header">
+    <svg class="icon" width="18" height="18"><use href="#icon-settings"/></svg>
+    <span class="page-title">功能开关</span>
+    <span id="savedBadge" class="saving-badge">已保存</span>
+  </div>
+  <div class="toolbar">
+    <input class="search-input" id="searchInput" placeholder="搜索功能名称…" />
+    <select class="filter-select" id="catFilter">
+      <option value="">全部分类</option>
+      <option value="admin">管理中心</option>
+      <option value="app">App 面板</option>
+      <option value="statusbar">状态栏</option>
+      <option value="settings">系统设置面板</option>
+    </select>
+    <span class="stat-text" id="statText"></span>
+  </div>
+  <div class="table-wrap">
+    <table id="ffTable">
+      <colgroup><col/><col/><col/><col/></colgroup>
+      <thead>
+        <tr>
+          <th>分类</th>
+          <th>功能名称</th>
+          <th>可见性（谁能看到）</th>
+          <th>可用性（谁能操作）</th>
+        </tr>
+      </thead>
+      <tbody id="ffBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // theme sync
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'theme') document.documentElement.setAttribute('data-theme', e.data.theme);
+    });
+    (function(){ const t=localStorage.getItem('system.theme'); if(t) document.documentElement.setAttribute('data-theme',t); })();
+
+    // ── 功能列表 ──────────────────────────────────────────────────────────────
+    const FEATURE_LIST = [
+      // ── 管理中心子页 ────────────────────────────────────────────────────────
+      { id:'admin_approval',      label:'审批中心',           cat:'admin',     navId:'admin_hub › approval'       },
+      { id:'admin_org',           label:'组织管理',           cat:'admin',     navId:'admin_hub › org'            },
+      { id:'admin_capabilities',  label:'系统能力',           cat:'admin',     navId:'admin_hub › capabilities'   },
+      { id:'admin_lists',         label:'清单注册',           cat:'admin',     navId:'admin_hub › lists'          },
+      { id:'admin_feature_flags', label:'功能开关',           cat:'admin',     navId:'admin_hub › feature_flags'  },
+      { id:'admin_bug_tracker',   label:'开发看板',           cat:'admin',     navId:'admin_hub › bug_tracker'    },
+      { id:'admin_ai_audit',      label:'AI 审计',            cat:'admin',     navId:'admin_hub › ai_audit'       },
+      { id:'admin_task_planning', label:'任务规划',           cat:'admin',     navId:'admin_hub › task_planning'  },
+      // ── App 面板 ────────────────────────────────────────────────────────────
+      { id:'app_workbench',       label:'工作台',             cat:'app',       navId:'App 面板 › 工作台'           },
+      { id:'app_my_files',        label:'我的文件',            cat:'app',       navId:'App 面板 › 我的文件'          },
+      { id:'app_craft_hub',       label:'工艺规划',            cat:'app',       navId:'App 面板 › 工艺规划'          },
+      { id:'app_project_hub',     label:'项目管理',            cat:'app',       navId:'App 面板 › 项目管理'          },
+      { id:'app_knowledge_hub',   label:'知识库',              cat:'app',       navId:'App 面板 › 知识库'            },
+      { id:'app_automation_hub',  label:'自动化与AI',          cat:'app',       navId:'App 面板 › 自动化与AI'        },
+      { id:'app_cad_sim',         label:'数模仿真',            cat:'app',       navId:'App 面板 › 数模仿真'          },
+      { id:'app_admin_hub',       label:'管理中心',            cat:'app',       navId:'App 面板 › 管理中心'          },
+      // ── 状态栏右侧 ──────────────────────────────────────────────────────────
+      { id:'sb_schedule',         label:'日程快览',            cat:'statusbar', navId:'状态栏 › 日程快览'            },
+      { id:'sb_ai_chat',          label:'AI 对话',             cat:'statusbar', navId:'状态栏 › AI 对话'             },
+      { id:'sb_ai_canvas',        label:'AI 画布',             cat:'statusbar', navId:'状态栏 › AI 画布'             },
+      { id:'sb_tracker',          label:'开发看板',            cat:'statusbar', navId:'状态栏 › 开发看板'            },
+      { id:'sb_task_planning',    label:'任务规划',            cat:'statusbar', navId:'状态栏 › 任务规划'            },
+      { id:'sb_notif',            label:'通知',                cat:'statusbar', navId:'状态栏 › 通知'                },
+      { id:'sb_log',              label:'日志',                cat:'statusbar', navId:'状态栏 › 日志'                },
+      { id:'sb_debug',            label:'调试',                cat:'statusbar', navId:'状态栏 › 调试'                },
+      { id:'sb_ai_balance',       label:'AI 余额',             cat:'statusbar', navId:'状态栏 › AI 余额'             },
+      // ── 系统设置面板 ────────────────────────────────────────────────────────
+      { id:'settings_panel_appearance',       label:'外观 / 主题',        cat:'settings',  navId:'系统设置 › 外观 / 主题'  },
+      { id:'settings_panel_shortcuts',        label:'快捷键',             cat:'settings',  navId:'系统设置 › 快捷键'       },
+      { id:'settings_panel_general',          label:'通用',               cat:'settings',  navId:'系统设置 › 通用'         },
+      { id:'settings_panel_database',         label:'数据库',             cat:'settings',  navId:'系统设置 › 数据库'       },
+      { id:'settings_panel_file_store',       label:'文件存储',           cat:'settings',  navId:'系统设置 › 文件存储'     },
+      { id:'settings_panel_feishu',           label:'飞书集成',           cat:'settings',  navId:'系统设置 › 飞书集成'     },
+      { id:'settings_panel_user_management',  label:'用户管理',           cat:'settings',  navId:'系统设置 › 用户管理'     },
+      { id:'settings_panel_feature_flags',    label:'功能开关',           cat:'settings',  navId:'系统设置 › 功能开关'     },
+      { id:'settings_panel_follows_cleanup',  label:'关注清理',           cat:'settings',  navId:'系统设置 › 关注清理'     },
+      { id:'settings_panel_notif_prefs',      label:'通知设置',           cat:'settings',  navId:'系统设置 › 通知设置'     },
+      { id:'settings_panel_plugin_market',    label:'插件市场',           cat:'settings',  navId:'系统设置 › 插件市场'     },
+      { id:'settings_panel_list_defaults',    label:'清单设置',           cat:'settings',  navId:'系统设置 › 清单设置'     },
+    ];
+
+    const CAT_LABELS = { admin:'管理中心', app:'App 面板', statusbar:'状态栏', settings:'系统设置' };
+
+    // 可见性和可用性共用同一套级别
+    const LEVEL_OPTS = [
+      { value:'all',         label:'所有人（含外部）' },
+      { value:'member',      label:'成员及以上'       },
+      { value:'team_admin',  label:'管理员及以上'     },
+      { value:'super_admin', label:'仅超管'           },
+    ];
+
+    // 各项的默认可见性（未在 DB 中设置时的运行时默认，与 main.js 保持一致）
+    const VISIBILITY_DEFAULTS = {
+      sb_ai_chat:       'super_admin',
+      sb_ai_canvas:     'super_admin',
+      sb_tracker:       'super_admin',
+      sb_debug:         'super_admin',
+      sb_ai_balance:    'super_admin',
+      sb_schedule:      'member',
+      admin_ai_audit:   'super_admin',
+      admin_task_planning: 'super_admin',
+      admin_bug_tracker:   'super_admin',
+      // 系统设置面板默认可见性（与 settings.js _SETTINGS_VISIBILITY 保持一致）
+      settings_panel_database:        'team_admin',
+      settings_panel_file_store:      'team_admin',
+      settings_panel_user_management: 'team_admin',
+      settings_panel_feature_flags:   'super_admin',
+    };
+
+    // ── 状态 ─────────────────────────────────────────────────────────────────
+    let _flags    = {};
+    let _filtered = [];
+    let _saveTimer = null;
+
+    function _defaultFlags() {
+      const d = {};
+      FEATURE_LIST.forEach(f => {
+        d[f.id] = {
+          visibility:   VISIBILITY_DEFAULTS[f.id] || 'all',
+          availability: 'all',
+        };
+      });
+      return d;
+    }
+
+    // ── Cloud fetch ───────────────────────────────────────────────────────────
+    function cf(path, opts) {
+      const fn = window.parent?._cloudFetch || window._cloudFetch || window.parent?.parent?._cloudFetch;
+      if (!fn) return Promise.reject(new Error('no _cloudFetch'));
+      return fn(path, opts);
+    }
+
+    async function loadFlags() {
+      _flags = _defaultFlags();
+      try {
+        const res = await cf('/admin/config/feature_flags');
+        if (res?.data?.value) {
+          const parsed = JSON.parse(res.data.value);
+          // 深度合并：只覆盖存在的字段
+          Object.keys(parsed).forEach(id => {
+            if (!_flags[id]) _flags[id] = { visibility: 'all', availability: 'all' };
+            Object.assign(_flags[id], parsed[id]);
+          });
+        }
+      } catch (_) {}
+    }
+
+    // ── 防抖保存 ──────────────────────────────────────────────────────────────
+    function scheduleSave() {
+      clearTimeout(_saveTimer);
+      _saveTimer = setTimeout(doSave, 500);
+    }
+
+    async function doSave() {
+      try {
+        await cf('/admin/config/feature_flags', {
+          method: 'PUT',
+          body: JSON.stringify({ value: JSON.stringify(_flags), description: '功能开关配置' }),
+        });
+        const badge = document.getElementById('savedBadge');
+        badge.classList.add('visible');
+        setTimeout(() => badge.classList.remove('visible'), 1500);
+        window.parent?.postMessage({ type: 'feature-flags-changed' }, '*');
+      } catch (e) {
+        console.warn('[feature_flags] save failed:', e.message);
+      }
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────
+    function _he(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function _selectHtml(featId, field, currentVal, disabled, isAvail) {
+      const prefix = isAvail ? 'ava' : 'vis';
+      const cls = `feat-select ${prefix}-${currentVal}`;
+      const dis = disabled ? ' disabled title="固定，不可调整"' : '';
+      const opts = LEVEL_OPTS.map(o =>
+        `<option value="${o.value}"${o.value === currentVal ? ' selected' : ''}>${_he(o.label)}</option>`
+      ).join('');
+      return `<select class="${cls}" data-id="${_he(featId)}" data-field="${field}"${dis}>${opts}</select>`;
+    }
+
+    function render() {
+      const body = document.getElementById('ffBody');
+      body.innerHTML = '';
+      _filtered.forEach(feat => {
+        const entry = _flags[feat.id] || { visibility: VISIBILITY_DEFAULTS[feat.id] || 'all', availability: 'all' };
+        const vis   = entry.visibility   || 'all';
+        const avail = entry.availability || 'all';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="cat-badge cat-${feat.cat}">${_he(CAT_LABELS[feat.cat] || feat.cat)}</span></td>
+          <td>
+            <span class="feat-name">${_he(feat.label)}</span>
+            <span class="feat-navid">${_he(feat.navId)}</span>
+          </td>
+          <td>${_selectHtml(feat.id, 'visibility',   vis,   !!feat.readonly, false)}</td>
+          <td>${_selectHtml(feat.id, 'availability', avail, !!feat.readonly, true)}</td>
+        `;
+        body.appendChild(tr);
+      });
+      document.getElementById('statText').textContent = `${_filtered.length} / ${FEATURE_LIST.length} 项`;
+      bindEvents();
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('.feat-select').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const id    = sel.dataset.id;
+          const field = sel.dataset.field;
+          if (!_flags[id]) _flags[id] = { visibility: 'all', availability: 'all' };
+          _flags[id][field] = sel.value;
+          const prefix = field === 'availability' ? 'ava' : 'vis';
+          // 更新颜色 class
+          sel.className = sel.className.replace(/\b(vis|ava)-\S+/, '');
+          sel.classList.add(`${prefix}-${sel.value}`);
+          scheduleSave();
+        });
+      });
+    }
+
+    // ── Filter ────────────────────────────────────────────────────────────────
+    function applyFilter() {
+      const q   = document.getElementById('searchInput').value.trim().toLowerCase();
+      const cat = document.getElementById('catFilter').value;
+      _filtered = FEATURE_LIST.filter(f => {
+        if (cat && f.cat !== cat) return false;
+        if (q && !f.label.toLowerCase().includes(q) && !f.id.includes(q) && !f.navId.toLowerCase().includes(q)) return false;
+        return true;
+      });
+      render();
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    async function init() {
+      document.getElementById('searchInput').addEventListener('input', applyFilter);
+      document.getElementById('catFilter').addEventListener('change', applyFilter);
+      await loadFlags();
+      applyFilter();
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  </script>
+</body>
+</html>

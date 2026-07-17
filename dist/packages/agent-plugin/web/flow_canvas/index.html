@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>流程编辑器 — AI00</title>
+  
+  
+  <link rel="stylesheet" href="/assets/index-3b567278.css">
+</head>
+<body>
+  <!-- ── 顶部工具栏 ──────────────────────────────────────────────── -->
+  <div class="fe-topbar">
+    <div class="fe-topbar-left">
+      <button class="fe-btn fe-btn-ghost" id="feBack" title="关闭">
+        <svg class="icon" width="14" height="14"><use href="/web/assets/icons.svg#icon-apps"/></svg>
+        返回
+      </button>
+      <input class="fe-flow-name-input" id="feFlowName" placeholder="流程名称…" spellcheck="false">
+      <input class="fe-flow-intent" id="feFlowIntent" placeholder="这个流程的意图（必填）…" spellcheck="false">
+    </div>
+    <div class="fe-topbar-right">
+      <span id="feSaveStatus" class="fe-save-status">未保存</span>
+      <button class="fe-btn fe-btn-ghost" id="feBtnHistory" title="执行历史">
+        <svg class="icon" width="13" height="13"><use href="/web/assets/icons.svg#icon-bell"/></svg>
+        历史
+      </button>
+      <button class="fe-btn fe-btn-ghost" id="feBtnStepMode" title="点动调试">
+        <svg class="icon" width="13" height="13"><use href="/web/assets/icons.svg#icon-star-filled"/></svg>
+        调试
+      </button>
+      <button class="fe-btn fe-btn-primary" id="feBtnRun" title="立即运行">
+        <svg class="icon" width="13" height="13"><use href="/web/assets/icons.svg#icon-apps"/></svg>
+        运行
+      </button>
+      <button class="fe-btn fe-btn-accent" id="feBtnSave">
+        <svg class="icon" width="13" height="13"><use href="/web/assets/icons.svg#icon-check-circle"/></svg>
+        保存
+      </button>
+    </div>
+  </div>
+
+  <!-- ── 主体 ───────────────────────────────────────────────────── -->
+  <div class="fe-main">
+
+    <!-- 左侧面板：节点类型 -->
+    <div class="fe-sidebar fe-sidebar-left" id="feNodePanel">
+      <div class="fe-panel-title">节点类型</div>
+      <div id="feNodeList"></div>
+    </div>
+
+    <!-- 画布区域 -->
+    <div class="fe-canvas-wrap">
+      <div id="feDrawflow"></div>
+      <!-- 运行中节点高亮覆盖层（由 JS 操控） -->
+    </div>
+
+    <!-- 右侧面板：节点配置 -->
+    <div class="fe-sidebar fe-sidebar-right hidden" id="feConfigPanel">
+      <div class="fe-panel-header">
+        <span class="fe-panel-title" id="feConfigTitle">节点配置</span>
+        <button class="fe-panel-close" id="feConfigClose">✕</button>
+      </div>
+      <div id="feConfigBody"></div>
+    </div>
+
+    <!-- 右侧历史抽屉 -->
+    <div class="fe-sidebar fe-sidebar-right hidden" id="feHistoryPanel">
+      <div class="fe-panel-header">
+        <span class="fe-panel-title">执行历史</span>
+        <button class="fe-panel-close" id="feHistoryClose">✕</button>
+      </div>
+      <div id="feHistoryList"></div>
+    </div>
+
+  </div>
+
+  <!-- 调试工具栏（step 模式时显示） -->
+  <div class="fe-debug-bar hidden" id="feDebugBar">
+    <span class="fe-debug-label" id="feDebugStatus">调试模式 — 暂停于节点：<b id="feDebugNode">—</b></span>
+    <button class="fe-btn fe-btn-primary" id="feBtnStep">下一步</button>
+    <button class="fe-btn fe-btn-ghost" id="feBtnStopDebug">停止</button>
+  </div>
+
+  <!-- 单节点测试 Modal -->
+  <div class="fe-modal-overlay hidden" id="feTestModal">
+    <div class="fe-modal">
+      <div class="fe-modal-header">
+        <span>测试节点: <b id="feTestNodeType"></b></span>
+        <button class="fe-modal-close" id="feTestClose">✕</button>
+      </div>
+      <div class="fe-modal-body">
+        <div class="fe-field-group">
+          <label>输入 JSON (inputs):</label>
+          <textarea id="feTestInputs" rows="5" placeholder='{"key":"value"}'></textarea>
+        </div>
+        <button class="fe-btn fe-btn-primary" id="feBtnRunTest">执行测试</button>
+        <div class="fe-test-result hidden" id="feTestResult">
+          <pre id="feTestOutput"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script 节点 AI 生成 Modal -->
+  <div class="fe-modal-overlay hidden" id="feGenScriptModal">
+    <div class="fe-modal fe-modal-wide">
+      <div class="fe-modal-header">
+        <span>AI 生成脚本</span>
+        <button class="fe-modal-close" id="feGenScriptClose">✕</button>
+      </div>
+      <div class="fe-modal-body" style="display:flex;flex-direction:column;gap:10px;">
+        <div class="fe-field-group">
+          <label>需求描述（自然语言）:</label>
+          <textarea id="feGenDesc" rows="3" placeholder="描述你要这段脚本做什么…"></textarea>
+        </div>
+        <button class="fe-btn fe-btn-primary" id="feBtnGenScript">
+          <svg class="icon" width="13" height="13"><use href="/web/assets/icons.svg#icon-apps"/></svg>
+          AI 生成
+        </button>
+        <div class="fe-field-group">
+          <label>生成的代码（可编辑）:</label>
+          <textarea id="feGenCode" rows="12" style="font-family:monospace;font-size:12px;" spellcheck="false"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="fe-btn fe-btn-ghost" id="feGenScriptCancel">取消</button>
+          <button class="fe-btn fe-btn-accent" id="feBtnUseScript">审阅确认使用</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/lib/drawflow.min.js"></script>
+  <script src="flow_editor.js"></script>
+</body>
+</html>
