@@ -1203,6 +1203,9 @@ _SEED_RELATIONS = [
     # ── 零件反向关系 ──────────────────────────────────────────────────────
     ("PartEntity", "usedIn", "用于工步", "operation", False, "零件被哪个工步装配", None),
 
+    # ── 装配零件（operation → part）─────────────────────────────────────────
+    ("operation", "usesPart", "装配零件", "part", False, "工步装配的零件", "pbom_part"),
+
     # ── 工艺层级链路（上下级包含关系）────────────────────────────────────────
     ("line_process",     "containsStation",  "包含工位工艺", "station_process",  False, "线体工艺包含的工位工艺",  None),
     ("station_process",  "containsOperator", "包含岗位工艺", "operator_process", False, "工位工艺包含的岗位工艺",  None),

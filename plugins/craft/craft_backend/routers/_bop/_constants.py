@@ -280,6 +280,7 @@ _LINK_TARGET_TABLE = {
     'bop_operator':         'workmanship_bop_bop_operator',
     # PBOM 零件
     'pbom_part':            'workmanship_bop_pbom',
+    'usesPart':             'workmanship_bop_pbom',
     # 物理实物资源（工厂现有）
     'physical_equipment':   'workmanship_factory_factory_equipments',
     'physical_tool':        'workmanship_factory_factory_tools',
@@ -322,6 +323,7 @@ _LINK_TARGET_TABLES = {
     'bop_operator':         ('workmanship_bop_bop_operator',            'gid', None),
     # PBOM 零件
     'pbom_part':            ('workmanship_bop_pbom',                    'gid', None),
+    'usesPart':             ('workmanship_bop_pbom',                    'gid', None),
     # 物理实物资源（工厂现有）
     'physical_equipment':   ('workmanship_factory_factory_equipments',  'gid', None),
     'physical_tool':        ('workmanship_factory_factory_tools',       'gid', None),
