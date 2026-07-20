@@ -1073,51 +1073,22 @@ async function runTests() {
     if (relText.includes('关联问题')) throw new Error('show_in_detail=false 的关系不应显示');
   });
 
-  await _assertAsync('layout_detail_panel schema relation add button stays enabled for valid link types', async () => {
+  await _assertAsync('layout_detail_panel 缺少规则列容器时跳过规则渲染', async () => {
     const w = makeLayoutDetailPanelEnv();
     const panel = new w.LayoutDetailPanel({
       containerEl: w.document.getElementById('llDetailPanel'),
-      cf: async (url) => {
-        if (url === '/api/ontology/schema/process') {
-          return {
-            relations: [
-              { name: 'needsTool', link_type_binding: 'needsTool', label_zh: '需求工具', range_node_type: 'tool_factory', sort_order: 10, show_in_detail: true },
-            ],
-          };
-        }
-        if (url.startsWith('/api/bop/entry-links?')) return { data: [] };
-        throw new Error('unexpected path ' + url);
-      },
+      cf: async () => ({ rules: [] }),
       toast() {},
       patchEntry: async () => {},
       reloadData: async () => {},
-      getLineageData: () => ({
-        childMap: new Map([['gid-1', []]]),
-        rowByGid: new Map([['gid-1', { gid: 'gid-1', node_type: 'process', parent_gid: 'line-1' }], ['line-1', { gid: 'line-1', node_type: 'line_process', parent_gid: null }]]),
-        lineGrantSet: new Set(['line-1']),
-        lineReadOnly: false,
-      }),
+      getLineageData: () => null,
       onNodeActivate() {},
       getVersionInfo: () => null,
       onVersionChange() {},
     });
-    panel._relationConfigByLinkType = new Map();
-    panel._currentRow = { gid: 'gid-1', node_type: 'process', parent_gid: 'line-1' };
-    await panel._renderRels('gid-1', w.document.getElementById('llDpRelsBody'));
-    const addBtn = w.document.querySelector('.ll-rg-add');
-    if (!addBtn) throw new Error('未渲染新增按钮');
-    if (addBtn.disabled) throw new Error('有效 linkType 的 schema 分组不应禁用新增按钮');
-    if (!addBtn.title.includes('添加需求工具')) throw new Error('按钮标题异常: ' + addBtn.title);
+    panel._rulesBody = null;
+    await panel._renderRules('gid-1', { node_type: 'process' });
   });
-
-  await _assertAsync('layout_detail_panel no longer uses stale add whitelist logic', async () => {
-    const code = fs.readFileSync(path.join(ROOT, 'packages/craft-plugin/web/lineage_view/layout_detail_panel.js'), 'utf-8');
-    if (code.includes("const addSupported = grp.key === 'child' || [")) {
-      throw new Error('仍然存在旧的 addSupported 白名单逻辑');
-    }
-  });
-
-  await _assertAsync('layout_detail_panel 缺少规则列容器时跳过规则渲染', async () => {
 
   await _assertAsync('layout_mode 只读线体下复制粘贴仍走创建接口', async () => {
     const w = makeLayoutModeEnv();

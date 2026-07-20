@@ -51,6 +51,36 @@ tail -n 200 logs/backend.out.log
 bash scripts/stop_backend.sh
 ```
 
+## 5.1 前端改动随 backend 提交时的 dist 同步
+
+当 `workmanship-web` 的前端改动需要一起发布到当前 backend 仓库时，不要等到 `git commit` 再生成产物。
+
+推荐流程：
+
+```bash
+bash scripts/sync_frontend_dist.sh
+git add -A dist
+```
+
+如果你在 PowerShell 里操作，优先使用：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/sync_frontend_dist.ps1
+git add -A dist
+```
+
+说明：
+- `scripts/sync_frontend_dist.sh` 会进入默认的 `../workmanship-web` 前端目录执行 `npm run build:web --silent`
+- `scripts/sync_frontend_dist.ps1` 提供给 PowerShell 使用，避免通过 bash/WSL 路径运行前端构建
+- 然后把前端 `dist/` 覆盖同步到当前 backend 仓库的 `dist/`
+- 若前端目录不在默认位置，可用环境变量覆盖：
+
+```bash
+FRONTEND_DIR=/path/to/workmanship-web bash scripts/sync_frontend_dist.sh
+```
+
+纯后端改动无需执行该脚本。
+
 ## 6. 配置说明
 
 主要配置文件：`backend/.env.dev`
