@@ -1474,8 +1474,8 @@ class LayoutDetailPanel {
             source_entry_title: l.source_entry_title,
           }));
       }
-
       const isOpen = !items.length ? false : true;
+      const addSupported = grp.key === 'child' || !!grp.linkTypes?.[0];
       html += `
         <div class="ll-rg">
           <div class="ll-rg-hdr" data-key="${_he(grp.key)}">
@@ -1483,7 +1483,7 @@ class LayoutDetailPanel {
             <span class="lv-nt-dot lv-nt-${_he(grp.ntType)}"></span>
             <span class="ll-rg-name">${_he(grp.name)}</span>
             <span class="ll-rg-cnt">${items.length}</span>
-            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="添加${_he(grp.name)}"${canEditCurrentLine ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
+            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="${_he(addSupported ? `添加${grp.name}` : `${grp.name} 暂不支持在此处新增`)}"${canEditCurrentLine && addSupported ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
           </div>
           <div class="ll-rg-items${isOpen ? ' open' : ''}">
             ${items.length ? items.map((item, idx) => {
@@ -2772,8 +2772,8 @@ class LayoutDetailPanel {
             source_entry_title: l.source_entry_title,
           }));
       }
-
       const isOpen = !items.length ? false : true;
+      const addSupported = grp.key === 'child' || !!grp.linkTypes?.[0];
       html += `
         <div class="ll-rg">
           <div class="ll-rg-hdr" data-key="${_he(grp.key)}">
@@ -2781,7 +2781,7 @@ class LayoutDetailPanel {
             <span class="lv-nt-dot lv-nt-${_he(grp.ntType)}"></span>
             <span class="ll-rg-name">${_he(grp.name)}</span>
             <span class="ll-rg-cnt">${items.length}</span>
-            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="添加${_he(grp.name)}"${canEditCurrentLine ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
+            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="${_he(addSupported ? `添加${grp.name}` : `${grp.name} 暂不支持在此处新增`)}"${canEditCurrentLine && addSupported ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
           </div>
           <div class="ll-rg-items${isOpen ? ' open' : ''}">
             ${items.length ? items.map((item, idx) => {
@@ -4003,14 +4003,7 @@ class LayoutDetailPanel {
       }
 
       const isOpen = !items.length ? false : true;
-      const addSupported = grp.key === 'child' || [
-        'pbom_part', 'usesPart',
-        'physical_equipment', 'project_equipment',
-        'physical_tool', 'project_tools',
-        'physical_fixture', 'project_tooling',
-        'issue', 'task_std', 'task_custom',
-        'knowledge', 'rule_std', 'rule_custom',
-      ].includes(grp.linkType);
+      const addSupported = grp.key === 'child' || !!grp.linkType;
       html += `
         <div class="ll-rg">
           <div class="ll-rg-hdr" data-key="${_he(grp.key)}">
