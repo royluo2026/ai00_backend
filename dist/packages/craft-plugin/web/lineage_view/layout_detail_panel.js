@@ -1797,8 +1797,11 @@ class LayoutDetailPanel {
     const grp = REL_GROUPS.find(g => g.key === key);
     const dot = grp?.dot || '#89b4fa';
 
-    // equip/tool/fixture 支持实物/需求双模式
-    const isResourceGroup = key === 'equip' || key === 'tool' || key === 'fixture';
+    const isResourceGroup = key === 'equip' || key === 'tool' || key === 'fixture' || [
+      'physical_equipment', 'project_equipment', 'needsEquipment',
+      'physical_tool', 'project_tools', 'needsTool',
+      'physical_fixture', 'project_tooling', 'needsFixture',
+    ].includes(nodeType || '');
     let selLinkType = nodeType || '';
 
     // 加载候选：按关系类型走对应数据源
@@ -1835,14 +1838,14 @@ class LayoutDetailPanel {
             unit: r.unit || 'pcs',
           }));
         }
-      } else if (key === 'equip' || ['physical_equipment', 'project_equipment'].includes(_nt)) {
+      } else if (key === 'equip' || ['physical_equipment', 'project_equipment', 'needsEquipment'].includes(_nt)) {
         const fgid = verInfo?.factoryGid;
         const url = fgid ? `/api/bop/factory/equipments?factory_gid=${encodeURIComponent(fgid)}&limit=20` : `/api/bop/factory/equipments?limit=20`;
         const resp = await this._cf(url); candidates = resp?.data || []; candSrcLabel = '设备库';
-      } else if (key === 'tool' || ['physical_tool', 'project_tools'].includes(_nt)) {
+      } else if (key === 'tool' || ['physical_tool', 'project_tools', 'needsTool'].includes(_nt)) {
         const resp = await this._cf(`/api/bop/factory/tools?limit=20`);
         candidates = resp?.data || []; candSrcLabel = '工具库';
-      } else if (key === 'fixture' || ['physical_fixture', 'project_tooling'].includes(_nt)) {
+      } else if (key === 'fixture' || ['physical_fixture', 'project_tooling', 'needsFixture'].includes(_nt)) {
         const resp = await this._cf(`/api/bop/factory/fixtures?limit=20`);
         candidates = resp?.data || []; candSrcLabel = '工装库';
       } else if (key === 'issue' || _nt === 'issue') {
@@ -2056,7 +2059,7 @@ class LayoutDetailPanel {
         } else if (key === 'issue' || key === 'task') {
           this._toast?.('关联已有实体请从右侧关联面板选择', 'info');
           return;
-        } else if (key === 'equip' || key === 'tool' || key === 'fixture') {
+        } else if (key === 'equip' || key === 'tool' || key === 'fixture' || isResourceGroup) {
           // 创建实物/需求关联（nodeType 已在 type 选择器中确定）
           const linkType = selLinkType || nodeType || '';
           await this._cf('/api/bop/entry-links', {
@@ -3134,8 +3137,11 @@ class LayoutDetailPanel {
     const grp = REL_GROUPS.find(g => g.key === key);
     const dot = grp?.dot || '#89b4fa';
 
-    // equip/tool/fixture 支持实物/需求双模式
-    const isResourceGroup = key === 'equip' || key === 'tool' || key === 'fixture';
+    const isResourceGroup = key === 'equip' || key === 'tool' || key === 'fixture' || [
+      'physical_equipment', 'project_equipment', 'needsEquipment',
+      'physical_tool', 'project_tools', 'needsTool',
+      'physical_fixture', 'project_tooling', 'needsFixture',
+    ].includes(nodeType || '');
     let selLinkType = nodeType || '';
 
     // 加载候选：按关系类型走对应数据源
@@ -3172,14 +3178,14 @@ class LayoutDetailPanel {
             unit: r.unit || 'pcs',
           }));
         }
-      } else if (key === 'equip' || ['physical_equipment', 'project_equipment'].includes(_nt)) {
+      } else if (key === 'equip' || ['physical_equipment', 'project_equipment', 'needsEquipment'].includes(_nt)) {
         const fgid = verInfo?.factoryGid;
         const url = fgid ? `/api/bop/factory/equipments?factory_gid=${encodeURIComponent(fgid)}&limit=20` : `/api/bop/factory/equipments?limit=20`;
         const resp = await this._cf(url); candidates = resp?.data || []; candSrcLabel = '设备库';
-      } else if (key === 'tool' || ['physical_tool', 'project_tools'].includes(_nt)) {
+      } else if (key === 'tool' || ['physical_tool', 'project_tools', 'needsTool'].includes(_nt)) {
         const resp = await this._cf(`/api/bop/factory/tools?limit=20`);
         candidates = resp?.data || []; candSrcLabel = '工具库';
-      } else if (key === 'fixture' || ['physical_fixture', 'project_tooling'].includes(_nt)) {
+      } else if (key === 'fixture' || ['physical_fixture', 'project_tooling', 'needsFixture'].includes(_nt)) {
         const resp = await this._cf(`/api/bop/factory/fixtures?limit=20`);
         candidates = resp?.data || []; candSrcLabel = '工装库';
       } else if (key === 'issue' || _nt === 'issue') {
@@ -3393,7 +3399,7 @@ class LayoutDetailPanel {
         } else if (key === 'issue' || key === 'task') {
           this._toast?.('关联已有实体请从右侧关联面板选择', 'info');
           return;
-        } else if (key === 'equip' || key === 'tool' || key === 'fixture') {
+        } else if (key === 'equip' || key === 'tool' || key === 'fixture' || isResourceGroup) {
           // 创建实物/需求关联（nodeType 已在 type 选择器中确定）
           const linkType = selLinkType || nodeType || '';
           await this._cf('/api/bop/entry-links', {

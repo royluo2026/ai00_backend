@@ -1073,6 +1073,39 @@ async function runTests() {
     if (relText.includes('关联问题')) throw new Error('show_in_detail=false 的关系不应显示');
   });
 
+  await _assertAsync('layout_detail_panel schema resource relation loads factory candidates', async () => {
+    const w = makeLayoutDetailPanelEnv();
+    const calls = [];
+    const panel = new w.LayoutDetailPanel({
+      containerEl: w.document.getElementById('llDetailPanel'),
+      cf: async (url, opts = {}) => {
+        calls.push({ url, opts });
+        if (url === '/api/bop/factory/tools?limit=20') return { data: [{ gid: 'tool-1', title: '扭力扳手' }] };
+        if (url.startsWith('/api/bop/entry-links?')) return { data: [] };
+        throw new Error('unexpected path ' + url);
+      },
+      toast() {},
+      patchEntry: async () => {},
+      reloadData: async () => {},
+      getLineageData: () => ({
+        childMap: new Map([['gid-1', []]]),
+        rowByGid: new Map([['gid-1', { gid: 'gid-1', node_type: 'process', parent_gid: 'line-1' }], ['line-1', { gid: 'line-1', node_type: 'line_process', parent_gid: null }]]),
+        lineGrantSet: new Set(['line-1']),
+        lineReadOnly: false,
+      }),
+      onNodeActivate() {},
+      getVersionInfo: () => null,
+      onVersionChange() {},
+    });
+    panel._currentRow = { gid: 'gid-1', node_type: 'process', parent_gid: 'line-1' };
+    await panel._openAddDetail('link:needsTool', 'gid-1', 'needsTool', '需求工具');
+    if (!calls.some(c => c.url === '/api/bop/factory/tools?limit=20')) {
+      throw new Error('needsTool 未走工具库候选加载');
+    }
+    const text = w.document.getElementById('llDpDetailBody').textContent || '';
+    if (!text.includes('扭力扳手')) throw new Error('工具候选未渲染');
+  });
+
   await _assertAsync('layout_detail_panel 缺少规则列容器时跳过规则渲染', async () => {
     const w = makeLayoutDetailPanelEnv();
     const panel = new w.LayoutDetailPanel({
