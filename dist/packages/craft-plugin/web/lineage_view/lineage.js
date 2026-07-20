@@ -61,10 +61,12 @@ const _LEVEL_STATS_PRIORITY = {
 // 节点类型语义最小深度（仅当 parent_gid 为 null 时使用）
 // factory_bop 是唯一允许 depth=0 的类型（根选择栏）；其他类型 ≥ 1，显示在列视图
 const _NODE_MIN_DEPTH = {
-  factory_bop:       0,  // 根节点
+  factory_bop:       0,
   line_process:      1,
   station_process:   2,
   operator_process:  3,
+  process:           4,
+  operation:         5,
 };
 // 族2：工序节点
 const _PROCESS_STATS_PRIORITY = ['operation', 'man', 'equipment_factory', 'equipment_need', 'fixture_factory', 'part', 'tool_need'];
@@ -2434,6 +2436,7 @@ const _ORDERED_NODE_TYPES = [
 
 // 建议子节点类型映射（根据父节点类型）
 const _CHILD_TYPE_MAP = {
+  factory_bop:      'line_process',
   line_process:     'station_process',
   station_process:  'operator_process',
   operator_process: 'process',
@@ -2442,6 +2445,7 @@ const _CHILD_TYPE_MAP = {
 
 // 变更父级时的预设父节点类型（_CHILD_TYPE_MAP 的反向）
 const _PARENT_TYPE_MAP = {
+  line_process:     'factory_bop',
   station_process:  'line_process',
   operator_process: 'station_process',
   process:          'operator_process',

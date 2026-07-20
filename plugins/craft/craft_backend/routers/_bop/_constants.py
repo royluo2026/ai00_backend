@@ -259,6 +259,7 @@ _PROCESS_ENTITY_MAP = {
     'line_process':     ('workmanship_bop_bop_line',     'bop_line'),
     'station_process':  ('workmanship_bop_bop_station',  'bop_station'),
     'operator_process': ('workmanship_bop_bop_operator', 'bop_operator'),
+    'process':          ('workmanship_bop_bop_process',  'bop_process'),
     'operation':        ('workmanship_bop_bop_steps',    'bop_steps'),
 }
 _PART_NODE_TYPES = {'part', 'non_standard_part', 'standard_part', 'support_material'}
@@ -268,6 +269,7 @@ _LINK_TARGET_TABLE = {
     'asm_line_process':     'workmanship_bop_bop_line',
     'asm_station_process':  'workmanship_bop_bop_station',
     'asm_operator_process': 'workmanship_bop_bop_operator',
+    'asm_process':          'workmanship_bop_bop_process',
     'asm_operation':        'workmanship_bop_bop_steps',
     # GBOP 标准库（关联面板主要使用）
     'gbop':                 'workmanship_tpl_gbop_entries',
