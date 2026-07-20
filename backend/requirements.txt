@@ -14,3 +14,7 @@ boto3>=1.34
 # cel-python>=0.4.0
 pymysql>=1.1
 bce-python-sdk>=0.9.0    # 百度云 BOS SDK（OIS 对象存储上传）
+
+# OIS3 SDK（内部 Artifactory 源）
+--index-url https://artifactory.ep.chehejia.com/artifactory/api/pypi/licloud-pypi/simple
+ois3-sdk-python

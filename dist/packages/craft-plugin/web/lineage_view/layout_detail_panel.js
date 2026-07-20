@@ -1215,16 +1215,17 @@ class LayoutDetailPanel {
     }
   }
 
-  /** 获取子节点的某个属性值数组（先查 meta，再查 entity-props） */
+  /** 获取子节点的某个属性值（优先实体表 entity_data，其次 entity-props API，最后兜底 meta） */
   async _fetchChildPropValues(children, propName) {
+    // 第一优先：entity_data（实体表列值，SQL JOIN 已带入）
     let values = children
       .map(c => {
-        const meta = (c.meta && typeof c.meta === 'object') ? c.meta : {};
-        return meta[propName];
+        const ed = c.entity_data;
+        if (ed && typeof ed === 'object' && ed[propName] != null) return Number(ed[propName]);
+        return NaN;
       })
-      .filter(v => v != null)
-      .map(Number)
       .filter(v => !isNaN(v));
+    // 第二优先：entity-props API
     if (!values.length) {
       const results = await Promise.all(
         children.map(c =>
@@ -1234,6 +1235,16 @@ class LayoutDetailPanel {
         )
       );
       values = results.filter(v => v != null).map(Number).filter(v => !isNaN(v));
+    }
+    // 最后兜底：meta
+    if (!values.length) {
+      values = children
+        .map(c => {
+          const meta = (c.meta && typeof c.meta === 'object') ? c.meta : {};
+          const v = meta[propName];
+          return v != null ? Number(v) : NaN;
+        })
+        .filter(v => !isNaN(v));
     }
     return values;
   }
@@ -1474,8 +1485,8 @@ class LayoutDetailPanel {
             source_entry_title: l.source_entry_title,
           }));
       }
+
       const isOpen = !items.length ? false : true;
-      const addSupported = grp.key === 'child' || !!grp.linkTypes?.[0];
       html += `
         <div class="ll-rg">
           <div class="ll-rg-hdr" data-key="${_he(grp.key)}">
@@ -1483,7 +1494,7 @@ class LayoutDetailPanel {
             <span class="lv-nt-dot lv-nt-${_he(grp.ntType)}"></span>
             <span class="ll-rg-name">${_he(grp.name)}</span>
             <span class="ll-rg-cnt">${items.length}</span>
-            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="${_he(addSupported ? `添加${grp.name}` : `${grp.name} 暂不支持在此处新增`)}"${canEditCurrentLine && addSupported ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
+            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="添加${_he(grp.name)}"${canEditCurrentLine ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
           </div>
           <div class="ll-rg-items${isOpen ? ' open' : ''}">
             ${items.length ? items.map((item, idx) => {
@@ -1786,6 +1797,10 @@ class LayoutDetailPanel {
     const grp = REL_GROUPS.find(g => g.key === key);
     const dot = grp?.dot || '#89b4fa';
 
+    // equip/tool/fixture 支持实物/需求双模式
+    const isResourceGroup = key === 'equip' || key === 'tool' || key === 'fixture';
+    let selLinkType = nodeType || '';
+
     // 加载候选：按关系类型走对应数据源
     let candidates = [];
     let candSrcLabel = 'GBOP';
@@ -1895,6 +1910,19 @@ class LayoutDetailPanel {
             <button class="ll-dp-hdr-btn" id="llAddClose" style="margin-left:auto">✕</button>
           </div>
           ${verSelHtml}
+          ${isResourceGroup ? `
+          <div style="display:flex;align-items:center;gap:6px;padding:0 0 6px">
+            <span style="font-size:10px;color:var(--subtext0,#a6adc8)">类型</span>
+            <select id="llAddLinkTypeSel" style="flex:1;background:var(--base,#1e1e2e);color:var(--text,#cdd6f4);
+              border:1px solid var(--surface1,#45475a);border-radius:4px;padding:3px 6px;font-size:11px">
+              ${(grp?.linkTypes || []).map(lt => {
+                const labels = { physical_equipment:'实物设备', project_equipment:'需求设备',
+                  physical_tool:'实物工具', project_tools:'需求工具',
+                  physical_fixture:'实物工装', project_tooling:'需求工装' };
+                return \`<option value="\${_he(lt)}"\${lt === (selLinkType || grp.linkTypes[0]) ? ' selected' : ''}>\${_he(labels[lt] || lt)}</option>\`;
+              }).join('')}
+            </select>
+          </div>` : ''}
           <div class="ll-det-search">
             <span style="font-size:11px;color:var(--overlay1)">⌕</span>
             <input id="llAddSearchInp" placeholder="搜索零件号 / 名称 / VPPS…">
@@ -1944,6 +1972,12 @@ class LayoutDetailPanel {
         }
       });
     }
+
+    // ── 类型切换（实物/需求）──
+    const typeSel = this._detDrawerBody.querySelector('#llAddLinkTypeSel');
+    typeSel?.addEventListener('change', () => {
+      selLinkType = typeSel.value;
+    });
 
     // ── 搜索（客户端过滤，按零件号/名称/VPPS/组件ID） ──
     const searchInp = this._detDrawerBody.querySelector('#llAddSearchInp');
@@ -2019,9 +2053,25 @@ class LayoutDetailPanel {
           await this._reloadData();
           this.refresh();
           this._toast?.('已关联 PBOM 零件', 'ok', 1200);
-        } else if (key === 'equip' || key === 'tool' || key === 'fixture' || key === 'issue' || key === 'task') {
+        } else if (key === 'issue' || key === 'task') {
           this._toast?.('关联已有实体请从右侧关联面板选择', 'info');
           return;
+        } else if (key === 'equip' || key === 'tool' || key === 'fixture') {
+          // 创建实物/需求关联（nodeType 已在 type 选择器中确定）
+          const linkType = selLinkType || nodeType || '';
+          await this._cf('/api/bop/entry-links', {
+            method: 'POST',
+            body: JSON.stringify({
+              entry_gid: parentGid,
+              link_type: linkType,
+              entity_gid: entityGid,
+              is_primary: false,
+            }),
+          });
+          await this._reloadData();
+          this.refresh();
+          this._closeDetDrawer();
+          this._toast?.('已关联', 'ok', 1200);
         } else if (key.startsWith('link:')) {
           // 本体自定义关系：从 schema 解析真实 link_type_binding
           const relName = key.slice(5);
@@ -2772,8 +2822,8 @@ class LayoutDetailPanel {
             source_entry_title: l.source_entry_title,
           }));
       }
+
       const isOpen = !items.length ? false : true;
-      const addSupported = grp.key === 'child' || !!grp.linkTypes?.[0];
       html += `
         <div class="ll-rg">
           <div class="ll-rg-hdr" data-key="${_he(grp.key)}">
@@ -2781,7 +2831,7 @@ class LayoutDetailPanel {
             <span class="lv-nt-dot lv-nt-${_he(grp.ntType)}"></span>
             <span class="ll-rg-name">${_he(grp.name)}</span>
             <span class="ll-rg-cnt">${items.length}</span>
-            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="${_he(addSupported ? `添加${grp.name}` : `${grp.name} 暂不支持在此处新增`)}"${canEditCurrentLine && addSupported ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
+            <button class="ll-rg-add" data-key="${_he(grp.key)}" title="添加${_he(grp.name)}"${canEditCurrentLine ? '' : ' disabled style="opacity:.45;cursor:not-allowed"'}>＋</button>
           </div>
           <div class="ll-rg-items${isOpen ? ' open' : ''}">
             ${items.length ? items.map((item, idx) => {
@@ -3084,6 +3134,10 @@ class LayoutDetailPanel {
     const grp = REL_GROUPS.find(g => g.key === key);
     const dot = grp?.dot || '#89b4fa';
 
+    // equip/tool/fixture 支持实物/需求双模式
+    const isResourceGroup = key === 'equip' || key === 'tool' || key === 'fixture';
+    let selLinkType = nodeType || '';
+
     // 加载候选：按关系类型走对应数据源
     let candidates = [];
     let candSrcLabel = 'GBOP';
@@ -3193,6 +3247,19 @@ class LayoutDetailPanel {
             <button class="ll-dp-hdr-btn" id="llAddClose" style="margin-left:auto">✕</button>
           </div>
           ${verSelHtml}
+          ${isResourceGroup ? `
+          <div style="display:flex;align-items:center;gap:6px;padding:0 0 6px">
+            <span style="font-size:10px;color:var(--subtext0,#a6adc8)">类型</span>
+            <select id="llAddLinkTypeSel" style="flex:1;background:var(--base,#1e1e2e);color:var(--text,#cdd6f4);
+              border:1px solid var(--surface1,#45475a);border-radius:4px;padding:3px 6px;font-size:11px">
+              ${(grp?.linkTypes || []).map(lt => {
+                const labels = { physical_equipment:'实物设备', project_equipment:'需求设备',
+                  physical_tool:'实物工具', project_tools:'需求工具',
+                  physical_fixture:'实物工装', project_tooling:'需求工装' };
+                return \`<option value="\${_he(lt)}"\${lt === (selLinkType || grp.linkTypes[0]) ? ' selected' : ''}>\${_he(labels[lt] || lt)}</option>\`;
+              }).join('')}
+            </select>
+          </div>` : ''}
           <div class="ll-det-search">
             <span style="font-size:11px;color:var(--overlay1)">⌕</span>
             <input id="llAddSearchInp" placeholder="搜索零件号 / 名称 / VPPS…">
@@ -3242,6 +3309,12 @@ class LayoutDetailPanel {
         }
       });
     }
+
+    // ── 类型切换（实物/需求）──
+    const typeSel = this._detDrawerBody.querySelector('#llAddLinkTypeSel');
+    typeSel?.addEventListener('change', () => {
+      selLinkType = typeSel.value;
+    });
 
     // ── 搜索（客户端过滤，按零件号/名称/VPPS/组件ID） ──
     const searchInp = this._detDrawerBody.querySelector('#llAddSearchInp');
@@ -3317,9 +3390,25 @@ class LayoutDetailPanel {
           await this._reloadData();
           this.refresh();
           this._toast?.('已关联 PBOM 零件', 'ok', 1200);
-        } else if (key === 'equip' || key === 'tool' || key === 'fixture' || key === 'issue' || key === 'task') {
+        } else if (key === 'issue' || key === 'task') {
           this._toast?.('关联已有实体请从右侧关联面板选择', 'info');
           return;
+        } else if (key === 'equip' || key === 'tool' || key === 'fixture') {
+          // 创建实物/需求关联（nodeType 已在 type 选择器中确定）
+          const linkType = selLinkType || nodeType || '';
+          await this._cf('/api/bop/entry-links', {
+            method: 'POST',
+            body: JSON.stringify({
+              entry_gid: parentGid,
+              link_type: linkType,
+              entity_gid: entityGid,
+              is_primary: false,
+            }),
+          });
+          await this._reloadData();
+          this.refresh();
+          this._closeDetDrawer();
+          this._toast?.('已关联', 'ok', 1200);
         } else if (key.startsWith('link:')) {
           // 本体自定义关系：从 schema 解析真实 link_type_binding
           const relName = key.slice(5);
@@ -4003,7 +4092,14 @@ class LayoutDetailPanel {
       }
 
       const isOpen = !items.length ? false : true;
-      const addSupported = grp.key === 'child' || !!grp.linkType;
+      const addSupported = grp.key === 'child' || [
+        'pbom_part', 'usesPart',
+        'physical_equipment', 'project_equipment',
+        'physical_tool', 'project_tools',
+        'physical_fixture', 'project_tooling',
+        'issue', 'task_std', 'task_custom',
+        'knowledge', 'rule_std', 'rule_custom',
+      ].includes(grp.linkType);
       html += `
         <div class="ll-rg">
           <div class="ll-rg-hdr" data-key="${_he(grp.key)}">

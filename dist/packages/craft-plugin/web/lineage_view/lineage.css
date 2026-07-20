@@ -3417,19 +3417,19 @@ body {
 .ll-props-key { color: var(--sapphire, #74c7ec); font-size: 11px; flex: 0 0 88px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ll-props-val { flex: 1; }
 .ll-props-derived-wrap { display: flex; align-items: center; gap: 6px; }
-.ll-props-derived-val  { font-weight: 500; color: var(--text1, #cdd6f4); }
+.ll-props-derived-val  { font-weight: 600; font-size: 14px; color: var(--text, #cdd6f4); }
 .ll-props-derived-badge {
-  font-size: 10px;
-  padding: 1px 5px;
+  font-size: 9px;
+  padding: 0 4px;
   border-radius: 3px;
-  background: rgba(16,185,129,.15);
-  color: #6ee7b7;
+  background: transparent;
+  color: var(--subtext0, #a6adc8);
   cursor: default;
   white-space: nowrap;
 }
 :root[data-lv-theme="light"] .ll-props-derived-badge {
-  background: #d1fae5;
-  color: #065f46;
+  background: transparent;
+  color: #6c7086;
 }
 .ll-props-inp {
   background: var(--surface0, #313244); border: 1px solid var(--surface1, #45475a);
