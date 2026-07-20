@@ -1919,7 +1919,7 @@ class LayoutDetailPanel {
                 const labels = { physical_equipment:'实物设备', project_equipment:'需求设备',
                   physical_tool:'实物工具', project_tools:'需求工具',
                   physical_fixture:'实物工装', project_tooling:'需求工装' };
-                return \`<option value="\${_he(lt)}"\${lt === (selLinkType || grp.linkTypes[0]) ? ' selected' : ''}>\${_he(labels[lt] || lt)}</option>\`;
+                return `<option value="${_he(lt)}"${lt === (selLinkType || grp.linkTypes[0]) ? ' selected' : ''}>${_he(labels[lt] || lt)}</option>`;
               }).join('')}
             </select>
           </div>` : ''}
@@ -3256,7 +3256,7 @@ class LayoutDetailPanel {
                 const labels = { physical_equipment:'实物设备', project_equipment:'需求设备',
                   physical_tool:'实物工具', project_tools:'需求工具',
                   physical_fixture:'实物工装', project_tooling:'需求工装' };
-                return \`<option value="\${_he(lt)}"\${lt === (selLinkType || grp.linkTypes[0]) ? ' selected' : ''}>\${_he(labels[lt] || lt)}</option>\`;
+                return `<option value="${_he(lt)}"${lt === (selLinkType || grp.linkTypes[0]) ? ' selected' : ''}>${_he(labels[lt] || lt)}</option>`;
               }).join('')}
             </select>
           </div>` : ''}
@@ -4092,14 +4092,7 @@ class LayoutDetailPanel {
       }
 
       const isOpen = !items.length ? false : true;
-      const addSupported = grp.key === 'child' || [
-        'pbom_part', 'usesPart',
-        'physical_equipment', 'project_equipment',
-        'physical_tool', 'project_tools',
-        'physical_fixture', 'project_tooling',
-        'issue', 'task_std', 'task_custom',
-        'knowledge', 'rule_std', 'rule_custom',
-      ].includes(grp.linkType);
+      const addSupported = grp.key === 'child' || !!grp.linkType;
       html += `
         <div class="ll-rg">
           <div class="ll-rg-hdr" data-key="${_he(grp.key)}">
