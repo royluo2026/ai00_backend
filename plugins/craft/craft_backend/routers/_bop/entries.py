@@ -938,8 +938,13 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         if short and short != lbl:
                             label_to_gid.setdefault(short, entry_gids[i])
 
-                created = []
+                # ── 收集数据，批量 INSERT ─────────────────────────────────
+                entry_rows = []
+                link_rows = []
+                entity_rows_by_table = {}  # table_name -> [(col_names, params), ...]
+
                 parent_gids_to_sync = set()
+                created = []
 
                 for i, r in enumerate(rows):
                     e_gid        = entry_gids[i]
@@ -947,110 +952,99 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                     lnk_gid      = link_gids[i]
                     node_type    = r.get('node_type', '')
                     lv           = _safe_int(r.get('_level', 0))
-                    # 优先使用行内的 ai00_level（前端已基于 node_type 计算），
-                    # 兜底再用后端 _AI00_LEVEL 映射，确保两侧一致
                     ai00_lv      = r.get('ai00_level') if r.get('ai00_level') is not None else _AI00_LEVEL.get(node_type)
                     title        = r.get('title', '')
                     vpps         = r.get('vpps') or None
                     vpps_desc    = r.get('vpps_desc') or None
                     parent_label = r.get('parent_bop_label') or r.get('parent_label') or None
                     if parent_label:
-                        # 先精确匹配，再尝试 "/" 前的短 ID
                         parent_gid = (label_to_gid.get(parent_label)
                                       or label_to_gid.get(parent_label.split('/')[0].strip()))
                     else:
                         parent_gid = None
 
                     entity_info = _IMPORT_ENTITY_MAP.get(node_type)
-
                     if entity_info:
                         e_table, link_type = entity_info
                         if node_type == 'operation':
-                            cur.execute(
-                                "INSERT IGNORE INTO workmanship_bop_bop_steps "
-                                "(gid, project_gid, title, vpps, vpps_desc,"
-                                " operation_code, vpps_part, part_feed)"
-                                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                                (ent_gid, project_gid, title, vpps, vpps_desc,
-                                 r.get('operation_code', ''),
-                                 r.get('vpps_part', ''), r.get('part_feed', False))
-                            )
+                            cols = ('gid', 'project_gid', 'title', 'vpps', 'vpps_desc',
+                                    'operation_code', 'vpps_part', 'part_feed')
+                            vals = (ent_gid, project_gid, title, vpps, vpps_desc,
+                                    r.get('operation_code', ''), r.get('vpps_part', ''), r.get('part_feed', False))
                         elif node_type == 'operator_process':
-                            cur.execute(
-                                "INSERT IGNORE INTO workmanship_bop_bop_operator "
-                                "(gid, project_gid, title, vpps, role_type,"
-                                " factory_role_ref_gid, headcount)"
-                                " VALUES (%s,%s,%s,%s,%s,%s,%s)",
-                                (ent_gid, project_gid, title, vpps,
-                                 r.get('role_type', ''),
-                                 r.get('factory_role_ref_gid') or None,
-                                 r.get('headcount', 1))
-                            )
+                            cols = ('gid', 'project_gid', 'title', 'vpps', 'role_type',
+                                    'factory_role_ref_gid', 'headcount')
+                            vals = (ent_gid, project_gid, title, vpps,
+                                    r.get('role_type', ''), r.get('factory_role_ref_gid') or None,
+                                    r.get('headcount', 1))
                         elif node_type == 'process':
-                            # bop_process 有 bop_version_gid NOT NULL + vpps_desc，name 列（非 title）
-                            cur.execute(
-                                "INSERT IGNORE INTO workmanship_bop_bop_process"
-                                "(gid, project_gid, bop_version_gid, name, vpps, vpps_desc)"
-                                " VALUES (%s,%s,%s,%s,%s,%s)",
-                                (ent_gid, project_gid, version_gid, title, vpps, vpps_desc)
-                            )
-                        elif node_type in ('equipment_need', 'fixture_need', 'tool_need'):
-                            # 项目资源需求表：只有 title + vpps，无 vpps_desc
-                            cur.execute(
-                                f"INSERT IGNORE INTO {e_table}(gid, project_gid, title, vpps)"
-                                f" VALUES (%s,%s,%s,%s)",
-                                (ent_gid, project_gid, title, vpps)
-                            )
+                            cols = ('gid', 'project_gid', 'bop_version_gid', 'name', 'vpps', 'vpps_desc')
+                            vals = (ent_gid, project_gid, version_gid, title, vpps, vpps_desc)
                         else:
-                            # bop_line / bop_station：只有 title + vpps
-                            cur.execute(
-                                f"INSERT IGNORE INTO {e_table}(gid, project_gid, title, vpps)"
-                                f" VALUES (%s,%s,%s,%s)",
-                                (ent_gid, project_gid, title, vpps)
-                            )
+                            cols = ('gid', 'project_gid', 'title', 'vpps')
+                            vals = (ent_gid, project_gid, title, vpps)
+                        entity_rows_by_table.setdefault(e_table, []).append((cols, vals))
                     else:
                         link_type = None
 
                     sort_val = r.get('seq_no', r.get('sort_order', i))
-                    cur.execute(
-                        "INSERT INTO workmanship_bop_bop_entries"
-                        "(gid, version_gid, parent_gid, node_type,"
-                        " sort_order, level, ai00_level,"
-                        " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
-                        " parent_bop_title, child_vpps, meta)"
-                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]','{}')",
-                        (e_gid, version_gid, parent_gid, node_type,
-                         sort_val, lv, ai00_lv,
-                         title, vpps, vpps_desc,
-                         '', False, '', '',
-                         parent_label)
-                    )
+                    entry_rows.append((
+                        e_gid, version_gid, parent_gid, node_type,
+                        sort_val, lv, ai00_lv,
+                        title, vpps, vpps_desc,
+                        '', False, '', '',
+                        parent_label,
+                    ))
 
                     if entity_info:
-                        cur.execute(
-                            "INSERT INTO workmanship_bop_bop_entry_links"
-                            "(gid, version_gid, entry_gid, entity_gid, link_type, is_primary)"
-                            " VALUES (%s,%s,%s,%s,%s,TRUE)"
-                            "",
-                            (lnk_gid, version_gid, e_gid, ent_gid, link_type)
-                        )
+                        link_rows.append((
+                            lnk_gid, version_gid, e_gid, ent_gid, link_type,
+                        ))
 
                     if parent_gid:
                         parent_gids_to_sync.add(parent_gid)
                     created.append(e_gid)
 
+                # ── 批量写入 ──────────────────────────────────────────────
+                # 先写 entity 表（INSERT IGNORE）
+                for table, rows_list in entity_rows_by_table.items():
+                    if not rows_list:
+                        continue
+                    # 所有行使用相同的列
+                    cols_sql = ','.join(rows_list[0][0])
+                    placeholders = ','.join(['%s'] * len(rows_list[0][0]))
+                    cur.executemany(
+                        f"INSERT IGNORE INTO {table}({cols_sql}) VALUES ({placeholders})",
+                        [r[1] for r in rows_list],
+                    )
+
+                # 批量写 bop_entries
+                cur.executemany(
+                    "INSERT INTO workmanship_bop_bop_entries"
+                    "(gid, version_gid, parent_gid, node_type,"
+                    " sort_order, level, ai00_level,"
+                    " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
+                    " parent_bop_title, child_vpps, meta)"
+                    " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]','{}')",
+                    entry_rows,
+                )
+
+                # 批量写 entry_links
+                if link_rows:
+                    cur.executemany(
+                        "INSERT INTO workmanship_bop_bop_entry_links"
+                        "(gid, version_gid, entry_gid, entity_gid, link_type, is_primary)"
+                        " VALUES (%s,%s,%s,%s,%s,TRUE)",
+                        link_rows,
+                    )
+
+                # ── 同步 child_vpps ──────────────────────────────────────
                 for pg in parent_gids_to_sync:
                     _sync_child_vpps(cur, pg, version_gid)
 
                 conn.commit()
                 _log.info("[import-tc] committed %d rows", len(created))
-                try:
-                    cur.execute(_ENTRY_LIST_SQL, (version_gid, version_gid))
-                    result_rows = [dict(r) for r in cur.fetchall()]
-                except Exception as list_err:
-                    _log.error("[import-tc] _ENTRY_LIST_SQL failed: %s", list_err)
-                    raise
-                return {"data": result_rows, "count": len(created), "skipped": skipped}
+                return {"count": len(created), "skipped": skipped}
 
     except HTTPException:
         raise
