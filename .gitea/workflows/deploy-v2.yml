@@ -11,14 +11,14 @@ jobs:
       - name: Checkout backend repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: test
           path: workmanship-backend
 
-      - name: Checkout frontend repo (same branch)
+      - name: Checkout frontend repo
         uses: actions/checkout@v4
         with:
           repository: devteam/workmanship-web
-          ref: ${{ github.ref_name }}
+          ref: test
           path: workmanship-web
           token: ${{ secrets.CROSS_REPO_TOKEN }}
 
