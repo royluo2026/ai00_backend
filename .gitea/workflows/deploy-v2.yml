@@ -1,0 +1,80 @@
+name: Deploy to V2 Test
+
+on:
+  push:
+    branches: [deploy-v2]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, test-server]
+    steps:
+      - name: Checkout backend repo
+        uses: actions/checkout@v4
+        with:
+          ref: deploy-v2
+          path: workmanship-backend
+
+      - name: Checkout frontend repo
+        uses: actions/checkout@v4
+        with:
+          repository: devteam/workmanship-web
+          ref: main
+          path: workmanship-web
+
+      - name: Build frontend
+        shell: cmd
+        working-directory: workmanship-web
+        run: |
+          where node
+          if exist "node_modules" rmdir /s /q node_modules
+          npm ci --ignore-scripts
+          npm run build:web --silent
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Install Python deps
+        shell: cmd
+        working-directory: workmanship-backend
+        run: |
+          if not exist "E:\projects\ai00-v2\venv" python -m venv E:\projects\ai00-v2\venv
+          E:\projects\ai00-v2\venv\Scripts\pip install -r backend\requirements.txt --quiet
+
+      - name: Deploy backend files
+        shell: cmd
+        run: |
+          if not exist "E:\projects\ai00-v2" mkdir E:\projects\ai00-v2
+          robocopy workmanship-backend\backend E:\projects\ai00-v2\backend /MIR /XD __pycache__ /XF *.pyc .env* /NFL /NDL /NJH /NJS
+          if %ERRORLEVEL% LEQ 7 exit 0
+
+      - name: Deploy frontend dist
+        shell: cmd
+        run: |
+          if not exist "E:\projects\ai00-v2\dist" mkdir E:\projects\ai00-v2\dist
+          robocopy workmanship-web\dist E:\projects\ai00-v2\dist /MIR /NFL /NDL /NJH /NJS
+          if %ERRORLEVEL% LEQ 7 exit 0
+
+      - name: Deploy scripts
+        shell: cmd
+        run: |
+          if not exist "E:\projects\ai00-v2\scripts" mkdir E:\projects\ai00-v2\scripts
+          robocopy workmanship-backend\scripts E:\projects\ai00-v2\scripts /MIR /NFL /NDL /NJH /NJS
+          if %ERRORLEVEL% LEQ 7 exit 0
+
+      - name: Copy extra config
+        shell: cmd
+        run: |
+          copy workmanship-backend\requirements.txt E:\projects\ai00-v2\requirements.txt /Y
+          copy workmanship-backend\backend\gunicorn.conf.py E:\projects\ai00-v2\ /Y
+
+      - name: Restart service
+        shell: cmd
+        run: |
+          net stop AI00Backend-V2 2>nul
+          timeout /t 3 /nobreak >nul
+          net start AI00Backend-V2
+
+      - name: Health check
+        shell: cmd
+        run: |
+          timeout /t 8 /nobreak >nul
+          curl -f http://127.0.0.1:8082/health
