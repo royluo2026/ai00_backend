@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI00 部署面板</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f0f14;color:#cdd6f4;padding:24px;min-height:100vh}
+h1{font-size:22px;font-weight:600;margin-bottom:20px;color:#cdd6f4}
+h1 span{color:#89b4fa}
+.card{background:#181825;border:1px solid #313244;border-radius:10px;padding:20px;margin-bottom:16px}
+.card h2{font-size:15px;font-weight:600;color:#a6adc8;margin-bottom:12px;text-transform:uppercase;letter-spacing:.04em}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:600;font-family:monospace}
+.tag-green{background:#1a3320;color:#a6e3a1}
+.tag-blue{background:#1a2033;color:#89b4fa}
+.tag-yellow{background:#332a1a;color:#f9e2af}
+.tag-red{background:#331a1a;color:#f38ba8}
+.badge{display:inline-block;padding:2px 10px;border-radius:5px;font-size:11px;font-weight:600}
+.badge-success{background:#a6e3a1;color:#1e1e2e}
+.badge-failure{background:#f38ba8;color:#1e1e2e}
+.badge-running{background:#89b4fa;color:#1e1e2e;animation:pulse 1.5s infinite}
+.badge-pending{background:#f9e2af;color:#1e1e2e}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.mono{font-family:'Cascadia Code','Fira Code',monospace;font-size:13px}
+.commit{font-family:monospace;font-size:13px;color:#89b4fa;background:#1a2033;padding:2px 8px;border-radius:4px;text-decoration:none}
+.commit:hover{text-decoration:underline}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #313244}
+th{color:#a6adc8;font-weight:600;font-size:11px;text-transform:uppercase}
+td .time{color:#6c7086;font-size:12px}
+tr:hover{background:#1e1e2e}
+.btn{padding:6px 14px;border-radius:6px;border:1px solid #45475a;background:#313244;color:#cdd6f4;cursor:pointer;font-size:12px;transition:.15s}
+.btn:hover{background:#45475a}
+.btn-rollback{background:#331a1a;border-color:#f38ba8;color:#f38ba8}
+.btn-rollback:hover{background:#4a2020}
+.btn-refresh{background:#1a3320;border-color:#a6e3a1;color:#a6e3a1}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:#1e1e2e;border:1px solid #313244;border-radius:12px;padding:24px;width:400px;max-width:90vw}
+.modal h3{margin-bottom:12px;color:#f9e2af}
+.modal p{font-size:13px;color:#bac2de;margin-bottom:16px;line-height:1.6}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.gap8{display:flex;gap:8px;align-items:center}
+.gap16{display:flex;gap:16px;align-items:center}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
+.mt12{margin-top:12px}
+.mt16{margin-top:16px}
+.section-label{font-size:11px;color:#6c7086;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.success-msg{color:#a6e3a1;font-size:13px;padding:8px 12px;background:#1a3320;border-radius:6px;margin-top:12px}
+.error-msg{color:#f38ba8;font-size:13px;padding:8px 12px;background:#331a1a;border-radius:6px;margin-top:12px}
+</style>
+</head>
+<body>
+
+<div class="flex-between">
+  <h1><span>AI00</span> Deploy Dashboard</h1>
+  <button class="btn btn-refresh" onclick="refreshAll()">&#x21bb; 刷新</button>
+</div>
+
+<!-- 当前版本 -->
+<div class="card">
+  <h2>当前部署</h2>
+  <div class="row gap16">
+    <div>
+      <div class="section-label">后端 Commit</div>
+      <a class="commit" id="cur-backend" href="#" target="_blank">---</a>
+    </div>
+    <div>
+      <div class="section-label">前端 Commit</div>
+      <a class="commit" id="cur-frontend" href="#" target="_blank">---</a>
+    </div>
+    <div>
+      <div class="section-label">部署时间</div>
+      <span class="time" id="cur-time">---</span>
+    </div>
+    <span id="needs-update" style="display:none" class="tag tag-yellow">有新版本待部署</span>
+  </div>
+</div>
+
+<!-- Pipeline 状态 -->
+<div class="card">
+  <div class="flex-between">
+    <h2>Pipeline 运行记录</h2>
+  </div>
+  <div id="pipeline-runs">加载中...</div>
+</div>
+
+<!-- 部署历史 -->
+<div class="card">
+  <div class="flex-between">
+    <h2>部署历史</h2>
+  </div>
+  <div id="deploy-history">加载中...</div>
+</div>
+
+<!-- 回滚确认弹窗 -->
+<div class="modal-overlay" id="rollback-modal">
+  <div class="modal">
+    <h3>确认回滚</h3>
+    <p>将回滚到 commit <strong class="mono" id="rollback-commit"></strong><br>
+       此操作会 force push 到 test 分支，触发完整重新部署。</p>
+    <div class="modal-btns">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-rollback" id="btn-confirm-rollback">确认回滚</button>
+    </div>
+    <div id="rollback-result"></div>
+  </div>
+</div>
+
+<script>
+const API = '/api/deploy';
+const GITEA = 'http://pc-pc2l7vve:3003';
+
+async function cf(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+async function refreshAll() {
+  await Promise.all([loadCurrent(), loadPipeline(), loadHistory()]);
+}
+
+async function loadCurrent() {
+  try {
+    const d = await cf(API + '/current');
+    const c = d.current || {};
+    const be = c.backend_commit || '---';
+    const fe = c.frontend_commit || '---';
+    document.getElementById('cur-backend').textContent = be;
+    document.getElementById('cur-backend').href = GITEA + '/devteam/workmanship-backend/commit/' + (c.backend_full || be);
+    document.getElementById('cur-frontend').textContent = fe;
+    document.getElementById('cur-frontend').href = GITEA + '/devteam/workmanship-web/commit/' + (c.frontend_full || fe);
+    document.getElementById('cur-time').textContent = c.deployed_at ? fmtTime(c.deployed_at) : '---';
+    document.getElementById('needs-update').style.display = d.needs_update ? 'inline-block' : 'none';
+  } catch(e) { document.getElementById('needs-update').style.display = 'none'; }
+}
+
+async function loadPipeline() {
+  const el = document.getElementById('pipeline-runs');
+  try {
+    const d = await cf(API + '/pipeline');
+    if (!d.runs || !d.runs.length) { el.innerHTML = '<span class="time">暂无记录</span>'; return; }
+    let html = '<table><tr><th>状态</th><th>Commit</th><th>分支</th><th>时间</th></tr>';
+    for (const r of d.runs) {
+      const badge = statusBadge(r.status, r.conclusion);
+      html += `<tr>
+        <td>${badge}</td>
+        <td><code>${r.head_sha||'-'}</code></td>
+        <td>${r.head_branch||'-'}</td>
+        <td class="time">${fmtTime(r.created_at)}</td>
+      </tr>`;
+    }
+    html += '</table>';
+    el.innerHTML = html;
+  } catch(e) { el.innerHTML = '<span class="time">无法获取 Pipeline 状态</span>'; }
+}
+
+async function loadHistory() {
+  const el = document.getElementById('deploy-history');
+  try {
+    const d = await cf(API + '/history');
+    if (!d.history || !d.history.length) { el.innerHTML = '<span class="time">暂无部署记录</span>'; return; }
+    let html = '<table><tr><th>后端 Commit</th><th>前端 Commit</th><th>部署时间</th><th>操作</th></tr>';
+    for (const h of d.history) {
+      html += `<tr>
+        <td><code>${h.backend_commit||'-'}</code></td>
+        <td><code>${h.frontend_commit||'-'}</code></td>
+        <td class="time">${fmtTime(h.deployed_at)}</td>
+        <td><button class="btn btn-rollback" onclick="confirmRollback('${h.backend_commit}','${h.deployed_at}')">回滚</button></td>
+      </tr>`;
+    }
+    html += '</table>';
+    el.innerHTML = html;
+  } catch(e) { el.innerHTML = '<span class="time">无法获取部署历史</span>'; }
+}
+
+function statusBadge(status, conclusion) {
+  if (status === 'running') return '<span class="badge badge-running">Running</span>';
+  if (status === 'waiting' || status === 'pending') return '<span class="badge badge-pending">Pending</span>';
+  if (conclusion === 'success') return '<span class="badge badge-success">Success</span>';
+  if (conclusion === 'failure') return '<span class="badge badge-failure">Failed</span>';
+  return `<span class="badge">${status||'-'}</span>`;
+}
+
+function fmtTime(t) {
+  if (!t) return '-';
+  const d = new Date(t);
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+let _rollbackCommit = '';
+
+function confirmRollback(commit, time) {
+  _rollbackCommit = commit;
+  document.getElementById('rollback-commit').textContent = commit + ' (' + fmtTime(time) + ')';
+  document.getElementById('rollback-modal').classList.add('active');
+  document.getElementById('rollback-result').innerHTML = '';
+}
+
+function closeModal() {
+  document.getElementById('rollback-modal').classList.remove('active');
+}
+
+document.getElementById('btn-confirm-rollback').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-confirm-rollback');
+  const rs = document.getElementById('rollback-result');
+  btn.disabled = true;
+  btn.textContent = '回滚中...';
+  try {
+    const r = await fetch(API + '/rollback', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({commit: _rollbackCommit})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      rs.innerHTML = '<div class="success-msg">'+d.message+'</div>';
+      setTimeout(() => { closeModal(); refreshAll(); }, 3000);
+    } else {
+      rs.innerHTML = '<div class="error-msg">'+ (d.detail||'失败') +'</div>';
+    }
+  } catch(e) {
+    rs.innerHTML = '<div class="error-msg">网络错误: '+e.message+'</div>';
+  }
+  btn.disabled = false;
+  btn.textContent = '确认回滚';
+});
+
+refreshAll();
+setInterval(refreshAll, 30000);
+</script>
+</body>
+</html>

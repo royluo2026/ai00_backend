@@ -258,6 +258,8 @@ class Settings:
         self.ois_idaas_client_secret = str(_ois_saved.get("idaas_client_secret") or _get_with_fallback("OIS_IDAAS_CLIENT_SECRET")).strip()
         self.ois_idaas_service_id    = str(_ois_saved.get("idaas_service_id") or _get_with_fallback("OIS_IDAAS_SERVICE_ID")).strip()
         self.ois_public_base_url     = str(_ois_saved.get("public_base_url") or os.getenv("OIS_PUBLIC_BASE_URL", "")).strip()
+        # Gitea token（用于查询 pipeline 状态）
+        self.gitea_token            = os.getenv("GITEA_TOKEN", "").strip()
 
 
 @lru_cache
