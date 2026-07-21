@@ -75,11 +75,11 @@ jobs:
       - name: Restart service
         shell: cmd
         run: |
-          sc stop AI00Backend-V2
-          timeout /t 5 /nobreak >nul
+          taskkill /F /FI "SERVICES eq AI00Backend-V2" 2>nul
+          timeout /t 3 /nobreak >nul
           taskkill /F /IM python.exe 2>nul
           timeout /t 2 /nobreak >nul
-          sc start AI00Backend-V2
+          net start AI00Backend-V2
 
       - name: Health check
         shell: cmd
