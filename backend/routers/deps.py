@@ -166,6 +166,7 @@ def get_current_user_claims_only(x_ai00_token: str = Header(alias="X-AI00-Token"
 
 
 _LOCAL_USER = {
+    "gid": "local",
     "system_role": "member",
     "org_role": "member",
     "team_id": "",
