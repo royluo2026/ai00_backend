@@ -260,6 +260,7 @@ const $layoutCanvas  = document.getElementById('lvLayoutCanvas');
 const $layoutEditBtn   = document.getElementById('lvLayoutEditBtn');
 const $layoutFitBtn    = document.getElementById('lvLayoutFitBtn');
 const $importPbomBtn   = document.getElementById('lvImportPbomBtn');
+const $importTcBtn     = document.getElementById('lvImportTcBtn');
 const $arrangeMode     = null; // 已移除
 const $arrangeModeWrap = null; // 已移除
 
@@ -1123,6 +1124,7 @@ function _syncLayoutUI() {
   // 布局模式下显示适应全局按钮和编辑按钮
   if ($layoutEditBtn) $layoutEditBtn.style.display = isLayout ? '' : 'none';
   $layoutFitBtn.style.display = isLayout ? '' : 'none';
+  if ($importTcBtn) $importTcBtn.style.display = isLayout ? '' : 'none';
   const $layoutSep = document.getElementById('lvLayoutSep');
   if ($layoutSep) $layoutSep.style.display = isLayout ? '' : 'none';
   // 确保编辑按钮 active 类与状态同步
@@ -4446,6 +4448,15 @@ function _bindEvents() {
     if (!_pbomProjects.length) await _loadPbomProjects();
     await _loadPbomVersions();
     _openPbomImportModal();
+  });
+
+  // ── 导入 TC（Layout 工具栏，使用 lineage 的正确 mapping）──
+  $importTcBtn?.addEventListener('click', () => {
+    if (_verMgr?.openImportTcModal) {
+      _verMgr.openImportTcModal();
+    } else {
+      _toast('版本管理器未就绪', 'warn');
+    }
   });
 }
 
