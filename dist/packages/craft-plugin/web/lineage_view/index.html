@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOP 工艺流程图</title>
-  
-  
-  
-  
+  <link rel="stylesheet" href="/web/common.css">
+  <link rel="stylesheet" href="lineage.css">
+  <link rel="stylesheet" href="layout_mode.css">
+  <link rel="stylesheet" href="layout_detail_panel.css">
   <script>
     // 在首帧渲染前立即应用主题，避免暗/亮色背景闪烁
     (function() {
@@ -32,10 +32,6 @@
     })();
   </script>
   <script src="/web/components/iframe_error_bridge.js"></script>
-  <link rel="stylesheet" href="/assets/index-368853c6.css">
-  <link rel="stylesheet" href="/assets/main-921414fe.css">
-  <link rel="stylesheet" href="/assets/lineage-3c29cb03.css">
-  <link rel="stylesheet" href="/assets/import_export-97b455f2.css">
 </head>
 <body style="background:#eff1f5">
   <!-- 悬浮设置按钮（FAB）：点击显示/隐藏工具栏 -->
@@ -228,7 +224,7 @@
       导入PBOM
     </button>
 
-    <!-- 导入 TC（布局模式专用，使用 lineage 的正确映射）-->
+    <!-- 导入 TC（布局模式专用，使用 lineage 的正确 mapping）-->
     <button class="lv-btn lv-btn-sm" id="lvImportTcBtn" style="display:none" title="从 Teamcenter CSV 导入工艺数据">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
@@ -503,13 +499,13 @@
   <!-- Toast -->
   <div class="lv-toast" id="lvToast" style="display:none"></div>
 
-  
+  <link rel="stylesheet" href="/web/components/diff_nav_tree.css?v=20260623">
   <script src="/web/components/miller_columns.js?v=20260623"></script>
   <script src="/web/components/diff_nav_tree.js?v=20260623"></script>
   <script src="staging_panel.js?v=20260623"></script>
   <script src="assoc_panel.js?v=20260623"></script>
   <script src="layout_detail_panel.js?v=20260623"></script>
-  
+  <link rel="stylesheet" href="/web/components/import_export.css">
   <style>
     /* 桥接 import_export.css 的 CSS 变量到 lineage 主题体系 */
     :root {
@@ -537,10 +533,10 @@
   </style>
   <script src="/web/components/import_export.js"></script>
   <script src="/web/shared/lv_utils.js?v=20260623"></script>
-  <script src="lineage_version_mgr.js?v=20260703b"></script>
-  <script src="lifecycle_panel.js?v=20260703b"></script>
-  <script src="lineage.js?v=20260703b"></script>
-  <script src="layout_mode.js?v=20260703b"></script>
+  <script src="lineage_version_mgr.js?v=20260721a"></script>
+  <script src="lifecycle_panel.js?v=20260721a"></script>
+  <script src="lineage.js?v=20260721a"></script>
+  <script src="layout_mode.js?v=20260721a"></script>
 
   <!-- ═══ LV: 新建 / 导入 BOP Modal ═══ -->
   <div id="lv-modal-create" class="lv-modal-overlay hidden">
