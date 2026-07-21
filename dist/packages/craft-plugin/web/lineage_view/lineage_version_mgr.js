@@ -991,7 +991,12 @@ class LineageVersionManager {
     const parsed = [];
     for (const line of this._tcRawLines) {
       const cols = this._parseCsvLine(line, sep);
-      if (cols.some(c => c.includes('PFMEA'))) continue;
+      // 过滤 PFMEA / 潜在失效原因 / 测试用例 行（按列内容或类型字段判定）
+      if (cols.some(c => {
+        const s = (c || '').toString();
+        return s.includes('PFMEA') || s.includes('潜在失效原因') || s.includes('失效模式')
+            || s.includes('测试用例') || s.includes('TestCase') || s.includes('Test Case');
+      })) continue;
 
       const raw = {};
       this._tcRawHeaders.forEach((h, idx) => { raw[h] = cols[idx] || ''; });
