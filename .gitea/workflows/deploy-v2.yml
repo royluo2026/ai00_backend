@@ -2,7 +2,7 @@ name: Deploy to V2 Test
 
 on:
   push:
-    branches: [deploy-v2]
+    branches: [test]
 
 jobs:
   deploy:
@@ -11,14 +11,14 @@ jobs:
       - name: Checkout backend repo
         uses: actions/checkout@v4
         with:
-          ref: deploy-v2
+          ref: ${{ github.ref_name }}
           path: workmanship-backend
 
-      - name: Checkout frontend repo
+      - name: Checkout frontend repo (same branch)
         uses: actions/checkout@v4
         with:
           repository: devteam/workmanship-web
-          ref: main
+          ref: ${{ github.ref_name }}
           path: workmanship-web
 
       - name: Build frontend
@@ -34,10 +34,9 @@ jobs:
 
       - name: Install Python deps
         shell: cmd
-        working-directory: workmanship-backend
         run: |
           if not exist "E:\projects\ai00-v2\venv" python -m venv E:\projects\ai00-v2\venv
-          E:\projects\ai00-v2\venv\Scripts\pip install -r backend\requirements.txt --quiet
+          E:\projects\ai00-v2\venv\Scripts\pip install -r workmanship-backend\backend\requirements.txt --quiet
 
       - name: Deploy backend files
         shell: cmd
