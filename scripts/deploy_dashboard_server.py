@@ -3,6 +3,7 @@ deploy_dashboard_server.py
 独立部署面板服务 — 不依赖主服务，重启不影响面板
 端口: 8090
 """
+import base64
 import json
 import subprocess
 import sys
@@ -17,6 +18,8 @@ BACKEND_REPO = Path("E:/Projects/ai00/workmanship-backend")
 GITEA_TOKEN = os.getenv("GITEA_TOKEN", "ece8d92157140c498cfb1b869ac16614e07bfd3e")
 UTC8 = timezone(timedelta(hours=8))
 PORT = int(os.getenv("DASHBOARD_PORT", "8090"))
+AUTH_USER = os.getenv("DASHBOARD_USER", "admin")
+AUTH_PASS = os.getenv("DASHBOARD_PASS", "ai00dashboard")
 
 
 def _load_history():
@@ -50,6 +53,30 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print(f"[{datetime.now(UTC8).strftime('%H:%M:%S')}] {args[0]}", flush=True)
 
+    def _check_auth(self):
+        auth = self.headers.get("Authorization", "")
+        if auth.startswith("Basic "):
+            try:
+                creds = base64.b64decode(auth[6:]).decode("utf-8")
+                user, _, pwd = creds.partition(":")
+                if user == AUTH_USER and pwd == AUTH_PASS:
+                    return True
+            except Exception:
+                pass
+        return False
+
+    def _require_auth(self):
+        if not self._check_auth():
+            body = json.dumps({"error": "unauthorized"}).encode("utf-8")
+            self.send_response(401)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("WWW-Authenticate", 'Basic realm="AI00 Dashboard"')
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return False
+        return True
+
     def _json(self, data, code=200):
         body = json.dumps(data, ensure_ascii=False).encode("utf-8")
         self.send_response(code)
@@ -69,6 +96,8 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+        if not self._require_auth():
+            return
         try:
             if self.path in ("/", "/index.html"):
                 html_file = HERE / "deploy_dashboard.html"
@@ -86,6 +115,8 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"error": str(e)[:200]}, 500)
 
     def do_POST(self):
+        if not self._require_auth():
+            return
         try:
             length = int(self.headers.get("Content-Length", 0))
             body = json.loads(self.rfile.read(length)) if length else {}
