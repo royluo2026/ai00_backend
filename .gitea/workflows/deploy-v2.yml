@@ -8,13 +8,13 @@ jobs:
   deploy:
     runs-on: [self-hosted, test-server]
     steps:
-      - name: Checkout backend repo
+      - name: Checkout backend
         uses: actions/checkout@v4
         with:
           ref: test
           path: workmanship-backend
 
-      - name: Checkout frontend repo
+      - name: Checkout frontend
         uses: actions/checkout@v4
         with:
           repository: devteam/workmanship-web
@@ -26,64 +26,13 @@ jobs:
         shell: cmd
         working-directory: workmanship-web
         run: |
-          where node
           if exist "node_modules" rmdir /s /q node_modules
           npm ci --ignore-scripts
-          npm run build:web --silent
+          npm run build:web
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Install Python deps
+      - name: Deploy
         shell: cmd
         run: |
-          if not exist "E:\projects\ai00-v2\venv" python -m venv E:\projects\ai00-v2\venv
-          E:\projects\ai00-v2\venv\Scripts\pip install --upgrade pip --quiet 2>nul
-          exit /b 0
-
-      - name: Deploy backend files
-        shell: cmd
-        run: |
-          if not exist "E:\projects\ai00-v2" mkdir E:\projects\ai00-v2
-          robocopy workmanship-backend\backend E:\projects\ai00-v2\backend /MIR /XD __pycache__ /XF *.pyc .env* /NFL /NDL /NJH /NJS
-          if %ERRORLEVEL% LEQ 7 exit 0
-
-      - name: Deploy plugins
-        shell: cmd
-        run: |
-          if not exist "E:\projects\ai00-v2\plugins" mkdir E:\projects\ai00-v2\plugins
-          robocopy workmanship-backend\plugins E:\projects\ai00-v2\plugins /MIR /XD __pycache__ /XF *.pyc /NFL /NDL /NJH /NJS
-          if %ERRORLEVEL% LEQ 7 exit 0
-
-      - name: Deploy frontend dist
-        shell: cmd
-        run: |
-          if not exist "E:\projects\ai00-v2\dist" mkdir E:\projects\ai00-v2\dist
-          robocopy workmanship-web\dist E:\projects\ai00-v2\dist /MIR /NFL /NDL /NJH /NJS
-          if %ERRORLEVEL% LEQ 7 exit 0
-
-      - name: Deploy scripts
-        shell: cmd
-        run: |
-          if not exist "E:\projects\ai00-v2\scripts" mkdir E:\projects\ai00-v2\scripts
-          robocopy workmanship-backend\scripts E:\projects\ai00-v2\scripts /MIR /NFL /NDL /NJH /NJS
-          if %ERRORLEVEL% LEQ 7 exit 0
-
-      - name: Ensure NSSM env
-        shell: cmd
-        run: |
-          nssm set AI00Backend-V2 AppEnvironmentExtra "ENV_FILE=E:\projects\ai00-v2\backend\.env.v2.runtime" "PYTHONIOENCODING=utf-8"
-
-      - name: Restart service
-        shell: cmd
-        run: |
-          taskkill /F /FI "SERVICES eq AI00Backend-V2" 2>nul
-          timeout /t 3 /nobreak >nul
-          taskkill /F /IM python.exe 2>nul
-          timeout /t 2 /nobreak >nul
-          net start AI00Backend-V2
-
-      - name: Health check
-        shell: cmd
-        run: |
-          timeout /t 8 /nobreak >nul
-          curl -f http://127.0.0.1:8082/health
+          call workmanship-backend\scripts\deploy.bat "%CD%"
