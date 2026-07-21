@@ -927,7 +927,10 @@ function _parseTcCsv(text) {
     const node_type = _TC_TYPE_MAP[tcType] || '';
     if (!node_type) {
       _stats.unknown++;
-      if (tcType) _stats.unknownTypes[tcType] = (_stats.unknownTypes[tcType] || 0) + 1;
+      if (tcType) {
+        _stats.unknownTypes[tcType] = (_stats.unknownTypes[tcType] || 0) + 1;
+        console.warn(`[TC import] 未识别的零组件类型: "${tcType}" (Level=${lv}, title="${title}")`);
+      }
       return null;
     }
 

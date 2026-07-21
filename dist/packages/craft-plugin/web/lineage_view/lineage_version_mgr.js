@@ -1003,8 +1003,7 @@ class LineageVersionManager {
       }
 
       const lvParsed = parseInt(row._level ?? '', 10);
-      if (isNaN(lvParsed) || lvParsed <= 0) continue;
-      row._level = lvParsed;
+      if (isNaN(lvParsed) || lvParsed < 0) continue;
 
       if (row._tc_raw_type) {
         const raw = row._tc_raw_type.trim();
@@ -1019,6 +1018,11 @@ class LineageVersionManager {
       } else {
         continue; // 无类型字段，跳过
       }
+
+      // Level 0 工厂根节点跳过（已由版本创建），线体级别的 Level 0 保留
+      if (lvParsed === 0 && row.node_type === 'factory_bop') continue;
+
+      row._level = lvParsed;
       delete row._tc_raw_type;
 
       // 父级 VPPS 链接
