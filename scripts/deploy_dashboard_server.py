@@ -28,6 +28,11 @@ def _load_history():
     return json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
 
 
+def _save_history(data):
+    HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+    HISTORY_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def _git(cwd, *args):
     r = subprocess.run(["git", "-C", str(cwd)] + list(args),
                        capture_output=True, text=True,
@@ -137,16 +142,36 @@ class Handler(BaseHTTPRequestHandler):
     def _get_current(self):
         h = _load_history()
         current = h.get("current")
-        latest = None
         try:
-            latest = _git(BACKEND_REPO, "rev-parse", "--short", "HEAD")
-        except Exception:
-            pass
-        return {
-            "current": current,
-            "latest_commit": latest,
-            "needs_update": bool(latest and current and latest != current.get("backend_commit")),
-        }
+            repo = _gitea_api("/repos/devteam/workmanship-backend/branches/test")
+            fe_repo = _gitea_api("/repos/devteam/workmanship-web/branches/test")
+            be_latest = repo.get("commit", {}).get("id", "")
+            be_short = be_latest[:7] if be_latest else ""
+            fe_latest = fe_repo.get("commit", {}).get("id", "")
+            fe_short = fe_latest[:7] if fe_latest else ""
+            print(f"[AUTO-DETECT] be={be_short} fe={fe_short} cur_be={current.get('backend_commit') if current else 'None'}", flush=True)
+            if be_short and (not current or current.get("backend_commit") != be_short):
+                entry = {
+                    "backend_commit": be_short,
+                    "backend_full": be_latest,
+                    "frontend_commit": fe_short,
+                    "frontend_full": fe_latest,
+                    "deployed_at": datetime.now(UTC8).strftime("%Y-%m-%dT%H:%M:%S"),
+                }
+                h["current"] = entry
+                h["history"] = [entry] + h.get("history", [])
+                h["history"] = h["history"][:20]
+                _save_history(h)
+                current = entry
+            return {"current": current, "needs_update": False}
+        except Exception as e:
+            print(f"[AUTO-DETECT] ERROR: {e}", flush=True)
+            return {
+                "current": current,
+                "latest_commit": None,
+                "needs_updaate": False,
+                "error": str(e)[:100],
+            }
 
     def _get_pipeline(self):
         try:
