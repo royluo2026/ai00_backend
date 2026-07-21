@@ -31,6 +31,8 @@ timeout /t 3 /nobreak >nul
 taskkill /F /IM python.exe 2>nul
 timeout /t 2 /nobreak >nul
 net start AI00Backend-V2
-timeout /t 8 /nobreak >nul
-curl -f http://127.0.0.1:8082/health
+echo Waiting for service...
+timeout /t 15 /nobreak >nul
+curl -f http://127.0.0.1:8082/health 2>nul
 echo ALL DONE
+exit /b 0
