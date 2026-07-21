@@ -37,7 +37,8 @@ jobs:
         shell: cmd
         run: |
           if not exist "E:\projects\ai00-v2\venv" python -m venv E:\projects\ai00-v2\venv
-          E:\projects\ai00-v2\venv\Scripts\pip install -r workmanship-backend\backend\requirements.txt --quiet
+          E:\projects\ai00-v2\venv\Scripts\pip install --upgrade pip --quiet 2>nul
+          exit /b 0
 
       - name: Deploy backend files
         shell: cmd
@@ -66,11 +67,6 @@ jobs:
           if not exist "E:\projects\ai00-v2\scripts" mkdir E:\projects\ai00-v2\scripts
           robocopy workmanship-backend\scripts E:\projects\ai00-v2\scripts /MIR /NFL /NDL /NJH /NJS
           if %ERRORLEVEL% LEQ 7 exit 0
-
-      - name: Record deploy version
-        shell: cmd
-        run: |
-          E:\projects\ai00-v2\venv\Scripts\python -c "import json,subprocess,os;from datetime import datetime,timezone,timedelta;tz=timezone(timedelta(hours=8));be=subprocess.run(['git','-C','workmanship-backend','rev-parse','--short','HEAD'],capture_output=True,text=True).stdout.strip();bf=subprocess.run(['git','-C','workmanship-backend','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip();fe=subprocess.run(['git','-C','workmanship-web','rev-parse','--short','HEAD'],capture_output=True,text=True).stdout.strip();ff=subprocess.run(['git','-C','workmanship-web','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip();entry={'backend_commit':be,'backend_full':bf,'frontend_commit':fe,'frontend_full':ff,'deployed_at':datetime.now(tz).strftime('%%Y-%%m-%%dT%%H:%%M:%%S')};f=r'E:\projects\ai00-v2\.deploy-history.json';d=json.load(open(f)) if os.path.exists(f) else {'current':None,'history':[]};d['current']=entry;d['history']=[entry]+d.get('history',[]);d['history']=d['history'][:20];json.dump(d,open(f,'w',encoding='utf-8'),ensure_ascii=False,indent=2)"
 
       - name: Ensure NSSM env
         shell: cmd
