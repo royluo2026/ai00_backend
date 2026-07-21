@@ -75,8 +75,8 @@ jobs:
       - name: Restart service
         shell: cmd
         run: |
-          net stop AI00Backend-V2 2>nul
-          timeout /t 5 /nobreak >nul
+          taskkill /F /FI "SERVICES eq AI00Backend-V2" 2>nul
+          timeout /t 3 /nobreak >nul
           for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8082.*LISTENING"') do taskkill /F /PID %%a 2>nul
           timeout /t 2 /nobreak >nul
           net start AI00Backend-V2
