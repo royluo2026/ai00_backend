@@ -68,27 +68,14 @@ jobs:
           if %ERRORLEVEL% LEQ 7 exit 0
 
       - name: Record deploy version
-        shell: powershell
+        shell: cmd
         run: |
-          $beShort = (git -C workmanship-backend rev-parse --short HEAD).Trim()
-          $beFull  = (git -C workmanship-backend rev-parse HEAD).Trim()
-          $feShort = (git -C workmanship-web rev-parse --short HEAD).Trim()
-          $feFull  = (git -C workmanship-web rev-parse HEAD).Trim()
-          $now     = [datetime]::UtcNow.AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss')
-          $entry = @{
-            backend_commit = $beShort
-            backend_full   = $beFull
-            frontend_commit = $feShort
-            frontend_full  = $feFull
-            deployed_at    = $now
-          }
-          $path = 'E:\projects\ai00-v2\.deploy-history.json'
-          $data = if (Test-Path $path) { Get-Content $path -Raw | ConvertFrom-Json } else { @{ current=$null; history=@() } }
-          if ($data.history -isnot [array]) { $data.history = @() }
-          $data.current = $entry
-          $data.history = @($entry) + [array]$data.history
-          if ($data.history.Count -gt 20) { $data.history = $data.history[0..19] }
-          $data | ConvertTo-Json -Depth 3 | Set-Content $path -Encoding UTF8
+          for /f "delims=" %%i in ('git -C workmanship-backend rev-parse --short HEAD') do set BE_SHORT=%%i
+          for /f "delims=" %%i in ('git -C workmanship-backend rev-parse HEAD') do set BE_FULL=%%i
+          for /f "delims=" %%i in ('git -C workmanship-web rev-parse --short HEAD') do set FE_SHORT=%%i
+          for /f "delims=" %%i in ('git -C workmanship-web rev-parse HEAD') do set FE_FULL=%%i
+          for /f "delims=" %%i in ('powershell -NoP -C "[datetime]::UtcNow.AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss')"') do set NOW=%%i
+          powershell -NoP -C "$f='E:\projects\ai00-v2\.deploy-history.json';$n=[PSCustomObject]@{backend_commit='%BE_SHORT%';backend_full='%BE_FULL%';frontend_commit='%FE_SHORT%';frontend_full='%FE_FULL%';deployed_at='%NOW%'};if(Test-Path $f){$d=Get-Content $f -Raw|ConvertFrom-Json}else{$d=[PSCustomObject]@{current=$null;history=@()}};$d.current=$n;$d.history=@($n)+[array]$d.history;if($d.history.Count -gt 20){$d.history=$d.history[0..19]};$d|ConvertTo-Json -Depth 3|Set-Content $f -Encoding UTF8"
 
       - name: Ensure NSSM env
         shell: cmd
