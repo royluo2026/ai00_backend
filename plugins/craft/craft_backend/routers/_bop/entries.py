@@ -941,8 +941,6 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                 # ── 收集数据，批量 INSERT ─────────────────────────────────
                 entry_rows = []
                 link_rows = []
-                entity_rows_by_table = {}  # table_name -> [(col_names, params), ...]
-
                 parent_gids_to_sync = set()
                 created = []
 
@@ -964,26 +962,50 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         parent_gid = None
 
                     entity_info = _IMPORT_ENTITY_MAP.get(node_type)
+
+                    # entity 表逐行 INSERT IGNORE（各实体表结构不同，不能批量）
                     if entity_info:
                         e_table, link_type = entity_info
                         if node_type == 'operation':
-                            cols = ('gid', 'project_gid', 'title', 'vpps', 'vpps_desc',
-                                    'operation_code', 'vpps_part', 'part_feed')
-                            vals = (ent_gid, project_gid, title, vpps, vpps_desc,
-                                    r.get('operation_code', ''), r.get('vpps_part', ''), r.get('part_feed', False))
+                            cur.execute(
+                                "INSERT IGNORE INTO workmanship_bop_bop_steps "
+                                "(gid, project_gid, title, vpps, vpps_desc,"
+                                " operation_code, vpps_part, part_feed)"
+                                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                (ent_gid, project_gid, title, vpps, vpps_desc,
+                                 r.get('operation_code', ''),
+                                 r.get('vpps_part', ''), r.get('part_feed', False))
+                            )
                         elif node_type == 'operator_process':
-                            cols = ('gid', 'project_gid', 'title', 'vpps', 'role_type',
-                                    'factory_role_ref_gid', 'headcount')
-                            vals = (ent_gid, project_gid, title, vpps,
-                                    r.get('role_type', ''), r.get('factory_role_ref_gid') or None,
-                                    r.get('headcount', 1))
+                            cur.execute(
+                                "INSERT IGNORE INTO workmanship_bop_bop_operator "
+                                "(gid, project_gid, title, vpps, role_type,"
+                                " factory_role_ref_gid, headcount)"
+                                " VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                                (ent_gid, project_gid, title, vpps,
+                                 r.get('role_type', ''),
+                                 r.get('factory_role_ref_gid') or None,
+                                 r.get('headcount', 1))
+                            )
                         elif node_type == 'process':
-                            cols = ('gid', 'project_gid', 'bop_version_gid', 'name', 'vpps', 'vpps_desc')
-                            vals = (ent_gid, project_gid, version_gid, title, vpps, vpps_desc)
+                            cur.execute(
+                                "INSERT IGNORE INTO workmanship_bop_bop_process"
+                                "(gid, project_gid, bop_version_gid, name, vpps, vpps_desc)"
+                                " VALUES (%s,%s,%s,%s,%s,%s)",
+                                (ent_gid, project_gid, version_gid, title, vpps, vpps_desc)
+                            )
+                        elif node_type in ('equipment_need', 'fixture_need', 'tool_need'):
+                            cur.execute(
+                                f"INSERT IGNORE INTO {e_table}(gid, project_gid, title, vpps)"
+                                f" VALUES (%s,%s,%s,%s)",
+                                (ent_gid, project_gid, title, vpps)
+                            )
                         else:
-                            cols = ('gid', 'project_gid', 'title', 'vpps')
-                            vals = (ent_gid, project_gid, title, vpps)
-                        entity_rows_by_table.setdefault(e_table, []).append((cols, vals))
+                            cur.execute(
+                                f"INSERT IGNORE INTO {e_table}(gid, project_gid, title, vpps)"
+                                f" VALUES (%s,%s,%s,%s)",
+                                (ent_gid, project_gid, title, vpps)
+                            )
                     else:
                         link_type = None
 
@@ -1005,31 +1027,17 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         parent_gids_to_sync.add(parent_gid)
                     created.append(e_gid)
 
-                # ── 批量写入 ──────────────────────────────────────────────
-                # 先写 entity 表（INSERT IGNORE）
-                for table, rows_list in entity_rows_by_table.items():
-                    if not rows_list:
-                        continue
-                    # 所有行使用相同的列
-                    cols_sql = ','.join(rows_list[0][0])
-                    placeholders = ','.join(['%s'] * len(rows_list[0][0]))
+                # ── 批量写入 entries 和 links ────────────────────────────
+                if entry_rows:
                     cur.executemany(
-                        f"INSERT IGNORE INTO {table}({cols_sql}) VALUES ({placeholders})",
-                        [r[1] for r in rows_list],
+                        "INSERT INTO workmanship_bop_bop_entries"
+                        "(gid, version_gid, parent_gid, node_type,"
+                        " sort_order, level, ai00_level,"
+                        " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
+                        " parent_bop_title, child_vpps, meta)"
+                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]','{}')",
+                        entry_rows,
                     )
-
-                # 批量写 bop_entries
-                cur.executemany(
-                    "INSERT INTO workmanship_bop_bop_entries"
-                    "(gid, version_gid, parent_gid, node_type,"
-                    " sort_order, level, ai00_level,"
-                    " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
-                    " parent_bop_title, child_vpps, meta)"
-                    " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]','{}')",
-                    entry_rows,
-                )
-
-                # 批量写 entry_links
                 if link_rows:
                     cur.executemany(
                         "INSERT INTO workmanship_bop_bop_entry_links"
