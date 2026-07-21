@@ -988,7 +988,7 @@ class LineageVersionManager {
 
   _tcApplyColMap() {
     const sep = this._tcSep || this._detectSep(this._tcRawLines[0] || '');
-    const rows = [];
+    const parsed = [];
     for (const line of this._tcRawLines) {
       const cols = this._parseCsvLine(line, sep);
       if (cols.some(c => c.includes('PFMEA'))) continue;
@@ -1006,21 +1006,18 @@ class LineageVersionManager {
       if (isNaN(lvParsed) || lvParsed < 0) continue;
 
       if (row._tc_raw_type) {
-        const raw = row._tc_raw_type.trim();
+        const rawType = row._tc_raw_type.trim();
         // 先精确匹配，再去掉括号后缀（如"总装操作（Product）"→"总装操作"）后重试
-        const stripped = raw.replace(/[（(][^）)]*[）)]\s*$/g, '').trim();
-        const nt = _TC_TYPE_MAP[raw] || _TC_TYPE_MAP[stripped];
+        const stripped = rawType.replace(/[（(][^）)]*[）)]\s*$/g, '').trim();
+        const nt = _TC_TYPE_MAP[rawType] || _TC_TYPE_MAP[stripped];
         if (!nt) {
-          console.warn('[TC import] 未识别的零组件类型，已跳过:', raw, row);
+          console.warn('[TC import] 未识别的零组件类型，已跳过:', rawType, row);
           continue;
         }
         row.node_type = nt;
       } else {
         continue; // 无类型字段，跳过
       }
-
-      // Level 0 工厂根节点跳过（已由版本创建），线体级别的 Level 0 保留
-      if (lvParsed === 0 && row.node_type === 'factory_bop') continue;
 
       row._level = lvParsed;
       delete row._tc_raw_type;
@@ -1031,7 +1028,23 @@ class LineageVersionManager {
         delete row._parent_vpps;
       }
 
-      rows.push(row);
+      parsed.push(row);
+    }
+
+    // Level 0 过滤策略：
+    //   - 若存在 Level 0 的 line_process（线体在顶层）→ 保留全部 Level 0
+    //   - 否则若存在 Level 1 的 line_process（线体在第二层，说明 Level 0 是工厂根）→ 过滤所有 Level 0
+    //   - 兜底：Level 0 的 factory_bop 视为工厂根，过滤（版本创建时已生成）
+    const hasLineAtLv0 = parsed.some(r => r._level === 0 && r.node_type === 'line_process');
+    const hasLineAtLv1 = parsed.some(r => r._level === 1 && r.node_type === 'line_process');
+    const dropLevel0 = !hasLineAtLv0 && hasLineAtLv1;
+    const rows = [];
+    for (const r of parsed) {
+      if (r._level === 0) {
+        if (dropLevel0) continue;
+        if (r.node_type === 'factory_bop') continue; // 工厂根由版本创建时生成
+      }
+      rows.push(r);
     }
     return rows;
   }
