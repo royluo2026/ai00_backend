@@ -70,12 +70,7 @@ jobs:
       - name: Record deploy version
         shell: cmd
         run: |
-          for /f "delims=" %%i in ('git -C workmanship-backend rev-parse --short HEAD') do set BE_SHORT=%%i
-          for /f "delims=" %%i in ('git -C workmanship-backend rev-parse HEAD') do set BE_FULL=%%i
-          for /f "delims=" %%i in ('git -C workmanship-web rev-parse --short HEAD') do set FE_SHORT=%%i
-          for /f "delims=" %%i in ('git -C workmanship-web rev-parse HEAD') do set FE_FULL=%%i
-          for /f "delims=" %%i in ('powershell -NoP -C "[datetime]::UtcNow.AddHours(8).ToString('yyyy-MM-ddTHH:mm:ss')"') do set NOW=%%i
-          powershell -NoP -C "$f='E:\projects\ai00-v2\.deploy-history.json';$n=[PSCustomObject]@{backend_commit='%BE_SHORT%';backend_full='%BE_FULL%';frontend_commit='%FE_SHORT%';frontend_full='%FE_FULL%';deployed_at='%NOW%'};if(Test-Path $f){$d=Get-Content $f -Raw|ConvertFrom-Json}else{$d=[PSCustomObject]@{current=$null;history=@()}};$d.current=$n;$d.history=@($n)+[array]$d.history;if($d.history.Count -gt 20){$d.history=$d.history[0..19]};$d|ConvertTo-Json -Depth 3|Set-Content $f -Encoding UTF8"
+          python -c "import json,subprocess,os;from datetime import datetime,timezone,timedelta;tz=timezone(timedelta(hours=8));be=subprocess.run(['git','-C','workmanship-backend','rev-parse','--short','HEAD'],capture_output=True,text=True).stdout.strip();bf=subprocess.run(['git','-C','workmanship-backend','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip();fe=subprocess.run(['git','-C','workmanship-web','rev-parse','--short','HEAD'],capture_output=True,text=True).stdout.strip();ff=subprocess.run(['git','-C','workmanship-web','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip();entry={'backend_commit':be,'backend_full':bf,'frontend_commit':fe,'frontend_full':ff,'deployed_at':datetime.now(tz).strftime('%Y-%m-%dT%H:%M:%S')};f=r'E:\projects\ai00-v2\.deploy-history.json';d=json.load(open(f)) if os.path.exists(f) else {'current':None,'history':[]};d['current']=entry;d['history']=[entry]+d.get('history',[]);d['history']=d['history'][:20];json.dump(d,open(f,'w',encoding='utf-8'),ensure_ascii=False,indent=2)"
 
       - name: Ensure NSSM env
         shell: cmd
