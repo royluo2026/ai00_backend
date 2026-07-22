@@ -1149,20 +1149,41 @@ class BopLifecyclePanel {
     });
     container.appendChild(projSel);
 
-    container.appendChild(_label('所属版本族（= 项目名，不含数据阶段）'));
-    const famSel = _sel('— 自成新版本族 —');
-    const famSeen = new Set();
-    allVers.filter(v => v.version_type !== 'template' && !v.archived_at).forEach(ver => {
-      const fgid = ver.version_family_gid || ver.gid;
-      if (!famSeen.has(fgid)) {
-        famSeen.add(fgid);
-        const opt = document.createElement('option');
-        opt.value = fgid;
-        opt.textContent = ver.bop_name || `族 ${fgid.slice(-6)}`;
-        famSel.appendChild(opt);
-      }
-    });
+    container.appendChild(_label('所属版本族'));
+    const famHint = document.createElement('div');
+    famHint.style.cssText =
+      'font-size:10px;padding:4px 6px;border-radius:4px;margin-bottom:8px;' +
+      'background:var(--base,#1e1e2e);color:var(--subtext0,#a6adc8);min-height:20px';
+    famHint.textContent = '请先选择项目';
+    container.appendChild(famHint);
+    const famSel = document.createElement('input'); famSel.type = 'hidden'; famSel.value = '';
     container.appendChild(famSel);
+    const refreshFamilyByProject = () => {
+      const selOpt = projSel.options[projSel.selectedIndex];
+      const projName = selOpt?.dataset?.projectName || '';
+      if (!projName) {
+        famSel.value = '';
+        famHint.textContent = '请先选择项目';
+        famHint.style.color = 'var(--subtext0,#a6adc8)';
+        return;
+      }
+      const match = allVers.find(v =>
+        v.version_type !== 'template' && !v.archived_at &&
+        (v.bop_name || '') === projName
+      );
+      if (match) {
+        famSel.value = match.version_family_gid || match.gid;
+        const cnt = allVers.filter(v =>
+          (v.version_family_gid || v.gid) === famSel.value && !v.archived_at
+        ).length;
+        famHint.textContent = `加入已有版本族「${projName}」（现有 ${cnt} 个版本）`;
+        famHint.style.color = 'var(--green,#40a02b)';
+      } else {
+        famSel.value = '';
+        famHint.textContent = `将成为新版本族「${projName}」`;
+        famHint.style.color = 'var(--blue,#89b4fa)';
+      }
+    };
 
     container.appendChild(_label('数据阶段 *（同族已用过的阶段会被禁用）'));
     const stageSel = _sel('— 请选择数据阶段 —');
@@ -1191,7 +1212,6 @@ class BopLifecyclePanel {
         stageSel.value = '';
       }
     };
-    famSel.addEventListener('change', refreshStageOptions);
     refreshStageOptions();
 
     const previewBox = document.createElement('div');
@@ -1241,10 +1261,14 @@ class BopLifecyclePanel {
       preview.textContent = `${bopName}${stageVal ? " · " + stageVal : ""}  ·  ${tag}` + (famGidVal ? '（族内递增）' : '（新族首版）');
       preview.style.color = 'var(--blue,#89b4fa)';
     };
-    if (projSel) projSel.addEventListener('change', updatePreview);
-    famSel.addEventListener('change',  refreshStageOptions);
-    famSel.addEventListener('change',  updatePreview);
+    if (projSel) {
+      projSel.addEventListener('change', refreshFamilyByProject);
+      projSel.addEventListener('change', refreshStageOptions);
+      projSel.addEventListener('change', updatePreview);
+    }
     stageSel.addEventListener('change', updatePreview);
+    refreshFamilyByProject();
+    refreshStageOptions();
 
     const createBtn = document.createElement('button');
     createBtn.className   = 'lv-lc-confirm-btn';
@@ -1252,6 +1276,7 @@ class BopLifecyclePanel {
     createBtn.style.marginTop = '0';
     createBtn.addEventListener('click', async () => {
       const projGid   = projSel?.value || '';
+      refreshFamilyByProject();
       const famGid    = famSel.value || null;
       const facGid    = hidFactory.value.trim() || null;
       const dataStage = stageSel.value || null;
