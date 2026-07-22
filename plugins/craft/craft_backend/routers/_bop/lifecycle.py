@@ -355,6 +355,7 @@ def get_lifecycle(gid: str, _u=Depends(_READ)):
             }
 
 
+
 def _list_family_versions(cur, family_gid: str) -> list:
     """返回某版本族下所有版本（精简字段）"""
     try:
