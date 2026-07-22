@@ -334,9 +334,19 @@ def get_lifecycle(gid: str, _u=Depends(_READ)):
                     _pm = json.loads(_pm) if isinstance(_pm, str) else (_pm or {})
                     pbom_vpps_check = _pm.get('vpps_check', {})
 
+            # lifecycle_state 在 DB 存为 TEXT/JSON，PyMySQL 可能返回字符串
+            _ls = ver['lifecycle_state']
+            if isinstance(_ls, str):
+                try:
+                    _ls = json.loads(_ls) if _ls else {}
+                except Exception:
+                    _ls = {}
+            elif _ls is None:
+                _ls = {}
+
             return {
                 "lifecycle_phase":  ver['lifecycle_phase'],
-                "lifecycle_state":  ver['lifecycle_state'],
+                "lifecycle_state":  _ls,
                 "bop_name":         ver['bop_name'],
                 "version_tag":      ver['version_tag'],
                 "data_stage":       ver['data_stage'],

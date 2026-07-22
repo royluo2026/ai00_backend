@@ -1288,7 +1288,7 @@ class BopLifecyclePanel {
       // 临时禁用，实时获取最新版本列表重新计算版本号
       createBtn.disabled    = true;
       createBtn.textContent = '检测版本号…';
-      let tag, bopName;
+      let tag, bopName, effectiveFamGid;
       try {
         const freshRes = await this._cf('/api/bop/versions?include_archived=true');
         const freshVers = freshRes.data || [];
@@ -1300,10 +1300,20 @@ class BopLifecyclePanel {
         bopName = projName ? projName : '';
         if (!bopName) { this._toast('版本名称获取失败，请重选项目', 'warn'); createBtn.disabled = false; createBtn.textContent = submitLabel; return; }
 
+        // 用 freshVers 重新判定版本族（覆盖提交时可能过期的闭包 famGid）
+        const freshMatch = freshVers.find(v =>
+          v.version_type !== 'template' && !v.archived_at && (v.bop_name || '') === projName
+        );
+        const freshFamGid = freshMatch ? (freshMatch.version_family_gid || freshMatch.gid) : null;
+        if (freshFamGid !== famGid) {
+          famSel.value = freshFamGid || '';
+        }
+        effectiveFamGid = freshFamGid;
+
         let nextNum = 1;
-        if (famGid) {
+        if (effectiveFamGid) {
           const maxN = freshVers
-            .filter(v => (v.version_family_gid || v.gid) === famGid && !v.archived_at)
+            .filter(v => (v.version_family_gid || v.gid) === effectiveFamGid && !v.archived_at)
             .reduce((m, v) => {
               const n = parseInt((v.version_tag || '').replace(/^v/i, ''));
               return isNaN(n) ? m : Math.max(m, n);
@@ -1314,7 +1324,7 @@ class BopLifecyclePanel {
         // 更新预览显示
         const preview = previewBox.querySelector('#lc-form-preview');
         if (preview) {
-          preview.textContent = `${bopName}${dataStage ? " · " + dataStage : ""}  ·  ${tag}` + (famGid ? '（族内递增）' : '（新族首版）');
+          preview.textContent = `${bopName}${dataStage ? " · " + dataStage : ""}  ·  ${tag}` + (effectiveFamGid ? '（族内递增）' : '（新族首版）');
           preview.style.color = 'var(--blue,#89b4fa)';
         }
       } catch (e) {
@@ -1335,7 +1345,7 @@ class BopLifecyclePanel {
             body: JSON.stringify({
               target_version_tag:        tag,
               target_bop_name:           bopName,
-              target_version_family_gid: famGid,
+              target_version_family_gid: effectiveFamGid,
               version_type:              'working',
               ...extraParams,
             }),
@@ -1348,7 +1358,7 @@ class BopLifecyclePanel {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               version_tag: tag, bop_name: bopName,
-              version_family_gid: famGid,
+              version_family_gid: effectiveFamGid,
               project_gid: projGid, factory_gid: facGid,
               data_stage: dataStage,
             }),

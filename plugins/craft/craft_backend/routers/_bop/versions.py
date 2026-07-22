@@ -517,6 +517,11 @@ def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
             cur.execute("SELECT lifecycle_state FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
             row2 = cur.fetchone()
             ls = dict(row2)['lifecycle_state'] or {}
+            if isinstance(ls, str):
+                try:
+                    ls = json.loads(ls) if ls else {}
+                except Exception:
+                    ls = {}
             if not same_stage:
                 # 推进 data_stage 时，清空 refine_stats 缓存（保留 init checklist）
                 ls.pop('refine_stats', None)
