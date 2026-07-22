@@ -166,6 +166,11 @@ def list_versions(
 def create_version(body: CreateBopVersionBody, _u=Depends(_WRITE)):
     gid = str(next_gid())
     family_gid = body.version_family_gid or gid
+    # 净化 bop_name：强制去掉 "  ·  <data_stage>" 后缀，版本族名只保留项目名
+    import re as _re
+    clean_bop_name = _re.sub(r'\s*[·＇・]\s*\S+$', '', (body.bop_name or '')).strip()
+    if not clean_bop_name:
+        clean_bop_name = (body.bop_name or '').strip()
     with get_conn() as conn:
         with conn.cursor() as cur:
             if body.pbom_version_gid:
@@ -182,7 +187,7 @@ def create_version(body: CreateBopVersionBody, _u=Depends(_WRITE)):
                 f"project_gid,factory_gid,vehicle_model_gid,maturity,takt_time,"
                 f"status,meta,lifecycle_phase,lifecycle_state,visibility,version_type,pbom_version_gid,owner_gid,data_stage) "
                 f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                (gid, body.version_tag, body.bop_name, family_gid,
+                (gid, body.version_tag, clean_bop_name, family_gid,
                  body.project_gid, body.factory_gid,
                  body.vehicle_model_gid, body.maturity, body.takt_time,
                  'active', json.dumps({}), 'init', json.dumps({}), 'team', body.version_type,

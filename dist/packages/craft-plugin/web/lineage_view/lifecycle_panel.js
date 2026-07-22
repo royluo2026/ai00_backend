@@ -1149,7 +1149,7 @@ class BopLifecyclePanel {
     });
     container.appendChild(projSel);
 
-    container.appendChild(_label('加入版本族'));
+    container.appendChild(_label('所属版本族（= 项目名，不含数据阶段）'));
     const famSel = _sel('— 自成新版本族 —');
     const famSeen = new Set();
     allVers.filter(v => v.version_type !== 'template' && !v.archived_at).forEach(ver => {
@@ -1164,7 +1164,7 @@ class BopLifecyclePanel {
     });
     container.appendChild(famSel);
 
-    container.appendChild(_label('数据阶段 *'));
+    container.appendChild(_label('数据阶段 *（同族已用过的阶段会被禁用）'));
     const stageSel = _sel('— 请选择数据阶段 —');
     _DATA_STAGES.forEach(s => {
       const opt = document.createElement('option');
@@ -1172,6 +1172,27 @@ class BopLifecyclePanel {
       stageSel.appendChild(opt);
     });
     container.appendChild(stageSel);
+
+    // 同族已用过的 data_stage 选项禁用
+    const refreshStageOptions = () => {
+      const famGid = famSel.value;
+      const usedStages = new Set(
+        allVers
+          .filter(v => famGid && (v.version_family_gid || v.gid) === famGid && !v.archived_at && v.data_stage)
+          .map(v => v.data_stage)
+      );
+      Array.from(stageSel.options).forEach(opt => {
+        if (!opt.value) return;
+        const used = usedStages.has(opt.value);
+        opt.disabled = used;
+        opt.textContent = used ? `${opt.value}（已有）` : opt.value;
+      });
+      if (stageSel.value && stageSel.options[stageSel.selectedIndex]?.disabled) {
+        stageSel.value = '';
+      }
+    };
+    famSel.addEventListener('change', refreshStageOptions);
+    refreshStageOptions();
 
     const previewBox = document.createElement('div');
     previewBox.style.cssText =
@@ -1212,14 +1233,16 @@ class BopLifecyclePanel {
         nextNum = maxN + 1;
       }
       const tag     = `v${nextNum}`;
-      const bopName = stageVal ? `${projName} · ${stageVal}` : projName;
+      // 版本族名只用项目名（不含数据阶段）；data_stage 单独存储
+      const bopName = projName;
       hidTag.value     = tag;
       hidName.value    = bopName;
       hidFactory.value = factoryGidVal;
-      preview.textContent = `${bopName}  ·  ${tag}` + (famGidVal ? '（族内递增）' : '（新族首版）');
+      preview.textContent = `${bopName}${stageVal ? " · " + stageVal : ""}  ·  ${tag}` + (famGidVal ? '（族内递增）' : '（新族首版）');
       preview.style.color = 'var(--blue,#89b4fa)';
     };
     if (projSel) projSel.addEventListener('change', updatePreview);
+    famSel.addEventListener('change',  refreshStageOptions);
     famSel.addEventListener('change',  updatePreview);
     stageSel.addEventListener('change', updatePreview);
 
@@ -1249,7 +1272,7 @@ class BopLifecyclePanel {
         let projName;
         const selOpt = projSel?.options[projSel.selectedIndex];
         projName = selOpt?.dataset.projectName || '';
-        bopName = projName ? (dataStage ? `${projName} · ${dataStage}` : projName) : '';
+        bopName = projName ? projName : '';
         if (!bopName) { this._toast('版本名称获取失败，请重选项目', 'warn'); createBtn.disabled = false; createBtn.textContent = submitLabel; return; }
 
         let nextNum = 1;
@@ -1266,7 +1289,7 @@ class BopLifecyclePanel {
         // 更新预览显示
         const preview = previewBox.querySelector('#lc-form-preview');
         if (preview) {
-          preview.textContent = `${bopName}  ·  ${tag}` + (famGid ? '（族内递增）' : '（新族首版）');
+          preview.textContent = `${bopName}${dataStage ? " · " + dataStage : ""}  ·  ${tag}` + (famGid ? '（族内递增）' : '（新族首版）');
           preview.style.color = 'var(--blue,#89b4fa)';
         }
       } catch (e) {
