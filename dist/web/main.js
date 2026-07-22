@@ -21,6 +21,21 @@
  *   - DOM 就绪初始化
  */
 
+// HTTP 非安全上下文下 navigator.clipboard 为 undefined，用 execCommand 兜底
+function _copyText(text) {
+  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+  return new Promise((resolve, reject) => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy') ? resolve() : reject(new Error('execCommand failed')); }
+    catch (e) { reject(e); }
+    finally { document.body.removeChild(ta); }
+  });
+}
+
 // ===================== 调试面板（最先初始化，供其他模块使用）=====================
 const dbg = (() => {
   const MAX = 500;
@@ -80,7 +95,7 @@ const dbg = (() => {
         const q = (document.getElementById('debug-search')?.value || '').toLowerCase();
         const visible = _logs.filter(l => !q || `${l.ts}  ${l.msg}`.toLowerCase().includes(q));
         const text = visible.map(l => `${l.ts}  ${l.msg}`).join('\n');
-        navigator.clipboard.writeText(text).then(() => {
+        _copyText(text).then(() => {
           const orig = copyBtn.textContent;
           copyBtn.textContent = '✓';
           setTimeout(() => { copyBtn.textContent = orig; }, 1500);
