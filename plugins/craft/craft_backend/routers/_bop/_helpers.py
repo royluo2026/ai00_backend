@@ -445,6 +445,7 @@ def _copy_entries_and_links(cur, src_version_gid: str, new_version_gid: str) -> 
     cur.execute(
         "SELECT gid, parent_gid, node_type, sort_order, level, ai00_level,"
         " title, vpps, vpps_desc, parent_bop_title, child_vpps,"
+        " vpps_part, catia_occurrence_name, parent_vpps_name,"
         " owner_gid, meta"
         " FROM workmanship_bop_bop_entries"
         " WHERE version_gid=%s AND is_deleted=FALSE"
@@ -469,14 +470,17 @@ def _copy_entries_and_links(cur, src_version_gid: str, new_version_gid: str) -> 
             "INSERT INTO workmanship_bop_bop_entries "
             "(gid, version_gid, parent_gid, node_type, sort_order, level, ai00_level,"
             " title, vpps, vpps_desc, parent_bop_title, child_vpps,"
+            " vpps_part, catia_occurrence_name, parent_vpps_name,"
             " owner_gid, meta, source_entry_gid) "
-            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
             (new_gid, new_version_gid, new_parent,
              e['node_type'], e['sort_order'], e.get('level', 0),
              _AI00_LEVEL.get(e['node_type']),
              e.get('title'), e.get('vpps'), e.get('vpps_desc'),
              e.get('parent_bop_title'),
              json.dumps(e.get('child_vpps') or []),
+             e.get('vpps_part') or '', e.get('catia_occurrence_name') or '',
+             e.get('parent_vpps_name') or '',
              e.get('owner_gid'), json.dumps(src_meta),
              e['gid'])
         )
