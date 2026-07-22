@@ -7,7 +7,7 @@ import json
 from typing import Optional, List
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from backend.db.connection import get_conn
@@ -268,17 +268,19 @@ def update_init_state(gid: str, body: InitStateBody, _u=Depends(_WRITE)):
 
 @router.get("/versions/{gid}/lifecycle")
 def get_lifecycle(gid: str, _u=Depends(_READ)):
-    """返回当前阶段、lifecycle_state、最新 stats（整体）、阶段历史、线体列表"""
+    """返回当前阶段、lifecycle_state、全局 stats、各阶段历史、操作列表。"""
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT lifecycle_phase, lifecycle_state, bop_name, version_tag, data_stage FROM workmanship_bop_bop_versions WHERE gid=%s",
+                "SELECT lifecycle_phase, lifecycle_state, bop_name, version_tag, data_stage, version_family_gid "
+                "FROM workmanship_bop_bop_versions WHERE gid=%s",
                 (gid,)
             )
             ver = cur.fetchone()
             if not ver:
                 raise HTTPException(404, f"版本 {gid} 不存在")
             ver = dict(ver)
+            family_gid = ver.get('version_family_gid') or gid
 
             cur.execute(
                 "SELECT * FROM workmanship_bop_bop_lifecycle_stats "
@@ -338,6 +340,7 @@ def get_lifecycle(gid: str, _u=Depends(_READ)):
                 "bop_name":         ver['bop_name'],
                 "version_tag":      ver['version_tag'],
                 "data_stage":       ver['data_stage'],
+                "version_family_gid": family_gid,
                 "stats":            stats,
                 "line_stats":       line_stats,
                 "history":          history,
@@ -347,90 +350,108 @@ def get_lifecycle(gid: str, _u=Depends(_READ)):
                 "family_lifecycle_phase": _get_family_phase(cur, ver.get('version_family_gid', '')),
                 "pbom_diff_queue_pending": _get_diff_queue_count(cur, gid),
                 "vehicle_ops_prep": bop_meta.get('vehicle_ops_prep', {}),
+                # 族内所有版本（含 active / baseline / M / archived），供前端"切片历史"等展示
+                "all_versions_in_family": _list_family_versions(cur, family_gid),
             }
 
 
-@router.post("/versions/{gid}/lifecycle/refresh-stats", status_code=200)
-def refresh_stats(gid: str, _u=Depends(_WRITE)):
-    """重新计算所有指标，写入今日快照行（expression-index ON CONFLICT 处理 NULL line_gid）"""
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT gid FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
-            if not cur.fetchone():
-                raise HTTPException(404, f"版本 {gid} 不存在")
+def _list_family_versions(cur, family_gid: str) -> list:
+    """返回某版本族下所有版本（精简字段）"""
+    try:
+        cur.execute(
+            "SELECT gid, version_tag, bop_name, version_family_gid, data_stage, "
+            "       status, change_note, archived_at, frozen_at, published_at, is_deleted "
+            "FROM workmanship_bop_bop_versions "
+            "WHERE (version_family_gid=%s OR gid=%s) AND is_deleted=FALSE "
+            "ORDER BY created_at",
+            (family_gid, family_gid)
+        )
+        return [dict(r) for r in cur.fetchall()]
+    except Exception:
+        return []
 
-            cur.execute(
-                "SELECT gid FROM workmanship_bop_bop_entries "
-                "WHERE version_gid=%s AND node_type='line_process' AND is_deleted=FALSE",
-                (gid,)
-            )
-            line_gids = [r['gid'] for r in cur.fetchall()]
 
-            today = date.today().isoformat()
-            upserted = []
+@router.post("/versions/{gid}/lifecycle/refresh-stats", status_code=202)
+def refresh_stats(gid: str, background_tasks: BackgroundTasks, _u=Depends(_WRITE)):
+    """重新计算所有指标，写入今日快照行。后台执行，立即返回。"""
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+    import threading
 
-            # ── 从关联 PBOM 版本读取 VPPS 核对结果（整体行使用）──────────────
-            cur.execute("SELECT meta FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
-            bop_meta_row = cur.fetchone()
-            _raw = dict(bop_meta_row)['meta'] if bop_meta_row else None
-            bop_meta = json.loads(_raw) if isinstance(_raw, str) else (_raw or {})
-            pbom_ver_gid = bop_meta.get('pbom_match', {}).get('pbom_version_gid', '')
-            vpps_nok_from_pbom = 0
-            if pbom_ver_gid:
-                cur.execute("SELECT meta FROM workmanship_bop_pbom_versions WHERE gid=%s", (pbom_ver_gid,))
-                prow = cur.fetchone()
-                if prow:
-                    vpps_nok_from_pbom = (dict(prow)['meta'] or {}).get('vpps_check', {}).get('nok', 0) or 0
+    def _compute_and_write():
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT gid FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
+                if not cur.fetchone():
+                    return
 
-            for lg in [None] + line_gids:
-                s = _compute_stats(cur, gid, lg)
-                # 整体行（lg=None）使用 PBOM 版本中保存的真实 nok_vpps
-                if lg is None and vpps_nok_from_pbom:
-                    s['nok_vpps'] = vpps_nok_from_pbom
-                row_gid = str(next_gid())
-                vals = [
-                    row_gid, gid, lg, today,
-                    s['nok_vpps'], s['nok_unbound_parts'], s['nok_unbound_ops'],
-                    s['tools_bound'], s['tools_total'],
-                    s['fixtures_bound'], s['fixtures_total'],
-                    s['equipment_bound'], s['equipment_total'],
-                    s['coverage_ok'], s['balance_ok'],
-                    s['tasks_done'], s['tasks_total'],
-                    s['issues_open'], s['rules_warn'], s['rules_block'],
-                    # DO UPDATE values:
-                    s['nok_vpps'], s['nok_unbound_parts'], s['nok_unbound_ops'],
-                    s['tools_bound'], s['tools_total'],
-                    s['fixtures_bound'], s['fixtures_total'],
-                    s['equipment_bound'], s['equipment_total'],
-                    s['coverage_ok'], s['balance_ok'],
-                    s['tasks_done'], s['tasks_total'],
-                    s['issues_open'], s['rules_warn'], s['rules_block'],
-                ]
-                # MySQL: ON DUPLICATE KEY UPDATE uses VALUES() - no duplicate params needed
-                cur.execute("""
-                    INSERT INTO workmanship_bop_bop_lifecycle_stats
-                      (gid, version_gid, line_gid, stats_snapshot_date,
-                       nok_vpps, nok_unbound_parts, nok_unbound_ops,
-                       tools_bound, tools_total, fixtures_bound, fixtures_total,
-                       equipment_bound, equipment_total, coverage_ok, balance_ok,
-                       tasks_done, tasks_total, issues_open, rules_warn, rules_block,
-                       refreshed_at)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW())
-                    ON DUPLICATE KEY UPDATE
-                      nok_vpps=VALUES(nok_vpps), nok_unbound_parts=VALUES(nok_unbound_parts),
-                      nok_unbound_ops=VALUES(nok_unbound_ops),
-                      tools_bound=VALUES(tools_bound), tools_total=VALUES(tools_total),
-                      fixtures_bound=VALUES(fixtures_bound), fixtures_total=VALUES(fixtures_total),
-                      equipment_bound=VALUES(equipment_bound), equipment_total=VALUES(equipment_total),
-                      coverage_ok=VALUES(coverage_ok), balance_ok=VALUES(balance_ok),
-                      tasks_done=VALUES(tasks_done), tasks_total=VALUES(tasks_total),
-                      issues_open=VALUES(issues_open), rules_warn=VALUES(rules_warn),
-                      rules_block=VALUES(rules_block), refreshed_at=NOW()
-                """, vals[:20])  # only INSERT params; VALUES() handles UPDATE
-                upserted.append(lg or 'overall')
+                cur.execute(
+                    "SELECT gid FROM workmanship_bop_bop_entries "
+                    "WHERE version_gid=%s AND node_type='line_process' AND is_deleted=FALSE",
+                    (gid,)
+                )
+                line_gids = [r['gid'] for r in cur.fetchall()]
 
-            conn.commit()
-            return {"refreshed": upserted}
+                today = date.today().isoformat()
+
+                cur.execute("SELECT meta FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
+                bop_meta_row = cur.fetchone()
+                _raw = dict(bop_meta_row)['meta'] if bop_meta_row else None
+                bop_meta = json.loads(_raw) if isinstance(_raw, str) else (_raw or {})
+                pbom_ver_gid = bop_meta.get('pbom_match', {}).get('pbom_version_gid', '')
+                vpps_nok_from_pbom = 0
+                if pbom_ver_gid:
+                    cur.execute("SELECT meta FROM workmanship_bop_pbom_versions WHERE gid=%s", (pbom_ver_gid,))
+                    prow = cur.fetchone()
+                    if prow:
+                        vpps_nok_from_pbom = (dict(prow)['meta'] or {}).get('vpps_check', {}).get('nok', 0) or 0
+
+                for lg in [None] + line_gids:
+                    s = _compute_stats(cur, gid, lg)
+                    if lg is None and vpps_nok_from_pbom:
+                        s['nok_vpps'] = vpps_nok_from_pbom
+                    row_gid = str(next_gid())
+                    vals = [
+                        row_gid, gid, lg, today,
+                        s['nok_vpps'], s['nok_unbound_parts'], s['nok_unbound_ops'],
+                        s['tools_bound'], s['tools_total'],
+                        s['fixtures_bound'], s['fixtures_total'],
+                        s['equipment_bound'], s['equipment_total'],
+                        s['coverage_ok'], s['balance_ok'],
+                        s['tasks_done'], s['tasks_total'],
+                        s['issues_open'], s['rules_warn'], s['rules_block'],
+                        s['nok_vpps'], s['nok_unbound_parts'], s['nok_unbound_ops'],
+                        s['tools_bound'], s['tools_total'],
+                        s['fixtures_bound'], s['fixtures_total'],
+                        s['equipment_bound'], s['equipment_total'],
+                        s['coverage_ok'], s['balance_ok'],
+                        s['tasks_done'], s['tasks_total'],
+                        s['issues_open'], s['rules_warn'], s['rules_block'],
+                    ]
+                    cur.execute("""
+                        INSERT INTO workmanship_bop_bop_lifecycle_stats
+                          (gid, version_gid, line_gid, stats_snapshot_date,
+                           nok_vpps, nok_unbound_parts, nok_unbound_ops,
+                           tools_bound, tools_total, fixtures_bound, fixtures_total,
+                           equipment_bound, equipment_total, coverage_ok, balance_ok,
+                           tasks_done, tasks_total, issues_open, rules_warn, rules_block,
+                           refreshed_at)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW())
+                        ON DUPLICATE KEY UPDATE
+                          nok_vpps=VALUES(nok_vpps), nok_unbound_parts=VALUES(nok_unbound_parts),
+                          nok_unbound_ops=VALUES(nok_unbound_ops),
+                          tools_bound=VALUES(tools_bound), tools_total=VALUES(tools_total),
+                          fixtures_bound=VALUES(fixtures_bound), fixtures_total=VALUES(fixtures_total),
+                          equipment_bound=VALUES(equipment_bound), equipment_total=VALUES(equipment_total),
+                          coverage_ok=VALUES(coverage_ok), balance_ok=VALUES(balance_ok),
+                          tasks_done=VALUES(tasks_done), tasks_total=VALUES(tasks_total),
+                          issues_open=VALUES(issues_open), rules_warn=VALUES(rules_warn),
+                          rules_block=VALUES(rules_block), refreshed_at=NOW()
+                    """, vals[:20])
+                conn.commit()
+
+    background_tasks.add_task(_compute_and_write)
+    return {"accepted": True, "message": "refresh started", "version_gid": gid}
 
 
 @router.get("/versions/{gid}/lifecycle/history")

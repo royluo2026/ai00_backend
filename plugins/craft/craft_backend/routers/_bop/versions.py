@@ -55,9 +55,11 @@ class LayoutConfigBody(BaseModel):
 
 
 class FreezeSnapshotBody(BaseModel):
-    target_data_stage: str                  # 冻结后活动版本推进到的阶段
+    target_data_stage: Optional[str] = None  # 冻结后活动版本推进到的阶段；None/空=同阶段（仅升版本号）
     change_note:       Optional[str] = None
-    promote_to_m:      bool = False         # 是否直接发布为 M
+    promote_to_m:      bool = False          # 是否直接发布为 M
+    bump_version_tag:  bool = True           # 活动版本 version_tag 自动递增（V1 → V2）
+    same_stage:        bool = False          # True = 仅升版本号，data_stage 保持不变
 
 
 # V1 废弃 Pydantic 模型
@@ -430,11 +432,14 @@ def publish_version(gid: str, _u=Depends(_WRITE)):
 @router.post("/versions/{gid}/freeze-snapshot", status_code=201)
 def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
     """
-    新版冻结：活动版本原地保持 active，fork 出副本变 baseline/M。
-    - 副本携带：当前所有条目/链接快照 + lifecycle_state 快照
-    - 活动版本：data_stage 推进，lifecycle_state 中的完善指标缓存清空
+    新版冻结/升版：活动版本原地保持 active，fork 出副本变 baseline/M。
+    - 副本携带：当前所有条目/链接快照 + lifecycle_state 快照，保留旧 data_stage
+    - 活动版本：
+        · same_stage=True 或 target_data_stage 为空 → data_stage 不变（仅 version_tag 自增）
+        · 否则 → data_stage 推进，lifecycle_state 完善指标缓存清空
     """
     from datetime import datetime, timezone
+    import re as _re
     with get_conn() as conn:
         with conn.cursor() as cur:
             # 1. 验证源版本存在且为 active
@@ -444,13 +449,26 @@ def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
                 raise HTTPException(404, f"版本 {gid} 不存在")
             src = dict(src)
             if src.get('status') != 'active':
-                raise HTTPException(400, f"只有 active 版本才能冻结（当前状态：{src.get('status')}）")
+                raise HTTPException(400, f"只有 active 版本才能升版（当前状态：{src.get('status')}）")
+
+            # 判断升版模式：同阶段仅版本号 / 推进到新 data_stage
+            same_stage = bool(body.same_stage) or not body.target_data_stage
+            current_stage = src.get('data_stage') or ''
+            new_stage = current_stage if same_stage else body.target_data_stage
 
             snap_gid   = str(next_gid())
             snap_status = 'M' if body.promote_to_m else 'baseline'
             now_iso    = datetime.now(timezone.utc).isoformat()
 
-            # 2. 创建快照副本（继承源版本字段，data_stage 保留当前阶段）
+            # 计算 change_note 默认值
+            if body.change_note:
+                change_note = body.change_note
+            elif same_stage:
+                change_note = f'升版（同阶段 {current_stage}）'
+            else:
+                change_note = f'升版 → {new_stage}'
+
+            # 2. 创建快照副本（继承源版本字段，data_stage 保留当前阶段，version_tag 保留旧值）
             cur.execute(f"""
                 INSERT INTO workmanship_bop_bop_versions
                   (gid, version_tag, bop_name, version_family_gid,
@@ -469,7 +487,7 @@ def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
                 FROM workmanship_bop_bop_versions WHERE gid=%s
             """, (
                 snap_gid, gid,
-                body.change_note or f'冻结切片 → {body.target_data_stage}',
+                change_note,
                 snap_status,
                 now_iso if body.promote_to_m else None,
                 gid
@@ -480,17 +498,29 @@ def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
             # 3. 复制条目和链接到副本（source_entry_gid 记录溯源）
             _copy_entries_and_links(cur, gid, snap_gid)
 
-            # 4. 原版本：推进 data_stage，清空完善指标缓存
+            # 4. 原版本：推进或保持 data_stage，version_tag 自增，清空完善指标缓存（仅推进时）
+            # version_tag 自增：V1 → V2、V02 → V03、纯数字 → +1
+            old_tag = src.get('version_tag') or 'V1'
+            m = _re.match(r'^([A-Za-z]*)(\d+)$', old_tag)
+            if m:
+                prefix, num = m.group(1), m.group(2)
+                width = len(num)
+                new_tag = f"{prefix}{str(int(num) + 1).zfill(width)}"
+            else:
+                new_tag = f"{old_tag}+1"
+
             cur.execute("SELECT lifecycle_state FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
             row2 = cur.fetchone()
-            ls   = dict(row2)['lifecycle_state'] or {}
-            # 清空 refine_stats 缓存（下轮重新计算），保留 init checklist
-            ls.pop('refine_stats', None)
+            ls = dict(row2)['lifecycle_state'] or {}
+            if not same_stage:
+                # 推进 data_stage 时，清空 refine_stats 缓存（保留 init checklist）
+                ls.pop('refine_stats', None)
+
             cur.execute("""
                 UPDATE workmanship_bop_bop_versions
-                SET data_stage=%s, lifecycle_state=%s, updated_at=NOW()
+                SET data_stage=%s, version_tag=%s, lifecycle_state=%s, updated_at=NOW()
                 WHERE gid=%s
-            """, (body.target_data_stage, json.dumps(ls), gid))
+            """, (new_stage, new_tag, json.dumps(ls), gid))
 
             # 5. 同步族群表 updated_at（如果族群表已建立）
             try:
@@ -506,9 +536,18 @@ def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
             return {
                 "snapshot_gid":    snap_gid,
                 "snapshot_status": snap_status,
-                "new_data_stage":  body.target_data_stage,
+                "new_data_stage":  new_stage,
+                "new_version_tag": new_tag,
+                "same_stage":      same_stage,
                 "snapshot":        snap_ver,
             }
+
+
+# 别名路由：语义更直观的"升版"入口（行为同 freeze-snapshot）
+@router.post("/versions/{gid}/promote", status_code=201)
+def promote_version(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
+    """升版别名 — 等同于 freeze-snapshot，便于前端语义化调用。"""
+    return freeze_snapshot(gid, body, _u)
 
 
 @router.post("/version-families/{family_gid}/archive", status_code=200)

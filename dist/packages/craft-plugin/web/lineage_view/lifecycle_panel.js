@@ -8,11 +8,16 @@
 
 const _LC_PHASE_LABELS = {
   init:          '新建',
-  refine:        '完善',
-  publish_cycle: '发布/更新',
+  // refine:        '完善',            // 暂注释：完善已并入"升版"
+  // publish_cycle: '发布/更新',       // 暂注释：发布/更新已并入"升版"
+  promote:       '升版',
+  snapshots:     '切片历史',
   archived:      '归档',
 };
-const _LC_PHASE_ORDER = ['init', 'refine', 'publish_cycle', 'archived'];
+const _LC_PHASE_ORDER = ['init', 'promote', 'snapshots', 'archived'];
+
+// 数据阶段序列（与后端一致，Pre-TG0→SOP）
+const _LC_DATA_STAGES = ['Pre-TG0','TG0','TG1','PreTG2','TG2','EP1','EP2','PPV','PP','P','SOP'];
 
 class BopLifecyclePanel {
   /**
@@ -188,7 +193,15 @@ class BopLifecyclePanel {
       this._data = await this._cf(
         `/api/bop/versions/${this._versionGid}/lifecycle`
       );
-      if (!this._viewPhase) this._viewPhase = this._data.lifecycle_phase;
+      // 兼容老 lifecycle_phase：refine/publish_cycle 视为 promote
+      let ph = this._data.lifecycle_phase;
+      if (ph && !_LC_PHASE_ORDER.includes(ph)) {
+        if (ph === 'refine' || ph === 'publish_cycle') ph = 'promote';
+        else ph = 'init';
+      }
+      if (!this._viewPhase || !_LC_PHASE_ORDER.includes(this._viewPhase)) {
+        this._viewPhase = ph || 'init';
+      }
       this._render();
     } catch (e) {
       if (this._mountEl) {
@@ -232,7 +245,13 @@ class BopLifecyclePanel {
   _renderPhaseBar(currentPhase) {
     const bar = document.createElement('div');
     bar.className = 'lv-lc-phase-bar';
-    const currentIdx = _LC_PHASE_ORDER.indexOf(currentPhase);
+    // 兼容老 lifecycle_phase：refine/publish_cycle 视为 promote
+    let cp = currentPhase;
+    if (cp && !_LC_PHASE_ORDER.includes(cp)) {
+      if (cp === 'refine' || cp === 'publish_cycle') cp = 'promote';
+      else cp = 'init';
+    }
+    const currentIdx = _LC_PHASE_ORDER.indexOf(cp);
 
     _LC_PHASE_ORDER.forEach((ph, i) => {
       const seg = document.createElement('div');
@@ -240,7 +259,7 @@ class BopLifecyclePanel {
       if (i < currentIdx) {
         seg.classList.add('done');
         seg.textContent = '✓ ' + _LC_PHASE_LABELS[ph];
-      } else if (ph === currentPhase) {
+      } else if (ph === cp) {
         seg.classList.add('active');
         seg.textContent = '▶ ' + _LC_PHASE_LABELS[ph];
       } else {
@@ -263,12 +282,166 @@ class BopLifecyclePanel {
     const card = document.createElement('div');
     card.className = 'lv-lc-card';
     switch (phase) {
-      case 'init':          card.appendChild(this._renderInitCard());    break;
-      case 'refine':        card.appendChild(this._renderRefineCard());  break;
-      case 'publish_cycle': card.appendChild(this._renderPublishCard()); break;
-      case 'archived':      card.appendChild(this._renderArchivedCard()); break;
+      case 'init':          card.appendChild(this._renderInitCard());         break;
+      // refine / publish_cycle 已注释，由 promote 替代
+      // case 'refine':        card.appendChild(this._renderRefineCard());  break;
+      // case 'publish_cycle': card.appendChild(this._renderPublishCard()); break;
+      case 'promote':       card.appendChild(this._renderPromoteCard());      break;
+      case 'snapshots':     card.appendChild(this._renderSnapshotsListCard()); break;
+      case 'archived':      card.appendChild(this._renderArchivedCard());    break;
     }
     return card;
+  }
+
+  // ── 升版卡片 ────────────────────────────────────────────────────────────
+  // 替代原"完善" + "发布/更新"两个 Tab：用户选择目标数据阶段（或本阶段仅升版本号）后，
+  // 调用后端 /promote（=freeze-snapshot 别名）创建快照副本 + 活动版本原地推进。
+  _renderPromoteCard() {
+    const frag = document.createDocumentFragment();
+    const d    = this._data || {};
+    const ver  = {
+      data_stage:  d.data_stage,
+      version_tag: d.version_tag,
+    };
+    const curStage = ver.data_stage || '';
+    const curTag   = ver.version_tag || '';
+    const stageIdx = _LC_DATA_STAGES.indexOf(curStage);
+
+    // 当前信息
+    const info = document.createElement('div');
+    info.style.cssText = 'font-size:12px;color:var(--text,#cdd6f4);margin-bottom:10px;line-height:1.6';
+    info.innerHTML =
+      `<div>当前版本：<b>${this._esc(curTag) || '—'}</b>` +
+      ` &nbsp;数据阶段：<b style="color:var(--blue,#89b4fa)">${this._esc(curStage) || '—'}</b></div>` +
+      `<div style="font-size:11px;color:var(--subtext0,#a6adc8);margin-top:4px">` +
+      `升版会把当前状态冻结为快照（保留旧 data_stage、用新 gid），活动版本 gid 不变。</div>`;
+    frag.appendChild(info);
+
+    // 目标数据阶段下拉
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'font-size:11px;color:var(--subtext0,#a6adc8);margin:8px 0 4px';
+    lbl.textContent = '目标数据阶段';
+    frag.appendChild(lbl);
+
+    const stageSel = document.createElement('select');
+    stageSel.style.cssText = 'width:100%;padding:6px 8px;font-size:12px;margin-bottom:12px';
+    stageSel.innerHTML = `<option value="">— 仅升版本号（保持 ${this._esc(curStage)}） —</option>` +
+      _LC_DATA_STAGES
+        .slice(stageIdx + 1)   // 只能选当前阶段之后
+        .map(s => `<option value="${s}">${s}</option>`).join('');
+    frag.appendChild(stageSel);
+
+    // change_note
+    const noteLbl = document.createElement('div');
+    noteLbl.style.cssText = 'font-size:11px;color:var(--subtext0,#a6adc8);margin:4px 0';
+    noteLbl.textContent = '变更备注（可选）';
+    frag.appendChild(noteLbl);
+    const noteInput = document.createElement('input');
+    noteInput.type = 'text';
+    noteInput.placeholder = '说明本次升版原因…';
+    noteInput.style.cssText = 'width:100%;padding:6px 8px;font-size:12px;margin-bottom:12px;box-sizing:border-box';
+    frag.appendChild(noteInput);
+
+    // 升版按钮
+    const btn = document.createElement('button');
+    btn.textContent = '升版';
+    btn.className = 'lv-lc-btn lv-lc-btn-primary';
+    btn.style.cssText = 'width:100%;padding:8px;font-size:13px;cursor:pointer';
+    btn.onclick = async () => {
+      const target = stageSel.value;
+      const sameStage = !target;
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = '升版中…';
+      try {
+        const resp = await this._cf(`/api/bop/versions/${this._versionGid}/promote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            target_data_stage: target || null,
+            same_stage: sameStage,
+            change_note: noteInput.value || null,
+            bump_version_tag: true,
+            promote_to_m: false,
+          }),
+        });
+        const msg = sameStage
+          ? `已升版至 ${resp.new_version_tag}（保留 ${resp.new_data_stage}）`
+          : `已升版至 ${resp.new_version_tag}（${resp.new_data_stage}）`;
+        this._toast?.(msg, 'ok');
+        await this._load();
+        if (this._onBopTreeChange) this._onBopTreeChange();
+      } catch (e) {
+        this._toast?.('升版失败: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    };
+    frag.appendChild(btn);
+    return frag;
+  }
+
+  // ── 切片历史卡片（独立 Tab）────────────────────────────────────────────
+  // 列出本版本族所有 baseline/M 快照，提供入口
+  _renderSnapshotsListCard() {
+    const frag = document.createDocumentFragment();
+    const d    = this._data || {};
+    const famGid = d.version_family_gid || this._versionGid;
+    const allVers = d.all_versions_in_family || [];
+
+    let snaps = [];
+    try {
+      snaps = allVers.filter(v =>
+        (v.version_family_gid || v.gid) === famGid &&
+        v.status !== 'active' && !v.archived_at
+      );
+    } catch {}
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'font-size:12px;color:var(--subtext0,#a6adc8);margin-bottom:8px';
+    hdr.textContent = `共 ${snaps.length} 个历史快照`;
+    frag.appendChild(hdr);
+
+    if (!snaps.length) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'font-size:12px;color:var(--overlay0,#6c7086);padding:10px 0';
+      empty.textContent = '暂无快照。升版时会自动保留快照。';
+      frag.appendChild(empty);
+      return frag;
+    }
+
+    snaps.forEach(s => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;' +
+        'border:1px solid var(--surface1,#313244);border-radius:6px;margin-bottom:6px;cursor:pointer';
+      const statusLbl = s.status === 'M' ? '发布' : (s.status === 'baseline' ? '基线' : s.status);
+      row.innerHTML =
+        `<span style="font-size:12px;font-weight:600;min-width:48px">${this._esc(s.version_tag || '')}</span>` +
+        `<span style="font-size:11px;padding:1px 5px;border-radius:3px;` +
+        `background:rgba(137,180,250,.15);color:var(--blue,#89b4fa)">${this._esc(s.data_stage || '')}</span>` +
+        `<span style="font-size:11px;padding:1px 5px;border-radius:3px;` +
+        `background:rgba(64,160,43,.12);color:var(--green,#40a02b)">${statusLbl}</span>` +
+        `<span style="font-size:10px;color:var(--subtext0,#a6adc8);margin-left:auto">` +
+        `${this._esc((s.change_note || '').slice(0, 30))}</span>`;
+      row.onclick = () => {
+        if (s.gid && confirm(`查看快照 ${s.version_tag}(${s.data_stage})?\n（历史快照为只读）`)) {
+          // 让宿主（lineage.js）通过版本切换菜单处理快照查看
+          if (this._onViewSnapshot) this._onViewSnapshot(s.gid);
+        }
+      };
+      row.onmouseenter = () => row.style.background = 'var(--surface1,#313244)';
+      row.onmouseleave = () => row.style.background = '';
+      frag.appendChild(row);
+    });
+    return frag;
+  }
+
+  // 简单 HTML 转义（避免重复依赖外部）
+  _esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
   }
 
   // ── 新建初版卡片（完整向导） ────────────────────────────────────────────
