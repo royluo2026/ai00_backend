@@ -481,14 +481,16 @@ def freeze_snapshot(gid: str, body: FreezeSnapshotBody, _u=Depends(_WRITE)):
                    maturity, takt_time, version_type, pbom_version_gid,
                    owner_gid, data_stage, parent_version_gid,
                    change_note, status, frozen_at, published_at,
-                   lifecycle_phase, lifecycle_state, meta, created_at, updated_at)
+                   lifecycle_phase, lifecycle_state, meta, visibility,
+                   created_at, updated_at)
                 SELECT
                   %s, version_tag, bop_name, version_family_gid,
                   project_gid, factory_gid, vehicle_model_gid,
                   maturity, takt_time, version_type, pbom_version_gid,
                   owner_gid, data_stage, %s,
                   %s, %s, NOW(), %s,
-                  lifecycle_phase, lifecycle_state, meta, NOW(), NOW()
+                  lifecycle_phase, lifecycle_state, meta, visibility,
+                  NOW(), NOW()
                 FROM workmanship_bop_bop_versions WHERE gid=%s
             """, (
                 snap_gid, gid,
