@@ -40,7 +40,7 @@ _ROLE_PERMISSIONS = {
                        "template.manage", "template.view",
                        "knowledge.manage", "knowledge.view",
                        "approval.submit", "feishu.view"},
-    "member":         {"project.view", "craft.write_draft", "craft.view",
+    "member":         {"project.view", "craft.write_direct", "craft.write_draft", "craft.view",
                        "rule.view", "template.view", "knowledge.view",
                        "approval.submit", "feishu.view"},
     "external":       {"external.view"},
@@ -54,7 +54,7 @@ _ORG_ROLE_PERMISSIONS = {
                     "rule.manage", "rule.view", "template.manage", "template.view",
                     "knowledge.manage", "knowledge.view",
                     "approval.submit", "approval.approve", "feishu.view"},
-    "member":      {"project.view", "craft.write_draft", "craft.view",
+    "member":      {"project.view", "craft.write_direct", "craft.write_draft", "craft.view",
                     "rule.view", "template.view", "knowledge.view",
                     "approval.submit", "feishu.view"},
     "external":    {"external.view"},
@@ -316,4 +316,3 @@ def build_profile(user: dict) -> dict:
         "grants":         grants,
         "visible_panels": _SETTINGS_VISIBILITY.get(role, ["appearance"]),
     }
-

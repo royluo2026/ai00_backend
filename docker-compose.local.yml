@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ai00_mysql_local
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ai00_local_root
+      MYSQL_DATABASE: ai00
+      MYSQL_USER: ai00
+      MYSQL_PASSWORD: ai00_local
+    ports:
+      - "3307:3306"          # 用 3307 避免与本机已有 MySQL 冲突
+    volumes:
+      - ai00_mysql_data:/var/lib/mysql
+      - ./backend/db/mysql_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ai00", "-pai00_local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ai00_mysql_data:

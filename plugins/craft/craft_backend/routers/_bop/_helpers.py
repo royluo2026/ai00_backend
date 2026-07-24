@@ -181,7 +181,8 @@ def _check_line_editable(cur, version_gid: str, entry_gid: str, user: dict, allo
     from backend.routers.deps import _get_user_grants, _derive_org_role
 
     org_role = user.get('org_role') or _derive_org_role(user.get('system_role', 'external'))
-    if org_role in ('super_admin', 'team_admin', 'project_admin'):
+    # 组织成员可编辑所有工艺流程图，不再受项目负责人或线体负责人范围限制。
+    if org_role in ('super_admin', 'member', 'team_admin', 'project_admin'):
         return
 
     cur.execute("SELECT project_gid FROM workmanship_bop_bop_versions WHERE gid=%s", (version_gid,))

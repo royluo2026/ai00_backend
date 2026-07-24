@@ -465,7 +465,8 @@ async function _loadLineGrants() {
     const verJson = await _cf(`/api/bop/versions/${_versionGid}`);
     const projectGid = verJson?.data?.project_gid || '';
     const orgRole = me?.data?.org_role || me?.data?.system_role || me?.org_role || me?.system_role || '';
-    if (orgRole === 'super_admin' || orgRole === 'team_admin' || orgRole === 'project_admin') return;
+    // 所有组织成员均可编辑全部线体，不再加载线体范围限制。
+    if (orgRole === 'super_admin' || orgRole === 'member' || orgRole === 'team_admin' || orgRole === 'project_admin') return;
     if (!projectGid) return;
     const permJson = await _cf(`/api/projects/${encodeURIComponent(projectGid)}/line-permissions`).catch(() => null);
     const editable = permJson?.data?.editable_line_gids || [];

@@ -721,10 +721,10 @@ class LayoutMode {
 
     const isDown = direction === 'down';
     const cardX  = sx + (LL_STATION_W - LL_RING_CARD_W) / 2;
-    // 工具框固定高度（3行），工序卡片需要避开它
+    // 资源框固定高度（3行），工序卡片需要避开它
     const _TOOL_BOX_H = 5 * 2 + 3 * 14 + 2 * 2 + 4;  // BOX_PAD*2 + 3*ROW_H + gaps + GAP
     const _hasTools = this._collectDeepByTypes(stationGid,
-      ['tool_factory','tool_need','fixture_factory','fixture_need']).length > 0;
+      ['equipment_factory','equipment_need','tool_factory','tool_need','fixture_factory','fixture_need']).length > 0;
 
     let Y = isDown
       ? sy + LL_STATION_H + LL_LAYER_GAP + (_hasTools ? _TOOL_BOX_H : 0)
@@ -814,27 +814,31 @@ class LayoutMode {
   }
 
   /**
-   * 渲染工位工具/工装清单框
+   * 渲染工位设备/工具/工装清单框
    * L 工位（direction='up'）→ 框在工位上方
    * R 工位（direction='down'）→ 框在工位下方
    */
   _renderStationToolBox(stationGid, parentEl, sx, sy, direction) {
     if (direction !== 'up' && direction !== 'down') return;
 
-    // 收集本工位子树里所有工具 / 工装节点
+    // 收集本工位子树里所有设备 / 工具 / 工装节点
+    const equipmentTypes = ['equipment_factory', 'equipment_need'];
     const toolTypes    = ['tool_factory', 'tool_need'];
     const fixtureTypes = ['fixture_factory', 'fixture_need'];
-    const allNodes = this._collectDeepByTypes(stationGid, [...toolTypes, ...fixtureTypes]);
+    const allNodes = this._collectDeepByTypes(stationGid, [...equipmentTypes, ...toolTypes, ...fixtureTypes]);
     if (allNodes.length === 0) return;
 
     // 按 title（型号）分组统计
-    const counts = new Map();  // title → { count, isFixture }
+    const counts = new Map();  // 类型 + title → { count, resourceType }
     for (const n of allNodes) {
-      const label = n.entity_data?.tool_spec || n.entity_data?.fixture_spec
+      const label = n.entity_data?.model_no || n.entity_data?.preferred_model
+        || n.entity_data?.tool_spec || n.entity_data?.fixture_spec
         || n.entity_data?.spec || n.title || '(未命名)';
-      const isFixture = fixtureTypes.includes(n.node_type);
-      const key = (isFixture ? '装:' : '具:') + label;
-      if (!counts.has(key)) counts.set(key, { label, count: 0, isFixture });
+      const resourceType = equipmentTypes.includes(n.node_type)
+        ? 'equipment'
+        : (fixtureTypes.includes(n.node_type) ? 'fixture' : 'tool');
+      const key = resourceType + ':' + label;
+      if (!counts.has(key)) counts.set(key, { label, count: 0, resourceType });
       counts.get(key).count++;
     }
 
@@ -864,17 +868,19 @@ class LayoutMode {
       box.style.top = (sy + LL_STATION_H + GAP) + 'px';
     }
 
-    for (const { label, count, isFixture } of rows) {
+    for (const { label, count, resourceType } of rows) {
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;gap:4px;height:14px;overflow:hidden';
 
       const typeBadge = document.createElement('span');
+      const badgeColors = { equipment: '#94e2d5', fixture: '#d3875a', tool: '#89dceb' };
+      const badgeLabels = { equipment: '设', fixture: '装', tool: '具' };
       typeBadge.style.cssText = [
-        `background:${isFixture ? '#d3875a' : '#89dceb'}`,
+        `background:${badgeColors[resourceType]}`,
         'color:#1e1e2e;font-size:8px;font-weight:700',
         'padding:0 3px;border-radius:2px;flex-shrink:0;line-height:14px',
       ].join(';');
-      typeBadge.textContent = isFixture ? '装' : '具';
+      typeBadge.textContent = badgeLabels[resourceType];
 
       const nameEl = document.createElement('span');
       nameEl.style.cssText = 'flex:1;font-size:9px;color:var(--text,#cdd6f4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';

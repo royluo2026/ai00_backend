@@ -240,7 +240,7 @@ function _resolveBackendBase(configBackendUrl = '') {
 const _ROLE_PERMS = {
   // 新 org_role 3值
   super_admin:    new Set(['project.view','craft.view','rule.view','template.view','knowledge.view','approval.submit','approval.approve','feishu.view','system.user.manage','system.tech_config','system.app_config']),
-  member:         new Set(['project.view','craft.view','rule.view','template.view','knowledge.view','approval.submit','feishu.view']),
+  member:         new Set(['project.view','craft.view','craft.write_direct','craft.write_draft','rule.view','template.view','knowledge.view','approval.submit','feishu.view']),
   external:       new Set(['external.view']),
   // 旧 7 角色别名（过渡期兼容，不报错）
   team_admin:     new Set(['project.view','craft.view','rule.view','template.view','knowledge.view','approval.submit','approval.approve','feishu.view','system.user.manage']),

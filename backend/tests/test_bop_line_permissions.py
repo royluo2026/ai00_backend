@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from plugins.craft.craft_backend.routers._bop import entries
+from plugins.craft.craft_backend.routers._bop import _helpers
 
 
 class FakeCursor:
@@ -65,6 +66,19 @@ class FakeGetConn:
 
 class DummyUser(dict):
     pass
+
+
+def test_member_can_edit_any_line_without_scope_lookup():
+    cursor = FakeCursor()
+
+    _helpers._check_line_editable(
+        cursor,
+        'ver-1',
+        'entry-1',
+        DummyUser(gid='user-1', org_role='member'),
+    )
+
+    assert cursor.executed == []
 
 
 def test_patch_entity_detail_checks_line_permission_with_version_and_entry(monkeypatch):
