@@ -54,7 +54,6 @@ const TREE_VALID_PARENTS = {
 
 // ── 关系分组配置 ──────────────────────────────────────────────────────────────
 const REL_GROUPS = [
-  { key: 'child',   name: '子节点',    ntType: 'process',           linkTypes: null },
   { key: 'pbom',    name: 'PBOM 零件', ntType: 'part',              linkTypes: ['pbom_part'] },
   { key: 'equip',   name: '设备',      ntType: 'equipment_factory', linkTypes: ['physical_equipment', 'project_equipment'] },
   { key: 'tool',    name: '工具',      ntType: 'tool_factory',      linkTypes: ['physical_tool', 'project_tools'] },
@@ -4063,17 +4062,14 @@ class LayoutDetailPanel {
       .filter(r => r.link_type_binding && r.show_in_detail !== false)
       .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99) || String(a.label_zh || a.name || '').localeCompare(String(b.label_zh || b.name || '')));
 
-    const groups = [
-      { key: 'child', name: '子节点', ntType: 'process', linkTypes: null, linkType: null },
-      ...relationConfigs.map(r => ({
-        key: `link:${r.link_type_binding}`,
-        name: r.label_zh || r.name || r.link_type_binding,
-        ntType: r.range_node_type || 'process',
-        linkTypes: [r.link_type_binding],
-        linkType: r.link_type_binding,
-        relation: r,
-      })),
-    ];
+    const groups = relationConfigs.map(r => ({
+      key: `link:${r.link_type_binding}`,
+      name: r.label_zh || r.name || r.link_type_binding,
+      ntType: r.range_node_type || 'process',
+      linkTypes: [r.link_type_binding],
+      linkType: r.link_type_binding,
+      relation: r,
+    }));
     this._currentRelGroups = groups;
 
     let html = '';

@@ -855,6 +855,11 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
         'equipment_need':   ('workmanship_bop_bop_equipments', 'project_equipment'),
         'fixture_need':     ('workmanship_bop_bop_fixtures',   'project_tooling'),
         'tool_need':        ('workmanship_bop_bop_tools',      'project_tools'),
+        # TC 零件既保留为树节点，也写入 PBOM 实体表，通过 pbom_part 显示为“装配零件”
+        'part':              ('workmanship_bop_pbom',           'pbom_part'),
+        'non_standard_part': ('workmanship_bop_pbom',           'pbom_part'),
+        'standard_part':     ('workmanship_bop_pbom',           'pbom_part'),
+        'support_material':  ('workmanship_bop_pbom',           'pbom_part'),
     }
 
     try:
@@ -875,11 +880,16 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
             try: return int(v)
             except (TypeError, ValueError): return default
 
+        def _safe_float(v, default=1.0):
+            try: return float(v)
+            except (TypeError, ValueError): return default
+
         rows = sorted(rows, key=lambda r: _safe_int(r.get('_level', 0)))
 
         with get_conn() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT project_gid, frozen_at FROM workmanship_bop_bop_versions WHERE gid=%s",
+                cur.execute("SELECT project_gid, frozen_at, pbom_version_gid, bop_name"
+                            " FROM workmanship_bop_bop_versions WHERE gid=%s",
                             (version_gid,))
                 ver = cur.fetchone()
                 if not ver:
@@ -887,6 +897,86 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                 if ver['frozen_at']:
                     raise HTTPException(403, "版本已冻结，不允许导入")
                 project_gid = ver['project_gid']
+                pbom_version_gid = ver.get('pbom_version_gid')
+
+                # PBOM 零件实体必须归属一个 PBOM 版本。TC 导入含零件且 BOP 尚未绑定
+                # PBOM 时，自动创建一个专用于本次导入的版本并回写绑定。
+                has_part_rows = any(r.get('node_type') in _PART_NODE_TYPES for r in rows)
+                if has_part_rows and not pbom_version_gid:
+                    pbom_version_gid = str(next_gid())
+                    pbom_name = f"{ver.get('bop_name') or 'BOP'} - TC导入零件"
+                    cur.execute(
+                        "INSERT INTO workmanship_bop_pbom_versions"
+                        " (gid, project_gid, version_tag, name, source_type, status, meta)"
+                        " VALUES (%s,%s,%s,%s,'tc','draft',%s)",
+                        (pbom_version_gid, project_gid, 'TC导入', pbom_name,
+                         json.dumps({'source_bop_version_gid': version_gid}, ensure_ascii=False)),
+                    )
+                    cur.execute(
+                        "UPDATE workmanship_bop_bop_versions SET pbom_version_gid=%s WHERE gid=%s",
+                        (pbom_version_gid, version_gid),
+                    )
+
+                # ── TC 同步：下线上一次 TC 导入生成的数据 ──────────────────
+                # 仅处理带 import_source=tc 标记的数据，不影响手工或其他来源节点。
+                cur.execute(
+                    "SELECT gid FROM workmanship_bop_bop_entries"
+                    " WHERE version_gid=%s AND is_deleted=FALSE"
+                    " AND JSON_UNQUOTE(JSON_EXTRACT(meta, '$.import_source'))='tc'",
+                    (version_gid,),
+                )
+                previous_tc_entry_gids = [r['gid'] for r in cur.fetchall()]
+                replaced = len(previous_tc_entry_gids)
+                if previous_tc_entry_gids:
+                    placeholders = ','.join(['%s'] * len(previous_tc_entry_gids))
+                    cur.execute(
+                        f"SELECT entity_gid, link_type FROM workmanship_bop_bop_entry_links"
+                        f" WHERE entry_gid IN ({placeholders}) AND deleted_at IS NULL",
+                        previous_tc_entry_gids,
+                    )
+                    previous_tc_links = [dict(r) for r in cur.fetchall()]
+
+                    # TC 自建的资源实体和 PBOM 实体随本批数据一起下线。
+                    tc_entity_tables = {
+                        'project_equipment': 'workmanship_bop_bop_equipments',
+                        'project_tooling': 'workmanship_bop_bop_fixtures',
+                        'project_tools': 'workmanship_bop_bop_tools',
+                    }
+                    for link_type, table_name in tc_entity_tables.items():
+                        entity_gids_for_type = [
+                            link['entity_gid'] for link in previous_tc_links
+                            if link['link_type'] == link_type
+                        ]
+                        if entity_gids_for_type:
+                            entity_placeholders = ','.join(['%s'] * len(entity_gids_for_type))
+                            cur.execute(
+                                f"UPDATE {table_name} SET is_deleted=TRUE, deleted_at=NOW()"
+                                f" WHERE gid IN ({entity_placeholders}) AND is_deleted=FALSE",
+                                entity_gids_for_type,
+                            )
+
+                    previous_part_gids = [
+                        link['entity_gid'] for link in previous_tc_links
+                        if link['link_type'] == 'pbom_part'
+                    ]
+                    if previous_part_gids:
+                        part_placeholders = ','.join(['%s'] * len(previous_part_gids))
+                        cur.execute(
+                            f"UPDATE workmanship_bop_pbom SET is_deleted=TRUE"
+                            f" WHERE gid IN ({part_placeholders}) AND is_deleted=FALSE",
+                            previous_part_gids,
+                        )
+
+                    cur.execute(
+                        f"UPDATE workmanship_bop_bop_entry_links SET deleted_at=NOW()"
+                        f" WHERE entry_gid IN ({placeholders}) AND deleted_at IS NULL",
+                        previous_tc_entry_gids,
+                    )
+                    cur.execute(
+                        f"UPDATE workmanship_bop_bop_entries SET is_deleted=TRUE, deleted_at=NOW()"
+                        f" WHERE gid IN ({placeholders}) AND is_deleted=FALSE",
+                        previous_tc_entry_gids,
+                    )
 
                 # ── 重复检测：加载该版本已有条目的字段指纹 ─────────────────
                 cur.execute(
@@ -929,14 +1019,19 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                 entity_gids = [str(next_gid()) for _ in rows]
                 link_gids   = [str(next_gid()) for _ in rows]
                 label_to_gid: dict = {}
+                part_label_to_entity_gid: dict = {}
                 for i, r in enumerate(rows):
                     lbl = r.get('bom_row_label') or r.get('label') or ''
                     if lbl:
                         label_to_gid[lbl] = entry_gids[i]
+                        if r.get('node_type') in _PART_NODE_TYPES:
+                            part_label_to_entity_gid[lbl] = entity_gids[i]
                         # 同时注册 "/" 前的短 ID（TC 格式：AS-000499138/00;1-...）
                         short = lbl.split('/')[0].strip()
                         if short and short != lbl:
                             label_to_gid.setdefault(short, entry_gids[i])
+                            if r.get('node_type') in _PART_NODE_TYPES:
+                                part_label_to_entity_gid.setdefault(short, entity_gids[i])
 
                 # ── 收集数据，批量 INSERT ─────────────────────────────────
                 entry_rows = []
@@ -1000,6 +1095,33 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                                 f" VALUES (%s,%s,%s,%s)",
                                 (ent_gid, project_gid, title, vpps)
                             )
+                        elif node_type in _PART_NODE_TYPES:
+                            parent_part_gid = None
+                            if parent_label:
+                                parent_part_gid = (
+                                    part_label_to_entity_gid.get(parent_label)
+                                    or part_label_to_entity_gid.get(parent_label.split('/')[0].strip())
+                                )
+                            part_vpps = r.get('vpps_part') or vpps
+                            cur.execute(
+                                "INSERT IGNORE INTO workmanship_bop_pbom"
+                                " (gid, snapshot_gid, part_no, title, quantity, parent_gid,"
+                                " vpps, vpps_desc, parent_vpps, parent_vpps_name,"
+                                " bom_row, bom_row_label, component_id, component_type,"
+                                " torque, torque_importance, ownership_user, level,"
+                                " catia_occurrence_name, vpps_source, meta)"
+                                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'tc',%s)",
+                                (ent_gid, pbom_version_gid,
+                                 r.get('bom_row_id') or r.get('bom_row_label') or title,
+                                 title, _safe_float(r.get('quantity')), parent_part_gid,
+                                 part_vpps, vpps_desc or '', r.get('parent_vpps') or '',
+                                 r.get('parent_vpps_name') or '', r.get('bom_row_label') or '',
+                                 r.get('bom_row_label') or '', r.get('bom_row_id') or '',
+                                 node_type, r.get('torque') or '',
+                                 r.get('torque_importance') or '', r.get('bom_row_owner') or '',
+                                 lv, r.get('catia_occurrence_name') or '',
+                                 json.dumps({'tc_node_type': node_type}, ensure_ascii=False))
+                            )
                         else:
                             cur.execute(
                                 f"INSERT IGNORE INTO {e_table}(gid, project_gid, title, vpps)"
@@ -1016,6 +1138,10 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         title, vpps, vpps_desc,
                         '', False, '', '',
                         parent_label,
+                        json.dumps({
+                            'import_source': 'tc',
+                            'tc_key': r.get('bom_row_id') or r.get('bom_row_label') or '',
+                        }, ensure_ascii=False),
                     ))
 
                     if entity_info:
@@ -1035,7 +1161,7 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         " sort_order, level, ai00_level,"
                         " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
                         " parent_bop_title, child_vpps, meta)"
-                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]','{}')",
+                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]',%s)",
                         entry_rows,
                     )
                 if link_rows:
@@ -1052,7 +1178,7 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
 
                 conn.commit()
                 _log.info("[import-tc] committed %d rows", len(created))
-                return {"count": len(created), "skipped": skipped}
+                return {"count": len(created), "skipped": skipped, "replaced": replaced}
 
     except HTTPException:
         raise
@@ -1953,5 +2079,3 @@ def rollback_entry_history(gid: str, log_gid: str, _u=Depends(_WRITE)):
             cur.execute(_ENTRY_BY_GID_SQL, (gid,))
             row = cur.fetchone()
             return {"ok": True, "entry": dict(row) if row else {}}
-
-
