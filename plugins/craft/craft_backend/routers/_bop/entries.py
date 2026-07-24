@@ -907,8 +907,9 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                     pbom_name = f"{ver.get('bop_name') or 'BOP'} - TC导入零件"
                     cur.execute(
                         "INSERT INTO workmanship_bop_pbom_versions"
-                        " (gid, project_gid, version_tag, name, source_type, status, meta)"
-                        " VALUES (%s,%s,%s,%s,'tc','draft',%s)",
+                        " (gid, project_gid, version_tag, name, source_type, status, meta,"
+                        " visibility, shared_team_gid, shared_project_gid)"
+                        " VALUES (%s,%s,%s,%s,'tc','draft',%s,'project',NULL,NULL)",
                         (pbom_version_gid, project_gid, 'TC导入', pbom_name,
                          json.dumps({'source_bop_version_gid': version_gid}, ensure_ascii=False)),
                     )
@@ -1065,8 +1066,9 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                             cur.execute(
                                 "INSERT IGNORE INTO workmanship_bop_bop_steps "
                                 "(gid, project_gid, title, vpps, vpps_desc,"
-                                " operation_code, vpps_part, part_feed)"
-                                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+                                " operation_code, vpps_part, part_feed, version_no, params, ext,"
+                                " is_deleted, is_archived)"
+                                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'01',JSON_OBJECT(),JSON_OBJECT(),FALSE,FALSE)",
                                 (ent_gid, project_gid, title, vpps, vpps_desc,
                                  r.get('operation_code', ''),
                                  r.get('vpps_part', ''), r.get('part_feed', False))
@@ -1075,8 +1077,9 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                             cur.execute(
                                 "INSERT IGNORE INTO workmanship_bop_bop_operator "
                                 "(gid, project_gid, title, vpps, role_type,"
-                                " factory_role_ref_gid, headcount)"
-                                " VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                                " factory_role_ref_gid, headcount, version_no, ext,"
+                                " is_deleted, is_archived)"
+                                " VALUES (%s,%s,%s,%s,%s,%s,%s,'01',JSON_OBJECT(),FALSE,FALSE)",
                                 (ent_gid, project_gid, title, vpps,
                                  r.get('role_type', ''),
                                  r.get('factory_role_ref_gid') or None,
@@ -1085,14 +1088,17 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         elif node_type == 'process':
                             cur.execute(
                                 "INSERT IGNORE INTO workmanship_bop_bop_process"
-                                "(gid, project_gid, bop_version_gid, name, vpps, vpps_desc)"
-                                " VALUES (%s,%s,%s,%s,%s,%s)",
+                                "(gid, project_gid, bop_version_gid, name, vpps, vpps_desc,"
+                                " version_no, vpps_part, part_feed, params, ext, is_deleted, is_archived)"
+                                " VALUES (%s,%s,%s,%s,%s,%s,'01','',FALSE,JSON_OBJECT(),JSON_OBJECT(),FALSE,FALSE)",
                                 (ent_gid, project_gid, version_gid, title, vpps, vpps_desc)
                             )
                         elif node_type in ('equipment_need', 'fixture_need', 'tool_need'):
                             cur.execute(
-                                f"INSERT IGNORE INTO {e_table}(gid, project_gid, title, vpps)"
-                                f" VALUES (%s,%s,%s,%s)",
+                                f"INSERT IGNORE INTO {e_table}"
+                                f" (gid, project_gid, title, vpps, version_no, quantity, status,"
+                                f" ext, is_deleted, is_archived)"
+                                f" VALUES (%s,%s,%s,%s,'01',1,'pending',JSON_OBJECT(),FALSE,FALSE)",
                                 (ent_gid, project_gid, title, vpps)
                             )
                         elif node_type in _PART_NODE_TYPES:
@@ -1109,8 +1115,8 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                                 " vpps, vpps_desc, parent_vpps, parent_vpps_name,"
                                 " bom_row, bom_row_label, component_id, component_type,"
                                 " torque, torque_importance, ownership_user, level,"
-                                " catia_occurrence_name, vpps_source, meta)"
-                                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'tc',%s)",
+                                " catia_occurrence_name, unit, vpps_source, is_deleted, meta)"
+                                " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'pcs','tc',FALSE,%s)",
                                 (ent_gid, pbom_version_gid,
                                  r.get('bom_row_id') or r.get('bom_row_label') or title,
                                  title, _safe_float(r.get('quantity')), parent_part_gid,
@@ -1124,8 +1130,9 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                             )
                         else:
                             cur.execute(
-                                f"INSERT IGNORE INTO {e_table}(gid, project_gid, title, vpps)"
-                                f" VALUES (%s,%s,%s,%s)",
+                                f"INSERT IGNORE INTO {e_table}"
+                                f" (gid, project_gid, title, vpps, version_no, ext, is_deleted, is_archived)"
+                                f" VALUES (%s,%s,%s,%s,'01',JSON_OBJECT(),FALSE,FALSE)",
                                 (ent_gid, project_gid, title, vpps)
                             )
                     else:
@@ -1160,15 +1167,16 @@ def import_tc_entries(version_gid: str, body: ImportTcBody, _u=Depends(_WRITE)):
                         "(gid, version_gid, parent_gid, node_type,"
                         " sort_order, level, ai00_level,"
                         " title, vpps, vpps_desc, vpps_part, part_feed, catia_occurrence_name, parent_vpps_name,"
-                        " parent_bop_title, child_vpps, meta)"
-                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]',%s)",
+                        " parent_bop_title, child_vpps, meta, is_deleted, is_archived)"
+                        " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'[]',%s,FALSE,FALSE)",
                         entry_rows,
                     )
                 if link_rows:
                     cur.executemany(
                         "INSERT INTO workmanship_bop_bop_entry_links"
-                        "(gid, version_gid, entry_gid, entity_gid, link_type, is_primary)"
-                        " VALUES (%s,%s,%s,%s,%s,TRUE)",
+                        "(gid, version_gid, entry_gid, entity_gid, link_type, is_primary,"
+                        " is_inherited, is_deleted, is_archived)"
+                        " VALUES (%s,%s,%s,%s,%s,TRUE,FALSE,FALSE,FALSE)",
                         link_rows,
                     )
 
