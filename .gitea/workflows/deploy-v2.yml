@@ -22,13 +22,15 @@ jobs:
           path: workmanship-web
           token: ${{ secrets.CROSS_REPO_TOKEN }}
 
+      - name: Install frontend dependencies
+        shell: cmd
+        working-directory: workmanship-web
+        run: npm ci --ignore-scripts
+
       - name: Build frontend
         shell: cmd
         working-directory: workmanship-web
-        run: |
-          if exist "node_modules" rmdir /s /q node_modules
-          npm ci --ignore-scripts
-          npm run build:web
+        run: npm run build:web
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
