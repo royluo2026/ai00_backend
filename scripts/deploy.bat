@@ -26,11 +26,29 @@ echo [5/6] configure and restart service
 nssm set AI00Backend-V2 AppEnvironmentExtra "ENV_FILE=E:\projects\ai00-v2\backend\.env.v2.runtime" "PYTHONIOENCODING=utf-8"
 if errorlevel 1 exit /b !ERRORLEVEL!
 nssm restart AI00Backend-V2
-if errorlevel 1 exit /b !ERRORLEVEL!
+if errorlevel 1 (
+  echo Normal restart failed; recovering only AI00Backend-V2.
+  set SERVICE_PID=
+  for /f "tokens=3" %%P in ('sc queryex AI00Backend-V2 ^| findstr /R /C:"PID *:"') do set SERVICE_PID=%%P
+  if not defined SERVICE_PID exit /b 1
+  if "!SERVICE_PID!"=="0" exit /b 1
+  taskkill /PID !SERVICE_PID! /F
+  if errorlevel 1 exit /b !ERRORLEVEL!
+  timeout /t 2 /nobreak >nul
+  nssm start AI00Backend-V2
+  if errorlevel 1 exit /b !ERRORLEVEL!
+)
 
 echo [6/6] health check
-timeout /t 15 /nobreak >nul
-curl -fsS http://127.0.0.1:8082/health
+set HEALTH_OK=
+for /L %%I in (1,1,12) do (
+  curl -fsS --max-time 5 http://127.0.0.1:8082/health >nul 2>&1 && set HEALTH_OK=1 && goto health_ready
+  timeout /t 5 /nobreak >nul
+)
+exit /b 1
+
+:health_ready
+curl -fsS --max-time 5 http://127.0.0.1:8082/health
 if errorlevel 1 exit /b !ERRORLEVEL!
 
 echo ALL DONE
