@@ -35,6 +35,9 @@ from pydantic import BaseModel
 from backend.db.connection import get_conn
 from backend.routers.deps import get_current_user
 from backend.utils.gid import next_gid
+from plugins.craft.craft_backend.public import (
+    ontology_class, ontology_class_labels, ontology_properties, upsert_external_bop_entries,
+)
 
 router = APIRouter(tags=["ext-datasource"])
 _log = logging.getLogger(__name__)
@@ -176,6 +179,23 @@ def _gid() -> str:
     return str(next_gid())
 
 
+
+def _enrich_mapping_classes(rows: list[dict]) -> list[dict]:
+    labels = ontology_class_labels(row.get("onto_class_gid") for row in rows)
+    for row in rows:
+        row["class_label"] = labels.get(str(row.get("onto_class_gid")))
+    return rows
+
+
+def _enrich_field_properties(rows: list[dict]) -> list[dict]:
+    properties = ontology_properties(row.get("onto_property_gid") for row in rows)
+    for row in rows:
+        prop = properties.get(str(row.get("onto_property_gid")), {})
+        row["prop_name"] = prop.get("name")
+        row["prop_label"] = prop.get("label_zh")
+        row["storage_hint"] = prop.get("storage_hint")
+    return rows
+
 def _ds_row(r: dict) -> dict:
     d = dict(r)
     d.pop("password_enc", None)  # 不返回加密密码
@@ -311,11 +331,11 @@ def list_mappings(datasource_gid: Optional[str] = Query(None), _u=Depends(get_cu
     with get_conn() as conn:
         with conn.cursor() as cur:
             if datasource_gid:
-                cur.execute("SELECT m.*, c.label_zh AS class_label FROM workmanship_int_ext_mappings m LEFT JOIN workmanship_onto_classes c ON c.gid=m.onto_class_gid WHERE m.datasource_gid=%s ORDER BY m.created_at", (datasource_gid,))
+                cur.execute("SELECT m.* FROM workmanship_int_ext_mappings m WHERE m.datasource_gid=%s ORDER BY m.created_at", (datasource_gid,))
             else:
-                cur.execute("SELECT m.*, c.label_zh AS class_label FROM workmanship_int_ext_mappings m LEFT JOIN workmanship_onto_classes c ON c.gid=m.onto_class_gid ORDER BY m.created_at")
+                cur.execute("SELECT m.* FROM workmanship_int_ext_mappings m ORDER BY m.created_at")
             rows = [dict(r) for r in cur.fetchall()]
-    return {"data": rows}
+    return {"data": _enrich_mapping_classes(rows)}
 
 
 @router.post("/api/ext-mappings", status_code=201)
@@ -330,9 +350,9 @@ def create_mapping(body: MappingBody, _u=Depends(get_current_user)):
                  body.filter_sql, body.unique_key_col, _u.get("gid",""))
             )
             conn.commit()
-            cur.execute("SELECT m.*, c.label_zh AS class_label FROM workmanship_int_ext_mappings m LEFT JOIN workmanship_onto_classes c ON c.gid=m.onto_class_gid WHERE m.gid=%s", (gid,))
+            cur.execute("SELECT m.* FROM workmanship_int_ext_mappings m WHERE m.gid=%s", (gid,))
             row = cur.fetchone()
-    return {"data": dict(row)}
+    return {"data": _enrich_mapping_classes([dict(row)])[0]}
 
 
 @router.patch("/api/ext-mappings/{gid}")
@@ -346,9 +366,9 @@ def update_mapping(gid: str, body: dict, _u=Depends(get_current_user)):
         with conn.cursor() as cur:
             cur.execute(f"UPDATE workmanship_int_ext_mappings SET {sets} WHERE gid=%s", list(data.values()) + [gid])
             conn.commit()
-            cur.execute("SELECT m.*, c.label_zh AS class_label FROM workmanship_int_ext_mappings m LEFT JOIN workmanship_onto_classes c ON c.gid=m.onto_class_gid WHERE m.gid=%s", (gid,))
+            cur.execute("SELECT m.* FROM workmanship_int_ext_mappings m WHERE m.gid=%s", (gid,))
             row = cur.fetchone()
-    return {"data": dict(row)}
+    return {"data": _enrich_mapping_classes([dict(row)])[0]}
 
 
 @router.delete("/api/ext-mappings/{gid}", status_code=204)
@@ -429,108 +449,73 @@ def execute_import(gid: str, _u=Depends(get_current_user)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT m.*, d.db_type, d.host, d.port, d.database, d.username, d.password_enc, "
-                "c.node_type_binding "
-                "FROM workmanship_int_ext_mappings m "
-                "JOIN workmanship_int_ext_datasources d ON d.gid=m.datasource_gid "
-                "JOIN workmanship_onto_classes c ON c.gid=m.onto_class_gid "
-                "WHERE m.gid=%s", (gid,))
+                "SELECT m.*,d.db_type,d.host,d.port,d.database,d.username,d.password_enc "
+                "FROM workmanship_int_ext_mappings m JOIN workmanship_int_ext_datasources d ON d.gid=m.datasource_gid "
+                "WHERE m.gid=%s",
+                (gid,),
+            )
             mapping = cur.fetchone()
             if not mapping:
                 raise HTTPException(404)
             mapping = dict(mapping)
-            cur.execute("SELECT fm.*, p.name AS prop_name, p.storage_hint FROM workmanship_int_ext_field_mappings fm LEFT JOIN workmanship_onto_properties p ON p.gid=fm.onto_property_gid WHERE fm.mapping_gid=%s AND fm.is_ignored=FALSE ORDER BY fm.sort_order", (gid,))
-            field_maps = [dict(r) for r in cur.fetchall()]
+            cur.execute(
+                "SELECT fm.* FROM workmanship_int_ext_field_mappings fm "
+                "WHERE fm.mapping_gid=%s AND fm.is_ignored=FALSE ORDER BY fm.sort_order",
+                (gid,),
+            )
+            field_maps = _enrich_field_properties([dict(row) for row in cur.fetchall()])
 
-    node_type = mapping.get("node_type_binding")
+    class_info = ontology_class(mapping["onto_class_gid"])
+    node_type = class_info.get("node_type_binding") if class_info else None
     if not node_type:
         raise HTTPException(400, "本体类未绑定 node_type，无法导入")
 
-    # 读取外部数据
     try:
         ext = _make_ext_conn(mapping)
         where = f"WHERE {mapping['filter_sql']}" if mapping.get("filter_sql") else ""
         cur2 = ext.cursor()
         cur2.execute(f"SELECT * FROM {mapping['ext_table']} {where}")
-        cols = [d[0] for d in cur2.description]
-        raw_rows = [dict(zip(cols, r)) for r in cur2.fetchall()]
+        cols = [desc[0] for desc in cur2.description]
+        raw_rows = [dict(zip(cols, row)) for row in cur2.fetchall()]
         ext.close()
-    except Exception as e:
-        raise HTTPException(400, f"读取外部数据失败：{e}")
+    except Exception as exc:
+        raise HTTPException(400, f"读取外部数据失败：{exc}") from exc
 
-    imported = updated = skipped = 0
-    errors = []
-    unique_col = mapping.get("unique_key_col")
+    bop_rows: list[dict] = []
+    for raw in raw_rows:
+        bop_fields: dict = {"node_type": node_type}
+        meta_fields: dict = {}
+        for field_map in field_maps:
+            value = raw.get(field_map["ext_column"])
+            if field_map.get("transform_expr"):
+                value = _safe_transform(field_map["transform_expr"], value)
+            if value is None:
+                continue
+            if field_map["target_type"] == "bop_field" and field_map.get("bop_field"):
+                bop_fields[field_map["bop_field"]] = value
+            elif field_map.get("prop_name"):
+                if field_map.get("storage_hint") == "entity_table":
+                    bop_fields[field_map["prop_name"]] = value
+                else:
+                    meta_fields[field_map["prop_name"]] = value
+        bop_fields["meta"] = meta_fields
+        bop_rows.append(bop_fields)
 
+    unique_bop_field = None
+    if mapping.get("unique_key_col"):
+        unique_bop_field = next(
+            (fm.get("bop_field") for fm in field_maps if fm["ext_column"] == mapping["unique_key_col"]),
+            None,
+        )
+    result = upsert_external_bop_entries(node_type, bop_rows, unique_bop_field)
     with get_conn() as conn:
         with conn.cursor() as cur:
-            for raw in raw_rows:
-                try:
-                    bop_fields: dict = {"node_type": node_type}
-                    meta_fields: dict = {}
-
-                    for fm in field_maps:
-                        col  = fm["ext_column"]
-                        val  = raw.get(col)
-                        val  = _safe_transform(fm.get("transform_expr",""), val) if fm.get("transform_expr") else val
-                        if val is None:
-                            continue
-                        if fm["target_type"] == "bop_field" and fm.get("bop_field"):
-                            bop_fields[fm["bop_field"]] = val
-                        elif fm.get("prop_name"):
-                            if fm.get("storage_hint") == "entity_table":
-                                bop_fields[fm["prop_name"]] = val  # 暂存，导入后再 patch 实体表
-                            else:
-                                meta_fields[fm["prop_name"]] = val
-
-                    bop_fields["meta"] = meta_fields
-
-                    # 按唯一键去重
-                    existing_gid = None
-                    if unique_col and unique_col in raw:
-                        uk_val = raw[unique_col]
-                        bop_key = next((fm["bop_field"] for fm in field_maps if fm["ext_column"] == unique_col and fm.get("bop_field")), None)
-                        if bop_key == "vpps":
-                            cur.execute("SELECT gid FROM workmanship_bop_bop_entries WHERE vpps=%s AND node_type=%s LIMIT 1", (str(uk_val), node_type))
-                            row = cur.fetchone()
-                            if row:
-                                existing_gid = row["gid"]
-
-                    import json
-                    if existing_gid:
-                        # 更新
-                        sets_data = {}
-                        for k, v in bop_fields.items():
-                            if k not in ("node_type",) and v is not None:
-                                sets_data[k] = json.dumps(v) if k == "meta" else v
-                        if sets_data:
-                            sets = ", ".join(f"{k}=%s" for k in sets_data) + ", updated_at=NOW()"
-                            cur.execute(f"UPDATE workmanship_bop_bop_entries SET {sets} WHERE gid=%s", list(sets_data.values()) + [existing_gid])
-                        updated += 1
-                    else:
-                        # 新建
-                        new_gid = _gid()
-                        title = bop_fields.get("title", "")
-                        vpps  = bop_fields.get("vpps", "")
-                        seq   = bop_fields.get("seq_no") or 0
-                        meta  = json.dumps(bop_fields.get("meta", {}))
-                        cur.execute(
-                            "INSERT INTO workmanship_bop_bop_entries(gid,node_type,title,vpps,seq_no,meta,ai00_level)"
-                            " VALUES (%s,%s,%s,%s,%s,%s,%s)",
-                            (new_gid, node_type, title, vpps, seq, meta, 5)
-                        )
-                        imported += 1
-                except Exception as row_err:
-                    errors.append(str(row_err))
-                    skipped += 1
-
             cur.execute(
-                "UPDATE workmanship_int_ext_mappings SET last_import_at=NOW(), last_import_count=%s WHERE gid=%s",
-                (imported + updated, gid)
+                "UPDATE workmanship_int_ext_mappings SET last_import_at=NOW(),last_import_count=%s WHERE gid=%s",
+                (result["imported"] + result["updated"], gid),
             )
-            conn.commit()
-
-    return {"imported": imported, "updated": updated, "skipped": skipped, "errors": errors[:10]}
+        conn.commit()
+    return result
 
 
 # ── 字段映射 ──────────────────────────────────────────────────────────────────
@@ -539,15 +524,9 @@ def execute_import(gid: str, _u=Depends(get_current_user)):
 def list_field_mappings(mapping_gid: str = Query(...), _u=Depends(get_current_user)):
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT fm.*, p.name AS prop_name, p.label_zh AS prop_label, p.storage_hint "
-                "FROM workmanship_int_ext_field_mappings fm "
-                "LEFT JOIN workmanship_onto_properties p ON p.gid=fm.onto_property_gid "
-                "WHERE fm.mapping_gid=%s ORDER BY fm.sort_order",
-                (mapping_gid,)
-            )
+            cur.execute("SELECT fm.* FROM workmanship_int_ext_field_mappings fm WHERE fm.mapping_gid=%s ORDER BY fm.sort_order", (mapping_gid,))
             rows = [dict(r) for r in cur.fetchall()]
-    return {"data": rows}
+    return {"data": _enrich_field_properties(rows)}
 
 
 class FieldMappingItem(BaseModel):

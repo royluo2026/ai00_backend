@@ -8,21 +8,65 @@ prefix: /api/knowledge_hub
 import json
 from typing import Optional, Any
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import BaseModel
 
 from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user
+from backend.routers.deps import build_profile, get_current_user
 from backend.utils.gid import next_gid
+from plugins.craft.craft_backend.public import append_item_history, list_item_history
 
 router = APIRouter(prefix="/api/knowledge_hub", tags=["knowledge_hub"])
 
+def _permissions(user: dict) -> set[str]:
+    return set(build_profile(user).get("permissions", []))
+
+
+def _current_team(user: dict) -> str:
+    return str(user.get("team_id") or "")
+
+
+def _normalize_scope(scope_type: str, requested_team: str | None, user: dict) -> tuple[str, str | None]:
+    scope = str(scope_type or "personal")
+    if scope not in {"personal", "team", "public"}:
+        raise HTTPException(status_code=400, detail="invalid knowledge scope")
+    if scope == "team":
+        team = _current_team(user)
+        if not team or (requested_team and requested_team != team):
+            raise HTTPException(status_code=403, detail="cannot access another team knowledge scope")
+        return scope, team
+    return scope, None
+
+
+def _assert_mutable(row: dict, user: dict) -> None:
+    scope = str(row.get("scope_type") or "personal")
+    uid = str(user.get("gid") or "")
+    if scope == "personal" and str(row.get("creator_gid") or "") == uid:
+        return
+    if scope == "team" and str(row.get("team_gid") or "") == _current_team(user):
+        if str(row.get("creator_gid") or "") == uid or "knowledge.manage" in _permissions(user):
+            return
+    if scope == "public" and "knowledge.manage" in _permissions(user):
+        return
+    raise HTTPException(status_code=403, detail="knowledge item is not writable by current user")
+
+
+def _visible_predicate(alias: str, user: dict) -> tuple[str, list[str]]:
+    return (
+        f"({alias}.scope_type='public' OR ({alias}.scope_type='personal' AND {alias}.creator_gid=%s) "
+        f"OR ({alias}.scope_type='team' AND {alias}.team_gid=%s AND {alias}.team_gid<>''))",
+        [str(user.get("gid") or ""), _current_team(user)],
+    )
+
 
 # ── Pydantic Models ────────────────────────────────────────────────────────────
+def _field_was_set(model: BaseModel, name: str) -> bool:
+    fields = getattr(model, "model_fields_set", getattr(model, "__fields_set__", set()))
+    return name in fields
 
 class FolderCreate(BaseModel):
     parent_gid: Optional[str] = None
-    scope_type: str = 'public'   # public | team
+    scope_type: str = 'personal'   # personal | public | team
     team_gid:   Optional[str] = None
     name:       str = '新建文件夹'
     sort_order: int = 0
@@ -36,7 +80,7 @@ class FolderPatch(BaseModel):
 
 class ItemCreate(BaseModel):
     folder_gid:   Optional[str] = None
-    scope_type:   str = 'public'
+    scope_type:   str = 'personal'
     team_gid:     Optional[str] = None
     item_type:    str = 'richtext'
     title:        str = '未命名文档'
@@ -70,55 +114,81 @@ class ItemPatch(BaseModel):
 @router.get("/folders")
 def list_folders(
     scope_type: Optional[str] = Query(None),
-    team_gid:   Optional[str] = Query(None),
-    current_user = Depends(get_current_user),
+    team_gid: Optional[str] = Query(None),
+    current_user=Depends(get_current_user),
 ):
     with get_conn() as conn:
         cur = conn.cursor()
-        conditions = ["1=1"]
-        params = []
+        visible, params = _visible_predicate("f", current_user)
+        conditions = [visible]
         if scope_type:
-            conditions.append("scope_type = %s")
-            params.append(scope_type)
-        if team_gid:
-            conditions.append("team_gid = %s")
-            params.append(team_gid)
+            normalized_scope, normalized_team = _normalize_scope(scope_type, team_gid, current_user)
+            conditions.append("f.scope_type=%s")
+            params.append(normalized_scope)
+            if normalized_scope == "team":
+                conditions.append("f.team_gid=%s")
+                params.append(normalized_team or "")
         cur.execute(
-            f"SELECT * FROM workmanship_know_folders WHERE {' AND '.join(conditions)} ORDER BY sort_order, created_at",
-            params
+            f"SELECT * FROM workmanship_know_folders f WHERE {' AND '.join(conditions)} "
+            "ORDER BY sort_order,created_at",
+            params,
         )
-        rows = cur.fetchall()
-        return [dict(r) for r in rows]
-
+        return [dict(row) for row in cur.fetchall()]
 
 @router.post("/folders")
-def create_folder(body: FolderCreate, current_user = Depends(get_current_user)):
-    from backend.utils.gid import next_gid
+def create_folder(body: FolderCreate, current_user=Depends(get_current_user)):
+    scope, team_gid = _normalize_scope(body.scope_type, body.team_gid, current_user)
+    if scope == "public" and "knowledge.manage" not in _permissions(current_user):
+        raise HTTPException(status_code=403, detail="public knowledge requires knowledge.manage")
     gid = str(next_gid())
     with get_conn() as conn:
         cur = conn.cursor()
+        if body.parent_gid:
+            cur.execute("SELECT * FROM workmanship_know_folders WHERE gid=%s", (body.parent_gid,))
+            parent = cur.fetchone()
+            if not parent:
+                raise HTTPException(status_code=404, detail="parent folder not found")
+            _assert_mutable(dict(parent), current_user)
+            if parent["scope_type"] != scope or str(parent.get("team_gid") or "") != str(team_gid or ""):
+                raise HTTPException(status_code=400, detail="parent folder scope mismatch")
         cur.execute(
-            """INSERT INTO workmanship_know_folders
-               (gid, parent_gid, scope_type, team_gid, name, sort_order, creator_gid, created_at, updated_at)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
-            (gid, body.parent_gid, body.scope_type, body.team_gid,
-             body.name, body.sort_order, current_user["gid"])
+            "INSERT INTO workmanship_know_folders "
+            "(gid,parent_gid,scope_type,team_gid,name,sort_order,creator_gid,created_at,updated_at) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,NOW(),NOW())",
+            (gid, body.parent_gid, scope, team_gid, body.name, body.sort_order, current_user["gid"]),
         )
         conn.commit()
-        cur.execute("SELECT * FROM workmanship_know_folders WHERE gid = %s", (gid,))
-        row = cur.fetchone()
-        return dict(row)
-
+        cur.execute("SELECT * FROM workmanship_know_folders WHERE gid=%s", (gid,))
+        return dict(cur.fetchone())
 
 @router.patch("/folders/{gid}")
 def patch_folder(gid: str, body: FolderPatch, current_user = Depends(get_current_user)):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM workmanship_know_folders WHERE gid=%s", (gid,))
+            existing = cur.fetchone()
+    if not existing:
+        raise HTTPException(status_code=404, detail="folder not found")
+    _assert_mutable(dict(existing), current_user)
+    if _field_was_set(body, "parent_gid") and body.parent_gid is not None:
+        if body.parent_gid == gid:
+            raise HTTPException(status_code=400, detail="folder cannot be its own parent")
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM workmanship_know_folders WHERE gid=%s", (body.parent_gid,))
+                parent = cur.fetchone()
+        if not parent:
+            raise HTTPException(status_code=404, detail="parent folder not found")
+        _assert_mutable(dict(parent), current_user)
+        if parent["scope_type"] != existing["scope_type"] or str(parent.get("team_gid") or "") != str(existing.get("team_gid") or ""):
+            raise HTTPException(status_code=400, detail="parent folder scope mismatch")
     sets = []
     params = []
     if body.name is not None:
         sets.append("name = %s"); params.append(body.name)
     if body.sort_order is not None:
         sets.append("sort_order = %s"); params.append(body.sort_order)
-    if body.parent_gid is not None:
+    if _field_was_set(body, "parent_gid"):
         sets.append("parent_gid = %s"); params.append(body.parent_gid)
     if not sets:
         return {"success": True}
@@ -132,29 +202,44 @@ def patch_folder(gid: str, body: FolderPatch, current_user = Depends(get_current
 
 
 @router.delete("/folders/{gid}")
-def delete_folder(gid: str, current_user = Depends(get_current_user)):
+def delete_folder(gid: str, current_user=Depends(get_current_user)):
     with get_conn() as conn:
         cur = conn.cursor()
-        # 递归删除子文件夹（PostgreSQL 不支持直接递归 DELETE，用 CTE）
-        cur.execute("""
-            WITH RECURSIVE sub AS (
-              SELECT gid FROM workmanship_know_folders WHERE gid = %s
-              UNION ALL
-              SELECT f.gid FROM workmanship_know_folders f INNER JOIN sub s ON f.parent_gid = s.gid
+        cur.execute("SELECT * FROM workmanship_know_folders WHERE gid=%s", (gid,))
+        root = cur.fetchone()
+        if not root:
+            raise HTTPException(status_code=404, detail="folder not found")
+        _assert_mutable(dict(root), current_user)
+        folder_gids = [gid]
+        frontier = [gid]
+        while frontier:
+            placeholders = ",".join(["%s"] * len(frontier))
+            cur.execute(
+                f"SELECT * FROM workmanship_know_folders WHERE parent_gid IN ({placeholders})",
+                frontier,
             )
-            DELETE FROM workmanship_know_items WHERE folder_gid IN (SELECT gid FROM sub)
-        """, (gid,))
-        cur.execute("""
-            WITH RECURSIVE sub AS (
-              SELECT gid FROM workmanship_know_folders WHERE gid = %s
-              UNION ALL
-              SELECT f.gid FROM workmanship_know_folders f INNER JOIN sub s ON f.parent_gid = s.gid
-            )
-            DELETE FROM workmanship_know_folders WHERE gid IN (SELECT gid FROM sub)
-        """, (gid,))
+            children = [dict(row) for row in cur.fetchall()]
+            for child in children:
+                _assert_mutable(child, current_user)
+            frontier = [str(child["gid"]) for child in children if str(child["gid"]) not in folder_gids]
+            folder_gids.extend(frontier)
+        placeholders = ",".join(["%s"] * len(folder_gids))
+        cur.execute(
+            f"SELECT * FROM workmanship_know_items WHERE folder_gid IN ({placeholders})",
+            folder_gids,
+        )
+        for item in cur.fetchall():
+            _assert_mutable(dict(item), current_user)
+        cur.execute(
+            f"DELETE FROM workmanship_know_items WHERE folder_gid IN ({placeholders})",
+            folder_gids,
+        )
+        cur.execute(
+            f"DELETE FROM workmanship_know_folders WHERE gid IN ({placeholders})",
+            folder_gids,
+        )
         conn.commit()
-    return {"success": True}
-
+    return {"success": True, "deleted_folders": len(folder_gids)}
 
 # ── 条目 ───────────────────────────────────────────────────────────────────────
 
@@ -162,88 +247,113 @@ def delete_folder(gid: str, current_user = Depends(get_current_user)):
 def list_items(
     folder_gid: Optional[str] = Query(None),
     scope_type: Optional[str] = Query(None),
-    team_gid:   Optional[str] = Query(None),
+    team_gid: Optional[str] = Query(None),
     show_hidden: Optional[bool] = Query(False),
     q: Optional[str] = Query(None),
-    current_user = Depends(get_current_user),
+    current_user=Depends(get_current_user),
 ):
     with get_conn() as conn:
         cur = conn.cursor()
-        conditions = ["1=1"]
-        params = []
+        visible, params = _visible_predicate("ki", current_user)
+        conditions = [visible]
         if folder_gid:
-            conditions.append("ki.folder_gid = %s"); params.append(folder_gid)
+            conditions.append("ki.folder_gid=%s")
+            params.append(folder_gid)
         if scope_type:
-            conditions.append("ki.scope_type = %s"); params.append(scope_type)
-        if team_gid:
-            conditions.append("ki.team_gid = %s"); params.append(team_gid)
+            normalized_scope, normalized_team = _normalize_scope(scope_type, team_gid, current_user)
+            conditions.append("ki.scope_type=%s")
+            params.append(normalized_scope)
+            if normalized_scope == "team":
+                conditions.append("ki.team_gid=%s")
+                params.append(normalized_team or "")
         if q:
-            conditions.append("ki.title LIKE %s"); params.append(f"%{q}%")
-        # personal 条目仅创建者可见
-        uid = current_user["gid"]
-        conditions.append("(ki.scope_type != 'personal' OR ki.creator_gid = %s)")
-        params.append(uid)
-        # 非超管不显示隐藏条目
-        is_admin = current_user.get("system_role") == "super_admin" or current_user.get("role") == "super_admin"
+            conditions.append("ki.title LIKE %s")
+            params.append(f"%{q}%")
+        is_admin = "knowledge.manage" in _permissions(current_user)
         if not (show_hidden and is_admin):
-            conditions.append("(ki.is_hidden = FALSE OR ki.is_hidden IS NULL)")
+            conditions.append("(ki.is_hidden=FALSE OR ki.is_hidden IS NULL)")
         cur.execute(
-            f"SELECT ki.gid, ki.folder_gid, ki.scope_type, ki.team_gid, "
-            f"ki.item_type, ki.title, ki.status, "
-            f"ki.file_path, ki.url, ki.site_ref, ki.tags, ki.is_system, ki.is_pinned, ki.is_hidden, "
-            f"ki.creator_gid, ki.created_at, ki.updated_at "
-            f"FROM workmanship_know_items ki WHERE {' AND '.join(conditions)} "
-            f"ORDER BY ki.is_pinned DESC , ki.is_system DESC, ki.updated_at DESC",
-            params
+            "SELECT ki.gid,ki.folder_gid,ki.scope_type,ki.team_gid,ki.item_type,ki.title,ki.status,"
+            "ki.file_path,ki.url,ki.site_ref,ki.tags,ki.is_system,ki.is_pinned,ki.is_hidden,"
+            "ki.creator_gid,ki.created_at,ki.updated_at FROM workmanship_know_items ki WHERE "
+            + " AND ".join(conditions)
+            + " ORDER BY ki.is_pinned DESC,ki.is_system DESC,ki.updated_at DESC",
+            params,
         )
-        rows = cur.fetchall()
-        return [dict(r) for r in rows]
-
+        return [dict(row) for row in cur.fetchall()]
 
 @router.get("/items/{gid}")
-def get_item(gid: str, current_user = Depends(get_current_user)):
-    with get_conn() as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM workmanship_know_items WHERE gid = %s", (gid,))
-        row = cur.fetchone()
-        if not row:
-            from fastapi import HTTPException
-            raise HTTPException(status_code=404, detail="not_found")
-        return dict(row)
-
-
-@router.post("/items")
-def create_item(body: ItemCreate, current_user = Depends(get_current_user)):
-    from backend.utils.gid import next_gid
-    gid = str(next_gid())
-    content_body_str = json.dumps(body.content_body) if body.content_body is not None else None
-    site_ref_str     = json.dumps(body.site_ref) if body.site_ref is not None else None
-    tags_str         = json.dumps(body.tags or [])
+def get_item(gid: str, current_user=Depends(get_current_user)):
+    visible, params = _visible_predicate("ki", current_user)
     with get_conn() as conn:
         cur = conn.cursor()
         cur.execute(
-            """INSERT INTO workmanship_know_items
-               (gid, folder_gid, scope_type, team_gid, item_type, title, status,
-                content_body, content_md, file_path, url, site_ref, tags,
-                creator_gid, created_at, updated_at)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(),NOW())""",
-            (gid, body.folder_gid, body.scope_type, body.team_gid,
-             body.item_type, body.title, body.status,
-             content_body_str, body.content_md, body.file_path,
-             body.url, site_ref_str, tags_str, current_user["gid"])
+            f"SELECT * FROM workmanship_know_items ki WHERE ki.gid=%s AND {visible}",
+            [gid, *params],
+        )
+        row = cur.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="not_found")
+    return dict(row)
+
+@router.post("/items")
+def create_item(body: ItemCreate, current_user=Depends(get_current_user)):
+    scope, team_gid = _normalize_scope(body.scope_type, body.team_gid, current_user)
+    if scope == "public" and "knowledge.manage" not in _permissions(current_user):
+        raise HTTPException(status_code=403, detail="public knowledge requires knowledge.manage")
+    gid = str(next_gid())
+    content_body_str = json.dumps(body.content_body) if body.content_body is not None else None
+    site_ref_str = json.dumps(body.site_ref) if body.site_ref is not None else None
+    tags_str = json.dumps(body.tags or [])
+    with get_conn() as conn:
+        cur = conn.cursor()
+        if body.folder_gid:
+            cur.execute("SELECT * FROM workmanship_know_folders WHERE gid=%s", (body.folder_gid,))
+            folder = cur.fetchone()
+            if not folder:
+                raise HTTPException(status_code=404, detail="folder not found")
+            _assert_mutable(dict(folder), current_user)
+            if folder["scope_type"] != scope or str(folder.get("team_gid") or "") != str(team_gid or ""):
+                raise HTTPException(status_code=400, detail="folder scope mismatch")
+        cur.execute(
+            "INSERT INTO workmanship_know_items "
+            "(gid,folder_gid,scope_type,team_gid,item_type,title,status,content_body,content_md,file_path,url,site_ref,tags,creator_gid,created_at,updated_at) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW(),NOW())",
+            (gid, body.folder_gid, scope, team_gid, body.item_type, body.title, body.status,
+             content_body_str, body.content_md, body.file_path, body.url, site_ref_str,
+             tags_str, current_user["gid"]),
         )
         conn.commit()
-        cur.execute("SELECT * FROM workmanship_know_items WHERE gid = %s", (gid,))
-        row = cur.fetchone()
-        return dict(row)
-
+        cur.execute("SELECT * FROM workmanship_know_items WHERE gid=%s", (gid,))
+        return dict(cur.fetchone())
 
 @router.patch("/items/{gid}")
 def patch_item(gid: str, body: ItemPatch, current_user = Depends(get_current_user)):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM workmanship_know_items WHERE gid=%s", (gid,))
+            existing = cur.fetchone()
+    if not existing:
+        raise HTTPException(status_code=404, detail="not_found")
+    _assert_mutable(dict(existing), current_user)
+    if _field_was_set(body, "scope_type") or _field_was_set(body, "team_gid"):
+        raise HTTPException(status_code=400, detail="knowledge item scope is immutable; copy into the target scope instead")
+    if _field_was_set(body, "folder_gid") and body.folder_gid is not None:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM workmanship_know_folders WHERE gid=%s", (body.folder_gid,))
+                folder = cur.fetchone()
+        if not folder:
+            raise HTTPException(status_code=404, detail="folder not found")
+        _assert_mutable(dict(folder), current_user)
+        if folder["scope_type"] != existing["scope_type"] or str(folder.get("team_gid") or "") != str(existing.get("team_gid") or ""):
+            raise HTTPException(status_code=400, detail="folder scope mismatch")
     sets = []
     params = []
+    if _field_was_set(body, "folder_gid"):
+        sets.append("folder_gid = %s")
+        params.append(body.folder_gid)
     mapping = {
-        "folder_gid": body.folder_gid,
         "title":      body.title,
         "status":     body.status,
         "content_md": body.content_md,
@@ -281,39 +391,28 @@ def patch_item(gid: str, body: ItemPatch, current_user = Depends(get_current_use
     with get_conn() as conn:
         cur = conn.cursor()
         cur.execute(f"UPDATE workmanship_know_items SET {', '.join(sets)} WHERE gid = %s", params)
-        # 写入变更历史
-        if changed_fields:
-            h_gid = str(next_gid())
-            h_id  = str(next_gid())
-            author_name = current_user.get("display_name") or current_user.get("name") or current_user.get("gid", "")
-            author_gid  = current_user.get("gid", "")
-            content = "更新了：" + "、".join(changed_fields)
-            cur.execute(
-                """INSERT INTO workmanship_work_item_entries
-                   (gid, id, item_type, item_gid, section, author, author_name, author_gid,
-                    content, sort_order, read_by_human, resolved, created_at, updated_at)
-                   VALUES (%s,%s,'knowledge_item',%s,'history','human',%s,%s,%s,
-                           UNIX_TIMESTAMP(),TRUE,FALSE,NOW(),NOW())""",
-                (h_gid, h_id, gid, author_name, author_gid, content)
-            )
         conn.commit()
+    if changed_fields:
+        author_name = current_user.get("display_name") or current_user.get("name") or current_user.get("gid", "")
+        author_gid = current_user.get("gid", "")
+        append_item_history("knowledge_item", gid, author_name, author_gid, "更新了：" + "、".join(changed_fields))
     return {"success": True}
 
 
 @router.get("/items/{gid}/history")
 def get_item_history(gid: str, current_user = Depends(get_current_user)):
     """返回某知识库条目的变更历史（section='history'），按时间降序（新在上）。"""
+    visible, params = _visible_predicate("ki", current_user)
     with get_conn() as conn:
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT gid, id, section, author, author_name, author_gid, content, "
-            "sort_order, created_at "
-            "FROM workmanship_work_item_entries "
-            "WHERE item_type='knowledge_item' AND item_gid=%s AND section='history' "
-            "ORDER BY created_at DESC",
-            (gid,)
-        )
-        rows = cur.fetchall()
+        with conn.cursor() as cur:
+            cur.execute(
+                f"SELECT 1 FROM workmanship_know_items ki WHERE ki.gid=%s AND {visible}",
+                [gid, *params],
+            )
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="not_found")
+    rows = list_item_history("knowledge_item", gid)
+
     return {"success": True, "data": [
         {"gid": r["gid"], "id": r["id"], "author_name": r["author_name"],
          "content": r["content"], "created_at": str(r["created_at"])}
@@ -323,6 +422,13 @@ def get_item_history(gid: str, current_user = Depends(get_current_user)):
 
 @router.delete("/items/{gid}")
 def delete_item(gid: str, current_user = Depends(get_current_user)):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM workmanship_know_items WHERE gid=%s", (gid,))
+            existing = cur.fetchone()
+    if not existing:
+        raise HTTPException(status_code=404, detail="not_found")
+    _assert_mutable(dict(existing), current_user)
     with get_conn() as conn:
         cur = conn.cursor()
         # 系统内置条目只有 super_admin 可以删除
@@ -344,76 +450,66 @@ def delete_item(gid: str, current_user = Depends(get_current_user)):
 # ── 收藏 ───────────────────────────────────────────────────────────────────────
 
 @router.post("/items/{gid}/favorite")
-def toggle_favorite(gid: str, current_user = Depends(get_current_user)):
+def toggle_favorite(gid: str, current_user=Depends(get_current_user)):
     user_gid = current_user["gid"]
+    visible, visible_params = _visible_predicate("ki", current_user)
     with get_conn() as conn:
         cur = conn.cursor()
-        cur.execute(
-            "SELECT 1 FROM workmanship_know_favorites WHERE user_gid = %s AND item_gid = %s",
-            (user_gid, gid)
-        )
-        exists = cur.fetchone()
-        if exists:
-            cur.execute(
-                "DELETE FROM workmanship_know_favorites WHERE user_gid = %s AND item_gid = %s",
-                (user_gid, gid)
-            )
+        cur.execute(f"SELECT 1 FROM workmanship_know_items ki WHERE ki.gid=%s AND {visible}", [gid, *visible_params])
+        if not cur.fetchone():
+            raise HTTPException(status_code=404, detail="not_found")
+        cur.execute("SELECT 1 FROM workmanship_know_favorites WHERE user_gid=%s AND item_gid=%s", (user_gid, gid))
+        if cur.fetchone():
+            cur.execute("DELETE FROM workmanship_know_favorites WHERE user_gid=%s AND item_gid=%s", (user_gid, gid))
             is_fav = False
         else:
-            cur.execute(
-                "INSERT INTO workmanship_know_favorites (user_gid, item_gid) VALUES (%s, %s)",
-                (user_gid, gid)
-            )
+            cur.execute("INSERT INTO workmanship_know_favorites (user_gid,item_gid) VALUES (%s,%s)", (user_gid, gid))
             is_fav = True
         conn.commit()
     return {"is_favorite": is_fav}
 
 
 @router.get("/favorites")
-def list_favorites(current_user = Depends(get_current_user)):
+def list_favorites(current_user=Depends(get_current_user)):
     user_gid = current_user["gid"]
+    visible, params = _visible_predicate("ki", current_user)
     with get_conn() as conn:
         cur = conn.cursor()
         cur.execute(
-            """SELECT ki.* FROM workmanship_know_items ki
-               JOIN workmanship_know_favorites kf ON kf.item_gid = ki.gid
-               WHERE kf.user_gid = %s ORDER BY kf.created_at DESC""",
-            (user_gid,)
+            "SELECT ki.* FROM workmanship_know_items ki JOIN workmanship_know_favorites kf ON kf.item_gid=ki.gid "
+            f"WHERE kf.user_gid=%s AND {visible} ORDER BY kf.created_at DESC",
+            [user_gid, *params],
         )
-        rows = cur.fetchall()
-        return [dict(r) for r in rows]
-
+        return [dict(row) for row in cur.fetchall()]
 
 # ── 最近访问 ───────────────────────────────────────────────────────────────────
 
 @router.post("/items/{gid}/recent")
-def record_recent(gid: str, current_user = Depends(get_current_user)):
+def record_recent(gid: str, current_user=Depends(get_current_user)):
     user_gid = current_user["gid"]
+    visible, params = _visible_predicate("ki", current_user)
     with get_conn() as conn:
         cur = conn.cursor()
+        cur.execute(f"SELECT 1 FROM workmanship_know_items ki WHERE ki.gid=%s AND {visible}", [gid, *params])
+        if not cur.fetchone():
+            raise HTTPException(status_code=404, detail="not_found")
         cur.execute(
-            """INSERT INTO workmanship_know_recent (user_gid, item_gid, accessed_at)
-               VALUES (%s, %s, NOW())
-               ON DUPLICATE KEY UPDATE accessed_at = NOW()""",
-            (user_gid, gid)
+            "INSERT INTO workmanship_know_recent (user_gid,item_gid,accessed_at) VALUES (%s,%s,NOW()) "
+            "ON DUPLICATE KEY UPDATE accessed_at=NOW()",
+            (user_gid, gid),
         )
         conn.commit()
     return {"success": True}
 
-
 @router.get("/recent")
-def list_recent(
-    limit: int = Query(20, le=100),
-    current_user = Depends(get_current_user),
-):
+def list_recent(limit: int = Query(20, le=100), current_user=Depends(get_current_user)):
     user_gid = current_user["gid"]
+    visible, params = _visible_predicate("ki", current_user)
     with get_conn() as conn:
         cur = conn.cursor()
         cur.execute(
-            """SELECT ki.* FROM workmanship_know_items ki
-               JOIN workmanship_know_recent kr ON kr.item_gid = ki.gid
-               WHERE kr.user_gid = %s ORDER BY kr.accessed_at DESC LIMIT %s""",
-            (user_gid, limit)
+            "SELECT ki.* FROM workmanship_know_items ki JOIN workmanship_know_recent kr ON kr.item_gid=ki.gid "
+            f"WHERE kr.user_gid=%s AND {visible} ORDER BY kr.accessed_at DESC LIMIT %s",
+            [user_gid, *params, limit],
         )
-        rows = cur.fetchall()
-        return [dict(r) for r in rows]
+        return [dict(row) for row in cur.fetchall()]

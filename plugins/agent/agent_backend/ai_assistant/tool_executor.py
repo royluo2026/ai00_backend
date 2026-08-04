@@ -71,7 +71,7 @@ def execute_tool(
 ) -> dict[str, Any]:
     """分发工具调用。返回结果 dict，失败时含 error 字段。"""
     try:
-        from backend.ai_assistant.tool_handlers import dispatch as _d
+        from .tool_handlers import dispatch as _d
         return _d(
             tool_name=tool_name,
             inputs=inputs,

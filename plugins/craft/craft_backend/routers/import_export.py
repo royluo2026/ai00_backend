@@ -26,9 +26,13 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.routers.deps import require_role
-from backend.utils.gid import next_gid
+from ..data.connection import get_conn
+from backend.platform_sdk.auth import require_role
+from backend.platform_sdk.ids import next_gid
+from backend.platform_sdk.export_templates import (
+    create_export_template, delete_export_template,
+    list_export_templates, update_export_template,
+)
 
 router = APIRouter(prefix="/api/import-export", tags=["import-export"])
 
@@ -106,83 +110,41 @@ def _row_to_dict(row, keys):
 
 @router.get("/templates")
 def list_templates(module: str = "", user=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            if module:
-                cur.execute(
-                    "SELECT gid,name,module,owner_gid,is_shared,config,created_at,updated_at "
-                    "FROM workmanship_app_export_templates "
-                    "WHERE (owner_gid=%s OR is_shared=TRUE) AND (module=%s OR module='*') "
-                    "ORDER BY created_at",
-                    (user["gid"], module),
-                )
-            else:
-                cur.execute(
-                    "SELECT gid,name,module,owner_gid,is_shared,config,created_at,updated_at "
-                    "FROM workmanship_app_export_templates "
-                    "WHERE owner_gid=%s OR is_shared=TRUE "
-                    "ORDER BY module,created_at",
-                    (user["gid"],),
-                )
-            rows = cur.fetchall()
-    return {"success": True, "data": [dict(r) for r in rows]}
+    return {"success": True, "data": list_export_templates(user["gid"], module)}
 
 
 @router.post("/templates")
 def create_template(body: CreateTemplateBody, user=Depends(_READ)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_app_export_templates (gid,name,module,owner_gid,is_shared,config) "
-                "VALUES (%s,%s,%s,%s,%s,%s)",
-                (gid, body.name, body.module, user["gid"],
-                 body.is_shared, json.dumps(body.config)),
-            )
+    gid = create_export_template(
+        user["gid"], body.name, body.module, body.config, body.is_shared
+    )
     return {"success": True, "data": {"gid": gid, "name": body.name, "config": body.config}}
+
+
+def _template_admin(user: dict) -> bool:
+    role = user.get("org_role") or user.get("system_role") or "external"
+    return role in {"super_admin", "team_admin"} or user.get("system_role") == "team_admin"
 
 
 @router.patch("/templates/{gid}")
 def update_template(gid: str, body: UpdateTemplateBody, user=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT owner_gid FROM workmanship_app_export_templates WHERE gid=%s", (gid,))
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(404, "模板不存在")
-            owner_gid = row["owner_gid"] if isinstance(row, dict) else row[0]
-            if owner_gid != user["gid"] and user["role"] not in ("super_admin", "team_admin"):
-                raise HTTPException(403, "无权修改此模板")
-
-            updates, vals = [], []
-            if body.name is not None:
-                updates.append("name=%s"); vals.append(body.name)
-            if body.module is not None:
-                updates.append("module=%s"); vals.append(body.module)
-            if body.config is not None:
-                updates.append("config=%s"); vals.append(json.dumps(body.config))
-            if body.is_shared is not None:
-                updates.append("is_shared=%s"); vals.append(body.is_shared)
-            if not updates:
-                return {"success": True}
-            updates.append("updated_at=NOW()")
-            vals.append(gid)
-            cur.execute(f"UPDATE workmanship_app_export_templates SET {','.join(updates)} WHERE gid=%s", vals)
+    try:
+        update_export_template(gid, user["gid"], _template_admin(user), body.model_dump())
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except PermissionError as exc:
+        raise HTTPException(403, str(exc)) from exc
     return {"success": True}
 
 
 @router.delete("/templates/{gid}")
 def delete_template(gid: str, user=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT owner_gid FROM workmanship_app_export_templates WHERE gid=%s", (gid,))
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(404, "模板不存在")
-            owner_gid = row["owner_gid"] if isinstance(row, dict) else row[0]
-            if owner_gid != user["gid"] and user["role"] not in ("super_admin", "team_admin"):
-                raise HTTPException(403, "无权删除此模板")
-            cur.execute("DELETE FROM workmanship_app_export_templates WHERE gid=%s", (gid,))
+    try:
+        delete_export_template(gid, user["gid"], _template_admin(user))
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except PermissionError as exc:
+        raise HTTPException(403, str(exc)) from exc
     return {"success": True}
 
 

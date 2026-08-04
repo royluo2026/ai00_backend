@@ -5,6 +5,11 @@ backend/ai_assistant/system_prompt.py
 """
 from __future__ import annotations
 
+from ..data.memory_repository import MemoryRepository
+from .tool_handlers.capability_tools import dispatch_knowledge
+
+_memory_repository = MemoryRepository()
+
 _SYSTEM_OVERVIEW = """你是小柔（AI00 智能助手），汽车工艺系统 AI00 的智能助理。
 你帮助工程师管理任务、问题、工艺知识、BOP 结构分析、工作流规划等工作。
 
@@ -80,69 +85,66 @@ def build(
 
         # WFC 画布对话模式指令
         if context.get("current_page") == "wfc_canvas":
-            custom = _inject_wfc_guide()
+            custom = _inject_wfc_guide(owner_gid, auth_mode)
             parts.append(custom if custom else _WFC_SECTION_DEFAULT)
 
-    # 用户偏好（从 DB 读取，失败则跳过）
+    # 私人偏好只从 Agent-owned memory repository 读取。
     try:
-        from backend.db.connection import get_conn
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT pref_key, pref_value FROM app.user_preferences WHERE user_gid=%s LIMIT 20",
-                    (owner_gid,)
-                )
-                prefs = {r["pref_key"]: r["pref_value"] for r in cur.fetchall()}
+        rows = _memory_repository.list_for_user(owner_gid, 100)
+        prefs = {
+            row["memory_key"].removeprefix("preference:"): row["content"]
+            for row in rows
+            if row.get("tag") == "preference" and str(row.get("memory_key", "")).startswith("preference:")
+        }
         if prefs:
-            pref_lines = ["## 用户偏好"] + [f"- {k}: {v}" for k, v in prefs.items()]
-            parts.append("\n".join(pref_lines))
+            parts.append("\n".join(["## 用户偏好"] + [f"- {key}: {value}" for key, value in prefs.items()]))
     except Exception:
         pass
 
-    # Knowledge RAG（system_doc 标签）
+    # 团队知识必须经过公开 Capability 和当前用户权限过滤。
     try:
-        from backend.db.connection import get_conn
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    SELECT title, content_md FROM knowledge.knowledge_entries
-                    WHERE tags::text LIKE '%system_doc%'
-                    ORDER BY created_at DESC LIMIT 5
-                """)
-                docs = cur.fetchall()
+        result = dispatch_knowledge(
+            "search_knowledge", {"query": "system_doc", "limit": 5},
+            user_gid=owner_gid, auth_mode=auth_mode,
+        )
+        docs = result.get("items", [])
         if docs:
-            rag_lines = ["## 系统参考文档（RAG）"]
-            for d in docs:
-                rag_lines.append(f"- {d['title']}: {(d.get('content_md') or '')[:200]}")
-            parts.append("\n".join(rag_lines))
+            evidence = result.get("evidence", [])
+            lines = ["## 系统参考文档（RAG）"]
+            for index, doc in enumerate(docs):
+                citation = evidence[index] if index < len(evidence) else {}
+                reference = citation.get("reference", "")
+                digest = citation.get("digest", "")
+                suffix = f" [来源: {reference} {digest}]" if reference else ""
+                lines.append(f"- {doc.get('title', '')}: {doc.get('content_preview', '')[:200]}{suffix}")
+            parts.append("\n".join(lines))
     except Exception:
         pass
 
     return "\n\n".join(parts)
 
 
-def _inject_wfc_guide() -> str:
-    """
-    查找知识库中 tags 含 'wfc_guide' 的条目，返回其内容作为 WFC 模式指令。
-    找到则返回格式化字符串（替换默认 wfc_section），找不到返回空字符串。
-    """
+def _inject_wfc_guide(user_gid: str, auth_mode: str) -> str:
+    """Load a visible WFC guide through the public knowledge Capability."""
     try:
-        from backend.db.connection import get_conn
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    SELECT title, content_md FROM knowledge.knowledge_entries
-                    WHERE tags::text LIKE '%wfc_guide%'
-                    ORDER BY created_at DESC LIMIT 1
-                """)
-                row = cur.fetchone()
-        if not row:
+        search = dispatch_knowledge(
+            "search_knowledge", {"query": "wfc_guide", "limit": 1},
+            user_gid=user_gid, auth_mode=auth_mode,
+        )
+        items = search.get("items", [])
+        if not items:
             return ""
-        title   = row["title"] or "WFC 画布对话模式（自定义）"
-        content = (row.get("content_md") or "").strip()
+        detail_result = dispatch_knowledge(
+            "get_knowledge_entry", {"gid": items[0]["gid"]},
+            user_gid=user_gid, auth_mode=auth_mode,
+        )
+        detail = detail_result.get("data", {})
+        content = str(detail.get("content_md") or "").strip()
+        evidence = detail_result.get("evidence", [])
         if not content:
             return ""
-        return f"\n【{title}】\n{content}\n"
+        citation = evidence[0] if evidence else {}
+        source = f"\n来源：{citation.get('reference', '')} {citation.get('digest', '')}" if citation.get("reference") else ""
+        return f"\n【{detail.get('title') or 'WFC 画布对话模式（自定义）'}】\n{content}{source}\n"
     except Exception:
         return ""
-

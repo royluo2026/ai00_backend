@@ -154,7 +154,15 @@ def update_team_config(
 
 @router.get("/{gid}/members")
 def list_team_members(gid: str, current_user: dict = Depends(get_current_user)):
-    """列出该团队的所有用户（team_id = gid）"""
+    """列出当前用户有权查看的团队成员。"""
+    role = current_user.get("org_role") or current_user.get("system_role", "")
+    own_team = str(current_user.get("team_id") or "") == str(gid)
+    manages_team = any(
+        grant.get("grant_type") == "team_admin" and str(grant.get("scope_gid") or "") == str(gid)
+        for grant in current_user.get("grants", [])
+    )
+    if role != "super_admin" and not own_team and not manages_team:
+        raise HTTPException(status_code=403, detail="无权查看该团队成员")
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(

@@ -10,35 +10,17 @@ DELETE /api/canvases/{gid}    — 删除画布
 PATCH  /api/canvases/{gid}/shared — 切换共享状态
 """
 from fastapi import APIRouter, Depends, Query
-from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user
-from backend.utils.gid import next_gid
+from ..data.connection import get_conn
+from backend.platform_sdk.auth import get_current_user
+from backend.platform_sdk.ids import next_gid
 
 router = APIRouter(prefix="/api/canvases", tags=["canvases"])
-
-
-def _ensure_table():
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS workmanship_app_wfc_canvases (
-                    gid        CHAR(36) PRIMARY KEY,
-                    owner_gid  TEXT NOT NULL DEFAULT '',
-                    title      TEXT NOT NULL DEFAULT '未命名画布',
-                    data       JSON NOT NULL DEFAULT (JSON_OBJECT()),
-                    is_shared  TINYINT(1) NOT NULL DEFAULT 0,
-                    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-                    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-            """)
-            cur.execute("CREATE INDEX IF NOT EXISTS idx_wfc_canvases_owner ON workmanship_app_wfc_canvases(owner_gid)")
 
 
 @router.get("")
 def list_canvases(
     _user: dict = Depends(get_current_user),
 ):
-    _ensure_table()
     user_gid = _user.get("gid", "")
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -68,7 +50,6 @@ def save_canvas(
     body: dict,
     _user: dict = Depends(get_current_user),
 ):
-    _ensure_table()
     gid       = body.get("gid") or ""
     title     = body.get("title") or "未命名画布"
     data      = body.get("data") or {}
@@ -115,7 +96,6 @@ def load_canvas(
     gid: str,
     _user: dict = Depends(get_current_user),
 ):
-    _ensure_table()
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -141,7 +121,6 @@ def delete_canvas(
     gid: str,
     _user: dict = Depends(get_current_user),
 ):
-    _ensure_table()
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT gid FROM workmanship_app_wfc_canvases WHERE gid = %s", (gid,))
@@ -159,7 +138,6 @@ def toggle_shared(
     body: dict,
     _user: dict = Depends(get_current_user),
 ):
-    _ensure_table()
     is_shared = bool(body.get("is_shared", False))
     with get_conn() as conn:
         with conn.cursor() as cur:

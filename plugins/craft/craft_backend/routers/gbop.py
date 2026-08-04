@@ -37,9 +37,9 @@ import io
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.routers.deps import require_role
-from backend.utils.gid import next_gid
+from ..data.connection import get_conn
+from backend.platform_sdk.auth import require_role
+from backend.platform_sdk.ids import next_gid
 
 router = APIRouter(prefix="/api/gbop", tags=["gbop"])
 
@@ -1434,37 +1434,6 @@ def fork_version(source_gid: str, body: ForkBody, current_user: dict = Depends(_
 # GBOP 车型 Auto-Link：PBOM vpps → workmanship_tpl_gbop_entries 匹配
 # ══════════════════════════════════════════════════════════════════
 
-_nav_bindings_migrated = False
-
-def _ensure_nav_bindings():
-    """幂等：创建 workmanship_bop_gbop_nav_bindings 表（已在 migrate.py 中处理，此处为兼容保留）"""
-    global _nav_bindings_migrated
-    if _nav_bindings_migrated:
-        return
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS workmanship_bop_gbop_nav_bindings (
-                    gid                    CHAR(36) PRIMARY KEY,
-                    pbom_version_gid       CHAR(36) NOT NULL,
-                    gbop_process_entry_gid CHAR(36),
-                    gbop_op_entry_gid      CHAR(36) NOT NULL,
-                    pbom_entry_gid         CHAR(36) NOT NULL,
-                    is_part_feed           TINYINT(1) NOT NULL DEFAULT 1,
-                    confirmed              TINYINT(1) NOT NULL DEFAULT 0,
-                    created_at             DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-                    UNIQUE KEY uq_gbop_nav (pbom_version_gid, gbop_op_entry_gid, pbom_entry_gid)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-            """)
-            cur.execute(
-                "CREATE INDEX IF NOT EXISTS idx_gbop_nav_pbom_ver "
-                "ON workmanship_bop_gbop_nav_bindings(pbom_version_gid)"
-            )
-        conn.commit()
-    _nav_bindings_migrated = True
-
-
-
 @router.get("/pbom-versions/{pbom_gid}/gbop-nav-link-summary")
 def gbop_nav_link_summary(pbom_gid: str, _u=Depends(_READ)):
     """
@@ -1472,7 +1441,6 @@ def gbop_nav_link_summary(pbom_gid: str, _u=Depends(_READ)):
     { gbop_op_entry_gid: { bop_entry_gid, is_valid, pbom_entry_gid } }
     供 AssocPanel 的 gbop_nav 适配器使用。
     """
-    _ensure_nav_bindings()
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -1501,7 +1469,6 @@ def gbop_vpps_auto_link_status(pbom_gid: str, _u=Depends(_READ)):
     返回当前 pbom 版本的 Auto-Link 状态：
     pending_count > 0 表示有未提交绑定，前端应禁止再次 Auto-Link。
     """
-    _ensure_nav_bindings()
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -1525,7 +1492,6 @@ def gbop_vpps_auto_link_confirm(pbom_gid: str, _u=Depends(_WRITE)):
     将当前 pbom 版本所有未提交(confirmed=FALSE)的 Auto-Link 绑定整体确认。
     确认后 Auto-Link 可再次执行。
     """
-    _ensure_nav_bindings()
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -1545,7 +1511,6 @@ def gbop_vpps_auto_link(pbom_gid: str, current_user: dict = Depends(_WRITE)):
     在 workmanship_tpl_gbop_entries 中找 vpps_part 相同且 part_feed=TRUE 的操作节点，
     向上溯源找到父工序节点，批量写入 workmanship_bop_gbop_nav_bindings（幂等）。
     """
-    _ensure_nav_bindings()
     # 有未提交绑定时拒绝重复执行
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -1683,7 +1648,6 @@ def gbop_process_hierarchy(pbom_gid: str, _u=Depends(_READ)):
     骨架来自 workmanship_tpl_gbop_entries（全部 process/operation），
     零件绑定来自 workmanship_bop_gbop_nav_bindings（仅 part_feed=TRUE 的操作才有零件）。
     """
-    _ensure_nav_bindings()
     with get_conn() as conn:
         with conn.cursor() as cur:
             # 1. 取所有活跃 GBOP 版本的 process / operation entry
@@ -1800,7 +1764,6 @@ def station_autolink_preview(
     3. 遍历 gbop_nav_bindings（confirmed=TRUE）→ 工序/操作/零件树
     4. 标记每条工序在本 BOP 版本中是否已创建过 bop_entry（linked）
     """
-    _ensure_nav_bindings()
     with get_conn() as conn:
         with conn.cursor() as cur:
             # 1. 取 BOP 版本信息
@@ -2064,7 +2027,6 @@ def station_autolink(bop_gid: str, body: StationAutolinkBody = StationAutolinkBo
     5. 幂等创建 operation bop_entry + pbom_part bop_entry_links
     6. 更新 station 的 child_vpps 缓存
     """
-    _ensure_nav_bindings()
     with get_conn() as conn:
         with conn.cursor() as cur:
             # 1. 取 BOP 版本信息

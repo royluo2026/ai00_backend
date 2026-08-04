@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "product_domains": [
+    "base",
+    "craft",
+    "simulation",
+    "agent",
+    "device"
+  ],
+  "data_owners": {
+    "base": {
+      "runtime_domain": "base",
+      "new_table_prefix": "workmanship_base_"
+    },
+    "craft": {
+      "runtime_domain": "craft",
+      "new_table_prefix": "workmanship_craft_"
+    },
+    "simulation": {
+      "runtime_domain": "simulation",
+      "new_table_prefix": "workmanship_sim_"
+    },
+    "agent": {
+      "runtime_domain": "agent",
+      "new_table_prefix": "workmanship_agent_"
+    },
+    "device": {
+      "runtime_domain": "device",
+      "new_table_prefix": "workmanship_device_"
+    },
+    "knowledge": {
+      "runtime_domain": "base",
+      "new_table_prefix": "workmanship_knowledge_"
+    }
+  },
+  "source_roots": [
+    {
+      "path": "plugins/craft",
+      "domain": "craft"
+    },
+    {
+      "path": "plugins/agent",
+      "domain": "agent"
+    },
+    {
+      "path": "plugins/device",
+      "domain": "device"
+    },
+    {
+      "path": "plugins/simulation",
+      "domain": "simulation"
+    },
+    {
+      "path": "backend",
+      "domain": "base"
+    }
+  ],
+  "public_import_prefixes": [
+    "backend.contracts",
+    "backend.platform_sdk"
+  ],
+  "migration_paths": [
+    "backend/db/migrations",
+    "backend/db/versioned_migrations.py",
+    "backend/scripts/run_migrations.py"
+  ],
+  "non_runtime_paths": [
+    "backend/db/pg_to_mysql_migrate.py",
+    "backend/db/check_schema_diff.py",
+    "backend/db/run_diff.py",
+    "backend/scripts/verify_domain_db_isolation.py"
+  ],
+  "ignored_identifiers": [
+    "workmanship_app_",
+    "workmanship_auth_",
+    "workmanship_bop_",
+    "workmanship_factory_",
+    "workmanship_int_",
+    "workmanship_know_",
+    "workmanship_onto_",
+    "workmanship_proj_",
+    "workmanship_tpl_",
+    "workmanship_work_",
+    "workmanship_prefix_tables_exist"
+  ],
+  "table_prefix_owners": [
+    {
+      "prefix": "workmanship_base_",
+      "owner": "base"
+    },
+    {
+      "prefix": "workmanship_craft_",
+      "owner": "craft"
+    },
+    {
+      "prefix": "workmanship_sim_",
+      "owner": "simulation"
+    },
+    {
+      "prefix": "workmanship_agent_",
+      "owner": "agent"
+    },
+    {
+      "prefix": "workmanship_device_",
+      "owner": "device"
+    },
+    {
+      "prefix": "workmanship_knowledge_",
+      "owner": "knowledge"
+    },
+    {
+      "prefix": "workmanship_auth_",
+      "owner": "base"
+    },
+    {
+      "prefix": "workmanship_plugin_",
+      "owner": "base"
+    },
+    {
+      "prefix": "workmanship_runtime_",
+      "owner": "device"
+    },
+    {
+      "prefix": "workmanship_bop_",
+      "owner": "craft"
+    },
+    {
+      "prefix": "workmanship_factory_",
+      "owner": "craft"
+    },
+    {
+      "prefix": "workmanship_tpl_",
+      "owner": "craft"
+    },
+    {
+      "prefix": "workmanship_proj_",
+      "owner": "craft"
+    },
+    {
+      "prefix": "workmanship_work_",
+      "owner": "craft"
+    },
+    {
+      "prefix": "workmanship_onto_",
+      "owner": "craft"
+    },
+    {
+      "prefix": "workmanship_know_",
+      "owner": "knowledge"
+    },
+    {
+      "prefix": "workmanship_int_",
+      "owner": "base"
+    }
+  ],
+  "table_overrides": {
+    "workmanship_display_id_counters": "base",
+    "workmanship_app_system_config": "base",
+    "workmanship_app_capability_audit": "base",
+    "workmanship_app_operational_alerts": "base",
+    "workmanship_app_worker_heartbeats": "base",
+    "workmanship_app_feishu_search_cache": "base",
+    "workmanship_app_view_configs": "base",
+    "workmanship_app_export_templates": "base",
+    "workmanship_app_workbench_configs": "base",
+    "workmanship_app_workbench_member_overrides": "base",
+    "workmanship_app_wb_annotations": "base",
+    "workmanship_app_ai_audit_logs": "agent",
+    "workmanship_app_ai_memory": "agent",
+    "workmanship_app_ai_sessions": "agent",
+    "workmanship_app_ai_turns": "agent",
+    "workmanship_app_flows": "agent",
+    "workmanship_app_flow_runs": "agent",
+    "workmanship_app_skills": "agent",
+    "workmanship_app_wfc_canvases": "craft",
+    "workmanship_app_bug_tracker_snapshots": "craft",
+    "workmanship_know_craft_rules": "craft",
+    "workmanship_work_follows": "base",
+    "workmanship_work_notifications": "base"
+  }
+}

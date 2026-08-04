@@ -15,7 +15,7 @@ _log = logging.getLogger(__name__)
 
 # 从客户端代码同步的权限常量（不依赖客户端模块，独立定义）
 _ROLE_PERMISSIONS = {
-    "super_admin":    {"system.tech_config", "system.app_config", "system.user.manage",
+    "super_admin":    {"system.tech_config", "system.app_config", "system.user.manage", "system.plugin.manage",
                        "project.create", "project.manage_any", "project.view",
                        "craft.write_direct", "craft.write_draft", "craft.view",
                        "rule.manage", "rule.view", "template.manage", "template.view",
@@ -48,7 +48,7 @@ _ROLE_PERMISSIONS = {
 
 # 新四层模型：org_role 基线权限（3值）
 _ORG_ROLE_PERMISSIONS = {
-    "super_admin": {"system.tech_config", "system.app_config", "system.user.manage",
+    "super_admin": {"system.tech_config", "system.app_config", "system.user.manage", "system.plugin.manage",
                     "project.create", "project.manage_any", "project.view",
                     "craft.write_direct", "craft.write_draft", "craft.view",
                     "rule.manage", "rule.view", "template.manage", "template.view",

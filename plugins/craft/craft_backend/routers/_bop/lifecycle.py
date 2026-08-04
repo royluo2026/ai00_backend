@@ -10,8 +10,8 @@ from datetime import date
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.utils.gid import next_gid
+from ...data.connection import get_conn
+from backend.platform_sdk.ids import next_gid
 
 from ._constants import _WRITE, _READ
 from . import _history

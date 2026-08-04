@@ -9,7 +9,11 @@ import math
 import uuid
 from typing import Any
 
-from backend.db.connection import get_conn
+from ...data.audit_repository import AuditRepository
+from ...data.memory_repository import MemoryRepository
+
+_memory_repository = MemoryRepository()
+_audit_repository = AuditRepository()
 
 TOOL_NAMES: set[str] = {
     "calculate",
@@ -86,39 +90,29 @@ def _calculate(expression: str) -> dict:
 
 
 def _save_preference(user_gid: str = "", key: str = "", value: str = "") -> dict:
+    if not user_gid or not key:
+        return {"error": "用户身份和偏好 key 不能为空"}
     try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO app.user_preferences (user_gid, pref_key, pref_value)
-                    VALUES (%s, %s, %s)
-                    ON CONFLICT (user_gid, pref_key)
-                    DO UPDATE SET pref_value=EXCLUDED.pref_value, updated_at=NOW()
-                """, (user_gid, key, value))
+        _memory_repository.save(user_gid, f"preference:{key}", value, "preference", True)
         return {"text": f"已保存偏好：{key} = {value}"}
-    except Exception:
-        # 表不存在时不报错
-        return {"text": f"已记录偏好：{key} = {value}"}
+    except Exception as exc:
+        return {"error": str(exc)}
 
 
 def _list_preferences(user_gid: str = "") -> dict:
+    if not user_gid:
+        return {"error": "用户身份缺失", "preferences": {}}
     try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT pref_key, pref_value FROM app.user_preferences WHERE user_gid=%s",
-                    (user_gid,),
-                )
-                rows = cur.fetchall()
-        items = {r["pref_key"]: r["pref_value"] for r in rows}
-        text = (
-            "用户偏好：\n" + "\n".join(f"  {k}: {v}" for k, v in items.items())
-            if items else "暂无保存的偏好"
-        )
+        rows = _memory_repository.list_for_user(user_gid, 200)
+        items = {
+            row["memory_key"].removeprefix("preference:"): row["content"]
+            for row in rows
+            if row.get("tag") == "preference" and str(row.get("memory_key", "")).startswith("preference:")
+        }
+        text = "用户偏好：\n" + "\n".join(f"  {key}: {value}" for key, value in items.items()) if items else "暂无保存的偏好"
         return {"text": text, "preferences": items}
-    except Exception:
-        return {"text": "暂无保存的偏好", "preferences": {}}
-
+    except Exception as exc:
+        return {"error": str(exc), "preferences": {}}
 
 def _generate_canvas(
     title: str = "工作流画布",
@@ -258,28 +252,19 @@ def _flag_for_review(
     if severity not in valid_severities:
         severity = "medium"
 
-    gid = str(uuid.uuid4()).replace("-", "")
     import json as _json
-
     try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO app.ai_audit_logs
-                        (gid, session_gid, user_gid, action_type, payload, created_at)
-                    VALUES (%s, %s, %s, 'flag_for_review', %s, NOW())
-                    ON CONFLICT DO NOTHING
-                """, (
-                    gid, session_gid, user_gid,
-                    _json.dumps({
-                        "reason":   reason,
-                        "context":  context,
-                        "severity": severity,
-                    }, ensure_ascii=False),
-                ))
-    except Exception:
-        # 表不存在时静默忽略
-        pass
+        gid = _audit_repository.record({
+            "session_gid": session_gid,
+            "user_gid": user_gid,
+            "tool_name": "flag_for_review",
+            "is_write": True,
+            "is_confirmed": True,
+            "inputs_json": _json.dumps({"reason": reason, "context": context, "severity": severity}, ensure_ascii=False),
+            "status": "review_requested",
+        })
+    except Exception as exc:
+        return {"error": f"人工复核标记写入失败：{exc}"}
 
     return {
         "text":    f"已标记人工复核（{severity}）：{reason}",

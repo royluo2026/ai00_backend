@@ -5,7 +5,7 @@ PBOM 变化点查询（场景 C 关联面板支撑）。
 """
 from fastapi import APIRouter, Depends, HTTPException
 
-from backend.db.connection import get_conn
+from ...data.connection import get_conn
 
 from ._constants import _READ
 

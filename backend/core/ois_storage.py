@@ -169,3 +169,89 @@ def upload(data: bytes, ext: str, mime: str, prefix: str = "uploads") -> str | N
     except Exception as e:
         _log.error("OIS 上传失败: %s | file_key=%s", e, file_key)
         return None
+
+
+def put_immutable(object_key: str, data: bytes, mime: str) -> dict | None:
+    """Write a caller-generated immutable object key and return its stable metadata.
+
+    The key must be content-addressed or revision-addressed by the caller. This
+    function never generates a replacement key and never treats a temporary URL
+    as the durable reference.
+    """
+    import hashlib
+    import io
+
+    normalized = str(object_key or "").strip().lstrip("/")
+    if not normalized or ".." in normalized.split("/") or "//" in normalized:
+        raise ValueError("object_key must be a normalized relative OIS key")
+    if not isinstance(data, bytes):
+        raise TypeError("data must be bytes")
+    if not is_enabled():
+        return None
+    cfg = _get_ois_config()
+    identify = cfg.get("identify", "")
+    client, err = _make_client()
+    if not client:
+        _log.error("OIS 客户端初始化失败: %s", err)
+        return None
+    try:
+        response = client.put_object(identify, normalized, io.BytesIO(data))
+        if not (hasattr(response, "is_succeed") and response.is_succeed()):
+            _log.error(
+                "OIS immutable upload failed: code=%s message=%s object_key=%s",
+                getattr(response, "code", "?"),
+                getattr(response, "message", "?"),
+                normalized,
+            )
+            return None
+        uploaded_key = getattr(getattr(response, "data", None), "object_key", normalized)
+        if uploaded_key != normalized:
+            raise RuntimeError(
+                f"OIS changed immutable object key: expected {normalized!r}, got {uploaded_key!r}"
+            )
+        return {
+            "object_key": normalized,
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "byte_size": len(data),
+            "media_type": mime,
+            "access_url": generate_access_url(normalized),
+        }
+    except Exception as exc:
+        _log.error("OIS immutable upload failed: %s | object_key=%s", exc, normalized)
+        return None
+
+def get_immutable(object_key: str, expected_sha256: str = "") -> bytes | None:
+    """Read an immutable OIS object and optionally verify its SHA-256 digest."""
+    import hashlib
+
+    normalized = str(object_key or "").strip().lstrip("/")
+    if not normalized or ".." in normalized.split("/") or "//" in normalized:
+        raise ValueError("object_key must be a normalized relative OIS key")
+    if not is_enabled():
+        return None
+    cfg = _get_ois_config()
+    client, err = _make_client()
+    if not client:
+        _log.error("OIS client unavailable: %s", err)
+        return None
+    try:
+        response = client.get_object(cfg.get("identify", ""), normalized)
+        if not (hasattr(response, "is_succeed") and response.is_succeed()):
+            _log.error("OIS immutable read failed: code=%s key=%s", getattr(response, "code", "?"), normalized)
+            return None
+        value = getattr(response, "data", None)
+        if isinstance(value, bytes):
+            data = value
+        elif hasattr(value, "read"):
+            data = value.read()
+        else:
+            body = getattr(value, "body", None) or getattr(value, "content", None)
+            data = body.read() if hasattr(body, "read") else body
+        if not isinstance(data, bytes):
+            raise RuntimeError("OIS get_object returned no byte payload")
+        if expected_sha256 and hashlib.sha256(data).hexdigest() != expected_sha256:
+            raise RuntimeError("OIS immutable object digest mismatch")
+        return data
+    except Exception as exc:
+        _log.error("OIS immutable read failed: %s | object_key=%s", exc, normalized)
+        return None

@@ -20,9 +20,20 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user, require_role, scope_visible_clause, _get_user_grants, _derive_org_role
-from backend.utils.gid import next_gid
+from ..data.connection import get_conn
+from backend.platform_sdk.access import build_access_scope
+from backend.platform_sdk.auth import get_current_user, require_role, get_user_grants, derive_org_role
+from backend.platform_sdk.ids import next_gid
+from backend.platform_sdk.project_access import (
+    add_project_member as add_project_access_member,
+    can_manage_project,
+    get_user_profiles,
+    list_all_project_memberships,
+    list_project_access_entries,
+    remove_project_member as remove_project_access_member,
+    replace_project_manager,
+    replace_section_leads,
+)
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -83,32 +94,13 @@ class CreateVehicleModelBody(BaseModel):
 
 
 def _can_manage_project_lines(user: dict, project_gid: str) -> bool:
-    """超管或项目管理员（project_manager）可以管理项目的线体权限。"""
-    org_role = user.get("org_role") or _derive_org_role(user.get("system_role", "external"))
-    if org_role == "super_admin":
-        return True
-    grants = _get_user_grants(user["gid"])
-    for g in grants:
-        if g.get("grant_type") == "project_admin" and g.get("scope_gid") == project_gid:
-            return True
-    # 也检查 project_members 表
-    try:
-        from backend.db.connection import get_conn
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT 1 FROM workmanship_auth_project_members "
-                    "WHERE project_gid = %s AND user_gid = %s",
-                    (project_gid, user["gid"]),
-                )
-                if cur.fetchone():
-                    return True
-    except: pass
-    return False
+    """Base owns project membership and grant semantics."""
+    org_role = user.get("org_role") or derive_org_role(user.get("system_role", "external"))
+    return org_role == "super_admin" or can_manage_project(user["gid"], project_gid)
 
 
 def _get_editable_line_gids(cur, user: dict, project_gid: str) -> set[str]:
-    org_role = user.get("org_role") or _derive_org_role(user.get("system_role", "external"))
+    org_role = user.get("org_role") or derive_org_role(user.get("system_role", "external"))
     if org_role == "super_admin":
         cur.execute(
             "SELECT gid FROM workmanship_bop_bop_entries WHERE node_type = 'line_process' AND is_deleted = FALSE"
@@ -121,7 +113,7 @@ def _get_editable_line_gids(cur, user: dict, project_gid: str) -> set[str]:
         )
         return {r["gid"] for r in cur.fetchall()}
 
-    grants = _get_user_grants(user["gid"])
+    grants = get_user_grants(user["gid"])
     return {g["scope_gid"] for g in grants if g["grant_type"] == "section_lead" and g.get("scope_gid")}
 def _row_to_project(r):
     return {
@@ -210,14 +202,26 @@ def list_projects(
     include_archived: bool = Query(False),
     current_user: dict = Depends(get_current_user),
 ):
-    scope_sql, scope_params = scope_visible_clause(current_user, owner_col="p.owner_gid", team_col="p.team_id")
-    conditions = [scope_sql]
-    params = list(scope_params)
+    access = build_access_scope(current_user)
+    conditions = []
+    params = []
+    if not access["is_admin"]:
+        visible = ["p.share_scope = 'global'", "p.owner_gid = %s"]
+        params.append(access["user_gid"])
+        if access["team_gids"]:
+            placeholders = ",".join(["%s"] * len(access["team_gids"]))
+            visible.append(f"(p.share_scope = 'team' AND p.team_id IN ({placeholders}))")
+            params.extend(access["team_gids"])
+        if access["project_gids"]:
+            placeholders = ",".join(["%s"] * len(access["project_gids"]))
+            visible.append(f"(p.share_scope IN ('team','project') AND p.gid IN ({placeholders}))")
+            params.extend(access["project_gids"])
+        conditions.append("(" + " OR ".join(visible) + ")")
     if not include_deleted:
         conditions.append("p.is_deleted = FALSE")
     if not include_archived:
         conditions.append("p.is_archived = FALSE")
-    where = " AND ".join(conditions)
+    where = " AND ".join(conditions) or "1=1"
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -225,14 +229,15 @@ def list_projects(
                 f"p.description, p.status, p.vehicle_model_gid, p.factory_gid, "
                 f"p.team_id, p.owner_gid, p.share_scope, p.jph, "
                 f"p.is_deleted, p.is_archived, p.deleted_at, p.archived_at, "
-                f"p.created_at, p.updated_at, "
-                f"u.name AS owner_name "
-                f"FROM workmanship_proj_projects p LEFT JOIN workmanship_auth_users u ON p.owner_gid = u.gid "
+                f"p.created_at, p.updated_at FROM workmanship_proj_projects p "
                 f"WHERE {where} ORDER BY p.updated_at DESC",
-                params
+                params,
             )
-            rows = cur.fetchall()
-    return {"success": True, "data": [_row_to_project(r) for r in rows]}
+            rows = [dict(row) for row in cur.fetchall()]
+    profiles = get_user_profiles(row["owner_gid"] for row in rows)
+    for row in rows:
+        row["owner_name"] = profiles.get(str(row["owner_gid"]), {}).get("name", "")
+    return {"success": True, "data": [_row_to_project(row) for row in rows]}
 
 
 @router.post("", status_code=201)
@@ -262,30 +267,38 @@ def create_project(body: CreateProjectBody, current_user: dict = Depends(_PROJEC
 
 @router.get("/members/matrix")
 def get_members_matrix(current_user: dict = Depends(get_current_user)):
-    """返回所有项目成员矩阵数据（人员×项目，含线体/角色信息）。"""
+    """Compose the Auth membership projection with Craft-owned project/line names."""
+    memberships = list_all_project_memberships()
+    project_gids = sorted({row["project_gid"] for row in memberships if row.get("project_gid")})
+    line_gids = sorted({row["scope_gid"] for row in memberships if row.get("scope_gid")})
+    projects = {}
+    sections = {}
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT pm.user_gid, u.name, u.email, u.avatar_url, "
-                "pm.project_gid, p.name AS project_name, "
-                "pm.role, pm.scope_gid, "
-                "be.title AS section_title "
-                "FROM workmanship_auth_project_members pm "
-                "JOIN workmanship_auth_users u ON pm.user_gid = u.gid "
-                "JOIN workmanship_proj_projects p ON pm.project_gid = p.gid AND p.is_deleted = FALSE "
-                "LEFT JOIN workmanship_bop_bop_entries be ON pm.scope_gid = be.gid "
-                "ORDER BY u.name, p.name"
-            )
-            rows = cur.fetchall()
+            if project_gids:
+                placeholders = ",".join(["%s"] * len(project_gids))
+                cur.execute(
+                    f"SELECT gid, name FROM workmanship_proj_projects "
+                    f"WHERE is_deleted=FALSE AND gid IN ({placeholders})",
+                    project_gids,
+                )
+                projects = {row["gid"]: row["name"] for row in cur.fetchall()}
+            if line_gids:
+                placeholders = ",".join(["%s"] * len(line_gids))
+                cur.execute(
+                    f"SELECT gid, title FROM workmanship_bop_bop_entries WHERE gid IN ({placeholders})",
+                    line_gids,
+                )
+                sections = {row["gid"]: row["title"] for row in cur.fetchall()}
     return {"success": True, "data": [
         {
-            "user_gid": r["user_gid"], "name": r["name"],
-            "email": r["email"], "avatar_url": r["avatar_url"],
-            "project_gid": r["project_gid"], "project_name": r["project_name"],
-            "project_role": r["role"], "section_gid": r["scope_gid"],
-            "section_title": r["section_title"],
+            "user_gid": row["user_gid"], "name": row["name"],
+            "email": row["email"], "avatar_url": row["avatar_url"],
+            "project_gid": row["project_gid"], "project_name": projects[row["project_gid"]],
+            "project_role": row["role"], "section_gid": row["scope_gid"],
+            "section_title": sections.get(row["scope_gid"], ""),
         }
-        for r in rows
+        for row in memberships if row.get("project_gid") in projects
     ]}
 
 
@@ -398,89 +411,53 @@ def delete_project(gid: str, current_user: dict = Depends(_ADMIN)):
 def list_project_members(gid: str, current_user: dict = Depends(get_current_user)):
     with get_conn() as conn:
         with conn.cursor() as cur:
-            # 1. 项目成员（project_members 表）
             cur.execute(
-                "SELECT pm.gid, pm.user_gid, u.name, u.email, u.avatar_url, "
-                "pm.role, pm.scope_gid, pm.scope_type, pm.created_at, be.title AS line_title "
-                "FROM workmanship_auth_project_members pm JOIN workmanship_auth_users u ON pm.user_gid = u.gid "
-                "LEFT JOIN workmanship_bop_bop_entries be ON pm.scope_gid = be.gid "
-                "WHERE pm.project_gid = %s",
-                (gid,)
+                "SELECT e.gid, e.title FROM workmanship_bop_bop_entries e "
+                "JOIN workmanship_bop_bop_versions v ON v.gid=e.version_gid "
+                "WHERE v.project_gid=%s AND v.archived_at IS NULL "
+                "AND e.node_type='line_process' AND e.is_deleted=FALSE",
+                (gid,),
             )
-            rows = list(cur.fetchall())
-            # 2. 线体管理员（permission_grants 表，项目所有线体）
-            cur.execute(
-                "SELECT pg.gid, pg.grantee_gid AS user_gid, u.name, u.email, u.avatar_url, "
-                "pg.scope_gid, pg.granted_at AS created_at, be.title AS line_title "
-                "FROM workmanship_auth_permission_grants pg JOIN workmanship_auth_users u ON pg.grantee_gid = u.gid "
-                "LEFT JOIN workmanship_bop_bop_entries be ON pg.scope_gid = be.gid "
-                "WHERE pg.grant_type = 'section_lead' AND pg.scope_gid IN ("
-                "  SELECT e.gid FROM workmanship_bop_bop_entries e "
-                "  JOIN workmanship_bop_bop_versions v ON v.gid = e.version_gid "
-                "  WHERE v.project_gid = %s AND v.archived_at IS NULL"
-                ")",
-                (gid,)
-            )
-            grant_rows = cur.fetchall()
-    # 合并，去重 user_gid + scope_gid
+            line_titles = {row["gid"]: row["title"] or "" for row in cur.fetchall()}
+    rows = list_project_access_entries(gid, line_titles)
     seen = set()
     result = []
-    for r in rows:
-        key = (r["user_gid"], r["scope_gid"] or "")
-        if key not in seen:
-            seen.add(key)
-            result.append({
-                "gid": r["gid"], "user_gid": r["user_gid"], "name": r["name"],
-                "email": r["email"], "avatar_url": r["avatar_url"],
-                "project_role": r["role"], "scope_gid": r["scope_gid"],
-                "scope_type": r.get("scope_type") or "", "line_title": r.get("line_title") or "",
-                "created_at": str(r["created_at"])
-            })
-    for r in grant_rows:
-        key = (r["user_gid"], r["scope_gid"] or "")
-        if key not in seen:
-            seen.add(key)
-            result.append({
-                "gid": r["gid"], "user_gid": r["user_gid"], "name": r["name"],
-                "email": r["email"], "avatar_url": r["avatar_url"],
-                "project_role": "section_lead", "scope_gid": r["scope_gid"],
-                "scope_type": "line", "line_title": r.get("line_title") or "",
-                "created_at": str(r["created_at"])
-            })
+    for row in rows:
+        key = (row["user_gid"], row.get("scope_gid") or "")
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append({
+            "gid": row["gid"], "user_gid": row["user_gid"], "name": row["name"],
+            "email": row["email"], "avatar_url": row["avatar_url"],
+            "project_role": row["role"], "scope_gid": row.get("scope_gid"),
+            "scope_type": row.get("scope_type") or "",
+            "line_title": line_titles.get(row.get("scope_gid"), ""),
+            "created_at": str(row["created_at"]),
+        })
     return {"success": True, "data": result}
 
 
 @router.post("/{gid}/members", status_code=201)
 def add_project_member(gid: str, body: AddMemberBody, current_user: dict = Depends(_PROJECT_WRITE)):
-    member_gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid = %s AND is_deleted = FALSE", (gid,))
+            cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid=%s AND is_deleted=FALSE", (gid,))
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="项目不存在")
-            try:
-                cur.execute(
-                    "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role, scope_type, scope_gid) "
-                    "VALUES (%s, %s, %s, %s, %s, %s)",
-                    (member_gid, gid, body.user_gid, body.project_role, 'project', body.section_gid)
-                )
-            except Exception:
-                raise HTTPException(status_code=409, detail="该用户已是项目成员")
-        conn.commit()
+    try:
+        member_gid = add_project_access_member(
+            gid, body.user_gid, body.project_role, body.section_gid
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=409, detail="该用户已是项目成员") from exc
     return {"success": True, "data": {"gid": member_gid}}
 
 
 @router.delete("/{gid}/members/{member_gid}")
 def remove_project_member(gid: str, member_gid: str, current_user: dict = Depends(_PROJECT_WRITE)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "DELETE FROM workmanship_auth_project_members WHERE gid = %s AND project_gid = %s",
-                (member_gid, gid)
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="成员记录不存在")
-        conn.commit()
+    if not remove_project_access_member(gid, member_gid):
+        raise HTTPException(status_code=404, detail="成员记录不存在")
     return {"success": True}
 
 
@@ -512,82 +489,37 @@ def get_project_bop_lines(gid: str, current_user: dict = Depends(get_current_use
 
 @router.put("/{gid}/line-assignment")
 def upsert_line_assignment(gid: str, body: LineGrantBody, current_user: dict = Depends(get_current_user)):
-    """按线体授予或撤销 section_lead grant。
-    传入 line_gid 为任意一个线体 gid，会自动找到该项目下所有同名线体 gid 并批量操作。
-    line_gid 为空时表示项目级操作（项目经理）。
-    传 user_gid=None 则清空管理员。
-    """
-    if not body.line_gid:
-        # 项目级管理员（项目经理）
-        if not _can_manage_project_lines(current_user, gid):
-            raise HTTPException(status_code=403, detail="权限不足")
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("DELETE FROM workmanship_auth_project_members WHERE project_gid=%s AND role='project_manager'", (gid,))
-                if body.user_gid:
-                    cur.execute(
-                        "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role, scope_type, scope_gid) "
-                        "VALUES (%s, %s, %s, 'project_manager', 'project', NULL)",
-                        (str(next_gid()), gid, body.user_gid),
-                    )
-            conn.commit()
-        return {"success": True}
+    """Replace project-manager or same-title line-lead assignments through Base access APIs."""
     if not _can_manage_project_lines(current_user, gid):
         raise HTTPException(status_code=403, detail="权限不足")
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid = %s AND is_deleted = FALSE", (gid,))
+            cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid=%s AND is_deleted=FALSE", (gid,))
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="项目不存在")
-            # 查这条线体的 title
-            cur.execute(
-                "SELECT title FROM workmanship_bop_bop_entries WHERE gid = %s AND node_type = 'line_process'",
-                (body.line_gid,)
-            )
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="线体不存在")
-            line_title = row["title"]
-            # 找到该项目所有同名线体的 gid
-            cur.execute(
-                "SELECT e.gid FROM workmanship_bop_bop_entries e "
-                "JOIN workmanship_bop_bop_versions v ON v.gid = e.version_gid "
-                "WHERE v.project_gid = %s AND v.archived_at IS NULL "
-                "AND e.node_type = 'line_process' AND e.is_deleted = FALSE AND e.title = %s",
-                (gid, line_title)
-            )
-            all_line_gids = [r["gid"] for r in cur.fetchall()]
-            if not all_line_gids:
-                raise HTTPException(status_code=404, detail="线体不存在")
-            # 删除所有同名线体的旧 grant
-            ph = ",".join(["%s"] * len(all_line_gids))
-            cur.execute(
-                f"DELETE FROM workmanship_auth_permission_grants WHERE grant_type = 'section_lead' AND scope_gid IN ({ph})",
-                all_line_gids,
-            )
-            # 也清理旧的 project_members（之后重新写入）
-            cur.execute(
-                f"DELETE FROM workmanship_auth_project_members WHERE project_gid = %s AND scope_gid IN ({ph})",
-                [gid] + all_line_gids,
-            )
-            # 批量插入新 grant + 同步到 project_members
-            if body.user_gid:
-                values_sql = ",".join(["(%s,%s,'section_lead',%s,%s,'')"] * len(all_line_gids))
-                flat = []
-                for lg in all_line_gids:
-                    flat.extend([str(next_gid()), body.user_gid, lg, current_user["gid"]])
+            if not body.line_gid:
+                line_gids = []
+            else:
                 cur.execute(
-                    f"INSERT INTO workmanship_auth_permission_grants (gid, grantee_gid, grant_type, scope_gid, granted_by, note) VALUES {values_sql}",
-                    flat,
+                    "SELECT title FROM workmanship_bop_bop_entries "
+                    "WHERE gid=%s AND node_type='line_process' AND is_deleted=FALSE",
+                    (body.line_gid,),
                 )
-                # 同步写入 project_members（让 scope_visible_clause 看到）
-                try:
-                    cur.execute(
-                        "INSERT INTO workmanship_auth_project_members (gid, project_gid, user_gid, role, scope_type, scope_gid) "
-                        "VALUES (%s, %s, %s, 'section_lead', 'line', %s)",
-                        (str(next_gid()), gid, body.user_gid, all_line_gids[0]),
-                    )
-                except Exception:
-                    pass  # 已存在则跳过
-        conn.commit()
+                row = cur.fetchone()
+                if not row:
+                    raise HTTPException(status_code=404, detail="线体不存在")
+                cur.execute(
+                    "SELECT e.gid FROM workmanship_bop_bop_entries e "
+                    "JOIN workmanship_bop_bop_versions v ON v.gid=e.version_gid "
+                    "WHERE v.project_gid=%s AND v.archived_at IS NULL "
+                    "AND e.node_type='line_process' AND e.is_deleted=FALSE AND e.title=%s",
+                    (gid, row["title"]),
+                )
+                line_gids = [item["gid"] for item in cur.fetchall()]
+                if not line_gids:
+                    raise HTTPException(status_code=404, detail="线体不存在")
+    if not body.line_gid:
+        replace_project_manager(gid, body.user_gid)
+    else:
+        replace_section_leads(gid, line_gids, body.user_gid, current_user["gid"])
     return {"success": True}

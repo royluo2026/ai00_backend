@@ -122,6 +122,17 @@ _READ_TOOLS = [
         },
     },
     {
+        "name": "get_knowledge_document",
+        "description": "读取有权访问的团队Markdown文档；可固定到指定revision，并返回可验证来源。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "document_gid": {"type": "string", "description": "知识文档GID"},
+                "revision_gid": {"type": "string", "description": "可选；指定不可变版本GID"},
+            },
+            "required": ["document_gid"],
+        },
+    },    {
         "name": "list_rules",
         "description": "列出工艺规则，支持按状态/类型过滤。",
         "input_schema": {
@@ -736,14 +747,14 @@ def get_all_tools_with_skills(owner_gid: str = "", auth_mode: str = "feishu") ->
     tools = list(ALL_TOOLS_OPENAI)
     # 动态 skill 工具：从数据库读取 active skills
     try:
-        from backend.db.connection import get_conn as _gc
-        with _gc() as conn:
+        from ..data.connection import get_agent_conn
+        with get_agent_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute("""
-                    SELECT gid, name, title, description FROM app.skills
-                    WHERE status='active' AND deleted_at IS NULL
+                    SELECT gid, name, title, description FROM workmanship_app_skills
+                    WHERE status='active' AND deleted_at IS NULL AND (owner_gid=%s OR owner_gid='__system__' OR scope='global')
                     ORDER BY sort_order ASC LIMIT 20
-                """)
+                """, (owner_gid,))
                 skills = cur.fetchall()
         for s in skills:
             tools.append({

@@ -1,0 +1,686 @@
+{
+  "registry_version": 1,
+  "table_count": 136,
+  "tables": [
+    {
+      "table": "workmanship_app_ai_audit_logs",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_app_ai_memory",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_app_ai_sessions",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_app_ai_turns",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_app_bug_tracker_snapshots",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_app_capability_audit",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_export_templates",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_feishu_search_cache",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_flow_runs",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_app_flows",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_app_operational_alerts",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_skills",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_app_system_config",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_view_configs",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_wb_annotations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_wfc_canvases",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_app_workbench_configs",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_workbench_member_overrides",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_app_worker_heartbeats",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_auth_auth_pending",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_auth_bid_sections",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_auth_permission_grants",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_auth_project_members",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_auth_section_owners",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_auth_teams",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_auth_users",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_schema_migrations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_self_annotations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_bop_asm_steps",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_control_plan",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_entries",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_entry_links",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_equipments",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_fixtures",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_floor_height",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_fork_presets",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_jack_pos",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_lifecycle_history",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_lifecycle_stats",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_line",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_line_checkpoints",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_line_history_state",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_line_operation_log",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_operator",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_pbom_diff_queue",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_process",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_process_charts",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_staging",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_station",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_steps",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_tools",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_version_families",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_bop_versions",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_cad_model_instances",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_canvas_bop_layers",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_gbop_match_staging",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_gbop_nav_bindings",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_pbom",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_pbom_versions",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_project_roles",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_bop_vpps_operations",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_display_id_counters",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_factory_factories",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_factory_factory_equipments",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_factory_factory_fixtures",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_factory_factory_layout_templates",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_factory_factory_lines",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_factory_factory_sections",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_factory_factory_stations",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_factory_factory_tools",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_int_ext_datasources",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_int_ext_field_mappings",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_int_ext_mappings",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_craft_rules",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_know_document_acl",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_documents",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_entries",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_favorites",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_folders",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_items",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_migration_items",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_migration_runs",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_proposals",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_publish_outbox",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_recent",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_revisions",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_know_spaces",
+      "owner": "knowledge",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_onto_axioms",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_onto_classes",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_onto_properties",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_onto_relations",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_plugin_installations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_plugin_lifecycle_events",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_plugin_namespace_kv",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_plugin_publishers",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_plugin_releases",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_plugin_usage_events",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_plugin_usage_month_closures",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_plugin_usage_monthly",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_proj_approval_orders",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_proj_collab_sessions",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_proj_issues",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_proj_projects",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_proj_task_dependencies",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_proj_tasks",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_proj_vehicle_models",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_runtime_commands",
+      "owner": "device",
+      "runtime_domain": "device"
+    },
+    {
+      "table": "workmanship_runtime_devices",
+      "owner": "device",
+      "runtime_domain": "device"
+    },
+    {
+      "table": "workmanship_runtime_enrollments",
+      "owner": "device",
+      "runtime_domain": "device"
+    },
+    {
+      "table": "workmanship_sim_environments",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_tpl_fastener_spec",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_gbop_entries",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_gbop_entry_links",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_gbop_operations",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_gbop_processes",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_gbop_versions",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_vpps_equipments",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_vpps_fixtures",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_vpps_parts",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_tpl_vpps_tools",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_follows",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_work_issues",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_item_change_logs",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_item_entries",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_item_shares",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_list_bitable_bindings",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_list_bitable_record_map",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_list_shares",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_lists",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_notifications",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_work_permission_requests",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_share_links",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_task_dependencies",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_task_template_items",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_task_templates",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_work_tasks",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    }
+  ]
+}

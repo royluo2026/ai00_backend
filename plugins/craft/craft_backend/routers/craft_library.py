@@ -23,9 +23,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user, require_role
-from backend.utils.gid import next_gid
+from ..data.connection import get_conn
+from backend.platform_sdk.auth import get_current_user, require_role
+from backend.platform_sdk.ids import next_gid
 
 router = APIRouter(prefix="/api/craft_lib", tags=["craft_library"])
 _log = __import__('logging').getLogger(__name__)
@@ -159,28 +159,6 @@ def _obsolete_template(table: str, gid: str, current_user: dict):
                 raise HTTPException(status_code=400, detail="记录不存在或已不可废弃")
         conn.commit()
     return {"success": True}
-
-
-_alias_migrated = False
-
-def _ensure_alias_column():
-    global _alias_migrated
-    if _alias_migrated: return
-    try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                try:
-                    cur.execute(
-                        "ALTER TABLE workmanship_tpl_vpps_parts "
-                        "ADD COLUMN alias JSON NOT NULL DEFAULT (JSON_ARRAY())"
-                    )
-                except Exception as e:
-                    if not (getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060):
-                        raise
-            conn.commit()
-        _alias_migrated = True
-    except Exception as e:
-        print(f"[craft_lib] alias column migration error: {e}")
 
 
 def _patch_record(table: str, gid: str, body, allowed_fields: list):
@@ -407,7 +385,6 @@ def list_part_names(
     q: Optional[str] = Query(None),
     current_user: dict = Depends(_READ)
 ):
-    _ensure_alias_column()
     with get_conn() as conn:
         with conn.cursor() as cur:
             if q:
@@ -446,7 +423,6 @@ def list_part_names(
 
 @router.post("/part_names", status_code=201)
 def create_part_name(body: PartNameBody, current_user: dict = Depends(_WRITE)):
-    _ensure_alias_column()
     if body.flex_type not in _FLEX_TYPE_VALUES:
         raise HTTPException(status_code=422, detail=f"flex_type 必须是 {sorted(_FLEX_TYPE_VALUES)} 之一")
     gid = str(next_gid())
@@ -561,7 +537,6 @@ class BatchAcceptAliasBody(BaseModel):
 @router.post("/part_names/batch_accept_alias")
 def batch_accept_vpps_alias(body: BatchAcceptAliasBody, current_user: dict = Depends(_WRITE)):
     """批量接受 VPPS 描述别名，并在 meta 中记录来源信息。"""
-    _ensure_alias_column()
     user_name = current_user.get("name") or current_user.get("email") or current_user.get("sub", "?")
     now_str = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     processed = 0
@@ -606,7 +581,6 @@ def batch_accept_vpps_alias(body: BatchAcceptAliasBody, current_user: dict = Dep
 
 @router.post("/part_names/{gid}/accept_alias")
 def accept_vpps_alias(gid: str, body: AcceptAliasBody, current_user: dict = Depends(_WRITE)):
-    _ensure_alias_column()
     user_name = current_user.get("name") or current_user.get("email") or current_user.get("sub", "?")
     now_str   = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     note = f'[别名] {user_name} @ {now_str}: 接受别名"{body.alias}"'

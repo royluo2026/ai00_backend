@@ -1,7 +1,7 @@
 """
 backend/ai_assistant/engineering_skills_seed.py
 ─────────────────────────────────────────────────
-预定义 6 个工程框架技能，写入 app.skills 表（ON CONFLICT DO NOTHING，幂等安全）。
+预定义 6 个工程框架技能，写入 workmanship_app_skills 表（ON CONFLICT DO NOTHING，幂等安全）。
 在 backend/main.py lifespan startup 阶段调用 seed_engineering_skills()。
 
 每个技能是完整的 Canvas 定义（skill_type='canvas'，scope='global'，is_system=True）。
@@ -243,25 +243,25 @@ _SKILLS: list[dict] = [
 
 def seed_engineering_skills() -> None:
     """
-    将 6 个工程框架技能写入 app.skills 表。
+    将 6 个工程框架技能写入 workmanship_app_skills 表。
     ON CONFLICT(name) DO NOTHING — 幂等安全，重启不会重复创建。
     """
     import json as _json
     try:
-        from backend.db.connection import get_conn
-        with get_conn() as conn:
+        from ..data.connection import get_agent_conn
+        with get_agent_conn() as conn:
             with conn.cursor() as cur:
                 for skill in _SKILLS:
                     gid = _gid(skill["name"])
                     cur.execute("""
-                        INSERT INTO app.skills
+                        INSERT INTO workmanship_app_skills
                             (gid, name, title, description, skill_type, scope,
-                             status, is_system, content, icon, tags,
+                             status, owner_gid, is_system, content, icon, tags,
                              sort_order, is_pinned, created_at, updated_at)
                         VALUES (%s, %s, %s, %s, 'canvas', 'global',
-                                'active', TRUE, %s, %s, %s,
+                                'active', '__system__', TRUE, %s, %s, %s,
                                 %s, FALSE, NOW(), NOW())
-                        ON CONFLICT (name) DO NOTHING
+                        ON DUPLICATE KEY UPDATE name=VALUES(name)
                     """, (
                         gid,
                         skill["name"],

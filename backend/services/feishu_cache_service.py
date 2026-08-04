@@ -32,51 +32,6 @@ FEISHU_API = "https://open.feishu.cn/open-apis"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# DDL（由 main.py lifespan 调用）
-# ─────────────────────────────────────────────────────────────────────────────
-
-def ensure_table():
-    """幂等建表：workmanship_app_feishu_search_cache。同时清理超过 7 天未刷新的过期行。"""
-    try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS workmanship_app_feishu_search_cache (
-                        user_gid    CHAR(36)    NOT NULL,
-                        entity_type VARCHAR(64) NOT NULL,
-                        entity_id   VARCHAR(255) NOT NULL,
-                        name        TEXT        NOT NULL DEFAULT '',
-                        search_ext  TEXT        NOT NULL DEFAULT '',
-                        data        JSON        NOT NULL DEFAULT (JSON_OBJECT()),
-                        updated_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-                        PRIMARY KEY (user_gid, entity_type, entity_id)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-                """)
-                cur.execute("""
-                    CREATE INDEX IF NOT EXISTS idx_feishu_cache_name
-                    ON workmanship_app_feishu_search_cache (user_gid, entity_type, name(191))
-                """)
-                cur.execute("""
-                    CREATE INDEX IF NOT EXISTS idx_feishu_cache_updated
-                    ON workmanship_app_feishu_search_cache (user_gid, entity_type, updated_at)
-                """)
-                # 清理超过 7 天未刷新的行（防长期堆积）
-                cur.execute("""
-                    DELETE FROM workmanship_app_feishu_search_cache
-                    WHERE updated_at < NOW() - INTERVAL 7 DAY
-                """)
-                # 清理历史遗留的 p2p 单聊（entity_type='chat' 且 open_id 字段为空字符串）
-                cur.execute("""
-                    DELETE FROM workmanship_app_feishu_search_cache
-                    WHERE entity_type = 'chat'
-                      AND JSON_UNQUOTE(JSON_EXTRACT(data, '$.open_id')) = ''
-                """)
-            conn.commit()
-    except Exception as e:
-        _log.warning("feishu_cache_service.ensure_table: %s", e)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 # 核心读写
 # ─────────────────────────────────────────────────────────────────────────────
 

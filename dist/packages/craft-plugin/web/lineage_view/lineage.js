@@ -25,7 +25,7 @@ const NT_ABBR = {
 // NT_LABEL：对照 docs/bop/db csv ui.xlsx "零组件类型AI_00" 列（lineage 卡片提示 / 筛选下拉显示）
 const NT_LABEL = {
   factory_bop:          '总装工厂BOP',    line_process:         '总装线体工艺',
-  station_process:      '总装工位工艺',   operator_process:     '总装岗位工艺',
+  station_process:      '总装工位工艺',   operator_process:     '岗位',
   man:                  '人',             station_factory:      '工厂工位',
   equipment_factory:    '设备（工厂）',   tool_factory:         '工具（工厂）',
   equipment_need:       '设备（需求）',   fixture_factory:      '工装（工厂）',
@@ -2419,7 +2419,7 @@ function _startInlineRename(cardEl) {
 const _ORDERED_NODE_TYPES = [
   ['operation',        '总装操作'],
   ['process',          '总装工序'],
-  ['operator_process', '总装岗位工艺'],
+  ['operator_process', '岗位'],
   ['station_process',  '总装工位工艺'],
   ['line_process',     '总装线体工艺'],
   ['man',              '人'],

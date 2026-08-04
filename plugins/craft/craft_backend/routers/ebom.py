@@ -19,9 +19,9 @@ from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user, require_role
-from backend.utils.gid import next_gid
+from ..data.connection import get_conn
+from backend.platform_sdk.auth import get_current_user, require_role
+from backend.platform_sdk.ids import next_gid
 
 router = APIRouter(prefix="/api/ebom", tags=["ebom"])
 _log = __import__('logging').getLogger(__name__)
@@ -29,81 +29,6 @@ _log = __import__('logging').getLogger(__name__)
 _READ = require_role("super_admin", "team_admin", "project_admin",
                      "rule_admin", "knowledge_admin", "member")
 _WRITE = require_role("super_admin", "team_admin", "project_admin", "member")
-
-# ── 幂等列补丁（启动时自动执行）─────────────────────────────────
-_migrated = False
-
-def _safe_add_column(cur, sql: str) -> None:
-    """执行 ALTER TABLE ADD COLUMN，忽略列已存在错误（1060）"""
-    try:
-        cur.execute(sql)
-    except Exception as e:
-        if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
-            return
-        raise
-
-
-def _ensure_columns():
-    global _migrated
-    if _migrated:
-        return
-    try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                # pbom_versions 扩展
-                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN name TEXT DEFAULT ''")
-                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN meta JSON NOT NULL DEFAULT (JSON_OBJECT())")
-                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN project_gid CHAR(36) DEFAULT NULL")
-                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN visibility TEXT DEFAULT 'project'")
-                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN shared_team_gid CHAR(36) DEFAULT NULL")
-                _safe_add_column(cur, "ALTER TABLE workmanship_bop_pbom_versions ADD COLUMN shared_project_gid CHAR(36) DEFAULT NULL")
-                try:
-                    cur.execute("ALTER TABLE workmanship_bop_pbom_versions ALTER COLUMN project_gid DROP NOT NULL")
-                except Exception:
-                    pass  # 已可为空或列类型不允许此操作，忽略
-                # pbom 零件扩展列（vpps + 19 列）
-                for col, typ in [
-                    ("vpps", "TEXT"),
-                    ("vpps_desc", "TEXT DEFAULT ''"), ("parent_vpps", "TEXT DEFAULT ''"),
-                    ("parent_vpps_name", "TEXT DEFAULT ''"), ("bom_row", "TEXT DEFAULT ''"),
-                    ("bom_row_label", "TEXT DEFAULT ''"),
-                    ("component_id", "TEXT DEFAULT ''"), ("component_type", "TEXT DEFAULT ''"),
-                    ("component_version_status", "TEXT DEFAULT ''"),
-                    ("purchase_status", "TEXT DEFAULT ''"), ("variable_formula", "TEXT DEFAULT ''"),
-                    ("torque", "TEXT DEFAULT ''"), ("torque_importance", "TEXT DEFAULT ''"),
-                    ("ownership_user", "TEXT DEFAULT ''"), ("level", "INTEGER DEFAULT NULL"),
-                    ("home", "TEXT DEFAULT ''"), ("configuration", "TEXT DEFAULT ''"),
-                    ("parent_bom_row", "TEXT DEFAULT ''"),
-                    ("remark", "TEXT DEFAULT ''"),
-                    ("temp_vpps", "TEXT DEFAULT ''"),
-                    # CATIA 实例数据 + 变换矩阵 + 限定框 + ECN/FNA
-                    ("catia_occurrence_name", "TEXT DEFAULT ''"),
-                    ("catia_file_name", "TEXT DEFAULT ''"),
-                    ("catia_uuid", "TEXT DEFAULT ''"),
-                    ("default_matrix", "TEXT DEFAULT ''"),
-                    ("abs_matrix", "TEXT DEFAULT ''"),
-                    ("rel_matrix", "TEXT DEFAULT ''"),
-                    ("local_bbox", "TEXT DEFAULT ''"),
-                    ("ecn", "TEXT DEFAULT ''"),
-                    ("fna", "TEXT DEFAULT ''"),
-                    # 紧固件主件识别分析结果
-                    ("geo_main_part", "TEXT DEFAULT ''"),
-                    ("ref_main_vpps_desc", "TEXT DEFAULT ''"),
-                    ("ref_main_vpps", "TEXT DEFAULT ''"),
-                    ("main_part_consistency", "TEXT DEFAULT ''"),
-                    ("geo_evidence", "TEXT DEFAULT ''"),
-                    ("lr_side", "TEXT DEFAULT ''"),
-                    # 系统字段（旧表可能缺）
-                    ("vpps_source", "TEXT NOT NULL DEFAULT ('auto')"),
-                    ("is_deleted", "TINYINT(1) NOT NULL DEFAULT 0"),
-                    ("meta", "JSON NOT NULL DEFAULT (JSON_OBJECT())"),
-                ]:
-                    _safe_add_column(cur, f"ALTER TABLE workmanship_bop_pbom ADD COLUMN {col} {typ}")
-            conn.commit()
-        _migrated = True
-    except Exception as e:
-        print(f"[ebom] column migration error: {e}")
-        # 不设 _migrated=True，下次请求重试
 
 # ── 版本列全集 ───────────────────────────────────────────────────
 _VER_COLS = "gid, project_gid, version_tag, name, source_type, status, created_at"
@@ -277,7 +202,6 @@ def list_snapshots(
     project_gid: Optional[str] = Query(None),
     current_user: dict = Depends(_READ)
 ):
-    _ensure_columns()
     with get_conn() as conn:
         with conn.cursor() as cur:
             if project_gid:
@@ -297,7 +221,6 @@ def list_snapshots(
 
 @router.post("/snapshots", status_code=201)
 def create_snapshot(body: CreateVersionBody, current_user: dict = Depends(_WRITE)):
-    _ensure_columns()
     gid = str(next_gid())
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -484,7 +407,6 @@ def add_part(gid: str, body: CreatePartBody, current_user: dict = Depends(_WRITE
 @router.post("/snapshots/{gid}/parts/batch", status_code=201)
 def add_parts_batch(gid: str, body: List[CreatePartBody], current_user: dict = Depends(_WRITE)):
     """批量添加零件（用于 Excel 导入）"""
-    _ensure_columns()
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT 1 FROM workmanship_bop_pbom_versions WHERE gid = %s", (gid,))
@@ -599,9 +521,6 @@ def vpps_check(
     规则1：主数据核对  规则2：父级一致性  规则3：层级前缀  规则4：紧固件主件一致性
     """
     import re as _re, json as _json
-    # 确保 alias 列存在（幂等）
-    from backend.routers.craft_library import _ensure_alias_column
-    _ensure_alias_column()
 
     with get_conn() as conn:
         with conn.cursor() as cur:

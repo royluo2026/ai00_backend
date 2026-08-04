@@ -44,3 +44,6 @@ desktop.ini
 # ── 测试覆盖率 ────────────────────────────────────────────────────────────────
 .coverage
 htmlcov/
+
+# Plugin SDK generated release artifacts
+/packages/plugin-sdk/**/dist/

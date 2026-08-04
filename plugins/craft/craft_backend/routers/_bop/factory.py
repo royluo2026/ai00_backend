@@ -9,8 +9,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.utils.gid import next_gid
+from ...data.connection import get_conn
+from backend.platform_sdk.ids import next_gid
 
 from ._constants import _ADMIN, _READ, _SEC_COLS, _SEC_KEYS, _STA_COLS, _STA_KEYS, _LTPL_COLS, _LTPL_KEYS
 from ._helpers import _row, _rows, _not_found

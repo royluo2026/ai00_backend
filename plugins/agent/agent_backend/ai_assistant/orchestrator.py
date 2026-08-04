@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
-    from backend.ai_assistant.task_classifier import TaskClassification
+    from .task_classifier import TaskClassification
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +136,7 @@ class OrchestratorRunner:
         返回 {"answer", "tool_calls", "pending_confirm", "orchestrator", "agents"}。
         若 Phase 1 未产生 SubAgent，返回 {"_fallback": True} 以降级到普通路径。
         """
-        from backend.ai_assistant.session_store import _store
+        from .session_store import _store
 
         # ── Phase 1：规划 ──────────────────────────────────────────────
         if task_cls and task_cls.get("sub_tasks"):
@@ -351,8 +351,8 @@ class OrchestratorRunner:
         使用 litellm 直接调用 + tool_handlers 执行工具（同步，无 SSE）。
         """
         import litellm
-        from backend.ai_assistant.tool_registry import ALL_TOOLS_OPENAI
-        from backend.ai_assistant.tool_handlers import dispatch as tool_dispatch
+        from .tool_registry import ALL_TOOLS_OPENAI
+        from .tool_handlers import dispatch as tool_dispatch
 
         sub_session_gid = f"{parent_session_gid}_sub_{agent.agent_id}"
 

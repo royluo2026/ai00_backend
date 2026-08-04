@@ -5,7 +5,7 @@ const NODE_TYPE_LABELS = {
   factory_bop:          '总装工厂BOP',
   line_process:         '总装线体工艺',
   station_process:      '总装工位工艺',
-  operator_process:     '总装岗位工艺',
+  operator_process:     '岗位',
   man:                  '人',
   station_factory:      '工厂工位',
   equipment_factory:    '设备（工厂）',

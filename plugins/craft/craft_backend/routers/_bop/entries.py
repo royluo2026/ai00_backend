@@ -14,8 +14,9 @@ from typing import Dict, List, Literal, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.utils.gid import next_gid
+from ...data.connection import get_conn
+from backend.platform_sdk.ids import next_gid
+from backend.platform_sdk.identity import resolve_identity_labels
 
 from ._constants import (
     _WRITE, _READ, _SUPER_ADMIN,
@@ -108,7 +109,7 @@ def _normalize_bop_pic_items(items):
 
 
 def _resolve_bop_pic_items(items):
-    from backend.core import ois_storage as _ois_storage
+    from backend.platform_sdk import ois_storage as _ois_storage
 
     resolved = []
     for pic in _normalize_bop_pic_items(items):
@@ -494,7 +495,7 @@ def create_entry(body: CreateEntryBody, _u=Depends(_WRITE)):
             conn.commit()  # 确保日志 INSERT 立即提交
             # 规则检验（WARN 模式，不阻断保存）
             try:
-                from backend.rule_engine.checker import check_entry_rules
+                from backend.platform_sdk.rules import check_entry_rules
                 rule_warnings = check_entry_rules(body.node_type, entry_gid)
             except Exception:
                 rule_warnings = []
@@ -642,7 +643,7 @@ def upload_bop_pic(body: BopPicUploadBody, _u=Depends(_WRITE)):
     )
     if len(data) > _BOP_PICS_MAX:
         raise HTTPException(400, f"图片大小超过 5MB 限制")
-    from backend.core import storage as _storage
+    from backend.platform_sdk import blob_storage as _storage
     minio_url = _storage.upload(data, ext, body.mime, prefix="bop_pics")
     _log.info(
         "bop pic upload storage result filename=%s url=%s",
@@ -651,7 +652,7 @@ def upload_bop_pic(body: BopPicUploadBody, _u=Depends(_WRITE)):
     )
     if minio_url:
         payload = {"url": minio_url}
-        from backend.core import ois_storage as _ois_storage
+        from backend.platform_sdk import ois_storage as _ois_storage
         ois_cfg = _ois_storage._get_ois_config()
         public_base = str(ois_cfg.get('public_base_url') or '').rstrip('/')
         identify = str(ois_cfg.get('identify') or '').strip()
@@ -1779,7 +1780,7 @@ class ResolveGidsBody(BaseModel):
 @router.post("/resolve-gids")
 def resolve_gids(body: ResolveGidsBody, _u=Depends(_READ)):
     """批量把 _gid 字段值解析为人类可读名称。"""
-    result: dict = {}
+    result: dict = resolve_identity_labels(body.gids)
     with get_conn() as conn:
         with conn.cursor() as cur:
             for field, gid in body.gids.items():

@@ -1,0 +1,4829 @@
+{
+  "registry_version": 1,
+  "violations": [
+    {
+      "category": "cross_domain_foreign_key",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_item_shares->workmanship_auth_users",
+      "detail": "cross-domain foreign keys are forbidden",
+      "fingerprint": "cd9b140f0a0253c3d5a6"
+    },
+    {
+      "category": "cross_domain_foreign_key",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_shares->workmanship_auth_users",
+      "detail": "cross-domain foreign keys are forbidden",
+      "fingerprint": "64822d5f293ac40fac7a"
+    },
+    {
+      "category": "cross_domain_foreign_key",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_permission_requests->workmanship_auth_users",
+      "detail": "cross-domain foreign keys are forbidden",
+      "fingerprint": "1015ddb0d84aec4ac4b8"
+    },
+    {
+      "category": "cross_domain_foreign_key",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_share_links->workmanship_auth_users",
+      "detail": "cross-domain foreign keys are forbidden",
+      "fingerprint": "7b2d2745c1723ca6ce3e"
+    },
+    {
+      "category": "cross_domain_foreign_key",
+      "path": "backend/main.py",
+      "scope": "_ensure_deep_link_tables",
+      "target": "workmanship_work_permission_requests->workmanship_auth_users",
+      "detail": "cross-domain foreign keys are forbidden",
+      "fingerprint": "29b0aed90b86dce490b6"
+    },
+    {
+      "category": "cross_domain_foreign_key",
+      "path": "backend/main.py",
+      "scope": "_ensure_deep_link_tables",
+      "target": "workmanship_work_share_links->workmanship_auth_users",
+      "detail": "cross-domain foreign keys are forbidden",
+      "fingerprint": "d4e516a071972372da3d"
+    },
+    {
+      "category": "cross_domain_foreign_key",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_work_item_shares->workmanship_auth_users",
+      "detail": "cross-domain foreign keys are forbidden",
+      "fingerprint": "4aeeba70ab646bb27607"
+    },
+    {
+      "category": "cross_domain_foreign_key",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_work_list_shares->workmanship_auth_users",
+      "detail": "cross-domain foreign keys are forbidden",
+      "fingerprint": "f52cf36fcfbacfb9ef51"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "<module>",
+      "target": "workmanship_runtime_commands",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_commands",
+      "fingerprint": "b5edc1036852a4867238"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "<module>",
+      "target": "workmanship_runtime_devices",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_devices",
+      "fingerprint": "570be2dd26d413f3071d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "<module>",
+      "target": "workmanship_runtime_enrollments",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_enrollments",
+      "fingerprint": "4eb987ca322816e07bd6"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "activate_device",
+      "target": "workmanship_runtime_devices",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_devices",
+      "fingerprint": "9d65a5c8d2a42d0019c3"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "activate_device",
+      "target": "workmanship_runtime_enrollments",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_enrollments",
+      "fingerprint": "d8a111eecd6b9bfc9a1b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "authenticate_device",
+      "target": "workmanship_runtime_devices",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_devices",
+      "fingerprint": "920eb84c9e5440a82a0e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "complete_command",
+      "target": "workmanship_runtime_commands",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_commands",
+      "fingerprint": "446982de88ba901335eb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "create_enrollment",
+      "target": "workmanship_runtime_enrollments",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_enrollments",
+      "fingerprint": "c1a51e5730477a02a673"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "enqueue_command",
+      "target": "workmanship_runtime_commands",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_commands",
+      "fingerprint": "f25e162056adb2bad01a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "enqueue_command",
+      "target": "workmanship_runtime_devices",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_devices",
+      "fingerprint": "a15ed620340f195a9fc5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "get_command",
+      "target": "workmanship_runtime_commands",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_commands",
+      "fingerprint": "34418ac48ae672f2e5dc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "heartbeat",
+      "target": "workmanship_runtime_devices",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_devices",
+      "fingerprint": "b346b5210c30ce7d1735"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "lease_command",
+      "target": "workmanship_runtime_commands",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_commands",
+      "fingerprint": "1af7dfe047895a9fba84"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "list_devices",
+      "target": "workmanship_runtime_devices",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_devices",
+      "fingerprint": "bdc35178d1b3d63599ce"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "revoke_device",
+      "target": "workmanship_runtime_commands",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_commands",
+      "fingerprint": "e4852f571364e1077955"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "revoke_device",
+      "target": "workmanship_runtime_devices",
+      "detail": "base SQL accesses device-owned table workmanship_runtime_devices",
+      "fingerprint": "5724214dc34f9825423b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/check_schema_diff.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_axioms",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_axioms",
+      "fingerprint": "0a0314902449166ed239"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/check_schema_diff.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "244adf4a634ff50d7772"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/check_schema_diff.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "afef2a4bae76f9687cb4"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/check_schema_diff.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "6d71ff18c57bae3f13e6"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_memory",
+      "detail": "base SQL accesses agent-owned table workmanship_app_ai_memory",
+      "fingerprint": "e607c517d5cd5eada6fc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_sessions",
+      "detail": "base SQL accesses agent-owned table workmanship_app_ai_sessions",
+      "fingerprint": "add83b040c59e3ff83ef"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_turns",
+      "detail": "base SQL accesses agent-owned table workmanship_app_ai_turns",
+      "fingerprint": "e059ea4793a08b322d36"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_wfc_canvases",
+      "detail": "base SQL accesses craft-owned table workmanship_app_wfc_canvases",
+      "fingerprint": "6f9f376d53296096e01f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "9df92f57181517f3537f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_entry_links",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entry_links",
+      "fingerprint": "80983d3a1b970cede767"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_staging",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_staging",
+      "fingerprint": "7f1bfa1231a2f30e0784"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_versions",
+      "fingerprint": "dbd62f5d84d9e2baee97"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_gbop_match_staging",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_gbop_match_staging",
+      "fingerprint": "6da5f4c16c291f6524d8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_gbop_nav_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_gbop_nav_bindings",
+      "fingerprint": "fc7d41287b7dcaf3990a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_pbom",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_pbom",
+      "fingerprint": "af7ae90023f6d89e7dc4"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_pbom_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_pbom_versions",
+      "fingerprint": "969e1bb18c35e6efa34a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_vpps_operations",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_vpps_operations",
+      "fingerprint": "a66c98c81495b05145af"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_sections",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_sections",
+      "fingerprint": "5a9ea6b1095558cfb7b0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "a6eb83c4a5a87c5ff7f1"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "b7b139dbd53a3c5d8f4a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "bd30afdc40e3a2c282f2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_issues",
+      "fingerprint": "e7ba390410a0c18aacb5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_tasks",
+      "fingerprint": "b31fbeb84b750e74efb9"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_vpps_parts",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_vpps_parts",
+      "fingerprint": "35fd054574afd486142a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_item_change_logs",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_change_logs",
+      "fingerprint": "896eae5ed273db2de211"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_item_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_shares",
+      "fingerprint": "94ce6a3b62ef47b843f2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_bindings",
+      "fingerprint": "fc6baa3c0da434d58c39"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_bitable_record_map",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_record_map",
+      "fingerprint": "2b584ddc2ed8bb67dfce"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_shares",
+      "fingerprint": "5cf359a8083c95dfd563"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "ecbc2e7c3b0f0564e2c4"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_permission_requests",
+      "detail": "base SQL accesses craft-owned table workmanship_work_permission_requests",
+      "fingerprint": "f728617abb68c4e0e934"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_share_links",
+      "detail": "base SQL accesses craft-owned table workmanship_work_share_links",
+      "fingerprint": "a92de8f52eda20d5f098"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_task_dependencies",
+      "detail": "base SQL accesses craft-owned table workmanship_work_task_dependencies",
+      "fingerprint": "2d46e6c3a89ce0bd74f2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_work_tasks",
+      "fingerprint": "58182928739749ef33f5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_audit_logs",
+      "detail": "base SQL accesses agent-owned table workmanship_app_ai_audit_logs",
+      "fingerprint": "87fdb73e94d4262436a1"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_memory",
+      "detail": "base SQL accesses agent-owned table workmanship_app_ai_memory",
+      "fingerprint": "b328bd598abb266e2a66"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_sessions",
+      "detail": "base SQL accesses agent-owned table workmanship_app_ai_sessions",
+      "fingerprint": "99f27d4b7670f7ce7d05"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_turns",
+      "detail": "base SQL accesses agent-owned table workmanship_app_ai_turns",
+      "fingerprint": "7a3406784bddd1cd5786"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_bug_tracker_snapshots",
+      "detail": "base SQL accesses craft-owned table workmanship_app_bug_tracker_snapshots",
+      "fingerprint": "b4cba23d0dcd7e317132"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_flow_runs",
+      "detail": "base SQL accesses agent-owned table workmanship_app_flow_runs",
+      "fingerprint": "8707535cdb0fb694908a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_flows",
+      "detail": "base SQL accesses agent-owned table workmanship_app_flows",
+      "fingerprint": "f87f5f2893a81829a9ac"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_skills",
+      "detail": "base SQL accesses agent-owned table workmanship_app_skills",
+      "fingerprint": "b7055d8d6561a38f54d0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_wfc_canvases",
+      "detail": "base SQL accesses craft-owned table workmanship_app_wfc_canvases",
+      "fingerprint": "75cd43e5d9d89b084d88"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_asm_steps",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_asm_steps",
+      "fingerprint": "81e175782241a4625e0e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_control_plan",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_control_plan",
+      "fingerprint": "be3ef0e2244091cf0939"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "79d6138ff81b3cede2c9"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_entry_links",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entry_links",
+      "fingerprint": "8fd84e11a824f20aab91"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_equipments",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_equipments",
+      "fingerprint": "05049465f4e420379bcf"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_fixtures",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_fixtures",
+      "fingerprint": "ea1f4d8755f2a2e540c9"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_floor_height",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_floor_height",
+      "fingerprint": "bc2b130db9e6707f92a1"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_fork_presets",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_fork_presets",
+      "fingerprint": "865c019c81adc2b112df"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_jack_pos",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_jack_pos",
+      "fingerprint": "c05ec4c802a10101439c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_lifecycle_history",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_lifecycle_history",
+      "fingerprint": "71e6e258115c48d382dd"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_lifecycle_stats",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_lifecycle_stats",
+      "fingerprint": "3bd72ed6446ab7a8c358"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_line",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_line",
+      "fingerprint": "10bd5316522aef8ae27c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_line_checkpoints",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_line_checkpoints",
+      "fingerprint": "06740988265952f26051"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_line_operation_log",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_line_operation_log",
+      "fingerprint": "e87a0ff100a131ee4e90"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_operator",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_operator",
+      "fingerprint": "6bd0841618c8063e24c1"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_pbom_diff_queue",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_pbom_diff_queue",
+      "fingerprint": "64db26460708ccde6b9d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_process",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_process",
+      "fingerprint": "9bacae54afd231cf567e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_process_charts",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_process_charts",
+      "fingerprint": "7521c0d7d4e6bc0fec2c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_staging",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_staging",
+      "fingerprint": "38daca7b9030c83ea2e2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_station",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_station",
+      "fingerprint": "d1c6ec195e15224fa3d0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_steps",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_steps",
+      "fingerprint": "64d4573c7fdc5fc2c9fb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_tools",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_tools",
+      "fingerprint": "a1ed82a530ca0d5c4742"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_version_families",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_version_families",
+      "fingerprint": "c7229e3329b6d93e165b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_versions",
+      "fingerprint": "a6a65aa2116ecca9a0c2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_cad_model_instances",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_cad_model_instances",
+      "fingerprint": "87ee8395930380444212"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_canvas_bop_layers",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_canvas_bop_layers",
+      "fingerprint": "72f4cabae9dec14dc5ca"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_gbop_match_staging",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_gbop_match_staging",
+      "fingerprint": "bc979243b444d31eb842"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_gbop_nav_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_gbop_nav_bindings",
+      "fingerprint": "cd31931f34d1e185d800"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_pbom",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_pbom",
+      "fingerprint": "0a427ee95ef5ec5ac2d0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_pbom_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_pbom_versions",
+      "fingerprint": "b6867f3b8ad8b6609842"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_project_roles",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_project_roles",
+      "fingerprint": "0ad5a04814d537175b7b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factories",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factories",
+      "fingerprint": "f6e6da0182f9e43efbe2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_equipments",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_equipments",
+      "fingerprint": "8b8cc5d386058db6d46f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_fixtures",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_fixtures",
+      "fingerprint": "88a584237e78bbe66c27"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_layout_templates",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_layout_templates",
+      "fingerprint": "943e044236fdf8b5f40c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_lines",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_lines",
+      "fingerprint": "e754219549aa466cf0fc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_sections",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_sections",
+      "fingerprint": "a6c38a7c9c5987353103"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_stations",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_stations",
+      "fingerprint": "13eee54d1930d9807c2a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_tools",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_tools",
+      "fingerprint": "d16ecf396288c943cabb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_axioms",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_axioms",
+      "fingerprint": "045929ccdf3202ea0d56"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "c7dd61dd8126d78312be"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "2f30b0e2c97059193c37"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "7c91fa6312e07a1cfcc5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_approval_orders",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_approval_orders",
+      "fingerprint": "33032ddda5200cf5ed21"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_collab_sessions",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_collab_sessions",
+      "fingerprint": "35122851e5d510d3a997"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_issues",
+      "fingerprint": "9199c45cfafcde17c05f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_projects",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_projects",
+      "fingerprint": "b2fb0b888ba355d7cbab"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_task_dependencies",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_task_dependencies",
+      "fingerprint": "c617135e2a4895dbf663"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_tasks",
+      "fingerprint": "2301eedddb1ccaa2f4b5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_vehicle_models",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_vehicle_models",
+      "fingerprint": "cfe05a5ffbc7e93fb70e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_fastener_spec",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_fastener_spec",
+      "fingerprint": "637d56dcdd1d4c96c1af"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_gbop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_entries",
+      "fingerprint": "31ed53d77928bea20a9a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_gbop_entry_links",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_entry_links",
+      "fingerprint": "ffb912ed26f7ac06dfe8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_gbop_operations",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_operations",
+      "fingerprint": "e41fe6d80a5355b44d2a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_gbop_processes",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_processes",
+      "fingerprint": "d229e7c2054ee65dd90e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_gbop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_versions",
+      "fingerprint": "c95d3094bd14b352a7c8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_vpps_equipments",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_vpps_equipments",
+      "fingerprint": "1ff0000eac725cb7b024"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_vpps_fixtures",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_vpps_fixtures",
+      "fingerprint": "ad0cb1552994f256feca"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_vpps_parts",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_vpps_parts",
+      "fingerprint": "a118693747565a8bce1f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_vpps_tools",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_vpps_tools",
+      "fingerprint": "32fce59d74c976b3aed1"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_follows",
+      "detail": "base SQL accesses craft-owned table workmanship_work_follows",
+      "fingerprint": "2db78e8bec28910c101c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_work_issues",
+      "fingerprint": "92303620fb01a049a682"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_item_change_logs",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_change_logs",
+      "fingerprint": "66701725e16f3fe02715"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_item_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_entries",
+      "fingerprint": "b160e16421bcb5eeeead"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_item_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_shares",
+      "fingerprint": "ba24fb0c91116326bf30"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_bindings",
+      "fingerprint": "7407054622b812c025dc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_bitable_record_map",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_record_map",
+      "fingerprint": "34783885e99538356a95"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_shares",
+      "fingerprint": "1c5069b8f69a594a1867"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "44576d704db86406b7f5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_notifications",
+      "detail": "base SQL accesses craft-owned table workmanship_work_notifications",
+      "fingerprint": "0c0a041425156ad8317b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_permission_requests",
+      "detail": "base SQL accesses craft-owned table workmanship_work_permission_requests",
+      "fingerprint": "d96352e9af0f54a40a8c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_share_links",
+      "detail": "base SQL accesses craft-owned table workmanship_work_share_links",
+      "fingerprint": "b9851f88a5d464b6f7c2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_task_template_items",
+      "detail": "base SQL accesses craft-owned table workmanship_work_task_template_items",
+      "fingerprint": "6c1faa184252f4b7f33b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_task_templates",
+      "detail": "base SQL accesses craft-owned table workmanship_work_task_templates",
+      "fingerprint": "13c51fa7c3e24415d9ff"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/pg_to_mysql_migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_work_tasks",
+      "fingerprint": "73399de5ee3155fab864"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/run_diff.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_axioms",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_axioms",
+      "fingerprint": "ba65fe7d9a6e1aa04e84"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/run_diff.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "c745c19eb4a141993afa"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/run_diff.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "d00d26430bde515ed273"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/db/run_diff.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "f9ba0efee2fc492cd5db"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_ai_memory_table",
+      "target": "workmanship_app_ai_memory",
+      "detail": "base SQL accesses agent-owned table workmanship_app_ai_memory",
+      "fingerprint": "3625a20c247b0f5f9e22"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_bitable_sync_tables",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_bindings",
+      "fingerprint": "8365b82c52f979aa7062"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_bitable_sync_tables",
+      "target": "workmanship_work_list_bitable_record_map",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_record_map",
+      "fingerprint": "9ca1d2e15400abb66ed5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_change_log_tables",
+      "target": "workmanship_work_item_change_logs",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_change_logs",
+      "fingerprint": "159dc50932e8f8e99707"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_deep_link_tables",
+      "target": "workmanship_work_permission_requests",
+      "detail": "base SQL accesses craft-owned table workmanship_work_permission_requests",
+      "fingerprint": "d21d2d8044b6c39d9917"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_deep_link_tables",
+      "target": "workmanship_work_share_links",
+      "detail": "base SQL accesses craft-owned table workmanship_work_share_links",
+      "fingerprint": "f4c4f8c6b3c46d87dcc4"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_entries",
+      "fingerprint": "42810224e7be53a83cbe"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_entry_links",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_entry_links",
+      "fingerprint": "09664da64efd18950beb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_operations",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_operations",
+      "fingerprint": "d5ff79a9727fae84ab61"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_processes",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_processes",
+      "fingerprint": "689910acb2c44f8c3732"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_versions",
+      "fingerprint": "1bf65668961839e84292"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_vpps_parts",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_vpps_parts",
+      "fingerprint": "2f78f019028bc0d7fef5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "a7b20c7206ea84f931bb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_process",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_process",
+      "fingerprint": "d7e74b7e9d3a3427d2ca"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_staging",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_staging",
+      "fingerprint": "62ccc260a2029236698a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_steps",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_steps",
+      "fingerprint": "f9f1f37830ba3dff019a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_versions",
+      "fingerprint": "aa91fae0f543a0fbabd6"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_pbom_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_pbom_versions",
+      "fingerprint": "67a5210f90b263b1f932"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_factory_factory_sections",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_sections",
+      "fingerprint": "f9762c40d9c8835c8243"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_proj_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_issues",
+      "fingerprint": "c796ef80d43cf61df6d4"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_proj_projects",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_projects",
+      "fingerprint": "f37e366dc578e166cf9f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_proj_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_tasks",
+      "fingerprint": "c58f5c37402547a7dd15"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_work_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_work_issues",
+      "fingerprint": "0506d34ffcfe33fa4317"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_work_item_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_entries",
+      "fingerprint": "df2c605ea67a3502f910"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "52f3d856cc52db2032c4"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_work_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_work_tasks",
+      "fingerprint": "35472ffd9703ecfb2894"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_permission_tables",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "0595abcaf51e74c00ad8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_work_item_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_shares",
+      "fingerprint": "4a999c5b0f408eac6038"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_work_list_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_shares",
+      "fingerprint": "4fb7c7e8f691ca2b8d5d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "3e9ae972094a9f5ca3bd"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/change_logs.py",
+      "scope": "list_change_logs",
+      "target": "workmanship_work_item_change_logs",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_change_logs",
+      "fingerprint": "49c285061bc894d4c963"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/change_logs.py",
+      "scope": "list_change_logs",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "a3d3cc053c68a285cbf4"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/collab.py",
+      "scope": "create_session",
+      "target": "workmanship_proj_collab_sessions",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_collab_sessions",
+      "fingerprint": "36ae4e64fdfa7dfc4cec"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/collab.py",
+      "scope": "end_session",
+      "target": "workmanship_proj_collab_sessions",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_collab_sessions",
+      "fingerprint": "9a8b2d3ff22e123225b6"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/collab.py",
+      "scope": "get_session",
+      "target": "workmanship_proj_collab_sessions",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_collab_sessions",
+      "fingerprint": "e9e54ad01830ad284afe"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/collab.py",
+      "scope": "join_session",
+      "target": "workmanship_proj_collab_sessions",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_collab_sessions",
+      "fingerprint": "5b44a09b1c2bd3d38073"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/collab.py",
+      "scope": "list_sessions",
+      "target": "workmanship_proj_collab_sessions",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_collab_sessions",
+      "fingerprint": "4d9bf99fc841e78059fe"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ext_datasource.py",
+      "scope": "create_mapping",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "e60e31889df4981d062a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ext_datasource.py",
+      "scope": "execute_import",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "731c58bb68f3fa062708"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ext_datasource.py",
+      "scope": "execute_import",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "a837c41973920ce42275"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ext_datasource.py",
+      "scope": "execute_import",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "03b164b29ce251e26ad9"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ext_datasource.py",
+      "scope": "list_field_mappings",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "f6f1ff05411a8920d38f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ext_datasource.py",
+      "scope": "list_mappings",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "e801bada2db05e80e3da"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ext_datasource.py",
+      "scope": "update_mapping",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "3decd3b0c338a16185d0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/follows.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_approval_orders",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_approval_orders",
+      "fingerprint": "d7553740dfa2762e5c70"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/follows.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_projects",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_projects",
+      "fingerprint": "8ea70a6aac23fdc41e9f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/follows.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_gbop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_tpl_gbop_entries",
+      "fingerprint": "a66cbac4cab658e4ee02"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/follows.py",
+      "scope": "check_follow",
+      "target": "workmanship_work_follows",
+      "detail": "base SQL accesses craft-owned table workmanship_work_follows",
+      "fingerprint": "79015650b59f870f8c6a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/follows.py",
+      "scope": "create_follow",
+      "target": "workmanship_work_follows",
+      "detail": "base SQL accesses craft-owned table workmanship_work_follows",
+      "fingerprint": "eeb44de7eb7c39ecd9a1"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/follows.py",
+      "scope": "delete_follow",
+      "target": "workmanship_work_follows",
+      "detail": "base SQL accesses craft-owned table workmanship_work_follows",
+      "fingerprint": "229cb6f7c1a79b3284cd"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/follows.py",
+      "scope": "list_follows",
+      "target": "workmanship_work_follows",
+      "detail": "base SQL accesses craft-owned table workmanship_work_follows",
+      "fingerprint": "270583f51b32ba0c5fd2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/follows.py",
+      "scope": "patch_follow",
+      "target": "workmanship_work_follows",
+      "detail": "base SQL accesses craft-owned table workmanship_work_follows",
+      "fingerprint": "d8b105f0238de6d31e9b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/item_entries.py",
+      "scope": "delete_item_entries",
+      "target": "workmanship_work_item_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_entries",
+      "fingerprint": "8be759272ba2d28e9a8b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/item_entries.py",
+      "scope": "get_item_entries",
+      "target": "workmanship_work_item_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_entries",
+      "fingerprint": "d53daec80c8b99ad88af"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/item_entries.py",
+      "scope": "put_item_entries",
+      "target": "workmanship_work_item_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_entries",
+      "fingerprint": "dffca76e7a2d00da997e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/knowledge_hub.py",
+      "scope": "get_item_history",
+      "target": "workmanship_work_item_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_entries",
+      "fingerprint": "eb018bafd07780a0ac80"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/knowledge_hub.py",
+      "scope": "patch_item",
+      "target": "workmanship_work_item_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_entries",
+      "fingerprint": "fc99c8dd6f0e21dce193"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "create_cloud_list",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "d1ba870adbe912e16a1d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "delete_cloud_list",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_versions",
+      "fingerprint": "ef952833239f8013425f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "delete_cloud_list",
+      "target": "workmanship_proj_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_issues",
+      "fingerprint": "a5984d94f5c926cc2917"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "delete_cloud_list",
+      "target": "workmanship_proj_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_tasks",
+      "fingerprint": "73c114729ed5e3c1256d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "delete_cloud_list",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "36a12541d7fad960595e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "list_cloud_lists",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_versions",
+      "fingerprint": "c949e1922f034561a69f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "list_cloud_lists",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "6eb3d70888cb966c85fb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "retarget_cloud_list_items",
+      "target": "workmanship_proj_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_issues",
+      "fingerprint": "53eb788d9ab61e454fa7"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "retarget_cloud_list_items",
+      "target": "workmanship_proj_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_tasks",
+      "fingerprint": "4b9ed493b6b8da9a3bec"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "retarget_cloud_list_items",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "604f91558af7cb0a94c3"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/lists.py",
+      "scope": "update_cloud_list",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "6ceeee46e0e626f4ac20"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/notifications.py",
+      "scope": "list_notifications",
+      "target": "workmanship_work_notifications",
+      "detail": "base SQL accesses craft-owned table workmanship_work_notifications",
+      "fingerprint": "38c79da7d2b3ec10cbce"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/notifications.py",
+      "scope": "mark_read",
+      "target": "workmanship_work_notifications",
+      "detail": "base SQL accesses craft-owned table workmanship_work_notifications",
+      "fingerprint": "91e2fb841d61196d855d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/notifications.py",
+      "scope": "read_all",
+      "target": "workmanship_work_notifications",
+      "detail": "base SQL accesses craft-owned table workmanship_work_notifications",
+      "fingerprint": "64c048c7e9a5f8cc7704"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/notifications.py",
+      "scope": "unread_count",
+      "target": "workmanship_work_notifications",
+      "detail": "base SQL accesses craft-owned table workmanship_work_notifications",
+      "fingerprint": "1b82f1c12c71d6fb12af"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_equipments",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_equipments",
+      "fingerprint": "45449be579d26829986b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_fixtures",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_fixtures",
+      "fingerprint": "e9a291226c9aaa6b4811"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_line",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_line",
+      "fingerprint": "e55101bd225531e7ea43"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_operator",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_operator",
+      "fingerprint": "4793fbfa74d2a49116c3"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_process",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_process",
+      "fingerprint": "08b02ae7bdc88ee928b8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_station",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_station",
+      "fingerprint": "2b9f125192b5c8b7efbb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_steps",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_steps",
+      "fingerprint": "fb1329ad19109028073c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_tools",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_tools",
+      "fingerprint": "f0ac71486bce4fbfaa89"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_equipments",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_equipments",
+      "fingerprint": "bb3494f6eab394af5042"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_fixtures",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_fixtures",
+      "fingerprint": "90572b9d8dea8db3bc60"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_stations",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_stations",
+      "fingerprint": "4e1f747a21e82a42ee62"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_tools",
+      "detail": "base SQL accesses craft-owned table workmanship_factory_factory_tools",
+      "fingerprint": "ad7133446f93aaff21db"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "_get_entity_table_and_gid",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "b162a6b267bbd53af314"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "_get_entity_table_and_gid",
+      "target": "workmanship_bop_bop_entry_links",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entry_links",
+      "fingerprint": "33897dbbb310f5276121"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "_get_entity_table_and_gid",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "5f3dbd4fc982e0243999"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "create_axiom",
+      "target": "workmanship_onto_axioms",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_axioms",
+      "fingerprint": "d8ea08163e23b4653731"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "create_class",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "3caa0d227c63068b4c9c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "create_property",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "bc35839bdb0e8b2a66f3"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "create_property",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "567004b8fe0bacc5a36b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "create_relation",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "fbc3519b67daafb9ec91"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "delete_axiom",
+      "target": "workmanship_onto_axioms",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_axioms",
+      "fingerprint": "32686e950271560893bf"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "delete_class",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "494f7d008308c98247da"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "delete_property",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "eb92be2113704a7d2561"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "delete_relation",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "b5a17f7e851106250d04"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_class_full",
+      "target": "workmanship_onto_axioms",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_axioms",
+      "fingerprint": "4157e581b80007c520c0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_class_full",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "9b8b73e657eba5675aed"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_class_full",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "3315f2e7a80be0e16c5b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_class_full",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "8f861eaa2ebd6aa184f0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_class_schema",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "02d5833ebfd5fa03b379"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_class_schema",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "a13a16c4014009f9e997"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_class_schema",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "0eed0a0a3252c744b52f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_entity_props",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "1986c7a516c4ca22ecfa"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_entity_props",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "8832e89d4d2a7f2ef824"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_entity_props",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "c3e70deb5494ffcbb0d5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_graph",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "d27567e7a8c1cf40bf97"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_graph",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "b047e4bba8d6af8d3913"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_node_type_config",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "6b43223f4dbb2a1e6d3e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "get_node_type_config",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "cc9cbf73933dd236c306"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_class_axioms",
+      "target": "workmanship_onto_axioms",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_axioms",
+      "fingerprint": "effc55b8324bcf9bd4e6"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_class_axioms",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "882b313f036f9048b03e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_class_axioms",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "31bba9815fed9d442d89"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_class_individuals",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "db3e8338c40bba5c51a9"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_class_individuals",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_versions",
+      "fingerprint": "0b1b387cc651aeb3c8d9"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_class_individuals",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "0bbe9ed53dd87f469463"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_classes",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "70d44f5f0fc1d6a8cd35"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_node_type_suggestions",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "5ee91a30f37e91add421"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_node_type_suggestions",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "410687182e6c1eaecc48"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "list_unbound_classes",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "b74065505fcf7c09d3e0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "patch_entity_props",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "14684ac3a9f123ee3b42"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "patch_entity_props",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "99de6215e5c8c2fdf921"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "patch_entity_props",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "bb0fcffe8864d21d3ae8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "schema_diff",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "44504a9ba4c7403ce87f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "schema_diff",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "a5e0d3f13e86940e718d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "seed_from_bop",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "cf2f540331384974e63b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "seed_from_bop",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "c6764a12f02d2b506865"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "seed_from_bop",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "9a5cbcd560917b2202cc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "sync_props_from_table",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "2fb42297b5b68e4a18e5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "sync_props_from_table",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "d6cdc5b28c414a5ea718"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "sync_props_from_table",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "5326b597fc85d91c8e78"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "update_class",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "706e1c8dd3907abd23ea"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "update_property",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "a50cba8f7436d9cb37a4"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/ontology.py",
+      "scope": "update_relation",
+      "target": "workmanship_onto_relations",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_relations",
+      "fingerprint": "70980603c8f63fdc10fb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/permission_requests.py",
+      "scope": "_send_notification",
+      "target": "workmanship_work_notifications",
+      "detail": "base SQL accesses craft-owned table workmanship_work_notifications",
+      "fingerprint": "1a4714ccc2022cc7633e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/permission_requests.py",
+      "scope": "approve_permission_request",
+      "target": "workmanship_work_list_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_shares",
+      "fingerprint": "9e842c1df5446e7ad2ef"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/permission_requests.py",
+      "scope": "approve_permission_request",
+      "target": "workmanship_work_permission_requests",
+      "detail": "base SQL accesses craft-owned table workmanship_work_permission_requests",
+      "fingerprint": "73973272772070776972"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/permission_requests.py",
+      "scope": "create_permission_request",
+      "target": "workmanship_work_permission_requests",
+      "detail": "base SQL accesses craft-owned table workmanship_work_permission_requests",
+      "fingerprint": "adc660965ff259147743"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/permission_requests.py",
+      "scope": "list_permission_requests",
+      "target": "workmanship_work_permission_requests",
+      "detail": "base SQL accesses craft-owned table workmanship_work_permission_requests",
+      "fingerprint": "d2b2ba471485bc2334d3"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/permission_requests.py",
+      "scope": "reject_permission_request",
+      "target": "workmanship_work_permission_requests",
+      "detail": "base SQL accesses craft-owned table workmanship_work_permission_requests",
+      "fingerprint": "e8c450b5e95c6658f84b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/rule_engine.py",
+      "scope": "audit_bop_version",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "7f8038f4e95008b2bc66"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/rules.py",
+      "scope": "list_rules",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "7dd1e635a251f9be589f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/share_links.py",
+      "scope": "_check_list_access",
+      "target": "workmanship_work_list_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_shares",
+      "fingerprint": "ca2703d92de9c40d4dda"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/share_links.py",
+      "scope": "_check_list_access",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "231f9bf4465eb8c9cb22"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/share_links.py",
+      "scope": "create_share_link",
+      "target": "workmanship_work_share_links",
+      "detail": "base SQL accesses craft-owned table workmanship_work_share_links",
+      "fingerprint": "e4418310387be88a4cc8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/share_links.py",
+      "scope": "delete_share_link",
+      "target": "workmanship_work_share_links",
+      "detail": "base SQL accesses craft-owned table workmanship_work_share_links",
+      "fingerprint": "af60e5e1654de9b35e1d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/share_links.py",
+      "scope": "resolve_share_link",
+      "target": "workmanship_work_share_links",
+      "detail": "base SQL accesses craft-owned table workmanship_work_share_links",
+      "fingerprint": "7bdbc59faf0ccaf0587e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/shares.py",
+      "scope": "_is_list_owner",
+      "target": "workmanship_work_lists",
+      "detail": "base SQL accesses craft-owned table workmanship_work_lists",
+      "fingerprint": "3f4dccb257682955a8cc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/shares.py",
+      "scope": "create_item_share",
+      "target": "workmanship_work_item_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_shares",
+      "fingerprint": "7c499ac5b2a7829cf562"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/shares.py",
+      "scope": "create_list_share",
+      "target": "workmanship_work_list_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_shares",
+      "fingerprint": "30401628a96748549b69"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/shares.py",
+      "scope": "delete_item_share",
+      "target": "workmanship_work_item_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_shares",
+      "fingerprint": "9c50750d1c6f67d15744"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/shares.py",
+      "scope": "delete_list_share",
+      "target": "workmanship_work_list_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_shares",
+      "fingerprint": "d53ff7068f5d9bdd6996"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/shares.py",
+      "scope": "get_list_shares",
+      "target": "workmanship_work_list_shares",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_shares",
+      "fingerprint": "02272dcf2715917bbfcf"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_panel1_items",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "0bb78d7e0680297b96d5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_panel1_items",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_versions",
+      "fingerprint": "017e121410beb549eba6"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_panel1_items",
+      "target": "workmanship_bop_pbom_versions",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_pbom_versions",
+      "fingerprint": "bfd8752041e6a3170886"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_panel1_items",
+      "target": "workmanship_proj_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_issues",
+      "fingerprint": "39537180f244b9c8fb02"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_panel1_items",
+      "target": "workmanship_proj_projects",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_projects",
+      "fingerprint": "410cc8e5452c67dad3fc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_panel1_items",
+      "target": "workmanship_proj_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_tasks",
+      "fingerprint": "69b07ecf64a2b85bc1a1"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_workbench_home",
+      "target": "workmanship_proj_issues",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_issues",
+      "fingerprint": "6f2fecf2b04f1d25e674"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_workbench_home",
+      "target": "workmanship_proj_projects",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_projects",
+      "fingerprint": "76f35c2969bb7d280a0a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_workbench_home",
+      "target": "workmanship_proj_tasks",
+      "detail": "base SQL accesses craft-owned table workmanship_proj_tasks",
+      "fingerprint": "a07ddde78f1516c790ce"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_workbench_home",
+      "target": "workmanship_work_follows",
+      "detail": "base SQL accesses craft-owned table workmanship_work_follows",
+      "fingerprint": "80c17297e60222149df6"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_equipments",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_equipments",
+      "fingerprint": "0fe6a55485f60cf75bb5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_fixtures",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_fixtures",
+      "fingerprint": "6eab692b2213b07699ff"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_line",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_line",
+      "fingerprint": "6216e32592d15ec2c6b6"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_operator",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_operator",
+      "fingerprint": "4d9bebaab9e7828571bd"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_station",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_station",
+      "fingerprint": "ab3ed11c6965d5dec8c3"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_steps",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_steps",
+      "fingerprint": "6de6a2d97efde7dac1ac"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_tools",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_tools",
+      "fingerprint": "039b0a767536462f762d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_project_roles",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_project_roles",
+      "fingerprint": "66198ca1f83bcfa4e227"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "_do_check",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "07c34c8ea48013fa6744"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "_do_check",
+      "target": "workmanship_bop_bop_entry_links",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entry_links",
+      "fingerprint": "75ad8d4dabbd486810e7"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "_do_check",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "909f029e52e35579f8c8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "_do_check",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "a8daec4080eb7caace57"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "_get_entity_table_from_db",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "407db8ae274e2222d601"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "_run",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "7511961b17f9f9055257"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "_run",
+      "target": "workmanship_bop_bop_entry_links",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entry_links",
+      "fingerprint": "38232ec3fb884391f5a5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/checker.py",
+      "scope": "_run",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "eee9e0dd8e8ee4e9dae5"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "build_agent_schema",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "36a1c9bc39cfbffa6d65"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "check_cardinality",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "8b0439bd649589ba6866"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "check_cardinality",
+      "target": "workmanship_onto_axioms",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_axioms",
+      "fingerprint": "0a9cf148204eb16302c3"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "check_cardinality",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "5390e3cade9e9818b713"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "check_cardinality",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "d0fd17ba81795a428047"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "consistency_check",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "base SQL accesses craft-owned table workmanship_bop_bop_entries",
+      "fingerprint": "31b70d624580e322982c"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "get_ancestor_gids",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "8cba0aded827ee24bed8"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "get_class_gid_for_node_type",
+      "target": "workmanship_onto_classes",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_classes",
+      "fingerprint": "2398f05b239923e54c96"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/rule_engine/reasoner.py",
+      "scope": "get_inherited_properties",
+      "target": "workmanship_onto_properties",
+      "detail": "base SQL accesses craft-owned table workmanship_onto_properties",
+      "fingerprint": "14bc583e9a907d7298c2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/services/bitable_sync_service.py",
+      "scope": "_get_binding",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_bindings",
+      "fingerprint": "cff18cf4ee8963ae9328"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/services/bitable_sync_service.py",
+      "scope": "_get_record_map_entry",
+      "target": "workmanship_work_list_bitable_record_map",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_record_map",
+      "fingerprint": "2ad96b878ce86a3abcda"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/services/bitable_sync_service.py",
+      "scope": "_upsert_record_map",
+      "target": "workmanship_work_list_bitable_record_map",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_record_map",
+      "fingerprint": "1678176280906d4d8477"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/services/bitable_sync_service.py",
+      "scope": "handle_webhook_event",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_bindings",
+      "fingerprint": "56411fdcb527dd480688"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/services/bitable_sync_service.py",
+      "scope": "pull_all",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_bindings",
+      "fingerprint": "f26fb226c98c17e6d10b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/services/bitable_sync_service.py",
+      "scope": "pull_all",
+      "target": "workmanship_work_list_bitable_record_map",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_record_map",
+      "fingerprint": "00d244eb3f8a7b36b25e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/services/bitable_sync_service.py",
+      "scope": "push_rows",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "base SQL accesses craft-owned table workmanship_work_list_bitable_bindings",
+      "fingerprint": "f9fdc0d19c3fbbfc21dc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/utils/change_log.py",
+      "scope": "record_changes",
+      "target": "workmanship_work_item_change_logs",
+      "detail": "base SQL accesses craft-owned table workmanship_work_item_change_logs",
+      "fingerprint": "29354ac06d156b9d4b7f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/utils/follow_trigger.py",
+      "scope": "notify_followers",
+      "target": "workmanship_work_follows",
+      "detail": "base SQL accesses craft-owned table workmanship_work_follows",
+      "fingerprint": "ffb4a9b502c22494195d"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "backend/utils/notif.py",
+      "scope": "create_notification",
+      "target": "workmanship_work_notifications",
+      "detail": "base SQL accesses craft-owned table workmanship_work_notifications",
+      "fingerprint": "515ee1de9ad31bce1681"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/_bop/_constants.py",
+      "scope": "<module>",
+      "target": "workmanship_auth_teams",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_teams",
+      "fingerprint": "460a368327b88ed82b3e"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/_bop/_constants.py",
+      "scope": "<module>",
+      "target": "workmanship_auth_users",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_users",
+      "fingerprint": "18b6c2ecb140a9bc8432"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/_bop/_constants.py",
+      "scope": "<module>",
+      "target": "workmanship_know_craft_rules",
+      "detail": "craft SQL accesses knowledge-owned table workmanship_know_craft_rules",
+      "fingerprint": "68f8cc0ddf9fdc21ee64"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/_bop/_constants.py",
+      "scope": "<module>",
+      "target": "workmanship_know_entries",
+      "detail": "craft SQL accesses knowledge-owned table workmanship_know_entries",
+      "fingerprint": "c7db0a0d00b63a04b25a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/approval.py",
+      "scope": "_find_reviewer_by_role",
+      "target": "workmanship_auth_users",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_users",
+      "fingerprint": "f3c8c03e67445558c191"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/import_export.py",
+      "scope": "create_template",
+      "target": "workmanship_app_export_templates",
+      "detail": "craft SQL accesses base-owned table workmanship_app_export_templates",
+      "fingerprint": "38f00bad760b2b66fd7a"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/import_export.py",
+      "scope": "delete_template",
+      "target": "workmanship_app_export_templates",
+      "detail": "craft SQL accesses base-owned table workmanship_app_export_templates",
+      "fingerprint": "f1e524017151c6c25f86"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/import_export.py",
+      "scope": "list_templates",
+      "target": "workmanship_app_export_templates",
+      "detail": "craft SQL accesses base-owned table workmanship_app_export_templates",
+      "fingerprint": "0d2c4b6ef66bef96edd0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/import_export.py",
+      "scope": "update_template",
+      "target": "workmanship_app_export_templates",
+      "detail": "craft SQL accesses base-owned table workmanship_app_export_templates",
+      "fingerprint": "5c079faef4ebf9f75f56"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "_can_manage_project_lines",
+      "target": "workmanship_auth_project_members",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_project_members",
+      "fingerprint": "c4af1a1ca4fab4f79146"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "add_project_member",
+      "target": "workmanship_auth_project_members",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_project_members",
+      "fingerprint": "aa0e9c1b56f101ed54f0"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "get_members_matrix",
+      "target": "workmanship_auth_project_members",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_project_members",
+      "fingerprint": "066b9e0686d14a01048b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "get_members_matrix",
+      "target": "workmanship_auth_users",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_users",
+      "fingerprint": "c788df1c0c1e8fe971d2"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "list_project_members",
+      "target": "workmanship_auth_permission_grants",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_permission_grants",
+      "fingerprint": "7892c0c0678b714cba1b"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "list_project_members",
+      "target": "workmanship_auth_project_members",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_project_members",
+      "fingerprint": "ec9a9bddd20e6915c5bc"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "list_project_members",
+      "target": "workmanship_auth_users",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_users",
+      "fingerprint": "5018ef5490df2a8b126f"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "list_projects",
+      "target": "workmanship_auth_users",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_users",
+      "fingerprint": "cd36de19d8525d38eb24"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "remove_project_member",
+      "target": "workmanship_auth_project_members",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_project_members",
+      "fingerprint": "8d3ceae8d4ccfd4ece41"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "upsert_line_assignment",
+      "target": "workmanship_auth_permission_grants",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_permission_grants",
+      "fingerprint": "479655b6591695fd0ffb"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "upsert_line_assignment",
+      "target": "workmanship_auth_project_members",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_project_members",
+      "fingerprint": "a3daeee8de14f14710be"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "_verify_project_access",
+      "target": "workmanship_auth_project_members",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_project_members",
+      "fingerprint": "c5e7f2b9872ab88fc2ae"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "create_cloud_task",
+      "target": "workmanship_auth_users",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_users",
+      "fingerprint": "cfdfb8886740af546248"
+    },
+    {
+      "category": "cross_domain_sql",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "list_cloud_tasks",
+      "target": "workmanship_auth_users",
+      "detail": "craft SQL accesses base-owned table workmanship_auth_users",
+      "fingerprint": "ab0360387fa9700361e7"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/canvas_executor.py",
+      "scope": "_exec_skill_call_node",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "43f6de36e7a41c394e76"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/canvas_executor.py",
+      "scope": "_exec_tool_node",
+      "target": "backend.ai_assistant.tool_handlers",
+      "detail": "agent imports Base internal module backend.ai_assistant.tool_handlers",
+      "fingerprint": "fad56268210b8c342e6e"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/canvas_executor.py",
+      "scope": "_simple_llm",
+      "target": "backend.routers.ai_chat",
+      "detail": "agent imports Base internal module backend.routers.ai_chat",
+      "fingerprint": "3895255ac9638a21da18"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/embedding_service.py",
+      "scope": "_get_ai_cfg",
+      "target": "backend.routers.ai_chat",
+      "detail": "agent imports Base internal module backend.routers.ai_chat",
+      "fingerprint": "488206c76ddb2cf65ae0"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/engineering_skills_seed.py",
+      "scope": "seed_engineering_skills",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "ddc278b840cd0dc3dc4f"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/orchestrator.py",
+      "scope": "<module>",
+      "target": "backend.ai_assistant.task_classifier",
+      "detail": "agent imports Base internal module backend.ai_assistant.task_classifier",
+      "fingerprint": "ddd31083fc73d7ae6c81"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/orchestrator.py",
+      "scope": "_run_subagent",
+      "target": "backend.ai_assistant.tool_handlers",
+      "detail": "agent imports Base internal module backend.ai_assistant.tool_handlers",
+      "fingerprint": "8625cff18d5cb5ecc0e3"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/orchestrator.py",
+      "scope": "_run_subagent",
+      "target": "backend.ai_assistant.tool_registry",
+      "detail": "agent imports Base internal module backend.ai_assistant.tool_registry",
+      "fingerprint": "9ffced25fc1cd7ba3070"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/orchestrator.py",
+      "scope": "run",
+      "target": "backend.ai_assistant.session_store",
+      "detail": "agent imports Base internal module backend.ai_assistant.session_store",
+      "fingerprint": "555ca58b94f26e16dc58"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/session_store.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "394eed38067988670b16"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/session_store.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "agent imports Base internal module backend.utils.gid",
+      "fingerprint": "104d55019c5a5a49f063"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/system_prompt.py",
+      "scope": "_inject_wfc_guide",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "7568f4e13f05998e98b2"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/system_prompt.py",
+      "scope": "build",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "3300cce09f5da53659cd"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_executor.py",
+      "scope": "execute_tool",
+      "target": "backend.ai_assistant.tool_handlers",
+      "detail": "agent imports Base internal module backend.ai_assistant.tool_handlers",
+      "fingerprint": "7f7dbb19894bd2efe697"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/capability_tools.py",
+      "scope": "_invoke",
+      "target": "backend.capabilities",
+      "detail": "agent imports Base internal module backend.capabilities",
+      "fingerprint": "2a75975d069df8d3cabb"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/capability_tools.py",
+      "scope": "_invoke",
+      "target": "backend.capabilities.validation_next",
+      "detail": "agent imports Base internal module backend.capabilities.validation_next",
+      "fingerprint": "cd8120eadc61f565e1a3"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/capability_tools.py",
+      "scope": "_invoke",
+      "target": "backend.routers.deps",
+      "detail": "agent imports Base internal module backend.routers.deps",
+      "fingerprint": "be8bf7d171c84901f8a3"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/capability_tools.py",
+      "scope": "_invoke",
+      "target": "backend.services.user_service",
+      "detail": "agent imports Base internal module backend.services.user_service",
+      "fingerprint": "83ced6b4eb8ca67ae4f0"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/craft_tools.py",
+      "scope": "<module>",
+      "target": "backend.config",
+      "detail": "agent imports Base internal module backend.config",
+      "fingerprint": "7a4de0e438616145a35c"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/craft_tools.py",
+      "scope": "_global_search",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "f735ec39b8a7510a2d98"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/knowledge_tools.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "64922a9ee57e42715869"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/knowledge_tools.py",
+      "scope": "_audit_entry_rules",
+      "target": "backend.rule_engine.checker",
+      "detail": "agent imports Base internal module backend.rule_engine.checker",
+      "fingerprint": "c8a3b5506ddee0b483fd"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/memory_tools.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "2841fa2b80cdc8d68fac"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/project_tools.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "4ce46f536bbc3b40d61a"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/project_tools.py",
+      "scope": "_add_task_progress_log",
+      "target": "backend.utils.gid",
+      "detail": "agent imports Base internal module backend.utils.gid",
+      "fingerprint": "e48f674efa0e37cb934a"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/project_tools.py",
+      "scope": "_create_approval_order",
+      "target": "backend.utils.gid",
+      "detail": "agent imports Base internal module backend.utils.gid",
+      "fingerprint": "f29cc50bb7909e7b6b6e"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/project_tools.py",
+      "scope": "_create_issue",
+      "target": "backend.utils.gid",
+      "detail": "agent imports Base internal module backend.utils.gid",
+      "fingerprint": "0b6d3f2a65f3efe3ae5a"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/project_tools.py",
+      "scope": "_create_task",
+      "target": "backend.utils.gid",
+      "detail": "agent imports Base internal module backend.utils.gid",
+      "fingerprint": "8cc76cd0d8dbc37d1e16"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/skill_tools.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "78a752f1b79ae4f0ce7a"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_handlers/system_tools.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "53fad16f929f4648be51"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/ai_assistant/tool_registry.py",
+      "scope": "get_all_tools_with_skills",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "d15c1a42b664411aa47f"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/ai_audit.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "de9a446cfba987e80b65"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/ai_audit.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "agent imports Base internal module backend.routers.deps",
+      "fingerprint": "43414a069d7204adf117"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/ai_audit.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "agent imports Base internal module backend.utils.gid",
+      "fingerprint": "cf5019c7fee0dd655a55"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/ai_chat.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "agent imports Base internal module backend.routers.deps",
+      "fingerprint": "e15e24e071f1a0d90d9b"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/ai_chat.py",
+      "scope": "_chat_sync_tolerant",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "808386b83a3a1bc2b0ed"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/ai_chat.py",
+      "scope": "_get_admin_config_raw",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "8d867ffaf635254cf0bd"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/ai_chat.py",
+      "scope": "_get_ai_config",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "eda9cc71746d35222dff"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/ai_chat.py",
+      "scope": "save_admin_config",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "0194d911a9b73006c134"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/flows.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "f4a086fc6abef5a0376f"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/flows.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "agent imports Base internal module backend.routers.deps",
+      "fingerprint": "2187bd8583e71a8d768b"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/flows.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "agent imports Base internal module backend.utils.gid",
+      "fingerprint": "d0462cd7c4c8f203cc6d"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/flows.py",
+      "scope": "gen_script",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "0b3be95f9dae16f0231b"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/skills.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "agent imports Base internal module backend.db.connection",
+      "fingerprint": "0e7263d8cacd6c776d45"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/skills.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "agent imports Base internal module backend.routers.deps",
+      "fingerprint": "73384060ff8ebbde5636"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/agent/agent_backend/routers/skills.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "agent imports Base internal module backend.utils.gid",
+      "fingerprint": "bcf8cf7e762fe67d79b6"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/_constants.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "e7ee9a1b70200e396994"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/_helpers.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "e88ebbaca88bd6294834"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/_helpers.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "25fc13e3c55e5f75b1f2"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/_helpers.py",
+      "scope": "_check_line_editable",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "9c55efa64ce391b03a73"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/entries.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "ff065d90d8c748e53abf"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/entries.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "68ec0e38fb38520763b9"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/entries.py",
+      "scope": "_resolve_bop_pic_items",
+      "target": "backend.core",
+      "detail": "craft imports Base internal module backend.core",
+      "fingerprint": "daff4447b3aab34d15d7"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/entries.py",
+      "scope": "create_entry",
+      "target": "backend.rule_engine.checker",
+      "detail": "craft imports Base internal module backend.rule_engine.checker",
+      "fingerprint": "cf043c2d55b814f21e05"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/entries.py",
+      "scope": "upload_bop_pic",
+      "target": "backend.core",
+      "detail": "craft imports Base internal module backend.core",
+      "fingerprint": "bf206b9683b2f42b7f6d"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/factory.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "38fb99337a6f8757d1ed"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/factory.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "eed41fd6084c3fbedc3d"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/fork.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "da2458a2767aeaf82c0f"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/fork.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "a1c73e20b4021e17a085"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/gbop.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "ca0d3deebbee0160ccfd"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/gbop.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "119fdd07c8858b79619f"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/lifecycle.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "76f96cf4b2f79ed28751"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/lifecycle.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "e9bf00bba3ee1522defa"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/pbom.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "efe1f8cf1aecf1c9f535"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/staging.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "27ee959cc42302de0c6e"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/staging.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "6b161483274fac8d9a18"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/templates.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "56b02888adab1202ed30"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/templates.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "45abebe24256de312835"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/versions.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "d8fa447128ef05c737f5"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/_bop/versions.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "e7877c91592177d836e5"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/approval.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "b25b0528ec54dc5c2a21"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/approval.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "5d0590ac915ba15b656b"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/approval.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "34755ea6cccaa868ad36"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/approval.py",
+      "scope": "approve_order",
+      "target": "backend.utils.notif",
+      "detail": "craft imports Base internal module backend.utils.notif",
+      "fingerprint": "01f9d2e2b0dc4a8bca43"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/approval.py",
+      "scope": "reject_order",
+      "target": "backend.utils.notif",
+      "detail": "craft imports Base internal module backend.utils.notif",
+      "fingerprint": "2ce92bb5ef299ebc1462"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/bitable_sync.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "bd1d7d5a771c1ae8707b"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/bitable_sync.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "7120497b8d96a79080c4"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/bitable_sync.py",
+      "scope": "<module>",
+      "target": "backend.services.bitable_sync_service",
+      "detail": "craft imports Base internal module backend.services.bitable_sync_service",
+      "fingerprint": "4ad1662298579b3480a2"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/canvases.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "fc42504dcd13ae3fcda5"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/canvases.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "810d650af616c86cd7a1"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/canvases.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "6146c5eef5a39b45d009"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/craft_library.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "407eb62a6cb939ce7668"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/craft_library.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "917ea6df12a09f7bf2fa"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/craft_library.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "6e4b538682430d1fe81a"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/ebom.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "2b52bc0867f892327f32"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/ebom.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "4e88232cde359ce1bf43"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/ebom.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "ea3bdfedf988bd1595d4"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/ebom.py",
+      "scope": "vpps_check",
+      "target": "backend.routers.craft_library",
+      "detail": "craft imports Base internal module backend.routers.craft_library",
+      "fingerprint": "66825f0dcae3e2c82ebb"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/factory.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "1d175f05e37905aed17c"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/factory.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "834a8208f59f0fa07f3a"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/factory.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "382d4d30705ab17b08f9"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/gbop.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "f0afdf65ae0300266d24"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/gbop.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "b99d05f5ee4ed786bc38"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/gbop.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "95c9107e2eaf0b052dc3"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/import_export.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "1dd2190c2cb3b89e6b75"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/import_export.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "6a499cbd10c3612d0089"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/import_export.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "e1c22d9d4f3a702a4a3f"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "9472ae7331d195b126ca"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "10ec5d249aa6c544b161"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "e062ba0269345dc0c625"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/projects.py",
+      "scope": "_can_manage_project_lines",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "f0bdf73b69624441251a"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "b75138e0ca0cb5bc2cea"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "<module>",
+      "target": "backend.db.sequences",
+      "detail": "craft imports Base internal module backend.db.sequences",
+      "fingerprint": "8267a1c3eafb3c59a2cf"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "79d0e979b89dba6c1e5c"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "<module>",
+      "target": "backend.utils.change_log",
+      "detail": "craft imports Base internal module backend.utils.change_log",
+      "fingerprint": "fea8c3f8950bd65f47d4"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "<module>",
+      "target": "backend.utils.follow_trigger",
+      "detail": "craft imports Base internal module backend.utils.follow_trigger",
+      "fingerprint": "d714e038ffa9d29c1f5b"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/promotion.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "6a5fc6f0f861fa55c607"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/std_op.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "2ca6a1c0d471f2c1f97b"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/std_op.py",
+      "scope": "<module>",
+      "target": "backend.db.sequences",
+      "detail": "craft imports Base internal module backend.db.sequences",
+      "fingerprint": "2735b7135d1884527a3e"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/std_op.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "d6ac3c11d1e17dbcf1c4"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/std_op.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "a9780ecdc451357b2239"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/task_templates.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "58d96f41921b56af5392"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/task_templates.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "7e6f69475ed82f917317"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/task_templates.py",
+      "scope": "<module>",
+      "target": "backend.utils.gid",
+      "detail": "craft imports Base internal module backend.utils.gid",
+      "fingerprint": "a9a8bc2eac0d002c018b"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/vpps_audit.py",
+      "scope": "<module>",
+      "target": "backend.db.connection",
+      "detail": "craft imports Base internal module backend.db.connection",
+      "fingerprint": "ac1fadc1c47fa8108134"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/vpps_audit.py",
+      "scope": "<module>",
+      "target": "backend.domain.vpps_audit.service",
+      "detail": "craft imports Base internal module backend.domain.vpps_audit.service",
+      "fingerprint": "f26ad1cae3ec35c4182e"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/vpps_audit.py",
+      "scope": "<module>",
+      "target": "backend.infra.vpps_audit_pg",
+      "detail": "craft imports Base internal module backend.infra.vpps_audit_pg",
+      "fingerprint": "262e028bd01d99a157ca"
+    },
+    {
+      "category": "internal_import",
+      "path": "plugins/craft/craft_backend/routers/vpps_audit.py",
+      "scope": "<module>",
+      "target": "backend.routers.deps",
+      "detail": "craft imports Base internal module backend.routers.deps",
+      "fingerprint": "543dcb5351b33a36b11d"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/audit_next.py",
+      "scope": "<module>",
+      "target": "workmanship_app_capability_audit",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "92383a69a1dceb172ad7"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "<module>",
+      "target": "workmanship_runtime_commands",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "5503f5d32bf1c33b9c6e"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "<module>",
+      "target": "workmanship_runtime_devices",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "fc9cace3194e82e13afe"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/local_runtime_next.py",
+      "scope": "<module>",
+      "target": "workmanship_runtime_enrollments",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "e9de596fbec70feae811"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/outbox_next.py",
+      "scope": "<module>",
+      "target": "workmanship_know_publish_outbox",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "6bdcfca18fb217fbc9cb"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/outbox_worker_next.py",
+      "scope": "<module>",
+      "target": "workmanship_app_operational_alerts",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "d6fdd56209aba755b61b"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/outbox_worker_next.py",
+      "scope": "<module>",
+      "target": "workmanship_app_worker_heartbeats",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "6cf18eed85f8edfe2905"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/proposals_next.py",
+      "scope": "<module>",
+      "target": "workmanship_know_proposals",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "fdc721d3f79b21f1b4cd"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/capabilities/review_next.py",
+      "scope": "<module>",
+      "target": "workmanship_know_proposals",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "9559320bed48c2c911ae"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/check_schema_diff.py",
+      "scope": "_extract_create_cols",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "e7145f27c5541650bb50"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/local_sqlite.py",
+      "scope": "_ensure_table",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "af4619a77e353903d86f"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_memory",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "3a20582bab4970d9d11d"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_sessions",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "024b589fcd1d3c9c5f60"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_ai_turns",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "4bbb91ea539ca4559c12"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_feishu_search_cache",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "d5120e701f6bf3436816"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_app_wfc_canvases",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "062d8787e7e7b282cd82"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_auth_permission_grants",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "9299c91dce22cd7b65de"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_auth_teams",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "8f8f4fbccdc063a92ccf"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_auth_users",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "2e6d5ca10a04df9f022c"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "cfc5e9c2a780d2915355"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_entry_links",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "bbd4d91d882188f58ffe"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_staging",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "f35a4226602c3847ec16"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "d32b07bca0c107cc1786"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_gbop_match_staging",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "3de26d91a4a7d8e15c6e"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_gbop_nav_bindings",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "db8a27314843e72d0623"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_pbom",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "180a5950da85142c0034"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_pbom_versions",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "4c80ac464e9d5754edd4"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_vpps_operations",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "3a98833f5db3eb0fe4f0"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_display_id_counters",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "727fb2a1c76a1e7329fd"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_factory_factory_sections",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "1161d6da6355384dc87c"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_int_ext_mappings",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "3316be2ab09ecf3b00ca"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_know_craft_rules",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "531dd367de5965ca3eb1"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_know_entries",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "0d74adcd31df7d605a11"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_know_items",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "20ef8b438301a352a9e1"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_classes",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "c891f70fba6384634400"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_properties",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "43a146f2b6a2b4fcbf89"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_onto_relations",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "79360a92d96d650ba591"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_issues",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "9d5118b2acc2e100d8d7"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_proj_tasks",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "e7881406c936fd1a233d"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_tpl_vpps_parts",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "4ccbed271561cb228917"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_item_change_logs",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "0358b06153cc3fd0e826"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_item_shares",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "a352829046c734c3a774"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "762535318c416a7a8e6f"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_bitable_record_map",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "f929dcf7f21edfdf7d8b"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_list_shares",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "4ca52397e96cf839a37f"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_lists",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "1a9377720e476df2bc63"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_permission_requests",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "142294580073547ba7d8"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_share_links",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "a101835ffce3ba1eb63e"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_task_dependencies",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "bb30ea9bab8c25803054"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/migrate.py",
+      "scope": "<module>",
+      "target": "workmanship_work_tasks",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "ed57398604d789f834e6"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/run_diff.py",
+      "scope": "_extract_create_cols",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "27614134550a11afac39"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/db/versioned_migrations.py",
+      "scope": "_ensure_ledger",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "44bd4f1e6e47c4dd3e00"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_ai_memory_table",
+      "target": "workmanship_app_ai_memory",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "b93d620f6bb3b755059d"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_bitable_sync_tables",
+      "target": "workmanship_work_list_bitable_bindings",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "415dc2a86cb8fd24ebd4"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_bitable_sync_tables",
+      "target": "workmanship_work_list_bitable_record_map",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "9f7a0035798f0b2045e7"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_change_log_tables",
+      "target": "workmanship_work_item_change_logs",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "18d5028eef8e471c065e"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_deep_link_tables",
+      "target": "workmanship_auth_users",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "0656f85d0c7eea17237e"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_deep_link_tables",
+      "target": "workmanship_work_permission_requests",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "45745d92f95232519ffc"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_deep_link_tables",
+      "target": "workmanship_work_share_links",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "87462c696110d162df9d"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_entries",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "89a233a3a0b2833fc458"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_entry_links",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "8431fbe6664af72c9ff5"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_operations",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "7cabb79a545317198d7b"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_processes",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "2f93ed13ab8ade975644"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_gbop_versions",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "645332de5666dccd1c7e"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_tpl_vpps_parts",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "b7bec09bcbb724f618d6"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "e4e6659c937533fe6fbc"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_app_wb_annotations",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "7a9e0a9a598ac2642293"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_auth_teams",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "fcbad8d2873ff6e1a72a"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_auth_users",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "b997ec12e79f7d307afe"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_entries",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "9290523350a374bf4df9"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_process",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "10695ca897e748cde4d3"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_staging",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "d19c64d8533a88b5bc75"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_steps",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "d0fe58c1c1d9160d7861"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_bop_versions",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "858a400a14d0ec965704"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_bop_pbom_versions",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "8fe79c14c078a6445d44"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_factory_factory_sections",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "ea5b7b763c8e3afb0f88"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_know_craft_rules",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "69e7a2a2bf2b67a0dfeb"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_know_entries",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "425696cce2a979724f13"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_know_favorites",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "a4c5218d260248e124af"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_know_folders",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "949c00b1d673a814f9b5"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_know_items",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "e510a2ec9f0b21542386"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_know_recent",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "a3a82548d93bca452ff0"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_proj_issues",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "b66bc2ad640833eb4b8e"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_proj_projects",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "a489f6420851b2282666"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_proj_tasks",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "35c0f63b77c9036e851d"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_work_issues",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "4dec2176aaa122356847"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_work_item_entries",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "06b00d3ac67b1d0d7032"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_work_lists",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "8148337d9a8ebeb1f7a4"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_lists_table",
+      "target": "workmanship_work_tasks",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "247354c214a06884dd82"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_permission_tables",
+      "target": "workmanship_auth_permission_grants",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "4e20767c8c1d12175353"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_permission_tables",
+      "target": "workmanship_auth_users",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "a9ab6092c7769f0c239c"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_permission_tables",
+      "target": "workmanship_work_lists",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "8cd01ac031204d2eaffa"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_auth_users",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "0eaca985e90b62fd7075"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_work_item_shares",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "332c5f87391a0b2a58c6"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_work_list_shares",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "768d692b90d217c109f5"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_share_tables",
+      "target": "workmanship_work_lists",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "210301edbee0016f8f73"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/main.py",
+      "scope": "_ensure_vpps_operations_table",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "1dc3363bebc5750e146d"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/plugin_platform/service.py",
+      "scope": "<module>",
+      "target": "workmanship_plugin_installations",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "34c2e45c38c496081289"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/plugin_platform/service.py",
+      "scope": "<module>",
+      "target": "workmanship_plugin_lifecycle_events",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "451ce413c0a8960ecec3"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/plugin_platform/service.py",
+      "scope": "<module>",
+      "target": "workmanship_plugin_publishers",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "191b2bc0f78d53651312"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/plugin_platform/service.py",
+      "scope": "<module>",
+      "target": "workmanship_plugin_releases",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "b0d733b7420f2f0a1a62"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/routers/workbench_home.py",
+      "scope": "get_panel1_items",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "474eacd0c34cb1e0ce52"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "backend/services/feishu_cache_service.py",
+      "scope": "ensure_table",
+      "target": "workmanship_app_feishu_search_cache",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "27d70cb2b7affc607a0b"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/agent/agent_backend/ai_assistant/session_store.py",
+      "scope": "_ensure_tables",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "d96aa91dfe41481bfcca"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/agent/agent_backend/routers/ai_audit.py",
+      "scope": "_ensure_ai_audit_table",
+      "target": "workmanship_app_ai_audit_logs",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "76c191fb192801bfc7f8"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/agent/agent_backend/routers/skills.py",
+      "scope": "_ensure_skills_table",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "c7cefc9731b10b176ca7"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/_bop/_helpers.py",
+      "scope": "_ensure_oplog_cols",
+      "target": "workmanship_bop_bop_line_operation_log",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "7225b4917e2e44648653"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/_bop/_history.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_line_history_state",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "c74035cc7a46db89d0b8"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/_bop/_history.py",
+      "scope": "<module>",
+      "target": "workmanship_bop_bop_line_operation_log",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "5d4ba5f9abd1afa7591b"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/_bop/gbop.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_bop_gbop_match_staging",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "d7508b7766f514eb94ca"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/_bop/gbop.py",
+      "scope": "_ensure_gbop_tables",
+      "target": "workmanship_bop_pbom",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "2a9ddb2951900865d045"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/_bop/gbop.py",
+      "scope": "_safe_add_column",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "00ad55961a79f44936ec"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/canvases.py",
+      "scope": "_ensure_table",
+      "target": "workmanship_app_wfc_canvases",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "dc4bdf65a05c518f6e42"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/craft_library.py",
+      "scope": "_ensure_alias_column",
+      "target": "workmanship_tpl_vpps_parts",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "ab47e4730d7a58ba4cd4"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/ebom.py",
+      "scope": "_ensure_columns",
+      "target": "workmanship_bop_pbom",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "54cd3439f1cf2aff16e5"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/ebom.py",
+      "scope": "_ensure_columns",
+      "target": "workmanship_bop_pbom_versions",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "4ab8a533ea18271a8de7"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/ebom.py",
+      "scope": "_safe_add_column",
+      "target": "<unknown>",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "0972794a9a3ba544e4ad"
+    },
+    {
+      "category": "runtime_ddl",
+      "path": "plugins/craft/craft_backend/routers/gbop.py",
+      "scope": "_ensure_nav_bindings",
+      "target": "workmanship_bop_gbop_nav_bindings",
+      "detail": "DDL is only allowed in versioned migration files",
+      "fingerprint": "ac2dec4b2a5e5f0874ee"
+    }
+  ]
+}

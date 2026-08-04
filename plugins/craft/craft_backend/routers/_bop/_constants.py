@@ -5,7 +5,7 @@ BOP 子包共享常量：权限 Depends、SQL 列名/键名、SQL 模板、映�
 """
 from pathlib import Path as _Path
 
-from backend.routers.deps import require_role
+from backend.platform_sdk.auth import require_role
 
 # ── 权限分组 ─────────────────────────────────────────────────────────────────
 _SUPER_ADMIN = require_role("super_admin")
@@ -196,7 +196,6 @@ _LINK_SNAPSHOT_MAP = {
     'issue':              ('workmanship_work_issues',               None),
     'task_std':           ('workmanship_work_tasks',                None),
     'task_custom':        ('workmanship_work_tasks',                None),
-    'knowledge':          ('workmanship_know_entries', None),
     'rule_std':           ('workmanship_know_craft_rules',     None),
     'rule_custom':        ('workmanship_know_craft_rules',     None),
 }
@@ -213,9 +212,6 @@ _GID_RESOLVE_MAP: dict = {
     'pbom_version_gid':     ('workmanship_bop_bop_versions',         'bop_name'),
     'parent_version_gid':   ('workmanship_bop_bop_versions',         'bop_name'),
     'version_family_gid':   ('workmanship_bop_bop_versions',         'bop_name'),
-    'owner_gid':            ('workmanship_auth_users',               'name'),
-    'created_by':           ('workmanship_auth_users',               'name'),
-    'team_gid':             ('workmanship_auth_teams',               'name'),
     'factory_line_gid':     ('workmanship_factory_factory_lines',    'name'),
     'station_gid':          ('workmanship_factory_factory_stations', 'name'),
 }
@@ -345,7 +341,6 @@ _LINK_TARGET_TABLES = {
     'issue':                ('workmanship_proj_issues',                 'gid', None),
     'task_custom':          ('workmanship_proj_tasks',                  'gid', None),
     'task_std':             ('workmanship_proj_tasks',                  'gid', None),
-    'knowledge':            ('workmanship_know_entries', 'gid', None),
     'rule_std':             ('workmanship_know_craft_rules',       'gid', None),
     'rule_custom':          ('workmanship_know_craft_rules',       'gid', None),
 }

@@ -19,13 +19,14 @@ from __future__ import annotations
 import json
 import os
 import uuid
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import StreamingResponse
 
-from backend.routers.deps import get_current_user, require_role
+from backend.platform_sdk.auth import get_current_user, require_role
 from ..ai_assistant.session_store import _store
 from ..ai_assistant import tool_executor as _te
 from ..ai_assistant import system_prompt as _sp
+from . import agent_runtime_proxy_next as _pi_proxy
 from ..ai_assistant.tool_registry import (
     get_all_tools_with_skills, WRITE_TOOLS_CONFIRM,
     _READ_TOOLS, _WRITE_TOOLS_CONFIRM, _WRITE_TOOLS_NO_CONFIRM, _SYSTEM_TOOLS,
@@ -50,44 +51,20 @@ _CHJ_BASE_COMPLETIONS = "http://api-hub.inner.chj.cloud/llm-gateway/v1/chat/comp
 # ── Config helpers ────────────────────────────────────────────────────────────
 
 def _get_ai_config(user_gid: str | None = None) -> dict:
-    """优先级：admin 全局配置（DB）→ 环境变量。user_gid 参数保留但不再使用。"""
-    # 1. 超管全局配置（app.system_config key='ai_admin_config'）
-    try:
-        from backend.db.connection import get_conn
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT value FROM app.system_config WHERE key='ai_admin_config'")
-                row = cur.fetchone()
-                if row:
-                    cfg = json.loads(row["value"]) if isinstance(row["value"], str) else dict(row["value"])
-                    if cfg.get("api_key"):
-                        return {**cfg, "source": "admin"}
-    except Exception:
-        _log.warning("_get_ai_config: DB 查询失败，回退到环境变量", exc_info=True)
+    """Model credentials are deployment secrets, never business-database records."""
     key = os.getenv("AI_API_KEY") or os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY")
     if key:
         return {
-            "model":    os.getenv("AI_MODEL", _DEFAULT_MODEL),
-            "api_key":  key,
+            "model": os.getenv("AI_MODEL", _DEFAULT_MODEL),
+            "api_key": key,
             "api_base": os.getenv("AI_API_BASE", ""),
-            "source":   "env",
+            "source": "env",
         }
     return {"model": "", "api_key": "", "api_base": "", "source": "none"}
 
 
 def _get_admin_config_raw() -> dict:
-    try:
-        from backend.db.connection import get_conn
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT value FROM app.system_config WHERE key='ai_admin_config'")
-                row = cur.fetchone()
-        if row and row["value"]:
-            return dict(row["value"])
-    except Exception:
-        _log.warning("_get_admin_config_raw: DB 查询失败", exc_info=True)
-
-
+    return _get_ai_config()
 
 def _mask_key(key: str) -> str:
     if not key:
@@ -501,6 +478,8 @@ def _chat_stream_gen(
                     ok = not (isinstance(res, dict) and res.get("error"))
                     _UI_TOOLS = {"generate_canvas", "bop_to_canvas", "create_discussion_topic", "open_in_container", "run_skill_canvas"}
                     evt: dict = {"type": "tool_end", "name": _name, "ok": ok}
+                    if isinstance(res, dict) and isinstance(res.get("evidence"), list):
+                        evt["evidence"] = res["evidence"][:20]
                     if _name in _UI_TOOLS and isinstance(res, dict):
                         evt["result"] = res
                     yield f'data: {json.dumps(evt)}\n\n'
@@ -540,17 +519,40 @@ def _chat_stream_gen(
     yield f'data: {json.dumps({"type":"done","session_id":session_gid,"total_tokens":_total_tokens,"model":model,"iter_count":_iter_count})}\n\n'
 
 
+# ── Pi Runtime compatibility switch ──────────────────────────────────────────
+
+def _pi_call(fn, *args):
+    try:
+        return fn(*args)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Agent Runtime unavailable: {str(exc)[:240]}") from exc
+
+
+def _require_legacy_session_owner(session_gid: str | None, user_gid: str) -> None:
+    if not session_gid:
+        return
+    owned = {row.get("gid") for row in _store.list_sessions(user_gid=user_gid)}
+    if session_gid not in owned:
+        raise HTTPException(status_code=404, detail="Session not found")
+
 # ── FastAPI 路由 ──────────────────────────────────────────────────────────────
 
 @router.post("/chat/stream")
 def chat_stream(
     body: dict,
     _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
-    """SSE 流式对话（主路径）。"""
+    """SSE 流式对话（主路径）；可灰度切换到 Pi Runtime。"""
+    if _pi_proxy.enabled():
+        return StreamingResponse(
+            _pi_proxy.stream_chat(body, x_ai00_token), media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
     message     = body.get("message", "")
     session_gid = body.get("session_id") or body.get("session_gid") or None
     user_gid    = _user.get("gid", "")
+    _require_legacy_session_owner(session_gid, user_gid)
     auth_mode   = "feishu"
     auth_token  = body.get("auth_token", "")
     context_raw = body.get("context") or {}
@@ -595,22 +597,17 @@ def _chat_sync_tolerant(body: dict, user: dict) -> dict:
     session_gid = body.get("session_id") or body.get("session_gid") or None
     user_gid = user.get("gid", "")
 
-    # 构造单轮消息（不走完整 session 历史，简化降级路径）
-    from backend.db.connection import get_conn as _gc
-    history: list = []
+    # Reuse the private Agent session repository; no fallback database query.
+    history = []
     if session_gid:
         try:
-            with _gc() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(
-                        "SELECT role, content FROM ai.chat_turns "
-                        "WHERE session_gid=%s ORDER BY created_at LIMIT 20",
-                        (session_gid,),
-                    )
-                    history = [{"role": r["role"], "content": r["content"]} for r in cur.fetchall()]
+            history = [
+                {"role": turn["role"], "content": turn["content"]}
+                for turn in _store.get_turns(session_gid)
+                if turn["role"] in ("user", "assistant")
+            ][-20:]
         except Exception:
-            pass  # 历史读取失败不阻断
-
+            pass
     msgs = history + [{"role": "user", "content": message}]
     model = _normalize_model(cfg["model"], cfg.get("api_base", ""))
 
@@ -644,8 +641,14 @@ def _chat_sync_tolerant(body: dict, user: dict) -> dict:
 def chat_sync(
     body: dict,
     _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
     """同步对话（降级路径，收集所有 SSE 事件后返回）。"""
+    if _pi_proxy.enabled():
+        return _pi_proxy.sync_chat(body, x_ai00_token)
+    _require_legacy_session_owner(
+        body.get("session_id") or body.get("session_gid"), _user.get("gid", ""),
+    )
     try:
         chunks = list(_chat_stream_gen(
             message=body.get("message", ""),
@@ -708,7 +711,10 @@ def confirm_tool(
     _user: dict = Depends(get_current_user),
 ):
     """确认写操作 → 继续执行对话。返回 SSE 流。"""
+    if _pi_proxy.enabled():
+        raise HTTPException(status_code=409, detail="Pi Runtime 写能力确认尚未开放")
     session_gid   = body.get("session_gid") or body.get("session_id", "")
+    _require_legacy_session_owner(session_gid, _user.get("gid", ""))
     confirm_token = body.get("confirm_token", "")
     tool_name     = body.get("tool_name", "")
     tool_use_id   = body.get("tool_use_id", "")
@@ -774,7 +780,10 @@ def confirm_tool_sync(
     _user: dict = Depends(get_current_user),
 ):
     """同步版确认写操作：执行工具后继续对话，收集 SSE 后返回 JSON。"""
+    if _pi_proxy.enabled():
+        raise HTTPException(status_code=409, detail="Pi Runtime 写能力确认尚未开放")
     session_gid   = body.get("session_gid") or body.get("session_id", "")
+    _require_legacy_session_owner(session_gid, _user.get("gid", ""))
     confirm_token = body.get("confirm_token", "")
     tool_name     = body.get("tool_name", "")
     tool_use_id   = body.get("tool_use_id", "")
@@ -855,8 +864,12 @@ def confirm_tool_sync(
 def abort_stream(
     body: dict,
     _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
+    if _pi_proxy.enabled():
+        return {"ok": True}
     session_gid = body.get("session_gid") or body.get("session_id", "")
+    _require_legacy_session_owner(session_gid, _user.get("gid", ""))
     if session_gid:
         _abort_flags[session_gid] = True
     return {"ok": True}
@@ -867,7 +880,10 @@ def abort_stream(
 @router.get("/sessions")
 def list_sessions(
     _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
+    if _pi_proxy.enabled():
+        return _pi_call(_pi_proxy.list_sessions, x_ai00_token)
     user_gid = _user.get("gid", "")
     sessions = _store.list_sessions(user_gid=user_gid)
     return {"sessions": [s for s in sessions if "_sub_" not in s.get("gid", "")]}
@@ -877,7 +893,11 @@ def list_sessions(
 def delete_session(
     gid: str,
     _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
+    if _pi_proxy.enabled():
+        return _pi_call(_pi_proxy.delete_session, x_ai00_token, gid)
+    _require_legacy_session_owner(gid, _user.get("gid", ""))
     _store.delete_session(gid)
     return {"success": True}
 
@@ -886,8 +906,12 @@ def delete_session(
 def get_session(
     gid: str,
     _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
     """返回会话的所有轮次（前端恢复历史对话用）。"""
+    if _pi_proxy.enabled():
+        return _pi_call(_pi_proxy.get_session, x_ai00_token, gid)
+    _require_legacy_session_owner(gid, _user.get("gid", ""))
     turns = _store.get_turns(gid)
     return {"turns": turns}
 
@@ -896,7 +920,10 @@ def get_session(
 def new_session(
     body: dict = {},
     _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
+    if _pi_proxy.enabled():
+        return _pi_call(_pi_proxy.new_session, x_ai00_token)
     user_gid = _user.get("gid", "")
     gid = _store.create_session(user_gid=user_gid)
     return {"session_gid": gid}
@@ -907,7 +934,10 @@ def new_session(
 @router.get("/tools")
 def list_tools(
     _user: dict = Depends(get_current_user),
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
 ):
+    if _pi_proxy.enabled():
+        return _pi_call(_pi_proxy.list_tools, x_ai00_token)
     def _fmt(tools, category, need_confirm):
         return [
             {
@@ -935,6 +965,8 @@ def get_admin_config(
     _user: dict = Depends(get_current_user),
 ):
     """全局 AI 配置：所有登录用户可读（超管可写）。"""
+    if _pi_proxy.enabled():
+        return {"source": "pi_runtime", "model": "由 Agent Runtime 管理", "has_key": True, "key_preview": "", "is_admin": (_user.get("org_role") or _user.get("system_role", "")) == "super_admin"}
     cfg = _get_ai_config()
     is_admin = (_user.get("org_role") or _user.get("system_role", "")) == "super_admin"
     result: dict = {
@@ -954,32 +986,18 @@ def save_admin_config(
     body: dict,
     _user: dict = Depends(require_role("super_admin")),
 ):
-    entry: dict = {}
-    if body.get("model"):
-        entry["model"] = body["model"]
-    entry["api_base"] = body.get("api_base", "")
-    if body.get("api_key"):
-        entry["api_key"] = body["api_key"]
-    try:
-        from backend.db.connection import get_conn
-        import json as _j
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO app.system_config (key, value)
-                    VALUES ('ai_admin_config', %s::jsonb)
-                    ON DUPLICATE KEY UPDATE value=VALUES(value), updated_at=NOW()
-                """, (_j.dumps(entry),))
-    except Exception as e:
-        return {"success": False, "error": _sanitize_error(e)}
-    return {"success": True}
-
+    raise HTTPException(
+        status_code=409,
+        detail="模型密钥由 Agent Runtime 部署 Secret 管理，禁止写入业务数据库",
+    )
 
 @router.post("/test-connection")
 def test_connection(
     body: dict,
     _user: dict = Depends(get_current_user),
 ):
+    if _pi_proxy.enabled():
+        return _pi_call(_pi_proxy.health)
     try:
         cfg = _get_ai_config()
     except Exception as e:

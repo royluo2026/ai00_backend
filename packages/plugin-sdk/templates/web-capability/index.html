@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI00 插件模板</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <header>
+      <p class="eyebrow">AI00 WEB PLUGIN</p>
+      <h1>能力调用模板</h1>
+      <p id="status" class="status">正在连接 AI00…</p>
+    </header>
+
+    <section aria-labelledby="capability-title">
+      <h2 id="capability-title">已授权能力</h2>
+      <div id="capabilities" class="chips"></div>
+    </section>
+
+    <section aria-labelledby="demo-title">
+      <h2 id="demo-title">运行示例</h2>
+      <label for="message">发送给 system.echo 的内容</label>
+      <div class="row">
+        <input id="message" value="你好，AI00 插件平台" maxlength="200">
+        <button id="run" disabled>调用能力</button>
+      </div>
+      <p>当前插件命名空间中的调用次数：<strong id="count">—</strong></p>
+      <pre id="output" aria-live="polite">等待首次调用</pre>
+      <button id="reset" class="secondary" disabled>清空示例计数</button>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

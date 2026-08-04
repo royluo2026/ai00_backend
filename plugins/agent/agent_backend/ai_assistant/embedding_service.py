@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def _get_ai_cfg() -> dict:
     """从后端 AI 配置读取 ai_cfg，失败返回空字典。"""
     try:
-        from backend.routers.ai_chat import _get_ai_config
+        from ..routers.ai_chat import _get_ai_config
         cfg = _get_ai_config(owner_gid="")
         return dict(cfg or {})
     except Exception:

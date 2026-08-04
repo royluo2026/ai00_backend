@@ -9,8 +9,8 @@ from typing import Optional
 
 from fastapi import HTTPException
 
-from backend.db.connection import get_conn
-from backend.utils.gid import next_gid
+from ...data.connection import get_conn
+from backend.platform_sdk.ids import next_gid
 
 from ._constants import (
     _LINK_SNAPSHOT_MAP,
@@ -178,9 +178,9 @@ def _get_entry_line_gid(cur, entry_gid: str) -> Optional[str]:
 
 
 def _check_line_editable(cur, version_gid: str, entry_gid: str, user: dict, allow_copy: bool = False):
-    from backend.routers.deps import _get_user_grants, _derive_org_role
+    from backend.platform_sdk.auth import get_user_grants, derive_org_role
 
-    org_role = user.get('org_role') or _derive_org_role(user.get('system_role', 'external'))
+    org_role = user.get('org_role') or derive_org_role(user.get('system_role', 'external'))
     # 组织成员可编辑所有工艺流程图，不再受项目负责人或线体负责人范围限制。
     if org_role in ('super_admin', 'member', 'team_admin', 'project_admin'):
         return
@@ -188,7 +188,7 @@ def _check_line_editable(cur, version_gid: str, entry_gid: str, user: dict, allo
     cur.execute("SELECT project_gid FROM workmanship_bop_bop_versions WHERE gid=%s", (version_gid,))
     ver = cur.fetchone()
     project_gid = ver['project_gid'] if ver else None
-    grants = _get_user_grants(user.get('gid', ''))
+    grants = get_user_grants(user.get('gid', ''))
     if project_gid and any(g['grant_type'] == 'project_owner' and g.get('scope_gid') == project_gid for g in grants):
         return
 
@@ -514,26 +514,6 @@ def _copy_entries_and_links(cur, src_version_gid: str, new_version_gid: str) -> 
 
 # ── 操作日志辅助 ───────────────────────────────────────────────────────────────
 
-_oplog_cols_ensured = False  # 进程级别只跑一次
-
-
-def _ensure_oplog_cols(cur) -> None:
-    """确保 bop_line_operation_log 表含 old_state / new_state 列（旧表可能没有）"""
-    global _oplog_cols_ensured
-    if _oplog_cols_ensured:
-        return
-    for col, defn in [
-        ('old_state', 'LONGTEXT DEFAULT NULL'),
-        ('new_state', 'LONGTEXT DEFAULT NULL'),
-    ]:
-        try:
-            cur.execute(
-                f"ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN {col} {defn}"
-            )
-        except Exception:
-            pass  # 列已存在 → 忽略
-    _oplog_cols_ensured = True
-
 def _get_line_gid(cur, entry_gid: str) -> Optional[str]:
     """迭代向上找 line_process 祖先节点 gid（最多20层）"""
     gid = entry_gid
@@ -560,7 +540,6 @@ def _log_entry_op(cur, *, version_gid: str, entry_gid: str, entry_title: str,
     """向 bop_line_operation_log 写一条操作记录；失败静默不阻断主事务。
     返回 (batch_id, line_gid) 供前端刷新操作历史面板。"""
     # 确保表有 old_state / new_state 列
-    _ensure_oplog_cols(cur)
     line_gid = _get_line_gid(cur, entry_gid) or entry_gid
     batch_id = str(next_gid())
     try:

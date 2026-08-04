@@ -6,7 +6,7 @@ Skill / AI 画布 工具处理器
 from __future__ import annotations
 from typing import Any
 
-from backend.db.connection import get_conn
+from ...data.connection import get_agent_conn
 
 TOOL_NAMES: set[str] = {
     "run_skill_canvas",
@@ -28,7 +28,7 @@ def dispatch(
     if tool_name == "run_skill_canvas":
         return _run_skill_canvas(user_gid=user_gid, auth_token=auth_token, **inputs)
     if tool_name == "list_skills":
-        return _list_skills(**inputs)
+        return _list_skills(user_gid=user_gid, **inputs)
     if tool_name.startswith("skill_tool_"):
         skill_name = tool_name[len("skill_tool_"):]
         return _run_skill_by_name(
@@ -52,12 +52,12 @@ def _run_skill_canvas(
 ) -> dict:
     """简化版 skill 执行：返回 skill 画布结构，由前端 wfc_window.js 处理。"""
     try:
-        with get_conn() as conn:
+        with get_agent_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT gid, title, content FROM app.skills "
-                    "WHERE gid=%s AND deleted_at IS NULL",
-                    (skill_gid,),
+                    "SELECT gid, title, content FROM workmanship_app_skills "
+                    "WHERE gid=%s AND deleted_at IS NULL AND (owner_gid=%s OR owner_gid='__system__' OR scope='global')",
+                    (skill_gid, user_gid),
                 )
                 row = cur.fetchone()
         if not row:
@@ -74,12 +74,12 @@ def _run_skill_canvas(
         return {"error": str(e)}
 
 
-def _list_skills(scope_filter: str = "all", limit: int = 30) -> dict:
+def _list_skills(scope_filter: str = "all", limit: int = 30, user_gid: str = "") -> dict:
     try:
-        with get_conn() as conn:
+        with get_agent_conn() as conn:
             with conn.cursor() as cur:
-                q = "SELECT gid, name, title, description FROM app.skills WHERE deleted_at IS NULL"
-                params: list = []
+                q = "SELECT gid, name, title, description FROM workmanship_app_skills WHERE deleted_at IS NULL AND (owner_gid=%s OR owner_gid='__system__' OR scope='global')"
+                params: list = [user_gid]
                 if scope_filter and scope_filter != "all":
                     q += " AND scope=%s"; params.append(scope_filter)
                 q += f" ORDER BY created_at DESC LIMIT {min(int(limit or 30), 100)}"
@@ -101,12 +101,12 @@ def _run_skill_by_name(
     auth_token: str = "",
 ) -> dict:
     try:
-        with get_conn() as conn:
+        with get_agent_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT gid, title FROM app.skills "
-                    "WHERE name=%s AND deleted_at IS NULL",
-                    (skill_name,),
+                    "SELECT gid, title FROM workmanship_app_skills "
+                    "WHERE name=%s AND deleted_at IS NULL AND (owner_gid=%s OR owner_gid='__system__' OR scope='global')",
+                    (skill_name, user_gid),
                 )
                 row = cur.fetchone()
         if not row:

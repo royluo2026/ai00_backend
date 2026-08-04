@@ -18,10 +18,40 @@ from pydantic import BaseModel
 
 from backend.db.connection import get_conn
 from backend.db.sequences import next_display_id
-from backend.routers.deps import get_current_user, get_current_user_optional
+from backend.routers.deps import build_profile, get_current_user
+from backend.platform_sdk.identity import get_active_team_member_gids
 from backend.utils.gid import next_gid
 
 router = APIRouter(tags=["knowledge"])
+
+
+def _permissions(user: dict) -> set[str]:
+    return set(build_profile(user).get("permissions", []))
+
+
+def _visible_sql(user: dict, alias: str = "") -> tuple[str, list]:
+    if "knowledge.view" not in _permissions(user) and "knowledge.manage" not in _permissions(user):
+        raise HTTPException(status_code=403, detail="缺少知识查看权限")
+    prefix = f"{alias}." if alias else ""
+    if (user.get("org_role") or user.get("system_role")) == "super_admin":
+        return "1=1", []
+    uid = str(user.get("gid") or "")
+    members = get_active_team_member_gids(str(user.get("team_id") or ""))
+    clauses = [f"{prefix}share_scope='global'", f"{prefix}creator_gid=%s"]
+    params: list = [uid]
+    if members:
+        placeholders = ",".join(["%s"] * len(members))
+        clauses.append(f"({prefix}share_scope='team' AND {prefix}creator_gid IN ({placeholders}))")
+        params.extend(members)
+    return "(" + " OR ".join(clauses) + ")", params
+
+
+def _assert_writable(row: dict, user: dict) -> None:
+    if str(row.get("creator_gid") or "") == str(user.get("gid") or ""):
+        return
+    if str(row.get("share_scope") or "team") in {"team", "global"} and "knowledge.manage" in _permissions(user):
+        return
+    raise HTTPException(status_code=403, detail="无权修改该知识条目")
 
 
 class KnowledgeBody(BaseModel):
@@ -72,11 +102,12 @@ def list_knowledge_entries(
     list_gid: Optional[str] = Query(None),
     context_class_gid: Optional[str] = Query(None),
     limit: int = Query(200, le=500),
-    current_user: Optional[dict] = Depends(get_current_user_optional),
+    current_user: dict = Depends(get_current_user),
 ):
     with get_conn() as conn:
         with conn.cursor() as cur:
-            clauses, params = ["1=1"], []
+            visible, params = _visible_sql(current_user)
+            clauses = [visible]
             if entry_type:
                 clauses.append("entry_type = %s"); params.append(entry_type)
             if list_gid:
@@ -94,6 +125,12 @@ def list_knowledge_entries(
 
 @router.post("/api/knowledge_entries", status_code=201)
 def create_knowledge_entry(body: KnowledgeBody, current_user: dict = Depends(get_current_user)):
+    if "knowledge.view" not in _permissions(current_user) and "knowledge.manage" not in _permissions(current_user):
+        raise HTTPException(status_code=403, detail="缺少知识创建权限")
+    if body.share_scope not in {"local", "team", "global"}:
+        raise HTTPException(status_code=400, detail="不支持的知识可见范围")
+    if body.share_scope == "global" and "knowledge.manage" not in _permissions(current_user):
+        raise HTTPException(status_code=403, detail="公开知识需要knowledge.manage权限")
     gid = str(next_gid())
     display_id = f"K-C{next_display_id('knowledge_display_seq'):08d}"
     uid = current_user["gid"]
@@ -125,10 +162,11 @@ def create_knowledge_entry(body: KnowledgeBody, current_user: dict = Depends(get
 
 
 @router.get("/api/knowledge_entries/{gid}")
-def get_knowledge_entry(gid: str, current_user: Optional[dict] = Depends(get_current_user_optional)):
+def get_knowledge_entry(gid: str, current_user: dict = Depends(get_current_user)):
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM workmanship_know_entries WHERE gid = %s", (gid,))
+            visible, params = _visible_sql(current_user, "k")
+            cur.execute(f"SELECT * FROM workmanship_know_entries k WHERE k.gid = %s AND {visible}", [gid, *params])
             row = cur.fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="知识条目不存在")
@@ -137,6 +175,19 @@ def get_knowledge_entry(gid: str, current_user: Optional[dict] = Depends(get_cur
 
 @router.patch("/api/knowledge_entries/{gid}")
 def update_knowledge_entry(gid: str, body: dict, current_user: dict = Depends(get_current_user)):
+    visible, visibility_params = _visible_sql(current_user, "k")
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(f"SELECT * FROM workmanship_know_entries k WHERE k.gid=%s AND {visible}", [gid, *visibility_params])
+            existing = cur.fetchone()
+    if not existing:
+        raise HTTPException(status_code=404, detail="知识条目不存在")
+    _assert_writable(dict(existing), current_user)
+    if "share_scope" in body:
+        if body["share_scope"] not in {"local", "team", "global"}:
+            raise HTTPException(status_code=400, detail="不支持的知识可见范围")
+        if body["share_scope"] == "global" and "knowledge.manage" not in _permissions(current_user):
+            raise HTTPException(status_code=403, detail="公开知识需要knowledge.manage权限")
     allowed = {
         "title", "entry_type", "status", "share_scope", "list_gid",
         "source_gid", "source_label", "maintainer_gid", "contributors",
@@ -164,19 +215,17 @@ def update_knowledge_entry(gid: str, body: dict, current_user: dict = Depends(ge
 
 @router.delete("/api/knowledge_entries/{gid}")
 def delete_knowledge_entry(gid: str, current_user: dict = Depends(get_current_user)):
-    uid = current_user["gid"]
+    visible, params = _visible_sql(current_user, "k")
     with get_conn() as conn:
         with conn.cursor() as cur:
-            # 允许创建者或管理员删除
-            cur.execute(
-                "DELETE FROM workmanship_know_entries WHERE gid = %s AND (creator_gid = %s OR %s IN (SELECT gid FROM workmanship_auth_users WHERE system_role IN ('super_admin','team_admin','knowledge_admin')))",
-                (gid, uid, uid),
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="知识条目不存在或无权限")
+            cur.execute(f"SELECT * FROM workmanship_know_entries k WHERE k.gid=%s AND {visible}", [gid, *params])
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="知识条目不存在")
+            _assert_writable(dict(row), current_user)
+            cur.execute("DELETE FROM workmanship_know_entries WHERE gid=%s", (gid,))
         conn.commit()
     return {"success": True}
-
 
 class VectorSearchBody(BaseModel):
     query_vector: list
@@ -187,41 +236,15 @@ class VectorSearchBody(BaseModel):
 @router.post("/api/knowledge_entries/vector-search")
 def vector_search_knowledge(
     body: VectorSearchBody,
-    current_user: Optional[dict] = Depends(get_current_user_optional),
+    current_user: dict = Depends(get_current_user),
 ):
-    """
-    pgvector 语义相似搜索。
-    需先执行 backend/db/schema.sql 中的 pgvector 建索引语句，
-    并通过 PATCH /api/knowledge_entries/{gid} 写入 embedding 字段。
-    """
+    """Fail closed until an OceanBase-compatible vector index adapter is configured."""
     if not body.query_vector:
         raise HTTPException(status_code=400, detail="query_vector 不能为空")
-    vec_str = "[" + ",".join(str(float(v)) for v in body.query_vector) + "]"
-    try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT gid, title, entry_type, tags, content_ref,
-                           (embedding <=> %s::vector) AS distance
-                    FROM workmanship_know_entries
-                    WHERE embedding IS NOT NULL
-                    ORDER BY embedding <=> %s::vector
-                    LIMIT %s
-                    """,
-                    (vec_str, vec_str, body.top_k),
-                )
-                rows = cur.fetchall()
-        results = [
-            {
-                "gid":        r["gid"],
-                "title":      r["title"],
-                "entry_type": r["entry_type"],
-                "tags":       r["tags"] or [],
-                "distance":   round(float(r["distance"]), 4),
-            }
-            for r in rows
-        ]
-        return {"success": True, "data": results, "total": len(results)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    raise HTTPException(
+        status_code=501,
+        detail=(
+            "当前 OceanBase 部署未配置向量检索适配器；"
+            "已禁用遗留 pgvector SQL，避免在生产库执行不兼容语句"
+        ),
+    )

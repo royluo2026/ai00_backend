@@ -20,6 +20,7 @@ from backend.db.connection import get_conn
 from backend.routers.deps import get_current_user
 from backend.utils.gid import next_gid
 from backend.utils.notif import create_notification
+from plugins.craft.craft_backend.public import get_follow_item_owner
 
 router = APIRouter(prefix="/api/follows", tags=["follows"])
 
@@ -94,7 +95,7 @@ def create_follow(body: CreateFollowBody, current_user: dict = Depends(get_curre
     gid = str(next_gid())
     with get_conn() as conn:
         # 查询 item 的 owner，准备发「有人关注了我的内容」通知
-        owner_gid = _get_item_owner(conn, body.item_type, body.item_gid)
+        owner_gid = get_follow_item_owner(body.item_type, body.item_gid)
         try:
             with conn.cursor() as cur:
                 cur.execute(
@@ -157,28 +158,6 @@ def patch_follow(gid: str, body: PatchFollowBody, current_user: dict = Depends(g
 
 
 # ── 辅助函数 ──────────────────────────────────────────────────────
-
-_ITEM_OWNER_QUERY = {
-    "project":   ("workmanship_proj_projects",       "owner_gid"),
-    "std_op":    ("workmanship_tpl_gbop_entries",        "created_by"),
-    "approval":  ("workmanship_proj_approval_orders", "applicant_gid"),
-}
-
-
-def _get_item_owner(conn, item_type: str, item_gid: str) -> Optional[str]:
-    """从云端表中查询 item 的 owner gid；本地 item_type 返回 None。"""
-    info = _ITEM_OWNER_QUERY.get(item_type)
-    if not info or not info[1]:
-        return None
-    table, col = info
-    try:
-        with conn.cursor() as cur:
-            cur.execute(f"SELECT {col} FROM {table} WHERE gid = %s", (item_gid,))
-            row = cur.fetchone()
-        return row[col] if row else None
-    except Exception:
-        return None
-
 
 def _item_type_label(item_type: str) -> str:
     return {

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI00 detached plugin release envelope",
+  "allOf": [
+    { "$ref": "./manifest-v2.schema.json" },
+    {
+      "type": "object",
+      "required": ["artifact"],
+      "properties": {
+        "artifact": {
+          "type": "object", "additionalProperties": false,
+          "required": ["object_key", "sha256", "size", "media_type"],
+          "properties": {
+            "object_key": { "type": "string", "minLength": 1 },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "size": { "type": "integer", "minimum": 1, "maximum": 104857600 },
+            "media_type": { "const": "application/zip" }
+          }
+        }
+      }
+    }
+  ]
+}

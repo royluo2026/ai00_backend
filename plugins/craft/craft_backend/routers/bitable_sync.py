@@ -11,9 +11,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user
-from backend.services.bitable_sync_service import bitable_sync_service
+from ..data.connection import get_conn
+from backend.platform_sdk.auth import get_current_user
+from ..services.bitable_sync import bitable_sync_service
 
 _log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/bitable-sync", tags=["bitable-sync"])

@@ -1,0 +1,4 @@
+:root { color-scheme: light dark; font: 14px system-ui, sans-serif; }
+body { margin: 0; padding: 24px; }
+button { padding: 8px 14px; }
+pre { white-space: pre-wrap; }

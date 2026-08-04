@@ -48,6 +48,9 @@ class PluginLoader:
                 if not plugin_id:
                     logger.warning(f"[PluginLoader] manifest 缺少 plugin_id: {manifest_path}")
                     continue
+                if "backend" in manifest and not str(plugin_id).startswith("official."):
+                    logger.error(f"[PluginLoader] 拒绝第三方后端代码声明: {manifest_path}")
+                    manifest.pop("backend", None)
                 if plugin_id in seen_ids:
                     # 已存在：合并 backend 段，更新 backend 目录（用于 sys.path 注入）
                     idx = next(i for i, p in enumerate(self._plugins) if p.get("plugin_id") == plugin_id)
@@ -136,11 +139,13 @@ class PluginLoader:
         nav_items = []
 
         for manifest in self._plugins:
+            plugin_id = manifest.get("plugin_id", "")
+            if not plugin_id.startswith("official."):
+                continue  # third-party Web plugins use the signed tenant registry
             frontend = manifest.get("frontend", {})
             if not frontend:
                 continue  # backend-only stub manifest，跳过
             base_path = frontend.get("base_path", "web")
-            plugin_id = manifest.get("plugin_id", "")
             pkg_dir = self._plugin_dirs.get(plugin_id)
 
             # 推导 web 可访问的前缀路径

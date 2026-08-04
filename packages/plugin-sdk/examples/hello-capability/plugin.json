@@ -1,0 +1,28 @@
+{
+  "schema_version": "2.0",
+  "plugin_id": "acme.ai00.hello",
+  "publisher_id": "acme",
+  "name": "Hello Capability",
+  "description": "Capability and namespace-storage reference plugin.",
+  "version": "1.0.0",
+  "compatibility": {
+    "platform_api": ">=1.0.0 <2.0.0",
+    "web_sdk": ">=0.1.0 <1.0.0"
+  },
+  "runtimes": {
+    "web": {
+      "entry": "index.html",
+      "sandbox": "allow-scripts"
+    }
+  },
+  "permissions": [
+    "plugin.storage.get",
+    "plugin.storage.put",
+    "system.echo"
+  ],
+  "data": {
+    "stores_personal_data": false,
+    "retention": "while-installed",
+    "uninstall": "delete"
+  }
+}

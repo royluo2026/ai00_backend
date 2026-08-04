@@ -1,0 +1,1 @@
+"""Simulation-owned persistence adapters."""

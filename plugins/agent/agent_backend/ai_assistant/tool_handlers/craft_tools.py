@@ -6,10 +6,12 @@ backend/ai_assistant/tool_handlers/craft_tools.py
 全部通过云端 REST 调用 backend 自身接口（httpx 直连 127.0.0.1:8080）。
 """
 from __future__ import annotations
+import os
 from typing import Any
 from urllib.parse import urlencode
 
-from backend.config import get_settings
+
+_BASE_URL = os.getenv("AI00_BASE_API_URL", "http://127.0.0.1:8080").rstrip("/")
 
 TOOL_NAMES: set[str] = {
     "search_parts",
@@ -29,8 +31,6 @@ TOOL_NAMES: set[str] = {
     "global_search",
 }
 
-_settings = get_settings()
-_BASE_URL = _settings.internal_backend_base_url
 
 
 def dispatch(
@@ -396,21 +396,8 @@ def _global_search(inputs: dict, auth_token: str) -> dict:
     results: dict[str, list] = {}
 
     if "bop" in cats:
-        # 搜 BOP 版本名（bop_name/version_tag）— 主要数据在这里
-        try:
-            from backend.db.connection import get_conn as _gc
-            with _gc() as conn:
-                with conn.cursor() as cur:
-                    cur.execute("""
-                        SELECT gid, bop_name, version_tag, status, project_gid
-                        FROM bop.bop_versions
-                        WHERE (bop_name ILIKE %s OR version_tag ILIKE %s)
-                          AND is_deleted = FALSE AND archived_at IS NULL
-                        ORDER BY created_at DESC LIMIT %s
-                    """, (f"%{q}%", f"%{q}%", limit))
-                    results["bop_versions"] = [dict(r) for r in cur.fetchall()]
-        except Exception as e:
-            results["bop_versions"] = []
+        r = _get(f"/api/bop/versions?q={urlencode({'q': q, 'limit': limit})}", auth_token)
+        results["bop_versions"] = r.get("data", []) if r else []
         # 同时搜 BOP 工序条目
         r = _get(f"/api/bop/entries/search?q={q}&limit={limit}", auth_token)
         results["bop_entries"] = r.get("data", []) if r else []

@@ -9,85 +9,13 @@ from typing import List, Literal
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.utils.gid import next_gid
+from ...data.connection import get_conn
+from backend.platform_sdk.ids import next_gid
 
 from ._constants import _WRITE, _READ, _SKIP_LINK_TYPES, _SHARED_ENTITY_LINK_TYPES
 from ._helpers import _deep_copy_entity
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
-
-# ── 幂等补丁（首次请求时执行）────────────────────────────────────
-_gbop_migrated = False
-
-def _safe_add_column(cur, sql: str) -> None:
-    """执行 ALTER TABLE ADD COLUMN，忽略列已存在错误（1060）"""
-    try:
-        cur.execute(sql)
-    except Exception as e:
-        if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
-            return
-        raise
-
-
-def _ensure_gbop_tables():
-    global _gbop_migrated
-    if _gbop_migrated:
-        return
-    print("[gbop] running _ensure_gbop_tables...")
-    try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                # workmanship_bop_pbom 软删除列（gbop_match_preview 需要）
-                _safe_add_column(
-                    cur,
-                    "ALTER TABLE workmanship_bop_pbom "
-                    "ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0"
-                )
-                print("[gbop] is_deleted column OK")
-                # gbop_match_staging 中间表
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS workmanship_bop_gbop_match_staging (
-                        gid                CHAR(36) PRIMARY KEY,
-                        pbom_version_gid   CHAR(36) NOT NULL,
-                        gbop_entry_gid     CHAR(36),
-                        pbom_entry_gid     CHAR(36) NOT NULL,
-                        bop_version_gid    CHAR(36),
-                        match_status       TEXT NOT NULL DEFAULT 'pending',
-                        extra_entry_gids   JSON NOT NULL DEFAULT (JSON_ARRAY()),
-                        created_entry_gid  CHAR(36),
-                        confirmed_by       TEXT,
-                        confirmed_at       DATETIME(6),
-                        created_by         TEXT,
-                        created_at         DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-                        UNIQUE KEY uq_gbop_staging (pbom_version_gid, pbom_entry_gid)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-                """)
-                cur.execute(
-                    "CREATE INDEX IF NOT EXISTS idx_gbop_staging_pbom_ver "
-                    "ON workmanship_bop_gbop_match_staging(pbom_version_gid)"
-                )
-                print("[gbop] gbop_match_staging table OK")
-                # 补列（旧表可能缺少）
-                _safe_add_column(
-                    cur,
-                    "ALTER TABLE workmanship_bop_gbop_match_staging "
-                    "ADD COLUMN extra_entry_gids JSON NOT NULL DEFAULT (JSON_ARRAY())"
-                )
-                _safe_add_column(
-                    cur,
-                    "ALTER TABLE workmanship_bop_gbop_match_staging "
-                    "ADD COLUMN created_entry_gid TEXT"
-                )
-                print("[gbop] gbop_match_staging columns patched")
-            conn.commit()
-        _gbop_migrated = True
-        print("[gbop] _ensure_gbop_tables done")
-    except Exception as e:
-        import traceback
-        print(f"[gbop] migration error: {e}")
-        traceback.print_exc()
-
 
 class GbopMatchConfirmItem(BaseModel):
     pbom_entry_gid: str
@@ -107,7 +35,6 @@ def gbop_match_preview(pbom_gid: str, _u=Depends(_READ)):
     按 vpps 在 GBOP 参考版本中匹配工序/操作 entry，合并已有确认状态。
     """
     print(f"[gbop] gbop_match_preview pbom_gid={pbom_gid!r}")
-    _ensure_gbop_tables()
     with get_conn() as conn:
         with conn.cursor() as cur:
             print(f"[gbop] step1: query pbom_versions")
@@ -253,7 +180,6 @@ def gbop_match_confirm(pbom_gid: str, body: GbopMatchConfirmBody, _u=Depends(_WR
     整批确认匹配结果，幂等写入 gbop_match_staging。
     bop_version_gid 为 NULL，由后续 auto-link 填入。
     """
-    _ensure_gbop_tables()
     user_gid = _u.get('gid') if isinstance(_u, dict) else None
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -473,7 +399,6 @@ def gbop_auto_link(bop_gid: str, _u=Depends(_WRITE)):
 def list_pbom_versions(project_gid: str, _u=Depends(_READ)):
     """列出指定项目下 status='ready' 的 PBOM 版本，供车型工序导航卡选择。"""
     print(f"[gbop] list_pbom_versions project_gid={project_gid!r}")
-    _ensure_gbop_tables()
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(

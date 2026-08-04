@@ -1,1 +1,1 @@
-# backend/rule_engine/
+"""Compatibility package for the Craft-owned rule engine."""

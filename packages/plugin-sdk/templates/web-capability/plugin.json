@@ -1,0 +1,29 @@
+{
+  "schema_version": "2.0",
+  "plugin_id": "example.ai00.capability-starter",
+  "publisher_id": "example",
+  "name": "Capability Starter",
+  "description": "AI00 Web Plugin template: capability calls, namespace storage and sandbox UI.",
+  "version": "0.1.0",
+  "compatibility": {
+    "platform_api": ">=1.0.0 <2.0.0",
+    "web_sdk": ">=0.1.0 <1.0.0"
+  },
+  "runtimes": {
+    "web": {
+      "entry": "index.html",
+      "sandbox": "allow-scripts"
+    }
+  },
+  "permissions": [
+    "plugin.storage.delete",
+    "plugin.storage.get",
+    "plugin.storage.put",
+    "system.echo"
+  ],
+  "data": {
+    "stores_personal_data": false,
+    "retention": "while-installed",
+    "uninstall": "delete"
+  }
+}

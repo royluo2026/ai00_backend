@@ -8,6 +8,7 @@ python-dotenv>=1.0
 pydantic>=2.0
 openpyxl>=3.1
 python-multipart>=0.0.9
+cryptography>=43.0
 httpx>=0.27
 boto3>=1.34
 # 可选：未安装时规则引擎中的 CEL 表达式会返回 SKIP，不影响服务启动

@@ -19,9 +19,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user, require_role, scope_visible_clause
-from backend.utils.gid import next_gid
+from ..data.connection import get_conn
+from backend.platform_sdk.auth import get_current_user, require_role, scope_visible_clause
+from backend.platform_sdk.ids import next_gid
+from backend.platform_sdk.identity import find_active_user_by_role
 
 router = APIRouter(prefix="/api/approval", tags=["approval"])
 _log = __import__('logging').getLogger(__name__)
@@ -179,7 +180,7 @@ def approve_order(gid: str, body: OpinionBody, current_user: dict = Depends(_APP
                                      item.get("target_scope", ""))
             # 通知申请人
             try:
-                from backend.utils.notif import create_notification
+                from backend.platform_sdk.notifications import create_notification
                 create_notification(
                     conn,
                     user_gid=row[2],
@@ -212,7 +213,7 @@ def reject_order(gid: str, body: OpinionBody, current_user: dict = Depends(_APPR
         if row and row[0] == "scope_upgrade":
             item = row[1] or {}
             try:
-                from backend.utils.notif import create_notification
+                from backend.platform_sdk.notifications import create_notification
                 create_notification(
                     conn,
                     user_gid=row[2],
@@ -264,24 +265,6 @@ _ITEM_TABLE = {
 }
 
 
-def _find_reviewer_by_role(conn, role: str, team_id: str = None) -> Optional[str]:
-    """找目标角色的第一个活跃用户 gid"""
-    with conn.cursor() as cur:
-        if team_id and role not in ("super_admin",):
-            cur.execute(
-                "SELECT gid FROM workmanship_auth_users WHERE system_role = %s AND team_id = %s "
-                "AND is_active = TRUE LIMIT 1",
-                (role, team_id)
-            )
-        else:
-            cur.execute(
-                "SELECT gid FROM workmanship_auth_users WHERE system_role = %s AND is_active = TRUE LIMIT 1",
-                (role,)
-            )
-        row = cur.fetchone()
-    return row[0] if row else None
-
-
 def _apply_scope_upgrade(conn, item_type: str, item_gid: str, target_scope: str):
     """审批通过后，更新目标表的 share_scope 字段"""
     table = _ITEM_TABLE.get(item_type)
@@ -318,7 +301,7 @@ def create_scope_upgrade_order(body: ScopeUpgradeBody, current_user: dict = Depe
     title = f"范围提升申请：{body.item_title}（{body.current_scope} → {body.target_scope}）"
 
     with get_conn() as conn:
-        reviewer_gid = _find_reviewer_by_role(conn, reviewer_role, current_user.get("team_id"))
+        reviewer_gid = find_active_user_by_role(reviewer_role, current_user.get("team_id"))
         with conn.cursor() as cur:
             cur.execute(
                 "INSERT INTO workmanship_proj_approval_orders "

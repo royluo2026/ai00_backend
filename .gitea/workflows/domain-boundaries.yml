@@ -1,0 +1,20 @@
+name: domain-boundaries
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  boundary-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Reject new domain-boundary violations
+        run: python backend/scripts/audit_domain_boundaries.py
+      - name: Test governance and migration rules
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m unittest backend.tests.test_domain_governance backend.tests.test_craft_simulation_contract backend.tests.test_agent_session_repository backend.tests.test_versioned_migration_files backend.tests.test_device_domain_boundary backend.tests.test_agent_flow_boundary backend.tests.test_agent_domain_clients backend.tests.test_agent_data_boundaries backend.tests.test_application_migration_boundary backend.tests.test_simulation_domain_boundary backend.tests.test_craft_data_boundary backend.tests.test_craft_vpps_audit_boundary backend.tests.test_craft_ontology_boundary backend.tests.test_self_annotations_oceanbase_boundary backend.tests.test_craft_lists_boundary

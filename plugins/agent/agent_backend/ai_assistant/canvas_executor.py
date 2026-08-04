@@ -218,7 +218,7 @@ class CanvasExecutor:
         self._log(f"    调用工具：{tool_name}  输入：{json.dumps(tool_inputs, ensure_ascii=False)[:300]}")
 
         try:
-            from backend.ai_assistant.tool_handlers import dispatch
+            from .tool_handlers import dispatch
             result = dispatch(
                 tool_name, tool_inputs,
                 auth_mode=self.auth_mode,
@@ -374,12 +374,12 @@ class CanvasExecutor:
         if not skill_gid:
             return {"_status": "skipped", "_summary": "skill_call 未配置 skill_gid"}
         try:
-            from backend.db.connection import get_conn
-            with get_conn() as conn:
+            from ..data.connection import get_agent_conn
+            with get_agent_conn() as conn:
                 with conn.cursor() as cur:
                     cur.execute(
-                        "SELECT content, title FROM app.skills WHERE gid=%s AND deleted_at IS NULL",
-                        (skill_gid,),
+                        "SELECT content, title FROM workmanship_app_skills WHERE gid=%s AND deleted_at IS NULL AND (owner_gid=%s OR owner_gid='__system__' OR scope='global')",
+                        (skill_gid, self.owner_gid),
                     )
                     row = cur.fetchone()
             if not row:
@@ -478,7 +478,7 @@ class CanvasExecutor:
         """同步调用 LLM，仅用于 agent/condition 节点推理（无工具调用）。"""
         try:
             import litellm
-            from backend.routers.ai_chat import _get_ai_config
+            from ..routers.ai_chat import _get_ai_config
             ai_cfg = _get_ai_config(self.owner_gid)
             if not ai_cfg.get("api_key"):
                 raise RuntimeError("未配置 AI API Key，无法执行推理节点")

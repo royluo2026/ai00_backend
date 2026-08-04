@@ -3,18 +3,6 @@ import json
 from typing import Any
 
 
-_HISTORY_DDL = (
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN batch_status VARCHAR(20) NOT NULL DEFAULT 'active'",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redo_guard_json JSON DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN touched_refs_json JSON DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN undone_at DATETIME(6) DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN undone_by TEXT DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redone_at DATETIME(6) DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN redone_by TEXT DEFAULT NULL",
-    "ALTER TABLE workmanship_bop_bop_line_operation_log ADD COLUMN invalidate_reason TEXT DEFAULT NULL",
-    "CREATE TABLE IF NOT EXISTS workmanship_bop_bop_line_history_state (version_gid CHAR(36) NOT NULL, line_gid CHAR(36) NOT NULL, current_batch_id TEXT DEFAULT NULL, current_direction VARCHAR(20) NOT NULL DEFAULT 'active', updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), PRIMARY KEY (version_gid, line_gid)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
-)
-
 
 def is_history_admin(user: dict | None) -> bool:
     actor_role = (user or {}).get("org_role") or (user or {}).get("system_role", "external")
@@ -25,15 +13,9 @@ def can_manage_line_history(user: dict | None, performed_by: str | None) -> bool
     return True
 
 
-def ensure_history_schema(cur) -> None:
-    for sql in _HISTORY_DDL:
-        try:
-            cur.execute(sql)
-        except Exception as e:
-            # MySQL/OceanBase error 1060 = Duplicate column name (column already exists, safe to skip)
-            if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1060:
-                continue
-            raise
+def ensure_history_schema(_cur) -> None:
+    """Compatibility no-op; schema is owned by versioned migrations."""
+    return None
 
 
 def latest_active_batch_sql() -> str:

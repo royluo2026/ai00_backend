@@ -16,11 +16,12 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from backend.db.connection import get_conn
-from backend.routers.deps import get_current_user, require_role
-from backend.utils.gid import next_gid
+from ..data.connection import get_agent_conn
+from backend.platform_sdk.auth import get_current_user, require_role
+import uuid
 
 router = APIRouter(prefix="/api/skills", tags=["skills"])
+_SUPER_ONLY = require_role("super_admin")
 
 _NAME_RE = re.compile(r'^[a-z][a-z0-9_]{1,49}$')
 
@@ -207,35 +208,6 @@ _SYSTEM_SKILLS = [
 ]
 
 
-def _ensure_skills_table(cur):
-    """确保 app.skills 表存在（防止新部署未手动执行 schema.sql）。"""
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS app.skills (
-            gid         TEXT PRIMARY KEY,
-            name        TEXT NOT NULL,
-            title       TEXT NOT NULL,
-            description TEXT NOT NULL DEFAULT '',
-            skill_type  TEXT NOT NULL,
-            scope       TEXT NOT NULL DEFAULT 'private',
-            status      TEXT NOT NULL DEFAULT 'draft',
-            owner_gid   TEXT NOT NULL DEFAULT '',
-            is_system   BOOLEAN NOT NULL DEFAULT FALSE,
-            content     JSONB NOT NULL DEFAULT '{}',
-            icon        TEXT NOT NULL DEFAULT '',
-            tags        JSONB NOT NULL DEFAULT '[]',
-            sort_order  INTEGER NOT NULL DEFAULT 0,
-            is_pinned   BOOLEAN NOT NULL DEFAULT FALSE,
-            created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-            updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-            deleted_at  TIMESTAMPTZ DEFAULT NULL
-        )
-    """)
-    cur.execute("""
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_skills_name
-        ON app.skills(name) WHERE deleted_at IS NULL
-    """)
-
-
 def _row_to_dict(r) -> dict:
     return {
         "gid":         r["gid"],
@@ -265,14 +237,14 @@ def list_skills(
     user: dict = Depends(get_current_user),
 ):
     owner_gid = user.get("gid", "")
-    with get_conn() as conn:
+    with get_agent_conn() as conn:
         with conn.cursor() as cur:
-            _ensure_skills_table(cur)
             cur.execute("""
-                SELECT * FROM app.skills
+                SELECT * FROM workmanship_app_skills
                 WHERE deleted_at IS NULL
+                  AND (owner_gid=%s OR owner_gid='__system__' OR scope='global')
                 ORDER BY sort_order, created_at
-            """)
+            """, (owner_gid,))
             rows = cur.fetchall()
 
     result = []
@@ -303,8 +275,15 @@ def create_skill(body: dict, user: dict = Depends(get_current_user)):
     if skill_type not in ("prompt", "tool", "flow"):
         raise HTTPException(400, "skill_type 必须是 prompt / tool / flow")
 
-    gid = str(next_gid())
+    gid = str(uuid.uuid4())
     owner_gid = user.get("gid", "")
+    if not owner_gid:
+        raise HTTPException(401, "用户身份缺失")
+    requested_scope = body.get("scope", "private")
+    if requested_scope == "team":
+        raise HTTPException(400, "团队 Skill 必须等待 team_gid/ACL 数据模型后启用")
+    if requested_scope == "global" and user.get("role") != "super_admin":
+        raise HTTPException(403, "只有超级管理员可以创建全局 Skill")
     content_raw = body.get("content", "{}")
     try:
         content_obj = json.loads(content_raw) if isinstance(content_raw, str) else content_raw
@@ -316,12 +295,11 @@ def create_skill(body: dict, user: dict = Depends(get_current_user)):
     except Exception:
         tags_obj = []
 
-    with get_conn() as conn:
+    with get_agent_conn() as conn:
         with conn.cursor() as cur:
-            _ensure_skills_table(cur)
             try:
                 cur.execute("""
-                    INSERT INTO app.skills
+                    INSERT INTO workmanship_app_skills
                         (gid, name, title, description, skill_type, scope, status,
                          owner_gid, is_system, content, icon, tags, sort_order, is_pinned)
                     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
@@ -329,7 +307,7 @@ def create_skill(body: dict, user: dict = Depends(get_current_user)):
                     gid, name, title,
                     body.get("description", ""),
                     skill_type,
-                    body.get("scope", "private"),
+                    requested_scope,
                     "draft",
                     owner_gid,
                     False,
@@ -350,16 +328,19 @@ def create_skill(body: dict, user: dict = Depends(get_current_user)):
 
 @router.put("/{gid}")
 def update_skill(gid: str, body: dict, user: dict = Depends(get_current_user)):
-    with get_conn() as conn:
+    if body.get("scope") == "team":
+        raise HTTPException(400, "团队 Skill 必须等待 team_gid/ACL 数据模型后启用")
+    if body.get("scope") == "global" and user.get("role") != "super_admin":
+        raise HTTPException(403, "只有超级管理员可以发布全局 Skill")
+    with get_agent_conn() as conn:
         with conn.cursor() as cur:
-            _ensure_skills_table(cur)
-            cur.execute("SELECT * FROM app.skills WHERE gid=%s AND deleted_at IS NULL", (gid,))
+            cur.execute("SELECT * FROM workmanship_app_skills WHERE gid=%s AND deleted_at IS NULL", (gid,))
             row = cur.fetchone()
             if not row:
                 raise HTTPException(404, "Skill 不存在")
             if row["is_system"]:
                 raise HTTPException(403, "系统预设 Skill 不可修改")
-            if row["owner_gid"] != user.get("gid", "") and user.get("role") not in ("super_admin", "team_admin"):
+            if row["owner_gid"] != user.get("gid", "") and user.get("role") != "super_admin":
                 raise HTTPException(403, "无权修改此 Skill")
 
             sets, params = [], []
@@ -392,7 +373,7 @@ def update_skill(gid: str, body: dict, user: dict = Depends(get_current_user)):
 
             sets.append("updated_at=NOW()")
             params.append(gid)
-            cur.execute(f"UPDATE app.skills SET {','.join(sets)} WHERE gid=%s", params)
+            cur.execute(f"UPDATE workmanship_app_skills SET {','.join(sets)} WHERE gid=%s", params)
     return {"success": True}
 
 
@@ -400,39 +381,37 @@ def update_skill(gid: str, body: dict, user: dict = Depends(get_current_user)):
 
 @router.delete("/{gid}")
 def delete_skill(gid: str, user: dict = Depends(get_current_user)):
-    with get_conn() as conn:
+    with get_agent_conn() as conn:
         with conn.cursor() as cur:
-            _ensure_skills_table(cur)
-            cur.execute("SELECT is_system, owner_gid FROM app.skills WHERE gid=%s AND deleted_at IS NULL", (gid,))
+            cur.execute("SELECT is_system, owner_gid FROM workmanship_app_skills WHERE gid=%s AND deleted_at IS NULL", (gid,))
             row = cur.fetchone()
             if not row:
                 raise HTTPException(404, "Skill 不存在")
             if row["is_system"]:
                 raise HTTPException(403, "系统预设 Skill 不可删除")
-            if row["owner_gid"] != user.get("gid", "") and user.get("role") not in ("super_admin", "team_admin"):
+            if row["owner_gid"] != user.get("gid", "") and user.get("role") != "super_admin":
                 raise HTTPException(403, "无权删除此 Skill")
-            cur.execute("UPDATE app.skills SET deleted_at=NOW() WHERE gid=%s", (gid,))
+            cur.execute("UPDATE workmanship_app_skills SET deleted_at=NOW() WHERE gid=%s", (gid,))
     return {"success": True}
 
 
 # ── 写入系统预设（幂等）────────────────────────────────────────────────────────
 
 @router.post("/seed-system", include_in_schema=False)
-def seed_system_skills():
-    """写入/更新系统预设 skill（幂等，name 冲突时更新内容）。内网调用，无需鉴权。"""
+def seed_system_skills(_user: dict = Depends(_SUPER_ONLY)):
+    """写入/更新系统预设 skill（幂等，name 冲突时更新内容）。仅超级管理员可执行。"""
     seeded = []
-    with get_conn() as conn:
+    with get_agent_conn() as conn:
         with conn.cursor() as cur:
-            _ensure_skills_table(cur)
             for sk in _SYSTEM_SKILLS:
                 content_obj = json.loads(sk["content"]) if isinstance(sk["content"], str) else sk["content"]
                 tags_obj = json.loads(sk["tags"]) if isinstance(sk["tags"], str) else sk["tags"]
 
-                cur.execute("SELECT gid FROM app.skills WHERE name=%s AND deleted_at IS NULL", (sk["name"],))
+                cur.execute("SELECT gid FROM workmanship_app_skills WHERE name=%s AND deleted_at IS NULL", (sk["name"],))
                 existing = cur.fetchone()
                 if existing:
                     cur.execute("""
-                        UPDATE app.skills
+                        UPDATE workmanship_app_skills
                         SET title=%s, description=%s, content=%s, icon=%s, tags=%s,
                             sort_order=%s, is_system=TRUE, scope='global', status='active',
                             updated_at=NOW()
@@ -447,9 +426,9 @@ def seed_system_skills():
                     ))
                     seeded.append({"name": sk["name"], "action": "updated", "gid": existing["gid"]})
                 else:
-                    gid = str(next_gid())
+                    gid = str(uuid.uuid4())
                     cur.execute("""
-                        INSERT INTO app.skills
+                        INSERT INTO workmanship_app_skills
                             (gid, name, title, description, skill_type, scope, status,
                              owner_gid, is_system, content, icon, tags, sort_order)
                         VALUES (%s,%s,%s,%s,%s,'global','active','__system__',TRUE,%s,%s,%s,%s)

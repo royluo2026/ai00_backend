@@ -25,12 +25,13 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.db.sequences import next_display_id
-from backend.routers.deps import get_current_user, task_scope_clauses
-from backend.utils.gid import next_gid
-from backend.utils.change_log import record_changes
-from backend.utils.follow_trigger import notify_followers, RESOLVED_STATUSES
+from ..data.connection import get_conn
+from backend.platform_sdk.ids import next_display_id
+from backend.platform_sdk.auth import get_current_user, task_scope_clauses
+from backend.platform_sdk.ids import next_gid
+from backend.platform_sdk.project_access import can_manage_project, get_user_profiles
+from ..services.change_tracking import record_changes
+from backend.platform_sdk.change_tracking import notify_followers, RESOLVED_STATUSES
 
 router = APIRouter(tags=["promotion"])
 
@@ -202,15 +203,8 @@ def _row_to_issue(r: dict) -> dict:
 
 
 def _verify_project_access(conn, project_gid: Optional[str], user_gid: str) -> bool:
-    """检查用户是否是项目成员（或项目为 None 时直接通过）。"""
-    if not project_gid:
-        return True
-    with conn.cursor() as cur:
-        cur.execute(
-            "SELECT 1 FROM workmanship_auth_project_members WHERE project_gid = %s AND user_gid = %s",
-            (project_gid, user_gid),
-        )
-        return cur.fetchone() is not None
+    """Base owns project membership; the conn argument remains for call compatibility."""
+    return not project_gid or can_manage_project(user_gid, project_gid)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -254,13 +248,15 @@ def list_cloud_tasks(
             where = " AND ".join(clauses)
             limit_clause = f" LIMIT {int(page_size)}" if page_size else ""
             cur.execute(
-                f"SELECT t.*, u.name AS owner_name FROM workmanship_proj_tasks t "
-                f"LEFT JOIN workmanship_auth_users u ON t.owner_user_gid = u.gid "
+                f"SELECT t.* FROM workmanship_proj_tasks t "
                 f"WHERE {where} ORDER BY t.created_at DESC{limit_clause}",
                 params,
             )
-            rows = cur.fetchall()
-    return {"success": True, "data": [_row_to_task(dict(r)) for r in rows]}
+            rows = [dict(row) for row in cur.fetchall()]
+    profiles = get_user_profiles(row.get("owner_user_gid") for row in rows)
+    for row in rows:
+        row["owner_name"] = profiles.get(str(row.get("owner_user_gid") or ""), {}).get("name", "")
+    return {"success": True, "data": [_row_to_task(row) for row in rows]}
 
 
 @router.post("/api/tasks", status_code=201)
@@ -317,13 +313,15 @@ def create_cloud_task(body: TaskBody, current_user: dict = Depends(get_current_u
             )
             _dbg.warning("DEBUG step5: INSERT ok, about to SELECT")
             cur.execute(
-                "SELECT t.*, u.name AS owner_name FROM workmanship_proj_tasks t "
-                "LEFT JOIN workmanship_auth_users u ON t.owner_user_gid = u.gid "
-                "WHERE t.gid = %s", (gid,)
+                "SELECT t.* FROM workmanship_proj_tasks t WHERE t.gid=%s", (gid,)
             )
             row = cur.fetchone()
             _dbg.warning("DEBUG step6: SELECT ok, row=%s", row is not None)
-    return {"success": True, "data": _row_to_task(dict(row)) if row else {"gid": gid}}
+    if row:
+        row = dict(row)
+        profile = get_user_profiles([row.get("owner_user_gid")]).get(str(row.get("owner_user_gid") or ""), {})
+        row["owner_name"] = profile.get("name", "")
+    return {"success": True, "data": _row_to_task(row) if row else {"gid": gid}}
 
 
 @router.get("/api/tasks/promote")

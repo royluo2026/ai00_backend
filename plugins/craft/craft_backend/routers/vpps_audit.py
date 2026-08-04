@@ -14,10 +14,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.domain.vpps_audit.service import VppsAuditService
-from backend.infra.vpps_audit_pg import PgVppsOperationRepository
-from backend.routers.deps import get_current_user, require_role
+from ..data.connection import get_conn
+from ..vpps_audit import MySqlVppsOperationRepository, VppsAuditService
+from backend.platform_sdk.auth import get_current_user, require_role
 
 router = APIRouter(prefix="/api/vpps-operations", tags=["vpps_audit"])
 
@@ -79,7 +78,7 @@ def rule4_bulk_ignore(body: BulkIgnoreRule4Body, user: dict = Depends(get_curren
     rows = [r.model_dump() for r in body.rows]
 
     with get_conn() as conn:
-        repo    = PgVppsOperationRepository(conn)
+        repo    = MySqlVppsOperationRepository(conn)
         service = VppsAuditService(repo)
         ops     = service.bulk_ignore_rule4(
             pbom_version_gid=body.pbom_version_gid,
@@ -104,7 +103,7 @@ def list_operations(
 ):
     """返回指定 PBOM 版本的 is_active 操作记录列表。"""
     with get_conn() as conn:
-        repo    = PgVppsOperationRepository(conn)
+        repo    = MySqlVppsOperationRepository(conn)
         service = VppsAuditService(repo)
         ops     = service.get_active_operations(pbom_version_gid, operation_type)
 
@@ -115,7 +114,7 @@ def list_operations(
 def get_rule4_ignores(pbom_version_gid: str, user: dict = Depends(get_current_user)):
     """返回该 PBOM 版本中已忽略的 rule4 pbom_row_gid 集合及操作详情。"""
     with get_conn() as conn:
-        repo    = PgVppsOperationRepository(conn)
+        repo    = MySqlVppsOperationRepository(conn)
         service = VppsAuditService(repo)
         ops     = service.get_active_operations(pbom_version_gid, "rule4_bulk_ignore")
         gids    = {op.pbom_row_gid for op in ops}
@@ -134,7 +133,7 @@ def revert_operation(gid: str, body: RevertBody, user: dict = Depends(get_curren
     reverted_by_name = body.reverted_by_name or user.get("name", "")
 
     with get_conn() as conn:
-        repo    = PgVppsOperationRepository(conn)
+        repo    = MySqlVppsOperationRepository(conn)
         service = VppsAuditService(repo)
         op      = service.revert_operation(gid, reverted_by_gid, reverted_by_name)
         conn.commit()
