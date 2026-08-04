@@ -25,9 +25,7 @@ if errorlevel 8 exit /b !ERRORLEVEL!
 echo [5/6] configure and restart service
 nssm set AI00Backend-V2 AppEnvironmentExtra "ENV_FILE=E:\projects\ai00-v2\backend\.env.v2.runtime" "PYTHONIOENCODING=utf-8"
 if errorlevel 1 exit /b !ERRORLEVEL!
-net stop AI00Backend-V2 >nul 2>&1
-timeout /t 3 /nobreak >nul
-net start AI00Backend-V2
+nssm restart AI00Backend-V2
 if errorlevel 1 exit /b !ERRORLEVEL!
 
 echo [6/6] health check
