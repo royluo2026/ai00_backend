@@ -33,3 +33,5 @@ def test_deploy_uses_readiness_not_liveness():
     assert "runtime_preflight.py" in deploy
     assert "run_migrations.py" in deploy
     assert "http://127.0.0.1:8082/ready" in deploy
+    assert "WaitForExit(15000)" in deploy
+    assert "recovering only AI00Backend-V2" in deploy

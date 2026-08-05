@@ -33,16 +33,16 @@ if errorlevel 1 exit /b !ERRORLEVEL!
 set ENV_FILE=%RUNTIME_ENV_FILE%
 nssm set AI00Backend-V2 AppEnvironmentExtra "ENV_FILE=E:\projects\ai00-v2\backend\.env.v2.runtime" "PYTHONIOENCODING=utf-8"
 if errorlevel 1 exit /b !ERRORLEVEL!
-nssm restart AI00Backend-V2
+powershell -NoProfile -Command "$p=Start-Process nssm -ArgumentList 'restart','AI00Backend-V2' -PassThru -WindowStyle Hidden; if (-not $p.WaitForExit(15000)) { $p.Kill(); exit 124 }; exit $p.ExitCode"
 if errorlevel 1 (
-  echo Normal restart failed; recovering only AI00Backend-V2.
+  echo Normal restart failed or timed out; recovering only AI00Backend-V2.
   set SERVICE_PID=
   for /f "tokens=3" %%P in ('sc queryex AI00Backend-V2 ^| findstr /R /C:"PID *:"') do set SERVICE_PID=%%P
-  if not defined SERVICE_PID exit /b 1
-  if "!SERVICE_PID!"=="0" exit /b 1
-  taskkill /PID !SERVICE_PID! /F
-  if errorlevel 1 exit /b !ERRORLEVEL!
-  timeout /t 2 /nobreak >nul
+  if defined SERVICE_PID if not "!SERVICE_PID!"=="0" (
+    taskkill /PID !SERVICE_PID! /F
+    if errorlevel 1 exit /b !ERRORLEVEL!
+    timeout /t 2 /nobreak >nul
+  )
   nssm start AI00Backend-V2
   if errorlevel 1 exit /b !ERRORLEVEL!
 )
