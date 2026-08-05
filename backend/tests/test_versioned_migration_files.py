@@ -3,6 +3,7 @@ from pathlib import Path
 
 from backend.db.versioned_migrations import (
     bootstrap_statements,
+    canonicalize_migration_sql,
     discover_migrations,
     normalize_oceanbase_sql,
     validate_migration,
@@ -19,6 +20,13 @@ class VersionedMigrationFileTests(unittest.TestCase):
         self.assertEqual(len(statements), 1)
         self.assertIn("workmanship_auth_users", statements[0])
 
+    def test_migration_checksum_input_is_line_ending_stable(self):
+        lf = "CREATE TABLE x (\n  gid VARCHAR(36)\n);\n"
+        crlf = lf.replace("\n", "\r\n")
+        self.assertEqual(
+            canonicalize_migration_sql(lf),
+            canonicalize_migration_sql(crlf),
+        )
     def test_legacy_json_defaults_are_normalized_for_oceanbase(self):
         sql = "CREATE TABLE IF NOT EXISTS workmanship_app_x (payload JSON NOT NULL DEFAULT (JSON_OBJECT()));"
         normalized = normalize_oceanbase_sql(sql)

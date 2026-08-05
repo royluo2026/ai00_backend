@@ -32,6 +32,7 @@ class Migration:
     path: Path
     sql: str
     checksum: str
+    legacy_checksums: tuple[str, ...] = ()
 
 
 def split_sql(sql: str) -> list[str]:
@@ -94,6 +95,11 @@ def split_sql(sql: str) -> list[str]:
     if trailing:
         statements.append(trailing)
     return statements
+
+
+def canonicalize_migration_sql(sql: str) -> str:
+    """Make migration checksums independent of Git/OS line-ending conversion."""
+    return sql.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def normalize_oceanbase_sql(sql: str) -> str:
@@ -162,7 +168,8 @@ def discover_migrations(directory: Path) -> list[Migration]:
             raise MigrationError(f"duplicate migration id: {migration_id}")
         seen.add(migration_id)
         raw = path.read_bytes()
-        sql = normalize_oceanbase_sql(raw.decode("utf-8"))
+        canonical_sql = canonicalize_migration_sql(raw.decode("utf-8"))
+        sql = normalize_oceanbase_sql(canonical_sql)
         migrations.append(
             Migration(
                 migration_id=migration_id,
@@ -170,7 +177,11 @@ def discover_migrations(directory: Path) -> list[Migration]:
                 name=match.group("name"),
                 path=path,
                 sql=sql,
-                checksum=hashlib.sha256(raw).hexdigest(),
+                checksum=hashlib.sha256(canonical_sql.encode("utf-8")).hexdigest(),
+                legacy_checksums=tuple({
+                    hashlib.sha256(raw).hexdigest(),
+                    hashlib.sha256(canonical_sql.replace("\n", "\r\n").encode("utf-8")).hexdigest(),
+                }),
             )
         )
     return migrations
@@ -321,7 +332,8 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
             if old:
                 checksum = old["checksum"] if isinstance(old, dict) else old[1]
                 status = old["status"] if isinstance(old, dict) else old[2]
-                if checksum != migration.checksum and status == "applied":
+                valid_checksums = {migration.checksum, *migration.legacy_checksums} - {""}
+                if checksum not in valid_checksums and status == "applied":
                     raise MigrationError(f"checksum changed for applied migration {migration.migration_id}")
                 if status == "applied":
                     continue
