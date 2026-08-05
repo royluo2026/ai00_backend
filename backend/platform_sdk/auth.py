@@ -8,10 +8,9 @@ from backend.routers.deps import (
     get_current_user_optional,
     require_role,
     scope_visible_clause,
-    task_scope_clauses,
 )
 
 __all__ = [
     "build_profile", "derive_org_role", "get_current_user", "get_user_grants",
-    "require_role", "scope_visible_clause", "task_scope_clauses", "get_current_user_optional",
+    "require_role", "scope_visible_clause", "get_current_user_optional",
 ]

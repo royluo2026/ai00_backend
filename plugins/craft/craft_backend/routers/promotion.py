@@ -27,8 +27,9 @@ from pydantic import BaseModel
 
 from ..data.connection import get_conn
 from backend.platform_sdk.ids import next_display_id
-from backend.platform_sdk.auth import get_current_user, task_scope_clauses
+from backend.platform_sdk.auth import get_current_user
 from backend.platform_sdk.ids import next_gid
+from backend.platform_sdk.access import build_access_scope
 from backend.platform_sdk.project_access import can_manage_project, get_user_profiles
 from ..services.change_tracking import record_changes
 from backend.platform_sdk.change_tracking import notify_followers, RESOLVED_STATUSES
@@ -202,6 +203,25 @@ def _row_to_issue(r: dict) -> dict:
     }
 
 
+def _task_scope_clauses(current_user: dict, alias: str) -> tuple[str, list[str]]:
+    """Translate a Base-issued value projection into Craft-only SQL predicates."""
+    scope = build_access_scope(current_user)
+    clauses = [f"{alias}.owner_user_gid = %s", f"{alias}.share_scope = 'global'"]
+    params: list[str] = [scope["user_gid"]]
+    if scope["team_member_gids"]:
+        placeholders = ",".join(["%s"] * len(scope["team_member_gids"]))
+        clauses.append(
+            f"({alias}.share_scope = 'team' AND {alias}.owner_user_gid IN ({placeholders}))"
+        )
+        params.extend(scope["team_member_gids"])
+    if scope["project_gids"]:
+        placeholders = ",".join(["%s"] * len(scope["project_gids"]))
+        clauses.append(
+            f"({alias}.share_scope = 'project' AND {alias}.project_gid IN ({placeholders}))"
+        )
+        params.extend(scope["project_gids"])
+    return "(" + " OR ".join(clauses) + ")", params
+
 def _verify_project_access(conn, project_gid: Optional[str], user_gid: str) -> bool:
     """Base owns project membership; the conn argument remains for call compatibility."""
     return not project_gid or can_manage_project(user_gid, project_gid)
@@ -224,9 +244,7 @@ def list_cloud_tasks(
     uid = current_user["gid"]
     with get_conn() as conn:
         with conn.cursor() as cur:
-            scope_clause, scope_params = task_scope_clauses(
-                uid, current_user.get("team_id") or ""
-            )
+            scope_clause, scope_params = _task_scope_clauses(current_user, alias="t")
             clauses = [scope_clause, "t.deleted_at IS NULL"]
             params = scope_params
             if project_gid:
@@ -509,9 +527,7 @@ def list_cloud_issues(
     uid = current_user["gid"]
     with get_conn() as conn:
         with conn.cursor() as cur:
-            scope_clause, scope_params = task_scope_clauses(
-                uid, current_user.get("team_id") or "", alias="i"
-            )
+            scope_clause, scope_params = _task_scope_clauses(current_user, alias="i")
             clauses = [scope_clause]
             params = scope_params
             if project_gid:

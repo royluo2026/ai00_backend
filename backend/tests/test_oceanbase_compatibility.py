@@ -3,6 +3,7 @@ from pathlib import Path
 
 from backend.db.versioned_migrations import Migration, MigrationError, validate_migration
 from backend.governance import load_registry
+from backend.scripts.oceanbase_compatibility_audit import declared_schema_columns
 
 from backend.db.oceanbase_compat import (
     assert_supported_server,
@@ -38,6 +39,16 @@ class _Connection:
 
 
 class OceanBaseCompatibilityTests(unittest.TestCase):
+    def test_declared_columns_include_create_and_alter_contracts(self):
+        schema = declared_schema_columns([
+            """CREATE TABLE IF NOT EXISTS workmanship_app_x (
+                gid CHAR(36) PRIMARY KEY,
+                name VARCHAR(64),
+                PRIMARY KEY (gid)
+            ) ENGINE=InnoDB;""",
+            "ALTER TABLE workmanship_app_x ADD COLUMN IF NOT EXISTS status VARCHAR(32);",
+        ])
+        self.assertEqual(schema["workmanship_app_x"], {"gid", "name", "status"})
     def test_text_and_blob_defaults_are_rejected(self):
         sql = """
         CREATE TABLE IF NOT EXISTS workmanship_app_bad (

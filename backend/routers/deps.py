@@ -230,62 +230,28 @@ def scope_visible_clause(current_user: dict,
                           owner_col: str = "owner_gid",
                           team_col: str = "team_id",
                           pk_col: str = None) -> tuple:
-    """
-    返回 (where_fragment, params_list) 用于拼入 SQL WHERE 子句。
-    super_admin 不过滤；其他角色按 share_scope 四级可见规则过滤。
-    pk_col: 主键列名（带表别名），默认从 owner_col 提取表前缀 + 'gid'
-    """
-    role = current_user.get("org_role") or current_user.get("system_role", "external")
-    if role == "super_admin":
+    """Build a consumer-table-only visibility clause from a Base projection."""
+    from backend.platform_sdk.access import build_access_scope
+
+    scope = build_access_scope(current_user)
+    if scope["is_admin"]:
         return "1=1", []
-    uid = current_user["gid"]
-    tid = current_user.get("team_id") or ""
-    # 自动从 owner_col 推导 pk_col，如 "p.owner_gid" → "p.gid"
     if pk_col is None:
-        prefix = owner_col.split('.')[0] + '.' if '.' in owner_col else ''
+        prefix = owner_col.split(".")[0] + "." if "." in owner_col else ""
         pk_col = f"{prefix}gid"
-    sql = (
-        f"(share_scope = 'global' "
-        f"OR (share_scope IN ('team','project') AND {pk_col} IN "
-        f"  (SELECT project_gid FROM workmanship_auth_project_members WHERE user_gid = %s)) "
-        f"OR (share_scope = 'team' AND {team_col} = %s) "
-        f"OR (share_scope = 'local' AND {owner_col} = %s))"
-    )
-    return sql, [uid, tid, uid]
 
+    clauses = ["share_scope = 'global'", f"(share_scope = 'local' AND {owner_col} = %s)"]
+    params: list[str] = [scope["user_gid"]]
+    if scope["team_gids"]:
+        placeholders = ",".join(["%s"] * len(scope["team_gids"]))
+        clauses.append(f"(share_scope = 'team' AND {team_col} IN ({placeholders}))")
+        params.extend(scope["team_gids"])
+    if scope["project_gids"]:
+        placeholders = ",".join(["%s"] * len(scope["project_gids"]))
+        clauses.append(f"(share_scope = 'project' AND {pk_col} IN ({placeholders}))")
+        params.extend(scope["project_gids"])
+    return "(" + " OR ".join(clauses) + ")", params
 
-def task_scope_clauses(uid: str, team_id: str, alias: str = "t") -> tuple[str, list]:
-    """
-    返回 tasks/issues 表的可见性 WHERE 子句。
-    规则：
-      - share_scope='local'   → 仅 owner_user_gid = uid
-      - share_scope='team'    → 同团队（owner_user_gid 属于同 team_id 的用户）
-      - share_scope='project' → 当前用户是该任务所属项目的成员
-      - share_scope='global'  → 全部可见
-    超管不得特殊绕过。
-    """
-    a = alias
-    if team_id:
-        clause = f"""(
-            {a}.owner_user_gid = %s
-            OR {a}.share_scope = 'global'
-            OR ({a}.share_scope = 'team' AND {a}.owner_user_gid IN (
-                    SELECT gid FROM workmanship_auth_users WHERE team_id = %s))
-            OR ({a}.share_scope = 'project' AND {a}.project_gid IS NOT NULL AND EXISTS(
-                    SELECT 1 FROM workmanship_auth_project_members pm
-                    WHERE pm.project_gid = {a}.project_gid AND pm.user_gid = %s))
-        )"""
-        params: list = [uid, team_id, uid]
-    else:
-        clause = f"""(
-            {a}.owner_user_gid = %s
-            OR {a}.share_scope = 'global'
-            OR ({a}.share_scope = 'project' AND {a}.project_gid IS NOT NULL AND EXISTS(
-                    SELECT 1 FROM workmanship_auth_project_members pm
-                    WHERE pm.project_gid = {a}.project_gid AND pm.user_gid = %s))
-        )"""
-        params = [uid, uid]
-    return clause, params
 
 
 def build_profile(user: dict) -> dict:

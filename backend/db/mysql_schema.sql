@@ -768,6 +768,12 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_versions (
     -- 归属/关联
     owner_gid         CHAR(36) DEFAULT NULL,
     pbom_version_gid  CHAR(36) DEFAULT NULL,
+    version_type      VARCHAR(32) NOT NULL DEFAULT ('working'),
+    visibility        VARCHAR(32) NOT NULL DEFAULT ('team'),
+    shared_team_gid   CHAR(36) DEFAULT NULL,
+    shared_project_gid CHAR(36) DEFAULT NULL,
+    data_stage        VARCHAR(64) DEFAULT NULL,
+    snapshot_data     JSON NULL,
     -- 时间戳
     frozen_at         DATETIME(6) DEFAULT NULL,
     archived_at       DATETIME(6) DEFAULT NULL,
@@ -1416,6 +1422,7 @@ CREATE TABLE IF NOT EXISTS workmanship_work_lists (
     sort_order    INT NOT NULL DEFAULT 0,
     visibility    VARCHAR(255) NOT NULL DEFAULT ('team'),
     project_gid   CHAR(36) DEFAULT NULL,
+    shared_team_gid CHAR(36) DEFAULT NULL,
     read_scope    TEXT,
     write_scope   TEXT,
     deleted_at    DATETIME(6) DEFAULT NULL,
@@ -1424,6 +1431,7 @@ CREATE TABLE IF NOT EXISTS workmanship_work_lists (
 
 CREATE INDEX idx_lists_owner     ON workmanship_work_lists (owner_type(16), owner_gid(191));
 CREATE INDEX idx_lists_item_type ON workmanship_work_lists (item_type(32));
+CREATE INDEX idx_lists_shared_team ON workmanship_work_lists (shared_team_gid);
 
 -- 任务表（work schema 旧版，保留兼容）
 CREATE TABLE IF NOT EXISTS workmanship_work_tasks (
@@ -1917,6 +1925,7 @@ CREATE TABLE IF NOT EXISTS workmanship_app_ai_audit_logs (
     resource_type VARCHAR(255) DEFAULT (''),
     status        VARCHAR(255) DEFAULT ('ok'),
     created_at    DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at    DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     UNIQUE KEY uq_ai_audit_gid (gid(191))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

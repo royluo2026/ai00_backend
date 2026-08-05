@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import ast
 import os
+import re
 import sys
 from pathlib import Path
 from urllib.parse import unquote, urlparse
@@ -28,6 +29,39 @@ SQL_SOURCE_ROOTS = (
     REPO_ROOT / "plugins",
 )
 
+
+_NON_COLUMN_HEADS = {"PRIMARY", "UNIQUE", "KEY", "INDEX", "CONSTRAINT", "FOREIGN", "CHECK"}
+_CREATE_TABLE_RE = re.compile(
+    r"CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+`?(\w+)`?\s*\((.*?)\)\s*ENGINE\s*=",
+    re.I | re.S,
+)
+_ADD_COLUMN_RE = re.compile(
+    r"ALTER\s+TABLE\s+`?(\w+)`?\s+ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?`?(\w+)`?",
+    re.I,
+)
+_COLUMN_LINE_RE = re.compile(r"^\s*`?([A-Za-z_]\w*)`?\s+", re.M)
+
+
+def declared_schema_columns(sql_sources: list[str]) -> dict[str, set[str]]:
+    """Collect the deploy contract from baseline CREATEs and versioned ALTERs."""
+    result: dict[str, set[str]] = {}
+    for sql in sql_sources:
+        for match in _CREATE_TABLE_RE.finditer(sql):
+            table, body = match.groups()
+            columns = result.setdefault(table, set())
+            for column_match in _COLUMN_LINE_RE.finditer(body):
+                column = column_match.group(1)
+                if column.upper() not in _NON_COLUMN_HEADS:
+                    columns.add(column)
+        for table, column in _ADD_COLUMN_RE.findall(sql):
+            result.setdefault(table, set()).add(column)
+    return result
+
+
+def expected_schema_columns() -> dict[str, set[str]]:
+    bootstrap = (REPO_ROOT / "backend" / "db" / "mysql_schema.sql").read_text(encoding="utf-8")
+    migrations = discover_migrations(REPO_ROOT / "backend" / "db" / "migrations")
+    return declared_schema_columns([bootstrap, *(migration.sql for migration in migrations)])
 
 def _python_sql_issues(path: Path) -> list[CompatibilityIssue]:
     try:
@@ -126,7 +160,24 @@ def live_audit(raw_url: str) -> list[str]:
             if invalid:
                 names = ", ".join(f"{row['TABLE_NAME']}.{row['COLUMN_NAME']}" for row in invalid[:20])
                 raise RuntimeError(f"live schema has TEXT/BLOB/JSON defaults: {names}")
-            messages.append("GET_LOCK/RELEASE_LOCK and live TEXT/BLOB/JSON-default checks passed")
+            expected = expected_schema_columns()
+            cur.execute(
+                "SELECT TABLE_NAME,COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=%s",
+                (database,),
+            )
+            live_columns: dict[str, set[str]] = {}
+            for row in cur.fetchall():
+                live_columns.setdefault(str(row["TABLE_NAME"]), set()).add(str(row["COLUMN_NAME"]))
+            missing = sorted(
+                f"{table}.{column}"
+                for table, columns in expected.items()
+                for column in columns - live_columns.get(table, set())
+            )
+            if missing:
+                raise RuntimeError("live schema is missing declared columns: " + ", ".join(missing[:40]))
+            messages.append(
+                "GET_LOCK/RELEASE_LOCK, live defaults, and declared-column checks passed"
+            )
     finally:
         conn.close()
     return messages
