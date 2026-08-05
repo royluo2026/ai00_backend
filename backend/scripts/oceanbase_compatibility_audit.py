@@ -118,15 +118,15 @@ def live_audit(raw_url: str) -> list[str]:
                 raise RuntimeError("RELEASE_LOCK capability probe failed")
             cur.execute(
                 "SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE FROM information_schema.COLUMNS "
-                "WHERE TABLE_SCHEMA=%s AND DATA_TYPE IN ('tinytext','text','mediumtext','longtext','tinyblob','blob','mediumblob','longblob') "
+                "WHERE TABLE_SCHEMA=%s AND DATA_TYPE IN ('tinytext','text','mediumtext','longtext','tinyblob','blob','mediumblob','longblob','json') "
                 "AND COLUMN_DEFAULT IS NOT NULL",
                 (database,),
             )
             invalid = cur.fetchall()
             if invalid:
                 names = ", ".join(f"{row['TABLE_NAME']}.{row['COLUMN_NAME']}" for row in invalid[:20])
-                raise RuntimeError(f"live schema has TEXT/BLOB defaults: {names}")
-            messages.append("GET_LOCK/RELEASE_LOCK and live TEXT/BLOB-default checks passed")
+                raise RuntimeError(f"live schema has TEXT/BLOB/JSON defaults: {names}")
+            messages.append("GET_LOCK/RELEASE_LOCK and live TEXT/BLOB/JSON-default checks passed")
     finally:
         conn.close()
     return messages

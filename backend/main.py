@@ -47,6 +47,7 @@ _log = logging.getLogger(__name__)
 
 _CRITICAL_ROUTE_SPECS: list[tuple[str, str]] = [
     ("GET", "/health"),
+    ("GET", "/ready"),
     ("GET", "/auth/me"),
     ("GET", "/api/lists"),
     ("GET", "/api/notifications/unread_count"),
@@ -55,6 +56,7 @@ _CRITICAL_ROUTE_SPECS: list[tuple[str, str]] = [
     ("GET", "/api/tasks"),
     ("GET", "/api/projects"),
     ("GET", "/api/bop/versions"),
+    ("GET", "/api/v1/plugin-marketplace/registry"),
 ]
 
 
@@ -66,15 +68,13 @@ def _run_route_self_check(app: FastAPI) -> None:
         return
 
     route_set: set[tuple[str, str]] = set()
-    # 使用 app.router.routes 更稳定；不同 FastAPI/Starlette 版本下 route 类型可能不同。
-    for _r in getattr(app.router, "routes", []):
-        _methods = getattr(_r, "methods", None)
-        _path = getattr(_r, "path", None)
-        if not _methods or not _path:
-            continue
-        for _m in _methods:
-            route_set.add((str(_m).upper(), str(_path)))
-
+    # FastAPI 0.139+ keeps included routers as lazy wrappers without .path/.methods.
+    # OpenAPI is the stable, flattened view used by both old and new versions.
+    for _path, _operations in app.openapi().get("paths", {}).items():
+        for _method in _operations:
+            _upper = str(_method).upper()
+            if _upper in {"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"}:
+                route_set.add((_upper, str(_path)))
     missing: list[tuple[str, str]] = []
     for _spec in _CRITICAL_ROUTE_SPECS:
         if _spec in route_set:

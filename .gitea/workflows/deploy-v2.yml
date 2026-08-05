@@ -34,6 +34,10 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
+      - name: Install backend dependencies
+        shell: cmd
+        run: E:\projects\ai00-v2\venv\Scripts\python.exe -m pip install -r workmanship-backend\backend\requirements.txt
+
       - name: Deploy
         shell: cmd
         run: |

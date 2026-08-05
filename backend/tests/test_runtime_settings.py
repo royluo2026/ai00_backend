@@ -126,6 +126,24 @@ def test_saved_cloud_db_url_overrides_env(monkeypatch, tmp_path):
     assert settings.users_db_url == 'mysql://saved:saved@db.internal:3307/saved_db'
 
 
+def test_explicit_env_file_prevents_saved_db_override(monkeypatch, tmp_path):
+    config_dir = tmp_path / '.ai00' / 'config'
+    config_dir.mkdir(parents=True)
+    (config_dir / 'system.json').write_text(
+        '{"cloud_db_config": {"host": "production.internal", "port": 2883, "user": "saved", "password": "saved", "collab_db": "production"}}',
+        encoding='utf-8',
+    )
+    monkeypatch.setattr('backend.config.Path.home', lambda: tmp_path)
+    monkeypatch.setattr('backend.config._env_file', str(tmp_path / '.env.runtime'))
+
+    settings = make_settings(
+        monkeypatch,
+        USERS_DB_URL='mysql://test:test@127.0.0.1:2881/ai00_test',
+    )
+
+    assert settings.users_db_url == 'mysql://test:test@127.0.0.1:2881/ai00_test'
+
+
 def test_empty_saved_cloud_db_password_falls_back_to_env(monkeypatch, tmp_path):
     config_dir = tmp_path / '.ai00' / 'config'
     config_dir.mkdir(parents=True)

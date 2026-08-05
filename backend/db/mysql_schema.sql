@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS workmanship_auth_teams (
     gid               CHAR(36) PRIMARY KEY,
     name              VARCHAR(512) NOT NULL DEFAULT (''),
     is_active         TINYINT(1) NOT NULL DEFAULT 1,
-    config            JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    config            JSON NOT NULL,
     feishu_dept_id    TEXT,
     parent_team_gid   CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
     created_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS workmanship_auth_users (
     external_subtype  TEXT,
     team_id           CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
     is_active         TINYINT(1) NOT NULL DEFAULT 1,
-    notification_prefs JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    notification_prefs JSON NOT NULL,
     org_role          TEXT,
     feishu_access_token  VARCHAR(4096) NOT NULL DEFAULT (''),
     feishu_refresh_token VARCHAR(4096) NOT NULL DEFAULT (''),
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_vehicle_models (
     platform     VARCHAR(255) NOT NULL DEFAULT (''),
     vehicle_type VARCHAR(255) DEFAULT (''),
     team_id      CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
-    meta         JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta         JSON NOT NULL,
     created_at   DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_projects (
     deleted_at        DATETIME(6) DEFAULT NULL,
     archived_at       DATETIME(6) DEFAULT NULL,
     project_type      VARCHAR(255) NOT NULL DEFAULT ('active'),
-    meta              JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta              JSON NOT NULL,
     created_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -172,8 +172,8 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_collab_sessions (
     section_gid TEXT NOT NULL,
     owner_gid   CHAR(36) NOT NULL REFERENCES workmanship_auth_users(gid) ON DELETE CASCADE,
     status      VARCHAR(255) NOT NULL DEFAULT ('active'),
-    participants JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    meta        JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    participants JSON NOT NULL,
+    meta        JSON NOT NULL,
     created_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     ended_at    DATETIME(6) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -190,10 +190,10 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_approval_orders (
     reviewer_gid  CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_users(gid) ON DELETE SET NULL,
     status        VARCHAR(255) NOT NULL DEFAULT ('pending'),
     source_ref    TEXT,
-    content       JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    opinions      JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    content       JSON NOT NULL,
+    opinions      JSON NOT NULL,
     share_scope   VARCHAR(255) NOT NULL DEFAULT ('project'),
-    meta          JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta          JSON NOT NULL,
     created_at    DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at    DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -229,11 +229,11 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_tasks (
     project_gid          CHAR(36) DEFAULT NULL REFERENCES workmanship_proj_projects(gid) ON DELETE SET NULL,
     status               VARCHAR(255) NOT NULL DEFAULT ('pending'),
     priority             VARCHAR(255) NOT NULL DEFAULT ('normal'),
-    source_ref           JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    source_ref           JSON NOT NULL,
     review_date          TEXT,
     meeting_level        VARCHAR(255) NOT NULL DEFAULT ('none'),
     meeting_doc_link     TEXT,
-    progress_logs        JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    progress_logs        JSON NOT NULL,
     due_date             TEXT,
     plan_start           TEXT,
     plan_end             TEXT,
@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_tasks (
     actual_end           TEXT,
     share_scope          VARCHAR(255) NOT NULL DEFAULT ('project'),
     list_gid             CHAR(36) DEFAULT NULL,
-    attachments          JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    attachments          JSON NOT NULL,
     -- 软删除
     is_deleted           TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at           DATETIME(6) DEFAULT NULL,
@@ -263,8 +263,8 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_tasks (
     feishu_assignee_name    TEXT,
     feishu_group_chat_id    TEXT,
     feishu_group_name       TEXT,
-    feishu_groups           JSON DEFAULT (JSON_ARRAY()),
-    feishu_docs             JSON DEFAULT (JSON_ARRAY()),
+    feishu_groups           JSON,
+    feishu_docs             JSON,
     created_at           DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at           DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -287,27 +287,27 @@ CREATE TABLE IF NOT EXISTS workmanship_proj_issues (
     owner_user_gid        CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_users(gid) ON DELETE SET NULL,
     assignee_team_gid     CHAR(36) DEFAULT NULL,
     project_gid           CHAR(36) DEFAULT NULL REFERENCES workmanship_proj_projects(gid) ON DELETE SET NULL,
-    tracking_refs         JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    tracking_refs         JSON NOT NULL,
     occurrence_root_cause TEXT,
     escape_root_cause     TEXT,
     interim_action        TEXT,
     permanent_action      TEXT,
-    source_ref            JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    source_ref            JSON NOT NULL,
     related_task_gid      CHAR(36) DEFAULT NULL,
     related_knowledge_gid CHAR(36) DEFAULT NULL,
     approval_order_gid    CHAR(36) DEFAULT NULL,
     bop_entry_gid         CHAR(36) DEFAULT NULL,
     share_scope           VARCHAR(255) NOT NULL DEFAULT ('project'),
     list_gid              CHAR(36) DEFAULT NULL,
-    attachments           JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    attachments           JSON NOT NULL,
     scheduled_date        DATE DEFAULT NULL,
     -- 飞书相关
     feishu_assignee_open_id TEXT,
     feishu_assignee_name    TEXT,
     feishu_group_chat_id    TEXT,
     feishu_group_name       TEXT,
-    feishu_groups           JSON DEFAULT (JSON_ARRAY()),
-    feishu_docs             JSON DEFAULT (JSON_ARRAY()),
+    feishu_groups           JSON,
+    feishu_docs             JSON,
     created_at            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -326,7 +326,7 @@ CREATE TABLE IF NOT EXISTS workmanship_factory_factories (
     gid        CHAR(36) PRIMARY KEY,
     name       VARCHAR(512) NOT NULL DEFAULT (''),
     team_id    CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
-    meta       JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta       JSON NOT NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -353,7 +353,7 @@ CREATE TABLE IF NOT EXISTS workmanship_factory_factory_lines (
     line_type   TEXT,
     description TEXT,
     sort_order  INT NOT NULL DEFAULT 0,
-    meta        JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta        JSON NOT NULL,
     created_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     created_by  TEXT
@@ -372,8 +372,8 @@ CREATE TABLE IF NOT EXISTS workmanship_factory_factory_stations (
     canvas_y            DOUBLE NOT NULL DEFAULT 0,
     takt_time           DOUBLE NOT NULL DEFAULT 60,
     height_mm           INT NOT NULL DEFAULT 1200,
-    meta                JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    ext                 JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta                JSON NOT NULL,
+    ext                 JSON NOT NULL,
     created_at          DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -387,8 +387,8 @@ CREATE TABLE IF NOT EXISTS workmanship_factory_factory_tools (
     template_gid CHAR(36) DEFAULT NULL REFERENCES workmanship_tpl_vpps_tools(gid) ON DELETE SET NULL,
     status       VARCHAR(255) NOT NULL DEFAULT ('in_use'),
     team_id      CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
-    meta         JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    ext          JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta         JSON NOT NULL,
+    ext          JSON NOT NULL,
     created_at   DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at   DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     UNIQUE KEY uq_factory_tools_asset_no (asset_no(255))
@@ -401,8 +401,8 @@ CREATE TABLE IF NOT EXISTS workmanship_factory_factory_equipments (
     template_gid CHAR(36) DEFAULT NULL REFERENCES workmanship_tpl_vpps_equipments(gid) ON DELETE SET NULL,
     status       VARCHAR(255) NOT NULL DEFAULT ('in_use'),
     team_id      CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
-    meta         JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    ext          JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta         JSON NOT NULL,
+    ext          JSON NOT NULL,
     created_at   DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at   DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     UNIQUE KEY uq_factory_equip_asset_no (asset_no(255))
@@ -415,8 +415,8 @@ CREATE TABLE IF NOT EXISTS workmanship_factory_factory_fixtures (
     template_gid CHAR(36) DEFAULT NULL REFERENCES workmanship_tpl_vpps_fixtures(gid) ON DELETE SET NULL,
     status       VARCHAR(255) NOT NULL DEFAULT ('in_use'),
     team_id      CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
-    meta         JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    ext          JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta         JSON NOT NULL,
+    ext          JSON NOT NULL,
     created_at   DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at   DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     UNIQUE KEY uq_factory_fix_asset_no (asset_no(255))
@@ -428,8 +428,8 @@ CREATE TABLE IF NOT EXISTS workmanship_factory_factory_layout_templates (
     name        VARCHAR(512) NOT NULL DEFAULT (''),
     factory_gid CHAR(36) DEFAULT NULL REFERENCES workmanship_factory_factories(gid) ON DELETE CASCADE,
     team_id     CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
-    stations    JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    meta        JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    stations    JSON NOT NULL,
+    meta        JSON NOT NULL,
     created_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -474,8 +474,8 @@ CREATE TABLE IF NOT EXISTS workmanship_tpl_gbop_entries (
     parent_vpps       VARCHAR(255) NOT NULL DEFAULT (''),
     status            VARCHAR(255) NOT NULL DEFAULT ('active'),
     sort_order        DOUBLE NOT NULL DEFAULT 0,
-    child_vpps        JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    meta              JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    child_vpps        JSON NOT NULL,
+    meta              JSON NOT NULL,
     team_id           TEXT,
     created_by        TEXT,
     created_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -498,14 +498,14 @@ CREATE TABLE IF NOT EXISTS workmanship_tpl_gbop_processes (
     op_name           VARCHAR(512) NOT NULL DEFAULT (''),
     standard_time     DOUBLE DEFAULT NULL,
     description       VARCHAR(2048) NOT NULL DEFAULT (''),
-    steps             JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    required_tools    JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    parameters        JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    steps             JSON NOT NULL,
+    required_tools    JSON NOT NULL,
+    parameters        JSON NOT NULL,
     importance        VARCHAR(255) NOT NULL DEFAULT (''),
     torque_importance VARCHAR(255) NOT NULL DEFAULT (''),
     vehicle_model     VARCHAR(255) NOT NULL DEFAULT (''),
     status            VARCHAR(255) NOT NULL DEFAULT ('active'),
-    meta              JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta              JSON NOT NULL,
     created_by        TEXT,
     created_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
@@ -527,14 +527,14 @@ CREATE TABLE IF NOT EXISTS workmanship_tpl_gbop_operations (
     op_name           VARCHAR(512) NOT NULL DEFAULT (''),
     standard_time     DOUBLE DEFAULT NULL,
     description       VARCHAR(2048) NOT NULL DEFAULT (''),
-    steps             JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    required_tools    JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    parameters        JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    steps             JSON NOT NULL,
+    required_tools    JSON NOT NULL,
+    parameters        JSON NOT NULL,
     importance        VARCHAR(255) NOT NULL DEFAULT (''),
     torque_importance VARCHAR(255) NOT NULL DEFAULT (''),
     vehicle_model     VARCHAR(255) NOT NULL DEFAULT (''),
     status            VARCHAR(255) NOT NULL DEFAULT ('active'),
-    meta              JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta              JSON NOT NULL,
     created_by        TEXT,
     created_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
@@ -561,7 +561,7 @@ CREATE INDEX idx_gbop_entry_links_ref   ON workmanship_tpl_gbop_entry_links (ref
 
 -- VPPS 工具模板
 CREATE TABLE IF NOT EXISTS workmanship_tpl_vpps_tools (
-    gid                TEXT,
+    gid        VARCHAR(36) NOT NULL,
     vpps               TEXT,
     name               VARCHAR(512) NOT NULL DEFAULT (''),
     gun_model          VARCHAR(255) NOT NULL DEFAULT (''),
@@ -581,36 +581,36 @@ CREATE TABLE IF NOT EXISTS workmanship_tpl_vpps_tools (
     extension_cad_no   VARCHAR(255) NOT NULL DEFAULT (''),
     category           VARCHAR(255) NOT NULL DEFAULT (''),
     status             VARCHAR(255) NOT NULL DEFAULT ('active'),
-    spec               JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    spec               JSON NOT NULL,
     team_id            CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
     created_at         DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    PRIMARY KEY (gid(36))
+    PRIMARY KEY (gid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_vpps_tools_vpps ON workmanship_tpl_vpps_tools (vpps(191));
 
 -- VPPS 设备模板
 CREATE TABLE IF NOT EXISTS workmanship_tpl_vpps_equipments (
-    gid        TEXT,
+    gid        VARCHAR(36) NOT NULL,
     name       VARCHAR(512) NOT NULL DEFAULT (''),
     category   VARCHAR(255) NOT NULL DEFAULT (''),
     status     VARCHAR(255) NOT NULL DEFAULT ('active'),
-    spec       JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    spec       JSON NOT NULL,
     team_id    CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    PRIMARY KEY (gid(36))
+    PRIMARY KEY (gid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- VPPS 工装模板
 CREATE TABLE IF NOT EXISTS workmanship_tpl_vpps_fixtures (
-    gid        TEXT,
+    gid        VARCHAR(36) NOT NULL,
     name       VARCHAR(512) NOT NULL DEFAULT (''),
     category   VARCHAR(255) NOT NULL DEFAULT (''),
     status     VARCHAR(255) NOT NULL DEFAULT ('active'),
-    spec       JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    spec       JSON NOT NULL,
     team_id    CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    PRIMARY KEY (gid(36))
+    PRIMARY KEY (gid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 紧固件规格库
@@ -629,7 +629,7 @@ CREATE TABLE IF NOT EXISTS workmanship_tpl_fastener_spec (
     flange_diameter VARCHAR(255) NOT NULL DEFAULT (''),
     first_vehicle   VARCHAR(255) NOT NULL DEFAULT (''),
     status          VARCHAR(255) NOT NULL DEFAULT ('active'),
-    meta            JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta            JSON NOT NULL,
     team_id         CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
     created_at      DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -653,7 +653,7 @@ CREATE TABLE IF NOT EXISTS workmanship_tpl_vpps_parts (
     ref_install_direction VARCHAR(255) NOT NULL DEFAULT (''),
     ref_static_clearance  VARCHAR(255) NOT NULL DEFAULT (''),
     ref_install_clearance VARCHAR(255) NOT NULL DEFAULT (''),
-    meta                  JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta                  JSON NOT NULL,
     team_id               CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_teams(gid) ON DELETE SET NULL,
     created_at            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
@@ -674,7 +674,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_pbom_versions (
     name        VARCHAR(512) DEFAULT (''),
     source_type VARCHAR(255) NOT NULL DEFAULT ('manual'),
     status      VARCHAR(255) NOT NULL DEFAULT ('draft'),
-    meta        JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta        JSON NOT NULL,
     created_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -728,7 +728,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_pbom (
     remark                   VARCHAR(2048) DEFAULT (''),
     temp_vpps                TEXT,
     is_deleted               TINYINT(1) NOT NULL DEFAULT 0,
-    meta                     JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta                     JSON NOT NULL,
     created_at               DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -740,8 +740,8 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_cad_model_instances (
     gid             CHAR(36) PRIMARY KEY,
     part_entry_gid  CHAR(36) NOT NULL REFERENCES workmanship_bop_pbom(gid) ON DELETE CASCADE,
     model_file_path VARCHAR(4096) NOT NULL DEFAULT (''),
-    transform       JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    meta            JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    transform       JSON NOT NULL,
+    meta            JSON NOT NULL,
     created_at      DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -761,7 +761,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_versions (
     status            VARCHAR(255) NOT NULL DEFAULT ('active'),
     description       TEXT,
     created_by        TEXT,
-    meta              JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta              JSON NOT NULL,
     -- 版本族
     version_family_gid CHAR(36) DEFAULT NULL,
     bop_name          VARCHAR(512) NOT NULL DEFAULT (''),
@@ -774,7 +774,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_versions (
     published_at      DATETIME(6) DEFAULT NULL,
     -- 生命周期
     lifecycle_phase   VARCHAR(255) NOT NULL DEFAULT ('init'),
-    lifecycle_state   JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    lifecycle_state   JSON NOT NULL,
     is_deleted        TINYINT(1) NOT NULL DEFAULT 0,
     is_archived       TINYINT(1) NOT NULL DEFAULT 0,
     created_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -807,15 +807,15 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_entries (
     parent_bop_label      TEXT,
     source_entry_gid      CHAR(36) DEFAULT NULL,
     owner_gid             CHAR(36) DEFAULT NULL,
-    process_flow_pic      JSON DEFAULT NULL,
-    process_chart_pic     JSON DEFAULT NULL,
-    child_vpps            JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    process_flow_pic      JSON NULL,
+    process_chart_pic     JSON NULL,
+    child_vpps            JSON NOT NULL,
     bom_row_owner         TEXT,
     is_deleted            TINYINT(1) NOT NULL DEFAULT 0,
     is_archived           TINYINT(1) NOT NULL DEFAULT 0,
     assignee_user_gid     CHAR(36) DEFAULT NULL,
     scheduled_date        DATE DEFAULT NULL,
-    meta                  JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta                  JSON NOT NULL,
     deleted_at            DATETIME(6) DEFAULT NULL,
     archived_at           DATETIME(6) DEFAULT NULL,
     created_at            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -839,7 +839,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_entry_links (
     is_primary      TINYINT(1) NOT NULL DEFAULT 0,
     is_inherited    TINYINT(1) NOT NULL DEFAULT 0,
     gbop_source_gid CHAR(36) DEFAULT NULL,
-    snapshot_data   JSON DEFAULT NULL,
+    snapshot_data   JSON NULL,
     version_gid     CHAR(36) DEFAULT NULL,
     is_deleted      TINYINT(1) NOT NULL DEFAULT 0,
     is_archived     TINYINT(1) NOT NULL DEFAULT 0,
@@ -864,7 +864,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_line (
     version_no      VARCHAR(255) NOT NULL DEFAULT ('01'),
     vpps            TEXT,
     owner_gid       CHAR(36) DEFAULT NULL,
-    ext             JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    ext             JSON NOT NULL,
     is_deleted      TINYINT(1) NOT NULL DEFAULT 0,
     is_archived     TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at      DATETIME(6) DEFAULT NULL,
@@ -885,7 +885,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_station (
     version_no  VARCHAR(255) NOT NULL DEFAULT ('01'),
     vpps        TEXT,
     owner_gid   CHAR(36) DEFAULT NULL,
-    ext         JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    ext         JSON NOT NULL,
     is_deleted  TINYINT(1) NOT NULL DEFAULT 0,
     is_archived TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at  DATETIME(6) DEFAULT NULL,
@@ -911,10 +911,10 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_process (
     vpps_desc       TEXT,
     vpps_part       VARCHAR(255) NOT NULL DEFAULT (''),
     part_feed       TINYINT(1) NOT NULL DEFAULT 0,
-    params          JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    params          JSON NOT NULL,
     source_type     TEXT,
     source_ref_gid  CHAR(36) DEFAULT NULL,
-    ext             JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    ext             JSON NOT NULL,
     is_deleted      TINYINT(1) NOT NULL DEFAULT 0,
     is_archived     TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at      DATETIME(6) DEFAULT NULL,
@@ -940,16 +940,16 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_steps (
     vpps_desc         TEXT,
     vpps_part         VARCHAR(255) NOT NULL DEFAULT (''),
     part_feed         TINYINT(1) NOT NULL DEFAULT 0,
-    params            JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    params            JSON NOT NULL,
     source_type       TEXT,
     source_ref_gid    CHAR(36) DEFAULT NULL,
     -- 降级字段
     vd_time           DOUBLE DEFAULT NULL,
     total_time        DOUBLE DEFAULT NULL,
     floor_height_need INT DEFAULT NULL,
-    process_flow_pic  JSON DEFAULT NULL,
-    process_chart_pic JSON DEFAULT NULL,
-    ext               JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    process_flow_pic  JSON NULL,
+    process_chart_pic JSON NULL,
+    ext               JSON NOT NULL,
     is_deleted        TINYINT(1) NOT NULL DEFAULT 0,
     is_archived       TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at        DATETIME(6) DEFAULT NULL,
@@ -994,7 +994,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_equipments (
     status                VARCHAR(255) NOT NULL DEFAULT ('pending'),
     owner_gid             CHAR(36) DEFAULT NULL,
     vpps                  TEXT,
-    ext                   JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    ext                   JSON NOT NULL,
     is_deleted            TINYINT(1) NOT NULL DEFAULT 0,
     is_archived           TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at            DATETIME(6) DEFAULT NULL,
@@ -1019,7 +1019,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_fixtures (
     status                  VARCHAR(255) NOT NULL DEFAULT ('pending'),
     owner_gid               CHAR(36) DEFAULT NULL,
     vpps                    TEXT,
-    ext                     JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    ext                     JSON NOT NULL,
     is_deleted              TINYINT(1) NOT NULL DEFAULT 0,
     is_archived             TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at              DATETIME(6) DEFAULT NULL,
@@ -1044,7 +1044,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_tools (
     status               VARCHAR(255) NOT NULL DEFAULT ('pending'),
     owner_gid            CHAR(36) DEFAULT NULL,
     vpps                 TEXT,
-    ext                  JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    ext                  JSON NOT NULL,
     is_deleted           TINYINT(1) NOT NULL DEFAULT 0,
     is_archived          TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at           DATETIME(6) DEFAULT NULL,
@@ -1068,7 +1068,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_project_roles (
     headcount            INT NOT NULL DEFAULT 1,
     owner_gid            CHAR(36) DEFAULT NULL,
     vpps                 TEXT,
-    ext                  JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    ext                  JSON NOT NULL,
     created_at           DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at           DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     created_by           TEXT
@@ -1087,7 +1087,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_operator (
     headcount       INT NOT NULL DEFAULT 1,
     owner_gid       CHAR(36) DEFAULT NULL,
     vpps            TEXT,
-    ext             JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    ext             JSON NOT NULL,
     is_deleted      TINYINT(1) NOT NULL DEFAULT 0,
     is_archived     TINYINT(1) NOT NULL DEFAULT 0,
     deleted_at      DATETIME(6) DEFAULT NULL,
@@ -1109,8 +1109,8 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_jack_pos (
     jack_pos_type   TEXT,
     ergonomic_score INT DEFAULT NULL,
     posture_desc    TEXT,
-    image_ref       JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    params          JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    image_ref       JSON NOT NULL,
+    params          JSON NOT NULL,
     status          VARCHAR(255) NOT NULL DEFAULT ('draft'),
     owner_gid       CHAR(36) DEFAULT NULL,
     vpps            TEXT,
@@ -1159,10 +1159,10 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_control_plan (
     display_id       VARCHAR(255) NOT NULL DEFAULT (''),
     version_no       VARCHAR(255) NOT NULL DEFAULT ('01'),
     status           VARCHAR(255) NOT NULL DEFAULT ('draft'),
-    content_ref      JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    applicable_scope JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    content_ref      JSON NOT NULL,
+    applicable_scope JSON NOT NULL,
     owner_gid        CHAR(36) DEFAULT NULL,
-    attachments      JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    attachments      JSON NOT NULL,
     vpps             TEXT,
     is_deleted       TINYINT(1) NOT NULL DEFAULT 0,
     is_archived      TINYINT(1) NOT NULL DEFAULT 0,
@@ -1185,9 +1185,9 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_process_charts (
     version_no  VARCHAR(255) NOT NULL DEFAULT ('01'),
     status      VARCHAR(255) NOT NULL DEFAULT ('draft'),
     chart_type  TEXT,
-    content_ref JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    content_ref JSON NOT NULL,
     owner_gid   CHAR(36) DEFAULT NULL,
-    attachments JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    attachments JSON NOT NULL,
     vpps        TEXT,
     is_deleted  TINYINT(1) NOT NULL DEFAULT 0,
     is_archived TINYINT(1) NOT NULL DEFAULT 0,
@@ -1222,9 +1222,9 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_fork_presets (
     gid                CHAR(36) PRIMARY KEY,
     name               TEXT NOT NULL,
     description        TEXT,
-    include_node_types JSON DEFAULT NULL,
-    field_rules        JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    meta_key_rules     JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    include_node_types JSON NULL,
+    field_rules        JSON NOT NULL,
+    meta_key_rules     JSON NOT NULL,
     team_gid           CHAR(36) DEFAULT NULL,
     created_by         TEXT,
     created_at         DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -1244,7 +1244,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_staging (
     source_ref_gid     CHAR(36) DEFAULT NULL,
     original_entry_gid CHAR(36) DEFAULT NULL,
     child_count        INT NOT NULL DEFAULT 0,
-    meta               JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    meta               JSON NOT NULL,
     sort_order         DOUBLE NOT NULL DEFAULT 0,
     is_deleted         TINYINT(1) NOT NULL DEFAULT 0,
     is_archived        TINYINT(1) NOT NULL DEFAULT 0,
@@ -1324,8 +1324,8 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_line_operation_log (
     op_type           TEXT NOT NULL,
     entity_gid        CHAR(36) DEFAULT NULL,
     entity_title      TEXT,
-    old_state         JSON DEFAULT NULL,
-    new_state         JSON DEFAULT NULL,
+    old_state         JSON NULL,
+    new_state         JSON NULL,
     op_seq            INT NOT NULL DEFAULT 0,
     performed_by      TEXT,
     performed_by_name TEXT,
@@ -1437,11 +1437,11 @@ CREATE TABLE IF NOT EXISTS workmanship_work_tasks (
     project_gid       CHAR(36) DEFAULT NULL REFERENCES workmanship_proj_projects(gid) ON DELETE SET NULL,
     status            VARCHAR(255) NOT NULL DEFAULT ('pending'),
     priority          VARCHAR(255) NOT NULL DEFAULT ('normal'),
-    source_ref        JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    source_ref        JSON NOT NULL,
     review_date       TEXT,
     meeting_level     VARCHAR(255) NOT NULL DEFAULT ('none'),
     meeting_doc_link  TEXT,
-    progress_logs     JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    progress_logs     JSON NOT NULL,
     due_date          TEXT,
     plan_start        TEXT,
     plan_end          TEXT,
@@ -1449,7 +1449,7 @@ CREATE TABLE IF NOT EXISTS workmanship_work_tasks (
     actual_end        TEXT,
     share_scope       VARCHAR(255) NOT NULL DEFAULT ('project'),
     list_gid          CHAR(36) DEFAULT NULL REFERENCES workmanship_work_lists(gid) ON DELETE SET NULL,
-    attachments       JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    attachments       JSON NOT NULL,
     created_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at        DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1470,19 +1470,19 @@ CREATE TABLE IF NOT EXISTS workmanship_work_issues (
     owner_user_gid        CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_users(gid) ON DELETE SET NULL,
     assignee_team_gid     CHAR(36) DEFAULT NULL,
     project_gid           CHAR(36) DEFAULT NULL REFERENCES workmanship_proj_projects(gid) ON DELETE SET NULL,
-    tracking_refs         JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    tracking_refs         JSON NOT NULL,
     occurrence_root_cause TEXT,
     escape_root_cause     TEXT,
     interim_action        TEXT,
     permanent_action      TEXT,
-    source_ref            JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    source_ref            JSON NOT NULL,
     related_task_gid      CHAR(36) DEFAULT NULL,
     related_knowledge_gid CHAR(36) DEFAULT NULL,
     approval_order_gid    CHAR(36) DEFAULT NULL,
     bop_entry_gid         CHAR(36) DEFAULT NULL,
     share_scope           VARCHAR(255) NOT NULL DEFAULT ('project'),
     list_gid              CHAR(36) DEFAULT NULL REFERENCES workmanship_work_lists(gid) ON DELETE SET NULL,
-    attachments           JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    attachments           JSON NOT NULL,
     created_at            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at            DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1500,7 +1500,7 @@ CREATE TABLE IF NOT EXISTS workmanship_work_task_templates (
     owner_gid   CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_users(gid) ON DELETE SET NULL,
     version     INT NOT NULL DEFAULT 1,
     is_active   TINYINT(1) NOT NULL DEFAULT 1,
-    entries     JSON DEFAULT (JSON_ARRAY()),
+    entries     JSON,
     created_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1560,13 +1560,13 @@ CREATE TABLE IF NOT EXISTS workmanship_know_entries (
     source_gid             CHAR(36) DEFAULT NULL,
     source_label           VARCHAR(512) NOT NULL DEFAULT (''),
     maintainer_gid         CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_users(gid) ON DELETE SET NULL,
-    contributors           JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    attachments            JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    tags                   JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    content_ref            JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    contributors           JSON NOT NULL,
+    attachments            JSON NOT NULL,
+    tags                   JSON NOT NULL,
+    content_ref            JSON NOT NULL,
     content_md             LONGTEXT NULL,
-    related_part_nos       JSON NOT NULL DEFAULT (JSON_ARRAY()),
-    related_operation_gids JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    related_part_nos       JSON NOT NULL,
+    related_operation_gids JSON NOT NULL,
     creator_gid            CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_users(gid) ON DELETE SET NULL,
     source_project_gid     CHAR(36) DEFAULT NULL REFERENCES workmanship_proj_projects(gid) ON DELETE SET NULL,
     scheduled_date         DATE DEFAULT NULL,
@@ -1592,13 +1592,13 @@ CREATE TABLE IF NOT EXISTS workmanship_know_craft_rules (
     name                 VARCHAR(512) NOT NULL DEFAULT (''),
     rule_type            VARCHAR(255) NOT NULL DEFAULT ('other'),
     enforcement_level    VARCHAR(255) NOT NULL DEFAULT ('advisory'),
-    rule_definition      JSON NOT NULL DEFAULT (JSON_OBJECT()),
-    applicable_scope     JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    rule_definition      JSON NOT NULL,
+    applicable_scope     JSON NOT NULL,
     status               VARCHAR(255) NOT NULL DEFAULT ('draft'),
     knowledge_source_gid CHAR(36) DEFAULT NULL,
     share_scope          VARCHAR(255) NOT NULL DEFAULT ('team'),
     list_gid             CHAR(36) DEFAULT NULL,
-    attachments          JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    attachments          JSON NOT NULL,
     scheduled_date       DATE DEFAULT NULL,
     owner_user_gid       CHAR(36) DEFAULT NULL,
     -- 本体 CEL 表达式
@@ -1637,12 +1637,12 @@ CREATE TABLE IF NOT EXISTS workmanship_know_items (
     item_type    VARCHAR(255) NOT NULL DEFAULT ('richtext'),
     title        VARCHAR(512) NOT NULL DEFAULT (''),
     status       VARCHAR(255) NOT NULL DEFAULT ('draft'),
-    content_body JSON DEFAULT NULL,
+    content_body JSON NULL,
     content_md   LONGTEXT NULL,
     file_path    VARCHAR(4096) DEFAULT (''),
     url          VARCHAR(4096) DEFAULT (''),
-    site_ref     JSON DEFAULT NULL,
-    tags         JSON DEFAULT (JSON_ARRAY()),
+    site_ref     JSON NULL,
+    tags         JSON,
     is_system    TINYINT(1) NOT NULL DEFAULT 0,
     is_pinned    TINYINT(1) NOT NULL DEFAULT 0,
     is_hidden    TINYINT(1) NOT NULL DEFAULT 0,
@@ -1667,18 +1667,18 @@ INSERT IGNORE INTO workmanship_know_items (
 
 -- 知识收藏
 CREATE TABLE IF NOT EXISTS workmanship_know_favorites (
-    user_gid   TEXT NOT NULL,
+    user_gid   VARCHAR(191) NOT NULL,
     item_gid   CHAR(36) NOT NULL,
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
-    PRIMARY KEY (user_gid(191), item_gid)
+    PRIMARY KEY (user_gid, item_gid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 最近访问
 CREATE TABLE IF NOT EXISTS workmanship_know_recent (
-    user_gid    TEXT NOT NULL,
+    user_gid   VARCHAR(191) NOT NULL,
     item_gid    CHAR(36) NOT NULL,
     accessed_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
-    PRIMARY KEY (user_gid(191), item_gid)
+    PRIMARY KEY (user_gid, item_gid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -1724,7 +1724,7 @@ CREATE TABLE IF NOT EXISTS workmanship_onto_properties (
     prop_kind             VARCHAR(255) NOT NULL DEFAULT ('data'),
     data_type             TEXT,
     range_class_gid       CHAR(36) DEFAULT NULL REFERENCES workmanship_onto_classes(gid) ON DELETE SET NULL,
-    enum_values           JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    enum_values           JSON NOT NULL,
     required              TINYINT(1) NOT NULL DEFAULT 0,
     min_val               DOUBLE DEFAULT NULL,
     max_val               DOUBLE DEFAULT NULL,
@@ -1732,7 +1732,7 @@ CREATE TABLE IF NOT EXISTS workmanship_onto_properties (
     sort_order            INT NOT NULL DEFAULT 0,
     storage_hint          VARCHAR(255) NOT NULL DEFAULT ('meta'),
     field_widget          VARCHAR(255) NOT NULL DEFAULT ('text'),
-    field_config          JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    field_config          JSON NOT NULL,
     show_in_create_dialog TINYINT(1) NOT NULL DEFAULT 1,
     dialog_order          INT NOT NULL DEFAULT 99,
     show_in_detail        TINYINT(1) NOT NULL DEFAULT 1,
@@ -1787,7 +1787,7 @@ CREATE TABLE IF NOT EXISTS workmanship_app_view_configs (
     list_gid   CHAR(36) DEFAULT NULL,
     owner_gid  VARCHAR(255) NOT NULL DEFAULT (''),
     is_shared  TINYINT(1) NOT NULL DEFAULT 0,
-    config     JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    config     JSON NOT NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1803,7 +1803,7 @@ CREATE TABLE IF NOT EXISTS workmanship_app_export_templates (
     module     VARCHAR(255) NOT NULL DEFAULT (''),
     owner_gid  CHAR(36) DEFAULT NULL REFERENCES workmanship_auth_users(gid) ON DELETE SET NULL,
     is_shared  TINYINT(1) NOT NULL DEFAULT 0,
-    config     JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    config     JSON NOT NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1818,7 +1818,7 @@ CREATE TABLE IF NOT EXISTS workmanship_app_workbench_configs (
     owner_gid  TEXT NOT NULL,
     name       VARCHAR(512) NOT NULL DEFAULT ('工作台'),
     sort_order INT NOT NULL DEFAULT 0,
-    widgets    JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    widgets    JSON NOT NULL,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1830,7 +1830,7 @@ CREATE TABLE IF NOT EXISTS workmanship_app_workbench_member_overrides (
     gid           CHAR(36) PRIMARY KEY,
     workbench_gid CHAR(36) NOT NULL REFERENCES workmanship_app_workbench_configs(gid) ON DELETE CASCADE,
     user_gid      CHAR(36) NOT NULL REFERENCES workmanship_auth_users(gid) ON DELETE CASCADE,
-    widgets       JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    widgets       JSON NOT NULL,
     created_at    DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at    DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     UNIQUE KEY uq_wb_overrides (workbench_gid, user_gid)
@@ -1861,7 +1861,7 @@ CREATE TABLE IF NOT EXISTS workmanship_app_flow_runs (
     status          VARCHAR(255) NOT NULL DEFAULT ('pending'),
     mode            VARCHAR(255) NOT NULL DEFAULT ('auto'),
     current_node_id TEXT,
-    context_data    JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    context_data    JSON NOT NULL,
     error_msg       TEXT,
     started_at      DATETIME(6) DEFAULT NULL,
     completed_at    DATETIME(6) DEFAULT NULL
@@ -1894,9 +1894,9 @@ CREATE TABLE IF NOT EXISTS workmanship_app_bug_tracker_snapshots (
     comment      LONGTEXT NULL,
     ai_question  LONGTEXT NULL,
     commit       VARCHAR(255) NOT NULL DEFAULT (''),
-    links        JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    links        JSON NOT NULL,
     history      LONGTEXT NULL,
-    entries      JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    entries      JSON NOT NULL,
     created_at   DATETIME(6) DEFAULT NULL,
     updated_at   DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     synced_at    DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
@@ -1935,9 +1935,9 @@ CREATE TABLE IF NOT EXISTS workmanship_app_skills (
     status      VARCHAR(255) NOT NULL DEFAULT ('draft'),
     owner_gid   VARCHAR(255) NOT NULL DEFAULT (''),
     is_system   TINYINT(1) NOT NULL DEFAULT 0,
-    content     JSON NOT NULL DEFAULT (JSON_OBJECT()),
+    content     JSON NOT NULL,
     icon        VARCHAR(255) NOT NULL DEFAULT (''),
-    tags        JSON NOT NULL DEFAULT (JSON_ARRAY()),
+    tags        JSON NOT NULL,
     sort_order  INT NOT NULL DEFAULT 0,
     is_pinned   TINYINT(1) NOT NULL DEFAULT 0,
     created_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -2032,7 +2032,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ════════════════════════════════════════════════════════════════════════
 -- 说明
 -- 1. gid 列均使用 CHAR(36)，适配 UUID v4 或雪花算法转 hex 格式。
--- 2. JSONB 已全部转为 JSON；JSON DEFAULT 使用 MySQL 8.0 表达式默认值语法。
+-- 2. JSONB 已全部转为 JSON；OceanBase 4.3.5 不允许 JSON DEFAULT，写入方须显式提供值。
 -- 3. PostgreSQL SEQUENCE 由 workmanship_display_id_counters 表替代。
 -- 4. 所有 WHERE 子句的条件索引（partial index）已去掉 WHERE，改为普通索引。
 -- 5. bop_entry_links 的 version_gid 索引已删除（该列不存在于表结构中）。

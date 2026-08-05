@@ -23,6 +23,14 @@ robocopy "%WS%\workmanship-backend\scripts" "%DEPLOY%\scripts" /MIR /NFL /NDL /N
 if errorlevel 8 exit /b !ERRORLEVEL!
 
 echo [5/6] configure and restart service
+set RUNTIME_ENV_FILE=E:\projects\ai00-v2\backend\.env.v2.runtime
+set MIGRATION_ENV_FILE=E:\projects\ai00-v2\backend\.env.v2.migration
+E:\projects\ai00-v2\venv\Scripts\python.exe "%DEPLOY%\backend\scripts\runtime_preflight.py" --env-file "%RUNTIME_ENV_FILE%"
+if errorlevel 1 exit /b !ERRORLEVEL!
+set ENV_FILE=%MIGRATION_ENV_FILE%
+E:\projects\ai00-v2\venv\Scripts\python.exe "%DEPLOY%\backend\scripts\run_migrations.py"
+if errorlevel 1 exit /b !ERRORLEVEL!
+set ENV_FILE=%RUNTIME_ENV_FILE%
 nssm set AI00Backend-V2 AppEnvironmentExtra "ENV_FILE=E:\projects\ai00-v2\backend\.env.v2.runtime" "PYTHONIOENCODING=utf-8"
 if errorlevel 1 exit /b !ERRORLEVEL!
 nssm restart AI00Backend-V2
@@ -39,16 +47,16 @@ if errorlevel 1 (
   if errorlevel 1 exit /b !ERRORLEVEL!
 )
 
-echo [6/6] health check
+echo [6/6] readiness check
 set HEALTH_OK=
 for /L %%I in (1,1,12) do (
-  curl -fsS --max-time 5 http://127.0.0.1:8082/health >nul 2>&1 && set HEALTH_OK=1 && goto health_ready
+  curl -fsS --max-time 5 http://127.0.0.1:8082/ready >nul 2>&1 && set HEALTH_OK=1 && goto health_ready
   timeout /t 5 /nobreak >nul
 )
 exit /b 1
 
 :health_ready
-curl -fsS --max-time 5 http://127.0.0.1:8082/health
+curl -fsS --max-time 5 http://127.0.0.1:8082/ready
 if errorlevel 1 exit /b !ERRORLEVEL!
 
 echo ALL DONE

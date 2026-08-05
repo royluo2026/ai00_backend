@@ -96,6 +96,58 @@ def split_sql(sql: str) -> list[str]:
     return statements
 
 
+def normalize_oceanbase_sql(sql: str) -> str:
+    """Remove MySQL defaults that OceanBase 4.3.5 rejects, without changing checksums."""
+    return re.sub(
+        r"\bJSON(?P<nullability>\s+(?:NOT\s+NULL|NULL))?\s+DEFAULT\s+"
+        r"\(JSON_(?:OBJECT|ARRAY)\(\)\)",
+        lambda match: "JSON" + (match.group("nullability") or ""),
+        sql,
+        flags=re.I,
+    )
+
+def bootstrap_statements(sql: str) -> list[str]:
+    """Return baseline statements scoped to the database selected by the URL."""
+    result: list[str] = []
+    for statement in split_sql(sql):
+        normalized = " ".join(_without_comments(statement).split()).upper()
+        if not normalized:
+            continue
+        if normalized.startswith("CREATE DATABASE ") or normalized.startswith("USE "):
+            continue
+        result.append(statement)
+    return result
+
+
+def apply_bootstrap_schema(conn, path: Path) -> bool:
+    """Create the baseline once; safely resume after OceanBase implicit commits."""
+    marker_table = "workmanship_display_id_counters"
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT COUNT(*) FROM information_schema.TABLES "
+            "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s",
+            (marker_table,),
+        )
+        row = cur.fetchone()
+    if int(_scalar(row)) > 0:
+        return False
+
+    sql = path.read_text(encoding="utf-8")
+    for statement in bootstrap_statements(sql):
+        try:
+            with conn.cursor() as cur:
+                cur.execute(statement)
+            conn.commit()
+        except Exception as exc:
+            # Standalone CREATE INDEX lacks IF NOT EXISTS in OceanBase. Retrying a
+            # partially committed bootstrap may therefore encounter a duplicate.
+            if getattr(exc, "args", ()) and exc.args[0] == 1061:
+                conn.rollback()
+                continue
+            conn.rollback()
+            raise MigrationError(f"baseline schema failed: {exc}") from exc
+    return True
+
 def discover_migrations(directory: Path) -> list[Migration]:
     migrations: list[Migration] = []
     seen: set[str] = set()
@@ -110,7 +162,7 @@ def discover_migrations(directory: Path) -> list[Migration]:
             raise MigrationError(f"duplicate migration id: {migration_id}")
         seen.add(migration_id)
         raw = path.read_bytes()
-        sql = raw.decode("utf-8")
+        sql = normalize_oceanbase_sql(raw.decode("utf-8"))
         migrations.append(
             Migration(
                 migration_id=migration_id,
@@ -140,6 +192,48 @@ def _is_resumable_ddl(statement: str) -> bool:
         )
     )
 
+
+def _prepare_resumable_statement(conn, statement: str) -> str | None:
+    """Translate declarative IF NOT EXISTS DDL for OceanBase 4.3.5."""
+    add_column = re.search(
+        r"\bALTER\s+TABLE\s+`?([A-Za-z0-9_]+)`?\s+ADD\s+COLUMN\s+"
+        r"IF\s+NOT\s+EXISTS\s+`?([A-Za-z0-9_]+)`?",
+        statement,
+        re.I,
+    )
+    if add_column:
+        table, column = add_column.groups()
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.COLUMNS "
+                "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s",
+                (table, column),
+            )
+            exists = int(_scalar(cur.fetchone())) > 0
+        if exists:
+            return None
+        return re.sub(r"\bADD\s+COLUMN\s+IF\s+NOT\s+EXISTS\b", "ADD COLUMN", statement, count=1, flags=re.I)
+
+    create_index = re.search(
+        r"\bCREATE\s+(?:UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS\s+"
+        r"`?([A-Za-z0-9_]+)`?\s+ON\s+`?([A-Za-z0-9_]+)`?",
+        statement,
+        re.I,
+    )
+    if create_index:
+        index, table = create_index.groups()
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COUNT(*) FROM information_schema.STATISTICS "
+                "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND INDEX_NAME=%s",
+                (table, index),
+            )
+            exists = int(_scalar(cur.fetchone())) > 0
+        if exists:
+            return None
+        return re.sub(r"\bINDEX\s+IF\s+NOT\s+EXISTS\b", "INDEX", statement, count=1, flags=re.I)
+
+    return statement
 
 def _assert_oceanbase_ddl_policy(migration: Migration, statements: list[str]) -> None:
     """Reject SQL that cannot safely resume after OceanBase implicit commits."""
@@ -236,8 +330,11 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                 # OceanBase commits before and after DDL. Each statement is deliberately
                 # replay-safe and committed independently so retries can resume safely.
                 for statement in split_sql(migration.sql):
+                    prepared = _prepare_resumable_statement(conn, statement)
+                    if prepared is None:
+                        continue
                     with conn.cursor() as cur:
-                        cur.execute(statement)
+                        cur.execute(prepared)
                     conn.commit()
                 duration = int((time.monotonic() - started) * 1000)
                 with conn.cursor() as cur:

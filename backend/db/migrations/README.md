@@ -18,7 +18,7 @@ OceanBase compatibility contract:
 - OceanBase DDL implicitly commits, so every statement must be independently replay-safe.
 - Only `CREATE TABLE IF NOT EXISTS`, `CREATE [UNIQUE] INDEX IF NOT EXISTS`, and
   `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` are accepted by the migration validator.
-- TEXT/BLOB columns must not declare `DEFAULT`, including explicit `DEFAULT NULL`.
+- TEXT/BLOB columns must not declare `DEFAULT`. Legacy JSON expression defaults are stripped by the runner because OceanBase 4.3.5 rejects them; new migrations should omit them.
 - Run `python backend/scripts/oceanbase_compatibility_audit.py` before packaging and
   add `--connect` in the deployment environment.
 - A failed migration may be corrected and retried; an applied migration is immutable.

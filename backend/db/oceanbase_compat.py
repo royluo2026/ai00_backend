@@ -9,7 +9,7 @@ from typing import Iterable
 MIN_OCEANBASE_VERSION = (4, 3, 5)
 MIN_OCEANBASE_VERSION_TEXT = ".".join(map(str, MIN_OCEANBASE_VERSION))
 
-_TEXT_TYPES = {"TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT", "TINYBLOB", "BLOB", "MEDIUMBLOB", "LONGBLOB"}
+_LOB_TYPES = {"TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT", "TINYBLOB", "BLOB", "MEDIUMBLOB", "LONGBLOB", "JSON"}
 _POSTGRES_PATTERNS = (
     ("OB001", re.compile(r"::\s*[A-Za-z_]", re.I), "PostgreSQL cast syntax (::type)"),
     ("OB002", re.compile(r"\bILIKE\b", re.I), "ILIKE"),
@@ -125,7 +125,7 @@ def text_columns_with_defaults(sql: str) -> list[str]:
     result: list[str] = []
     for name, definition, _line in _column_fragments(sql):
         type_match = re.match(r"\s*([A-Za-z]+)\b", definition)
-        if type_match and type_match.group(1).upper() in _TEXT_TYPES and re.search(r"\bDEFAULT\b", definition, re.I):
+        if type_match and type_match.group(1).upper() in _LOB_TYPES and re.search(r"\bDEFAULT\b", definition, re.I):
             result.append(name)
     return result
 
@@ -139,7 +139,7 @@ def audit_sql(path: Path, sql: str, *, check_postgres: bool = True) -> list[Comp
                 issues.append(CompatibilityIssue(code, str(path), cleaned.count("\n", 0, match.start()) + 1, f"unsupported MySQL-mode syntax: {label}"))
     for name, definition, line in _column_fragments(sql):
         type_match = re.match(r"\s*([A-Za-z]+)\b", definition)
-        if type_match and type_match.group(1).upper() in _TEXT_TYPES and re.search(r"\bDEFAULT\b", definition, re.I):
+        if type_match and type_match.group(1).upper() in _LOB_TYPES and re.search(r"\bDEFAULT\b", definition, re.I):
             issues.append(CompatibilityIssue("OB010", str(path), line, f"{type_match.group(1).upper()} column {name!r} cannot declare DEFAULT in OceanBase MySQL mode"))
     for match in re.finditer(r"\b(?:CREATE\s+(?:UNIQUE\s+)?INDEX(?:\s+IF\s+NOT\s+EXISTS)?|(?:UNIQUE\s+)?(?:KEY|INDEX))\s+`?([A-Za-z_][\w]*)`?", cleaned, re.I):
         name = match.group(1)

@@ -146,6 +146,17 @@ def _require(key: str) -> str:
     return val
 
 
+def _configured_users_db_url() -> str:
+    """Resolve the base-domain database without bypassing deployment isolation.
+
+    An explicit ENV_FILE is an immutable deployment boundary. Desktop-saved
+    settings remain a legacy convenience only when no deployment file is used.
+    """
+    if _env_file:
+        return _require("USERS_DB_URL")
+    return _load_saved_cloud_db_url() or _require("USERS_DB_URL")
+
+
 class Settings:
     # 飞书凭证
     feishu_app_id:       str = ""
@@ -228,7 +239,7 @@ class Settings:
         self.feishu_app_secret        = str(_feishu_saved.get("app_secret") or _require("FEISHU_APP_SECRET")).strip()
         self.feishu_redirect_uri      = str(_feishu_saved.get("redirect_uri") or _require("FEISHU_REDIRECT_URI")).strip()
         self.jwt_secret               = _require("JWT_SECRET")
-        self.users_db_url             = _load_saved_cloud_db_url() or _require("USERS_DB_URL")
+        self.users_db_url             = _configured_users_db_url()
         self.jwt_expire_hours         = int(_get_with_fallback("JWT_EXPIRE_HOURS") or "72")
         self.host                     = (_get_with_fallback("HOST") or "0.0.0.0").strip()
         self.port                     = int(_get_with_fallback("PORT") or "8080")

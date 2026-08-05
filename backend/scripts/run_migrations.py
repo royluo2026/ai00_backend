@@ -12,10 +12,14 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from backend.db.oceanbase_compat import verify_live_server
-from backend.db.versioned_migrations import apply_migrations
+from backend.db.versioned_migrations import apply_bootstrap_schema, apply_migrations
 
 
 def main() -> int:
+    env_file = os.environ.get("ENV_FILE", "").strip()
+    if env_file:
+        from dotenv import load_dotenv
+        load_dotenv(env_file, override=True)
     raw = os.environ.get("AI00_DDL_DB_URL", "")
     if not raw:
         raise SystemExit("AI00_DDL_DB_URL is required; application runtime credentials are refused")
@@ -37,6 +41,9 @@ def main() -> int:
     try:
         profile = verify_live_server(conn)
         print(f"OceanBase compatibility verified: {profile['version']} ({profile['compatibility_mode']})")
+        bootstrap_path = REPO_ROOT / "backend/db/mysql_schema.sql"
+        bootstrapped = apply_bootstrap_schema(conn, bootstrap_path)
+        print("baseline schema initialized" if bootstrapped else "baseline schema already present")
         applied = apply_migrations(conn)
         print(f"applied {len(applied)} migration(s): {', '.join(applied) or 'none'}")
     finally:

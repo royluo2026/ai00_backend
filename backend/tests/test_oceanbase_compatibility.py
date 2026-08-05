@@ -46,9 +46,11 @@ class OceanBaseCompatibilityTests(unittest.TestCase):
         );
         ALTER TABLE workmanship_app_bad
             ADD COLUMN IF NOT EXISTS payload BLOB DEFAULT NULL;
+        ALTER TABLE workmanship_app_bad
+            ADD COLUMN IF NOT EXISTS metadata JSON DEFAULT (JSON_OBJECT());
         """
-        self.assertEqual(text_columns_with_defaults(sql), ["content", "payload"])
-        self.assertEqual([issue.code for issue in audit_sql(Path("bad.sql"), sql)], ["OB010", "OB010"])
+        self.assertEqual(text_columns_with_defaults(sql), ["content", "payload", "metadata"])
+        self.assertEqual([issue.code for issue in audit_sql(Path("bad.sql"), sql)], ["OB010", "OB010", "OB010"])
 
     def test_text_column_is_not_confused_by_later_column_default(self):
         sql = "CREATE TABLE IF NOT EXISTS workmanship_app_ok (message TEXT NOT NULL, status VARCHAR(32) DEFAULT 'open');"
