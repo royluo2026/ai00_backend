@@ -91,6 +91,9 @@ register_ontology_proposal_capabilities(capability_registry)
 from .ontology_releases_next import register_ontology_release_capabilities
 register_ontology_release_capabilities(capability_registry)
 
+from .system_shared_next import register_system_shared_capabilities
+register_system_shared_capabilities(capability_registry)
+
 from .knowledge_migration_next import register_knowledge_migration_capabilities
 register_knowledge_migration_capabilities(capability_registry)
 
