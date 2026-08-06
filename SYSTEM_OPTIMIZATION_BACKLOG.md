@@ -24,11 +24,12 @@
 | SYS-006 | 基座 | Version Graph Kernel版本图内核 | 评审并冻结Artifact、不可变Commit、父版本图、内容Hash、OIS快照、活动指针、fork、diff、merge预览及非破坏性restore等通用原语；明确基座与领域适配器边界，并以BOP和Knowledge Revision完成验证 | P1 | SYS-002、SYS-005 | 待设计 | 参考Git语义但不直接暴露Git命令；各领域只开放有业务意义的Capability |
 | SYS-007 | 基座 | 已确认系统级Capability与控制面协议落地 | 实现并验证system.search、activity.search、job.get/cancel、identity.principal.search、lineage.get和change_impact.preview；Catalog、确认、事件/通知、OIS传输和数据库运维保持内部协议 | P1 | SYS-002、SYS-005、SEM-001 | 待验证 | 首批九项共享能力及服务端Catalog过滤已实现，见Phase 55/57；真实部署和跨域Provider验收未完成 |
 | CRAFT-001 | Craft | 首批BOP读取能力设计与实现 | 已批准的版本查询、执行结构、零件关联、版本比较、工作包等能力完成契约、注册、测试和首个真实消费者迁移 | P0 | SYS-002、SYS-005 | 待验证 | 契约、注册、测试及Web版本列表/Agent执行结构消费者已迁移；待OceanBase真实数据烟测 |
-| CRAFT-002 | Craft | Craft校验规则与Validation Policy治理 | 完成现有校验盘点；每项登记来源、Owner、适用范围、严重级别和执行机制；建立版本化Policy注册表；冻结并测试`draft_check`、`publish_check`、`simulation_check`、`workstation_check` | P0 | 本体与规则Owner明确 | 待讨论 | Policy框架与四项VPPS盘点已实现；来源、Owner、阈值、算法和回放证据仍待业务确认，见Phase 56 |
-| CRAFT-003 | Craft | `craft.bop.version.validate`权威校验能力 | 能按冻结Policy返回可复现结论、规则/程序/本体版本、BOP Hash及证据；发布流程强制重新执行`publish_check` | P0 | CRAFT-002、SYS-002 | 待设计 | 能力语义已批准；不允许Agent选择性跳过强制规则 |
-| CRAFT-004 | Craft | BOP草稿受治理写能力 | 冻结类型化变更Schema和`draft.change.preview/apply`契约；完成无副作用预览、Hash绑定、乐观并发、幂等、事务回滚、权限和审计测试 | P1 | SYS-002、SYS-005、CRAFT-002 | 待设计 | 业务语义已批准；不把节点CRUD或JSON Patch公开为Capability |
-| CRAFT-005 | Craft | BOP创建与生命周期能力 | `version.create`按empty/bop_version/template/import_preview来源创建草稿；发布和非破坏归档按状态机冻结；发布绑定Policy、不可变快照、确认和审计 | P1 | CRAFT-002、CRAFT-003 | 待设计 | clone已合并到create；不提供物理删除 |
-| CRAFT-006 | Craft | PBOM VPPS规则与校验治理 | 将现有四条硬编码检查登记为版本化规则；冻结VPPS主数据、算法与阈值版本；实现`craft.pbom.vpps.validate`可复现结果、错误分级和证据 | P0 | CRAFT-002、SYS-002 | 待设计 | 原`craft.ebom.vpps.validate`候选更正归属；当前页面ignore不视为正式让步 |
+| CRAFT-002 | Craft | Craft校验规则与Validation Policy治理 | 重新梳理现有校验；每项登记来源、Owner、适用范围、严重级别和执行机制；规则成熟后再冻结并测试`draft_check`、`publish_check`、`simulation_check`、`workstation_check` | P2 | 本体与规则Owner明确 | 待完善 | Policy技术框架与四项VPPS候选盘点已实现；现有规则不完善，不进入当前强制校验，见Phase 56/63 |
+| CRAFT-003 | Craft | `craft.bop.version.validate`权威校验能力 | 能按冻结Policy返回可复现结论、规则/程序/本体版本、BOP Hash及证据；发布流程强制重新执行`publish_check` | P2 | CRAFT-002、SYS-002 | 暂缓 | 等成熟规则获批后实施；不得把当前四项候选直接升级为阻断规则 |
+| CRAFT-004 | Craft | BOP草稿受治理写能力 | 冻结类型化变更Schema和`draft.change.preview/apply`契约；完成无副作用预览、Hash绑定、乐观并发、幂等、事务回滚、权限和审计测试 | P1 | SYS-002、SYS-005 | 待实施 | 可先实现写入安全与审计；不包含尚未成熟的领域规则校验，不把节点CRUD或JSON Patch公开为Capability |
+| CRAFT-005 | Craft | BOP创建与非破坏归档能力 | `version.create`按empty/bop_version/template/import_preview来源创建草稿；按状态机完成非破坏归档，保留不可变快照、确认和审计 | P1 | SYS-002、SYS-005 | 待实施 | clone合并到create；不提供物理删除；发布拆到CRAFT-009 |
+| CRAFT-006 | Craft | PBOM VPPS规则与校验治理 | 把现有四条检查作为候选规则重新验证；冻结主数据、算法、阈值和证据后，再决定是否实现`craft.pbom.vpps.validate` | P2 | CRAFT-002、SYS-002 | 待完善 | 当前实现不完善；仅作待办，不注册Capability，不把页面ignore视为正式让步 |
+| CRAFT-009 | Craft | BOP发布能力 | 成熟的`publish_check`获批后，实现发布前重跑、不可变快照、状态机、确认和审计 | P2 | CRAFT-002、CRAFT-003、CRAFT-005 | 暂缓 | 当前不实现无规则发布，也不以不完善规则阻断发布 |
 | CRAFT-007 | Craft | 决策PBOM VPPS让步机制 | 结合真实业务场景决定是否允许让步、由谁审批、适用范围、有效期、撤销和对发布的影响；只有决策通过后才提案具体Capability | P2 | CRAFT-006、审批流程需求 | 暂缓 | 当前不加入`waiver.create/revoke`，不得提前实现或公开 |
 | CRAFT-008 | Craft | 退役PBOM→GBOP错误匹配模型 | 盘点并迁移`gbop-match-preview/confirm`、auto-link、staging等消费者；删除错误关系或转为真实BOP/GBOP来源关系；全过程保留数据迁移与回归证据 | P0 | CRAFT-001、真实数据盘点 | 待设计 | PBOM与GBOP没有业务关系，相关接口不得Capability化 |
 | SEM-001 | 语义层 | 系统级受治理语义查询 | 冻结`semantic.context.get`、领域命名空间视图、深度/节点上限、ACL、来源版本、冲突和证据语义；至少由Craft场景验收 | P1 | SYS-005、本体Owner确认 | 实施中 | 命名视图、深度/节点上限及稳定引用契约已实现；Craft真实场景和ACL验收未完成 |
@@ -57,13 +58,13 @@
 
 ## 3. 当前推荐执行顺序
 
-1. 按实施计划先完成Kernel契约和ONT-001/Craft只读垂直切片，不提前实现被规则治理阻塞的校验能力。
-2. 并行准备 `SYS-001`、`PLUGIN-001`、`KNOW-001` 的真实环境验收条件。
-3. 启动 `CRAFT-002` 校验规则与Validation Policy盘点，它是校验、发布和受控写入的共同前置。
-4. Capability讨论结束后，先实施 `SYS-002`、`CRAFT-001` 和 `AGENT-001`，形成真实消费者闭环。
-5. 再进入 Craft写能力、Simulation、插件领域开放、Public API/MCP和Local Runtime。
+1. 完成已实现 Capability 的真实环境验收准备，并继续清理消费者和领域边界。
+2. 先实施 `CRAFT-004/005` 的安全写入、创建和非破坏归档，不引入未成熟 VPPS 规则。
+3. 并行推进 `SYS-001`、`PLUGIN-001`、`KNOW-001` 和 `AGENT-001` 的验收与消费者闭环。
+4. `CRAFT-002/003/006/009` 保留为规则治理、权威校验和发布待办，规则成熟后再恢复。
+5. 随后进入 Simulation、插件领域开放、Public API/MCP和Local Runtime。
 
-## 4. 本轮新增重点项：CRAFT-002
+## 4. CRAFT-002 未来治理要求
 
 首轮盘点必须为每项校验建立以下字段：
 
@@ -84,15 +85,20 @@
 
 任何尚未找到可靠来源或适用边界的“经验规则”，只能登记为候选或提示，不得进入强制发布校验。
 
-## 5. CRAFT-002 当前阻塞清单（2026-08-06）
+## 5. CRAFT-002 候选规则待办（2026-08-06）
 
-以下检查来自 `plugins/craft/craft_backend/routers/ebom.py` 的现有实现，但尚不具备进入强制发布策略所需的治理资料：
+以下检查来自 `plugins/craft/craft_backend/routers/ebom.py` 的现有实现。业务决策确认这些规则目前不完善，因此它们降为候选规则待办，不作为当前开发或发布流程的强制规则：
 
-| Check ID | 当前实现 | 缺失治理字段 | 处置 |
+| Check ID | 当前实现 | 缺失治理字段 | 当前处置 |
 | --- | --- | --- | --- |
-| `vpps.master_data` | VPPS主数据及名称/描述一致性 | source_ref、Owner、阈值、算法版本、Policy版本、正反/边界/历史回放 | 仅盘点，不注册Capability |
-| `vpps.parent` | 父级字段与实际父零件VPPS一致性 | source_ref、Owner、阈值、算法版本、Policy版本、正反/边界/历史回放 | 仅盘点，不注册Capability |
-| `vpps.hierarchy_prefix` | 子项VPPS层级前缀检查 | source_ref、Owner、阈值、算法版本、Policy版本、正反/边界/历史回放 | 仅盘点，不注册Capability |
-| `vpps.fastener_main_part` | 紧固件几何/描述主件一致性 | source_ref、Owner、阈值、算法版本、Policy版本、正反/边界/历史回放 | 仅盘点，不注册Capability；现有ignore不视为正式让步 |
+| `vpps.master_data` | VPPS主数据及名称/描述一致性 | source_ref、Owner、阈值、算法版本、Policy版本、正反/边界/历史回放 | 候选待办；重新验证后再决定保留、修改或删除 |
+| `vpps.parent` | 父级字段与实际父零件VPPS一致性 | source_ref、Owner、阈值、算法版本、Policy版本、正反/边界/历史回放 | 候选待办；重新验证后再决定保留、修改或删除 |
+| `vpps.hierarchy_prefix` | 子项VPPS层级前缀检查 | source_ref、Owner、阈值、算法版本、Policy版本、正反/边界/历史回放 | 候选待办；重新验证后再决定保留、修改或删除 |
+| `vpps.fastener_main_part` | 紧固件几何/描述主件一致性 | source_ref、Owner、阈值、算法版本、Policy版本、正反/边界/历史回放 | 候选待办；重新验证后再决定保留、修改或删除；现有ignore不视为正式让步 |
 
-在上述字段由业务Owner确认并形成 `publish_check` 四类测试证据前，`craft.bop.version.validate`、`craft.bop.version.publish` 和 `craft.pbom.vpps.validate` 必须保持未注册状态，Task 13 的发布与权威校验写能力不得启动。
+在规则成熟并获得业务批准前，`craft.bop.version.validate`、`craft.bop.version.publish` 和 `craft.pbom.vpps.validate` 保持未注册。该限制只阻止权威校验和发布，不再阻止以下独立安全能力的开发：
+
+- `craft.bop.version.create`
+- `craft.bop.version.archive`
+- `craft.bop.draft.change.preview/apply`
+- `craft.bop.import.preview`
