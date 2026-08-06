@@ -7,7 +7,7 @@ from fastapi import HTTPException
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from backend.routers import ontology
+from plugins.craft.craft_backend.routers import ontology
 
 
 class FakeCursor:

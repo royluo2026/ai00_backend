@@ -10,6 +10,7 @@ Mock 集成测试 — mock psycopg2，用 TestClient 调用各 router 端点，
   - 调用典型端点，捕获 cursor.execute() 的 SQL 参数 → 断言含 schema 前缀
 """
 import re
+from contextlib import ExitStack
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -209,7 +210,31 @@ def mock_conn():
     mock_connection.__enter__.return_value = mock_connection
     mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
 
-    with patch("backend.db.connection.get_conn", return_value=mock_connection):
+    # Plugin routes are loaded by their declared top-level package names.
+    # Load registrations before patching the connection aliases they own.
+    from backend.main import app as _registered_app  # noqa: F401
+
+    targets = (
+        "backend.db.connection.get_conn",
+        "backend.db.sequences.get_conn",
+        "backend.platform_sdk.access.get_conn",
+        "backend.routers.annotations.get_conn",
+        "backend.routers.follows.get_conn",
+        "backend.routers.knowledge.get_conn",
+        "backend.routers.knowledge_hub.get_conn",
+        "backend.routers.notifications.get_conn",
+        "backend.routers.views.get_conn",
+        "backend.routers.workbenches.get_conn",
+        "agent_backend.routers.flows.get_agent_conn",
+        "craft_backend.routers.item_entries.get_conn",
+        "craft_backend.routers.lists.get_conn",
+        "craft_backend.routers.promotion.get_conn",
+        "craft_backend.routers.rules.get_conn",
+        "craft_backend.routers.task_templates.get_conn",
+    )
+    with ExitStack() as stack:
+        for target in targets:
+            stack.enter_context(patch(target, return_value=mock_connection))
         yield mock_connection, mock_cursor
 
 

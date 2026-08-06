@@ -298,74 +298,53 @@ def test_no_deprecated_table_names():
 
 
 def test_table_map_covers_all_routers():
-    """
-    验证 _TABLE_SCHEMA_MAP 覆盖了所有 router 文件中出现的 SQL 表名。
-    无需手动维护——测试本身会报告遗漏的表名。
-    """
-    # 收集所有 .py 文件中 SQL 关键字后的裸表名
-    all_tables = set()
-    for pyfile in _get_python_files():
-        text = pyfile.read_text(encoding="utf-8")
-        for match in _SQL_KEYWORD_TABLE_RE.finditer(text):
-            raw = match.group(1) or match.group(2) or match.group(3)
-            if raw and "." not in raw and raw.isidentifier():
-                all_tables.add(raw)
+    """Reject legacy schema qualification in SQL executed by Base or plugin routers."""
+    project_root = BACKEND_DIR.parent
+    router_dirs = [BACKEND_DIR / "routers"]
+    router_dirs.extend(
+        path for path in (project_root / "plugins").glob("*/*_backend/routers")
+        if path.is_dir()
+    )
+    legacy_ref = re.compile(
+        r"\b(auth|proj|bop|factory|template|work|knowledge|app)"
+        r"\.[A-Za-z_][A-Za-z0-9_]*\b",
+        re.IGNORECASE,
+    )
 
-    # 已知不需要 schema 前缀的标识符
-    SQL_KEYWORDS = {"TRUE", "FALSE", "NULL", "NOW", "EXISTS", "DEFAULT",
-                    "SET", "VALUES", "WHERE", "AND", "OR", "ON", "AS",
-                    "NOT", "IN", "IS", "CASCADE", "DELETE", "INSERT",
-                    "UPDATE", "SELECT", "FROM", "INTO", "TABLE", "JOIN",
-                    "REFERENCES", "WITH", "ALL", "ANY", "SOME", "BETWEEN",
-                    "LIKE", "ILIKE", "ORDER", "GROUP", "BY", "HAVING",
-                    "LIMIT", "OFFSET", "FETCH", "FOR", "OF", "ROW",
-                    "ROWS", "RANGE", "UNBOUNDED", "PRECEDING",
-                    "FOLLOWING", "CURRENT", "LEFT", "RIGHT", "INNER",
-                    "OUTER", "CROSS", "FULL", "NATURAL", "USING",
-                    "DISTINCT", "COUNT", "SUM", "AVG", "MIN", "MAX",
-                    "COALESCE", "LPAD", "NOW", "TRUE", "FALSE", "NULL",
-                    "ASC", "DESC", "FIRST", "LAST", "OVER", "PARTITION",
-                    "FILTER", "WITHIN", "ARRAY", "ROW", "TYPE", "TEXT",
-                    "NAME", "ROLE", "JSONB", "BOOLEAN", "REAL", "INTEGER",
-                    "SMALLINT", "NUMERIC", "TIMESTAMPTZ", "IF", "CREATE",
-                    "SCHEMA"}
+    def literal_sql(node: ast.AST) -> str | None:
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        if isinstance(node, ast.JoinedStr):
+            return "".join(
+                value.value
+                for value in node.values
+                if isinstance(value, ast.Constant) and isinstance(value.value, str)
+            )
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+            left = literal_sql(node.left)
+            right = literal_sql(node.right)
+            return None if left is None or right is None else left + right
+        return None
 
-    # Python 导入语句和模块名（不是 SQL 表引用）
-    PYTHON_IMPORT_TABLES = {"typing", "datetime", "functools", "pathlib",
-                            "contextlib", "fastapi", "pydantic", "openpyxl",
-                            "dotenv", "deprecated", "backend", "sub", "re"}
+    violations = []
+    for router_dir in router_dirs:
+        for pyfile in router_dir.rglob("*.py"):
+            tree = ast.parse(pyfile.read_text(encoding="utf-8"), filename=str(pyfile))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call) or not node.args:
+                    continue
+                func = node.func
+                if not isinstance(func, ast.Attribute) or func.attr not in {"execute", "executemany"}:
+                    continue
+                sql = literal_sql(node.args[0])
+                if not sql:
+                    continue
+                for match in legacy_ref.finditer(sql):
+                    violations.append(
+                        (pyfile.relative_to(project_root), node.lineno, match.group(0))
+                    )
 
-    # schema 名本身（出现在 DDL "CREATE SCHEMA IF NOT EXISTS xxx" 中）
-    SCHEMA_NAMES = {"auth", "proj", "bop", "factory", "template", "work",
-                    "knowledge", "app"}
-
-    # V1 废弃表名（仅出现在注释/docstring 中，非实际 SQL 引用）
-    V1_DEPRECATED = {"bop_operations", "bop_posts", "operation_resources",
-                     "step_resources", "work_plans", "sections", "operation_flat"}
-
-    missing = set()
-    for tbl in all_tables:
-        if tbl.upper() in SQL_KEYWORDS:
-            continue
-        if tbl in TABLE_SCHEMA_MAP:
-            continue
-        if tbl in DEPRECATED_TABLE_NAMES:
-            continue
-        if tbl in PYTHON_IMPORT_TABLES:
-            continue
-        if tbl in SCHEMA_NAMES:
-            continue
-        if tbl in V1_DEPRECATED:
-            continue
-        if tbl.endswith("_seq"):  # 序列
-            continue
-        # 非 ASCII 字符（中文 docstring 碎片，不是表名）
-        if any(ord(c) > 127 for c in tbl):
-            continue
-        missing.add(tbl)
-
-    if missing:
-        pytest.fail(
-            f"_TABLE_SCHEMA_MAP 中缺失以下表名（请确认是否需要加 schema 前缀）:\n"
-            + "\n".join(f"  - {t}" for t in sorted(missing))
-        )
+    assert not violations, (
+        "OceanBase single-schema SQL contains legacy schema qualification:\n"
+        + "\n".join(f"  - {path}:{line}: {ref}" for path, line, ref in violations)
+    )

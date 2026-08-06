@@ -275,7 +275,10 @@ def test_undo_line_history_replays_latest_active_batch(monkeypatch):
 
     result = lifecycle.undo_line_history("ver-1", "line-1", _u={"gid": "user-1"})
 
-    assert result == {"batch_id": "batch-1", "status": "undone"}
+    assert result["batch_id"] == "batch-1" and result["status"] == "undone"
+    assert result["version_gid"] == "ver-1" and result["line_gid"] == "line-1"
+    assert result["affected_entries"] == ["entry-1"]
+    assert result["operation_log"] == []
     assert calls[0] == ("update_entry", "undo")
     assert calls[1] == ("batch-1", "undone")
 
@@ -304,6 +307,9 @@ def test_redo_line_history_replays_latest_undone_batch(monkeypatch):
 
     result = lifecycle.redo_line_history("ver-1", "line-1", _u={"gid": "user-1"})
 
-    assert result == {"batch_id": "batch-2", "status": "active"}
+    assert result["batch_id"] == "batch-2" and result["status"] == "active"
+    assert result["version_gid"] == "ver-1" and result["line_gid"] == "line-1"
+    assert result["affected_entries"] == ["entry-1"]
+    assert result["operation_log"] == []
     assert calls[0] == ("update_entry", "redo")
     assert calls[1] == ("batch-2", "active")

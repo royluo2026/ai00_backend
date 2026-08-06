@@ -317,14 +317,14 @@ class TestNextDisplayId:
         return fake_get_conn, mock_cur
 
     def test_returns_next_val_from_db(self):
-        fake_get_conn, mock_cur = self._make_mock_conn({"next_val": 42})
+        fake_get_conn, mock_cur = self._make_mock_conn({"val": 42})
         with patch("backend.db.sequences.get_conn", fake_get_conn):
             import backend.db.sequences as seq
             result = seq.next_display_id("proj_tasks_display_seq")
         assert result == 42
 
     def test_update_called_before_select(self):
-        fake_get_conn, mock_cur = self._make_mock_conn({"next_val": 1})
+        fake_get_conn, mock_cur = self._make_mock_conn({"val": 1})
         with patch("backend.db.sequences.get_conn", fake_get_conn):
             import backend.db.sequences as seq
             seq.next_display_id("knowledge_display_seq")
@@ -337,7 +337,7 @@ class TestNextDisplayId:
         assert "SELECT" in second_sql, f"第二条 SQL 应为 SELECT，实际: {second_sql}"
 
     def test_seq_name_passed_to_both_queries(self):
-        fake_get_conn, mock_cur = self._make_mock_conn({"next_val": 5})
+        fake_get_conn, mock_cur = self._make_mock_conn({"val": 5})
         seq_name = "rules_display_seq"
         with patch("backend.db.sequences.get_conn", fake_get_conn):
             import backend.db.sequences as seq
@@ -357,7 +357,7 @@ class TestNextDisplayId:
                 seq.next_display_id("nonexistent_seq")
 
     def test_display_id_format_task(self):
-        fake_get_conn, mock_cur = self._make_mock_conn({"next_val": 7})
+        fake_get_conn, mock_cur = self._make_mock_conn({"val": 7})
         with patch("backend.db.sequences.get_conn", fake_get_conn):
             import backend.db.sequences as seq
             n = seq.next_display_id("proj_tasks_display_seq")

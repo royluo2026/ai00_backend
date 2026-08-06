@@ -9,6 +9,7 @@ MySQL 连接池（PyMySQL + dbutils PooledDB）
   这样在本地开发没有 MySQL 实例时，后端服务也可以正常启动。
 """
 import logging
+import os
 import traceback
 from contextlib import contextmanager
 from typing import Optional
@@ -25,6 +26,13 @@ _log = logging.getLogger("backend.db")
 
 def init_pool() -> None:
     global _pool
+    if (
+        os.getenv("AI00_PYTEST_OFFLINE") == "1"
+        and os.getenv("AI00_ALLOW_LIVE_DB_TESTS") != "1"
+    ):
+        _pool = None
+        _log.info("pytest offline mode: Base database connection pool is disabled")
+        return
     s = get_settings()
     params = s.get_db_params()
     _log.info(f"🔌 尝试连接数据库: mysql://{params['host']}:{params['port']}/{params['db']}")

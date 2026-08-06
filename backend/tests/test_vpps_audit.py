@@ -5,7 +5,7 @@ VPPS 操作审计测试套件
 
 覆盖范围：
   1. Domain 服务层 (VppsAuditService)     — 纯单元测试，mock repository
-  2. Infra 层 (PgVppsOperationRepository) — mock psycopg2，验证 SQL 含 bop.vpps_operations 前缀
+  2. Infra 层 (MySqlVppsOperationRepository) — mock DB-API，验证 SQL 含 workmanship_bop_vpps_operations 前缀
   3. Router 端点 (TestClient)             — mock get_conn，验证 HTTP 响应格式和状态码
   4. SQL Schema 前缀                      — 所有端点不得使用裸表名 vpps_operations
   5. 前端 JS 静态检查                     — 验证 ebom.js / list_diff_shell.js 包含关键逻辑
@@ -19,9 +19,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from backend.domain.vpps_audit.models import VppsOperation
-from backend.domain.vpps_audit.service import VppsAuditService
-from backend.infra.vpps_audit_pg import PgVppsOperationRepository
+from plugins.craft.craft_backend.vpps_audit.models import VppsOperation
+from plugins.craft.craft_backend.vpps_audit.service import VppsAuditService
+from plugins.craft.craft_backend.vpps_audit.mysql_repository import MySqlVppsOperationRepository
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -78,7 +78,7 @@ def _op_as_db_row(op: VppsOperation) -> dict:
 
 
 def _make_cursor_and_conn():
-    """构造 mock psycopg2 connection + cursor（支持 with conn.cursor() as cur）。"""
+    """构造 mock DB-API connection + cursor（支持 with conn.cursor() as cur）。"""
     mc = MagicMock()
     mc.fetchone.return_value = None
     mc.fetchall.return_value = []
@@ -117,7 +117,10 @@ def bop_entries_module(monkeypatch):
     module_name = "craft_backend.routers._bop.entries"
     sys.modules.pop(module_name, None)
     module = importlib.import_module(module_name)
+    original_check = module._check_line_editable
+    module._check_line_editable = lambda *_args, **_kwargs: None
     yield module
+    module._check_line_editable = original_check
     sys.modules.pop(module_name, None)
     if craft_plugin_root_str in sys.path:
         sys.path.remove(craft_plugin_root_str)
@@ -132,6 +135,8 @@ def bop_mock_conn():
 
 @pytest.fixture
 def mock_conn():
+    from backend.main import app as _registered_app  # noqa: F401
+
     mc, conn = _make_cursor_and_conn()
     with patch("craft_backend.routers.vpps_audit.get_conn", return_value=conn):
         yield conn, mc
@@ -282,28 +287,28 @@ class TestVppsAuditService:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 2. Infra 层 — SQL 正确性验证（mock psycopg2）
+# 2. Infra 层 — SQL 正确性验证（mock DB-API）
 # ─────────────────────────────────────────────────────────────────────────────
 
-class TestPgVppsOperationRepository:
+class TestMySqlVppsOperationRepository:
 
     # ── save_batch ────────────────────────────────────────────────────────────
 
-    def test_save_batch_sql_uses_bop_schema(self):
-        """save_batch 发出的 SQL 包含 bop.vpps_operations。"""
+    def test_save_batch_sql_uses_physical_table(self):
+        """save_batch 发出的 SQL 包含 workmanship_bop_vpps_operations。"""
         mc, conn = _make_cursor_and_conn()
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.save_batch([_make_op(gid="op_1"), _make_op(gid="op_2", pbom_row_gid="row_002")])
 
         assert mc.executemany.called
         sql = mc.executemany.call_args[0][0]
-        assert "bop.vpps_operations" in sql
+        assert "workmanship_bop_vpps_operations" in sql
         assert "INTO vpps_operations" not in sql   # 无裸表名
 
     def test_save_batch_row_count_matches_ops(self):
         """save_batch 传给 executemany 的参数行数等于 ops 数量。"""
         mc, conn = _make_cursor_and_conn()
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.save_batch([_make_op(gid=f"op_{i}") for i in range(3)])
         rows = mc.executemany.call_args[0][1]
         assert len(rows) == 3
@@ -311,29 +316,29 @@ class TestPgVppsOperationRepository:
     def test_save_batch_empty_skips_db(self):
         """空列表不调用 executemany。"""
         mc, conn = _make_cursor_and_conn()
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.save_batch([])
         mc.executemany.assert_not_called()
 
-    def test_save_single_sql_uses_bop_schema(self):
-        """save 发出的 INSERT SQL 包含 bop.vpps_operations。"""
+    def test_save_single_sql_uses_physical_table(self):
+        """save 发出的 INSERT SQL 包含 workmanship_bop_vpps_operations。"""
         mc, conn = _make_cursor_and_conn()
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.save(_make_op())
         sql = mc.execute.call_args[0][0]
-        assert "bop.vpps_operations" in sql
+        assert "workmanship_bop_vpps_operations" in sql
 
     # ── get_active_rule4_ignores ──────────────────────────────────────────────
 
-    def test_get_rule4_ignores_sql_uses_bop_schema(self):
-        """SELECT SQL 包含 bop.vpps_operations。"""
+    def test_get_rule4_ignores_sql_uses_physical_table(self):
+        """SELECT SQL 包含 workmanship_bop_vpps_operations。"""
         mc, conn = _make_cursor_and_conn()
         mc.fetchall.return_value = [{"pbom_row_gid": "r1"}, {"pbom_row_gid": "r2"}]
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         result = repo.get_active_rule4_ignores("ver_001")
 
         sql = mc.execute.call_args[0][0]
-        assert "bop.vpps_operations" in sql
+        assert "workmanship_bop_vpps_operations" in sql
         assert "rule4_bulk_ignore" in sql
         assert result == {"r1", "r2"}
 
@@ -341,7 +346,7 @@ class TestPgVppsOperationRepository:
         """SQL 参数中含有传入的 pbom_version_gid。"""
         mc, conn = _make_cursor_and_conn()
         mc.fetchall.return_value = []
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.get_active_rule4_ignores("ver_SPECIFIC")
         params = mc.execute.call_args[0][1]
         assert "ver_SPECIFIC" in params
@@ -350,56 +355,56 @@ class TestPgVppsOperationRepository:
         """DB 无记录时返回空 set。"""
         mc, conn = _make_cursor_and_conn()
         mc.fetchall.return_value = []
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         assert repo.get_active_rule4_ignores("ver_001") == set()
 
     # ── get_active_by_version ─────────────────────────────────────────────────
 
-    def test_get_active_by_version_sql_uses_bop_schema(self):
-        """不带 operation_type 参数时 SQL 含 bop.vpps_operations。"""
+    def test_get_active_by_version_sql_uses_physical_table(self):
+        """不带 operation_type 参数时 SQL 含 workmanship_bop_vpps_operations。"""
         mc, conn = _make_cursor_and_conn()
         mc.fetchall.return_value = []
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.get_active_by_version("ver_001")
         sql = mc.execute.call_args[0][0]
-        assert "bop.vpps_operations" in sql
+        assert "workmanship_bop_vpps_operations" in sql
 
     def test_get_active_by_version_with_type_filter_passes_param(self):
         """传入 operation_type 时参数中包含该值。"""
         mc, conn = _make_cursor_and_conn()
         mc.fetchall.return_value = []
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.get_active_by_version("ver_001", operation_type="rule4_bulk_ignore")
         params = mc.execute.call_args[0][1]
         assert "rule4_bulk_ignore" in params
 
     # ── revert ────────────────────────────────────────────────────────────────
 
-    def test_revert_sql_uses_bop_schema(self):
-        """UPDATE SQL 含 bop.vpps_operations 且有 RETURNING。"""
+    def test_revert_sql_uses_physical_table(self):
+        """UPDATE SQL 含 workmanship_bop_vpps_operations 且不使用 RETURNING。"""
         mc, conn = _make_cursor_and_conn()
         mc.fetchone.return_value = None
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.revert("op_001", "user_002", "王五")
 
         sql = mc.execute.call_args[0][0]
-        assert "bop.vpps_operations" in sql
-        assert "RETURNING" in sql.upper()
+        assert "workmanship_bop_vpps_operations" in sql
+        assert "RETURNING" not in sql.upper()
 
     def test_revert_sql_sets_is_active_false(self):
         """UPDATE SQL 将 is_active 置为 FALSE。"""
         mc, conn = _make_cursor_and_conn()
         mc.fetchone.return_value = None
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         repo.revert("op_001", "user_002", "王五")
         sql = mc.execute.call_args[0][0].replace(" ", "").upper()
-        assert "IS_ACTIVE=FALSE" in sql or "IS_ACTIVE=FALSE" in sql
+        assert "IS_ACTIVE=0" in sql
 
     def test_revert_returns_none_when_not_found(self):
         """fetchone 为 None 时返回 None。"""
         mc, conn = _make_cursor_and_conn()
         mc.fetchone.return_value = None
-        repo = PgVppsOperationRepository(conn)
+        repo = MySqlVppsOperationRepository(conn)
         assert repo.revert("op_nonexistent", "u", "") is None
 
     def test_revert_returns_operation_when_found(self):
@@ -408,7 +413,8 @@ class TestPgVppsOperationRepository:
         mc.fetchone.return_value = _op_as_db_row(
             _make_op(is_active=False, reverted_by_gid="user_002", reverted_by_name="王五")
         )
-        repo = PgVppsOperationRepository(conn)
+        mc.rowcount = 1
+        repo = MySqlVppsOperationRepository(conn)
         result = repo.revert("op_001", "user_002", "王五")
 
         assert isinstance(result, VppsOperation)
@@ -541,6 +547,10 @@ class TestVppsAuditRoutes:
             {"pbom_row_gid": "row_1"},
             {"pbom_row_gid": "row_2"},
         ]
+        mc.fetchall.return_value = [
+            _op_as_db_row(_make_op(pbom_row_gid="row_1")),
+            _op_as_db_row(_make_op(gid="op_gid_002", pbom_row_gid="row_2")),
+        ]
         resp = client.get("/api/vpps-operations/rule4-ignores?pbom_version_gid=ver_001")
         assert resp.status_code == 200
         data = resp.json()
@@ -569,6 +579,7 @@ class TestVppsAuditRoutes:
             _make_op(is_active=False, reverted_by_gid="test_user_gid", reverted_by_name="Test User",
                      reverted_at=_NOW)
         )
+        mc.rowcount = 1
         resp = client.post("/api/vpps-operations/op_001/revert", json={})
         assert resp.status_code == 200
         data = resp.json()
@@ -589,10 +600,15 @@ class TestVppsAuditRoutes:
         mc.fetchone.return_value = _op_as_db_row(
             _make_op(is_active=False, reverted_by_gid="test_user_gid", reverted_at=_NOW)
         )
+        mc.rowcount = 1
         resp = client.post("/api/vpps-operations/op_001/revert", json={})
         assert resp.status_code == 200
         # 验证 SQL 参数中包含 JWT user gid
-        params = mc.execute.call_args[0][1]
+        params = next(
+            call.args[1]
+            for call in mc.execute.call_args_list
+            if str(call.args[0]).lstrip().upper().startswith("UPDATE")
+        )
         assert "test_user_gid" in params
 
 
@@ -819,15 +835,15 @@ class TestBopCreateEntry:
         )
 
 class TestVppsAuditSchemaPrefixes:
-    """确认所有端点发出的 SQL 都不含裸表名 vpps_operations（必须有 bop. 前缀）。"""
+    """确认所有端点发出的 SQL 都不含裸表名 vpps_operations（必须使用 Craft 领域物理表名）。"""
 
     def _assert_no_bare_table(self, mc, endpoint_name: str):
         sqls = _collect_sqls(mc)
         assert sqls, f"[{endpoint_name}] 未捕获到任何 SQL 调用"
         for sql in sqls:
             if "vpps_operations" in sql:
-                assert "bop.vpps_operations" in sql, (
-                    f"[{endpoint_name}] SQL 使用裸表名 vpps_operations（缺少 bop. 前缀）:\n{sql}"
+                assert "workmanship_bop_vpps_operations" in sql, (
+                    f"[{endpoint_name}] SQL 未使用 Craft 领域物理表名:\n{sql}"
                 )
 
     def test_bulk_ignore_sql_prefix(self, client, mock_conn):
@@ -865,7 +881,7 @@ class TestVppsAuditSchemaPrefixes:
 import re
 from pathlib import Path
 
-_WEB = Path(__file__).parents[2] / "web"
+_WEB = Path(__file__).parents[2] / "dist" / "web"
 
 
 class TestFrontendJsStaticCheck:
@@ -875,6 +891,9 @@ class TestFrontendJsStaticCheck:
     """
 
     def _read(self, rel_path: str) -> str:
+        if rel_path.startswith("ebom/"):
+            craft_web = Path(__file__).parents[2] / "dist" / "packages" / "craft-plugin" / "web"
+            return (craft_web / rel_path).read_text(encoding="utf-8")
         return (_WEB / rel_path).read_text(encoding="utf-8")
 
     # ── ebom.js ───────────────────────────────────────────────────────────────
