@@ -99,7 +99,7 @@ class TestGetDbParams:
 class TestMysqlSchemaFile:
     """B — mysql_schema.sql 无 PG 专有语法，结构符合 MySQL 8.0 规范。"""
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture
     def schema_text(self):
         assert SCHEMA_FILE.exists(), f"mysql_schema.sql 不存在: {SCHEMA_FILE}"
         return SCHEMA_FILE.read_text(encoding="utf-8")
@@ -429,7 +429,7 @@ class TestMigrateBatch:
 class TestConnectionModule:
     """G — connection.py 已完全切换到 PyMySQL，无 psycopg2 引用。"""
 
-    @pytest.fixture(scope="class")
+    @pytest.fixture
     def conn_source(self):
         conn_file = BACKEND_DIR / "db" / "connection.py"
         assert conn_file.exists()

@@ -150,7 +150,7 @@ def _list_columns(ext_conn, table: str, db_type: str) -> list[dict]:
 # ── 转换表达式安全执行 ─────────────────────────────────────────────────────────
 
 _SAFE_OPS = {ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow,
-             ast.USub, ast.UAdd, ast.Num, ast.Constant, ast.BinOp, ast.UnaryOp,
+             ast.USub, ast.UAdd, ast.Constant, ast.BinOp, ast.UnaryOp,
              ast.Expression, ast.Load}
 _SAFE_FUNCS = {"round", "int", "float", "str", "abs"}
 
