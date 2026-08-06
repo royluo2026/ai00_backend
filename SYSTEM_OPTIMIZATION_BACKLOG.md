@@ -43,7 +43,7 @@
 | AGENT-003 | Agent | 用户私有会话、记忆与团队知识边界验收 | 私聊/群聊/Web会话权限、个人记忆、团队知识提案和审计隔离通过安全测试；聊天不自动进入团队知识 | P1 | AGENT-002、Knowledge能力 | 待设计 | 飞书入口后置但隐私模型先统一 |
 | KNOW-001 | 基座/Knowledge | Knowledge Hub切换到Revision Capability | 编辑、读取、Diff、回滚均走Revision Capability；真实OIS迁移验收后才清理旧`content_md`路径 | P0 | SYS-001 | 待实施 | `IMPROVEMENT_PLAN.md` Phase 2检查点 |
 | KNOW-002 | 基座/Knowledge | 团队Markdown实时共创闭环 | 多人编辑、冲突处理、不可变版本、评论、提案评审、引用证据和完整修改归因通过端到端测试 | P1 | KNOW-001 | 待实施 | 所有已认证人员可看可改；空间不作ACL边界；Agent默认提案优先 |
-| KNOW-003 | 基座/Knowledge | 退役文档ACL兼容面 | Web不再展示文档ACL管理；未注册ACL helper和迁移写入完成真实数据盘点后退役；是否删除旧表单独决策 | P1 | KNOW-001、KNOW-002 | 待实施 | 正常受治理Capability已在Phase 60停止ACL读写；外部Web仍有三个未注册Capability死入口 |
+| KNOW-003 | 基座/Knowledge | 退役文档ACL兼容面 | Web不再展示文档ACL管理；未注册ACL helper和迁移写入完成真实数据盘点后退役；是否删除旧表单独决策 | P1 | KNOW-001、KNOW-002 | 实施中 | 正常Capability已停止ACL读写；Web死入口已在本地分支`codex/knowledge-open-collaboration-web`提交`a71a401`，待集成；helper/旧表仍待真实数据盘点 |
 | PLUGIN-001 | 基座/插件 | 轻量插件中心真实环境E2E | 参考插件完成上传、审核、发布、安装授权、调用计量、停用、升级、回滚、吊销和月度快照；在真实OceanBase/OIS/JWT环境通过 | P0 | SYS-001 | 待验证 | 首期约30人范围不再扩张 |
 | PLUGIN-002 | 基座/插件 | 领域Capability安全开放机制 | Manifest精确版本授权、租户安装授权、用户ACL、风险确认、配额和审计取交集；先开放单项低风险只读能力 | P1 | SYS-002、SYS-005、PLUGIN-001 | 待设计 | 第三方代码不得注入主后端进程 |
 | SIM-001 | Simulation | Craft到Simulation可复现闭环 | Simulation使用已发布`execution_structure`及固定Hash创建环境；来源、重建、补偿和一致性校验可复现 | P1 | CRAFT-001、SYS-002 | 待讨论 | 草稿预览环境必须显式标记，不能冒充正式来源 |

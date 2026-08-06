@@ -35,15 +35,6 @@ class KnowledgeWorkspaceWebContractTests(unittest.TestCase):
         self.assertIn("knowledge.document.diff", source)
         self.assertNotIn("diffLines", source)
         self.assertIn("textContent = result.data?.diff", source)
-    def test_acl_management_uses_capabilities_and_current_team_members(self):
-        start = self.web.index("async function _showWorkspaceAcl")
-        end = self.web.index("async function _showWorkspaceDiff", start)
-        source = self.web[start:end]
-        self.assertIn("knowledge.document.acl.list", source)
-        self.assertIn("knowledge.document.acl.grant", source)
-        self.assertIn("knowledge.document.acl.revoke", source)
-        self.assertIn("/api/teams/", source)
-        self.assertIn("_confirmDialog", source)
     def test_migration_panel_is_read_only_and_capability_backed(self):
         self.assertIn("_makeSpecialNode('migration'", self.web)
         start = self.web.index("async function _renderMigrationStatus")
