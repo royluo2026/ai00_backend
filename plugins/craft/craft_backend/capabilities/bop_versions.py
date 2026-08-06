@@ -20,7 +20,7 @@ from ..data.connection import get_craft_conn
 
 _VERSION_COLUMNS = """
 gid, project_gid, factory_gid, vehicle_model_gid,
-version_tag, version_no, bop_name, version_family_gid,
+version_tag, version_no, revision, bop_name, version_family_gid,
 parent_version_gid, change_note, maturity, takt_time, status,
 frozen_at, published_at, archived_at, version_type, pbom_version_gid,
 owner_gid, data_stage, visibility, lifecycle_phase, lifecycle_state,
@@ -196,7 +196,7 @@ repository = BopVersionRepository()
 
 def _revision(row: Mapping[str, Any]) -> Any:
     meta = _json_object(row.get("meta"))
-    return meta.get("revision") or row.get("version_no") or row.get("version_tag")
+    return row.get("revision") or meta.get("revision") or row.get("version_no") or row.get("version_tag")
 
 
 def _content_hash(row: Mapping[str, Any]) -> str | None:

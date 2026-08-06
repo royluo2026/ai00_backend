@@ -753,6 +753,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_versions (
     vehicle_model_gid CHAR(36) DEFAULT NULL REFERENCES workmanship_proj_vehicle_models(gid) ON DELETE SET NULL,
     version_tag       VARCHAR(255) NOT NULL DEFAULT (''),
     version_no        TEXT,
+    revision          BIGINT NOT NULL DEFAULT 1,
     base_version_gid  CHAR(36) DEFAULT NULL,
     parent_version_gid CHAR(36) DEFAULT NULL,
     change_note       TEXT,

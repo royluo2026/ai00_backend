@@ -119,3 +119,30 @@ def seal_execution_plan(plan: Mapping[str, Any]) -> dict[str, Any]:
     sealed["content_hash"] = compute_content_hash(sealed)
     validate_execution_plan(sealed)
     return sealed
+
+
+class CraftExecutionStructureV1:
+    """Semantic name for the v1 Craft execution snapshot wire contract.
+
+    The wire ID remains ``craft.execution-plan`` until Simulation migrates.
+    """
+
+    contract_id = CONTRACT_ID
+    contract_version = CONTRACT_VERSION
+
+    @classmethod
+    def from_normalized(
+        cls,
+        normalized: Mapping[str, Any],
+        *,
+        official: bool,
+    ) -> dict[str, Any]:
+        plan = copy.deepcopy(dict(normalized))
+        plan["contract_id"] = cls.contract_id
+        plan["contract_version"] = cls.contract_version
+        plan["official"] = official
+        return seal_execution_plan(plan)
+
+
+validate_execution_structure = validate_execution_plan
+seal_execution_structure = seal_execution_plan
