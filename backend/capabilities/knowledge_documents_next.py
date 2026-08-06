@@ -55,8 +55,10 @@ def create_space(payload: dict[str, Any], context: CapabilityContext) -> dict[st
     tenant = _tenant(context)
     name = str(payload.get("name") or "").strip()
     visibility = str(payload.get("visibility") or "team")
-    if not name or len(name) > 512 or visibility not in {"private", "team"}:
-        raise ValueError("valid space name and visibility are required")
+    if not name or len(name) > 512:
+        raise ValueError("valid space name is required")
+    if visibility != "team":
+        raise ValueError("Knowledge spaces are tenant-wide; visibility must be team")
     from backend.db.connection import get_conn
     from backend.utils.gid import next_gid
     gid = str(next_gid())
@@ -77,8 +79,8 @@ def list_spaces(_payload: dict[str, Any], context: CapabilityContext) -> dict[st
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT gid,name,visibility,created_by,updated_at FROM workmanship_know_spaces "
-                "WHERE tenant_gid=%s AND (visibility='team' OR created_by=%s) ORDER BY updated_at DESC",
-                (tenant, context.user_gid),
+                "WHERE tenant_gid=%s ORDER BY updated_at DESC",
+                (tenant,),
             )
             items = [dict(row) for row in cur.fetchall()]
     return {"items": items, "total": len(items)}
@@ -89,8 +91,8 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
     if not markdown.strip():
         raise ValueError("markdown is required")
     visibility = str(payload.get("visibility") or "team")
-    if not existing and visibility not in {"private", "team"}:
-        raise ValueError("visibility must be private or team")
+    if not existing and visibility != "team":
+        raise ValueError("Knowledge documents are tenant-wide; visibility must be team")
     from backend.db.connection import get_conn
     from backend.utils.gid import next_gid
 
@@ -101,12 +103,12 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
                 cur.execute(
                     "SELECT d.*,r.content_sha256 AS before_sha256 FROM workmanship_know_documents d "
                     "LEFT JOIN workmanship_know_revisions r ON r.gid=d.current_revision_gid "
-                    "WHERE d.gid=%s AND d.tenant_gid=%s AND " + _access_sql("edit") + " FOR UPDATE",
-                    (document_gid, tenant, context.user_gid, context.user_gid, tenant),
+                    "WHERE d.gid=%s AND d.tenant_gid=%s FOR UPDATE",
+                    (document_gid, tenant),
                 )
                 document = cur.fetchone()
                 if not document:
-                    raise PermissionError("document not found or edit access denied")
+                    raise LookupError("document not found")
                 document = dict(document)
                 requested_base = str(payload.get("base_revision_gid") or "").strip()
                 current_base = str(document.get("current_revision_gid") or "").strip()
@@ -132,9 +134,8 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
                 if not title or not _SLUG_RE.fullmatch(slug):
                     raise ValueError("title and a safe lowercase slug are required")
                 cur.execute(
-                    "SELECT gid FROM workmanship_know_spaces WHERE gid=%s AND tenant_gid=%s "
-                    "AND (visibility='team' OR created_by=%s)",
-                    (space_gid, tenant, context.user_gid),
+                    "SELECT gid FROM workmanship_know_spaces WHERE gid=%s AND tenant_gid=%s",
+                    (space_gid, tenant),
                 )
                 if not cur.fetchone():
                     raise LookupError("knowledge space not found")
@@ -155,17 +156,6 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
                     "VALUES (%s,%s,%s,%s,%s,'published',%s,%s,%s)",
                     (document_gid, tenant, space_gid, title, slug, revision_gid, revision_gid, context.user_gid),
                 )
-                cur.execute(
-                    "INSERT INTO workmanship_know_document_acl "
-                    "(document_gid,subject_type,subject_gid,permission,created_by) VALUES (%s,'user',%s,'admin',%s)",
-                    (document_gid, context.user_gid, context.user_gid),
-                )
-                if visibility == "team":
-                    cur.execute(
-                        "INSERT INTO workmanship_know_document_acl "
-                        "(document_gid,subject_type,subject_gid,permission,created_by) VALUES (%s,'team',%s,'edit',%s)",
-                        (document_gid, tenant, context.user_gid),
-                    )
             channel = str(context.source or "web")[:32]
             delegated_user_gid = getattr(context, "delegated_user_gid", None)
             agent_run_gid = getattr(context, "agent_run_gid", None) or getattr(context, "agent_run_id", None)
@@ -213,12 +203,12 @@ def get_document(payload: dict[str, Any], context: CapabilityContext) -> Capabil
             cur.execute(
                 "SELECT d.title,d.tenant_gid,d.space_gid,d.gid AS document_gid,r.gid AS revision_gid,r.revision_no,r.object_key,r.content_sha256,r.state "
                 "FROM workmanship_know_documents d JOIN workmanship_know_revisions r ON r.document_gid=d.gid "
-                "WHERE d.gid=%s AND d.tenant_gid=%s AND r.gid=COALESCE(NULLIF(%s,''),d.published_revision_gid) AND " + _access_sql("view"),
-                (document_gid, tenant, revision_gid, context.user_gid, context.user_gid, tenant),
+                "WHERE d.gid=%s AND d.tenant_gid=%s AND r.gid=COALESCE(NULLIF(%s,''),d.published_revision_gid)",
+                (document_gid, tenant, revision_gid),
             )
             row = cur.fetchone()
     if not row:
-        raise LookupError("document or revision not found, or access denied")
+        raise LookupError("document or revision not found")
     row = dict(row)
     markdown = load_markdown_revision(row["object_key"], row["content_sha256"])
     data = {**row, "markdown": markdown}
@@ -236,9 +226,9 @@ def search_documents(payload: dict[str, Any], context: CapabilityContext) -> Cap
             cur.execute(
                 "SELECT d.title,d.slug,d.tenant_gid,d.space_gid,d.gid AS document_gid,r.gid AS revision_gid,r.revision_no,r.object_key,r.content_sha256,r.state "
                 "FROM workmanship_know_documents d JOIN workmanship_know_revisions r ON r.gid=d.published_revision_gid "
-                "WHERE d.tenant_gid=%s AND (d.title LIKE %s OR d.slug LIKE %s) AND " + _access_sql("view") +
+                "WHERE d.tenant_gid=%s AND (d.title LIKE %s OR d.slug LIKE %s)"
                 " ORDER BY d.updated_at DESC LIMIT %s",
-                (tenant, like, like, context.user_gid, context.user_gid, tenant, limit),
+                (tenant, like, like, limit),
             )
             rows = [dict(row) for row in cur.fetchall()]
     items = [
@@ -260,13 +250,13 @@ def list_document_revisions(payload: dict[str, Any], context: CapabilityContext)
                 "r.revision_no,r.base_revision_gid,r.restored_from_revision_gid,r.object_key,"
                 "r.content_sha256,r.byte_size,r.state,r.created_by,r.created_at "
                 "FROM workmanship_know_documents d JOIN workmanship_know_revisions r ON r.document_gid=d.gid "
-                "WHERE d.gid=%s AND d.tenant_gid=%s AND " + _access_sql("view") +
+                "WHERE d.gid=%s AND d.tenant_gid=%s"
                 " ORDER BY r.revision_no DESC LIMIT %s",
-                (document_gid, tenant, context.user_gid, context.user_gid, tenant, limit),
+                (document_gid, tenant, limit),
             )
             rows = [dict(row) for row in cur.fetchall()]
     if not rows:
-        raise LookupError("document not found, or access denied")
+        raise LookupError("document not found")
     items = [
         {key: row.get(key) for key in (
             "document_gid", "revision_gid", "revision_no", "base_revision_gid",
