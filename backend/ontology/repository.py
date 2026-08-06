@@ -105,6 +105,71 @@ class OntologyReleaseRepository:
                 row = cursor.fetchone()
         return dict(row) if row else None
 
+    def resolve_release(self, release_gid: str | None = None) -> dict[str, Any]:
+        with _open_connection(self._connection_factory) as conn:
+            with conn.cursor() as cursor:
+                if release_gid:
+                    cursor.execute(
+                        "SELECT gid AS release_gid,parent_release_gid,content_sha256,object_count,ois_object_key,source,source_gid "
+                        "FROM workmanship_base_ontology_releases WHERE gid=%s",
+                        (release_gid,),
+                    )
+                else:
+                    cursor.execute(
+                        "SELECT r.gid AS release_gid,r.parent_release_gid,r.content_sha256,r.object_count,r.ois_object_key,r.source,r.source_gid "
+                        "FROM workmanship_base_ontology_active_refs a "
+                        "JOIN workmanship_base_ontology_releases r ON r.gid=a.release_gid WHERE a.ref_name='default'",
+                    )
+                row = cursor.fetchone()
+        if not row:
+            raise LookupError("ontology release not found or no active release is configured")
+        return dict(row)
+
+    def list_objects(self, release_gid: str, kinds: set[str] | None = None) -> list[dict[str, Any]]:
+        params: list[Any] = [release_gid]
+        where = "release_gid=%s"
+        if kinds:
+            ordered = sorted(kinds)
+            where += " AND object_kind IN (" + ",".join(["%s"] * len(ordered)) + ")"
+            params.extend(ordered)
+        with _open_connection(self._connection_factory) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT object_kind,stable_object_gid,object_sha256,object_json "
+                    f"FROM workmanship_base_ontology_release_objects WHERE {where} "
+                    "ORDER BY object_kind,stable_object_gid",
+                    tuple(params),
+                )
+                rows = cursor.fetchall()
+        result = []
+        for row in rows:
+            raw = row["object_json"]
+            item = json.loads(raw) if isinstance(raw, str) else dict(raw)
+            item.setdefault("kind", row["object_kind"])
+            item.setdefault("stable_gid", row["stable_object_gid"])
+            item["object_sha256"] = row["object_sha256"]
+            result.append(item)
+        return result
+
+    def get_object(self, release_gid: str, kind: str, stable_gid: str) -> dict[str, Any] | None:
+        with _open_connection(self._connection_factory) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT object_kind,stable_object_gid,object_sha256,object_json "
+                    "FROM workmanship_base_ontology_release_objects "
+                    "WHERE release_gid=%s AND object_kind=%s AND stable_object_gid=%s",
+                    (release_gid, kind, stable_gid),
+                )
+                row = cursor.fetchone()
+        if not row:
+            return None
+        raw = row["object_json"]
+        item = json.loads(raw) if isinstance(raw, str) else dict(raw)
+        item.setdefault("kind", row["object_kind"])
+        item.setdefault("stable_gid", row["stable_object_gid"])
+        item["object_sha256"] = row["object_sha256"]
+        return item
+
     def activate(
         self,
         *,

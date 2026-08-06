@@ -15,6 +15,7 @@ class CapabilityKernelContractTests(unittest.TestCase):
         expected_owners = {
             "system": "base",
             "knowledge": "knowledge",
+            "ontology": "ontology",
             "plugin": "plugin",
             "local": "runtime",
             "vismockup": "vismockup",
