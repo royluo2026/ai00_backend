@@ -3,6 +3,7 @@
   "name": "工艺规划",
   "backend": {
     "routers_module": "craft_backend.routers",
+    "capabilities_module": "craft_backend.capabilities",
     "owned_schemas": ["bop", "template", "factory", "proj"]
   }
 }

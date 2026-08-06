@@ -1,0 +1,65 @@
+import json
+from pathlib import Path
+
+import pytest
+
+from backend.capabilities.registry_next import CapabilityRegistry
+from backend.plugin_loader import PluginLoader
+
+
+def test_official_craft_provider_loads_without_kernel_importing_craft():
+    root = Path(__file__).resolve().parents[2]
+    loader = PluginLoader(root / "missing-packages", root / "plugins")
+    loader.discover()
+
+    loaded = loader.register_capabilities(CapabilityRegistry())
+
+    assert loaded == ("official.craft",)
+    kernel_source = (root / "backend/capabilities/registry_next.py").read_text(encoding="utf-8")
+    assert "craft_backend" not in kernel_source
+    assert "plugins.craft" not in kernel_source
+
+
+def test_third_party_manifest_cannot_load_backend_provider(tmp_path):
+    packages = tmp_path / "packages"
+    plugins = tmp_path / "plugins"
+    package = packages / "third-party"
+    package.mkdir(parents=True)
+    plugins.mkdir()
+    (package / "manifest.json").write_text(
+        json.dumps(
+            {
+                "plugin_id": "third.example",
+                "backend": {"capabilities_module": "third_party.capabilities"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    loader = PluginLoader(packages, plugins)
+
+    found = loader.discover()
+
+    assert "backend" not in found[0]
+    assert loader.register_capabilities(CapabilityRegistry()) == ()
+
+
+def test_declared_official_provider_failure_aborts_registration(tmp_path):
+    packages = tmp_path / "packages"
+    plugins = tmp_path / "plugins"
+    package = packages / "broken"
+    package.mkdir(parents=True)
+    plugins.mkdir()
+    (package / "manifest.json").write_text(
+        json.dumps(
+            {
+                "plugin_id": "official.broken",
+                "backend": {"capabilities_module": "module_that_does_not_exist"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    loader = PluginLoader(packages, plugins)
+    loader.discover()
+
+    with pytest.raises(RuntimeError, match="official.broken"):
+        loader.register_capabilities(CapabilityRegistry())

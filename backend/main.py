@@ -210,6 +210,8 @@ from backend.plugin_loader import PluginLoader as _PluginLoader
 
 _plugin_loader = _PluginLoader()
 _plugin_loader.discover()
+from backend.capabilities.registry_next import capability_registry as _capability_registry
+_plugin_capability_providers = _plugin_loader.register_capabilities(_capability_registry)
 
 # 收集所有插件声明的 OWNED_MODULES（这些模块由插件管理，不走 auto-scan）
 _plugin_owned: set[str] = set()

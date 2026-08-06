@@ -128,6 +128,40 @@ class PluginLoader:
 
         return routers
 
+    def register_capabilities(self, registry) -> tuple[str, ...]:
+        """Load Capability providers declared by official backend manifests."""
+        loaded: list[str] = []
+        for manifest in self._plugins:
+            plugin_id = str(manifest.get("plugin_id") or "")
+            if not plugin_id.startswith("official."):
+                continue
+            module_path = manifest.get("backend", {}).get("capabilities_module")
+            if not module_path:
+                continue
+
+            pkg_dir = self._plugin_backend_dirs.get(plugin_id) or self._plugin_dirs.get(plugin_id)
+            pkg_dir_str = str(pkg_dir) if pkg_dir else None
+            injected = False
+            if pkg_dir_str and pkg_dir_str not in sys.path:
+                sys.path.insert(0, pkg_dir_str)
+                injected = True
+
+            try:
+                mod = importlib.import_module(module_path)
+                register = getattr(mod, "register_capabilities")
+                register(registry)
+                loaded.append(plugin_id)
+                logger.info(f"[PluginLoader] 加载 Capability provider: {plugin_id} from {module_path}")
+            except Exception as exc:
+                raise RuntimeError(
+                    f"Capability provider load failed: {plugin_id} ({module_path})"
+                ) from exc
+            finally:
+                if injected and pkg_dir_str in sys.path:
+                    sys.path.remove(pkg_dir_str)
+
+        return tuple(loaded)
+
     def get_web_registry(self) -> dict:
         """
         为网页版构建插件注册表（tab 定义 + nav 项）。
