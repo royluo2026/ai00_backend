@@ -79,6 +79,9 @@ register_knowledge_capabilities(capability_registry)
 from .knowledge_documents_next import register_knowledge_document_capabilities
 register_knowledge_document_capabilities(capability_registry)
 
+from .knowledge_context_next import register_knowledge_context_capability
+register_knowledge_context_capability(capability_registry)
+
 from .knowledge_migration_next import register_knowledge_migration_capabilities
 register_knowledge_migration_capabilities(capability_registry)
 

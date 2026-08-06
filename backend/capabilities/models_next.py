@@ -22,6 +22,8 @@ class CapabilitySpec(BaseModel):
     do_not_use_when: str = ""
     subject_concepts: tuple[str, ...] = ()
     effects: tuple[str, ...] = ()
+    deprecated: bool = False
+    replaced_by: str | None = None
     description: str = ""
     execution: CapabilityExecution = CapabilityExecution.CLOUD
     risk: CapabilityRisk = CapabilityRisk.READ

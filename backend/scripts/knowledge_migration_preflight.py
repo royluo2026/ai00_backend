@@ -62,6 +62,7 @@ def evaluate(
     required_migrations = (
         "202608040003_knowledge_markdown_revisions.sql",
         "202608040004_knowledge_legacy_migration_runs.sql",
+        "202608060002_knowledge_revision_attribution.sql",
     )
     migration_root = REPO_ROOT / "backend/db/migrations"
     missing_migrations = [name for name in required_migrations if not (migration_root / name).is_file()]
@@ -74,7 +75,7 @@ def evaluate(
     from backend.capabilities.registry_next import capability_registry
     required_capabilities = (
         "knowledge.document.get",
-        "knowledge.document.revisions",
+        "knowledge.document.history.get",
         "knowledge.migration.status",
     )
     missing_capabilities = []

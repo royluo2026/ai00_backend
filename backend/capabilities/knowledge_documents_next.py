@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from .models_next import CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from .models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from backend.knowledge.revision_store import (
     load_markdown_revision,
     prepare_markdown_revision,
@@ -99,17 +99,32 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
             if existing:
                 document_gid = str(payload.get("document_gid") or "").strip()
                 cur.execute(
-                    "SELECT d.* FROM workmanship_know_documents d WHERE d.gid=%s AND d.tenant_gid=%s AND " + _access_sql("edit") + " FOR UPDATE",
+                    "SELECT d.*,r.content_sha256 AS before_sha256 FROM workmanship_know_documents d "
+                    "LEFT JOIN workmanship_know_revisions r ON r.gid=d.current_revision_gid "
+                    "WHERE d.gid=%s AND d.tenant_gid=%s AND " + _access_sql("edit") + " FOR UPDATE",
                     (document_gid, tenant, context.user_gid, context.user_gid, tenant),
                 )
                 document = cur.fetchone()
                 if not document:
                     raise PermissionError("document not found or edit access denied")
                 document = dict(document)
+                requested_base = str(payload.get("base_revision_gid") or "").strip()
+                current_base = str(document.get("current_revision_gid") or "").strip()
+                if requested_base != current_base:
+                    raise CapabilityBusinessError(
+                        "revision_conflict",
+                        "The document changed after the caller loaded it.",
+                        details={
+                            "document_gid": document_gid,
+                            "requested_base_revision_gid": requested_base,
+                            "current_revision_gid": current_base,
+                        },
+                    )
                 title = title or str(document["title"])
                 cur.execute("SELECT COALESCE(MAX(revision_no),0) AS n FROM workmanship_know_revisions WHERE document_gid=%s", (document_gid,))
                 revision_no = int(cur.fetchone()["n"]) + 1
-                base_revision_gid = document.get("current_revision_gid")
+                base_revision_gid = current_base
+                before_sha256 = document.get("before_sha256")
                 space_gid = str(document["space_gid"])
             else:
                 space_gid = str(payload.get("space_gid") or "").strip()
@@ -126,6 +141,7 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
                 document_gid = str(next_gid())
                 revision_no = 1
                 base_revision_gid = None
+                before_sha256 = None
             revision_gid = str(next_gid())
             prepared = prepare_markdown_revision(
                 tenant_gid=tenant, space_gid=space_gid, document_gid=document_gid,
@@ -150,11 +166,17 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
                         "(document_gid,subject_type,subject_gid,permission,created_by) VALUES (%s,'team',%s,'edit',%s)",
                         (document_gid, tenant, context.user_gid),
                     )
+            channel = str(context.source or "web")[:32]
+            delegated_user_gid = getattr(context, "delegated_user_gid", None)
+            agent_run_gid = getattr(context, "agent_run_gid", None) or getattr(context, "agent_run_id", None)
+            plugin_id = getattr(context, "plugin_id", None)
+            plugin_version = getattr(context, "plugin_version", None)
+            change_summary = str(payload.get("change_summary") or "").strip()[:2048] or None
             cur.execute(
                 "INSERT INTO workmanship_know_revisions "
-                "(gid,tenant_gid,space_gid,document_gid,revision_no,base_revision_gid,restored_from_revision_gid,object_key,content_sha256,byte_size,media_type,state,created_by) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'published',%s)",
-                (revision_gid, tenant, space_gid, document_gid, revision_no, base_revision_gid, payload.get("_restored_from_revision_gid"), stored["object_key"], stored["sha256"], stored["byte_size"], stored["media_type"], context.user_gid),
+                "(gid,tenant_gid,space_gid,document_gid,revision_no,base_revision_gid,restored_from_revision_gid,object_key,content_sha256,byte_size,media_type,state,created_by,channel,delegated_user_gid,agent_run_gid,plugin_id,plugin_version,request_id,before_sha256,after_sha256,change_summary) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'published',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (revision_gid, tenant, space_gid, document_gid, revision_no, base_revision_gid, payload.get("_restored_from_revision_gid"), stored["object_key"], stored["sha256"], stored["byte_size"], stored["media_type"], context.user_gid, channel, delegated_user_gid, agent_run_gid, plugin_id, plugin_version, context.request_id, before_sha256, stored["sha256"], change_summary),
             )
             if existing:
                 cur.execute(
@@ -304,6 +326,7 @@ def rollback_document(payload: dict[str, Any], context: CapabilityContext) -> Ca
             "document_gid": document_gid,
             "title": target.get("title") or "",
             "markdown": target["markdown"],
+            "base_revision_gid": str(payload.get("base_revision_gid") or ""),
             "_restored_from_revision_gid": target_revision_gid,
         },
         context,
@@ -403,15 +426,65 @@ def grant_document_acl(payload: dict[str, Any], context: CapabilityContext) -> d
 
 
 def register_knowledge_document_capabilities(registry) -> None:
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.space.create", version=1, description="Create a tenant Knowledge Workspace space.", risk="write", confirmation="user", idempotent=False, permissions=("knowledge.manage",), input_schema={"type":"object","required":["name"]}, output_schema={"type":"object"}, tags=("knowledge","space","write")), create_space)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.space.list", version=1, description="List spaces visible to the current user.", permissions=("knowledge.view",), input_schema={"type":"object"}, output_schema={"type":"object"}, tags=("knowledge","space","read")), list_spaces)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.create", version=1, description="Create a published Markdown document revision in immutable OIS storage.", risk="write", confirmation="user", idempotent=False, permissions=("knowledge.manage",), input_schema={"type":"object","required":["space_gid","title","slug","markdown"]}, output_schema={"type":"object"}, tags=("knowledge","document","write")), create_document)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.revise", version=1, description="Publish a new immutable revision of a document.", risk="write", confirmation="user", idempotent=False, permissions=("knowledge.manage",), input_schema={"type":"object","required":["document_gid","markdown"]}, output_schema={"type":"object"}, tags=("knowledge","document","write")), revise_document)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.search", version=1, description="Search authorized published document revisions by title or slug.", permissions=("knowledge.view",), input_schema={"type":"object"}, output_schema={"type":"object"}, tags=("knowledge","document","read")), search_documents)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.get", version=1, description="Read one authorized immutable Markdown revision with evidence.", permissions=("knowledge.view",), input_schema={"type":"object","required":["document_gid"]}, output_schema={"type":"object"}, tags=("knowledge","document","read")), get_document)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.revisions", version=1, description="List authorized immutable revision metadata for a document.", permissions=("knowledge.view",), input_schema={"type":"object","required":["document_gid"]}, output_schema={"type":"object"}, tags=("knowledge","document","read")), list_document_revisions)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.diff", version=1, description="Diff two authorized immutable Markdown revisions.", permissions=("knowledge.view",), input_schema={"type":"object","required":["document_gid","from_revision_gid","to_revision_gid"]}, output_schema={"type":"object"}, tags=("knowledge","document","read")), diff_document_revisions)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.rollback", version=1, description="Restore a historical revision by publishing a new immutable revision.", risk="write", confirmation="user", idempotent=False, permissions=("knowledge.manage",), input_schema={"type":"object","required":["document_gid","target_revision_gid"]}, output_schema={"type":"object"}, tags=("knowledge","document","write")), rollback_document)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.acl.list", version=1, description="List document ACL entries for document administrators.", permissions=("knowledge.manage",), input_schema={"type":"object","required":["document_gid"]}, output_schema={"type":"object"}, tags=("knowledge","acl","read")), list_document_acl)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.acl.revoke", version=1, description="Revoke one document ACL entry without removing creator administration.", risk="write", confirmation="user", idempotent=True, permissions=("knowledge.manage",), input_schema={"type":"object","required":["document_gid","subject_type","subject_gid"]}, output_schema={"type":"object"}, tags=("knowledge","acl","write")), revoke_document_acl)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.document.acl.grant", version=1, description="Grant document access inside the current tenant.", risk="write", confirmation="user", idempotent=True, permissions=("knowledge.manage",), input_schema={"type":"object","required":["document_gid","subject_type","subject_gid","permission"]}, output_schema={"type":"object"}, tags=("knowledge","acl","write")), grant_document_acl)
+    common = {
+        "owner": "knowledge",
+        "subject_concepts": ("knowledge.document", "knowledge.revision"),
+        "plugin_callable": True,
+        "output_schema": {"type": "object"},
+    }
+    registry.register(CapabilitySpec(
+        **common, id="knowledge.space.search", description="Search spaces available in the current tenant.",
+        use_when="A caller needs a knowledge space.", do_not_use_when="The space gid is already known.",
+        effects=("read:knowledge.space",), input_schema={"type": "object"}, tags=("knowledge", "space", "read")), list_spaces)
+    registry.register(CapabilitySpec(
+        **common, id="knowledge.space.create", description="Create a tenant Knowledge Workspace space.",
+        use_when="A new collaboration boundary is required.", do_not_use_when="A suitable space already exists.",
+        effects=("create:knowledge.space",), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "required": ["name"]}, tags=("knowledge", "space", "write")), create_space)
+    registry.register(CapabilitySpec(
+        **common, id="knowledge.document.get", description="Read one immutable Markdown revision with evidence.",
+        use_when="An exact document or revision is required.", do_not_use_when="Only bounded decision context is needed.",
+        effects=("read:knowledge.document",), input_schema={"type": "object", "required": ["document_gid"]},
+        tags=("knowledge", "document", "read")), get_document)
+    registry.register(CapabilitySpec(
+        **common, id="knowledge.document.create", description="Create a published Markdown document revision in immutable OIS storage.",
+        use_when="A new knowledge document is required.", do_not_use_when="Updating an existing document.",
+        effects=("create:knowledge.document", "create:knowledge.revision"), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "required": ["space_gid", "title", "slug", "markdown"]},
+        tags=("knowledge", "document", "write")), create_document)
+    registry.register(CapabilitySpec(
+        **common, id="knowledge.document.revise", description="Publish a new immutable revision with optimistic concurrency.",
+        use_when="Updating a document from a known base revision.", do_not_use_when="The caller has not loaded the current revision.",
+        effects=("create:knowledge.revision", "update:knowledge.document_head"), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "required": ["document_gid", "base_revision_gid", "markdown"]},
+        tags=("knowledge", "document", "write")), revise_document)
+    registry.register(CapabilitySpec(
+        **common, id="knowledge.document.diff", description="Diff two immutable Markdown revisions.",
+        use_when="A caller needs exact changes between revisions.", do_not_use_when="Only revision metadata is required.",
+        effects=("read:knowledge.revision",), input_schema={"type": "object", "required": ["document_gid", "from_revision_gid", "to_revision_gid"]},
+        tags=("knowledge", "document", "read")), diff_document_revisions)
+    registry.register(CapabilitySpec(
+        **common, id="knowledge.document.history.get", description="List immutable revision metadata for a document.",
+        use_when="A caller needs attribution or revision history.", do_not_use_when="The exact revision is already known.",
+        effects=("read:knowledge.revision",), input_schema={"type": "object", "required": ["document_gid"]},
+        tags=("knowledge", "document", "read")), list_document_revisions)
+    registry.register(CapabilitySpec(
+        **common, id="knowledge.document.restore", description="Restore historical content by publishing a new immutable revision.",
+        use_when="Historical content must become the new head without deleting history.", do_not_use_when="Only reading old content.",
+        effects=("create:knowledge.revision", "update:knowledge.document_head"), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "required": ["document_gid", "base_revision_gid", "target_revision_gid"]},
+        tags=("knowledge", "document", "write")), rollback_document)
+
+    aliases = (
+        ("knowledge.space.list", "knowledge.space.search", list_spaces, {"type": "object"}, "read"),
+        ("knowledge.document.revisions", "knowledge.document.history.get", list_document_revisions, {"type": "object", "required": ["document_gid"]}, "read"),
+        ("knowledge.document.rollback", "knowledge.document.restore", rollback_document, {"type": "object", "required": ["document_gid", "base_revision_gid", "target_revision_gid"]}, "write"),
+    )
+    for alias, replacement, handler, input_schema, risk in aliases:
+        registry.register(CapabilitySpec(
+            owner="knowledge", id=alias, description=f"Deprecated compatibility alias for {replacement}.",
+            use_when="Migrating a legacy internal consumer.", do_not_use_when=f"New callers must use {replacement}.",
+            subject_concepts=("knowledge.document", "knowledge.revision"), effects=("compatibility:knowledge",),
+            deprecated=True, replaced_by=replacement, plugin_callable=False, risk=risk,
+            confirmation="user" if risk == "write" else "none", idempotent=risk != "write",
+            input_schema=input_schema, output_schema={"type": "object"}, tags=("knowledge", "deprecated")), handler)
