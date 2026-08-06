@@ -125,6 +125,15 @@ class OntologyReleaseRepository:
             raise LookupError("ontology release not found or no active release is configured")
         return dict(row)
 
+    def search_releases(self, limit: int = 50) -> list[dict[str, Any]]:
+        with _open_connection(self._connection_factory) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT gid AS release_gid,parent_release_gid,content_sha256,object_count,ois_object_key,source,source_gid,created_by,created_at "
+                    "FROM workmanship_base_ontology_releases ORDER BY created_at DESC LIMIT %s",
+                    (max(1, min(limit, 100)),),
+                )
+                return [dict(row) for row in cursor.fetchall()]
     def list_objects(self, release_gid: str, kinds: set[str] | None = None) -> list[dict[str, Any]]:
         params: list[Any] = [release_gid]
         where = "release_gid=%s"

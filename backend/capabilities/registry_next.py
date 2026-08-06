@@ -88,6 +88,9 @@ register_ontology_concept_capabilities(capability_registry)
 from .ontology_proposals_next import register_ontology_proposal_capabilities
 register_ontology_proposal_capabilities(capability_registry)
 
+from .ontology_releases_next import register_ontology_release_capabilities
+register_ontology_release_capabilities(capability_registry)
+
 from .knowledge_migration_next import register_knowledge_migration_capabilities
 register_knowledge_migration_capabilities(capability_registry)
 

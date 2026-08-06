@@ -206,6 +206,16 @@ class OntologyProposalRepository:
                 )
                 return [dict(row) for row in cursor.fetchall()]
 
+    def list_reviews(self, proposal_gid: str, proposal_revision_gid: str) -> list[dict[str, Any]]:
+        with _open(self._connection_factory) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT gid AS review_gid,proposal_gid,proposal_revision_gid,content_sha256,decision,reviewer_gid,comment,created_at "
+                    "FROM workmanship_base_ontology_proposal_reviews "
+                    "WHERE proposal_gid=%s AND proposal_revision_gid=%s ORDER BY created_at",
+                    (proposal_gid, proposal_revision_gid),
+                )
+                return [dict(row) for row in cursor.fetchall()]
     def save_review(
         self, *, review_gid: str, proposal_gid: str, proposal_revision_gid: str,
         content_sha256: str, decision: str, reviewer_gid: str, comment: str | None,
