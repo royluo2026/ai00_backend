@@ -59,7 +59,7 @@ def register_proposal_capability(registry) -> None:
     from .models_next import CapabilitySpec
 
     registry.register(
-        CapabilitySpec(
+        CapabilitySpec(owner="knowledge",
             id="knowledge.propose",
             version=1,
             description="提交一份待评审的 Markdown 知识提案，不直接修改正式知识库。",

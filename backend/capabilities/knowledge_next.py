@@ -86,5 +86,5 @@ def search_knowledge(payload: dict[str, Any], context: CapabilityContext) -> dic
 
 def register_knowledge_capabilities(registry) -> None:
     from .models_next import CapabilitySpec
-    registry.register(CapabilitySpec(id="knowledge.get", version=1, description="读取当前用户有权访问的知识条目及 Markdown 正文.", permissions=("knowledge.view",), input_schema={"type": "object", "required": ["gid"]}, output_schema={"type": "object"}, tags=("knowledge", "read")), get_knowledge)
-    registry.register(CapabilitySpec(id="knowledge.search", version=1, description="按标题、Markdown 正文和标签搜索知识条目.", permissions=("knowledge.view",), input_schema={"type": "object"}, output_schema={"type": "object"}, tags=("knowledge", "read")), search_knowledge)
+    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.get", version=1, description="读取当前用户有权访问的知识条目及 Markdown 正文.", permissions=("knowledge.view",), input_schema={"type": "object", "required": ["gid"]}, output_schema={"type": "object"}, tags=("knowledge", "read")), get_knowledge)
+    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.search", version=1, description="按标题、Markdown 正文和标签搜索知识条目.", permissions=("knowledge.view",), input_schema={"type": "object"}, output_schema={"type": "object"}, tags=("knowledge", "read")), search_knowledge)

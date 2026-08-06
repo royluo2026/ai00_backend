@@ -132,7 +132,7 @@ def register_plugin_storage_capabilities(registry) -> None:
     list_schema = {"type": "object", "properties": {"prefix": {"type": "string"}, "limit": {"type": "integer"}}, "additionalProperties": False}
     put_schema = {"type": "object", "required": ["key", "value"], "properties": {"key": {"type": "string"}, "value": {}, "expected_version": {"type": "integer"}}, "additionalProperties": False}
     delete_schema = {"type": "object", "required": ["key"], "properties": {"key": {"type": "string"}, "expected_version": {"type": "integer"}}, "additionalProperties": False}
-    common = {"version": 1, "plugin_callable": True, "output_schema": {"type": "object"}, "tags": ("plugin", "storage")}
+    common = {"version": 1, "owner": "plugin", "plugin_callable": True, "output_schema": {"type": "object"}, "tags": ("plugin", "storage")}
     registry.register(CapabilitySpec(id="plugin.storage.get", description="Read a value from the caller plugin namespace.", input_schema=key_schema, **common), get_value)
     registry.register(CapabilitySpec(id="plugin.storage.list", description="List keys in the caller plugin namespace.", input_schema=list_schema, **common), list_values)
     registry.register(CapabilitySpec(id="plugin.storage.put", description="Create or replace a value using optimistic versioning.", risk=CapabilityRisk.WRITE, idempotent=False, input_schema=put_schema, **common), put_value)

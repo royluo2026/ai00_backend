@@ -9,7 +9,7 @@ BASE_SCHEMA = {"type": "object", "required": ["plugin_id"], "properties": {"plug
 
 
 def _spec(capability_id: str, description: str, schema: dict) -> CapabilitySpec:
-    return CapabilitySpec(id=capability_id, version=1, description=description, risk=CapabilityRisk.WRITE, confirmation="admin", permissions=("system.plugin.manage",), input_schema=schema, output_schema={"type": "object"}, tags=("plugin", "marketplace", "admin"))
+    return CapabilitySpec(owner="plugin", id=capability_id, version=1, description=description, risk=CapabilityRisk.WRITE, confirmation="admin", permissions=("system.plugin.manage",), input_schema=schema, output_schema={"type": "object"}, tags=("plugin", "marketplace", "admin"))
 
 
 def register_plugin_marketplace_capabilities(registry) -> None:

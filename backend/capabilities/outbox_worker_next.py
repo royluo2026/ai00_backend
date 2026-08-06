@@ -127,7 +127,7 @@ def worker_health(_payload: dict[str, Any], _context) -> dict[str, Any]:
 
 def register_worker_capability(registry) -> None:
     from .models_next import CapabilitySpec
-    registry.register(CapabilitySpec(
+    registry.register(CapabilitySpec(owner="base",
         id="system.worker.outbox.health", version=1,
         description="查看知识发布 worker 心跳、队列数量和告警数量。",
         permissions=("system.tech_config",), input_schema={"type": "object"},

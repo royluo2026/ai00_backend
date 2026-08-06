@@ -32,7 +32,7 @@ def list_outbox(payload: dict[str, Any], context) -> dict[str, Any]:
 
 def register_outbox_capability(registry) -> None:
     from .models_next import CapabilitySpec
-    registry.register(CapabilitySpec(
+    registry.register(CapabilitySpec(owner="knowledge",
         id="knowledge.proposal.outbox.list", version=1,
         description="查看当前用户或团队可见的知识发布补偿队列。",
         permissions=("knowledge.manage",),

@@ -101,7 +101,7 @@ def register_review_capability(registry) -> None:
     from .models_next import CapabilitySpec
 
     registry.register(
-        CapabilitySpec(
+        CapabilitySpec(owner="knowledge",
             id="knowledge.proposal.review",
             version=1,
             description="审核知识提案；通过后将 Markdown 写入 OIS 并生成正式知识条目。",

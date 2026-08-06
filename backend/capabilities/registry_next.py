@@ -54,14 +54,15 @@ class CapabilityRegistry:
         try:
             value = item.handler(payload, context)
             if inspect.isawaitable(value): value = await value
+            evidence = ()
+            if isinstance(value, CapabilityOutput):
+                evidence = value.evidence
+                value = value.data
+            validate_payload(dict(item.spec.output_schema), value, label="output")
         except Exception as exc:
             audit_sink.record(capability_id=item.spec.id, version=item.spec.version, context=context, payload=payload, status="failed", error=str(exc))
             record_usage(context, item.spec.id, False)
             raise
-        evidence = ()
-        if isinstance(value, CapabilityOutput):
-            evidence = value.evidence
-            value = value.data
         audit_sink.record(capability_id=item.spec.id, version=item.spec.version, context=context, payload=payload, status="succeeded")
         record_usage(context, item.spec.id, True)
         audit = {"source": context.source, "user_gid": context.user_gid, "request_id": context.request_id}
@@ -71,7 +72,7 @@ class CapabilityRegistry:
         return CapabilityResult(capability_id=item.spec.id, version=item.spec.version, data=value, evidence=evidence, audit=audit)
 
 capability_registry = CapabilityRegistry()
-capability_registry.register(CapabilitySpec(id="system.echo", version=1, description="Return the supplied JSON payload; used to verify adapters.", plugin_callable=True, input_schema={"type": "object"}, output_schema={"type": "object"}, tags=("system", "diagnostic")), lambda payload, _context: payload)
+capability_registry.register(CapabilitySpec(id="system.echo", version=1, owner="base", description="Return the supplied JSON payload; used to verify adapters.", plugin_callable=True, input_schema={"type": "object"}, output_schema={"type": "object"}, tags=("system", "diagnostic")), lambda payload, _context: payload)
 from .knowledge_next import register_knowledge_capabilities
 register_knowledge_capabilities(capability_registry)
 

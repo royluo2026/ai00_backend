@@ -17,6 +17,11 @@ class CapabilitySpec(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}$")
     version: int = Field(default=1, ge=1)
+    owner: str = Field(pattern=r"^[a-z][a-z0-9_.-]{1,63}$")
+    use_when: str = ""
+    do_not_use_when: str = ""
+    subject_concepts: tuple[str, ...] = ()
+    effects: tuple[str, ...] = ()
     description: str = ""
     execution: CapabilityExecution = CapabilityExecution.CLOUD
     risk: CapabilityRisk = CapabilityRisk.READ
@@ -54,6 +59,24 @@ class CapabilityError(BaseModel):
     message: str
     retryable: bool = False
     details: Mapping[str, Any] = Field(default_factory=dict)
+
+
+class CapabilityBusinessError(RuntimeError):
+    """Stable domain failure raised by handlers without owning HTTP semantics."""
+
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        *,
+        retryable: bool = False,
+        details: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.retryable = retryable
+        self.details = dict(details or {})
 
 
 class CapabilityOutput(BaseModel):

@@ -92,7 +92,7 @@ def migration_status(payload: dict[str, Any], context: CapabilityContext) -> dic
 
 def register_knowledge_migration_capabilities(registry) -> None:
     registry.register(
-        CapabilitySpec(
+        CapabilitySpec(owner="knowledge",
             id="knowledge.migration.status",
             version=1,
             description="Inspect tenant-safe legacy Markdown migration readiness and audited runs.",

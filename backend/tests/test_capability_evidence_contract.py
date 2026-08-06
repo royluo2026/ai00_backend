@@ -8,7 +8,7 @@ class CapabilityEvidenceContractTests(unittest.IsolatedAsyncioTestCase):
     async def test_handler_evidence_is_separate_from_business_data(self):
         registry = CapabilityRegistry()
         registry.register(
-            CapabilitySpec(id="test.evidence", plugin_callable=True),
+            CapabilitySpec(id="test.evidence", owner="test", plugin_callable=True),
             lambda _payload, _context: CapabilityOutput(
                 data={"decision": "pass"},
                 evidence=(EvidenceRef(kind="ois.revision", reference="ois://knowledge/rev-1", digest="sha256:abc", summary="published revision"),),

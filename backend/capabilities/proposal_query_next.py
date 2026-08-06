@@ -62,7 +62,7 @@ def register_proposal_query_capabilities(registry) -> None:
     from .models_next import CapabilitySpec
 
     registry.register(
-        CapabilitySpec(
+        CapabilitySpec(owner="knowledge",
             id="knowledge.proposal.list",
             version=1,
             description="列出当前管理员可审核的知识提案。",
@@ -74,7 +74,7 @@ def register_proposal_query_capabilities(registry) -> None:
         list_proposals,
     )
     registry.register(
-        CapabilitySpec(
+        CapabilitySpec(owner="knowledge",
             id="knowledge.proposal.get",
             version=1,
             description="获取一份知识提案的完整 Markdown 和审核状态。",

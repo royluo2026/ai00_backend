@@ -83,7 +83,7 @@ def retry_publish(payload: dict[str, Any], context) -> dict[str, Any]:
 
 def register_retry_capability(registry) -> None:
     from .models_next import CapabilitySpec
-    registry.register(CapabilitySpec(
+    registry.register(CapabilitySpec(owner="knowledge",
         id="knowledge.proposal.outbox.retry", version=1,
         description="重试一个 OIS 知识发布补偿任务，幂等创建正式知识条目。",
         risk="write", confirmation="user", permissions=("knowledge.manage",),

@@ -6,7 +6,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
-from backend.capabilities.init_next import CapabilityContext, CapabilityPermissionError, capability_registry
+from backend.capabilities.init_next import CapabilityBusinessError, CapabilityContext, CapabilityError, CapabilityPermissionError, capability_registry
 from backend.capabilities.registry_next import CapabilityConfirmationError
 from backend.capabilities.confirmation_next import confirmation_manager
 from backend.capabilities.validation_next import validate_payload
@@ -18,6 +18,27 @@ class InvokeRequest(BaseModel):
     payload: dict[str, Any] = Field(default_factory=dict)
     version: int | None = Field(default=None, ge=1)
     confirmation_token: str | None = None
+
+
+_BUSINESS_ERROR_STATUS = {
+    "resource_not_found": 404,
+    "version_not_found": 404,
+    "version_not_published": 409,
+    "state_conflict": 409,
+    "precondition_failed": 412,
+}
+
+def _business_error_http_exception(error: CapabilityBusinessError) -> HTTPException:
+    payload = CapabilityError(
+        code=error.code,
+        message=error.message,
+        retryable=error.retryable,
+        details=error.details,
+    )
+    return HTTPException(
+        status_code=_BUSINESS_ERROR_STATUS.get(error.code, 422),
+        detail=payload.model_dump(mode="json"),
+    )
 
 
 def _build_router(prefix: str) -> APIRouter:
@@ -104,6 +125,8 @@ def _build_router(prefix: str) -> APIRouter:
         )
         try:
             result = await capability_registry.invoke(capability_id, body.payload, context, version=body.version)
+        except CapabilityBusinessError as exc:
+            raise _business_error_http_exception(exc) from exc
         except CapabilityConfirmationError as exc:
             raise HTTPException(status_code=409, detail={"code": "confirmation_rejected", "message": str(exc)}) from exc
         except CapabilityPermissionError as exc:

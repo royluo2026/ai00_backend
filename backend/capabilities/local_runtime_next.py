@@ -30,13 +30,13 @@ def register_local_runtime_capabilities(registry) -> None:
     ]
     for capability_id, description, risk, confirmation, schema in specs:
         registry.register(CapabilitySpec(
-            id=capability_id, version=1, description=description, execution="local", risk=risk,
+            owner="vismockup", id=capability_id, version=1, description=description, execution="local", risk=risk,
             confirmation=confirmation, permissions=("agent.run",), input_schema=schema,
             output_schema={"type":"object"}, device_capability=capability_id,
             tags=("vismockup", "local", risk),
         ), _handler(capability_id))
     registry.register(CapabilitySpec(
-        id="local.command.get", version=1, description="读取本人发起的本地命令状态和结果。",
+        owner="runtime", id="local.command.get", version=1, description="读取本人发起的本地命令状态和结果。",
         permissions=("agent.run",), input_schema={"type":"object","required":["command_gid"],"properties":{"command_gid":{"type":"string"}},"additionalProperties":False},
         output_schema={"type":"object"}, tags=("local", "read"),
     ), _get_command)
