@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from .bop_versions import register_bop_version_capabilities
+
 
 def register_capabilities(registry: Any) -> None:
     """Register Craft-owned handlers; never mount routers or start workers."""
-    # Domain capabilities are added incrementally by the agreed implementation plan.
-    # Keeping the provider callable while empty establishes the ownership boundary.
-    del registry
+    register_bop_version_capabilities(registry)
