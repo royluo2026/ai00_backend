@@ -329,7 +329,7 @@ def register_bop_version_capabilities(registry: Any) -> None:
             do_not_use_when="The caller needs to discover or compare versions.",
             subject_concepts=("craft.bop.version",),
             effects=("read:craft.bop.version",),
-            plugin_callable=True,
+            plugin_callable=False,
             input_schema={
                 "type": "object",
                 "required": ["version_gid"],
@@ -350,7 +350,7 @@ def register_bop_version_capabilities(registry: Any) -> None:
             do_not_use_when="The caller already has one exact version GID.",
             subject_concepts=("craft.bop.version", "base.project"),
             effects=("read:craft.bop.version",),
-            plugin_callable=True,
+            plugin_callable=False,
             input_schema={
                 "type": "object",
                 "properties": {

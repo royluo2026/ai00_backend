@@ -38,7 +38,7 @@ def register_bop_compare_capability(registry: Any) -> None:
     registry.register(CapabilitySpec(
         id="craft.bop.version.compare", owner="craft", description="Compare two BOP versions as semantic structure changes.",
         use_when="The caller needs additions, removals, moves and field changes.", do_not_use_when="A raw database JSON diff is requested.",
-        subject_concepts=("craft.bop.version",), effects=("read:craft.bop.version.compare",), plugin_callable=True,
+        subject_concepts=("craft.bop.version",), effects=("read:craft.bop.version.compare",), plugin_callable=False,
         input_schema={"type": "object", "required": ["from_version_gid", "to_version_gid"]},
         output_schema={"type": "object", "required": ["comparability", "added", "removed", "moved", "changed"]},
         tags=("craft", "bop", "version", "compare", "read")), compare_bop_versions)

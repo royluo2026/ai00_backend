@@ -158,7 +158,7 @@ _STRUCTURE_OUTPUT = {
 def register_bop_structure_capabilities(registry: Any) -> None:
     common = {
         "owner": "craft",
-        "plugin_callable": True,
+        "plugin_callable": False,
         "permissions": (),
     }
     registry.register(

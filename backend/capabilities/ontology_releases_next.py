@@ -106,7 +106,7 @@ def activate_release(payload: dict[str, Any], context: CapabilityContext) -> Cap
 
 
 def register_ontology_release_capabilities(registry: Any) -> None:
-    common = {"owner": "ontology", "plugin_callable": True, "subject_concepts": ("ontology.release",), "output_schema": {"type": "object"}, "tags": ("ontology", "release")}
+    common = {"owner": "ontology", "plugin_callable": False, "subject_concepts": ("ontology.release",), "output_schema": {"type": "object"}, "tags": ("ontology", "release")}
     registry.register(CapabilitySpec(**common, id="ontology.release.get", description="Read one immutable or active release.", use_when="A release identity or current active release is needed.", do_not_use_when="Comparing two releases.", effects=("read:ontology.release",), input_schema={"type": "object"}), get_release)
     registry.register(CapabilitySpec(**common, id="ontology.release.search", description="Search immutable release metadata.", use_when="Release history is required.", do_not_use_when="A release identity is known.", effects=("read:ontology.release",), input_schema={"type": "object"}), search_releases)
     registry.register(CapabilitySpec(**common, id="ontology.release.diff", description="Compute a semantic stable-identity release diff.", use_when="Change impact between two releases is needed.", do_not_use_when="Raw JSON text differences are expected.", effects=("read:ontology.release",), input_schema={"type": "object", "required": ["from_release_gid", "to_release_gid"]}), diff_releases)

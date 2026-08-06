@@ -19,8 +19,9 @@ class AgentKnowledgeCitationTests(unittest.TestCase):
     def test_web_agent_stream_and_ui_preserve_structured_evidence(self):
         root = Path(__file__).resolve().parents[2]
         stream = (root / "plugins/agent/agent_backend/routers/ai_chat.py").read_text(encoding="utf-8")
-        web = (root.parent / "workmanship-web/web/workbench/workbench.js").read_text(encoding="utf-8")
-        css = (root.parent / "workmanship-web/web/workbench/workbench.css").read_text(encoding="utf-8")
+        workspace = root.parents[1] if root.parent.name == ".worktrees" else root.parent
+        web = (workspace / "workmanship-web/web/workbench/workbench.js").read_text(encoding="utf-8")
+        css = (workspace / "workmanship-web/web/workbench/workbench.css").read_text(encoding="utf-8")
         self.assertIn('evt["evidence"]', stream)
         self.assertIn("Array.isArray(evt.evidence)", web)
         self.assertIn("引用来源", web)

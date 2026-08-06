@@ -14,6 +14,7 @@ class CapabilityKernelContractTests(unittest.TestCase):
     def test_registered_capabilities_declare_their_real_owner(self):
         expected_owners = {
             "system": "base",
+            "craft": "craft",
             "knowledge": "knowledge",
             "ontology": "ontology",
             "identity": "base",

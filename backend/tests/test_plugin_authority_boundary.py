@@ -8,7 +8,7 @@ from backend.capabilities.registry_next import capability_registry
 from backend.plugin_platform.service import authorize_plugin_invocation, validate_capability_grants
 
 ROOT = Path(__file__).resolve().parents[2]
-V3_ROOT = ROOT.parent
+V3_ROOT = ROOT.parents[1] if ROOT.parent.name == ".worktrees" else ROOT.parent
 
 
 class _Cursor:

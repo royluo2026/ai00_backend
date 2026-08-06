@@ -6,7 +6,8 @@ class KnowledgeWorkspaceWebContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         root = Path(__file__).resolve().parents[2]
-        cls.web = (root.parent / "workmanship-web/web/knowledge_hub/knowledge_hub.js").read_text(encoding="utf-8")
+        workspace = root.parents[1] if root.parent.name == ".worktrees" else root.parent
+        cls.web = (workspace / "workmanship-web/web/knowledge_hub/knowledge_hub.js").read_text(encoding="utf-8")
 
     def test_team_cocreation_has_distinct_navigation_and_storage_path(self):
         self.assertIn("_makeSpecialNode('workspace'", self.web)

@@ -79,7 +79,7 @@ def register_ontology_concept_capabilities(registry: Any) -> None:
         },
     }
     common = {
-        "owner": "ontology", "plugin_callable": True, "permissions": (),
+        "owner": "ontology", "plugin_callable": False, "permissions": (),
         "subject_concepts": ("ontology.release", "ontology.object"),
         "output_schema": {"type": "object"},
         "tags": ("ontology", "read"),

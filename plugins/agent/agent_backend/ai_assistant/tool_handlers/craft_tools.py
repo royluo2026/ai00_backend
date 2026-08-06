@@ -9,9 +9,13 @@ from __future__ import annotations
 import os
 from typing import Any
 from urllib.parse import urlencode
+from backend.config import get_settings
 
 
-_BASE_URL = os.getenv("AI00_BASE_API_URL", "http://127.0.0.1:8080").rstrip("/")
+from .capability_tools import dispatch_bop_structure
+
+
+_BASE_URL = os.getenv("AI00_BASE_API_URL", get_settings().internal_backend_base_url).rstrip("/")
 
 TOOL_NAMES: set[str] = {
     "search_parts",
@@ -38,6 +42,7 @@ def dispatch(
     inputs: dict,
     auth_mode: str = "feishu",
     auth_token: str = "",
+    user_gid: str = "",
     **_kwargs,
 ) -> Any:
     if tool_name == "search_parts":
@@ -55,9 +60,9 @@ def dispatch(
     if tool_name == "list_gbop_versions":
         return _list_gbop_versions(inputs, auth_token)
     if tool_name == "list_asm_lines":
-        return _list_asm_lines(inputs, auth_token)
+        return _list_asm_lines(inputs, user_gid=user_gid, auth_mode=auth_mode)
     if tool_name == "get_bop_entries":
-        return _get_bop_entries(inputs, auth_token)
+        return _get_bop_entries(inputs, user_gid=user_gid, auth_mode=auth_mode)
     if tool_name == "search_bop_entries":
         return _search_bop_entries(inputs, auth_token)
     if tool_name == "preview_auto_link":
@@ -262,36 +267,24 @@ def _list_gbop_versions(inputs: dict, auth_token: str) -> dict:
     return {"text": f"共 {len(versions)} 个GBOP版本", "data": versions}
 
 
-def _list_asm_lines(inputs: dict, auth_token: str) -> dict:
-    version_gid = inputs.get("version_gid", "")
-    if not version_gid:
-        return {"error": "缺少 version_gid"}
-    result = _get(f"/api/bop/versions/{version_gid}/entries", auth_token)
-    if result is None:
-        return {"error": "线体列表查询失败"}
-    items = result.get("items") or result.get("data") or []
-    lines = [i for i in items if i.get("node_type") == "line_process"]
-    return {"text": f"共 {len(lines)} 条线体", "data": lines}
+def _list_asm_lines(inputs: dict, *, user_gid: str, auth_mode: str) -> dict:
+    if not user_gid:
+        return {"error": "用户身份缺失，不能访问 BOP 能力"}
+    result = dispatch_bop_structure(inputs, user_gid=user_gid, auth_mode=auth_mode)
+    if result.get("error"):
+        return result
+    nodes = result.get("data", {}).get("nodes", [])
+    lines = [node for node in nodes if node.get("kind") == "line_process"]
+    return {"text": f"共 {len(lines)} 条线体", "data": lines, "evidence": result.get("evidence", []), "source": "capability"}
 
 
-def _get_bop_entries(inputs: dict, auth_token: str) -> dict:
-    version_gid = inputs.get("version_gid", "").strip()
-    if not version_gid:
-        return {"error": "请提供 version_gid"}
-    result = _get(f"/api/bop/versions/{version_gid}/entries", auth_token)
-    if result is None:
-        return {"error": "BOP 条目查询失败"}
-    entries = result.get("data", [])
-    if not entries:
-        return {"text": "该 BOP 版本暂无条目。", "data": []}
-    lines = [f"共 {len(entries)} 条工艺条目：\n"]
-    for e in entries[:100]:
-        indent   = "  " * int(e.get("level", 0) or 0)
-        vpps_str = f" `{e['vpps']}`" if e.get("vpps") else ""
-        lines.append(f"{indent}- [{e.get('node_type','')}]{vpps_str} {e.get('title','')}")
-    if len(entries) > 100:
-        lines.append(f"\n…（共 {len(entries)} 条，仅展示前 100 条）")
-    return {"text": "\n".join(lines), "data": entries}
+def _get_bop_entries(inputs: dict, *, user_gid: str, auth_mode: str) -> dict:
+    if not user_gid:
+        return {"error": "用户身份缺失，不能访问 BOP 能力"}
+    try:
+        return dispatch_bop_structure(inputs, user_gid=user_gid, auth_mode=auth_mode)
+    except Exception as exc:
+        return {"error": str(exc), "source": "capability"}
 
 
 def _search_bop_entries(inputs: dict, auth_token: str) -> dict:

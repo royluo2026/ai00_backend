@@ -429,7 +429,7 @@ def register_knowledge_document_capabilities(registry) -> None:
     common = {
         "owner": "knowledge",
         "subject_concepts": ("knowledge.document", "knowledge.revision"),
-        "plugin_callable": True,
+        "plugin_callable": False,
         "output_schema": {"type": "object"},
     }
     registry.register(CapabilitySpec(

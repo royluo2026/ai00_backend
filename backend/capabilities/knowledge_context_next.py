@@ -97,6 +97,6 @@ def register_knowledge_context_capability(registry: Any) -> None:
     registry.register(CapabilitySpec(
         id="knowledge.context.retrieve", owner="knowledge", description="Retrieve bounded immutable Knowledge revision references for one task.",
         use_when="A person or model needs decision context, not whole documents.", do_not_use_when="The caller already knows an exact document revision.",
-        subject_concepts=("knowledge.document", "knowledge.revision"), effects=("read:knowledge.context",), plugin_callable=True,
+        subject_concepts=("knowledge.document", "knowledge.revision"), effects=("read:knowledge.context",), plugin_callable=False,
         input_schema={"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer"}}},
         output_schema={"type": "object", "required": ["items", "query"]}, tags=("knowledge", "context", "read")), retrieve_context)

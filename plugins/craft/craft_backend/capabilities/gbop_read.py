@@ -129,7 +129,7 @@ def list_gbop_item_knowledge(payload: dict[str, Any], _context: CapabilityContex
 
 
 def register_gbop_read_capabilities(registry: Any) -> None:
-    common = {"owner": "craft", "plugin_callable": True, "permissions": (), "subject_concepts": ("craft.gbop.item",), "effects": ("read:craft.gbop",), "tags": ("craft", "gbop", "active", "read")}
+    common = {"owner": "craft", "plugin_callable": False, "permissions": (), "subject_concepts": ("craft.gbop.item",), "effects": ("read:craft.gbop",), "tags": ("craft", "gbop", "active", "read")}
     for capability_id, handler, required in (
         ("craft.gbop.item.search", search_gbop_items, []),
         ("craft.gbop.item.usage.get", get_gbop_item_usage, ["item_gid"]),

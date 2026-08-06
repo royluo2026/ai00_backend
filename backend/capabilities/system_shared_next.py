@@ -124,7 +124,7 @@ def register_system_shared_capabilities(registry: Any) -> None:
     )
     for capability_id, handler, description, risk, permissions, required in defs:
         registry.register(CapabilitySpec(
-            id=capability_id, owner="base", plugin_callable=True, description=description,
+            id=capability_id, owner="base", plugin_callable=False, description=description,
             use_when="A bounded shared-system composition is required.", do_not_use_when="A domain-specific stable ref is already known.",
             subject_concepts=("system.object_ref",), effects=(("request:system.job_cancel",) if capability_id=="system.job.cancel" else ("read:system.ref",)),
             risk=risk, confirmation="user" if risk=="write" else "none", permissions=permissions,

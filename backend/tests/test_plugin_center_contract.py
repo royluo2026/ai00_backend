@@ -38,8 +38,9 @@ class PluginCenterContractTests(unittest.TestCase):
 
     def test_web_center_has_three_tabs_and_core_metrics(self):
         root = Path(__file__).resolve().parents[2]
-        html = (root.parent / "workmanship-web/web/settings/index.html").read_text(encoding="utf-8")
-        js = (root.parent / "workmanship-web/web/settings/plugin_center.js").read_text(encoding="utf-8")
+        workspace = root.parents[1] if root.parent.name == ".worktrees" else root.parent
+        html = (workspace / "workmanship-web/web/settings/index.html").read_text(encoding="utf-8")
+        js = (workspace / "workmanship-web/web/settings/plugin_center.js").read_text(encoding="utf-8")
         for tab in ("available", "installed", "upload"):
             self.assertIn(f'data-tab="{tab}"', html)
         for label in ("本月", "上月", "增量", "成功率"):

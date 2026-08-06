@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from ...integrations.platform_http import PlatformHttpClient, PlatformHttpError
-from .capability_tools import dispatch_knowledge
+from .capability_tools import dispatch_knowledge, dispatch_ontology
 
 TOOL_NAMES = {
     "search_knowledge", "get_knowledge_entry", "get_knowledge_document", "list_rules", "find_similar_cases",
@@ -19,6 +19,11 @@ def dispatch(tool_name: str, inputs: dict, auth_mode: str = "feishu", auth_token
             return dispatch_knowledge(tool_name, inputs, user_gid=user_gid, auth_mode=auth_mode)
         except Exception as exc:
             return {"error": str(exc), "source": "capability"}
+    if tool_name == "get_ontology_schema":
+        try:
+            return dispatch_ontology(inputs, user_gid=user_gid, auth_mode=auth_mode)
+        except Exception as exc:
+            return {"error": str(exc), "source": "capability"}
     client = PlatformHttpClient(auth_token)
     try:
         if tool_name == "list_rules":
@@ -31,8 +36,6 @@ def dispatch(tool_name: str, inputs: dict, auth_mode: str = "feishu", auth_token
             value = client.post("/api/rule-engine/check-batch", inputs)
         elif tool_name == "recommend_practice":
             value = client.get("/api/knowledge/recommendations", inputs)
-        elif tool_name == "get_ontology_schema":
-            value = client.get(f"/api/ontology/schema/{inputs.get('node_type', '')}")
         elif tool_name == "audit_entry_rules":
             value = client.post(f"/api/rule-engine/audit/entry/{inputs.get('entry_gid', '')}", inputs)
         elif tool_name == "get_entry_relations":

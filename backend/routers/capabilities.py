@@ -52,6 +52,10 @@ def _build_router(prefix: str) -> APIRouter:
         _current_user: dict = Depends(get_current_user),
     ):
         specs = capability_registry.list(execution=execution, tag=tag, plugin_callable=True if consumer == "plugin" else None)
+        granted = set(build_profile(_current_user).get("permissions", []))
+        specs = [spec for spec in specs if set(spec.permissions) <= granted]
+        if consumer in {"agent", "api", "mcp"}:
+            specs = [spec for spec in specs if not spec.deprecated]
         return {"success": True, "data": [spec.model_dump(mode="json") for spec in specs]}
 
     @api.get("/{capability_id}")

@@ -84,7 +84,7 @@ def submit_review(payload: dict[str, Any], context: CapabilityContext) -> Capabi
 
 def register_ontology_proposal_capabilities(registry: Any) -> None:
     common = {
-        "owner": "ontology", "plugin_callable": True,
+        "owner": "ontology", "plugin_callable": False,
         "subject_concepts": ("ontology.proposal", "ontology.proposal_revision"),
         "output_schema": {"type": "object"}, "tags": ("ontology", "proposal"),
     }
