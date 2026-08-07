@@ -7,6 +7,7 @@ from .bop_structure import register_bop_structure_capabilities
 from .bop_versions import register_bop_version_capabilities
 from .gbop_read import register_gbop_read_capabilities
 from .pbom_read import register_pbom_read_capabilities
+from .bop_writes import register_bop_write_capabilities
 
 
 def register_capabilities(registry: Any) -> None:
@@ -16,3 +17,4 @@ def register_capabilities(registry: Any) -> None:
     register_bop_compare_capability(registry)
     register_pbom_read_capabilities(registry)
     register_gbop_read_capabilities(registry)
+    register_bop_write_capabilities(registry)

@@ -31,5 +31,5 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "craft.bop.linked_parts.get", "craft.bop.version.compare", "craft.bop.version.get",
     "craft.bop.version.list", "craft.bop.work_package.get", "craft.gbop.item.knowledge.list",
     "craft.gbop.item.search", "craft.gbop.item.usage.get", "craft.pbom.part.search",
-    "craft.pbom.snapshot.compare", "craft.pbom.snapshot.get",
+    "craft.pbom.snapshot.compare", "craft.pbom.snapshot.get", "craft.bop.draft.change.preview", "craft.bop.draft.change.apply", "craft.bop.version.create", "craft.bop.version.archive", "craft.bop.import.preview",
 })

@@ -26,8 +26,8 @@
 | CRAFT-001 | Craft | 首批BOP读取能力设计与实现 | 已批准的版本查询、执行结构、零件关联、版本比较、工作包等能力完成契约、注册、测试和首个真实消费者迁移 | P0 | SYS-002、SYS-005 | 待验证 | 契约、注册、测试及Web版本列表/Agent执行结构消费者已迁移；待OceanBase真实数据烟测 |
 | CRAFT-002 | Craft | Craft校验规则与Validation Policy治理 | 重新梳理现有校验；每项登记来源、Owner、适用范围、严重级别和执行机制；规则成熟后再冻结并测试`draft_check`、`publish_check`、`simulation_check`、`workstation_check` | P2 | 本体与规则Owner明确 | 待完善 | Policy技术框架与四项VPPS候选盘点已实现；现有规则不完善，不进入当前强制校验，见Phase 56/63 |
 | CRAFT-003 | Craft | `craft.bop.version.validate`权威校验能力 | 能按冻结Policy返回可复现结论、规则/程序/本体版本、BOP Hash及证据；发布流程强制重新执行`publish_check` | P2 | CRAFT-002、SYS-002 | 暂缓 | 等成熟规则获批后实施；不得把当前四项候选直接升级为阻断规则 |
-| CRAFT-004 | Craft | BOP草稿受治理写能力 | 冻结类型化变更Schema和`draft.change.preview/apply`契约；完成无副作用预览、Hash绑定、乐观并发、幂等、事务回滚、权限和审计测试 | P1 | SYS-002、SYS-005 | 待实施 | 可先实现写入安全与审计；不包含尚未成熟的领域规则校验，不把节点CRUD或JSON Patch公开为Capability |
-| CRAFT-005 | Craft | BOP创建与非破坏归档能力 | `version.create`按empty/bop_version/template/import_preview来源创建草稿；按状态机完成非破坏归档，保留不可变快照、确认和审计 | P1 | SYS-002、SYS-005 | 待实施 | clone合并到create；不提供物理删除；发布拆到CRAFT-009 |
+| CRAFT-004 | Craft | BOP草稿受治理写能力 | 冻结类型化变更Schema和`draft.change.preview/apply`契约；完成无副作用预览、Hash绑定、乐观并发、幂等、事务回滚、权限和审计测试 | P1 | SYS-002、SYS-005 | 实施中 | Phase 64 已完成离线契约与能力注册；真实事务/持久化/权限烟测待授权环境，详见 `docs/audit/phase64-craft-write-capabilities-plan.md` |
+| CRAFT-005 | Craft | BOP创建与非破坏归档能力 | `version.create`按empty/bop_version/template/import_preview来源创建草稿；按状态机完成非破坏归档，保留不可变快照、确认和审计 | P1 | SYS-002、SYS-005 | 实施中 | Phase 64 已完成离线契约、创建/归档 Capability 与 migration；真实事务/持久化/权限烟测待授权环境，发布仍拆到 CRAFT-009 |
 | CRAFT-006 | Craft | PBOM VPPS规则与校验治理 | 把现有四条检查作为候选规则重新验证；冻结主数据、算法、阈值和证据后，再决定是否实现`craft.pbom.vpps.validate` | P2 | CRAFT-002、SYS-002 | 待完善 | 当前实现不完善；仅作待办，不注册Capability，不把页面ignore视为正式让步 |
 | CRAFT-009 | Craft | BOP发布能力 | 成熟的`publish_check`获批后，实现发布前重跑、不可变快照、状态机、确认和审计 | P2 | CRAFT-002、CRAFT-003、CRAFT-005 | 暂缓 | 当前不实现无规则发布，也不以不完善规则阻断发布 |
 | CRAFT-007 | Craft | 决策PBOM VPPS让步机制 | 结合真实业务场景决定是否允许让步、由谁审批、适用范围、有效期、撤销和对发布的影响；只有决策通过后才提案具体Capability | P2 | CRAFT-006、审批流程需求 | 暂缓 | 当前不加入`waiver.create/revoke`，不得提前实现或公开 |
