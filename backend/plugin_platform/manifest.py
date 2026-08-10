@@ -51,6 +51,28 @@ class DataPolicy(BaseModel):
     uninstall: Literal["delete", "retain", "export-then-delete"] = "delete"
 
 
+class CapabilityRequirement(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    id: str = Field(pattern=r"^[a-z][a-z0-9_.-]{2,127}$")
+    major: int = Field(ge=1, le=2147483647)
+
+
+class CapabilityRequirements(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    required: tuple[CapabilityRequirement, ...] = ()
+    optional: tuple[CapabilityRequirement, ...] = ()
+
+    @model_validator(mode="after")
+    def unique_requirements(self):
+        required = {(item.id, item.major) for item in self.required}
+        optional = {(item.id, item.major) for item in self.optional}
+        if len(required) != len(self.required) or len(optional) != len(self.optional):
+            raise ValueError("capability requirements must be unique")
+        if required & optional:
+            raise ValueError("a capability cannot be both required and optional")
+        return self
+
+
 class PluginManifestV2(BaseModel):
     model_config = ConfigDict(extra="forbid")
     schema_version: Literal["2.0"]
@@ -62,6 +84,7 @@ class PluginManifestV2(BaseModel):
     compatibility: Compatibility
     runtimes: dict[Literal["web"], WebRuntime]
     permissions: tuple[str, ...] = ()
+    capabilities: CapabilityRequirements = Field(default_factory=CapabilityRequirements)
     artifact: Artifact
     data: DataPolicy = Field(default_factory=DataPolicy)
 

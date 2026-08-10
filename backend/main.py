@@ -230,7 +230,7 @@ _capability_gateway = _configure_capability_gateway(
         user_loader=lambda gid: _capability_user_service.get_by_gid(gid),
         grants_resolver=lambda identity, user: (
             _capability_deps.build_capability_authorization_grants(
-                user, identity.tenant.tenant_id, identity.consumer.type.value
+                user, identity.tenant.tenant_id, identity.consumer.type.value, identity
             )
         ),
         approval_service=_ApprovalService(_SqlApprovalStore(_capability_connection)),

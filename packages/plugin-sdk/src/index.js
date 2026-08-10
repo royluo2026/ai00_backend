@@ -41,6 +41,8 @@ export class Ai00PluginClient {
     return this.invoke("plugin.storage.delete", payload);
   }
   grantedCapabilities() { return Object.freeze([...(this.#init?.grantedCapabilities ?? [])]); }
+  catalogRelease() { return this.#init?.catalogRelease; }
+  capabilityMajor(capabilityId) { return this.#init?.capabilityVersions?.[capabilityId]; }
   async invoke(capabilityId, payload, timeoutMs = 30_000) {
     if (!this.#init) throw new Error("AI00 host handshake is not complete");
     if (!this.#init.grantedCapabilities.includes(capabilityId)) throw new Error(`Capability not granted: ${capabilityId}`);

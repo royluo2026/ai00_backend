@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 import mimetypes
 import requests
+import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import Response
@@ -12,10 +14,19 @@ from pydantic import BaseModel, Field
 from backend.plugin_platform.artifacts import ArtifactError, publish_web_assets, upload_to_ois, validate_package
 from backend.plugin_platform.manifest import ManifestError, parse_manifest
 from backend.plugin_platform.metrics import close_month, monthly_ranking
-from backend.plugin_platform.mounts import MountTokenError, issue_mount_token, mount_url, verify_mount_token
+from backend.plugin_platform.mounts import (
+    MountSessionError, MountSessionService, MountTokenError, SqlMountSessionStore, mount_url,
+)
 from backend.plugin_platform.service import list_catalog, list_installations, list_lifecycle_events, list_releases, register_publisher, resolve_asset_object_key, review_release, revoke_release, submit_release, tenant_registry, verify_submission_signature
 from backend.plugin_platform.signing import SignatureError
-from backend.routers.deps import build_profile, get_current_user
+from backend.routers.deps import build_profile, get_authenticated_principal, get_current_user
+from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.contracts import (
+    ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType,
+    InvocationEnvelope, TenantIdentity,
+)
+from backend.capability_v2.gateway import get_default_gateway
+from backend.capability_v2.policies import GatewayPolicyError
 
 router = APIRouter(prefix="/api/v1/plugin-marketplace", tags=["plugin-marketplace"])
 
@@ -35,6 +46,74 @@ class PublisherRequest(BaseModel):
 class ReviewRequest(BaseModel):
     approved: bool
     note: str = Field(default="", max_length=4000)
+
+
+class MountInvokeRequest(BaseModel):
+    payload: dict = Field(default_factory=dict)
+    major_version: int = Field(ge=1)
+    idempotency_key: str | None = Field(default=None, min_length=1, max_length=255)
+    expected_resource_version: str | None = Field(default=None, max_length=255)
+    approval_reference: str | None = Field(default=None, max_length=512)
+
+
+def _mount_service() -> MountSessionService:
+    from backend.db.connection import get_conn
+    return MountSessionService(SqlMountSessionStore(get_conn))
+
+
+def _catalog_release() -> CatalogRelease:
+    path = Path(__file__).resolve().parents[2] / "docs/governance/capability-catalog-release.json"
+    release = CatalogRelease.model_validate_json(path.read_text(encoding="utf-8"))
+    if release.release_id != get_default_gateway().catalog_release:
+        raise MountSessionError("gateway and plugin mount catalog releases differ")
+    return release
+
+
+def _resolved_mount_grants(item: dict, release: CatalogRelease) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    descriptors = {(value.id, value.major_version): value for value in release.descriptors}
+    capability_contract = item.get("capabilities") or {}
+    required = {
+        (str(value.get("id")), int(value.get("major", 0)))
+        for value in capability_contract.get("required") or ()
+    }
+    optional = {
+        (str(value.get("id")), int(value.get("major", 0)))
+        for value in capability_contract.get("optional") or ()
+    }
+    # Legacy permissions carry no major. They remain install metadata but do not
+    # become V2 authority until a matching plugin-exposed descriptor exists.
+    legacy = {(str(value), 1) for value in item.get("permissions") or ()}
+    selected: list[str] = []
+    missing_required: list[str] = []
+    for capability_id, major in sorted(required | optional | legacy):
+        descriptor = descriptors.get((capability_id, major))
+        if descriptor is not None and descriptor.exposure.plugin:
+            selected.append(f"{capability_id}@{major}")
+        elif (capability_id, major) in required:
+            missing_required.append(f"{capability_id}@{major}")
+    return tuple(selected), tuple(missing_required)
+
+
+def _plugin_identity(session, user: dict, principal) -> ConsumerIdentity:
+    return ConsumerIdentity(
+        actor=ActorIdentity(**principal.model_dump()),
+        tenant=TenantIdentity(
+            tenant_id=session.tenant_id, membership="member",
+            active_roles=tuple(filter(None, (user.get("org_role"), user.get("system_role")))),
+        ),
+        consumer=ConsumerDescriptor(
+            type=ConsumerType.PLUGIN, consumer_id=session.plugin_id,
+            consumer_version=session.plugin_version, installation_id=session.installation_id,
+            mount_session_id=session.mount_session_id,
+        ),
+    )
+
+
+def _resolve_mount_for_user(mount_session_id: str, user: dict):
+    tenant = user.get("team_id") or f"user:{user['gid']}"
+    return _mount_service().resolve_for_user(
+        mount_session_id, current_user_id=str(user["gid"]), current_tenant_id=tenant,
+    )
 
 
 def _bad(exc: Exception) -> HTTPException:
@@ -75,17 +154,116 @@ def installation_events(plugin_id: str, limit: int = Query(default=100, ge=1, le
 
 
 @router.get("/registry")
-def registry(user: dict = Depends(get_current_user)):
+def registry(
+    user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
+):
     """Only enabled, signed tenant plugins are returned to the Web shell."""
     data = tenant_registry(user)
     tenant = user.get("team_id") or f"user:{user['gid']}"
     try:
+        release = _catalog_release()
+        service = _mount_service()
         for item in data:
-            token = issue_mount_token(tenant_gid=tenant, plugin_id=item["plugin_id"], version=item["version"], artifact_sha256=item["artifact"]["sha256"])
-            item["mount_url"] = mount_url(token, item["plugin_id"], item["version"], item["web"]["entry"])
-    except MountTokenError as exc:
+            grants, missing_required = _resolved_mount_grants(item, release)
+            installation_id = item.get("installation_id")
+            revocation_version = int(item.get("mount_revocation_version") or 1)
+            item.pop("installation_id", None)
+            item.pop("mount_revocation_version", None)
+            if not installation_id:
+                item["mount_unavailable_reason"] = "installation_identity_missing_reinstall_required"
+                continue
+            if missing_required:
+                item["mount_unavailable_reason"] = "required_capability_unavailable"
+                item["missing_required_capabilities"] = missing_required
+                continue
+            issued = service.issue(
+                user_id=str(user["gid"]), tenant_id=tenant,
+                installation_id=str(installation_id), plugin_id=item["plugin_id"],
+                plugin_version=item["version"], artifact_sha256=item["artifact"]["sha256"],
+                catalog_release=release.release_id, capability_grants=grants,
+                resource_scopes=(f"tenant:{tenant}",), data_scopes=("internal",),
+                revocation_version=revocation_version,
+                authenticated_at=principal.authenticated_at,
+            )
+            item["mount_session_id"] = issued.session.mount_session_id
+            item["catalog_release"] = release.release_id
+            item["capability_grants"] = grants
+            item["capability_versions"] = {
+                value.rsplit("@", 1)[0]: int(value.rsplit("@", 1)[1]) for value in grants
+            }
+            item["mount_url"] = mount_url(
+                issued.asset_token, item["plugin_id"], item["version"], item["web"]["entry"]
+            )
+    except (MountSessionError, MountTokenError) as exc:
         raise HTTPException(503, detail={"code": "plugin_mount_unavailable", "message": str(exc)}) from exc
     return {"success": True, "data": data}
+
+
+@router.post("/mounts/{mount_session_id}/capabilities/{capability_id}:invoke")
+async def invoke_from_mount(
+    mount_session_id: str,
+    capability_id: str,
+    body: MountInvokeRequest,
+    user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
+):
+    try:
+        session = _resolve_mount_for_user(mount_session_id, user)
+        if f"{capability_id}@{body.major_version}" not in session.capability_grants:
+            raise MountSessionError("capability is not granted to this mount session")
+    except MountSessionError as exc:
+        raise HTTPException(403, detail={"code": "plugin_mount_denied", "message": str(exc)}) from exc
+    gateway = get_default_gateway()
+    request_id = f"plugin_{uuid.uuid4().hex}"
+    result = await gateway.invoke(InvocationEnvelope(
+        capability_id=capability_id,
+        major_version=body.major_version,
+        catalog_release=session.catalog_release,
+        payload=body.payload,
+        identity=_plugin_identity(session, user, principal),
+        idempotency_key=body.idempotency_key,
+        expected_resource_version=body.expected_resource_version,
+        approval_reference=body.approval_reference,
+        request_id=request_id,
+        trace_id=request_id,
+    ))
+    return result.model_dump(mode="json")
+
+
+@router.post("/mounts/{mount_session_id}/capabilities/{capability_id}:confirm")
+async def confirm_from_mount(
+    mount_session_id: str,
+    capability_id: str,
+    body: MountInvokeRequest,
+    user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
+):
+    try:
+        session = _resolve_mount_for_user(mount_session_id, user)
+        if f"{capability_id}@{body.major_version}" not in session.capability_grants:
+            raise MountSessionError("capability is not granted to this mount session")
+        gateway = get_default_gateway()
+        request_id = f"plugin_approval_{uuid.uuid4().hex}"
+        issued = await gateway.request_approval(InvocationEnvelope(
+            capability_id=capability_id, major_version=body.major_version,
+            catalog_release=session.catalog_release, payload=body.payload,
+            identity=_plugin_identity(session, user, principal),
+            idempotency_key=body.idempotency_key,
+            expected_resource_version=body.expected_resource_version,
+            request_id=request_id, trace_id=request_id,
+        ))
+    except MountSessionError as exc:
+        raise HTTPException(403, detail={"code": "plugin_mount_denied", "message": str(exc)}) from exc
+    except GatewayPolicyError as exc:
+        raise HTTPException(409, detail={"code": exc.code, "message": exc.message}) from exc
+    # This endpoint is called by the trusted Host approval loop, never forwarded
+    # through postMessage to the plugin iframe.
+    return {
+        "approval_reference": issued.token,
+        "approval_id": issued.challenge.approval_id,
+        "expires_at": issued.challenge.expires_at,
+    }
 
 
 @router.post("/publishers")
@@ -147,8 +325,9 @@ def revoke(plugin_id: str, version: str, body: ReviewRequest, user: dict = Depen
 def plugin_asset(token: str, plugin_id: str, version: str, asset_path: str):
     upstream = None
     try:
-        claims = verify_mount_token(token)
-        if claims.plugin_id != plugin_id or claims.version != version: raise MountTokenError("mount route does not match token")
+        claims = _mount_service().resolve_asset_token(
+            token, expected_plugin_id=plugin_id, expected_version=version
+        )
         object_key = resolve_asset_object_key(claims, asset_path)
         from backend.core import ois_storage
         access_url = ois_storage.generate_access_url(object_key, 60)
@@ -165,7 +344,7 @@ def plugin_asset(token: str, plugin_id: str, version: str, asset_path: str):
             chunks.append(chunk)
         content = b"".join(chunks)
         upstream.close(); upstream = None
-    except MountTokenError as exc:
+    except (MountTokenError, MountSessionError) as exc:
         if upstream: upstream.close()
         raise HTTPException(403, detail={"code": "invalid_plugin_mount", "message": str(exc)}) from exc
     except PermissionError as exc:

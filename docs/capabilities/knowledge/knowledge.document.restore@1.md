@@ -8,7 +8,7 @@ Restore historical content by publishing a new immutable revision.
 - 不适用：Only reading old content.
 - 生命周期：`experimental`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_2a2db4d509b4862334ad8872762ef39f`
+- Catalog Release：`rel_7263b81c7344960ad9df52f6fb8fdd30`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -76,7 +76,7 @@ Restore historical content by publishing a new immutable revision.
 ```json
 {
   "capability_id": "knowledge.document.restore",
-  "catalog_release": "rel_2a2db4d509b4862334ad8872762ef39f",
+  "catalog_release": "rel_7263b81c7344960ad9df52f6fb8fdd30",
   "major_version": 1,
   "payload": {
     "base_revision_gid": "example",

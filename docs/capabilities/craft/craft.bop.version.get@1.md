@@ -8,7 +8,7 @@ Read one BOP version identity, lifecycle and revision evidence.
 - 不适用：The caller needs to discover or compare versions.
 - 生命周期：`experimental`
 - 所属领域：`craft`
-- Catalog Release：`rel_2a2db4d509b4862334ad8872762ef39f`
+- Catalog Release：`rel_7263b81c7344960ad9df52f6fb8fdd30`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -74,7 +74,7 @@ Read one BOP version identity, lifecycle and revision evidence.
 ```json
 {
   "capability_id": "craft.bop.version.get",
-  "catalog_release": "rel_2a2db4d509b4862334ad8872762ef39f",
+  "catalog_release": "rel_7263b81c7344960ad9df52f6fb8fdd30",
   "major_version": 1,
   "payload": {
     "version_gid": "example"

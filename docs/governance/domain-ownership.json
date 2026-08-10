@@ -31,7 +31,8 @@
         "backend/db/migrations/202608100001_base_capability_catalog_releases.sql",
         "backend/db/migrations/202608100002_base_consumer_delegations.sql",
         "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql",
-        "backend/db/migrations/202608100004_base_artifacts_and_operations.sql"
+        "backend/db/migrations/202608100004_base_artifacts_and_operations.sql",
+        "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql"
       ],
       "test_paths": ["backend/tests/test_base_*.py"],
       "documentation_paths": ["docs/capabilities/base-platform/**"]

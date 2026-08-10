@@ -63,6 +63,8 @@ type InitMessage = {
   instanceId: string;
   channelToken: string;
   grantedCapabilities: string[];
+  catalogRelease?: string;
+  capabilityVersions?: Readonly<Record<string, number>>;
 };
 
 type ResponseMessage = {
@@ -123,6 +125,14 @@ export class Ai00PluginClient {
 
   grantedCapabilities(): readonly string[] {
     return Object.freeze([...(this.init?.grantedCapabilities ?? [])]);
+  }
+
+  catalogRelease(): string | undefined {
+    return this.init?.catalogRelease;
+  }
+
+  capabilityMajor(capabilityId: string): number | undefined {
+    return this.init?.capabilityVersions?.[capabilityId];
   }
 
   async invoke<T = unknown>(capabilityId: string, payload: Record<string, unknown>, timeoutMs = 30_000): Promise<CapabilityResult<T>> {

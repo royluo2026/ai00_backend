@@ -8,7 +8,7 @@
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`experimental`
 - 所属领域：`local_integration`
-- Catalog Release：`rel_2a2db4d509b4862334ad8872762ef39f`
+- Catalog Release：`rel_7263b81c7344960ad9df52f6fb8fdd30`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -75,7 +75,7 @@
 ```json
 {
   "capability_id": "vismockup.status",
-  "catalog_release": "rel_2a2db4d509b4862334ad8872762ef39f",
+  "catalog_release": "rel_7263b81c7344960ad9df52f6fb8fdd30",
   "major_version": 1,
   "payload": {
     "device_gid": "example"

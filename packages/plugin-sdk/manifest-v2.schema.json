@@ -21,6 +21,20 @@
       "properties": { "web": { "type": "object", "additionalProperties": false, "required": ["entry", "sandbox"], "properties": { "entry": { "type": "string" }, "sandbox": { "const": "allow-scripts" } } } }
     },
     "permissions": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{2,127}$" } },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "array", "uniqueItems": true,
+          "items": { "$ref": "#/$defs/capabilityRequirement" }
+        },
+        "optional": {
+          "type": "array", "uniqueItems": true,
+          "items": { "$ref": "#/$defs/capabilityRequirement" }
+        }
+      }
+    },
     "artifact": { "type": "object", "additionalProperties": false, "required": ["object_key", "sha256", "size", "media_type"], "properties": { "object_key": { "type": "string" }, "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }, "size": { "type": "integer", "minimum": 1, "maximum": 104857600 }, "media_type": { "const": "application/zip" } } },
     "data": {
       "type": "object", "additionalProperties": false, "required": ["stores_personal_data", "retention", "uninstall"],
@@ -28,6 +42,17 @@
         "stores_personal_data": { "type": "boolean" },
         "retention": { "enum": ["none", "while-installed", "tenant-policy"] },
         "uninstall": { "enum": ["delete", "retain", "export-then-delete"] }
+      }
+    }
+  },
+  "$defs": {
+    "capabilityRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "major"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{2,127}$" },
+        "major": { "type": "integer", "minimum": 1, "maximum": 2147483647 }
       }
     }
   }

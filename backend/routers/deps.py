@@ -326,12 +326,40 @@ def build_profile(user: dict) -> dict:
 
 
 def build_capability_authorization_grants(
-    user: dict, tenant_id: str, consumer_type: str = "web"
+    user: dict, tenant_id: str, consumer_type: str = "web", identity=None,
 ):
     """Translate reviewed legacy roles into explicit V2 resource/data grants."""
     from backend.capability_v2.authorization import AuthorizationGrants
 
     profile = build_profile(user)
+    if consumer_type == "plugin":
+        if identity is None or not identity.consumer.mount_session_id:
+            raise PermissionError("plugin mount identity is required")
+        from backend.db.connection import get_conn
+        from backend.plugin_platform.mounts import SqlMountSessionStore
+        session = SqlMountSessionStore(get_conn).get_live_by_id(
+            identity.consumer.mount_session_id
+        )
+        actor_id = identity.actor.user_id or identity.actor.service_id
+        if (
+            session.user_id != str(user.get("gid"))
+            or session.user_id != actor_id
+            or session.tenant_id != tenant_id
+            or session.plugin_id != identity.consumer.consumer_id
+            or session.plugin_version != identity.consumer.consumer_version
+            or session.installation_id != identity.consumer.installation_id
+        ):
+            raise PermissionError("plugin mount identity binding mismatch")
+        return AuthorizationGrants(
+            permissions=tuple(sorted(profile.get("permissions", ()))),
+            capability_scopes=tuple(sorted(
+                value.rsplit("@", 1)[0] for value in session.capability_grants
+            )),
+            resource_scopes=session.resource_scopes,
+            data_scopes=session.data_scopes,
+            policy_version=f"plugin-mount-v2:{session.revocation_version}",
+            tenant_id=tenant_id,
+        )
     resource_scopes = {f"tenant:{tenant_id}"}
     for grant in profile.get("grants", ()):
         scope_gid = str(grant.get("scope_gid") or "").strip()

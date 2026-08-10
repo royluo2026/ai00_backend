@@ -738,7 +738,7 @@ git commit -m "docs: generate the capability developer manual"
 - Replace: `backend/plugin_platform/mounts.py`
 - Modify: `backend/plugin_platform/service.py`
 - Modify: `backend/routers/plugin_marketplace.py`
-- Create: `backend/db/migrations/202608100005_plugin_mount_sessions.sql`
+- Create: `backend/db/migrations/202608100005_base_plugin_mount_sessions.sql`
 - Create: `backend/tests/test_plugin_mount_sessions_v2.py`
 - Modify: `packages/plugin-sdk/manifest-v2.schema.json`
 - Modify: `packages/plugin-sdk/src/host.ts`
@@ -750,7 +750,7 @@ git commit -m "docs: generate the capability developer manual"
 - Produces: `PluginMountSession` bound to installation, artifact hash, user, tenant, Catalog Release, Capability version ranges, resource/data scopes and revocation version.
 - Host Bridge sends/receives full `CapabilityResultV2`; ApprovalChallenge is handled by host UI and never exposed as a reusable token.
 
-- [ ] **Step 1: Write failing Manifest and mount forgery tests**
+- [x] **Step 1: Write failing Manifest and mount forgery tests**
 
 ```python
 def test_mount_token_cannot_cross_users(mount_service):
@@ -763,7 +763,7 @@ def test_optional_capability_does_not_block_install(parse_manifest):
     assert manifest.optional_capabilities[0].id == "craft.routing.get"
 ```
 
-- [ ] **Step 2: Run Backend and Web bridge tests to expose Header identity/result truncation**
+- [x] **Step 2: Run Backend and Web bridge tests to expose Header identity/result truncation**
 
 Run: `python -m pytest backend/tests/test_plugin_mount_sessions_v2.py backend/tests/test_plugin_mount_tokens_next.py -q`
 
@@ -771,7 +771,7 @@ Run in Web repo: `npm test`.
 
 Expected: FAIL on user/install binding and full result preservation.
 
-- [ ] **Step 3: Implement persisted Mount Session and host-owned approval loop**
+- [x] **Step 3: Implement persisted Mount Session and host-owned approval loop**
 
 ```ts
 export interface PluginCapabilityResponse<T> {
@@ -786,7 +786,7 @@ export interface PluginCapabilityResponse<T> {
 
 Static assets use the session identity, survive page lazy loading, and check live revocation. Remove `X-AI00-Plugin-ID`, `X-AI00-Plugin-Version` and `data.data` rewrapping.
 
-- [ ] **Step 4: Run plugin security and full Web regression**
+- [x] **Step 4: Run plugin security and full Web regression**
 
 Run: `python -m pytest backend/tests/test_plugin_mount_sessions_v2.py backend/tests/test_plugin_authority_boundary.py backend/tests/test_plugin_platform_next.py backend/tests/test_plugin_acceptance_tooling.py -q`
 
@@ -794,10 +794,10 @@ Run in Web repo: `npm test`.
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit separately in Backend and Web repositories**
+- [x] **Step 5: Commit separately in Backend and Web repositories**
 
 ```bash
-git add backend/plugin_platform backend/routers/plugin_marketplace.py backend/db/migrations/202608100005_plugin_mount_sessions.sql backend/tests/test_plugin_mount_sessions_v2.py packages/plugin-sdk
+git add backend/plugin_platform backend/routers/plugin_marketplace.py backend/routers/deps.py backend/main.py backend/scripts/plugin_platform_acceptance.py backend/capability_v2/v1_adapter.py backend/db/migrations/202608100005_base_plugin_mount_sessions.sql backend/tests/test_plugin_mount_sessions_v2.py backend/tests/test_plugin_authority_boundary.py packages/plugin-sdk docs/capabilities docs/governance .github/CODEOWNERS
 git commit -m "feat: bind plugin capabilities to mount sessions"
 ```
 

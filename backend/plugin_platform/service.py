@@ -43,32 +43,6 @@ def validate_capability_grants(values: Any) -> tuple[str, ...]:
     return grants
 
 
-def authorize_plugin_invocation(user: dict, plugin_id: str, version: str, capability_id: str) -> dict:
-    """Server-side grant check; browser sandbox checks are never the authority."""
-    if not plugin_id or not version:
-        raise PermissionError("plugin identity and version are required")
-    tenant = _tenant_for_user(user)
-    from backend.db.connection import get_conn
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT i.state,i.current_version,i.granted_capabilities,r.status "
-                "FROM workmanship_plugin_installations i "
-                "JOIN workmanship_plugin_releases r ON r.plugin_id=i.plugin_id AND r.version=i.current_version "
-                "WHERE i.tenant_gid=%s AND i.plugin_id=%s",
-                (tenant, plugin_id),
-            )
-            row = cur.fetchone()
-    if not row or row["state"] not in ("enabled", "rolled_back"):
-        raise PermissionError("plugin installation is not enabled")
-    if row["current_version"] != version or row["status"] != "published":
-        raise PermissionError("plugin version is not active")
-    grants = set(_decode(row.get("granted_capabilities") or []))
-    if capability_id not in grants:
-        raise PermissionError("capability is not granted to this plugin installation")
-    validate_capability_grants((capability_id,))
-    return {"tenant_gid": tenant, "plugin_id": plugin_id, "plugin_version": version}
-
 def _event(cur, tenant: str, plugin_id: str, old: str | None, new: str, version: str, actor: str, detail: dict | None = None) -> None:
     cur.execute(
         "INSERT INTO workmanship_plugin_lifecycle_events (gid,tenant_gid,plugin_id,from_state,to_state,version,actor_gid,detail) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -171,7 +145,9 @@ def revoke_release(plugin_id: str, version: str, reason: str, actor_gid: str) ->
                 old = installation["state"]
                 if old != "revoked":
                     require_transition(old, "revoked")
-                    cur.execute("UPDATE workmanship_plugin_installations SET state='revoked',last_error=%s,updated_at=NOW() WHERE tenant_gid=%s AND plugin_id=%s", (reason[:4000], installation["tenant_gid"], plugin_id))
+                    cur.execute("UPDATE workmanship_plugin_installations SET state='revoked',last_error=%s,"
+                                "mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                                "WHERE tenant_gid=%s AND plugin_id=%s", (reason[:4000], installation["tenant_gid"], plugin_id))
                     _event(cur, installation["tenant_gid"], plugin_id, old, "revoked", version, actor_gid, {"reason": reason})
         conn.commit()
     return {"plugin_id": plugin_id, "version": version, "status": "revoked", "affected_installations": len(installations)}
@@ -262,15 +238,20 @@ def install(payload: dict, context) -> dict:
             consented = validate_capability_grants(payload.get("granted_capabilities", []))
             if set(consented) != set(requested):
                 raise ValueError("granted_capabilities must exactly match the signed manifest permissions")
+            installation_id = f"installation_{secrets.token_hex(16)}"
             if existing:
                 cur.execute(
                     "UPDATE workmanship_plugin_installations SET current_version=%s,previous_version=NULL,state='disabled',"
-                    "granted_capabilities=%s,previous_granted_capabilities=NULL,installed_by=%s,last_error=NULL,updated_at=NOW() "
+                    "granted_capabilities=%s,previous_granted_capabilities=NULL,installed_by=%s,last_error=NULL,"
+                    "installation_id=%s,mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
                     "WHERE tenant_gid=%s AND plugin_id=%s",
-                    (version, _json(consented), context.user_gid, tenant, plugin_id),
+                    (version, _json(consented), context.user_gid, installation_id, tenant, plugin_id),
                 )
             else:
-                cur.execute("INSERT INTO workmanship_plugin_installations (tenant_gid,plugin_id,current_version,state,granted_capabilities,installed_by) VALUES (%s,%s,%s,'disabled',%s,%s)", (tenant, plugin_id, version, _json(consented), context.user_gid))
+                cur.execute("INSERT INTO workmanship_plugin_installations "
+                            "(tenant_gid,plugin_id,current_version,state,granted_capabilities,installed_by,installation_id,mount_revocation_version) "
+                            "VALUES (%s,%s,%s,'disabled',%s,%s,%s,1)",
+                            (tenant, plugin_id, version, _json(consented), context.user_gid, installation_id))
             _event(cur, tenant, plugin_id, "uninstalled" if existing else None, "disabled", version, context.user_gid, {"action": "reinstall" if existing else "install"})
         conn.commit()
     return {"plugin_id": plugin_id, "version": version, "state": "disabled"}
@@ -288,7 +269,9 @@ def transition(payload: dict, context, target: str) -> dict:
             detail = None
             if target == "uninstalled":
                 detail = {"data": _apply_uninstall_data_policy(cur, tenant, plugin_id, row["current_version"])}
-            cur.execute("UPDATE workmanship_plugin_installations SET state=%s,updated_at=NOW() WHERE tenant_gid=%s AND plugin_id=%s", (target, tenant, plugin_id))
+            cur.execute("UPDATE workmanship_plugin_installations SET state=%s,"
+                        "mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                        "WHERE tenant_gid=%s AND plugin_id=%s", (target, tenant, plugin_id))
             _event(cur, tenant, plugin_id, row["state"], target, row["current_version"], context.user_gid, detail)
         conn.commit()
     return {"plugin_id": plugin_id, "version": row["current_version"], "state": target}
@@ -310,7 +293,11 @@ def upgrade(payload: dict, context) -> dict:
             if not row: raise ValueError("plugin is not installed")
             require_transition(row["state"], "upgrading")
             result = begin_upgrade(row["current_version"], version)
-            cur.execute("UPDATE workmanship_plugin_installations SET current_version=%s,previous_version=%s,state='upgrading',previous_granted_capabilities=granted_capabilities,granted_capabilities=%s,updated_at=NOW() WHERE tenant_gid=%s AND plugin_id=%s", (result.current_version, result.previous_version, _json(consented), tenant, plugin_id))
+            cur.execute("UPDATE workmanship_plugin_installations SET current_version=%s,previous_version=%s,state='upgrading',"
+                        "previous_granted_capabilities=granted_capabilities,granted_capabilities=%s,"
+                        "mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                        "WHERE tenant_gid=%s AND plugin_id=%s",
+                        (result.current_version, result.previous_version, _json(consented), tenant, plugin_id))
             _event(cur, tenant, plugin_id, row["state"], "upgrading", version, context.user_gid, {"previous_version": row["current_version"]})
         conn.commit()
     return {"plugin_id": plugin_id, "version": version, "previous_version": result.previous_version, "state": "upgrading"}
@@ -333,7 +320,11 @@ def rollback(payload: dict, context) -> dict:
             require_transition(row["state"], "rolled_back")
             result = plan_rollback(row["current_version"], row.get("previous_version"))
             _release(cur, plugin_id, result.current_version)
-            cur.execute("UPDATE workmanship_plugin_installations SET current_version=%s,previous_version=%s,state='rolled_back',granted_capabilities=previous_granted_capabilities,previous_granted_capabilities=granted_capabilities,updated_at=NOW() WHERE tenant_gid=%s AND plugin_id=%s", (result.current_version, result.previous_version, tenant, plugin_id))
+            cur.execute("UPDATE workmanship_plugin_installations SET current_version=%s,previous_version=%s,state='rolled_back',"
+                        "granted_capabilities=previous_granted_capabilities,previous_granted_capabilities=granted_capabilities,"
+                        "mount_revocation_version=mount_revocation_version+1,updated_at=NOW() "
+                        "WHERE tenant_gid=%s AND plugin_id=%s",
+                        (result.current_version, result.previous_version, tenant, plugin_id))
             _event(cur, tenant, plugin_id, row["state"], "rolled_back", result.current_version, context.user_gid, {"rolled_back_from": row["current_version"]})
         conn.commit()
     return {"plugin_id": plugin_id, "version": result.current_version, "state": "rolled_back"}
@@ -390,12 +381,29 @@ def tenant_registry(user: dict) -> list[dict]:
     from backend.db.connection import get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT i.plugin_id,i.current_version,i.granted_capabilities,r.manifest,r.artifact_object_key,r.artifact_sha256,r.platform_signature FROM workmanship_plugin_installations i JOIN workmanship_plugin_releases r ON r.plugin_id=i.plugin_id AND r.version=i.current_version WHERE i.tenant_gid=%s AND i.state IN ('enabled','rolled_back') AND r.status='published'", (tenant,))
+            cur.execute("SELECT i.plugin_id,i.current_version,i.granted_capabilities,"
+                        "i.installation_id,i.mount_revocation_version,r.manifest,"
+                        "r.artifact_object_key,r.artifact_sha256,r.platform_signature "
+                        "FROM workmanship_plugin_installations i "
+                        "JOIN workmanship_plugin_releases r "
+                        "ON r.plugin_id=i.plugin_id AND r.version=i.current_version "
+                        "WHERE i.tenant_gid=%s AND i.state IN ('enabled','rolled_back') "
+                        "AND r.status='published'", (tenant,))
             rows = list(cur.fetchall())
     result = []
     for row in rows:
         manifest = _decode(row["manifest"])
-        result.append({"name": manifest["name"], "plugin_id": row["plugin_id"], "version": row["current_version"], "web": manifest["runtimes"]["web"], "permissions": _decode(row["granted_capabilities"]), "artifact": {"object_key": row["artifact_object_key"], "sha256": row["artifact_sha256"]}, "platform_signed": bool(row["platform_signature"]), "platform_signature": row["platform_signature"]})
+        result.append({
+            "name": manifest["name"], "plugin_id": row["plugin_id"],
+            "version": row["current_version"], "web": manifest["runtimes"]["web"],
+            "permissions": _decode(row["granted_capabilities"]),
+            "capabilities": manifest.get("capabilities") or {"required": [], "optional": []},
+            "installation_id": row.get("installation_id"),
+            "mount_revocation_version": int(row.get("mount_revocation_version") or 1),
+            "artifact": {"object_key": row["artifact_object_key"], "sha256": row["artifact_sha256"]},
+            "platform_signed": bool(row["platform_signature"]),
+            "platform_signature": row["platform_signature"],
+        })
     return result
 
 
@@ -406,7 +414,9 @@ def resolve_asset_object_key(claims, asset_path: str) -> str:
     from backend.db.connection import get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT r.publisher_id FROM workmanship_plugin_installations i JOIN workmanship_plugin_releases r ON r.plugin_id=i.plugin_id AND r.version=i.current_version WHERE i.tenant_gid=%s AND i.plugin_id=%s AND i.current_version=%s AND i.state IN ('enabled','rolled_back') AND r.status='published' AND r.artifact_sha256=%s", (claims.tenant_gid, claims.plugin_id, claims.version, claims.artifact_sha256))
+            version = getattr(claims, "plugin_version", None) or getattr(claims, "version", None)
+            tenant = getattr(claims, "tenant_id", None) or getattr(claims, "tenant_gid", None)
+            cur.execute("SELECT r.publisher_id FROM workmanship_plugin_installations i JOIN workmanship_plugin_releases r ON r.plugin_id=i.plugin_id AND r.version=i.current_version WHERE i.tenant_gid=%s AND i.plugin_id=%s AND i.current_version=%s AND i.state IN ('enabled','rolled_back') AND r.status='published' AND r.artifact_sha256=%s", (tenant, claims.plugin_id, version, claims.artifact_sha256))
             row = cur.fetchone()
     if not row: raise PermissionError("plugin mount is disabled, revoked, changed, or unknown")
-    return f"plugin-assets/{row['publisher_id']}/{claims.plugin_id}/{claims.version}/{claims.artifact_sha256}/{normalized}"
+    return f"plugin-assets/{row['publisher_id']}/{claims.plugin_id}/{version}/{claims.artifact_sha256}/{normalized}"

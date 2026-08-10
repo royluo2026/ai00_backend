@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_2a2db4d509b4862334ad8872762ef39f",
-  "catalog_hash": "sha256:2a2db4d509b4862334ad8872762ef39fd3809eaf412bfa51ee9320a6366f8748",
+  "release_id": "rel_7263b81c7344960ad9df52f6fb8fdd30",
+  "catalog_hash": "sha256:7263b81c7344960ad9df52f6fb8fdd30364aeea65bad7d5a231c5608ba00ef57",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -3786,7 +3786,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": false,
         "api": true,
         "mcp": false,
@@ -3844,7 +3844,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": false,
         "api": true,
         "mcp": false,
@@ -4323,7 +4323,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": false,
         "api": true,
         "mcp": false,
@@ -5084,5 +5084,5 @@
       "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
     }
   ],
-  "created_at": "2026-08-10T08:08:58.865706Z"
+  "created_at": "2026-08-10T08:33:53.621132Z"
 }

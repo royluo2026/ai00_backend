@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 157,
+  "table_count": 158,
   "tables": [
     {
       "table": "workmanship_app_ai_audit_logs",
@@ -569,6 +569,11 @@
     },
     {
       "table": "workmanship_plugin_lifecycle_events",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_plugin_mount_sessions",
       "owner": "base",
       "runtime_domain": "base"
     },

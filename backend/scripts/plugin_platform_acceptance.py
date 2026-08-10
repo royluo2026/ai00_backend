@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import uuid
 from pathlib import Path
 
 import requests
@@ -75,14 +74,15 @@ def run(args) -> list[str]:
     if not asset.ok or b"<html" not in asset.content.lower(): raise AcceptanceError("sandbox entry asset could not be mounted")
     steps.append("sandbox entry mounted from OIS")
 
-    invoke_path="/api/v1/capabilities/system.echo:invoke"
-    identity={"X-AI00-Source":"plugin","X-AI00-Plugin-ID":plugin_id,"X-AI00-Plugin-Version":version,"X-Request-ID":f"accept-web-{uuid.uuid4().hex}"}
-    client.request("POST",invoke_path,json={"payload":{"acceptance":"web"}},headers=identity); steps.append("web plugin capability invoked")
-    run_id=f"accept-agent-{uuid.uuid4().hex}"
-    agent_identity={"X-AI00-Source":"agent","X-AI00-Plugin-ID":plugin_id,"X-AI00-Plugin-Version":version,"X-AI00-Agent-Run-ID":run_id}
-    client.request("POST",invoke_path,json={"payload":{"acceptance":"agent-1"}},headers=agent_identity)
-    client.request("POST",invoke_path,json={"payload":{"acceptance":"agent-2"}},headers=agent_identity)
-    steps.append("agent run invoked twice with one usage dedupe identity")
+    major = int(mounted.get("capability_versions", {}).get("system.echo") or 0)
+    if major:
+        invoke_path=(f"/api/v1/plugin-marketplace/mounts/{mounted['mount_session_id']}"
+                     f"/capabilities/system.echo:invoke")
+        result=client.request("POST",invoke_path,json={"major_version":major,"payload":{}})
+        if not result.get("ok"): raise AcceptanceError("mount-scoped plugin capability failed")
+        steps.append("mount-scoped web plugin capability invoked")
+    else:
+        steps.append("plugin mounted with no V2 capability grant")
 
     upgrade_values = (args.upgrade_package, args.upgrade_release, args.upgrade_signature)
     if any(upgrade_values) and not all(upgrade_values):
