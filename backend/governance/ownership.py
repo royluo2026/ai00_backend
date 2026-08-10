@@ -33,6 +33,8 @@ class DomainRegistry:
         self.ignored_identifiers = frozenset(data.get("ignored_identifiers", ()))
         self.table_prefix_owners = tuple(data.get("table_prefix_owners", ()))
         self.table_overrides = data.get("table_overrides", {})
+        self.migration_owner_overrides = data.get("migration_owner_overrides", {})
+        self.migration_table_exceptions = data.get("migration_table_exceptions", {})
         self._validate()
 
     def _validate(self) -> None:
@@ -49,6 +51,18 @@ class DomainRegistry:
         for table, owner in self.table_overrides.items():
             if owner not in known or not TABLE_RE.fullmatch(table):
                 raise OwnershipError(f"invalid table override: {table}={owner}")
+        for migration_id, owner in self.migration_owner_overrides.items():
+            if not re.fullmatch(r"\d{12}", migration_id) or owner not in known:
+                raise OwnershipError(f"invalid migration owner override: {migration_id}={owner}")
+        for migration_id, exception in self.migration_table_exceptions.items():
+            tables = exception.get("tables", ())
+            reason = exception.get("reason", "")
+            if (not re.fullmatch(r"\d{12}", migration_id)
+                    or not tables
+                    or any(not TABLE_RE.fullmatch(table) for table in tables)
+                    or not isinstance(reason, str)
+                    or len(reason.strip()) < 40):
+                raise OwnershipError(f"invalid migration table exception: {migration_id}")
 
     def source_domain(self, relative_path: str | Path) -> str | None:
         normalized = Path(relative_path).as_posix().lstrip("./")
@@ -77,6 +91,14 @@ class DomainRegistry:
 
     def validate_tables(self, tables: Iterable[str]) -> list[str]:
         return sorted({table for table in tables if self.table_owner(table) is None})
+
+    def migration_owner(self, migration_id: str, declared_domain: str) -> str:
+        """Resolve immutable legacy filenames to their reviewed first-class owner."""
+        return self.migration_owner_overrides.get(migration_id, declared_domain)
+
+    def migration_allows_table(self, migration_id: str, table: str) -> bool:
+        exception = self.migration_table_exceptions.get(migration_id, {})
+        return table in exception.get("tables", ())
 
     def is_migration_path(self, relative_path: str | Path) -> bool:
         normalized = Path(relative_path).as_posix().lstrip("./")

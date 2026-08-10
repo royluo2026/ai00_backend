@@ -2,10 +2,14 @@
   "version": 1,
   "product_domains": [
     "base",
+    "digital_model",
+    "project_management",
     "craft",
     "simulation",
     "agent",
-    "device"
+    "device",
+    "ontology",
+    "knowledge"
   ],
   "data_owners": {
     "base": {
@@ -15,6 +19,14 @@
     "craft": {
       "runtime_domain": "craft",
       "new_table_prefix": "workmanship_craft_"
+    },
+    "digital_model": {
+      "runtime_domain": "digital_model",
+      "new_table_prefix": "workmanship_model_"
+    },
+    "project_management": {
+      "runtime_domain": "project_management",
+      "new_table_prefix": "workmanship_project_"
     },
     "simulation": {
       "runtime_domain": "simulation",
@@ -29,8 +41,12 @@
       "new_table_prefix": "workmanship_device_"
     },
     "knowledge": {
-      "runtime_domain": "base",
+      "runtime_domain": "knowledge",
       "new_table_prefix": "workmanship_knowledge_"
+    },
+    "ontology": {
+      "runtime_domain": "ontology",
+      "new_table_prefix": "workmanship_ontology_"
     }
   },
   "source_roots": [
@@ -51,12 +67,29 @@
       "domain": "simulation"
     },
     {
+      "path": "plugins/digital_model",
+      "domain": "digital_model"
+    },
+    {
+      "path": "plugins/project_management",
+      "domain": "project_management"
+    },
+    {
+      "path": "backend/ontology",
+      "domain": "ontology"
+    },
+    {
+      "path": "backend/knowledge",
+      "domain": "knowledge"
+    },
+    {
       "path": "backend",
       "domain": "base"
     }
   ],
   "public_import_prefixes": [
     "backend.contracts",
+    "backend.capability_v2",
     "backend.platform_sdk"
   ],
   "migration_paths": [
@@ -109,6 +142,18 @@
       "owner": "knowledge"
     },
     {
+      "prefix": "workmanship_model_",
+      "owner": "digital_model"
+    },
+    {
+      "prefix": "workmanship_project_",
+      "owner": "project_management"
+    },
+    {
+      "prefix": "workmanship_ontology_",
+      "owner": "ontology"
+    },
+    {
       "prefix": "workmanship_auth_",
       "owner": "base"
     },
@@ -134,15 +179,15 @@
     },
     {
       "prefix": "workmanship_proj_",
-      "owner": "craft"
+      "owner": "project_management"
     },
     {
       "prefix": "workmanship_work_",
-      "owner": "craft"
+      "owner": "project_management"
     },
     {
       "prefix": "workmanship_onto_",
-      "owner": "craft"
+      "owner": "ontology"
     },
     {
       "prefix": "workmanship_know_",
@@ -162,9 +207,9 @@
     "workmanship_app_feishu_search_cache": "base",
     "workmanship_app_view_configs": "base",
     "workmanship_app_export_templates": "base",
-    "workmanship_app_workbench_configs": "base",
-    "workmanship_app_workbench_member_overrides": "base",
-    "workmanship_app_wb_annotations": "base",
+    "workmanship_app_workbench_configs": "project_management",
+    "workmanship_app_workbench_member_overrides": "project_management",
+    "workmanship_app_wb_annotations": "project_management",
     "workmanship_app_ai_audit_logs": "agent",
     "workmanship_app_ai_memory": "agent",
     "workmanship_app_ai_sessions": "agent",
@@ -172,10 +217,27 @@
     "workmanship_app_flows": "agent",
     "workmanship_app_flow_runs": "agent",
     "workmanship_app_skills": "agent",
+    "workmanship_base_ontology_active_refs": "ontology",
+    "workmanship_base_ontology_change_proposals": "ontology",
+    "workmanship_base_ontology_proposal_reviews": "ontology",
+    "workmanship_base_ontology_proposal_revisions": "ontology",
+    "workmanship_base_ontology_release_objects": "ontology",
+    "workmanship_base_ontology_releases": "ontology",
     "workmanship_app_wfc_canvases": "craft",
     "workmanship_app_bug_tracker_snapshots": "craft",
     "workmanship_know_craft_rules": "craft",
-    "workmanship_work_follows": "base",
-    "workmanship_work_notifications": "base"
+    "workmanship_work_follows": "project_management",
+    "workmanship_work_notifications": "project_management"
+  },
+  "migration_owner_overrides": {
+    "202608050002": "project_management",
+    "202608050003": "project_management",
+    "202608060003": "ontology"
+  },
+  "migration_table_exceptions": {
+    "202608030005": {
+      "tables": ["workmanship_work_task_dependencies"],
+      "reason": "Immutable pre-boundary migration mixed one Project Management table into a Craft release; replacement migrations must not repeat this dependency."
+    }
   }
 }

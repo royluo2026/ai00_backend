@@ -6,6 +6,8 @@ import sys
 from fnmatch import fnmatch
 from pathlib import Path
 
+from backend.governance import load_registry as load_runtime_domain_registry
+
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 OWNERSHIP_PATH = REPOSITORY_ROOT / "docs" / "governance" / "domain-ownership.json"
@@ -22,6 +24,17 @@ EXPECTED_DOMAINS = {
     "Ontology",
     "Knowledge",
     "Local Integration",
+}
+DOMAIN_SLUGS = {
+    "Base Platform": "base",
+    "Agent": "agent",
+    "Craft": "craft",
+    "Digital Model": "digital_model",
+    "Project Management": "project_management",
+    "Simulation": "simulation",
+    "Ontology": "ontology",
+    "Knowledge": "knowledge",
+    "Local Integration": "device",
 }
 
 
@@ -71,6 +84,24 @@ def test_every_versioned_migration_has_exactly_one_domain_owner():
         assert len(owners) == 1, f"{migration}: owners={owners}"
     declared = {pattern for patterns in claims.values() for pattern in patterns if "*" not in pattern}
     assert declared <= migrations
+
+
+def test_runtime_database_governance_uses_the_same_first_class_domains():
+    registry = load_runtime_domain_registry()
+
+    assert set(registry.product_domains) == set(DOMAIN_SLUGS.values())
+    assert registry.data_owners["knowledge"]["runtime_domain"] == "knowledge"
+    assert registry.table_owner("workmanship_proj_tasks").owner == "project_management"
+    assert registry.table_owner("workmanship_onto_concepts").owner == "ontology"
+    assert registry.table_owner("workmanship_know_documents").owner == "knowledge"
+    assert registry.migration_owner("202608050002", "craft") == "project_management"
+    assert registry.migration_owner("202608050003", "craft") == "project_management"
+    assert registry.migration_owner("202608060003", "base") == "ontology"
+    assert registry.migration_allows_table("202608030005", "workmanship_work_task_dependencies")
+    for exception in registry.migration_table_exceptions.values():
+        assert exception["tables"]
+        assert all("*" not in table for table in exception["tables"])
+        assert len(exception["reason"].strip()) >= 40
 
 
 def test_dependency_baseline_is_exact_and_checker_rejects_new_violations():

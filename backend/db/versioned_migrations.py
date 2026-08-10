@@ -14,7 +14,7 @@ from pathlib import Path
 from backend.governance import DomainRegistry, OwnershipError, load_registry
 
 MIGRATION_RE = re.compile(
-    r"^(?P<id>\d{12})_(?P<domain>base|craft|simulation|agent|device|knowledge)_(?P<name>[a-z0-9_]+)\.sql$"
+    r"^(?P<id>\d{12})_(?P<domain>base|craft|digital_model|project_management|simulation|agent|device|ontology|knowledge)_(?P<name>[a-z0-9_]+)\.sql$"
 )
 LOCK_NAME = "ai00:database-migrations:v1"
 LEDGER_TABLE = "workmanship_base_schema_migrations"
@@ -276,12 +276,15 @@ def validate_migration(migration: Migration, registry: DomainRegistry) -> None:
     unowned = registry.validate_tables(tables)
     if unowned:
         raise OwnershipError(f"migration contains unowned tables: {unowned}")
+    effective_owner = registry.migration_owner(migration.migration_id, migration.domain)
     wrong_owner = sorted(
-        table for table in tables if registry.table_owner(table).owner != migration.domain
+        table for table in tables
+        if registry.table_owner(table).owner != effective_owner
+        and not registry.migration_allows_table(migration.migration_id, table)
     )
     if wrong_owner:
         raise OwnershipError(
-            f"{migration.path.name} is owned by {migration.domain} but accesses {wrong_owner}"
+            f"{migration.path.name} is owned by {effective_owner} but accesses {wrong_owner}"
         )
     _assert_oceanbase_ddl_policy(migration, meaningful)
 
@@ -338,6 +341,7 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                 if status == "applied":
                     continue
             started = time.monotonic()
+            effective_owner = registry.migration_owner(migration.migration_id, migration.domain)
             try:
                 # OceanBase commits before and after DDL. Each statement is deliberately
                 # replay-safe and committed independently so retries can resume safely.
@@ -356,7 +360,7 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                             VALUES (%s, %s, %s, %s, 'applied', %s, NULL)
                             ON DUPLICATE KEY UPDATE status='applied', duration_ms=VALUES(duration_ms),
                                 error=NULL, applied_at=CURRENT_TIMESTAMP(6)""",
-                        (migration.migration_id, migration.domain, migration.name, migration.checksum, duration),
+                        (migration.migration_id, effective_owner, migration.name, migration.checksum, duration),
                     )
                 conn.commit()
                 applied.append(migration.migration_id)
@@ -370,7 +374,7 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                             VALUES (%s, %s, %s, %s, 'failed', %s, %s)
                             ON DUPLICATE KEY UPDATE status='failed', duration_ms=VALUES(duration_ms),
                                 error=VALUES(error), applied_at=CURRENT_TIMESTAMP(6)""",
-                        (migration.migration_id, migration.domain, migration.name, migration.checksum, duration, str(exc)[:4000]),
+                        (migration.migration_id, effective_owner, migration.name, migration.checksum, duration, str(exc)[:4000]),
                     )
                 conn.commit()
                 raise MigrationError(f"migration {migration.migration_id} failed: {exc}") from exc
