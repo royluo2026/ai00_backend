@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "vectors": [
+    {
+      "name": "artifact-open-unicode-safe",
+      "secret": "0123456789abcdef0123456789abcdef",
+      "payload_hash": "sha256:676453573af420cdc1a782dd580278027056fb29e23afda16570ad81505373b3",
+      "signature": "hmac-sha256:c99509bac60a2eebc46cec1a62269a8f6950d9ac99a505fbba19e2eba886266b",
+      "outcome_signature": "hmac-sha256:c55fa8807e2d0df4eef6eb0b54edc979e5e9a9fbe8fb8d87f270d6f4a4163b73",
+      "envelope": {
+        "protocol": "ai00.local-operation.v2",
+        "operation_id": "operation_0123456789abcdef0123456789abcdef",
+        "tenant_id": "tenant_1",
+        "capability_id": "vismockup.model.open",
+        "payload": {
+          "device_id": "device_1",
+          "artifact_ref": {
+            "artifact_id": "artifact_model_1",
+            "media_type": "model/step",
+            "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "byte_size": 1024,
+            "version": 1
+          }
+        },
+        "payload_hash": "sha256:676453573af420cdc1a782dd580278027056fb29e23afda16570ad81505373b3",
+        "key_id": "key-2026-08",
+        "issued_at": "2026-08-10T00:00:00Z",
+        "expires_at": "2026-08-10T00:05:00Z"
+      },
+      "outcome": {
+        "protocol": "ai00.local-operation.v2",
+        "operation_id": "operation_0123456789abcdef0123456789abcdef",
+        "status": "completed",
+        "result": {"opened": true},
+        "error_code": "",
+        "reported_at": "2026-08-10T00:06:00Z"
+      }
+    }
+  ]
+}

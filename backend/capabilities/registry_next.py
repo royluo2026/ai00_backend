@@ -126,10 +126,6 @@ register_retry_capability(capability_registry)
 from backend.base.operations import register_worker_capability
 register_worker_capability(capability_registry)
 
-from .local_runtime_next import register_local_runtime_capabilities
-register_local_runtime_capabilities(capability_registry)
-
-
 from .plugin_marketplace_next import register_plugin_marketplace_capabilities
 register_plugin_marketplace_capabilities(capability_registry)
 

@@ -225,6 +225,20 @@ from backend.capability_v2.reliability import (
 from backend.db.connection import get_conn as _capability_connection
 from backend.routers import deps as _capability_deps
 from backend.services import user_service as _capability_user_service
+from backend.domain_ports.resource_authorization import resource_authorizers as _resource_authorizers
+from backend.capability_v2.artifacts import SqlArtifactStore as _CapabilityArtifactStore
+
+
+def _authorize_owned_artifact(artifact_id, identity):
+    try:
+        record = _CapabilityArtifactStore(_capability_connection).get_artifact(artifact_id)
+    except Exception:
+        return False
+    actor_id = identity.actor.user_id or identity.actor.service_id or ""
+    return record.tenant_id == identity.tenant.tenant_id and record.actor_id == actor_id
+
+
+_resource_authorizers.register("artifact", _authorize_owned_artifact)
 _capability_gateway = _configure_capability_gateway(
     _capability_registry,
     policy=_LegacyGatewayPolicy(
@@ -235,6 +249,7 @@ _capability_gateway = _configure_capability_gateway(
             )
         ),
         approval_service=_ApprovalService(_SqlApprovalStore(_capability_connection)),
+        resource_authorizer=lambda ref, identity, _user: _resource_authorizers.authorize(ref, identity),
     ),
     reliability=_ReliabilityCoordinator(
         _SqlOutcomeStore(_capability_connection),

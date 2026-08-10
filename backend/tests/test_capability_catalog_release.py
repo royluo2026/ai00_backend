@@ -237,6 +237,7 @@ def test_checked_in_official_provider_hashes_match_exact_source_artifacts():
         "official.digital-model": root / "plugins" / "digital_model",
         "official.project-management": root / "plugins" / "project_management",
         "official.simulation": root / "plugins" / "simulation",
+        "official.local-integration": root / "plugins" / "device",
     }
     for provider in document["providers"]:
         assert provider["artifact_hash"] == hash_provider_artifact(

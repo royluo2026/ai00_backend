@@ -2,8 +2,8 @@
 
 本目录由不可变 Catalog Release 自动生成，不接受手工修改。
 
-- Catalog Release：`rel_62702938fc287d57bd0a2e4e3bf7385c`
-- Catalog Hash：`sha256:62702938fc287d57bd0a2e4e3bf7385c48241f4846171576083a3ce101afa789`
+- Catalog Release：`rel_240296a5c4f1835b2ccabd56169c67e6`
+- Catalog Hash：`sha256:240296a5c4f1835b2ccabd56169c67e6735765cfc6499f16a8d84802ff428492`
 - 描述符数量：99
 
 ## 重要边界
@@ -31,12 +31,12 @@
 | 消费者 | 能力数 |
 |---|---:|
 | web | 99 |
-| plugin | 84 |
-| agent | 85 |
+| plugin | 92 |
+| agent | 92 |
 | api | 99 |
-| mcp | 85 |
+| mcp | 92 |
 | worker | 1 |
-| local_runtime | 0 |
+| local_runtime | 7 |
 
 ## 文件
 

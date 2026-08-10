@@ -1,23 +1,23 @@
 # local.command.get@1
 
-读取本人发起的本地命令状态和结果。
+Read an owned local operation outcome.
 
 ## 使用判断
 
-- 适用：读取本人发起的本地命令状态和结果。
+- 适用：Read an owned local operation outcome.
 - 不适用：Use a governed Capability V2 contract when one is available.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`local_integration`
-- Catalog Release：`rel_62702938fc287d57bd0a2e4e3bf7385c`
+- Catalog Release：`rel_240296a5c4f1835b2ccabd56169c67e6`
 - Schema 精度：`typed`
-- 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -28,14 +28,14 @@
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:agent.run`
+- 授权策略：`local-integration.v2:agent.run`
 - 自动化等级：`A2`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `local-operation` ← `command_id`（必填）
 
 ## 执行与可靠性
 
@@ -50,7 +50,7 @@
 - Operation：`none`
 - Artifact：`none`
 - 审计：`standard`
-- Evidence：`optional`
+- Evidence：`required`
 - 配额成本：1
 
 ## 输入 Schema
@@ -59,12 +59,13 @@
 {
   "additionalProperties": false,
   "properties": {
-    "command_gid": {
+    "command_id": {
+      "minLength": 1,
       "type": "string"
     }
   },
   "required": [
-    "command_gid"
+    "command_id"
   ],
   "type": "object"
 }
@@ -75,10 +76,10 @@
 ```json
 {
   "capability_id": "local.command.get",
-  "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+  "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
   "major_version": 1,
   "payload": {
-    "command_gid": "example"
+    "command_id": "example"
   }
 }
 ```
@@ -90,7 +91,248 @@
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "capability_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "capability_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "command_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "created_at": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "device_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "error_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "result": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "connected": {
+              "type": "boolean"
+            },
+            "platform": {
+              "enum": [
+                "windows"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "connected",
+            "platform"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "enum": [
+                "starting",
+                "already_running"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "opened": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "opened"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "max_depth": {
+              "type": "integer"
+            },
+            "nodes": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "catia_occurrence_name": {
+                    "type": "string"
+                  },
+                  "has_more": {
+                    "type": "boolean"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "node_key": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "parent_node_key": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "node_key",
+                  "parent_node_key",
+                  "name",
+                  "catia_occurrence_name",
+                  "has_more"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "nodes",
+            "max_depth"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "matched": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "not_found": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "matched",
+            "not_found"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "enum": [
+                "all_on",
+                "all_off",
+                "deselect"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "action"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "artifact_ref": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "byte_size": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "media_type": {
+                  "enum": [
+                    "model/jt",
+                    "model/plmxml",
+                    "application/vnd.siemens.plmxml+xml",
+                    "model/step"
+                  ],
+                  "type": "string"
+                },
+                "sha256": {
+                  "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "version": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "artifact_id",
+                "media_type",
+                "sha256",
+                "byte_size",
+                "version"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "artifact_ref"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "status": {
+      "enum": [
+        "queued",
+        "leased",
+        "reconciling",
+        "completed",
+        "failed",
+        "outcome_unknown",
+        "expired",
+        "cancelled"
+      ],
+      "type": "string"
+    },
+    "updated_at": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "command_id",
+    "device_id",
+    "capability_id",
+    "capability_version",
+    "status",
+    "created_at",
+    "updated_at"
+  ],
   "type": "object"
 }
 ```
@@ -127,9 +369,13 @@
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `device_not_found`：The workstation is unavailable or is not owned by the caller.（retryable=false）
+- `device_capability_unavailable`：The workstation does not advertise the requested capability.（retryable=true）
+- `local_operation_signing_key_unavailable`：The server cannot sign a local operation.（retryable=true）
+- `local_operation_failed`：The workstation returned a sanitized local execution error.（retryable=false）
+- `local_operation_outcome_unknown`：Execution may have occurred and must be reconciled before retry.（retryable=true）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

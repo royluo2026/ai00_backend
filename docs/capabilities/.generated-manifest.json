@@ -79,7 +79,7 @@
     "local-integration/vismockup.capture@1.md",
     "local-integration/vismockup.highlight@1.md",
     "local-integration/vismockup.launch@1.md",
-    "local-integration/vismockup.open_file@1.md",
+    "local-integration/vismockup.model.open@1.md",
     "local-integration/vismockup.status@1.md",
     "local-integration/vismockup.tree@1.md",
     "local-integration/vismockup.visibility@1.md",

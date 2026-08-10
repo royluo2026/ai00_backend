@@ -1,41 +1,41 @@
 # vismockup.launch@1
 
-启动或连接 VisMockup。
+Launch or connect to VisMockup.
 
 ## 使用判断
 
-- 适用：启动或连接 VisMockup。
+- 适用：Launch or connect to VisMockup.
 - 不适用：Use a governed Capability V2 contract when one is available.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`local_integration`
-- Catalog Release：`rel_62702938fc287d57bd0a2e4e3bf7385c`
+- Catalog Release：`rel_240296a5c4f1835b2ccabd56169c67e6`
 - Schema 精度：`typed`
-- 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
-| agent | 不可用 |
+| plugin | 可用 |
+| agent | 可用 |
 | api | 可用 |
-| mcp | 不可用 |
+| mcp | 可用 |
 | worker | 不可用 |
-| local_runtime | 不可用 |
+| local_runtime | 可用 |
 
 插件和 Agent 只有在上表对应值为“可用”，且安装/Mount 或 Delegation 明确授权时才可调用。
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:agent.run`
+- 授权策略：`local-integration.v2:agent.run`
 - 自动化等级：`A1`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `device` ← `device_id`（必填）
 
 ## 执行与可靠性
 
@@ -43,14 +43,14 @@
 - 执行模式：`local`
 - 超时：30 秒
 - 审批：`user`
-- 幂等：`optional`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
+- 一致性：`external`
 - Operation：`required`
 - Artifact：`none`
 - 审计：`standard`
-- Evidence：`optional`
+- Evidence：`required`
 - 配额成本：1
 
 ## 输入 Schema
@@ -59,13 +59,13 @@
 {
   "additionalProperties": false,
   "properties": {
-    "device_gid": {
+    "device_id": {
       "minLength": 1,
       "type": "string"
     }
   },
   "required": [
-    "device_gid"
+    "device_id"
   ],
   "type": "object"
 }
@@ -76,10 +76,10 @@
 ```json
 {
   "capability_id": "vismockup.launch",
-  "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+  "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
   "major_version": 1,
   "payload": {
-    "device_gid": "example"
+    "device_id": "example"
   }
 }
 ```
@@ -91,7 +91,32 @@
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "command_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "device_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "expires_in": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "queued"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "command_id",
+    "device_id",
+    "status",
+    "expires_in"
+  ],
   "type": "object"
 }
 ```
@@ -128,9 +153,13 @@
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `device_not_found`：The workstation is unavailable or is not owned by the caller.（retryable=false）
+- `device_capability_unavailable`：The workstation does not advertise the requested capability.（retryable=true）
+- `local_operation_signing_key_unavailable`：The server cannot sign a local operation.（retryable=true）
+- `local_operation_failed`：The workstation returned a sanitized local execution error.（retryable=false）
+- `local_operation_outcome_unknown`：Execution may have occurred and must be reconciled before retry.（retryable=true）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

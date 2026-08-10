@@ -21,10 +21,15 @@ public sealed class RuntimeWorker(DeviceGatewayClient gateway, SessionHostClient
                 var command = await gateway.LeaseAsync(stoppingToken);
                 if (command is not null)
                 {
-                    CommandCompletion completion;
-                    try { completion = await sessionHost.ExecuteAsync(command, stoppingToken); }
-                    catch (Exception ex) { completion = new(command.LeaseId, false, Error: ex.Message[..Math.Min(1000, ex.Message.Length)]); }
-                    await gateway.CompleteAsync(command.CommandId, completion, stoppingToken);
+                    OperationCompletion completion;
+                    try
+                    {
+                        var request = await gateway.PrepareAsync(command, stoppingToken);
+                        completion = await sessionHost.ExecuteAsync(request, stoppingToken);
+                        completion = await gateway.FinalizeAsync(command, completion, stoppingToken);
+                    }
+                    catch (Exception) { completion = new(command.Operation.OperationId, "outcome_unknown", ErrorCode: "session_host_unavailable"); }
+                    await gateway.CompleteAsync(command.Operation.OperationId, command.LeaseId, completion, stoppingToken);
                 }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }

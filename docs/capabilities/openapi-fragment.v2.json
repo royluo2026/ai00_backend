@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_62702938fc287d57bd0a2e4e3bf7385c"
+    "version": "rel_240296a5c4f1835b2ccabd56169c67e6"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -279,7 +279,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -549,7 +549,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -856,7 +856,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -1140,7 +1140,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -1429,7 +1429,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -1703,7 +1703,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -1951,7 +1951,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -2216,7 +2216,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -2493,7 +2493,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -2779,7 +2779,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -3132,7 +3132,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -3393,7 +3393,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -3706,7 +3706,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -3954,7 +3954,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -4197,7 +4197,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -4445,7 +4445,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -4695,7 +4695,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -4966,7 +4966,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.compare",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -5238,7 +5238,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -5541,7 +5541,7 @@
           }
         },
         "summary": "digital_model.component.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -5801,7 +5801,7 @@
           }
         },
         "summary": "digital_model.model.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -6057,7 +6057,7 @@
           }
         },
         "summary": "digital_model.model.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -6336,7 +6336,7 @@
           }
         },
         "summary": "digital_model.model.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -6598,7 +6598,7 @@
           }
         },
         "summary": "digital_model.snapshot.compare",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -6941,7 +6941,7 @@
           }
         },
         "summary": "digital_model.snapshot.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -7323,7 +7323,7 @@
           }
         },
         "summary": "digital_model.version.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -7568,7 +7568,7 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -7884,7 +7884,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -8186,7 +8186,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -8452,7 +8452,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -8734,7 +8734,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -9069,7 +9069,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -9353,7 +9353,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -9646,7 +9646,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -9981,7 +9981,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -10265,7 +10265,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -10617,7 +10617,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -11127,7 +11127,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -11499,7 +11499,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -11893,7 +11893,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -12237,7 +12237,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -12566,7 +12566,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -12950,7 +12950,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -13339,7 +13339,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -13718,7 +13718,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -13991,7 +13991,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -14266,7 +14266,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -14541,13 +14541,13 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
     "/api/v2/capabilities/local.command.get:invoke": {
       "post": {
-        "description": "读取本人发起的本地命令状态和结果。",
+        "description": "Read an owned local operation outcome.",
         "operationId": "invoke_local_command_get_v1",
         "requestBody": {
           "content": {
@@ -14555,12 +14555,13 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "command_gid": {
+                  "command_id": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
                 "required": [
-                  "command_gid"
+                  "command_id"
                 ],
                 "type": "object"
               }
@@ -14639,7 +14640,248 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "capability_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "capability_version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "command_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "device_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "error_code": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "result": {
+                              "anyOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "connected": {
+                                      "type": "boolean"
+                                    },
+                                    "platform": {
+                                      "enum": [
+                                        "windows"
+                                      ],
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "connected",
+                                    "platform"
+                                  ],
+                                  "type": "object"
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "status": {
+                                      "enum": [
+                                        "starting",
+                                        "already_running"
+                                      ],
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "status"
+                                  ],
+                                  "type": "object"
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "opened": {
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "opened"
+                                  ],
+                                  "type": "object"
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "max_depth": {
+                                      "type": "integer"
+                                    },
+                                    "nodes": {
+                                      "items": {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "catia_occurrence_name": {
+                                            "type": "string"
+                                          },
+                                          "has_more": {
+                                            "type": "boolean"
+                                          },
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "node_key": {
+                                            "minLength": 1,
+                                            "type": "string"
+                                          },
+                                          "parent_node_key": {
+                                            "type": [
+                                              "string",
+                                              "null"
+                                            ]
+                                          }
+                                        },
+                                        "required": [
+                                          "node_key",
+                                          "parent_node_key",
+                                          "name",
+                                          "catia_occurrence_name",
+                                          "has_more"
+                                        ],
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    }
+                                  },
+                                  "required": [
+                                    "nodes",
+                                    "max_depth"
+                                  ],
+                                  "type": "object"
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "matched": {
+                                      "minimum": 0,
+                                      "type": "integer"
+                                    },
+                                    "not_found": {
+                                      "items": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                      },
+                                      "type": "array"
+                                    }
+                                  },
+                                  "required": [
+                                    "matched",
+                                    "not_found"
+                                  ],
+                                  "type": "object"
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "action": {
+                                      "enum": [
+                                        "all_on",
+                                        "all_off",
+                                        "deselect"
+                                      ],
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "action"
+                                  ],
+                                  "type": "object"
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "artifact_ref": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "artifact_id": {
+                                          "minLength": 1,
+                                          "type": "string"
+                                        },
+                                        "byte_size": {
+                                          "minimum": 0,
+                                          "type": "integer"
+                                        },
+                                        "media_type": {
+                                          "enum": [
+                                            "model/jt",
+                                            "model/plmxml",
+                                            "application/vnd.siemens.plmxml+xml",
+                                            "model/step"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "sha256": {
+                                          "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                                          "pattern": "^[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "version": {
+                                          "minimum": 1,
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "artifact_id",
+                                        "media_type",
+                                        "sha256",
+                                        "byte_size",
+                                        "version"
+                                      ],
+                                      "type": "object"
+                                    }
+                                  },
+                                  "required": [
+                                    "artifact_ref"
+                                  ],
+                                  "type": "object"
+                                }
+                              ]
+                            },
+                            "status": {
+                              "enum": [
+                                "queued",
+                                "leased",
+                                "reconciling",
+                                "completed",
+                                "failed",
+                                "outcome_unknown",
+                                "expired",
+                                "cancelled"
+                              ],
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command_id",
+                            "device_id",
+                            "capability_id",
+                            "capability_version",
+                            "status",
+                            "created_at",
+                            "updated_at"
+                          ],
                           "type": "object"
                         },
                         {
@@ -14767,7 +15009,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -15067,7 +15309,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -15365,7 +15607,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -15628,7 +15870,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -15864,7 +16106,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -16160,7 +16402,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -16456,7 +16698,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -16751,7 +16993,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -17021,7 +17263,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -17540,7 +17782,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -17836,7 +18078,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -18141,7 +18383,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -18454,7 +18696,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -18695,7 +18937,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -18936,7 +19178,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -19188,7 +19430,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -19429,7 +19671,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -19670,7 +19912,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -19910,7 +20152,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -20157,7 +20399,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -20414,7 +20656,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -20660,7 +20902,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -20901,7 +21143,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -21146,7 +21388,7 @@
           }
         },
         "summary": "plugin.upgrade.finish",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -21408,7 +21650,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -21660,7 +21902,7 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -22237,7 +22479,7 @@
           }
         },
         "summary": "simulation.environment.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -22686,7 +22928,7 @@
           }
         },
         "summary": "simulation.environment.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -23150,7 +23392,7 @@
           }
         },
         "summary": "simulation.environment.list",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -23463,7 +23705,7 @@
           }
         },
         "summary": "simulation.parameter_set.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -23768,7 +24010,7 @@
           }
         },
         "summary": "simulation.parameter_set.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -24091,7 +24333,7 @@
           }
         },
         "summary": "simulation.profile.create",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -24401,7 +24643,7 @@
           }
         },
         "summary": "simulation.profile.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -24680,7 +24922,7 @@
           }
         },
         "summary": "simulation.result.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -24975,7 +25217,7 @@
           }
         },
         "summary": "simulation.run.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -25270,7 +25512,7 @@
           }
         },
         "summary": "simulation.run.start",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -25509,7 +25751,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -25760,7 +26002,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -25991,7 +26233,7 @@
           }
         },
         "summary": "system.echo",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -26240,7 +26482,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -26489,7 +26731,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -26744,7 +26986,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -27013,7 +27255,7 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
@@ -27295,13 +27537,13 @@
           }
         },
         "summary": "system.worker.outbox.health",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
     "/api/v2/capabilities/vismockup.capture:invoke": {
       "post": {
-        "description": "捕获当前 VisMockup 视图。",
+        "description": "Capture the active VisMockup view as an ArtifactRef.",
         "operationId": "invoke_vismockup_capture_v1",
         "requestBody": {
           "content": {
@@ -27309,13 +27551,13 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "device_gid": {
+                  "device_id": {
                     "minLength": 1,
                     "type": "string"
                   }
                 },
                 "required": [
-                  "device_gid"
+                  "device_id"
                 ],
                 "type": "object"
               }
@@ -27394,7 +27636,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "command_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "device_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "expires_in": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command_id",
+                            "device_id",
+                            "status",
+                            "expires_in"
+                          ],
                           "type": "object"
                         },
                         {
@@ -27522,13 +27789,13 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
     "/api/v2/capabilities/vismockup.highlight:invoke": {
       "post": {
-        "description": "按 CATIA occurrence 名称高亮节点。",
+        "description": "Highlight occurrences by CATIA occurrence name.",
         "operationId": "invoke_vismockup_highlight_v1",
         "requestBody": {
           "content": {
@@ -27538,16 +27805,20 @@
                 "properties": {
                   "catia_names": {
                     "items": {
+                      "minLength": 1,
                       "type": "string"
                     },
+                    "maxItems": 1000,
+                    "minItems": 1,
                     "type": "array"
                   },
-                  "device_gid": {
+                  "device_id": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
                 "required": [
-                  "device_gid",
+                  "device_id",
                   "catia_names"
                 ],
                 "type": "object"
@@ -27627,7 +27898,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "command_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "device_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "expires_in": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command_id",
+                            "device_id",
+                            "status",
+                            "expires_in"
+                          ],
                           "type": "object"
                         },
                         {
@@ -27755,13 +28051,13 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
     "/api/v2/capabilities/vismockup.launch:invoke": {
       "post": {
-        "description": "启动或连接 VisMockup。",
+        "description": "Launch or connect to VisMockup.",
         "operationId": "invoke_vismockup_launch_v1",
         "requestBody": {
           "content": {
@@ -27769,13 +28065,13 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "device_gid": {
+                  "device_id": {
                     "minLength": 1,
                     "type": "string"
                   }
                 },
                 "required": [
-                  "device_gid"
+                  "device_id"
                 ],
                 "type": "object"
               }
@@ -27854,7 +28150,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "command_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "device_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "expires_in": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command_id",
+                            "device_id",
+                            "status",
+                            "expires_in"
+                          ],
                           "type": "object"
                         },
                         {
@@ -27982,31 +28303,67 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/vismockup.open_file:invoke": {
+    "/api/v2/capabilities/vismockup.model.open:invoke": {
       "post": {
-        "description": "打开允许目录中的 PLMXML/JT 文件。",
-        "operationId": "invoke_vismockup_open_file_v1",
+        "description": "Materialize and open an authorized model ArtifactRef.",
+        "operationId": "invoke_vismockup_model_open_v1",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "device_gid": {
-                    "type": "string"
+                  "artifact_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "artifact_id": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "byte_size": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "media_type": {
+                        "enum": [
+                          "model/jt",
+                          "model/plmxml",
+                          "application/vnd.siemens.plmxml+xml",
+                          "model/step"
+                        ],
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "version": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "artifact_id",
+                      "media_type",
+                      "sha256",
+                      "byte_size",
+                      "version"
+                    ],
+                    "type": "object"
                   },
-                  "file_path": {
+                  "device_id": {
                     "minLength": 1,
                     "type": "string"
                   }
                 },
                 "required": [
-                  "device_gid",
-                  "file_path"
+                  "device_id",
+                  "artifact_ref"
                 ],
                 "type": "object"
               }
@@ -28056,7 +28413,7 @@
                       "type": "array"
                     },
                     "capability_id": {
-                      "const": "vismockup.open_file"
+                      "const": "vismockup.model.open"
                     },
                     "correlation": {
                       "additionalProperties": false,
@@ -28085,7 +28442,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "command_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "device_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "expires_in": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command_id",
+                            "device_id",
+                            "status",
+                            "expires_in"
+                          ],
                           "type": "object"
                         },
                         {
@@ -28212,14 +28594,14 @@
             "description": "CapabilityResultV2"
           }
         },
-        "summary": "vismockup.open_file",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "summary": "vismockup.model.open",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
     "/api/v2/capabilities/vismockup.status:invoke": {
       "post": {
-        "description": "读取 VisMockup 连接状态。",
+        "description": "Read VisMockup connection state.",
         "operationId": "invoke_vismockup_status_v1",
         "requestBody": {
           "content": {
@@ -28227,13 +28609,13 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "device_gid": {
+                  "device_id": {
                     "minLength": 1,
                     "type": "string"
                   }
                 },
                 "required": [
-                  "device_gid"
+                  "device_id"
                 ],
                 "type": "object"
               }
@@ -28312,7 +28694,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "command_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "device_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "expires_in": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command_id",
+                            "device_id",
+                            "status",
+                            "expires_in"
+                          ],
                           "type": "object"
                         },
                         {
@@ -28440,13 +28847,13 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
     "/api/v2/capabilities/vismockup.tree:invoke": {
       "post": {
-        "description": "读取 VisMockup 结构树。",
+        "description": "Read the active VisMockup product tree.",
         "operationId": "invoke_vismockup_tree_v1",
         "requestBody": {
           "content": {
@@ -28454,18 +28861,21 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "device_gid": {
+                  "device_id": {
+                    "minLength": 1,
                     "type": "string"
                   },
                   "force": {
                     "type": "boolean"
                   },
                   "max_depth": {
+                    "maximum": 100,
+                    "minimum": 1,
                     "type": "integer"
                   }
                 },
                 "required": [
-                  "device_gid"
+                  "device_id"
                 ],
                 "type": "object"
               }
@@ -28544,7 +28954,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "command_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "device_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "expires_in": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command_id",
+                            "device_id",
+                            "status",
+                            "expires_in"
+                          ],
                           "type": "object"
                         },
                         {
@@ -28672,13 +29107,13 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     },
     "/api/v2/capabilities/vismockup.visibility:invoke": {
       "post": {
-        "description": "执行全显、全隐或取消选择。",
+        "description": "Change active-view visibility or selection.",
         "operationId": "invoke_vismockup_visibility_v1",
         "requestBody": {
           "content": {
@@ -28694,12 +29129,13 @@
                     ],
                     "type": "string"
                   },
-                  "device_gid": {
+                  "device_id": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
                 "required": [
-                  "device_gid",
+                  "device_id",
                   "action"
                 ],
                 "type": "object"
@@ -28779,7 +29215,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "command_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "device_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "expires_in": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [
+                                "queued"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "command_id",
+                            "device_id",
+                            "status",
+                            "expires_in"
+                          ],
                           "type": "object"
                         },
                         {
@@ -28907,7 +29368,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "x-ai00-catalog-release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "x-ai00-major-version": 1
       }
     }

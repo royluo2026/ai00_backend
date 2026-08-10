@@ -228,6 +228,64 @@ class OperationService:
         return record
 
 
+class TrustedExternalOperationReconciler:
+    """Advance externally executed operations after an adapter authenticates its worker."""
+
+    def __init__(self, store: OperationStore, *, allowed_kind_prefix: str) -> None:
+        if not allowed_kind_prefix:
+            raise ValueError("allowed_kind_prefix is required")
+        self._store = store
+        self._prefix = allowed_kind_prefix
+
+    def reconcile(self, operation_id: str, target: OperationStatus, *, error_code: str | None = None) -> OperationRef:
+        record = self._store.get(operation_id)
+        if not record.kind.startswith(self._prefix):
+            raise OperationAuthorizationError("operation kind is outside reconciler boundary")
+        if record.ref.status == target:
+            return record.ref
+        terminal = {OperationStatus.COMPLETED, OperationStatus.FAILED, OperationStatus.OUTCOME_UNKNOWN}
+        if target not in terminal | {OperationStatus.CLAIMED}:
+            raise OperationTransitionError("unsupported external reconciliation target")
+        if target is OperationStatus.FAILED and not error_code:
+            raise OperationTransitionError("failed operation requires error_code")
+        path = _reconciliation_path(record.ref.status, target)
+        for status in path:
+            replacement = record.model_copy(update={
+                "ref": record.ref.model_copy(update={"status": status, "version": record.ref.version + 1}),
+                "updated_at": datetime.now(UTC),
+                "error_code": error_code if status in {OperationStatus.FAILED, OperationStatus.OUTCOME_UNKNOWN} else None,
+            })
+            record = self._store.compare_and_swap(operation_id, record.ref.version, replacement)
+        return record.ref
+
+
+def _reconciliation_path(current: OperationStatus, target: OperationStatus) -> tuple[OperationStatus, ...]:
+    if current in {OperationStatus.COMPLETED, OperationStatus.FAILED, OperationStatus.CANCELLED}:
+        raise OperationTransitionError("terminal operation cannot be reconciled to a different state")
+    ordered = (OperationStatus.ACCEPTED, OperationStatus.CLAIMED, OperationStatus.PREPARING, OperationStatus.RUNNING)
+    if target is OperationStatus.CLAIMED:
+        if current is not OperationStatus.ACCEPTED:
+            if current in ordered[1:]:
+                return ()
+            raise OperationTransitionError("operation cannot return to claimed")
+        return (OperationStatus.CLAIMED,)
+    path: list[OperationStatus] = []
+    if current in ordered:
+        index = ordered.index(current)
+        path.extend(ordered[index + 1:])
+        current = OperationStatus.RUNNING
+    if target is OperationStatus.COMPLETED:
+        if current is OperationStatus.OUTCOME_UNKNOWN:
+            path.append(OperationStatus.COMPLETED)
+        elif current is OperationStatus.POST_PROCESSING:
+            path.append(OperationStatus.COMPLETED)
+        else:
+            path.extend((OperationStatus.POST_PROCESSING, OperationStatus.COMPLETED))
+    elif target in {OperationStatus.FAILED, OperationStatus.OUTCOME_UNKNOWN}:
+        path.append(target)
+    return tuple(path)
+
+
 def _actor_id(identity: ConsumerIdentity) -> str:
     return identity.actor.user_id or identity.actor.service_id or ""
 
@@ -265,5 +323,5 @@ def _operation_from_row(row) -> OperationRecord:
 __all__ = [
     "InMemoryOperationStore", "OperationAuthorizationError", "OperationError",
     "OperationRecord", "OperationService", "OperationStore", "OperationTransitionError",
-    "SqlOperationStore",
+    "SqlOperationStore", "TrustedExternalOperationReconciler",
 ]

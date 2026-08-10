@@ -25,6 +25,7 @@
         "backend/capabilities/system_shared_next.py",
         "backend/capabilities/plugin_marketplace_next.py",
         "backend/domain_ports/versioned_resources.py",
+        "backend/domain_ports/resource_authorization.py",
         "services/mcp-gateway/**"
       ],
       "provider_paths": ["backend/system_capabilities/base_provider.py"],
@@ -168,10 +169,10 @@
       "maintainers": ["@ai00/local-integration-maintainers"],
       "artifact": "ai00-local-runtime",
       "module_prefixes": ["plugins.device"],
-      "code_paths": ["plugins/device/**", "local-runtime/**", "backend/capabilities/local_runtime_next.py"],
-      "provider_paths": ["backend/capabilities/local_runtime_next.py", "local-runtime/src/**"],
-      "migration_paths": ["backend/db/migrations/202608030004_device_control_plane.sql"],
-      "test_paths": ["plugins/device/**/test_*.py", "backend/tests/test_local_runtime_*.py", "local-runtime/**/Tests/**"],
+      "code_paths": ["plugins/device/**", "local-runtime/**", "backend/domain_ports/local_integration.py"],
+      "provider_paths": ["plugins/device/device_backend/capabilities/**", "local-runtime/src/**"],
+      "migration_paths": ["backend/db/migrations/202608030004_device_control_plane.sql", "backend/db/migrations/202608100011_device_operation_protocol_v2.sql"],
+      "test_paths": ["plugins/device/**/test_*.py", "backend/tests/test_local_*.py", "backend/tests/test_device_*.py", "local-runtime/**/Tests/**"],
       "documentation_paths": ["docs/capabilities/local-integration/**"]
     }
   }

@@ -8,7 +8,7 @@ Parse and hash a BOP import document without mutating Craft state.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_62702938fc287d57bd0a2e4e3bf7385c`
+- Catalog Release：`rel_240296a5c4f1835b2ccabd56169c67e6`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -96,7 +96,7 @@ Parse and hash a BOP import document without mutating Craft state.
 ```json
 {
   "capability_id": "craft.bop.import.preview",
-  "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+  "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
   "major_version": 1,
   "payload": {
     "document": {}

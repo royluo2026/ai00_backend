@@ -1,5 +1,5 @@
 {
-  "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+  "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
   "tools": [
     {
       "agent_output_schema": {
@@ -27,7 +27,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -155,7 +155,7 @@
       },
       "invoke": {
         "capability_id": "identity.principal.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -226,7 +226,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -348,7 +348,7 @@
       },
       "invoke": {
         "capability_id": "plugin.disable",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -424,7 +424,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -546,7 +546,7 @@
       },
       "invoke": {
         "capability_id": "plugin.enable",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -622,7 +622,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -766,7 +766,7 @@
       },
       "invoke": {
         "capability_id": "plugin.install",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "granted_capabilities": [],
@@ -846,7 +846,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -968,7 +968,7 @@
       },
       "invoke": {
         "capability_id": "plugin.revoke",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -1044,7 +1044,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -1166,7 +1166,7 @@
       },
       "invoke": {
         "capability_id": "plugin.rollback",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -1238,7 +1238,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "external",
@@ -1366,7 +1366,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.delete",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "key": "example"
@@ -1444,7 +1444,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1566,7 +1566,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "key": "example"
@@ -1664,7 +1664,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1786,7 +1786,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.list",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -1864,7 +1864,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "external",
@@ -2004,7 +2004,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.put",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "key": "example",
@@ -2078,7 +2078,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -2200,7 +2200,7 @@
       },
       "invoke": {
         "capability_id": "plugin.uninstall",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -2286,7 +2286,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -2430,7 +2430,7 @@
       },
       "invoke": {
         "capability_id": "plugin.upgrade",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "granted_capabilities": [],
@@ -2520,7 +2520,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -2650,7 +2650,7 @@
       },
       "invoke": {
         "capability_id": "plugin.upgrade.finish",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "healthy": false,
@@ -2733,7 +2733,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2867,7 +2867,7 @@
       },
       "invoke": {
         "capability_id": "semantic.context.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "named_view": "example"
@@ -2943,7 +2943,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3059,7 +3059,7 @@
       },
       "invoke": {
         "capability_id": "system.activity.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -3136,7 +3136,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3258,7 +3258,7 @@
       },
       "invoke": {
         "capability_id": "system.change_impact.preview",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "change_ref": "example"
@@ -3329,7 +3329,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3449,7 +3449,7 @@
       },
       "invoke": {
         "capability_id": "system.echo",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -3510,7 +3510,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -3640,7 +3640,7 @@
       },
       "invoke": {
         "capability_id": "system.job.cancel",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "job_gid": "example",
@@ -3726,7 +3726,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3856,7 +3856,7 @@
       },
       "invoke": {
         "capability_id": "system.job.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "job_gid": "example",
@@ -3952,7 +3952,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4074,7 +4074,7 @@
       },
       "invoke": {
         "capability_id": "system.lineage.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "object_ref": "example"
@@ -4183,7 +4183,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4311,7 +4311,7 @@
       },
       "invoke": {
         "capability_id": "system.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -4454,7 +4454,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:system.tech_config",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4562,7 +4562,7 @@
       },
       "invoke": {
         "capability_id": "system.worker.outbox.health",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -4700,7 +4700,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -4877,7 +4877,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.draft.change.apply",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "preview_gid": "example"
@@ -5024,7 +5024,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5229,7 +5229,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.draft.change.preview",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "commands": [],
@@ -5398,7 +5398,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5567,7 +5567,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -5727,7 +5727,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5906,7 +5906,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.preview",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "expected_revision": 1,
@@ -6038,7 +6038,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -6247,7 +6247,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.import.preview",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "document": {}
@@ -6335,7 +6335,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -6504,7 +6504,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.linked_parts.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -6604,7 +6604,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -6783,7 +6783,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.archive",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "expected_revision": 1,
@@ -6909,7 +6909,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -7088,7 +7088,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.compare",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "from_version_gid": "example",
@@ -7219,7 +7219,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -7440,7 +7440,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.create",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "source": "empty",
@@ -7641,7 +7641,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -7810,7 +7810,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -8000,7 +8000,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8201,7 +8201,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.list",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -8318,7 +8318,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8533,7 +8533,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.work_package.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "scope": {
@@ -8671,7 +8671,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8840,7 +8840,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.knowledge.list",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -8922,7 +8922,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9093,7 +9093,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -9165,7 +9165,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9334,7 +9334,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.usage.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -9416,7 +9416,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9601,7 +9601,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.part.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -9701,7 +9701,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9880,7 +9880,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.compare",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "from_snapshot_gid": "example",
@@ -10017,7 +10017,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10186,7 +10186,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -10344,7 +10344,7 @@
       "audit_policy": "standard",
       "authorization_policy": "digital_model.v2:digital_model.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10476,7 +10476,7 @@
       },
       "invoke": {
         "capability_id": "digital_model.component.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "model_id": "example",
@@ -10626,7 +10626,7 @@
       "audit_policy": "standard",
       "authorization_policy": "digital_model.v2:digital_model.use",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -10746,7 +10746,7 @@
       },
       "invoke": {
         "capability_id": "digital_model.model.create",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "name": "example",
@@ -10854,7 +10854,7 @@
       "audit_policy": "standard",
       "authorization_policy": "digital_model.v2:digital_model.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10966,7 +10966,7 @@
       },
       "invoke": {
         "capability_id": "digital_model.model.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "model_id": "example"
@@ -11092,7 +11092,7 @@
       "audit_policy": "standard",
       "authorization_policy": "digital_model.v2:digital_model.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11210,7 +11210,7 @@
       },
       "invoke": {
         "capability_id": "digital_model.model.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -11324,7 +11324,7 @@
       "audit_policy": "standard",
       "authorization_policy": "digital_model.v2:digital_model.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11452,7 +11452,7 @@
       },
       "invoke": {
         "capability_id": "digital_model.snapshot.compare",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "from_version_id": "example",
@@ -11653,7 +11653,7 @@
       "audit_policy": "standard",
       "authorization_policy": "digital_model.v2:digital_model.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11773,7 +11773,7 @@
       },
       "invoke": {
         "capability_id": "digital_model.snapshot.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "model_id": "example",
@@ -12004,7 +12004,7 @@
       "audit_policy": "standard",
       "authorization_policy": "digital_model.v2:digital_model.use",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -12298,7 +12298,7 @@
       },
       "invoke": {
         "capability_id": "digital_model.version.create",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "artifact_ref": {
@@ -12484,7 +12484,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -12666,7 +12666,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.context.retrieve",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -12807,7 +12807,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -12971,7 +12971,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.create",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "markdown": "example",
@@ -13105,7 +13105,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13233,7 +13233,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.diff",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "document_gid": "example",
@@ -13368,7 +13368,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13486,7 +13486,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -13689,7 +13689,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13811,7 +13811,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.history.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -14011,7 +14011,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -14139,7 +14139,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.restore",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "base_revision_gid": "example",
@@ -14289,7 +14289,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -14435,7 +14435,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.revise",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "base_revision_gid": "example",
@@ -14661,7 +14661,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -14773,7 +14773,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "gid": "example"
@@ -15227,7 +15227,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -15343,7 +15343,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.migration.status",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -15807,7 +15807,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -15919,7 +15919,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -16279,7 +16279,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -16391,7 +16391,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.list",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -16716,7 +16716,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -16822,7 +16822,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.outbox.list",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -17082,7 +17082,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -17194,7 +17194,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.outbox.retry",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "outbox_gid": "example"
@@ -17489,7 +17489,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -17625,7 +17625,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.review",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "decision": "approved",
@@ -17965,7 +17965,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.view",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -18111,7 +18111,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.propose",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "content_md": "example",
@@ -18447,7 +18447,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18569,7 +18569,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -18792,7 +18792,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -18920,7 +18920,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.create",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "name": "example"
@@ -19055,7 +19055,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19153,7 +19153,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -19238,25 +19238,292 @@
     {
       "agent_output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "capability_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "capability_version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "created_at": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "connected": {
+                    "type": "boolean"
+                  },
+                  "platform": {
+                    "enum": [
+                      "windows"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "connected",
+                  "platform"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "starting",
+                      "already_running"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "opened": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "opened"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "max_depth": {
+                    "type": "integer"
+                  },
+                  "nodes": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "catia_occurrence_name": {
+                          "type": "string"
+                        },
+                        "has_more": {
+                          "type": "boolean"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "node_key": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "parent_node_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "node_key",
+                        "parent_node_key",
+                        "name",
+                        "catia_occurrence_name",
+                        "has_more"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "nodes",
+                  "max_depth"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "matched": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "not_found": {
+                    "items": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "matched",
+                  "not_found"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "all_on",
+                      "all_off",
+                      "deselect"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "action"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "artifact_id": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "byte_size": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "media_type": {
+                        "enum": [
+                          "model/jt",
+                          "model/plmxml",
+                          "application/vnd.siemens.plmxml+xml",
+                          "model/step"
+                        ],
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "version": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "artifact_id",
+                      "media_type",
+                      "sha256",
+                      "byte_size",
+                      "version"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "artifact_ref"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "leased",
+              "reconciling",
+              "completed",
+              "failed",
+              "outcome_unknown",
+              "expired",
+              "cancelled"
+            ],
+            "type": "string"
+          },
+          "updated_at": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "capability_id",
+          "capability_version",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
         "type": "object"
       },
       "artifact_policy": "none",
       "audit_policy": "standard",
-      "authorization_policy": "legacy:agent.run",
+      "authorization_policy": "local-integration.v2:agent.run",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
-      "data_classification": "internal",
-      "delegation_policy": "none",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
       "deprecation_message": null,
-      "description": "读取本人发起的本地命令状态和结果。",
+      "description": "Read an owned local operation outcome.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
-      "domain_errors": [],
-      "domain_errors_complete": false,
-      "evidence_policy": "optional",
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -19264,14 +19531,11 @@
         "api": true,
         "local_runtime": false,
         "mcp": true,
-        "plugin": false,
+        "plugin": true,
         "web": true,
         "worker": false
       },
-      "exposure_blockers": [
-        "domain_errors_not_declared",
-        "experimental_lifecycle"
-      ],
+      "exposure_blockers": [],
       "gateway_errors": [
         "catalog_resolution_failed",
         "consumer_not_allowed",
@@ -19306,58 +19570,1903 @@
       "inputSchema": {
         "additionalProperties": false,
         "properties": {
-          "command_gid": {
+          "command_id": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "required": [
-          "command_gid"
+          "command_id"
         ],
         "type": "object"
       },
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "command_gid": {
+          "command_id": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "required": [
-          "command_gid"
+          "command_id"
         ],
         "type": "object"
       },
       "invoke": {
         "capability_id": "local.command.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
-          "command_gid": "example"
+          "command_id": "example"
         }
       },
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "major_version": 1,
       "minimal_input_example": {
-        "command_gid": "example"
+        "command_id": "example"
       },
       "name": "local.command.get",
       "operation_policy": "none",
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "capability_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "capability_version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "created_at": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "connected": {
+                    "type": "boolean"
+                  },
+                  "platform": {
+                    "enum": [
+                      "windows"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "connected",
+                  "platform"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "starting",
+                      "already_running"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "opened": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "opened"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "max_depth": {
+                    "type": "integer"
+                  },
+                  "nodes": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "catia_occurrence_name": {
+                          "type": "string"
+                        },
+                        "has_more": {
+                          "type": "boolean"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "node_key": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "parent_node_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "node_key",
+                        "parent_node_key",
+                        "name",
+                        "catia_occurrence_name",
+                        "has_more"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "nodes",
+                  "max_depth"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "matched": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "not_found": {
+                    "items": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "matched",
+                  "not_found"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "all_on",
+                      "all_off",
+                      "deselect"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "action"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "artifact_id": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "byte_size": {
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "media_type": {
+                        "enum": [
+                          "model/jt",
+                          "model/plmxml",
+                          "application/vnd.siemens.plmxml+xml",
+                          "model/step"
+                        ],
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "version": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "artifact_id",
+                      "media_type",
+                      "sha256",
+                      "byte_size",
+                      "version"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "artifact_ref"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "leased",
+              "reconciling",
+              "completed",
+              "failed",
+              "outcome_unknown",
+              "expired",
+              "cancelled"
+            ],
+            "type": "string"
+          },
+          "updated_at": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "capability_id",
+          "capability_version",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
         "type": "object"
       },
       "owner_domain": "local_integration",
       "rate_limit_cost": 1,
       "required_auth_freshness_seconds": 0,
-      "resource_selectors": [],
-      "schema_hash": "sha256:0a76234b1111ad7f3c2b657c8688405daac0d1907ca33ecfd77b7bb1efdafda9",
+      "resource_selectors": [
+        {
+          "payload_path": "command_id",
+          "required": true,
+          "resource_type": "local-operation"
+        }
+      ],
+      "schema_hash": "sha256:f2d545b0241307ed671a30fb9a56b6331b8fcd25289fd8d9ad78586b151c5e12",
       "schema_precision": "typed",
       "side_effect_level": "read",
       "strict": true,
       "timeout_seconds": 30,
       "title": "local.command.get",
-      "use_when": "读取本人发起的本地命令状态和结果。"
+      "use_when": "Read an owned local operation outcome."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "output",
+      "audit_policy": "standard",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "automation_level": "A1",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+      "concurrency_policy": "none",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Capture the active VisMockup view as an ArtifactRef.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "local",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": true,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed",
+        "operation_service_unavailable",
+        "operation_create_failed",
+        "operation_create_outcome_failed"
+      ],
+      "id": "vismockup.capture",
+      "idempotency_policy": "required",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "vismockup.capture",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+        "major_version": 1,
+        "payload": {
+          "device_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "device_id": "example"
+      },
+      "name": "vismockup.capture",
+      "operation_policy": "required",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "local_integration",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "device_id",
+          "required": true,
+          "resource_type": "device"
+        }
+      ],
+      "schema_hash": "sha256:fd868c09e7d73ae7cdbd3c034a284bf0438ab7e828a3e085ce40eb35c5ad2157",
+      "schema_precision": "typed",
+      "side_effect_level": "write",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "vismockup.capture",
+      "use_when": "Capture the active VisMockup view as an ArtifactRef."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "automation_level": "A1",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+      "concurrency_policy": "none",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Highlight occurrences by CATIA occurrence name.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "local",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": true,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed",
+        "operation_service_unavailable",
+        "operation_create_failed",
+        "operation_create_outcome_failed"
+      ],
+      "id": "vismockup.highlight",
+      "idempotency_policy": "required",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "catia_names": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "minItems": 1,
+            "type": "array"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "catia_names"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "catia_names": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "minItems": 1,
+            "type": "array"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "catia_names"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "vismockup.highlight",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+        "major_version": 1,
+        "payload": {
+          "catia_names": [
+            "example"
+          ],
+          "device_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "catia_names": [
+          "example"
+        ],
+        "device_id": "example"
+      },
+      "name": "vismockup.highlight",
+      "operation_policy": "required",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "local_integration",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "device_id",
+          "required": true,
+          "resource_type": "device"
+        }
+      ],
+      "schema_hash": "sha256:d18d532db8762f1f8b69a1cd3fd2220204d8e843012b3aadfc9284306db14cb9",
+      "schema_precision": "typed",
+      "side_effect_level": "write",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "vismockup.highlight",
+      "use_when": "Highlight occurrences by CATIA occurrence name."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "automation_level": "A1",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+      "concurrency_policy": "none",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Launch or connect to VisMockup.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "local",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": true,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed",
+        "operation_service_unavailable",
+        "operation_create_failed",
+        "operation_create_outcome_failed"
+      ],
+      "id": "vismockup.launch",
+      "idempotency_policy": "required",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "vismockup.launch",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+        "major_version": 1,
+        "payload": {
+          "device_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "device_id": "example"
+      },
+      "name": "vismockup.launch",
+      "operation_policy": "required",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "local_integration",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "device_id",
+          "required": true,
+          "resource_type": "device"
+        }
+      ],
+      "schema_hash": "sha256:fd868c09e7d73ae7cdbd3c034a284bf0438ab7e828a3e085ce40eb35c5ad2157",
+      "schema_precision": "typed",
+      "side_effect_level": "write",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "vismockup.launch",
+      "use_when": "Launch or connect to VisMockup."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "input",
+      "audit_policy": "standard",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "automation_level": "A1",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+      "concurrency_policy": "none",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Materialize and open an authorized model ArtifactRef.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "local",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": true,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed",
+        "operation_service_unavailable",
+        "operation_create_failed",
+        "operation_create_outcome_failed"
+      ],
+      "id": "vismockup.model.open",
+      "idempotency_policy": "required",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "media_type": {
+                "enum": [
+                  "model/jt",
+                  "model/plmxml",
+                  "application/vnd.siemens.plmxml+xml",
+                  "model/step"
+                ],
+                "type": "string"
+              },
+              "sha256": {
+                "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "type": "object"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "artifact_ref"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "byte_size": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "media_type": {
+                "enum": [
+                  "model/jt",
+                  "model/plmxml",
+                  "application/vnd.siemens.plmxml+xml",
+                  "model/step"
+                ],
+                "type": "string"
+              },
+              "sha256": {
+                "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "type": "object"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "artifact_ref"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "vismockup.model.open",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+        "major_version": 1,
+        "payload": {
+          "artifact_ref": {
+            "artifact_id": "example",
+            "byte_size": 0,
+            "media_type": "model/jt",
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "version": 1
+          },
+          "device_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "artifact_ref": {
+          "artifact_id": "example",
+          "byte_size": 0,
+          "media_type": "model/jt",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "version": 1
+        },
+        "device_id": "example"
+      },
+      "name": "vismockup.model.open",
+      "operation_policy": "required",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "local_integration",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "device_id",
+          "required": true,
+          "resource_type": "device"
+        },
+        {
+          "payload_path": "artifact_ref.artifact_id",
+          "required": true,
+          "resource_type": "artifact"
+        }
+      ],
+      "schema_hash": "sha256:17450bbe4ea70054a96e152dea1b88af08bb932acac1e360379064ff244dcf87",
+      "schema_precision": "typed",
+      "side_effect_level": "write",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "vismockup.model.open",
+      "use_when": "Materialize and open an authorized model ArtifactRef."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "automation_level": "A2",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+      "concurrency_policy": "none",
+      "confirmation_policy": "none",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Read VisMockup connection state.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "local",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": true,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed",
+        "operation_service_unavailable",
+        "operation_create_failed",
+        "operation_create_outcome_failed"
+      ],
+      "id": "vismockup.status",
+      "idempotency_policy": "optional",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "vismockup.status",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+        "major_version": 1,
+        "payload": {
+          "device_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "device_id": "example"
+      },
+      "name": "vismockup.status",
+      "operation_policy": "required",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "local_integration",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "device_id",
+          "required": true,
+          "resource_type": "device"
+        }
+      ],
+      "schema_hash": "sha256:fd868c09e7d73ae7cdbd3c034a284bf0438ab7e828a3e085ce40eb35c5ad2157",
+      "schema_precision": "typed",
+      "side_effect_level": "read",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "vismockup.status",
+      "use_when": "Read VisMockup connection state."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "automation_level": "A2",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+      "concurrency_policy": "none",
+      "confirmation_policy": "none",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Read the active VisMockup product tree.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "local",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": true,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed",
+        "operation_service_unavailable",
+        "operation_create_failed",
+        "operation_create_outcome_failed"
+      ],
+      "id": "vismockup.tree",
+      "idempotency_policy": "optional",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "force": {
+            "type": "boolean"
+          },
+          "max_depth": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "force": {
+            "type": "boolean"
+          },
+          "max_depth": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "vismockup.tree",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+        "major_version": 1,
+        "payload": {
+          "device_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "device_id": "example"
+      },
+      "name": "vismockup.tree",
+      "operation_policy": "required",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "local_integration",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "device_id",
+          "required": true,
+          "resource_type": "device"
+        }
+      ],
+      "schema_hash": "sha256:ebfc8b1788e406c734b8a61c48418fe52c186514ddc9924e0e2980e2e951df7b",
+      "schema_precision": "typed",
+      "side_effect_level": "read",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "vismockup.tree",
+      "use_when": "Read the active VisMockup product tree."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "automation_level": "A1",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+      "concurrency_policy": "none",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Change active-view visibility or selection.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "local",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": true,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed",
+        "operation_service_unavailable",
+        "operation_create_failed",
+        "operation_create_outcome_failed"
+      ],
+      "id": "vismockup.visibility",
+      "idempotency_policy": "required",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "all_on",
+              "all_off",
+              "deselect"
+            ],
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "action"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "all_on",
+              "all_off",
+              "deselect"
+            ],
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id",
+          "action"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "vismockup.visibility",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+        "major_version": 1,
+        "payload": {
+          "action": "all_on",
+          "device_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "action": "all_on",
+        "device_id": "example"
+      },
+      "name": "vismockup.visibility",
+      "operation_policy": "required",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "device_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expires_in": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "local_integration",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "device_id",
+          "required": true,
+          "resource_type": "device"
+        }
+      ],
+      "schema_hash": "sha256:57a7a257abfe27febafca0f636e2fff908201c4d5368acd5ac3ff9a9438f937e",
+      "schema_precision": "typed",
+      "side_effect_level": "write",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "vismockup.visibility",
+      "use_when": "Change active-view visibility or selection."
     },
     {
       "agent_output_schema": {
@@ -19443,7 +21552,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19524,7 +21633,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -19655,7 +21764,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19725,7 +21834,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -19828,7 +21937,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19952,7 +22061,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "stable_gid": "example"
@@ -20109,7 +22218,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20199,7 +22308,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.resolve",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "term": "example"
@@ -20331,7 +22440,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20503,7 +22612,7 @@
       },
       "invoke": {
         "capability_id": "ontology.mapping.assess",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "source": {},
@@ -20863,7 +22972,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20948,7 +23057,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.diff",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "from_release_gid": "example",
@@ -21360,7 +23469,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21430,7 +23539,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -21637,7 +23746,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21707,7 +23816,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -21882,7 +23991,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21980,7 +24089,7 @@
       },
       "invoke": {
         "capability_id": "base.project.search",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -22288,7 +24397,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -22666,7 +24775,7 @@
       },
       "invoke": {
         "capability_id": "simulation.environment.create",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "execution_plan_ref": {
@@ -23232,7 +25341,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -23354,7 +25463,7 @@
       },
       "invoke": {
         "capability_id": "simulation.environment.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "environment_id": "example"
@@ -23862,7 +25971,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -23982,7 +26091,7 @@
       },
       "invoke": {
         "capability_id": "simulation.environment.list",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {}
       },
@@ -24316,7 +26425,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -24494,7 +26603,7 @@
       },
       "invoke": {
         "capability_id": "simulation.parameter_set.create",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "name": "example",
@@ -24654,7 +26763,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -24816,7 +26925,7 @@
       },
       "invoke": {
         "capability_id": "simulation.parameter_set.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "parameter_set_ref": {
@@ -24993,7 +27102,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -25181,7 +27290,7 @@
       },
       "invoke": {
         "capability_id": "simulation.profile.create",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "name": "example",
@@ -25355,7 +27464,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -25517,7 +27626,7 @@
       },
       "invoke": {
         "capability_id": "simulation.profile.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "simulation_profile_ref": {
@@ -25688,7 +27797,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -25810,7 +27919,7 @@
       },
       "invoke": {
         "capability_id": "simulation.result.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "run_id": "example"
@@ -25978,7 +28087,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A2",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -26100,7 +28209,7 @@
       },
       "invoke": {
         "capability_id": "simulation.run.get",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "run_id": "example"
@@ -26284,7 +28393,7 @@
       "audit_policy": "standard",
       "authorization_policy": "simulation.v2:simulation.use",
       "automation_level": "A1",
-      "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+      "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -26406,7 +28515,7 @@
       },
       "invoke": {
         "capability_id": "simulation.run.start",
-        "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
+        "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
         "major_version": 1,
         "payload": {
           "environment_id": "example"

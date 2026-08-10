@@ -1,0 +1,9 @@
+{
+  "plugin_id": "official.local-integration",
+  "name": "本地集成",
+  "backend": {
+    "capabilities_module": "device_backend.capabilities",
+    "provider_version": "1.0.0",
+    "owned_schemas": ["device_runtime"]
+  }
+}

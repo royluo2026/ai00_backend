@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_62702938fc287d57bd0a2e4e3bf7385c",
-  "catalog_hash": "sha256:62702938fc287d57bd0a2e4e3bf7385c48241f4846171576083a3ce101afa789",
+  "release_id": "rel_240296a5c4f1835b2ccabd56169c67e6",
+  "catalog_hash": "sha256:240296a5c4f1835b2ccabd56169c67e6735765cfc6499f16a8d84802ff428492",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -12751,17 +12751,17 @@
       "id": "local.command.get",
       "major_version": 1,
       "owner_domain": "local_integration",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "local.command.get",
-      "description": "读取本人发起的本地命令状态和结果。",
-      "use_when": "读取本人发起的本地命令状态和结果。",
+      "description": "Read an owned local operation outcome.",
+      "use_when": "Read an owned local operation outcome.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -12769,34 +12769,523 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:agent.run",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "resource_selectors": [
+        {
+          "resource_type": "local-operation",
+          "payload_path": "command_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "command_gid"
-        ],
         "properties": {
-          "command_gid": {
-            "type": "string"
+          "command_id": {
+            "type": "string",
+            "minLength": 1
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "command_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "capability_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "leased",
+              "reconciling",
+              "completed",
+              "failed",
+              "outcome_unknown",
+              "expired",
+              "cancelled"
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "connected": {
+                    "type": "boolean"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "windows"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "connected",
+                  "platform"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "starting",
+                      "already_running"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "status"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "opened": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "opened"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "node_key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "parent_node_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "catia_occurrence_name": {
+                          "type": "string"
+                        },
+                        "has_more": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "node_key",
+                        "parent_node_key",
+                        "name",
+                        "catia_occurrence_name",
+                        "has_more"
+                      ]
+                    }
+                  },
+                  "max_depth": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "nodes",
+                  "max_depth"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "matched": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "not_found": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "matched",
+                  "not_found"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "all_on",
+                      "all_off",
+                      "deselect"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "action"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "artifact_ref": {
+                    "type": "object",
+                    "properties": {
+                      "artifact_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "media_type": {
+                        "type": "string",
+                        "enum": [
+                          "model/jt",
+                          "model/plmxml",
+                          "application/vnd.siemens.plmxml+xml",
+                          "model/step"
+                        ]
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      "byte_size": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "version": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "artifact_id",
+                      "media_type",
+                      "sha256",
+                      "byte_size",
+                      "version"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "artifact_ref"
+                ]
+              }
+            ]
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "updated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "capability_id",
+          "capability_version",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "capability_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "leased",
+              "reconciling",
+              "completed",
+              "failed",
+              "outcome_unknown",
+              "expired",
+              "cancelled"
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "connected": {
+                    "type": "boolean"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "windows"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "connected",
+                  "platform"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "starting",
+                      "already_running"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "status"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "opened": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "opened"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "node_key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "parent_node_key": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "catia_occurrence_name": {
+                          "type": "string"
+                        },
+                        "has_more": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "node_key",
+                        "parent_node_key",
+                        "name",
+                        "catia_occurrence_name",
+                        "has_more"
+                      ]
+                    }
+                  },
+                  "max_depth": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "nodes",
+                  "max_depth"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "matched": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "not_found": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "matched",
+                  "not_found"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "all_on",
+                      "all_off",
+                      "deselect"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "action"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "artifact_ref": {
+                    "type": "object",
+                    "properties": {
+                      "artifact_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "media_type": {
+                        "type": "string",
+                        "enum": [
+                          "model/jt",
+                          "model/plmxml",
+                          "application/vnd.siemens.plmxml+xml",
+                          "model/step"
+                        ]
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      "byte_size": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "version": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "artifact_id",
+                      "media_type",
+                      "sha256",
+                      "byte_size",
+                      "version"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "artifact_ref"
+                ]
+              }
+            ]
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "updated_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "capability_id",
+          "capability_version",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
       },
-      "schema_hash": "sha256:0a76234b1111ad7f3c2b657c8688405daac0d1907ca33ecfd77b7bb1efdafda9",
+      "schema_hash": "sha256:f2d545b0241307ed671a30fb9a56b6331b8fcd25289fd8d9ad78586b151c5e12",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -12806,11 +13295,37 @@
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "none",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.change.proposal.create",
@@ -22076,425 +22591,992 @@
       "id": "vismockup.capture",
       "major_version": 1,
       "owner_domain": "local_integration",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.capture",
-      "description": "捕获当前 VisMockup 视图。",
-      "use_when": "捕获当前 VisMockup 视图。",
+      "description": "Capture the active VisMockup view as an ArtifactRef.",
+      "use_when": "Capture the active VisMockup view as an ArtifactRef.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
-        "local_runtime": false
+        "local_runtime": true
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:agent.run",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "device_gid"
-        ],
         "properties": {
-          "device_gid": {
+          "device_id": {
             "type": "string",
             "minLength": 1
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "device_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
-      "artifact_policy": "none",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
+      },
+      "schema_hash": "sha256:fd868c09e7d73ae7cdbd3c034a284bf0438ab7e828a3e085ce40eb35c5ad2157",
+      "artifact_policy": "output",
       "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "vismockup.highlight",
       "major_version": 1,
       "owner_domain": "local_integration",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.highlight",
-      "description": "按 CATIA occurrence 名称高亮节点。",
-      "use_when": "按 CATIA occurrence 名称高亮节点。",
+      "description": "Highlight occurrences by CATIA occurrence name.",
+      "use_when": "Highlight occurrences by CATIA occurrence name.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
-        "local_runtime": false
+        "local_runtime": true
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:agent.run",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "device_gid",
-          "catia_names"
-        ],
         "properties": {
-          "device_gid": {
-            "type": "string"
+          "device_id": {
+            "type": "string",
+            "minLength": 1
           },
           "catia_names": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "maxItems": 1000
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "device_id",
+          "catia_names"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:540ab17f01bb895ddf75ac67e2482c54c92af008d71f6e67adcf09da656d155f",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
+      },
+      "schema_hash": "sha256:d18d532db8762f1f8b69a1cd3fd2220204d8e843012b3aadfc9284306db14cb9",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "vismockup.launch",
       "major_version": 1,
       "owner_domain": "local_integration",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.launch",
-      "description": "启动或连接 VisMockup。",
-      "use_when": "启动或连接 VisMockup。",
+      "description": "Launch or connect to VisMockup.",
+      "use_when": "Launch or connect to VisMockup.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
-        "local_runtime": false
+        "local_runtime": true
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:agent.run",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "device_gid"
-        ],
         "properties": {
-          "device_gid": {
+          "device_id": {
             "type": "string",
             "minLength": 1
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "device_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
+      },
+      "schema_hash": "sha256:fd868c09e7d73ae7cdbd3c034a284bf0438ab7e828a3e085ce40eb35c5ad2157",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
-      "id": "vismockup.open_file",
+      "id": "vismockup.model.open",
       "major_version": 1,
       "owner_domain": "local_integration",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
-      "title": "vismockup.open_file",
-      "description": "打开允许目录中的 PLMXML/JT 文件。",
-      "use_when": "打开允许目录中的 PLMXML/JT 文件。",
+      "title": "vismockup.model.open",
+      "description": "Materialize and open an authorized model ArtifactRef.",
+      "use_when": "Materialize and open an authorized model ArtifactRef.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
-        "local_runtime": false
+        "local_runtime": true
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:agent.run",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        },
+        {
+          "resource_type": "artifact",
+          "payload_path": "artifact_ref.artifact_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "device_gid",
-          "file_path"
-        ],
         "properties": {
-          "device_gid": {
-            "type": "string"
-          },
-          "file_path": {
+          "device_id": {
             "type": "string",
             "minLength": 1
+          },
+          "artifact_ref": {
+            "type": "object",
+            "properties": {
+              "artifact_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "media_type": {
+                "type": "string",
+                "enum": [
+                  "model/jt",
+                  "model/plmxml",
+                  "application/vnd.siemens.plmxml+xml",
+                  "model/step"
+                ]
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "example": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "byte_size": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "device_id",
+          "artifact_ref"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:f8f67a691922555db93ccc846a2a3f741855e3b3cd01ce9e594cfbca13434102",
-      "artifact_policy": "none",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
+      },
+      "schema_hash": "sha256:17450bbe4ea70054a96e152dea1b88af08bb932acac1e360379064ff244dcf87",
+      "artifact_policy": "input",
       "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "vismockup.status",
       "major_version": 1,
       "owner_domain": "local_integration",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.status",
-      "description": "读取 VisMockup 连接状态。",
-      "use_when": "读取 VisMockup 连接状态。",
+      "description": "Read VisMockup connection state.",
+      "use_when": "Read VisMockup connection state.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "read",
       "execution_mode": "local",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
-        "local_runtime": false
+        "local_runtime": true
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:agent.run",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "device_gid"
-        ],
         "properties": {
-          "device_gid": {
+          "device_id": {
             "type": "string",
             "minLength": 1
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "device_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
+      },
+      "schema_hash": "sha256:fd868c09e7d73ae7cdbd3c034a284bf0438ab7e828a3e085ce40eb35c5ad2157",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "optional",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "none",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "vismockup.tree",
       "major_version": 1,
       "owner_domain": "local_integration",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.tree",
-      "description": "读取 VisMockup 结构树。",
-      "use_when": "读取 VisMockup 结构树。",
+      "description": "Read the active VisMockup product tree.",
+      "use_when": "Read the active VisMockup product tree.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "read",
       "execution_mode": "local",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
-        "local_runtime": false
+        "local_runtime": true
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:agent.run",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "device_gid"
-        ],
         "properties": {
-          "device_gid": {
-            "type": "string"
+          "device_id": {
+            "type": "string",
+            "minLength": 1
           },
           "max_depth": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
           },
           "force": {
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "device_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:193ae44d1e7fdf3c18f6f2fe117be988e0afe40e8671f2b75439e5a891220422",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
+      },
+      "schema_hash": "sha256:ebfc8b1788e406c734b8a61c48418fe52c186514ddc9924e0e2980e2e951df7b",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "optional",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "none",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "vismockup.visibility",
       "major_version": 1,
       "owner_domain": "local_integration",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.visibility",
-      "description": "执行全显、全隐或取消选择。",
-      "use_when": "执行全显、全隐或取消选择。",
+      "description": "Change active-view visibility or selection.",
+      "use_when": "Change active-view visibility or selection.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
-        "local_runtime": false
+        "local_runtime": true
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:agent.run",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "local-integration.v2:agent.run",
+      "resource_selectors": [
+        {
+          "resource_type": "device",
+          "payload_path": "device_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "device_gid",
-          "action"
-        ],
         "properties": {
-          "device_gid": {
-            "type": "string"
+          "device_id": {
+            "type": "string",
+            "minLength": 1
           },
           "action": {
             "type": "string",
@@ -22505,29 +23587,113 @@
             ]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "device_id",
+          "action"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:4b817eaefe9e181f83bd5f0e3af80d057093209c52e8e42a1ce4a83a26ffa0bf",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          "expires_in": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command_id",
+          "device_id",
+          "status",
+          "expires_in"
+        ]
+      },
+      "schema_hash": "sha256:57a7a257abfe27febafca0f636e2fff908201c4d5368acd5ac3ff9a9438f937e",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     }
   ],
   "provider_artifacts": [
@@ -22544,6 +23710,12 @@
       "artifact_hash": "sha256:9ddf2440ddd5d929aafd5682c5f006393757cbcb7b76bee588d448378a7cb326"
     },
     {
+      "plugin_id": "official.local-integration",
+      "module": "device_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:eac8cc86c872f160b6fc9d934d61a20d03a8b1b831197d868760b12631596652"
+    },
+    {
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
@@ -22556,5 +23728,5 @@
       "artifact_hash": "sha256:7c593c94096c99fb5101472da2df37b5229668bd0995ff2611441bc61a551bc0"
     }
   ],
-  "created_at": "2026-08-10T12:01:48.635188Z"
+  "created_at": "2026-08-10T12:36:45.816612Z"
 }

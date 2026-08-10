@@ -2359,7 +2359,9 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "capability:ontology.change.proposal.create": {
@@ -3384,7 +3386,9 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "capability:vismockup.highlight": {
@@ -3407,7 +3411,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "capability:vismockup.launch": {
@@ -3430,17 +3435,18 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
-    "capability:vismockup.open_file": {
-      "function_id": "capability:vismockup.open_file",
+    "capability:vismockup.model.open": {
+      "function_id": "capability:vismockup.model.open",
       "domain": "Local Integration",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "vismockup.open_file",
+      "target_capability": "vismockup.model.open",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
@@ -3453,7 +3459,9 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/provider.py",
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "capability:vismockup.status": {
@@ -3476,7 +3484,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "capability:vismockup.tree": {
@@ -3499,7 +3508,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "capability:vismockup.visibility": {
@@ -3522,7 +3532,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "local_command:vismockup.capture": {
@@ -3544,7 +3555,7 @@
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "local_command:vismockup.highlight": {
@@ -3566,7 +3577,7 @@
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "local_command:vismockup.launch": {
@@ -3588,17 +3599,17 @@
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
-    "local_command:vismockup.open_file": {
-      "function_id": "local_command:vismockup.open_file",
+    "local_command:vismockup.model.open": {
+      "function_id": "local_command:vismockup.model.open",
       "domain": "Local Integration",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
       ],
-      "target_capability": "vismockup.open_file",
+      "target_capability": "vismockup.model.open",
       "exposure": "Local Runtime",
       "automation_level": "automated",
       "resource_types": [
@@ -3610,7 +3621,7 @@
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "local_command:vismockup.status": {
@@ -3632,7 +3643,7 @@
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "local_command:vismockup.tree": {
@@ -3654,7 +3665,7 @@
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "local_command:vismockup.visibility": {
@@ -3676,7 +3687,7 @@
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/local_runtime_next.py"
+        "plugins/device/device_backend/capabilities/runtime.py"
       ]
     },
     "rest:DELETE:/admin/config/{key}": {
@@ -8961,6 +8972,28 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/users.py"
+      ]
+    },
+    "rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}": {
+      "function_id": "rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}",
+      "domain": "Local Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "device"
+      ],
+      "data_classification": "internal",
+      "classification": "internal",
+      "migration_status": "internal_protocol",
+      "owner": "Local Integration",
+      "exclusion_reason": "Device-authenticated artifact materialization transport; callers use vismockup.model.open instead.",
+      "source_paths": [
+        "backend/routers/device_runtime.py"
       ]
     },
     "rest:GET:/api/v1/devices": {
@@ -15470,10 +15503,10 @@
         "device"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "internal",
+      "migration_status": "internal_protocol",
       "owner": "Local Integration",
-      "exclusion_reason": null,
+      "exclusion_reason": "Device bootstrap transport authenticated by a one-time enrollment token; it is not a user business capability.",
       "source_paths": [
         "backend/routers/device_runtime.py"
       ]
@@ -15492,10 +15525,10 @@
         "device"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "internal",
+      "migration_status": "internal_protocol",
       "owner": "Local Integration",
-      "exclusion_reason": null,
+      "exclusion_reason": "Device-authenticated signed-operation lease transport; users invoke the corresponding governed capability.",
       "source_paths": [
         "backend/routers/device_runtime.py"
       ]
@@ -15514,10 +15547,10 @@
         "device"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "internal",
+      "migration_status": "internal_protocol",
       "owner": "Local Integration",
-      "exclusion_reason": null,
+      "exclusion_reason": "Device-authenticated signed-outcome reconciliation transport; users poll OperationRef or local.command.get.",
       "source_paths": [
         "backend/routers/device_runtime.py"
       ]
@@ -15536,10 +15569,10 @@
         "device"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "internal",
+      "migration_status": "internal_protocol",
       "owner": "Local Integration",
-      "exclusion_reason": null,
+      "exclusion_reason": "Device liveness protocol used only by enrolled Local Runtime instances, not by plugins or agents.",
       "source_paths": [
         "backend/routers/device_runtime.py"
       ]
@@ -16554,6 +16587,28 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/uploads.py"
+      ]
+    },
+    "rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact": {
+      "function_id": "rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact",
+      "domain": "Local Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "device"
+      ],
+      "data_classification": "internal",
+      "classification": "internal",
+      "migration_status": "internal_protocol",
+      "owner": "Local Integration",
+      "exclusion_reason": "Device-authenticated capture upload transport; consumers receive the resulting ArtifactRef through the operation outcome.",
+      "source_paths": [
+        "backend/routers/device_runtime.py"
       ]
     },
     "rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content": {

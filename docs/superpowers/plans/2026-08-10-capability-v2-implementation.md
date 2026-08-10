@@ -1232,7 +1232,7 @@ Commit the identity/snapshot slice as `feat(digital-model): add governed model s
 - Produces: signed Canonical JSON Operation Envelope and Outcome shared by Python/C# test vectors.
 - Local commands accept ArtifactRef/ModelRef; device ownership supports explicit tenant/workstation grants.
 
-- [ ] **Step 1: Write shared-vector, crash-recovery and path-rejection tests**
+- [x] **Step 1: Write shared-vector, crash-recovery and path-rejection tests**
 
 ```python
 def test_python_signature_matches_dotnet_vector(vector):
@@ -1243,7 +1243,7 @@ def test_local_command_rejects_file_path(provider):
         provider.invoke({"device_gid": "d1", "file_path": "C:\\secret.jt"})
 ```
 
-- [ ] **Step 2: Verify mismatched capability lists and missing formal canonicalization**
+- [x] **Step 2: Verify mismatched capability lists and missing formal canonicalization**
 
 Run: `python -m pytest backend/tests/test_local_operation_protocol_v2.py backend/tests/test_device_runtime_protocol.py -q`
 
@@ -1251,11 +1251,13 @@ Run on Windows CI: `dotnet test local-runtime/Ai00.LocalRuntime.sln -c Release`.
 
 Expected: FAIL before shared vectors and crash recovery are implemented.
 
-- [ ] **Step 3: Implement signed envelopes, bounded ledger, reconciliation and sanitized errors**
+- [x] **Step 3: Implement signed envelopes, bounded ledger, reconciliation and sanitized errors**
 
 On startup, `started` entries become `outcome_unknown` and reconcile with cloud; they are not replayed automatically. Named-pipe ACL is restricted to the service/session identity, and secrets support rotation.
 
-- [ ] **Step 4: Run Backend/.NET protocol and device suites**
+- [x] **Step 4a: Run Backend protocol and device suites**
+
+- [ ] **Step 4b: Run .NET protocol and device suites in Windows CI** (`dotnet` SDK is unavailable on this workstation)
 
 Run: `python -m pytest backend/tests/test_local_operation_protocol_v2.py backend/tests/test_device_capabilities.py backend/tests/test_device_runtime_protocol.py backend/tests/test_device_domain_boundary.py -q`.
 
@@ -1263,7 +1265,7 @@ Run on Windows CI: `dotnet test local-runtime/Ai00.LocalRuntime.sln -c Release`.
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/domain_ports/local_integration.py plugins/device backend/tests/test_local_operation_protocol_v2.py backend/tests/fixtures/device_protocol_vectors.json local-runtime

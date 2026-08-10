@@ -25,7 +25,7 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "plugin.uninstall", "plugin.upgrade", "plugin.upgrade.finish", "semantic.context.get",
     "system.activity.search", "system.change_impact.preview", "system.echo", "system.job.cancel",
     "system.job.get", "system.lineage.get", "system.search", "system.worker.outbox.health",
-    "vismockup.capture", "vismockup.highlight", "vismockup.launch", "vismockup.open_file",
+    "vismockup.capture", "vismockup.highlight", "vismockup.launch", "vismockup.model.open",
     "vismockup.status", "vismockup.tree", "vismockup.visibility",
     "craft.bop.execution_structure.get", "craft.bop.execution_structure.preview",
     "craft.bop.linked_parts.get", "craft.bop.version.compare", "craft.bop.version.get",

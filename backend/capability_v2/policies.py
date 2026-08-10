@@ -55,10 +55,12 @@ class LegacyServerGatewayPolicy:
         user_loader: Callable[[str], dict | None],
         grants_resolver: Callable[[ConsumerIdentity, dict], AuthorizationGrants],
         approval_service: ApprovalService | None = None,
+        resource_authorizer: Callable[[str, ConsumerIdentity, dict], bool] | None = None,
     ) -> None:
         self._user_loader = user_loader
         self._grants_resolver = grants_resolver
         self._approvals = approval_service
+        self._resource_authorizer = resource_authorizer
 
     def authorize(self, descriptor, envelope, provider) -> None:
         actor = envelope.identity.actor
@@ -71,6 +73,16 @@ class LegacyServerGatewayPolicy:
         decision = CapabilityAuthorizer(lambda _identity: grants).authorize(
             descriptor, envelope, required_permissions=tuple(provider.spec.permissions)
         )
+        if not decision.allowed and decision.code == "resource_scope_denied" and self._resource_authorizer is not None:
+            try:
+                owned = tuple(ref for ref in decision.resource_refs if self._resource_authorizer(ref, envelope.identity, user))
+            except Exception as exc:
+                raise GatewayPolicyError("resource_authorization_failed", "Resource ownership could not be verified.") from exc
+            if owned:
+                grants = grants.model_copy(update={"resource_scopes": tuple(sorted(set(grants.resource_scopes) | set(owned)))})
+                decision = CapabilityAuthorizer(lambda _identity: grants).authorize(
+                    descriptor, envelope, required_permissions=tuple(provider.spec.permissions)
+                )
         if not decision.allowed:
             raise GatewayPolicyError(decision.code, "Capability authorization was denied.")
         return decision

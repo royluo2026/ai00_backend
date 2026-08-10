@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.LocalRuntime.Service",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.LocalRuntime.SessionHost", "src\Ai00.LocalRuntime.SessionHost\Ai00.LocalRuntime.SessionHost.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF003}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ai00.LocalRuntime.Tests", "tests\Ai00.LocalRuntime.Tests\Ai00.LocalRuntime.Tests.csproj", "{F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -26,5 +28,9 @@ Global
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF003}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF003}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF003}.Release|Any CPU.Build.0 = Release|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {F1AA1880-35EB-4BCE-A62E-DB7C8C6EF004}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal

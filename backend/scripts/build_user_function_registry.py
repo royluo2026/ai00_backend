@@ -339,7 +339,7 @@ def scan_mcp_tools(root: Path) -> dict[str, dict]:
 
 def scan_local_runtime_commands(root: Path) -> dict[str, dict]:
     found: dict[str, dict] = {}
-    path = root / "backend" / "capabilities" / "local_runtime_next.py"
+    path = root / "plugins" / "device" / "device_backend" / "capabilities" / "runtime.py"
     if not path.exists():
         return found
     content = path.read_text(encoding="utf-8")
