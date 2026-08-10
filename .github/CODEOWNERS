@@ -15,6 +15,7 @@
 /backend/db/migrations/202608050001_base_permission_grants.sql @ai00/base-maintainers
 /backend/db/migrations/202608100001_base_capability_catalog_releases.sql @ai00/base-maintainers
 /backend/db/migrations/202608100002_base_consumer_delegations.sql @ai00/base-maintainers
+/backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql @ai00/base-maintainers
 
 # Agent
 /plugins/agent/** @ai00/agent-maintainers

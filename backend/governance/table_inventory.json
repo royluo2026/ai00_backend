@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 149,
+  "table_count": 154,
   "tables": [
     {
       "table": "workmanship_app_ai_audit_logs",
@@ -133,7 +133,32 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_capability_approvals",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_audit_ledger",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_audit_outbox",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_capability_catalog_releases",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_outcomes",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_rate_windows",
       "owner": "base",
       "runtime_domain": "base"
     },

@@ -19,11 +19,17 @@ from backend.capability_v2.contracts import (
     ConsumerType,
     ExposurePolicy,
     InvocationEnvelope,
+    SideEffectLevel,
     TenantIdentity,
 )
 from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.capability_v2.authorization import AuthorizationDecision
 from backend.capability_v2.policies import GatewayPolicyError
+from backend.capability_v2.outcomes import InMemoryOutcomeStore
+from backend.capability_v2.reliability import (
+    InMemoryRateLimiter, ReliabilityCoordinator, TransactionalCapabilityOutput,
+    transactional_provider,
+)
 
 
 def _descriptor(*, plugin: bool = False) -> CapabilityDescriptorV2:
@@ -54,7 +60,7 @@ def _identity(consumer_type: ConsumerType) -> ConsumerIdentity:
     )
 
 
-def _gateway(descriptor, handler, policy):
+def _gateway(descriptor, handler, policy, reliability=None):
     registry = CapabilityRegistry()
     registry.register(
         CapabilitySpec(
@@ -67,7 +73,9 @@ def _gateway(descriptor, handler, policy):
     release = build_release([descriptor])
     store = InMemoryCatalogStore()
     store.publish(release)
-    return CapabilityGatewayService(CatalogResolver(store, registry), policy), release
+    return CapabilityGatewayService(
+        CatalogResolver(store, registry), policy, reliability=reliability
+    ), release
 
 
 def _envelope(release, consumer_type=ConsumerType.WEB):
@@ -246,3 +254,226 @@ def test_gateway_sanitizes_business_error_details_for_ai_consumers():
     assert result.error.details == {}
     assert "top-secret" not in result.error.message
     assert "projection_redacted" in result.warnings
+
+
+def test_gateway_fails_closed_for_write_when_durable_reliability_is_unavailable():
+    descriptor = _descriptor().model_copy(update={"side_effect_level": SideEffectLevel.WRITE})
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args):
+            return None
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    dispatched = []
+    gateway, release = _gateway(
+        descriptor, lambda *_args: dispatched.append(True) or {"routing_id": "routing_1"}, Policy()
+    )
+    result = asyncio.run(gateway.invoke(_envelope(release)))
+
+    assert result.error.code == "reliability_unavailable"
+    assert dispatched == []
+
+
+def test_gateway_records_write_outcome_and_audit_outbox_atomically():
+    descriptor = _descriptor().model_copy(update={
+        "side_effect_level": SideEffectLevel.WRITE, "idempotency_policy": "required",
+        "consistency_policy": "eventual",
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args):
+            return None
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    store = InMemoryOutcomeStore()
+    coordinator = ReliabilityCoordinator(store, InMemoryRateLimiter(limit=100))
+    gateway, release = _gateway(
+        descriptor, lambda *_args: {"routing_id": "routing_1"}, Policy(), coordinator
+    )
+    envelope = _envelope(release).model_copy(update={"idempotency_key": "idem_1"})
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.ok is True
+    assert store.snapshot()[0].status == "completed"
+    assert len(store.pending_audit_events()) == 1
+
+
+def test_gateway_returns_outcome_unknown_if_provider_returns_but_outcome_commit_fails():
+    descriptor = _descriptor().model_copy(update={
+        "side_effect_level": SideEffectLevel.WRITE, "idempotency_policy": "required",
+        "consistency_policy": "eventual",
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args):
+            return None
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    class FailingCompletionStore(InMemoryOutcomeStore):
+        def complete(self, operation_id, result):
+            raise RuntimeError("database unavailable after provider return")
+
+    store = FailingCompletionStore()
+    coordinator = ReliabilityCoordinator(store, InMemoryRateLimiter(limit=100))
+    gateway, release = _gateway(
+        descriptor, lambda *_args: {"routing_id": "routing_1"}, Policy(), coordinator
+    )
+    envelope = _envelope(release).model_copy(update={"idempotency_key": "idem_1"})
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.status.value == "outcome_unknown"
+    assert result.operation_ref.status.value == "outcome_unknown"
+    assert result.error.code == "outcome_persistence_failed"
+    assert store.snapshot()[0].status == "outcome_unknown"
+    assert store.pending_audit_events()[0].payload["status"] == "outcome_unknown"
+
+
+def test_idempotent_replay_does_not_require_or_consume_a_second_approval():
+    descriptor = _descriptor().model_copy(update={
+        "side_effect_level": SideEffectLevel.WRITE, "idempotency_policy": "required",
+        "consistency_policy": "eventual",
+    })
+    approvals = []
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args):
+            approvals.append(True)
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    store = InMemoryOutcomeStore()
+    coordinator = ReliabilityCoordinator(store, InMemoryRateLimiter(limit=100))
+    gateway, release = _gateway(
+        descriptor, lambda *_args: {"routing_id": "routing_1"}, Policy(), coordinator
+    )
+    envelope = _envelope(release).model_copy(update={"idempotency_key": "idem_1"})
+
+    first = asyncio.run(gateway.invoke(envelope))
+    replay = asyncio.run(gateway.invoke(envelope.model_copy(update={"approval_reference": None})))
+
+    assert replay.ok is True and replay.status == first.status
+    assert replay.operation_ref == first.operation_ref
+    assert replay.data is None
+    assert approvals == [True]
+
+
+def test_gateway_enlists_transactional_provider_outcome_in_same_transaction():
+    descriptor = _descriptor().model_copy(update={
+        "side_effect_level": SideEffectLevel.WRITE, "idempotency_policy": "required",
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args):
+            return None
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    class TransactionalStore(InMemoryOutcomeStore):
+        enlisted = None
+        def complete_in_transaction(self, transaction, operation_id, result):
+            self.enlisted = transaction
+            return self.complete(operation_id, result)
+
+    class Transaction:
+        committed = False
+        rolled_back = False
+        closed = False
+        def commit(self): self.committed = True
+        def rollback(self): self.rolled_back = True
+        def close(self): self.closed = True
+
+    transaction = Transaction()
+    store = TransactionalStore()
+    coordinator = ReliabilityCoordinator(store, InMemoryRateLimiter(limit=100))
+    @transactional_provider
+    def handler(*_args):
+        return TransactionalCapabilityOutput(
+            data={"routing_id": "routing_1"}, transaction=transaction
+        )
+    gateway, release = _gateway(descriptor, handler, Policy(), coordinator)
+    envelope = _envelope(release).model_copy(update={"idempotency_key": "idem_1"})
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.ok is True
+    assert store.enlisted is transaction
+    assert transaction.committed is True
+    assert transaction.rolled_back is False
+    assert transaction.closed is True
+
+
+def test_gateway_rolls_back_transactional_provider_when_output_contract_is_invalid():
+    descriptor = _descriptor().model_copy(update={
+        "side_effect_level": SideEffectLevel.WRITE, "idempotency_policy": "required",
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    class Transaction:
+        committed = False
+        rolled_back = False
+        closed = False
+        def commit(self): self.committed = True
+        def rollback(self): self.rolled_back = True
+        def close(self): self.closed = True
+
+    transaction = Transaction()
+    store = InMemoryOutcomeStore()
+    @transactional_provider
+    def handler(*_args):
+        return TransactionalCapabilityOutput(
+            data={"unexpected": "field"}, transaction=transaction
+        )
+    gateway, release = _gateway(
+        descriptor, handler, Policy(), ReliabilityCoordinator(store, InMemoryRateLimiter(limit=100))
+    )
+    envelope = _envelope(release).model_copy(update={"idempotency_key": "idem_1"})
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.error.code == "provider_failed"
+    assert transaction.committed is False
+    assert transaction.rolled_back is True
+    assert transaction.closed is True
+    assert store.snapshot()[0].status == "failed"
+
+
+def test_gateway_rejects_strong_write_before_nontransactional_provider_dispatch():
+    descriptor = _descriptor().model_copy(update={
+        "side_effect_level": SideEffectLevel.WRITE,
+        "idempotency_policy": "required",
+        "consistency_policy": "strong",
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="policy-7")
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    dispatched = []
+    gateway, release = _gateway(
+        descriptor,
+        lambda *_args: dispatched.append(True) or {"routing_id": "routing_1"},
+        Policy(), ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100)),
+    )
+    envelope = _envelope(release).model_copy(update={"idempotency_key": "idem_1"})
+    result = asyncio.run(gateway.invoke(envelope))
+
+    assert result.error.code == "transaction_participant_required"
+    assert dispatched == []

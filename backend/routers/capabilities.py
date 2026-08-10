@@ -8,8 +8,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
 from backend.capabilities.init_next import CapabilityBusinessError, CapabilityError, capability_registry
-from backend.capabilities.confirmation_next import confirmation_manager
-from backend.capabilities.validation_next import validate_payload
 from backend.routers.deps import build_profile, get_current_user
 from backend.routers.deps import get_authenticated_principal
 from backend.capability_v2.contracts import (
@@ -22,6 +20,7 @@ from backend.capability_v2.contracts import (
     TenantIdentity,
 )
 from backend.capability_v2.gateway import get_default_gateway
+from backend.capability_v2.policies import GatewayPolicyError
 
 
 class InvokeRequest(BaseModel):
@@ -33,6 +32,20 @@ class InvokeRequest(BaseModel):
 def _correlation_id(candidate: str | None, fallback: str) -> str:
     value = (candidate or "").strip()
     return value if re.fullmatch(IDENTITY_PATTERN, value) else fallback
+
+
+def _web_identity(current_user: dict, principal) -> ConsumerIdentity:
+    return ConsumerIdentity(
+        actor=ActorIdentity(**principal.model_dump()),
+        tenant=TenantIdentity(
+            tenant_id=str(current_user.get("team_id") or "default"),
+            membership="member",
+            active_roles=tuple(filter(None, (
+                current_user.get("org_role"), current_user.get("system_role"),
+            ))),
+        ),
+        consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
+    )
 
 
 _BUSINESS_ERROR_STATUS = {
@@ -88,27 +101,48 @@ def _build_router(prefix: str) -> APIRouter:
         return {"success": True, "data": spec.model_dump(mode="json")}
 
     @api.post("/{capability_id}:confirm")
-    def confirm_capability(
+    async def confirm_capability(
         capability_id: str,
         body: InvokeRequest,
+        request: Request,
         current_user: dict = Depends(get_current_user),
+        principal = Depends(get_authenticated_principal),
     ):
+        if body.version is None:
+            raise HTTPException(status_code=400, detail={"code": "major_version_required"})
+        generated_request_id = f"cap_{uuid.uuid4().hex}"
+        request_id = _correlation_id(request.headers.get("X-Request-ID"), generated_request_id)
+        trace_id = _correlation_id(request.headers.get("X-Trace-ID"), request_id)
+        gateway = get_default_gateway()
         try:
-            item = capability_registry.get(capability_id, body.version)
-        except KeyError as exc:
-            raise HTTPException(status_code=404, detail={"code": "capability_not_found", "message": str(exc)}) from exc
-        if item.spec.confirmation == "none":
-            raise HTTPException(status_code=400, detail={"code": "confirmation_not_required", "message": "该能力不需要确认"})
-        try:
-            validate_payload(dict(item.spec.input_schema), body.payload)
-        except ValueError as exc:
-            raise HTTPException(status_code=400, detail={"code": "invalid_payload", "message": str(exc)}) from exc
-        permissions = tuple(build_profile(current_user).get("permissions", []))
-        missing = sorted(set(item.spec.permissions) - set(permissions))
-        if missing:
-            raise HTTPException(status_code=403, detail={"code": "permission_denied", "missing": missing})
-        token = confirmation_manager.issue(item.spec.id, item.spec.version, current_user["gid"], body.payload)
-        return {"success": True, "data": {"confirmation_token": token, "expires_in": confirmation_manager.ttl_seconds, "capability_id": item.spec.id, "version": item.spec.version}}
+            issued = await gateway.request_approval(InvocationEnvelope(
+                capability_id=capability_id,
+                major_version=body.version,
+                catalog_release=gateway.catalog_release,
+                payload=body.payload,
+                identity=_web_identity(current_user, principal),
+                request_id=request_id,
+                trace_id=trace_id,
+            ))
+        except GatewayPolicyError as exc:
+            status_code = 409 if exc.code in {"confirmation_not_required"} else 403
+            if exc.code in {"catalog_resolution_failed", "invalid_input"}:
+                status_code = 400
+            if exc.code in {
+                "approval_service_failed", "approval_service_unavailable",
+                "transaction_participant_required",
+            }:
+                status_code = 503
+            raise HTTPException(
+                status_code=status_code, detail={"code": exc.code, "message": exc.message}
+            ) from exc
+        return {"success": True, "data": {
+            "confirmation_token": issued.token,
+            "expires_at": issued.challenge.expires_at.isoformat(),
+            "capability_id": issued.challenge.capability_id,
+            "version": issued.challenge.major_version,
+            "approval_id": issued.challenge.approval_id,
+        }}
 
     @api.post("/{capability_id}:invoke")
     async def invoke_capability(
@@ -124,17 +158,7 @@ def _build_router(prefix: str) -> APIRouter:
         request_id = _correlation_id(request.headers.get("X-Request-ID"), generated_request_id)
         trace_id = _correlation_id(request.headers.get("X-Trace-ID"), request_id)
         gateway = get_default_gateway()
-        identity = ConsumerIdentity(
-            actor=ActorIdentity(**principal.model_dump()),
-            tenant=TenantIdentity(
-                tenant_id=str(current_user.get("team_id") or "default"),
-                membership="member",
-                active_roles=tuple(filter(None, (
-                    current_user.get("org_role"), current_user.get("system_role"),
-                ))),
-            ),
-            consumer=ConsumerDescriptor(type=ConsumerType.WEB, consumer_id="ai00.web"),
-        )
+        identity = _web_identity(current_user, principal)
         result = await gateway.invoke(InvocationEnvelope(
             capability_id=capability_id,
             major_version=body.version,

@@ -6,6 +6,16 @@ from .identity import AuthenticatedPrincipal, IdentityBroker
 from .gateway import CapabilityGatewayService
 from .authorization import AuthorizationDecision, AuthorizationGrants, CapabilityAuthorizer
 from .projection import project_result
+from .outcomes import OutcomeRecord, SqlOutcomeStore
+from .reliability import (
+    ApprovalChallenge,
+    ApprovalService,
+    ReliabilityCoordinator,
+    SqlApprovalStore,
+    SqlRateLimiter,
+    TransactionalCapabilityOutput,
+    transactional_provider,
+)
 from .contracts import (
     ArtifactRef,
     CapabilityDescriptorV2,
@@ -17,6 +27,8 @@ from .contracts import (
 
 __all__ = [
     "ArtifactRef",
+    "ApprovalChallenge",
+    "ApprovalService",
     "AuthenticatedPrincipal",
     "AuthorizationDecision",
     "AuthorizationGrants",
@@ -31,7 +43,14 @@ __all__ = [
     "IdentityBroker",
     "InvocationEnvelope",
     "OperationRef",
+    "OutcomeRecord",
     "ProviderArtifact",
     "SqlDelegationStore",
+    "SqlApprovalStore",
+    "SqlOutcomeStore",
+    "SqlRateLimiter",
+    "ReliabilityCoordinator",
+    "TransactionalCapabilityOutput",
+    "transactional_provider",
     "project_result",
 ]

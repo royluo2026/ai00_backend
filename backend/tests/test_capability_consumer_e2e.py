@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from fastapi.testclient import TestClient
 
 from backend.capability_v2.identity import AuthenticatedPrincipal
+from backend.capability_v2.reliability import ApprovalChallenge, IssuedApproval
 from backend.main import app
 from backend.routers.deps import get_authenticated_principal, get_current_user
 
@@ -61,5 +62,50 @@ def test_public_rest_returns_same_versioned_result_error_evidence_shape(monkeypa
         assert result["data"] == {}
         assert result["error"] is None
         assert result["correlation"]["request_id"].startswith("cap_")
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_confirmation_route_uses_gateway_and_server_constructed_web_identity(monkeypatch):
+    captured = []
+
+    class Gateway:
+        catalog_release = "rel_test"
+        async def request_approval(self, envelope):
+            captured.append(envelope)
+            return IssuedApproval(
+                token="approval-secret-token",
+                challenge=ApprovalChallenge(
+                    approval_id="approval_1", token_hash="a" * 64,
+                    capability_id=envelope.capability_id, major_version=envelope.major_version,
+                    consumer_fingerprint="consumer:" + "b" * 64,
+                    resource_refs=(), policy_version="policy-7",
+                    confirmation_policy="user",
+                    payload_hash="sha256:" + "c" * 64,
+                    expires_at=datetime.now(UTC),
+                ),
+            )
+
+    async def user():
+        return {"gid": "u1", "team_id": "t1", "system_role": "engineer", "is_active": True}
+    def principal():
+        return AuthenticatedPrincipal(
+            user_id="u1", authentication_method="test-jwt", authenticated_at=datetime.now(UTC)
+        )
+
+    app.dependency_overrides[get_current_user] = user
+    app.dependency_overrides[get_authenticated_principal] = principal
+    monkeypatch.setattr("backend.routers.capabilities.get_default_gateway", lambda: Gateway())
+    try:
+        with TestClient(app) as client:
+            response = client.post(
+                "/api/v1/capabilities/craft.routing.update:confirm",
+                json={"version": 1, "payload": {}},
+                headers={"X-AI00-Source": "agent", "X-AI00-Agent-Run-ID": "forged"},
+            )
+        assert response.status_code == 200
+        assert response.json()["data"]["approval_id"] == "approval_1"
+        assert captured[0].identity.consumer.type.value == "web"
+        assert captured[0].identity.consumer.agent_run_id is None
     finally:
         app.dependency_overrides.clear()

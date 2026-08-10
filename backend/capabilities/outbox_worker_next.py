@@ -34,6 +34,35 @@ def _open_dead_alert(cur, outbox_gid: str, error: str) -> None:
     )
 
 
+def deliver_capability_audit_once(limit: int = 100) -> int:
+    """Deliver the V2 audit outbox idempotently into the immutable audit ledger."""
+    from backend.capability_v2.outcomes import SqlOutcomeStore
+    from backend.db.connection import get_conn
+
+    store = SqlOutcomeStore(get_conn)
+
+    def persist(event) -> None:
+        payload = event.payload
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT IGNORE INTO workmanship_base_capability_audit_ledger "
+                    "(event_id,operation_id,capability_id,major_version,request_id,tenant_id,"
+                    "actor_id,consumer_type,consumer_id,consumer_instance_id,policy_version,"
+                    "payload_hash,status,created_at) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    (
+                        event.event_id, event.operation_id, payload["capability_id"],
+                        payload["major_version"], payload["request_id"], payload["tenant_id"],
+                        payload["actor_id"], payload["consumer_type"], payload["consumer_id"],
+                        payload.get("consumer_instance_id"), payload["policy_version"],
+                        payload["payload_hash"], payload["status"], event.created_at,
+                    ),
+                )
+
+    return store.deliver_audit_outbox(persist, limit=limit)
+
+
 async def run_once(limit: int = 20) -> dict[str, Any]:
     """Run one locked batch. MySQL GET_LOCK prevents duplicate workers."""
     from backend.db.connection import get_conn
@@ -48,6 +77,7 @@ async def run_once(limit: int = 20) -> dict[str, Any]:
             _heartbeat(cur, "running", {"batch_size": limit})
             lock_conn.commit()
         try:
+            audit_delivered = deliver_capability_audit_once(limit=max(limit, 100))
             with lock_conn.cursor() as cur:
                 cur.execute(
                     "SELECT gid FROM workmanship_know_publish_outbox "
@@ -108,6 +138,7 @@ async def run_once(limit: int = 20) -> dict[str, Any]:
                 "completed": sum(r["status"] == "completed" for r in results),
                 "failed": sum(r["status"] == "failed" for r in results),
                 "dead": sum(r["status"] == "dead" for r in results),
+                "capability_audit_delivered": audit_delivered,
                 "results": results,
             }
             with lock_conn.cursor() as cur:

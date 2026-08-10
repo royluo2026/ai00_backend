@@ -214,6 +214,14 @@ from backend.capabilities.registry_next import capability_registry as _capabilit
 _plugin_capability_providers = _plugin_loader.register_capabilities(_capability_registry)
 from backend.capability_v2.gateway import configure_default_gateway as _configure_capability_gateway
 from backend.capability_v2.policies import LegacyServerGatewayPolicy as _LegacyGatewayPolicy
+from backend.capability_v2.outcomes import SqlOutcomeStore as _SqlOutcomeStore
+from backend.capability_v2.reliability import (
+    ApprovalService as _ApprovalService,
+    ReliabilityCoordinator as _ReliabilityCoordinator,
+    SqlApprovalStore as _SqlApprovalStore,
+    SqlRateLimiter as _SqlRateLimiter,
+)
+from backend.db.connection import get_conn as _capability_connection
 from backend.routers import deps as _capability_deps
 from backend.services import user_service as _capability_user_service
 _capability_gateway = _configure_capability_gateway(
@@ -225,6 +233,11 @@ _capability_gateway = _configure_capability_gateway(
                 user, identity.tenant.tenant_id, identity.consumer.type.value
             )
         ),
+        approval_service=_ApprovalService(_SqlApprovalStore(_capability_connection)),
+    ),
+    reliability=_ReliabilityCoordinator(
+        _SqlOutcomeStore(_capability_connection),
+        _SqlRateLimiter(_capability_connection, limit=1000, window_seconds=60),
     ),
 )
 

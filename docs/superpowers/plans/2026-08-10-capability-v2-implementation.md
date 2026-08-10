@@ -537,13 +537,19 @@ git commit -m "feat: enforce resource and data scoped capability access"
 **Files:**
 - Create: `backend/capability_v2/reliability.py`
 - Create: `backend/capability_v2/outcomes.py`
-- Create: `backend/db/migrations/202608100003_capability_outcomes_and_approvals.sql`
+- Create: `backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql`
 - Create: `backend/tests/test_capability_reliability_pipeline.py`
-- Modify: `backend/capabilities/confirmation_next.py`
-- Modify: `backend/capabilities/idempotency_next.py`
-- Modify: `backend/capabilities/rate_limit_next.py`
-- Modify: `backend/capabilities/audit_next.py`
+- Create: `backend/tests/test_capability_reliability_sql.py`
+- Modify: `backend/capability_v2/gateway.py`
+- Modify: `backend/capability_v2/policies.py`
+- Modify: `backend/capability_v2/__init__.py`
+- Modify: `backend/routers/capabilities.py`
 - Modify: `backend/capabilities/outbox_worker_next.py`
+- Modify: `backend/main.py`
+- Modify: `backend/tests/test_capability_consumer_e2e.py`
+- Modify: `docs/governance/domain-ownership.json`
+- Modify: `backend/governance/table_inventory.json`
+- Modify: `.github/CODEOWNERS`
 
 **Interfaces:**
 - Produces: `ApprovalChallenge` bound to consumer, Run/Mount, resource, policy version and payload hash.
@@ -587,14 +593,19 @@ High-risk writes fail closed when durable Outcome/Audit storage is unavailable. 
 
 - [ ] **Step 4: Run reliability, confirmation, idempotency, rate and audit suites**
 
-Run: `python -m pytest backend/tests/test_capability_reliability_pipeline.py backend/tests/test_confirmation_storage.py backend/tests/test_capability_idempotency.py backend/tests/test_rate_limit.py backend/tests/test_audit_reliability.py -q`
+Run: `python -m pytest backend/tests/test_capability_reliability_pipeline.py backend/tests/test_capability_reliability_sql.py backend/tests/test_capability_gateway_pipeline.py backend/tests/test_capability_consumer_e2e.py -q`
 
 Expected: PASS.
+
+Strong-consistency writes must use `@transactional_provider` and return
+`TransactionalCapabilityOutput`; otherwise Gateway rejects before dispatch. Base persists only
+outcome metadata and immutable references, never domain result bodies. `dual` approval remains
+fail-closed until the two-distinct-approver workflow is exposed as a governed capability.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add backend/capability_v2/reliability.py backend/capability_v2/outcomes.py backend/db/migrations/202608100003_capability_outcomes_and_approvals.sql backend/tests/test_capability_reliability_pipeline.py backend/capabilities/confirmation_next.py backend/capabilities/idempotency_next.py backend/capabilities/rate_limit_next.py backend/capabilities/audit_next.py backend/capabilities/outbox_worker_next.py
+git add backend/capability_v2/reliability.py backend/capability_v2/outcomes.py backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql backend/tests/test_capability_reliability_pipeline.py backend/tests/test_capability_reliability_sql.py backend/tests/test_capability_gateway_pipeline.py backend/tests/test_capability_consumer_e2e.py backend/capability_v2/gateway.py backend/capability_v2/policies.py backend/capability_v2/__init__.py backend/routers/capabilities.py backend/capabilities/outbox_worker_next.py backend/main.py docs/governance/domain-ownership.json backend/governance/table_inventory.json .github/CODEOWNERS docs/superpowers/plans/2026-08-10-capability-v2-implementation.md
 git commit -m "feat: make capability outcomes and approvals durable"
 ```
 
