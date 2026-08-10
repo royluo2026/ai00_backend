@@ -323,3 +323,37 @@ def build_profile(user: dict) -> dict:
         "grants":         grants,
         "visible_panels": _SETTINGS_VISIBILITY.get(role, ["appearance"]),
     }
+
+
+def build_capability_authorization_grants(
+    user: dict, tenant_id: str, consumer_type: str = "web"
+):
+    """Translate reviewed legacy roles into explicit V2 resource/data grants."""
+    from backend.capability_v2.authorization import AuthorizationGrants
+
+    profile = build_profile(user)
+    resource_scopes = {f"tenant:{tenant_id}"}
+    for grant in profile.get("grants", ()):
+        scope_gid = str(grant.get("scope_gid") or "").strip()
+        if not scope_gid:
+            continue
+        if grant.get("grant_type") == "project_owner":
+            resource_scopes.add(f"project:{scope_gid}")
+        elif grant.get("grant_type") == "team_admin":
+            resource_scopes.add(f"team:{scope_gid}")
+    data_scopes = {"internal"}
+    if set(profile.get("permissions", ())) & {
+        "craft.view", "craft.write_direct", "knowledge.view", "knowledge.manage"
+    }:
+        data_scopes.add("confidential")
+    if profile.get("org_role") == "super_admin":
+        resource_scopes.add("*")
+        data_scopes.add("*")
+    return AuthorizationGrants(
+        permissions=tuple(sorted(profile.get("permissions", ()))),
+        capability_scopes=("*",) if consumer_type in {"web", "api"} else (),
+        resource_scopes=tuple(sorted(resource_scopes)),
+        data_scopes=tuple(sorted(data_scopes)),
+        policy_version="legacy-rbac-to-abac-v1",
+        tenant_id=tenant_id,
+    )

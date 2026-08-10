@@ -274,6 +274,7 @@ class CapabilityDescriptorV2(FrozenModel):
     delegation_policy: Literal["none", "same_actor", "scoped"] = "none"
     input_schema: Mapping[str, Any]
     output_schema: Mapping[str, Any]
+    agent_output_schema: Mapping[str, Any] | None = None
     schema_hash: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
     artifact_policy: Literal["none", "input", "output", "input_output"] = "none"
     operation_policy: Literal["none", "optional", "required"] = "none"
@@ -291,4 +292,6 @@ class CapabilityDescriptorV2(FrozenModel):
     def public_schemas_are_closed(self) -> "CapabilityDescriptorV2":
         _assert_closed_schema(self.input_schema, "input_schema")
         _assert_closed_schema(self.output_schema, "output_schema")
+        if self.agent_output_schema is not None:
+            _assert_closed_schema(self.agent_output_schema, "agent_output_schema")
         return self

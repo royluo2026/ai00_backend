@@ -1,10 +1,11 @@
 """Policy interfaces used by the fixed Gateway pipeline."""
 from __future__ import annotations
 
-from typing import Any, Protocol
+from typing import Any, Callable, Protocol
 
 from backend.capabilities.registry_next import RegisteredCapability
 
+from .authorization import AuthorizationDecision, AuthorizationGrants, CapabilityAuthorizer
 from .contracts import CapabilityDescriptorV2, ConsumerIdentity, InvocationEnvelope
 
 
@@ -17,7 +18,7 @@ class GatewayPolicyError(PermissionError):
 
 class GatewayPolicy(Protocol):
     def authorize(self, descriptor: CapabilityDescriptorV2, envelope: InvocationEnvelope,
-                  provider: RegisteredCapability) -> None: ...
+                  provider: RegisteredCapability) -> AuthorizationDecision | None: ...
     def approve(self, descriptor: CapabilityDescriptorV2, envelope: InvocationEnvelope,
                 provider: RegisteredCapability) -> None: ...
     def project(self, descriptor: CapabilityDescriptorV2, identity: ConsumerIdentity,
@@ -27,7 +28,7 @@ class GatewayPolicy(Protocol):
 class FailClosedGatewayPolicy:
     """Safe default until the ABAC and persistent approval services are wired."""
 
-    def authorize(self, descriptor, envelope, provider) -> None:
+    def authorize(self, descriptor, envelope, provider) -> AuthorizationDecision:
         if provider.spec.permissions:
             raise GatewayPolicyError("authorization_policy_unavailable", "Authorization policy is not configured.")
 
@@ -42,20 +43,28 @@ class FailClosedGatewayPolicy:
 class LegacyServerGatewayPolicy:
     """Server-side bridge for reviewed V1 providers during the V2 migration."""
 
+    def __init__(
+        self,
+        user_loader: Callable[[str], dict | None],
+        grants_resolver: Callable[[ConsumerIdentity, dict], AuthorizationGrants],
+    ) -> None:
+        self._user_loader = user_loader
+        self._grants_resolver = grants_resolver
+
     def authorize(self, descriptor, envelope, provider) -> None:
         actor = envelope.identity.actor
         if actor.user_id is None:
             raise GatewayPolicyError("service_authorization_unavailable", "Service grants are not configured.")
-        from backend.routers.deps import build_profile
-        from backend.services.user_service import get_by_gid
-
-        user = get_by_gid(actor.user_id)
+        user = self._user_loader(actor.user_id)
         if not user or not user.get("is_active", True):
             raise GatewayPolicyError("actor_inactive", "Actor is inactive.")
-        granted = set(build_profile(user).get("permissions", ()))
-        missing = sorted(set(provider.spec.permissions) - granted)
-        if missing:
-            raise GatewayPolicyError("permission_denied", f"Missing permissions: {', '.join(missing)}")
+        grants = self._grants_resolver(envelope.identity, user)
+        decision = CapabilityAuthorizer(lambda _identity: grants).authorize(
+            descriptor, envelope, required_permissions=tuple(provider.spec.permissions)
+        )
+        if not decision.allowed:
+            raise GatewayPolicyError(decision.code, "Capability authorization was denied.")
+        return decision
 
     def approve(self, descriptor, envelope, provider) -> None:
         if descriptor.confirmation_policy == "none":

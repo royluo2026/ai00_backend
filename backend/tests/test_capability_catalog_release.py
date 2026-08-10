@@ -155,6 +155,27 @@ def test_compatibility_scanner_blocks_stable_removal_and_same_major_contract_cha
     assert compatibility_errors(previous, build_release([stable, _descriptor("craft.routing.get", 2)])) == []
 
 
+def test_compatibility_scanner_binds_agent_projection_schema_to_stable_major():
+    stable = _descriptor("craft.routing.get").model_copy(update={
+        "lifecycle_status": LifecycleStatus.STABLE,
+        "exposure": ExposurePolicy(web=True, api=True, agent=True),
+        "agent_output_schema": {
+            "type": "object", "properties": {}, "additionalProperties": False,
+        },
+    })
+    changed = stable.model_copy(update={
+        "agent_output_schema": {
+            "type": "object",
+            "properties": {"new_field": {"type": "string"}},
+            "additionalProperties": False,
+        }
+    })
+
+    assert compatibility_errors(build_release([stable]), build_release([changed])) == [
+        "stable capability agent projection changed without major version bump: craft.routing.get@1"
+    ]
+
+
 def test_resolve_requires_release_and_pinned_major_without_latest_fallback():
     registry = CapabilityRegistry()
     registry.register(

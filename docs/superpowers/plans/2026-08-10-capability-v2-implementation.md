@@ -357,6 +357,7 @@ git commit -m "feat: add immutable capability catalog releases"
 - Create: `backend/db/migrations/202608100002_base_consumer_delegations.sql`
 - Create: `backend/tests/test_consumer_identity_broker.py`
 - Modify: `backend/routers/deps.py`
+- Modify: `backend/main.py`
 
 **Interfaces:**
 - Produces: `IdentityBroker.for_web()`, `.for_plugin_mount()`, `.for_agent_delegation()`, `.for_mcp_client()`, `.for_worker()`, `.for_local_runtime()`.
@@ -482,8 +483,15 @@ git commit -m "feat: route every capability through one gateway"
 - Create: `backend/capability_v2/projection.py`
 - Create: `backend/tests/test_capability_abac_matrix.py`
 - Create: `backend/tests/test_llm_projection_policy.py`
+- Modify: `backend/capability_v2/contracts.py`
+- Modify: `backend/capability_v2/catalog.py`
+- Modify: `backend/capability_v2/gateway.py`
+- Modify: `backend/capability_v2/__init__.py`
 - Modify: `backend/capability_v2/policies.py`
+- Modify: `backend/tests/test_capability_gateway_pipeline.py`
+- Modify: `backend/tests/test_capability_catalog_release.py`
 - Modify: `backend/routers/deps.py`
+- Modify: `backend/main.py`
 
 **Interfaces:**
 - Produces: `AuthorizationDecision(allowed, code, policy_version, resource_refs, data_scopes)`.
@@ -520,7 +528,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add backend/capability_v2/authorization.py backend/capability_v2/projection.py backend/capability_v2/policies.py backend/tests/test_capability_abac_matrix.py backend/tests/test_llm_projection_policy.py backend/routers/deps.py
+git add backend/capability_v2/authorization.py backend/capability_v2/projection.py backend/capability_v2/policies.py backend/capability_v2/contracts.py backend/capability_v2/catalog.py backend/capability_v2/gateway.py backend/capability_v2/__init__.py backend/tests/test_capability_abac_matrix.py backend/tests/test_llm_projection_policy.py backend/tests/test_capability_gateway_pipeline.py backend/tests/test_capability_catalog_release.py backend/routers/deps.py backend/main.py docs/superpowers/plans/2026-08-10-capability-v2-implementation.md
 git commit -m "feat: enforce resource and data scoped capability access"
 ```
 

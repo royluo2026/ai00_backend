@@ -63,7 +63,7 @@ def canonical_catalog_bytes(
     provider_artifacts: Iterable[ProviderArtifact] = (),
 ) -> bytes:
     descriptor_documents = sorted(
-        (item.model_dump(mode="json") for item in descriptors),
+        (_descriptor_document(item) for item in descriptors),
         key=lambda item: (item["id"], item["major_version"]),
     )
     provider_documents = sorted(
@@ -76,6 +76,14 @@ def canonical_catalog_bytes(
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
+
+
+def _descriptor_document(item: CapabilityDescriptorV2) -> dict:
+    document = item.model_dump(mode="json")
+    # Preserve hashes of releases created before this additive optional field existed.
+    if document.get("agent_output_schema") is None:
+        document.pop("agent_output_schema", None)
+    return document
 
 
 def build_release(
@@ -120,6 +128,11 @@ def compatibility_errors(previous: CatalogRelease, candidate: CatalogRelease) ->
             continue
         if new.schema_hash != old.schema_hash:
             errors.append(f"stable capability schema changed without major version bump: {label}")
+            continue
+        if new.agent_output_schema != old.agent_output_schema:
+            errors.append(
+                f"stable capability agent projection changed without major version bump: {label}"
+            )
             continue
         if new.owner_domain != old.owner_domain:
             errors.append(f"stable capability owner changed without major version bump: {label}")

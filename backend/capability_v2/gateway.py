@@ -22,8 +22,8 @@ from .policies import (
     FailClosedGatewayPolicy,
     GatewayPolicy,
     GatewayPolicyError,
-    LegacyServerGatewayPolicy,
 )
+from .projection import project_result
 
 
 class CapabilityGatewayService:
@@ -59,9 +59,13 @@ class CapabilityGatewayService:
             return self._rejected(envelope, "consumer_not_allowed", "Consumer is not exposed to this capability.")
 
         try:
-            self._policy.authorize(descriptor, envelope, provider)
+            authorization = self._policy.authorize(descriptor, envelope, provider)
         except GatewayPolicyError as exc:
-            return self._rejected(envelope, exc.code, exc.message)
+            return project_result(
+                self._rejected(envelope, exc.code, exc.message),
+                descriptor,
+                envelope.identity,
+            )
         except Exception:
             return self._failed(
                 envelope, "authorization_failed", "Capability authorization service failed."
@@ -75,7 +79,12 @@ class CapabilityGatewayService:
         try:
             self._policy.approve(descriptor, envelope, provider)
         except GatewayPolicyError as exc:
-            return self._rejected(envelope, exc.code, exc.message)
+            return project_result(
+                self._rejected(envelope, exc.code, exc.message),
+                descriptor,
+                envelope.identity,
+                data_scopes=authorization.data_scopes if authorization is not None else (),
+            )
         except Exception:
             return self._failed(envelope, "approval_failed", "Capability approval service failed.")
 
@@ -96,17 +105,22 @@ class CapabilityGatewayService:
             validate_payload(dict(descriptor.output_schema), value, label="output")
             projected = self._policy.project(descriptor, envelope.identity, value)
         except CapabilityBusinessError as exc:
-            return self._rejected(
-                envelope,
-                exc.code,
-                exc.message,
-                retryable=exc.retryable,
-                details=exc.details,
+            return project_result(
+                self._rejected(
+                    envelope,
+                    exc.code,
+                    exc.message,
+                    retryable=exc.retryable,
+                    details=exc.details,
+                ),
+                descriptor,
+                envelope.identity,
+                data_scopes=authorization.data_scopes if authorization is not None else (),
             )
         except Exception:
             return self._failed(envelope, "provider_failed", "Capability provider failed.")
 
-        return CapabilityResultV2(
+        result = CapabilityResultV2(
             ok=True,
             status=CapabilityStatus.COMPLETED,
             capability_id=envelope.capability_id,
@@ -114,6 +128,12 @@ class CapabilityGatewayService:
             data=projected,
             evidence=evidence,
             correlation=CorrelationRef(request_id=envelope.request_id, trace_id=envelope.trace_id),
+        )
+        return project_result(
+            result,
+            descriptor,
+            envelope.identity,
+            data_scopes=authorization.data_scopes if authorization is not None else (),
         )
 
     @staticmethod
@@ -166,7 +186,7 @@ def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
     store.publish(release)
     _default_gateway = CapabilityGatewayService(
         CatalogResolver(store, registry),
-        policy or LegacyServerGatewayPolicy(),
+        policy or FailClosedGatewayPolicy(),
     ).bind_release(release.release_id)
     return _default_gateway
 

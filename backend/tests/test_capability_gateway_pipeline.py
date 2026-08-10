@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 import pytest
 
 from backend.capabilities.models_next import CapabilitySpec
+from backend.capabilities.models_next import CapabilityBusinessError
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capability_v2.catalog import CatalogResolver, build_release
 from backend.capability_v2.catalog_store import InMemoryCatalogStore
@@ -21,6 +22,7 @@ from backend.capability_v2.contracts import (
     TenantIdentity,
 )
 from backend.capability_v2.gateway import CapabilityGatewayService
+from backend.capability_v2.authorization import AuthorizationDecision
 from backend.capability_v2.policies import GatewayPolicyError
 
 
@@ -190,3 +192,57 @@ def test_gateway_rejects_closed_schema_unknown_fields_before_dispatch():
 
     assert result.error.code == "invalid_input"
     assert dispatched == []
+
+
+def test_gateway_applies_ai_projection_with_authorized_data_scopes():
+    descriptor = _descriptor().model_copy(update={
+        "exposure": ExposurePolicy(web=True, agent=True),
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(
+                allowed=True, code="allowed", policy_version="policy-7",
+                data_scopes=("internal",),
+            )
+        def approve(self, *_args):
+            return None
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    gateway, release = _gateway(
+        descriptor, lambda _payload, _context: {"routing_id": "routing_1"}, Policy()
+    )
+    result = asyncio.run(gateway.invoke(_envelope(release, ConsumerType.AGENT)))
+
+    assert result.data["routing_id"]["kind"] == "untrusted_text"
+    assert "ai_untrusted_content" in result.warnings
+
+
+def test_gateway_sanitizes_business_error_details_for_ai_consumers():
+    descriptor = _descriptor().model_copy(update={
+        "exposure": ExposurePolicy(web=True, agent=True),
+    })
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(
+                allowed=True, code="allowed", policy_version="policy-7"
+            )
+        def approve(self, *_args):
+            return None
+        def project(self, _descriptor, _identity, data):
+            return data
+
+    def handler(_payload, _context):
+        raise CapabilityBusinessError(
+            "resource_not_found", "person@example.com token=top-secret",
+            details={"api_token": "top-secret"},
+        )
+
+    gateway, release = _gateway(descriptor, handler, Policy())
+    result = asyncio.run(gateway.invoke(_envelope(release, ConsumerType.AGENT)))
+
+    assert result.error.details == {}
+    assert "top-secret" not in result.error.message
+    assert "projection_redacted" in result.warnings

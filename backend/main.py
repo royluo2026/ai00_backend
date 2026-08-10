@@ -213,7 +213,20 @@ _plugin_loader.discover()
 from backend.capabilities.registry_next import capability_registry as _capability_registry
 _plugin_capability_providers = _plugin_loader.register_capabilities(_capability_registry)
 from backend.capability_v2.gateway import configure_default_gateway as _configure_capability_gateway
-_capability_gateway = _configure_capability_gateway(_capability_registry)
+from backend.capability_v2.policies import LegacyServerGatewayPolicy as _LegacyGatewayPolicy
+from backend.routers import deps as _capability_deps
+from backend.services import user_service as _capability_user_service
+_capability_gateway = _configure_capability_gateway(
+    _capability_registry,
+    policy=_LegacyGatewayPolicy(
+        user_loader=lambda gid: _capability_user_service.get_by_gid(gid),
+        grants_resolver=lambda identity, user: (
+            _capability_deps.build_capability_authorization_grants(
+                user, identity.tenant.tenant_id, identity.consumer.type.value
+            )
+        ),
+    ),
+)
 
 # 收集所有插件声明的 OWNED_MODULES（这些模块由插件管理，不走 auto-scan）
 _plugin_owned: set[str] = set()
