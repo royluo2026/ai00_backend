@@ -1,6 +1,8 @@
 import unittest
 from pathlib import Path
 
+from backend.platform_sdk.capabilities import invoke_capability_for_user
+
 
 class AgentDomainClientTests(unittest.TestCase):
     def test_project_and_knowledge_tools_have_no_domain_database_fallback(self):
@@ -19,9 +21,9 @@ class AgentDomainClientTests(unittest.TestCase):
 
 
     def test_in_process_agent_adapter_cannot_bypass_write_confirmation(self):
-        root = Path(__file__).resolve().parents[2]
-        text = (root / "backend/platform_sdk/capabilities.py").read_text(encoding="utf-8")
-        self.assertIn('item.spec.confirmation != "none"', text)
-        self.assertIn("requires an explicit confirmation token", text)
+        with self.assertRaisesRegex(PermissionError, "trusted ConsumerIdentity or Agent delegation"):
+            invoke_capability_for_user(
+                "craft.bop.version.archive", {}, user_gid="forged-user", source="agent"
+            )
 if __name__ == "__main__":
     unittest.main()

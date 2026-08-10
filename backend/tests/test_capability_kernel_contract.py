@@ -15,20 +15,26 @@ class CapabilityKernelContractTests(unittest.TestCase):
         expected_owners = {
             "system": "base",
             "craft": "craft",
+            "digital_model": "digital_model",
             "knowledge": "knowledge",
             "ontology": "ontology",
             "identity": "base",
             "semantic": "base",
             "base": "base",
-            "plugin": "plugin",
-            "local": "runtime",
-            "vismockup": "vismockup",
+            "plugin": "base",
+            "local": "local_integration",
+            "simulation": "simulation",
+            "vismockup": "local_integration",
         }
         for spec in __import__(
             "backend.capabilities.registry_next",
             fromlist=["capability_registry"],
         ).capability_registry.list():
-            expected_owner = expected_owners[spec.id.split(".", 1)[0]]
+            expected_owner = (
+                "project_management"
+                if spec.id.startswith("base.project.")
+                else expected_owners[spec.id.split(".", 1)[0]]
+            )
             self.assertEqual(spec.owner, expected_owner, spec.id)
 
     def test_business_error_keeps_stable_code_and_details(self):

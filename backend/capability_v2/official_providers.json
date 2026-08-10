@@ -29,7 +29,7 @@
       "plugin_id": "official.local-integration",
       "module": "device_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:eac8cc86c872f160b6fc9d934d61a20d03a8b1b831197d868760b12631596652"
+      "artifact_hash": "sha256:11db2d769431f6509fa69be6f234a13993e73b3324fece12f773d14000edb534"
     }
   ]
 }

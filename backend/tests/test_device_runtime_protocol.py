@@ -24,12 +24,37 @@ def test_completion_http_body_requires_signed_closed_outcome():
         CompleteBody.model_validate({**body.model_dump(), "success": True})
 
 
-def test_protocol_migration_normalizes_legacy_terminal_state():
+def test_protocol_migration_does_not_mix_non_resumable_data_backfill():
     from pathlib import Path
     root = Path(__file__).resolve().parents[2]
     migration = (root / "backend/db/migrations/202608100011_device_operation_protocol_v2.sql").read_text(encoding="utf-8")
-    assert "status = 'completed'" in migration
+    assert "UPDATE workmanship_runtime_commands" not in migration
+    assert "ADD COLUMN IF NOT EXISTS protocol_version" in migration
+    assert "succeeded" in migration
     assert "lease_retry_limit_reached" in migration
+
+
+def test_get_command_projects_legacy_terminal_values(monkeypatch):
+    class Cursor:
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def execute(self, *_args): return None
+        def fetchone(self):
+            return {
+                "gid": "operation-1", "status": "succeeded",
+                "error": "lease retry limit reached", "result": "{}",
+            }
+
+    class Connection:
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def cursor(self): return Cursor()
+
+    monkeypatch.setattr(control_plane, "get_device_conn", lambda: Connection())
+    result = control_plane.get_command("operation-1", "user-1")
+
+    assert result["status"] == "completed"
+    assert result["error"] == "lease_retry_limit_reached"
 
 
 def test_pending_device_outcome_is_reconciled_idempotently(monkeypatch):

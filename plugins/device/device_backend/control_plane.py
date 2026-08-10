@@ -31,6 +31,15 @@ def _decode(value: Any) -> Any:
     return value
 
 
+def _normalize_legacy_outcome(row: dict) -> dict:
+    """Project pre-V2 terminal values without mutating migration history."""
+    if row.get("status") == "succeeded":
+        row["status"] = "completed"
+    if row.get("error") == "lease retry limit reached":
+        row["error"] = "lease_retry_limit_reached"
+    return row
+
+
 def _iso_utc(value: Any) -> str:
     if not isinstance(value, datetime):
         return str(value)
@@ -199,8 +208,8 @@ def enqueue_command(capability_id: str, version: int, payload: dict, user_gid: s
             if capability_id not in advertised:
                 raise ValueError(f"Device does not advertise {capability_id}")
             cur.execute(
-                "INSERT INTO workmanship_runtime_commands (gid, device_gid, capability_id, capability_version, payload, payload_hash, requested_by, expires_at) VALUES (%s,%s,%s,%s,%s,%s,%s,DATE_ADD(NOW(), INTERVAL %s SECOND))",
-                (command_gid, device_gid, capability_id, version, encoded, hashlib.sha256(encoded.encode()).hexdigest(), user_gid, ttl_seconds),
+                "INSERT INTO workmanship_runtime_commands (gid, device_gid, capability_id, capability_version, protocol_version, payload, payload_hash, requested_by, expires_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,DATE_ADD(NOW(), INTERVAL %s SECOND))",
+                (command_gid, device_gid, capability_id, version, PROTOCOL_V2, encoded, hashlib.sha256(encoded.encode()).hexdigest(), user_gid, ttl_seconds),
             )
         conn.commit()
     return {"command_gid": command_gid, "device_gid": device_gid, "status": "queued", "expires_in": ttl_seconds}
@@ -337,6 +346,7 @@ def get_command(command_gid: str, user_gid: str) -> dict:
             row = cur.fetchone()
     if not row:
         raise LookupError("Command not found")
+    row = _normalize_legacy_outcome(dict(row))
     if str(row.get("status") or "").startswith("pending_"):
         row["status"] = "reconciling"
         row["result"] = None

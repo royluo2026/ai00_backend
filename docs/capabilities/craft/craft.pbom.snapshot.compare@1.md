@@ -8,7 +8,7 @@ craft.pbom.snapshot.compare
 - 不适用：No exact PBOM snapshot is known.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_515f4828b3d683f2be3116e82670d12e`
+- Catalog Release：`rel_84f5817abbc66e72c7c0e2fca722456f`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -82,7 +82,7 @@ craft.pbom.snapshot.compare
 ```json
 {
   "capability_id": "craft.pbom.snapshot.compare",
-  "catalog_release": "rel_515f4828b3d683f2be3116e82670d12e",
+  "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
   "major_version": 1,
   "payload": {
     "from_snapshot_gid": "example",
