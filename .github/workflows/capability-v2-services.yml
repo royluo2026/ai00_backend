@@ -1,0 +1,56 @@
+name: Capability V2 Services
+
+on:
+  pull_request:
+    paths:
+      - "services/agent-runtime/**"
+      - "services/mcp-gateway/**"
+      - "local-runtime/**"
+      - "backend/tests/test_external_service_ownership.py"
+      - ".github/workflows/capability-v2-services.yml"
+  push:
+    branches: [deploy]
+    paths:
+      - "services/agent-runtime/**"
+      - "services/mcp-gateway/**"
+      - "local-runtime/**"
+
+jobs:
+  agent-runtime:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/agent-runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: services/agent-runtime/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  mcp-gateway:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/mcp-gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: services/mcp-gateway/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  local-runtime:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - run: dotnet test local-runtime/Ai00.LocalRuntime.sln -c Release

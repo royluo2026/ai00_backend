@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup><ProjectReference Include="..\Ai00.LocalRuntime.Contracts\Ai00.LocalRuntime.Contracts.csproj" /></ItemGroup>
+</Project>
