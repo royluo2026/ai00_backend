@@ -168,7 +168,7 @@ def test_legacy_role_bridge_derives_exact_resource_scopes_without_global_widenin
     assert "*" not in grants.resource_scopes
     assert grants.data_scopes == ("confidential", "internal")
 
-    plugin_grants = deps.build_capability_authorization_grants(
-        {"gid": "user_1"}, "tenant_1", "plugin"
-    )
-    assert plugin_grants.capability_scopes == ()
+    with pytest.raises(PermissionError, match="mount identity"):
+        deps.build_capability_authorization_grants(
+            {"gid": "user_1"}, "tenant_1", "plugin"
+        )

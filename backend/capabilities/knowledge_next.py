@@ -104,5 +104,9 @@ def search_knowledge(payload: dict[str, Any], context: CapabilityContext) -> dic
 
 def register_knowledge_capabilities(registry) -> None:
     from .models_next import CapabilitySpec
+    from backend.knowledge.operations import KnowledgeOperationsProvider
+    from backend.domain_ports.operations import operations_registry
+
+    operations_registry.register(KnowledgeOperationsProvider())
     register_capability(registry, CapabilitySpec(owner="knowledge", id="knowledge.get", version=1, description="读取当前用户有权访问的知识条目及 Markdown 正文.", permissions=("knowledge.view",), plugin_callable=True, input_schema={"type": "object", "required": ["gid"], "properties": {"gid": {"type": "string"}}}, output_schema=ENTRY_SCHEMA, tags=("knowledge", "read")), get_knowledge)
     register_capability(registry, CapabilitySpec(owner="knowledge", id="knowledge.search", version=1, description="按标题、Markdown 正文和标签搜索知识条目.", permissions=("knowledge.view",), plugin_callable=True, input_schema={"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 100}, "entry_type": {"type": "string"}}}, output_schema=ENTRY_SEARCH_SCHEMA, tags=("knowledge", "read")), search_knowledge)

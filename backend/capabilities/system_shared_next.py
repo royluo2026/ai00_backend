@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from backend.system_capabilities.providers import provider_registry, stable_ref
+from backend.base.provider import register_capability
 from .models_next import CapabilityContext, CapabilityOutput, CapabilitySpec
 
 
@@ -112,7 +113,7 @@ def register_system_shared_capabilities(registry: Any) -> None:
         ("semantic.context.get", semantic_context, "Read an allowlisted bounded semantic named view.", "read", (), ["named_view"]),
     )
     for capability_id, handler, description, risk, permissions, required in defs:
-        registry.register(CapabilitySpec(
+        register_capability(registry, CapabilitySpec(
             id=capability_id, owner="base", plugin_callable=False, description=description,
             use_when="A bounded shared-system composition is required.", do_not_use_when="A domain-specific stable ref is already known.",
             subject_concepts=("system.object_ref",), effects=(("request:system.job_cancel",) if capability_id=="system.job.cancel" else ("read:system.ref",)),

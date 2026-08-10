@@ -6,21 +6,21 @@ Revoke an installed plugin immediately.
 
 - 适用：Revoke an installed plugin immediately.
 - 不适用：Use a governed Capability V2 contract when one is available.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_7eb69937273ad75a0e0781788fa7ac11`
+- Catalog Release：`rel_88726d21e3ffa53eb69b4580e0b22354`
 - Schema 精度：`typed`
-- 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
-| agent | 不可用 |
+| plugin | 可用 |
+| agent | 可用 |
 | api | 可用 |
-| mcp | 不可用 |
+| mcp | 可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -28,14 +28,14 @@ Revoke an installed plugin immediately.
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:system.plugin.manage`
-- 自动化等级：`A1`
-- 数据分类：`internal`
-- Delegation：`none`
-- 认证新鲜度：0 秒
+- 授权策略：`base.v2:system.plugin.manage`
+- 自动化等级：`A0`
+- 数据分类：`restricted`
+- Delegation：`scoped`
+- 认证新鲜度：300 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `plugin-installation` ← `plugin_id`（必填）
 
 ## 执行与可靠性
 
@@ -43,13 +43,13 @@ Revoke an installed plugin immediately.
 - 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`admin`
-- 幂等：`optional`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
-- Operation：`none`
+- 一致性：`external`
+- Operation：`optional`
 - Artifact：`none`
-- 审计：`standard`
+- 审计：`high_risk`
 - Evidence：`optional`
 - 配额成本：1
 
@@ -60,7 +60,6 @@ Revoke an installed plugin immediately.
   "additionalProperties": false,
   "properties": {
     "plugin_id": {
-      "minLength": 3,
       "type": "string"
     }
   },
@@ -76,7 +75,7 @@ Revoke an installed plugin immediately.
 ```json
 {
   "capability_id": "plugin.revoke",
-  "catalog_release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+  "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
   "major_version": 1,
   "payload": {
     "plugin_id": "example"
@@ -91,7 +90,22 @@ Revoke an installed plugin immediately.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "plugin_id": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "plugin_id",
+    "version",
+    "state"
+  ],
   "type": "object"
 }
 ```
@@ -125,9 +139,16 @@ Revoke an installed plugin immediately.
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
+- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
+- `approval_required`：The governed operation requires a valid approval.（retryable=false）
+- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
+- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
+- `version_conflict`：The resource version differs from the expected version.（retryable=false）
+- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
+- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

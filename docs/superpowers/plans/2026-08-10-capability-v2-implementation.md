@@ -1117,17 +1117,27 @@ Physical extraction of the legacy Project Management routers still hosted below
 `plugins/craft` and replacement of cross-domain convenience calls in `public.py`
 remain explicit boundary-debt work and must not be interpreted as completed here.
 
-- [ ] **Step 3: Implement one complete vertical slice at a time**
+Base Platform slice completed on 2026-08-10: all 22 stable identity, plugin
+lifecycle/storage and shared system capabilities now publish native stable V2
+descriptors with closed schemas and Plugin/Agent/MCP exposure. Plugin lifecycle
+writes remain A0/admin-only with fresh authentication, mandatory idempotency and
+high-risk audit. Agent storage namespaces are derived from trusted delegated
+consumer identities. Worker health now composes a Knowledge-owned public
+operations port instead of reading Knowledge tables from the Base capability.
+The architecture audit reports zero new violations and one additional historical
+violation resolved relative to the pre-slice baseline.
+
+- [x] **Step 3: Implement one complete vertical slice at a time**
 
 For every missing ID: add Descriptor, closed schemas, resource selectors, automation policy, Application Port method, Provider, success/error tests, Plugin/Agent contract examples and generated docs. Migrate read/validate first, draft writes second, publish/restore/bulk writes last. Craft writes create ChangeSet/Commit; Knowledge revisions preserve Evidence and immutable history. Project Management stores only stable refs to Craft/Model/Simulation/Knowledge resources and cannot write their tables.
 
-- [ ] **Step 4: Require zero missing stable records and run domain regressions**
+- [x] **Step 4: Require zero missing stable records and run domain regressions**
 
 Run: `python -m pytest backend/tests/test_domain_capability_coverage.py backend/tests/test_base_capability_providers.py plugins/project_management/tests backend/tests/test_knowledge_document_capabilities.py backend/tests/test_craft_bop_version_capabilities.py backend/tests/test_craft_write_capabilities.py -q`
 
 Expected: PASS with zero skipped stable Capability rows.
 
-- [ ] **Step 5: Commit each reviewed vertical slice**
+- [x] **Step 5: Commit each reviewed vertical slice**
 
 Commit format: `feat(<domain>): expose <user-function-id> through capability v2`.
 

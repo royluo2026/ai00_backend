@@ -6,18 +6,18 @@ Search bounded principal summaries.
 
 - 适用：A bounded shared-system composition is required.
 - 不适用：A domain-specific stable ref is already known.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_7eb69937273ad75a0e0781788fa7ac11`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
+- Catalog Release：`rel_88726d21e3ffa53eb69b4580e0b22354`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -28,10 +28,10 @@ Search bounded principal summaries.
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:authenticated`
+- 授权策略：`base.v2:authenticated`
 - 自动化等级：`A2`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
@@ -59,7 +59,12 @@ Search bounded principal summaries.
 {
   "additionalProperties": false,
   "properties": {
-    "query": {}
+    "limit": {
+      "type": "integer"
+    },
+    "query": {
+      "type": "string"
+    }
   },
   "required": [
     "query"
@@ -73,7 +78,7 @@ Search bounded principal summaries.
 ```json
 {
   "capability_id": "identity.principal.search",
-  "catalog_release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+  "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
   "major_version": 1,
   "payload": {
     "query": "example"
@@ -88,7 +93,23 @@ Search bounded principal summaries.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "total": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "items",
+    "total"
+  ],
   "type": "object"
 }
 ```
@@ -122,9 +143,16 @@ Search bounded principal summaries.
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
+- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
+- `approval_required`：The governed operation requires a valid approval.（retryable=false）
+- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
+- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
+- `version_conflict`：The resource version differs from the expected version.（retryable=false）
+- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
+- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

@@ -2940,8 +2940,7 @@
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/outbox_worker_next.py"
+        "backend/capabilities/agreed_catalog.py"
       ]
     },
     "capability:vismockup.capture": {

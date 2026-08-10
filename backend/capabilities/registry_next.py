@@ -82,7 +82,8 @@ class CapabilityRegistry:
         return CapabilityResult(capability_id=item.spec.id, version=item.spec.version, data=value, evidence=evidence, audit=audit)
 
 capability_registry = CapabilityRegistry()
-capability_registry.register(CapabilitySpec(id="system.echo", version=1, owner="base", description="Return the supplied JSON payload; used to verify adapters.", plugin_callable=True, input_schema={"type": "object"}, output_schema={"type": "object"}, tags=("system", "diagnostic")), lambda payload, _context: payload)
+from backend.base.provider import register_capability as register_base_capability
+register_base_capability(capability_registry, CapabilitySpec(id="system.echo", version=1, owner="base", description="Return the supplied JSON payload; used to verify adapters.", plugin_callable=True, input_schema={"type": "object"}, output_schema={"type": "object"}, tags=("system", "diagnostic")), lambda payload, _context: payload)
 from .knowledge_next import register_knowledge_capabilities
 register_knowledge_capabilities(capability_registry)
 
@@ -122,7 +123,7 @@ register_outbox_capability(capability_registry)
 from .outbox_retry_next import register_retry_capability
 register_retry_capability(capability_registry)
 
-from .outbox_worker_next import register_worker_capability
+from backend.base.operations import register_worker_capability
 register_worker_capability(capability_registry)
 
 from .local_runtime_next import register_local_runtime_capabilities

@@ -8,7 +8,7 @@ Read the current immutable proposal revision.
 - 不适用：Searching proposals.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_7eb69937273ad75a0e0781788fa7ac11`
+- Catalog Release：`rel_88726d21e3ffa53eb69b4580e0b22354`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -73,7 +73,7 @@ Read the current immutable proposal revision.
 ```json
 {
   "capability_id": "ontology.change.proposal.get",
-  "catalog_release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+  "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
   "major_version": 1,
   "payload": {
     "proposal_gid": "example"

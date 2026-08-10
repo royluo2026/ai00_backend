@@ -338,8 +338,11 @@ class CapabilityGatewayService:
             request_id=envelope.request_id,
             confirmation_token=envelope.approval_reference,
             agent_run_id=envelope.identity.consumer.agent_run_id,
+            # Plugin storage uses a server-derived consumer namespace. Agents receive
+            # their own delegated consumer namespace; they cannot select another
+            # plugin or agent namespace through request payload.
             plugin_id=(envelope.identity.consumer.consumer_id
-                       if envelope.identity.consumer.type.value == "plugin" else None),
+                       if envelope.identity.consumer.type.value in {"plugin", "agent"} else None),
             plugin_version=envelope.identity.consumer.consumer_version,
         )
 

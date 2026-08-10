@@ -1,8 +1,11 @@
 # Generated from docs/governance/domain-ownership.json. Keep both files in sync.
 
 # Base Platform
+/backend/base/** @ai00/base-maintainers
 /backend/system_capabilities/** @ai00/base-maintainers
 /backend/plugin_platform/** @ai00/base-maintainers
+/backend/capabilities/system_shared_next.py @ai00/base-maintainers
+/backend/capabilities/plugin_marketplace_next.py @ai00/base-maintainers
 /backend/config.py @ai00/base-maintainers
 /backend/core/** @ai00/base-maintainers
 /backend/db/connection.py @ai00/base-maintainers
@@ -68,6 +71,7 @@
 /backend/capabilities/review_next.py @ai00/knowledge-maintainers
 /backend/capabilities/outbox_next.py @ai00/knowledge-maintainers
 /backend/capabilities/outbox_retry_next.py @ai00/knowledge-maintainers
+/backend/capabilities/outbox_worker_next.py @ai00/base-maintainers
 /backend/domain_ports/knowledge.py @ai00/knowledge-maintainers
 /backend/db/migrations/202608030007_knowledge_proposal_outbox.sql @ai00/knowledge-maintainers
 /backend/db/migrations/202608040003_knowledge_markdown_revisions.sql @ai00/knowledge-maintainers

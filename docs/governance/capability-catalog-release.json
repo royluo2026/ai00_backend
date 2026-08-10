@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_7eb69937273ad75a0e0781788fa7ac11",
-  "catalog_hash": "sha256:7eb69937273ad75a0e0781788fa7ac11d704295905ddc84b024be838d5475390",
+  "release_id": "rel_88726d21e3ffa53eb69b4580e0b22354",
+  "catalog_hash": "sha256:88726d21e3ffa53eb69b4580e0b22354e982f730e379c9f579ef4bab7508ec62",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -4608,7 +4608,7 @@
       "id": "identity.principal.search",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "identity.principal.search",
       "description": "Search bounded principal summaries.",
@@ -4618,7 +4618,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -4626,32 +4626,69 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "query"
-        ],
-        "properties": {
-          "query": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total"
+        ]
       },
-      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
+      "schema_hash": "sha256:280228fe31d22408df476c7b9daeff10af8fe09c904e193485a70de4a37e4ae1",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4664,8 +4701,49 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "knowledge.context.retrieve",
@@ -13560,7 +13638,7 @@
       "id": "plugin.disable",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.disable",
       "description": "Disable an installed plugin.",
@@ -13570,59 +13648,139 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:system.plugin.manage",
-      "resource_selectors": [],
-      "data_classification": "internal",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "plugin_id"
-        ],
         "properties": {
           "plugin_id": {
-            "type": "string",
-            "minLength": 3
+            "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "plugin_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
+      },
+      "schema_hash": "sha256:474fdf665ec0d15f8a8ce57069f5a2697c8da5ff2763097b29bc3e20c337f2f5",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
       "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.enable",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.enable",
       "description": "Enable an installed plugin.",
@@ -13632,59 +13790,139 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:system.plugin.manage",
-      "resource_selectors": [],
-      "data_classification": "internal",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "plugin_id"
-        ],
         "properties": {
           "plugin_id": {
-            "type": "string",
-            "minLength": 3
+            "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "plugin_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
+      },
+      "schema_hash": "sha256:474fdf665ec0d15f8a8ce57069f5a2697c8da5ff2763097b29bc3e20c337f2f5",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
       "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.install",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.install",
       "description": "Install a platform-signed release in disabled state.",
@@ -13694,26 +13932,27 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:system.plugin.manage",
-      "resource_selectors": [],
-      "data_classification": "internal",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "plugin_id",
-          "version",
-          "granted_capabilities"
-        ],
         "properties": {
           "plugin_id": {
             "type": "string"
@@ -13728,35 +13967,115 @@
             }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "granted_capabilities"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:7fd6541339a8a14ff38ee70766b713073e5ce1ccf7b9a7b5d35ade5c91f0a355",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
+      },
+      "schema_hash": "sha256:f7223e859ec027ffb54533b362de81b97e819b301e72076fe9c3a67b84dbc3fe",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
       "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.revoke",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.revoke",
       "description": "Revoke an installed plugin immediately.",
@@ -13766,59 +14085,139 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:system.plugin.manage",
-      "resource_selectors": [],
-      "data_classification": "internal",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "plugin_id"
-        ],
         "properties": {
           "plugin_id": {
-            "type": "string",
-            "minLength": 3
+            "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "plugin_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
+      },
+      "schema_hash": "sha256:474fdf665ec0d15f8a8ce57069f5a2697c8da5ff2763097b29bc3e20c337f2f5",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
       "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.rollback",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.rollback",
       "description": "Roll back to the previous platform-signed version.",
@@ -13828,59 +14227,139 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:system.plugin.manage",
-      "resource_selectors": [],
-      "data_classification": "internal",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "plugin_id"
-        ],
         "properties": {
           "plugin_id": {
-            "type": "string",
-            "minLength": 3
+            "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "plugin_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
+      },
+      "schema_hash": "sha256:474fdf665ec0d15f8a8ce57069f5a2697c8da5ff2763097b29bc3e20c337f2f5",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
       "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.storage.delete",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.storage.delete",
       "description": "Delete a value using optional optimistic versioning.",
@@ -13890,24 +14369,27 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-storage-key",
+          "payload_path": "key",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "key"
-        ],
         "properties": {
           "key": {
             "type": "string"
@@ -13916,35 +14398,105 @@
             "type": "integer"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "key"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "deleted"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:658b7ed0e5465c0a8880c00062a97cca4b3823de3bc8adfb6f08bff1983d07b6",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "deleted"
+        ]
+      },
+      "schema_hash": "sha256:253c3d01a7806adf260b2010b002d98015077fc04a2b25823e238c5ee8425242",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "none",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.storage.get",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.storage.get",
       "description": "Read a value from the caller plugin namespace.",
@@ -13962,34 +14514,82 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-storage-key",
+          "payload_path": "key",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "key"
-        ],
         "properties": {
           "key": {
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "key"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "value",
+          "version",
+          "updated_at"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "value",
+          "version",
+          "updated_at"
+        ]
       },
-      "schema_hash": "sha256:e170a9c1953900bc7e16800051f41c0870713c77cbc78c633ca0e5461d2328bf",
+      "schema_hash": "sha256:46fdae6bf3393605260f0aaf9cfcc528848c8329fcc929c20fa8dcd757468e43",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14002,14 +14602,55 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.storage.list",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.storage.list",
       "description": "List keys in the caller plugin namespace.",
@@ -14027,11 +14668,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "properties": {
@@ -14046,15 +14687,77 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "updated_at": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "key",
+                "version",
+                "updated_at"
+              ]
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "limit"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "updated_at": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "key",
+                "version",
+                "updated_at"
+              ]
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "limit"
+        ]
       },
-      "schema_hash": "sha256:bb88ea9b5c1610243ea5b1339aa555812bf40d66c05e40764b809f5bb053f071",
+      "schema_hash": "sha256:b1cda0888a5a6abce2ebfb14447fad106a75af5c2f6680ad07c7f6e511eb1ae0",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14067,14 +14770,55 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.storage.put",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.storage.put",
       "description": "Create or replace a value using optimistic versioning.",
@@ -14084,25 +14828,27 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-storage-key",
+          "payload_path": "key",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "key",
-          "value"
-        ],
         "properties": {
           "key": {
             "type": "string"
@@ -14116,35 +14862,106 @@
             "type": "integer"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "value"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:065e6f8f26a030782da29d65580f568d0608ac902624be5301d5d1b11643f5d4",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "version"
+        ]
+      },
+      "schema_hash": "sha256:b8165b1ba995f3d9194adfb9d1d94b78c20e56e321ad44c264d868f28595339d",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "none",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.uninstall",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.uninstall",
       "description": "Uninstall a disabled or revoked plugin.",
@@ -14154,59 +14971,139 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:system.plugin.manage",
-      "resource_selectors": [],
-      "data_classification": "internal",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "plugin_id"
-        ],
         "properties": {
           "plugin_id": {
-            "type": "string",
-            "minLength": 3
+            "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "plugin_id"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
+      },
+      "schema_hash": "sha256:474fdf665ec0d15f8a8ce57069f5a2697c8da5ff2763097b29bc3e20c337f2f5",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
       "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.upgrade",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.upgrade",
       "description": "Stage a signed version upgrade pending health result.",
@@ -14216,26 +15113,27 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:system.plugin.manage",
-      "resource_selectors": [],
-      "data_classification": "internal",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "plugin_id",
-          "version",
-          "granted_capabilities"
-        ],
         "properties": {
           "plugin_id": {
             "type": "string"
@@ -14250,35 +15148,135 @@
             }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "granted_capabilities"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "previous_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:7fd6541339a8a14ff38ee70766b713073e5ce1ccf7b9a7b5d35ade5c91f0a355",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "previous_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
+      },
+      "schema_hash": "sha256:e438d2b2a55c47ea15965b7097d4745f3ed27c9bebc18af13f358de6e6729624",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
       "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.upgrade.finish",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "plugin.upgrade.finish",
       "description": "Complete or fail a staged upgrade after health validation.",
@@ -14288,25 +15286,27 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:system.plugin.manage",
-      "resource_selectors": [],
-      "data_classification": "internal",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "automation_level": "A0",
+      "authorization_policy": "base.v2:system.plugin.manage",
+      "resource_selectors": [
+        {
+          "resource_type": "plugin-installation",
+          "payload_path": "plugin_id",
+          "required": true
+        }
+      ],
+      "data_classification": "restricted",
+      "required_auth_freshness_seconds": 300,
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "plugin_id",
-          "healthy"
-        ],
         "properties": {
           "plugin_id": {
             "type": "string"
@@ -14315,35 +15315,114 @@
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "healthy"
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:c6fbbd7aba9fc663f1b468dcac508a5c1da18169a46c2a82c6fadf3ded776ac9",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "plugin_id",
+          "version",
+          "state"
+        ]
+      },
+      "schema_hash": "sha256:5edfe5e34c381f4d1e01f97f9a373ca57ddc0463c14d2a94aacdac9fbee6052b",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
       "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "semantic.context.get",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "semantic.context.get",
       "description": "Read an allowlisted bounded semantic named view.",
@@ -14353,7 +15432,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -14361,32 +15440,80 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "named_view": {
+            "type": "string"
+          },
+          "depth": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "named_view"
-        ],
-        "properties": {
-          "named_view": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "named_view": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "depth": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "named_view",
+          "items",
+          "depth"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "named_view": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "depth": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "named_view",
+          "items",
+          "depth"
+        ]
       },
-      "schema_hash": "sha256:e4db2afad3f9fd2d101906d3d8d63a7630e535350e3a13ad32907d2578b0b6bc",
+      "schema_hash": "sha256:8928922db0c0bd9a3dd5812479ab91ea40cba14bfdc2270e1b8e4b5fc0b941b9",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14399,14 +15526,55 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "system.activity.search",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "system.activity.search",
       "description": "Search immutable activity summaries.",
@@ -14416,7 +15584,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -14424,28 +15592,63 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [],
-        "properties": {},
+        "properties": {
+          "limit": {
+            "type": "integer"
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total"
+        ]
       },
-      "schema_hash": "sha256:15961aca8cb6ee2259e6ea275755616228a9c37f094f6f6aa50291aaf4b803c0",
+      "schema_hash": "sha256:26b682a1137ed76614b1814be5075181ca94614cbffd4dfaf8528154755621fd",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14458,14 +15661,55 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "system.change_impact.preview",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "system.change_impact.preview",
       "description": "Compose impact from a server-issued preview or diff ref.",
@@ -14475,7 +15719,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -14483,32 +15727,84 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "change_ref": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "change_ref"
-        ],
-        "properties": {
-          "change_ref": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "change_ref": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "unknown": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "change_ref",
+          "items",
+          "unknown"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "change_ref": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "unknown": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "change_ref",
+          "items",
+          "unknown"
+        ]
       },
-      "schema_hash": "sha256:769caa7b49c4a788bd09b04f0971b01cecbecc178f95206fab59481295319933",
+      "schema_hash": "sha256:23e3605e9c2b511f2579f0c714bdad9677dc73f1186bb72994cceb43bb80be16",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14521,14 +15817,55 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "system.echo",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "system.echo",
       "description": "Return the supplied JSON payload; used to verify adapters.",
@@ -14546,27 +15883,45 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "properties": {
+          "echo": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "properties": {
+          "echo": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "properties": {
+          "echo": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "schema_hash": "sha256:dcf9afbe8ef5961e7498de5e5538673a2b543d4d73c494d4f1d812a7ae9ea681",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14579,14 +15934,55 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "system.job.cancel",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "system.job.cancel",
       "description": "Request job cancellation without claiming rollback.",
@@ -14596,58 +15992,151 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "system-job",
+          "payload_path": "job_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "job_gid": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "job_gid",
           "owner"
-        ],
-        "properties": {
-          "job_gid": {},
-          "owner": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "job_gid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "rolled_back": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "job_gid",
+          "status",
+          "owner",
+          "rolled_back"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:62000ddac5d6c1c8b9b47520857f8bfce186037823ea4cd7ac142e4efcf4a885",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "job_gid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "rolled_back": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "job_gid",
+          "status",
+          "owner",
+          "rolled_back"
+        ]
+      },
+      "schema_hash": "sha256:399ac3cedf528fc0f6b109eac74517965977c54ab5e6a5e77fb9acb16e84923e",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "system.job.get",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "system.job.get",
       "description": "Read one owner-scoped asynchronous job.",
@@ -14657,7 +16146,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -14665,34 +16154,82 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "base.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "system-job",
+          "payload_path": "job_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "job_gid": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "job_gid",
           "owner"
-        ],
-        "properties": {
-          "job_gid": {},
-          "owner": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "job_gid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "rolled_back": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "job_gid",
+          "status",
+          "owner",
+          "rolled_back"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "job_gid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "rolled_back": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "job_gid",
+          "status",
+          "owner",
+          "rolled_back"
+        ]
       },
-      "schema_hash": "sha256:62000ddac5d6c1c8b9b47520857f8bfce186037823ea4cd7ac142e4efcf4a885",
+      "schema_hash": "sha256:399ac3cedf528fc0f6b109eac74517965977c54ab5e6a5e77fb9acb16e84923e",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14705,14 +16242,55 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "system.lineage.get",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "system.lineage.get",
       "description": "Compose immutable provenance events and completeness.",
@@ -14722,7 +16300,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -14730,32 +16308,92 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "object_ref": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "object_ref"
-        ],
-        "properties": {
-          "object_ref": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "object_ref": {
+            "type": "string"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "breaks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "complete": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "object_ref",
+          "events",
+          "breaks",
+          "complete"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "object_ref": {
+            "type": "string"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "breaks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "complete": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "object_ref",
+          "events",
+          "breaks",
+          "complete"
+        ]
       },
-      "schema_hash": "sha256:c06f8e28727241209f09e2f0834abba683fc01e88f3c797d23f209b8e420340d",
+      "schema_hash": "sha256:88defd0e42b3f95fdd630ccf1f874b42270714a97dbc10ab85de2a4ee5d86be4",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14768,14 +16406,55 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "system.search",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "system.search",
       "description": "Search stable references across registered domain providers.",
@@ -14785,7 +16464,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -14793,32 +16472,117 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "base.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "query"
-        ],
-        "properties": {
-          "query": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object_ref": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "match_reason": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "object_ref",
+                "owner"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "query"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object_ref": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "match_reason": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "object_ref",
+                "owner"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "query"
+        ]
       },
-      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
+      "schema_hash": "sha256:8fd77fa3347ce99b42d47734e8bb749a030df1e80d5c82971d0d7ac19b8ae6f7",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14831,24 +16595,65 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "system.worker.outbox.health",
       "major_version": 1,
       "owner_domain": "base",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "system.worker.outbox.health",
-      "description": "查看知识发布 worker 心跳、队列数量和告警数量。",
-      "use_when": "查看知识发布 worker 心跳、队列数量和告警数量。",
+      "description": "Read the Knowledge publication worker heartbeat, queue totals, and alert total.",
+      "use_when": "Read the Knowledge publication worker heartbeat, queue totals, and alert total.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -14856,11 +16661,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:system.tech_config",
+      "authorization_policy": "base.v2:system.tech_config",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "properties": {},
@@ -14868,15 +16673,141 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "heartbeat": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "worker_name": {
+                    "type": "string"
+                  },
+                  "worker_id": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "details": {},
+                  "heartbeat_at": {
+                    "type": "string"
+                  },
+                  "started_at": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "worker_name",
+                  "worker_id",
+                  "status",
+                  "heartbeat_at",
+                  "started_at"
+                ]
+              }
+            ]
+          },
+          "outbox_counts": {
+            "type": "object",
+            "properties": {
+              "pending": {
+                "type": "integer"
+              },
+              "publishing": {
+                "type": "integer"
+              },
+              "completed": {
+                "type": "integer"
+              },
+              "dead": {
+                "type": "integer"
+              }
+            },
+            "additionalProperties": false
+          },
+          "open_alerts": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "heartbeat",
+          "outbox_counts",
+          "open_alerts"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "properties": {
+          "heartbeat": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "worker_name": {
+                    "type": "string"
+                  },
+                  "worker_id": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "details": {},
+                  "heartbeat_at": {
+                    "type": "string"
+                  },
+                  "started_at": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "worker_name",
+                  "worker_id",
+                  "status",
+                  "heartbeat_at",
+                  "started_at"
+                ]
+              }
+            ]
+          },
+          "outbox_counts": {
+            "type": "object",
+            "properties": {
+              "pending": {
+                "type": "integer"
+              },
+              "publishing": {
+                "type": "integer"
+              },
+              "completed": {
+                "type": "integer"
+              },
+              "dead": {
+                "type": "integer"
+              }
+            },
+            "additionalProperties": false
+          },
+          "open_alerts": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "heartbeat",
+          "outbox_counts",
+          "open_alerts"
+        ]
       },
-      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "schema_hash": "sha256:620f8af7edbf3e0fcaa0a170627140deb8a4b16a915da4ad1add6a2d4df2afbf",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14889,8 +16820,49 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "vismockup.capture",
@@ -15364,5 +17336,5 @@
       "artifact_hash": "sha256:15bec7ce65ca53100ce79eee368b8f1dd6c79fc596871b5e012336c4a0c2336d"
     }
   ],
-  "created_at": "2026-08-10T11:15:17.121580Z"
+  "created_at": "2026-08-10T11:23:59.774673Z"
 }

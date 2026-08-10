@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_7eb69937273ad75a0e0781788fa7ac11"
+    "version": "rel_88726d21e3ffa53eb69b4580e0b22354"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -279,7 +279,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -549,7 +549,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -856,7 +856,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -1140,7 +1140,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -1429,7 +1429,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -1703,7 +1703,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -1951,7 +1951,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -2216,7 +2216,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -2493,7 +2493,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -2779,7 +2779,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -3132,7 +3132,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -3393,7 +3393,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -3706,7 +3706,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -3954,7 +3954,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -4197,7 +4197,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -4445,7 +4445,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -4695,7 +4695,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -4966,7 +4966,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.compare",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -5238,7 +5238,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -5252,7 +5252,12 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "query": {}
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "query": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "query"
@@ -5334,7 +5339,23 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "total": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -5462,7 +5483,7 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -5778,7 +5799,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -6080,7 +6101,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -6346,7 +6367,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -6628,7 +6649,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -6963,7 +6984,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -7247,7 +7268,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -7540,7 +7561,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -7875,7 +7896,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -8159,7 +8180,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -8511,7 +8532,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -9021,7 +9042,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -9393,7 +9414,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -9787,7 +9808,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -10131,7 +10152,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -10460,7 +10481,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -10844,7 +10865,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -11233,7 +11254,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -11612,7 +11633,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -11885,7 +11906,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -12160,7 +12181,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -12435,7 +12456,7 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -12661,7 +12682,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -12961,7 +12982,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -13259,7 +13280,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -13522,7 +13543,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -13758,7 +13779,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -14054,7 +14075,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -14350,7 +14371,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -14645,7 +14666,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -14915,7 +14936,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -15434,7 +15455,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -15730,7 +15751,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -16035,7 +16056,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -16348,7 +16369,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -16363,7 +16384,6 @@
                 "additionalProperties": false,
                 "properties": {
                   "plugin_id": {
-                    "minLength": 3,
                     "type": "string"
                   }
                 },
@@ -16447,7 +16467,22 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "plugin_id": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "plugin_id",
+                            "version",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -16575,7 +16610,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -16590,7 +16625,6 @@
                 "additionalProperties": false,
                 "properties": {
                   "plugin_id": {
-                    "minLength": 3,
                     "type": "string"
                   }
                 },
@@ -16674,7 +16708,22 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "plugin_id": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "plugin_id",
+                            "version",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -16802,7 +16851,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -16911,7 +16960,22 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "plugin_id": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "plugin_id",
+                            "version",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -17039,7 +17103,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -17054,7 +17118,6 @@
                 "additionalProperties": false,
                 "properties": {
                   "plugin_id": {
-                    "minLength": 3,
                     "type": "string"
                   }
                 },
@@ -17138,7 +17201,22 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "plugin_id": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "plugin_id",
+                            "version",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -17266,7 +17344,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -17281,7 +17359,6 @@
                 "additionalProperties": false,
                 "properties": {
                   "plugin_id": {
-                    "minLength": 3,
                     "type": "string"
                   }
                 },
@@ -17365,7 +17442,22 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "plugin_id": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "plugin_id",
+                            "version",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -17493,7 +17585,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -17594,7 +17686,18 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "deleted": {
+                              "type": "boolean"
+                            },
+                            "key": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "deleted"
+                          ],
                           "type": "object"
                         },
                         {
@@ -17722,7 +17825,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -17820,7 +17923,28 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            },
+                            "value": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "value",
+                            "version",
+                            "updated_at"
+                          ],
                           "type": "object"
                         },
                         {
@@ -17948,7 +18072,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -18046,7 +18170,38 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "key": {
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "type": "string"
+                                  },
+                                  "version": {
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "key",
+                                  "version",
+                                  "updated_at"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "limit": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "limit"
+                          ],
                           "type": "object"
                         },
                         {
@@ -18174,7 +18329,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -18281,7 +18436,18 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "key": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "version"
+                          ],
                           "type": "object"
                         },
                         {
@@ -18409,7 +18575,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -18424,7 +18590,6 @@
                 "additionalProperties": false,
                 "properties": {
                   "plugin_id": {
-                    "minLength": 3,
                     "type": "string"
                   }
                 },
@@ -18508,7 +18673,22 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "plugin_id": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "plugin_id",
+                            "version",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -18636,7 +18816,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -18738,7 +18918,22 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "plugin_id": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "plugin_id",
+                            "version",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -18866,7 +19061,7 @@
           }
         },
         "summary": "plugin.upgrade.finish",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -18975,7 +19170,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "plugin_id": {
+                              "type": "string"
+                            },
+                            "previous_version": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "plugin_id",
+                            "version",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -19103,7 +19323,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -19117,7 +19337,15 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "named_view": {}
+                  "depth": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "named_view": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "named_view"
@@ -19199,7 +19427,27 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "depth": {
+                              "type": "integer"
+                            },
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "named_view": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "named_view",
+                            "items",
+                            "depth"
+                          ],
                           "type": "object"
                         },
                         {
@@ -19327,7 +19575,7 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -19340,8 +19588,11 @@
             "application/json": {
               "schema": {
                 "additionalProperties": false,
-                "properties": {},
-                "required": [],
+                "properties": {
+                  "limit": {
+                    "type": "integer"
+                  }
+                },
                 "type": "object"
               }
             }
@@ -19419,7 +19670,23 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "total": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -19547,7 +19814,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -19561,7 +19828,9 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "change_ref": {}
+                  "change_ref": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "change_ref"
@@ -19643,7 +19912,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "change_ref": {
+                              "type": "string"
+                            },
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "unknown": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "change_ref",
+                            "items",
+                            "unknown"
+                          ],
                           "type": "object"
                         },
                         {
@@ -19771,7 +20065,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -19784,7 +20078,13 @@
             "application/json": {
               "schema": {
                 "additionalProperties": false,
-                "properties": {},
+                "properties": {
+                  "echo": {
+                    "additionalProperties": false,
+                    "properties": {},
+                    "type": "object"
+                  }
+                },
                 "type": "object"
               }
             }
@@ -19862,7 +20162,13 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "echo": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
+                          },
                           "type": "object"
                         },
                         {
@@ -19990,7 +20296,7 @@
           }
         },
         "summary": "system.echo",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -20004,8 +20310,12 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "job_gid": {},
-                  "owner": {}
+                  "job_gid": {
+                    "type": "string"
+                  },
+                  "owner": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "job_gid",
@@ -20088,7 +20398,26 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "job_gid": {
+                              "type": "string"
+                            },
+                            "owner": {
+                              "type": "string"
+                            },
+                            "rolled_back": {
+                              "type": "boolean"
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "job_gid",
+                            "status",
+                            "owner",
+                            "rolled_back"
+                          ],
                           "type": "object"
                         },
                         {
@@ -20216,7 +20545,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -20230,8 +20559,12 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "job_gid": {},
-                  "owner": {}
+                  "job_gid": {
+                    "type": "string"
+                  },
+                  "owner": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "job_gid",
@@ -20314,7 +20647,26 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "job_gid": {
+                              "type": "string"
+                            },
+                            "owner": {
+                              "type": "string"
+                            },
+                            "rolled_back": {
+                              "type": "boolean"
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "job_gid",
+                            "status",
+                            "owner",
+                            "rolled_back"
+                          ],
                           "type": "object"
                         },
                         {
@@ -20442,7 +20794,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -20456,7 +20808,9 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "object_ref": {}
+                  "object_ref": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "object_ref"
@@ -20538,7 +20892,36 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "breaks": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "complete": {
+                              "type": "boolean"
+                            },
+                            "events": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "object_ref": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "events",
+                            "breaks",
+                            "complete"
+                          ],
                           "type": "object"
                         },
                         {
@@ -20666,7 +21049,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -20680,7 +21063,12 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "query": {}
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "query": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "query"
@@ -20762,7 +21150,47 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "match_reason": {
+                                    "type": "string"
+                                  },
+                                  "object_ref": {
+                                    "type": "string"
+                                  },
+                                  "owner": {
+                                    "type": "string"
+                                  },
+                                  "summary": {
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "object_ref",
+                                  "owner"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "query": {
+                              "type": "string"
+                            },
+                            "total": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total",
+                            "query"
+                          ],
                           "type": "object"
                         },
                         {
@@ -20890,13 +21318,13 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
     "/api/v2/capabilities/system.worker.outbox.health:invoke": {
       "post": {
-        "description": "查看知识发布 worker 心跳、队列数量和告警数量。",
+        "description": "Read the Knowledge publication worker heartbeat, queue totals, and alert total.",
         "operationId": "invoke_system_worker_outbox_health_v1",
         "requestBody": {
           "content": {
@@ -20981,7 +21409,70 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "heartbeat": {
+                              "anyOf": [
+                                {
+                                  "type": "null"
+                                },
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "details": {},
+                                    "heartbeat_at": {
+                                      "type": "string"
+                                    },
+                                    "started_at": {
+                                      "type": "string"
+                                    },
+                                    "status": {
+                                      "type": "string"
+                                    },
+                                    "worker_id": {
+                                      "type": "string"
+                                    },
+                                    "worker_name": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "worker_name",
+                                    "worker_id",
+                                    "status",
+                                    "heartbeat_at",
+                                    "started_at"
+                                  ],
+                                  "type": "object"
+                                }
+                              ]
+                            },
+                            "open_alerts": {
+                              "type": "integer"
+                            },
+                            "outbox_counts": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "completed": {
+                                  "type": "integer"
+                                },
+                                "dead": {
+                                  "type": "integer"
+                                },
+                                "pending": {
+                                  "type": "integer"
+                                },
+                                "publishing": {
+                                  "type": "integer"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "heartbeat",
+                            "outbox_counts",
+                            "open_alerts"
+                          ],
                           "type": "object"
                         },
                         {
@@ -21109,7 +21600,7 @@
           }
         },
         "summary": "system.worker.outbox.health",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -21336,7 +21827,7 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -21569,7 +22060,7 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -21796,7 +22287,7 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -22027,7 +22518,7 @@
           }
         },
         "summary": "vismockup.open_file",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -22254,7 +22745,7 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -22486,7 +22977,7 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     },
@@ -22721,7 +23212,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
+        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
         "x-ai00-major-version": 1
       }
     }

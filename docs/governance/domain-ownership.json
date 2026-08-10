@@ -14,6 +14,7 @@
       "artifact": "ai00-base-platform",
       "module_prefixes": ["backend.system_capabilities", "backend.plugin_platform"],
       "code_paths": [
+        "backend/base/**",
         "backend/system_capabilities/**",
         "backend/plugin_platform/**",
         "backend/config.py",
@@ -21,6 +22,8 @@
         "backend/db/connection.py",
         "backend/utils/gid.py",
         "backend/capabilities/registry_next.py",
+        "backend/capabilities/system_shared_next.py",
+        "backend/capabilities/plugin_marketplace_next.py",
         "services/mcp-gateway/**"
       ],
       "provider_paths": ["backend/system_capabilities/base_provider.py"],

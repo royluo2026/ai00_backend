@@ -158,26 +158,3 @@ async def run_forever(interval_seconds: int = 30, batch_size: int = 20) -> None:
         except Exception:
             _log.exception("outbox worker iteration failed")
         await asyncio.sleep(interval_seconds)
-
-
-def worker_health(_payload: dict[str, Any], _context) -> dict[str, Any]:
-    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT worker_name, worker_id, status, details, heartbeat_at, started_at FROM workmanship_app_worker_heartbeats WHERE worker_name='knowledge-outbox'")
-            heartbeat = cur.fetchone()
-            cur.execute("SELECT status, COUNT(*) AS count FROM workmanship_know_publish_outbox GROUP BY status")
-            counts = {row["status"]: row["count"] for row in cur.fetchall()}
-            cur.execute("SELECT COUNT(*) AS count FROM workmanship_app_operational_alerts WHERE status='open'")
-            alert_row = cur.fetchone() or {"count": 0}
-    return {"heartbeat": dict(heartbeat) if heartbeat else None, "outbox_counts": counts, "open_alerts": alert_row["count"]}
-
-
-def register_worker_capability(registry) -> None:
-    from .models_next import CapabilitySpec
-    registry.register(CapabilitySpec(owner="base",
-        id="system.worker.outbox.health", version=1,
-        description="查看知识发布 worker 心跳、队列数量和告警数量。",
-        permissions=("system.tech_config",), input_schema={"type": "object"},
-        output_schema={"type": "object"}, tags=("system", "operations", "read"),
-    ), worker_health)
