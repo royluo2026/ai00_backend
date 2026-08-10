@@ -3,11 +3,14 @@
   "title": "User Function Registry",
   "type": "object",
   "required": ["schema_version", "functions"],
+  "additionalProperties": false,
   "properties": {
     "schema_version": {"const": 1},
     "functions": {
       "type": "object",
-      "additionalProperties": {"$ref": "#/$defs/UserFunctionRecord"}
+      "additionalProperties": {
+        "$ref": "#/$defs/UserFunctionRecord"
+      }
     }
   },
   "$defs": {
@@ -16,8 +19,9 @@
       "required": [
         "function_id", "domain", "stability", "current_consumers", "target_capability",
         "exposure", "automation_level", "resource_types", "data_classification",
-        "migration_status", "owner", "exclusion_reason"
+        "migration_status", "owner", "exclusion_reason", "classification", "source_paths"
       ],
+      "additionalProperties": false,
       "properties": {
         "function_id": {"type": "string", "minLength": 1},
         "domain": {"enum": ["Base", "Craft", "Digital Model", "Simulation", "Ontology", "Knowledge", "Local Integration"]},
@@ -32,8 +36,27 @@
         "migration_status": {"type": "string"},
         "owner": {"type": "string"},
         "exclusion_reason": {"type": ["string", "null"]},
-        "source_paths": {"type": "array", "items": {"type": "string"}}
-      }
+        "source_paths": {"type": "array", "items": {"type": "string"}},
+        "review_notes": {"type": "array", "items": {"type": "string"}}
+      },
+      "anyOf": [
+        {"properties": {"target_capability": {"type": "string", "minLength": 1}}},
+        {
+          "properties": {
+            "target_capability": {"type": "null"},
+            "classification": {"const": "unreviewed"},
+            "migration_status": {"const": "candidate"},
+            "exclusion_reason": {"type": "null"}
+          }
+        },
+        {
+          "properties": {
+            "target_capability": {"type": "null"},
+            "classification": {"enum": ["internal", "operations", "ui_transient"]},
+            "exclusion_reason": {"type": "string", "minLength": 1}
+          }
+        }
+      ]
     }
   }
 }

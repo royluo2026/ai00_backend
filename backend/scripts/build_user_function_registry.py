@@ -23,7 +23,13 @@ VALID_EXCLUSIONS = {"internal", "operations", "ui_transient"}
 ROUTE_METHODS = {"get", "post", "put", "patch", "delete", "head", "options"}
 CAPABILITY_PATTERN = r"(?:base|craft|identity|knowledge|local|ontology|plugin|semantic|system|vismockup)\.[a-z0-9_.]+"
 CAPABILITY_RE = re.compile(rf"(?<![a-z0-9_.])({CAPABILITY_PATTERN})(?![a-z0-9_.])")
-WEB_CALL_RE = re.compile(r"(?:fetch|_cloudFetch|bridge(?:\.invoke)?)\s*\(\s*[\"']([^\"'\x60${?]+)")
+FETCH_CALL_RE = re.compile(
+    r"\b(?:fetch|_cloudFetch)\s*\(\s*(?P<quote>[\"'])(?P<endpoint>[^\"'\x60${]+)(?P=quote)(?P<options>\s*,\s*\{[^{}]*\})?\s*\)"
+)
+FETCH_START_RE = re.compile(r"\b(?:fetch|_cloudFetch)\s*\(")
+FETCH_METHOD_RE = re.compile(r"(?:[\"']method[\"']|method)\s*:\s*[\"'](?P<method>[A-Za-z]+)[\"']")
+BRIDGE_INVOKE_RE = re.compile(r"\bbridge\.invoke\s*\(\s*[\"'](?P<name>[^\"']+)[\"']")
+DEFAULT_EXCLUSION_REASON = "Operations or transient interface; not selected for a Capability migration."
 
 TARGET_CAPABILITIES = {
     "rest:GET:/api/bop/versions": "craft.bop.version.list",
@@ -95,16 +101,39 @@ def _router_prefix(tree: ast.AST) -> str:
     return ""
 
 
-def _add(found: dict[str, dict], function_id: str, *, consumer: str, source_path: str, domain: str | None = None) -> None:
+def _add(found: dict[str, dict], function_id: str, *, consumer: str, source_path: str,
+         domain: str | None = None, stability: str = "stable") -> None:
     row = found.setdefault(function_id, {
         "function_id": function_id,
         "domain": domain or _domain(function_id, source_path),
-        "stability": "stable",
+        "stability": stability,
         "current_consumers": set(),
         "source_paths": set(),
     })
     row["current_consumers"].add(consumer)
     row["source_paths"].add(source_path)
+
+
+def scan_web_source(content: str, source_path: str) -> dict[str, dict]:
+    """Discover static Web calls, retaining method and dynamic-call audit gaps."""
+    found: dict[str, dict] = {}
+    static_starts: set[int] = set()
+    for match in FETCH_CALL_RE.finditer(content):
+        static_starts.add(match.start())
+        endpoint = match.group("endpoint")
+        if not endpoint.startswith("/api/"):
+            continue
+        method_match = FETCH_METHOD_RE.search(match.group("options") or "")
+        method = method_match.group("method").upper() if method_match else "GET"
+        _add(found, f"rest:{method}:{endpoint}", consumer="Web", source_path=source_path)
+    for match in BRIDGE_INVOKE_RE.finditer(content):
+        _add(found, f"bridge:invoke:{match.group('name')}", consumer="Web", source_path=source_path)
+    for match in FETCH_START_RE.finditer(content):
+        if match.start() not in static_starts:
+            line = content.count("\n", 0, match.start()) + 1
+            _add(found, f"web_gap:dynamic_fetch:{source_path}:{line}", consumer="Web",
+                 source_path=source_path, stability="experimental")
+    return found
 
 
 def scan_fastapi_routes(root: Path) -> dict[str, dict]:
@@ -153,12 +182,9 @@ def scan_web_calls(root: Path) -> dict[str, dict]:
                 content = path.read_text(encoding="utf-8")
             except UnicodeDecodeError:
                 continue
-            for endpoint in WEB_CALL_RE.findall(content):
-                if endpoint.startswith("/api/"):
-                    function_id = f"web:{endpoint}"
-                else:
-                    function_id = f"web:bridge:{endpoint}"
-                _add(found, function_id, consumer="Web", source_path=relative)
+            for function_id, row in scan_web_source(content, relative).items():
+                _add(found, function_id, consumer="Web", source_path=relative,
+                     domain=row["domain"], stability=row["stability"])
     return found
 
 
@@ -240,7 +266,8 @@ def discover_user_functions(root: Path = REPOSITORY_ROOT) -> list[dict]:
                     scan_agent_tools, scan_mcp_tools, scan_local_runtime_commands):
         for function_id, row in scanner(root).items():
             for consumer in row["current_consumers"]:
-                _add(found, function_id, consumer=consumer, source_path=next(iter(row["source_paths"])), domain=row["domain"])
+                _add(found, function_id, consumer=consumer, source_path=next(iter(row["source_paths"])),
+                     domain=row["domain"], stability=row["stability"])
             found[function_id]["source_paths"].update(row["source_paths"])
     return [{**row, "current_consumers": sorted(row["current_consumers"]), "source_paths": sorted(row["source_paths"])}
             for _, row in sorted(found.items())]
@@ -267,11 +294,11 @@ def _defaults(discovered: dict) -> dict:
         "automation_level": "automated" if automated else "interactive",
         "resource_types": _resource_types(function_id),
         "data_classification": "internal",
-        "classification": "mapped" if target_capability else "operations",
+        "classification": "mapped" if target_capability else "unreviewed",
         "migration_status": "registered" if function_id.startswith("capability:") else (
-            "mapped" if target_capability else "excluded"),
+            "mapped" if target_capability else "candidate"),
         "owner": discovered["domain"],
-        "exclusion_reason": None if target_capability else "Operations or transient interface; not selected for a Capability migration.",
+        "exclusion_reason": None,
         "source_paths": discovered["source_paths"],
     }
 
@@ -282,7 +309,19 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
     merged: list[dict] = []
     for function_id in sorted(set(existing) | set(discovered_by_id)):
         if function_id not in discovered_by_id:
-            merged.append(existing[function_id])
+            retained = dict(existing[function_id])
+            if retained.get("exclusion_reason") == DEFAULT_EXCLUSION_REASON:
+                retained.update({
+                    "classification": "unreviewed",
+                    "migration_status": "candidate",
+                    "exclusion_reason": None,
+                })
+            if (retained.get("target_capability") is None
+                    and retained.get("classification") == "unreviewed"
+                    and retained.get("migration_status") == "candidate"
+                    and not retained.get("review_notes")):
+                continue
+            merged.append(retained)
             continue
         generated = _defaults(discovered_by_id[function_id])
         previous = existing.get(function_id)
@@ -290,7 +329,8 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
             generated.update(previous)
             generated["current_consumers"] = discovered_by_id[function_id]["current_consumers"]
             generated["source_paths"] = discovered_by_id[function_id]["source_paths"]
-            if previous.get("classification") == "unreviewed":
+            if (previous.get("classification") == "unreviewed"
+                    or previous.get("exclusion_reason") == DEFAULT_EXCLUSION_REASON):
                 generated.update({key: value for key, value in _defaults(discovered_by_id[function_id]).items()
                                   if key not in {"current_consumers", "source_paths"}})
                 generated["current_consumers"] = discovered_by_id[function_id]["current_consumers"]
@@ -300,7 +340,8 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
 
 
 def registry_errors(existing: dict[str, dict], discovered: list[dict]) -> list[str]:
-    discovered_ids = {row["function_id"] for row in discovered}
+    discovered_by_id = {row["function_id"]: row for row in discovered}
+    discovered_ids = set(discovered_by_id)
     errors: list[str] = []
     for row in discovered:
         if row["stability"] == "stable" and row["function_id"] not in existing:
@@ -308,10 +349,75 @@ def registry_errors(existing: dict[str, dict], discovered: list[dict]) -> list[s
     for function_id, row in existing.items():
         if row.get("stability") == "stable" and function_id not in discovered_ids:
             errors.append(f"stale stable function: {function_id}")
+        if function_id in discovered_by_id:
+            for field in ("domain", "stability", "current_consumers", "source_paths"):
+                actual = row.get(field)
+                expected = discovered_by_id[function_id].get(field)
+                if isinstance(actual, list):
+                    actual = sorted(actual)
+                if isinstance(expected, list):
+                    expected = sorted(expected)
+                if actual != expected:
+                    errors.append(f"generated evidence drift for {function_id}: {field}")
         if (row.get("stability") == "stable" and not row.get("target_capability")
                 and row.get("classification") not in VALID_EXCLUSIONS):
             errors.append(f"stable function lacks capability or valid exclusion: {function_id}")
+        elif row.get("stability") == "stable" and not row.get("target_capability"):
+            reason = row.get("exclusion_reason")
+            if (not isinstance(reason, str) or len(reason.strip()) < 20
+                    or reason == DEFAULT_EXCLUSION_REASON):
+                errors.append(f"stable function lacks a specific reviewed exclusion: {function_id}")
     return sorted(set(errors))
+
+
+def validate_registry_document(document: object, schema: dict) -> list[str]:
+    """Validate this JSON-Schema contract without an optional third-party package."""
+    errors: list[str] = []
+    if not isinstance(document, dict):
+        return ["root must be an object"]
+    root_properties = schema["properties"]
+    if schema.get("additionalProperties") is False:
+        for key in document:
+            if key not in root_properties:
+                errors.append(f"root has unknown property: {key}")
+    for key in schema["required"]:
+        if key not in document:
+            errors.append(f"root missing required property: {key}")
+    if document.get("schema_version") != 1:
+        errors.append("root schema_version must be 1")
+    functions = document.get("functions")
+    if not isinstance(functions, dict):
+        return errors + ["functions must be an object"]
+    record_schema = schema["$defs"]["UserFunctionRecord"]
+    allowed = set(record_schema["properties"])
+    required = record_schema["required"]
+    for function_id, record in functions.items():
+        if not isinstance(record, dict):
+            errors.append(f"record {function_id} must be an object")
+            continue
+        if record_schema.get("additionalProperties") is False:
+            for key in record:
+                if key not in allowed:
+                    errors.append(f"record has unknown property: {key}")
+        for key in required:
+            if key not in record:
+                errors.append(f"record missing required property: {key}")
+        if record.get("function_id") != function_id:
+            errors.append("record function_id must match its key")
+        if record.get("domain") not in DOMAINS:
+            errors.append("record has invalid domain")
+        if record.get("stability") not in {"stable", "experimental", "deprecated"}:
+            errors.append("record has invalid stability")
+        if not isinstance(record.get("current_consumers"), list) or not isinstance(record.get("source_paths"), list):
+            errors.append("record evidence fields must be arrays")
+        if record.get("target_capability") is None:
+            classification = record.get("classification")
+            reason = record.get("exclusion_reason")
+            candidate = classification == "unreviewed" and record.get("migration_status") == "candidate" and reason is None
+            reviewed_exclusion = classification in VALID_EXCLUSIONS and isinstance(reason, str) and bool(reason.strip())
+            if not (candidate or reviewed_exclusion):
+                errors.append("record has invalid exclusion")
+    return errors
 
 
 def load_registry(path: Path = REGISTRY_PATH) -> dict[str, dict]:
