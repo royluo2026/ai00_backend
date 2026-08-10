@@ -27,6 +27,8 @@ class InvokeRequest(BaseModel):
     payload: dict[str, Any] = Field(default_factory=dict)
     version: int | None = Field(default=None, ge=1)
     confirmation_token: str | None = None
+    idempotency_key: str | None = Field(default=None, min_length=1, max_length=255)
+    expected_resource_version: str | None = Field(default=None, max_length=255)
 
 
 def _correlation_id(candidate: str | None, fallback: str) -> str:
@@ -121,6 +123,8 @@ def _build_router(prefix: str) -> APIRouter:
                 catalog_release=gateway.catalog_release,
                 payload=body.payload,
                 identity=_web_identity(current_user, principal),
+                idempotency_key=body.idempotency_key,
+                expected_resource_version=body.expected_resource_version,
                 request_id=request_id,
                 trace_id=trace_id,
             ))
@@ -165,6 +169,8 @@ def _build_router(prefix: str) -> APIRouter:
             catalog_release=gateway.catalog_release,
             payload=body.payload,
             identity=identity,
+            idempotency_key=body.idempotency_key,
+            expected_resource_version=body.expected_resource_version,
             approval_reference=body.confirmation_token,
             request_id=request_id,
             trace_id=trace_id,
