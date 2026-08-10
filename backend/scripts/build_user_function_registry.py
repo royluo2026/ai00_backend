@@ -339,7 +339,12 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
     return merged
 
 
-def registry_errors(existing: dict[str, dict], discovered: list[dict]) -> list[str]:
+def registry_errors(
+    existing: dict[str, dict],
+    discovered: list[dict],
+    *,
+    include_governance: bool = True,
+) -> list[str]:
     discovered_by_id = {row["function_id"]: row for row in discovered}
     discovered_ids = set(discovered_by_id)
     errors: list[str] = []
@@ -359,14 +364,15 @@ def registry_errors(existing: dict[str, dict], discovered: list[dict]) -> list[s
                     expected = sorted(expected)
                 if actual != expected:
                     errors.append(f"generated evidence drift for {function_id}: {field}")
-        if (row.get("stability") == "stable" and not row.get("target_capability")
-                and row.get("classification") not in VALID_EXCLUSIONS):
-            errors.append(f"stable function lacks capability or valid exclusion: {function_id}")
-        elif row.get("stability") == "stable" and not row.get("target_capability"):
-            reason = row.get("exclusion_reason")
-            if (not isinstance(reason, str) or len(reason.strip()) < 20
-                    or reason == DEFAULT_EXCLUSION_REASON):
-                errors.append(f"stable function lacks a specific reviewed exclusion: {function_id}")
+        if include_governance:
+            if (row.get("stability") == "stable" and not row.get("target_capability")
+                    and row.get("classification") not in VALID_EXCLUSIONS):
+                errors.append(f"stable function lacks capability or valid exclusion: {function_id}")
+            elif row.get("stability") == "stable" and not row.get("target_capability"):
+                reason = row.get("exclusion_reason")
+                if (not isinstance(reason, str) or len(reason.strip()) < 20
+                        or reason == DEFAULT_EXCLUSION_REASON):
+                    errors.append(f"stable function lacks a specific reviewed exclusion: {function_id}")
     return sorted(set(errors))
 
 
@@ -444,17 +450,20 @@ def _counts(records: Iterable[dict]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="fail if stable functions are missing or stale")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true", help="fail when discovered source evidence is missing, stale, or changed")
+    mode.add_argument("--strict", action="store_true", help="run source drift checks and fail for unresolved stable governance candidates")
     parser.add_argument("--write", action="store_true", help="write the merged registry")
     args = parser.parse_args(argv)
     existing = load_registry()
     discovered = discover_user_functions()
-    errors = registry_errors(existing, discovered)
-    if args.check:
+    if args.check or args.strict:
+        errors = registry_errors(existing, discovered, include_governance=args.strict)
         if errors:
             print("User Function Registry drift:", *errors, sep="\n- ", file=sys.stderr)
             return 1
-        print(f"User Function Registry check passed: {_counts(existing.values())}")
+        label = "strict check" if args.strict else "check"
+        print(f"User Function Registry {label} passed: {_counts(existing.values())}")
         return 0
     records = merge_discovery(existing, discovered)
     write_registry(records)

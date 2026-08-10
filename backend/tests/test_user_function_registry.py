@@ -236,9 +236,22 @@ def test_discovery_preserves_experimental_stability_for_dynamic_web_gaps():
     assert discovered["web_gap:dynamic_fetch:dist/web/core/auth_state.js:55"]["stability"] == "experimental"
 
 
-def test_check_cli_returns_nonzero_when_baseline_contains_unreviewed_stable_candidates():
+def test_check_cli_passes_when_source_evidence_matches_with_governance_candidates():
     result = subprocess.run(
         [sys.executable, str(SCRIPT_PATH), "--check"],
+        cwd=REPOSITORY_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    assert "User Function Registry check passed" in result.stdout
+
+
+def test_strict_cli_returns_nonzero_when_baseline_contains_unreviewed_stable_candidates():
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT_PATH), "--strict"],
         cwd=REPOSITORY_ROOT,
         text=True,
         capture_output=True,
