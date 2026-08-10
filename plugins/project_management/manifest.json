@@ -1,0 +1,9 @@
+{
+  "plugin_id": "official.project-management",
+  "name": "项目管理",
+  "backend": {
+    "capabilities_module": "project_management_backend.capabilities",
+    "provider_version": "1.0.0",
+    "owned_schemas": ["project_management"]
+  }
+}

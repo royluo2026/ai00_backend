@@ -1,22 +1,22 @@
 {
-  "release_id": "rel_01f9fd2a284a601308cc94da2abcaf90",
-  "catalog_hash": "sha256:01f9fd2a284a601308cc94da2abcaf909d04f966d37fc22db2592c64cffff507",
+  "release_id": "rel_9322bdfe651224292d37be91bcb0f647",
+  "catalog_hash": "sha256:9322bdfe651224292d37be91bcb0f647ee98d25d9801b7c035e45b867d1f8d55",
   "descriptors": [
     {
       "id": "base.project.search",
       "major_version": 1,
-      "owner_domain": "base",
+      "owner_domain": "project_management",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "base.project.search",
-      "description": "Search project refs through the owning domain provider.",
-      "use_when": "A bounded shared-system composition is required.",
-      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "description": "Search visible Project Management refs by name or code.",
+      "use_when": "A caller needs a stable project reference before invoking another domain.",
+      "do_not_use_when": "A project reference is already known or project rows are requested.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -35,21 +35,120 @@
           "query"
         ],
         "properties": {
-          "query": {}
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
         },
         "additionalProperties": false
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "object_ref",
+                "title",
+                "owner"
+              ],
+              "properties": {
+                "object_ref": {
+                  "type": "string",
+                  "pattern": "^project:[A-Za-z0-9_.:-]+$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "match_reason": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string",
+                  "const": "project_management"
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 50
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "query": {
+            "type": "string"
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "object_ref",
+                "title",
+                "owner"
+              ],
+              "properties": {
+                "object_ref": {
+                  "type": "string",
+                  "pattern": "^project:[A-Za-z0-9_.:-]+$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "match_reason": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "string",
+                  "const": "project_management"
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 50
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "query": {
+            "type": "string"
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
+      "schema_hash": "sha256:457b8b11c543ab678195574862eb7c75430674764bdb50f8908f01dd4192b335",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -7086,7 +7185,13 @@
       "module": "craft_backend.capabilities",
       "version": "1.0.0",
       "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
+    },
+    {
+      "plugin_id": "official.project-management",
+      "module": "project_management_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:15bec7ce65ca53100ce79eee368b8f1dd6c79fc596871b5e012336c4a0c2336d"
     }
   ],
-  "created_at": "2026-08-10T10:07:57.076979Z"
+  "created_at": "2026-08-10T10:21:46.131115Z"
 }

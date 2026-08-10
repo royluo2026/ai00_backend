@@ -83,3 +83,4 @@
 # Domain-specific shared-kernel adapters remain owned by their domain teams.
 /backend/domain_ports/ontology.py @ai00/ontology-maintainers
 /backend/capability_v2/revision/ontology_adapter.py @ai00/ontology-maintainers
+/backend/domain_ports/project_management.py @ai00/project-management-maintainers

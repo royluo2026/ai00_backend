@@ -82,6 +82,10 @@ def test_domain_classification_uses_business_owner_not_consumer_surface():
     assert builder._domain(
         "rest:GET:/api/health", "backend/routers/health.py"
     ) == "Base Platform"
+    assert builder._domain(
+        "capability:craft.gbop.item.knowledge.list",
+        "plugins/craft/craft_backend/capabilities/gbop_read.py",
+    ) == "Craft"
 
 
 def test_registry_schema_exposes_every_independently_owned_domain():
@@ -290,6 +294,23 @@ def test_merge_discards_only_stale_unreviewed_generated_candidates():
     assert builder.merge_discovery({generated["function_id"]: generated}, []) == []
 
 
+def test_merge_discards_stale_unreviewed_capability_literals():
+    builder = _builder_module()
+    stale = {
+        "function_id": "capability:craft.write",
+        "domain": "Craft",
+        "stability": "stable",
+        "current_consumers": ["Capability Registry"],
+        "target_capability": "craft.write",
+        "classification": "mapped",
+        "migration_status": "registered",
+        "exclusion_reason": None,
+        "source_paths": ["plugins/craft/capabilities/example.py"],
+    }
+
+    assert builder.merge_discovery({stale["function_id"]: stale}, []) == []
+
+
 def test_web_scanner_merges_http_methods_with_rest_and_audits_dynamic_calls():
     builder = _builder_module()
     found = builder.scan_web_source(
@@ -311,6 +332,18 @@ fetch(endpoint);""",
     assert found["rest:POST:/api/items"]["current_consumers"] == {"Web"}
     assert found["bridge:invoke:create_item"]["stability"] == "stable"
     assert found["web_gap:dynamic_fetch:dist/web/example.js:5"]["stability"] == "experimental"
+
+
+def test_capability_scanner_uses_registered_descriptor_ids_not_permission_literals():
+    builder = _builder_module()
+    source = (
+        'CapabilitySpec(id="craft.real.read", permissions=("craft.write",), '
+        'subject_concepts=("craft.bop.version",))\n'
+    )
+
+    found = builder.capability_ids_in_source(source, {"craft.real.read"})
+
+    assert found == {"craft.real.read"}
 
 
 def test_discovery_preserves_experimental_stability_for_dynamic_web_gaps():

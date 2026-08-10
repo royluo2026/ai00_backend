@@ -8,7 +8,7 @@ Create an immutable typed proposal against the exact active release.
 - 不适用：Direct mutation of an active release is expected.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
+- Catalog Release：`rel_9322bdfe651224292d37be91bcb0f647`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -74,7 +74,7 @@ Create an immutable typed proposal against the exact active release.
 ```json
 {
   "capability_id": "ontology.change.proposal.create",
-  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+  "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
   "major_version": 1,
   "payload": {
     "base_release_gid": "example",

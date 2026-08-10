@@ -65,6 +65,19 @@ def _relative(path: Path) -> str:
 
 def _domain(value: str, path: str = "") -> str:
     subject = f"{value} {path}".lower()
+    capability_id = value.lower().removeprefix("capability:")
+    if value.lower().startswith("capability:"):
+        if capability_id.startswith("base.project."):
+            return "Project Management"
+        for prefix, domain in (
+            ("craft.", "Craft"),
+            ("knowledge.", "Knowledge"),
+            ("ontology.", "Ontology"),
+            ("agent.", "Agent"),
+            ("simulation.", "Simulation"),
+        ):
+            if capability_id.startswith(prefix):
+                return domain
     if "vismockup" in subject or "local" in subject or "device" in subject:
         return "Local Integration"
     if "simulation" in subject:
@@ -225,8 +238,43 @@ def scan_web_calls(root: Path) -> dict[str, dict]:
     return found
 
 
-def scan_capability_registrations(root: Path) -> dict[str, dict]:
+def capability_ids_in_source(content: str, registered_ids: set[str]) -> set[str]:
+    """Return only strings that are real frozen Descriptor identities.
+
+    Capability source also contains permission names, subject concepts and
+    resource types with the same dotted syntax. Treating those strings as
+    invokable functions corrupts the governance registry.
+    """
+    return set(CAPABILITY_RE.findall(content)) & registered_ids
+
+
+def _registered_capability_ids(root: Path) -> set[str]:
+    catalog_path = root / "docs" / "governance" / "capability-catalog-release.json"
+    if not catalog_path.is_file():
+        raise FileNotFoundError(
+            "frozen Capability Catalog Release is required before User Function discovery"
+        )
+    document = json.loads(catalog_path.read_text(encoding="utf-8"))
+    descriptors = document.get("descriptors")
+    if not isinstance(descriptors, list):
+        raise ValueError("Capability Catalog Release has no descriptor array")
+    result = {
+        str(item.get("id") or "")
+        for item in descriptors
+        if isinstance(item, dict) and item.get("id")
+    }
+    if not result:
+        raise ValueError("Capability Catalog Release contains no descriptor identities")
+    return result
+
+
+def scan_capability_registrations(
+    root: Path,
+    *,
+    registered_ids: set[str] | None = None,
+) -> dict[str, dict]:
     found: dict[str, dict] = {}
+    known_ids = registered_ids if registered_ids is not None else _registered_capability_ids(root)
     for base in (root / "backend" / "capabilities", root / "plugins"):
         if not base.exists():
             continue
@@ -238,7 +286,7 @@ def scan_capability_registrations(root: Path) -> dict[str, dict]:
                 content = path.read_text(encoding="utf-8")
             except UnicodeDecodeError:
                 continue
-            for capability_id in CAPABILITY_RE.findall(content):
+            for capability_id in capability_ids_in_source(content, known_ids):
                 _add(found, f"capability:{capability_id}", consumer="Capability Registry", source_path=relative)
     return found
 
@@ -385,6 +433,16 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
     for function_id in sorted(set(existing) | set(discovered_by_id)):
         if function_id not in discovered_by_id:
             retained = dict(existing[function_id])
+            if (
+                function_id.startswith("capability:")
+                and retained.get("migration_status") == "registered"
+                and not retained.get("review_notes")
+            ):
+                # Capability discovery is now constrained by the frozen
+                # Descriptor catalog. A stale generated record is therefore a
+                # permission/resource literal, or a capability already removed
+                # through the catalog compatibility process—not a callable.
+                continue
             if retained.get("exclusion_reason") == DEFAULT_EXCLUSION_REASON:
                 retained.update({
                     "classification": "unreviewed",
@@ -403,13 +461,12 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
         if previous:
             generated.update(previous)
             # Domain labels are generated evidence, not a governance override.
-            # Migrate retired taxonomy values deterministically while retaining
-            # reviewed exposure, lifecycle, and explanatory metadata.
+            # Recompute them deterministically while retaining reviewed
+            # exposure, lifecycle, and explanatory metadata.
             previous_domain = previous.get("domain")
-            if previous_domain not in DOMAINS:
-                generated["domain"] = discovered_by_id[function_id]["domain"]
-                if previous.get("owner") == previous_domain:
-                    generated["owner"] = generated["domain"]
+            generated["domain"] = discovered_by_id[function_id]["domain"]
+            if previous.get("owner") == previous_domain:
+                generated["owner"] = generated["domain"]
             generated["current_consumers"] = discovered_by_id[function_id]["current_consumers"]
             generated["source_paths"] = discovered_by_id[function_id]["source_paths"]
             if (previous.get("classification") == "unreviewed"

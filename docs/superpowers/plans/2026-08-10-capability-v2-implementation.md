@@ -1071,7 +1071,7 @@ git commit -m "feat: version ontology changes and analyze impact"
 - Produces: one V2 Descriptor and Gateway Provider for every stable record; no direct Router/Repository consumer access.
 - Requires: project/workspace/task/issue/milestone/member-role/change-coordination behavior is owned by Project Management, not Base Platform or Craft.
 
-- [ ] **Step 1: Write a failing data-driven domain coverage test**
+- [x] **Step 1: Write a failing data-driven domain coverage test**
 
 ```python
 @pytest.mark.parametrize("domain", ["Base Platform", "Project Management", "Knowledge", "Craft"])
@@ -1081,11 +1081,18 @@ def test_stable_domain_functions_have_v2_descriptors(domain, user_functions, cat
     assert expected - actual == set()
 ```
 
-- [ ] **Step 2: Run and capture the exact missing Capability IDs**
+- [x] **Step 2: Run and capture the exact missing Capability IDs**
 
 Run: `python -m pytest backend/tests/test_domain_capability_coverage.py -q`
 
 Expected: FAIL with the registry-derived missing IDs; attach the list to the Task review.
+
+Captured on 2026-08-10: stable target ID existence gaps were zero after fixing the
+registry scanner to exclude permission/resource literals. The real migration gaps
+were one owner mismatch (`base.project.search`), 43 empty output contracts, and
+59 Base/Knowledge/Craft/Project-Management contracts without joint Plugin+Agent
+exposure. The Project Management slice is now green; Base, Knowledge and Craft
+remain gated by `test_domain_capability_coverage.py` until migrated.
 
 - [ ] **Step 3: Implement one complete vertical slice at a time**
 

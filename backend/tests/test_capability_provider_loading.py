@@ -7,14 +7,14 @@ from backend.capabilities.registry_next import CapabilityRegistry
 from backend.plugin_loader import PluginLoader
 
 
-def test_official_craft_provider_loads_without_kernel_importing_craft():
+def test_official_domain_providers_load_without_kernel_importing_domains():
     root = Path(__file__).resolve().parents[2]
     loader = PluginLoader(root / "missing-packages", root / "plugins")
     loader.discover()
 
     loaded = loader.register_capabilities(CapabilityRegistry())
 
-    assert loaded == ("official.craft",)
+    assert loaded == ("official.craft", "official.project-management")
     kernel_source = (root / "backend/capabilities/registry_next.py").read_text(encoding="utf-8")
     assert "craft_backend" not in kernel_source
     assert "plugins.craft" not in kernel_source

@@ -10,120 +10,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
-      "concurrency_policy": "none",
-      "confirmation_policy": "none",
-      "consistency_policy": "strong",
-      "data_classification": "internal",
-      "delegation_policy": "none",
-      "deprecation_message": null,
-      "description": "Search project refs through the owning domain provider.",
-      "do_not_use_when": "A domain-specific stable ref is already known.",
-      "domain_errors_complete": false,
-      "evidence_policy": "optional",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "agent": true,
-        "api": true,
-        "local_runtime": false,
-        "mcp": true,
-        "plugin": false,
-        "web": true,
-        "worker": false
-      },
-      "exposure_blockers": [
-        "legacy_partial_schema",
-        "domain_errors_not_declared",
-        "experimental_lifecycle"
-      ],
-      "gateway_errors": [
-        "catalog_resolution_failed",
-        "consumer_not_allowed",
-        "authorization_failed",
-        "permission_denied",
-        "tenant_scope_denied",
-        "resource_scope_denied",
-        "data_scope_denied",
-        "delegation_required",
-        "delegation_expired",
-        "resource_selector_missing",
-        "resource_selector_invalid",
-        "invalid_input",
-        "confirmation_required",
-        "confirmation_rejected",
-        "idempotency_key_required",
-        "idempotency_payload_conflict",
-        "idempotency_in_progress",
-        "rate_limit_exceeded",
-        "transaction_participant_required",
-        "provider_failed",
-        "outcome_persistence_failed"
-      ],
-      "id": "base.project.search",
-      "idempotency_policy": "none",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {
-          "query": {}
-        },
-        "required": [
-          "query"
-        ],
-        "type": "object"
-      },
-      "input_schema": {
-        "additionalProperties": false,
-        "properties": {
-          "query": {}
-        },
-        "required": [
-          "query"
-        ],
-        "type": "object"
-      },
-      "invoke": {
-        "capability_id": "base.project.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
-        "major_version": 1,
-        "payload": {
-          "query": "example"
-        }
-      },
-      "lifecycle_status": "experimental",
-      "major_version": 1,
-      "minimal_input_example": {
-        "query": "example"
-      },
-      "name": "base.project.search",
-      "operation_policy": "none",
-      "output_schema": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "owner_domain": "base",
-      "rate_limit_cost": 1,
-      "required_auth_freshness_seconds": 0,
-      "resource_selectors": [],
-      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
-      "schema_precision": "legacy_partial",
-      "side_effect_level": "read",
-      "strict": true,
-      "timeout_seconds": 30,
-      "title": "base.project.search",
-      "use_when": "A bounded shared-system composition is required."
-    },
-    {
-      "agent_output_schema": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "artifact_policy": "none",
-      "audit_policy": "standard",
-      "authorization_policy": "legacy:authenticated",
-      "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -196,7 +83,7 @@
       },
       "invoke": {
         "capability_id": "identity.principal.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -236,7 +123,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -312,7 +199,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "key": "example"
@@ -352,7 +239,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -428,7 +315,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -464,7 +351,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -537,7 +424,7 @@
       },
       "invoke": {
         "capability_id": "semantic.context.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "named_view": "example"
@@ -577,7 +464,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -641,7 +528,7 @@
       },
       "invoke": {
         "capability_id": "system.activity.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -677,7 +564,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -750,7 +637,7 @@
       },
       "invoke": {
         "capability_id": "system.change_impact.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "change_ref": "example"
@@ -790,7 +677,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -852,7 +739,7 @@
       },
       "invoke": {
         "capability_id": "system.echo",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -888,7 +775,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -965,7 +852,7 @@
       },
       "invoke": {
         "capability_id": "system.job.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "job_gid": "example",
@@ -1007,7 +894,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1080,7 +967,7 @@
       },
       "invoke": {
         "capability_id": "system.lineage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "object_ref": "example"
@@ -1120,7 +1007,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1193,7 +1080,7 @@
       },
       "invoke": {
         "capability_id": "system.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -1233,7 +1120,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.tech_config",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1295,7 +1182,7 @@
       },
       "invoke": {
         "capability_id": "system.worker.outbox.health",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -1346,7 +1233,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1427,7 +1314,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.draft.change.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "commands": "example",
@@ -1507,7 +1394,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1584,7 +1471,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -1666,7 +1553,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1751,7 +1638,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "expected_revision": 0,
@@ -1825,7 +1712,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1898,7 +1785,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.import.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document": "example"
@@ -1958,7 +1845,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2035,7 +1922,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.linked_parts.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -2097,7 +1984,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2174,7 +2061,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.compare",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_version_gid": "example",
@@ -2244,7 +2131,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2321,7 +2208,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -2385,7 +2272,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2486,7 +2373,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -2554,7 +2441,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2643,7 +2530,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.work_package.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "scope": {},
@@ -2715,7 +2602,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2788,7 +2675,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.knowledge.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -2842,7 +2729,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2907,7 +2794,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -2957,7 +2844,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3030,7 +2917,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.usage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -3084,7 +2971,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3157,7 +3044,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.part.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -3215,7 +3102,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3292,7 +3179,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.compare",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_snapshot_gid": "example",
@@ -3352,7 +3239,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3425,7 +3312,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -3479,7 +3366,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3556,7 +3443,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.context.retrieve",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -3599,7 +3486,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3680,7 +3567,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.diff",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example",
@@ -3724,7 +3611,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3797,7 +3684,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -3837,7 +3724,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3910,7 +3797,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.history.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -3950,7 +3837,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4023,7 +3910,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.revisions",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -4063,7 +3950,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4136,7 +4023,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "gid": "example"
@@ -4176,7 +4063,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4238,7 +4125,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.migration.status",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -4274,7 +4161,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4350,7 +4237,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -4390,7 +4277,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4466,7 +4353,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -4502,7 +4389,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4572,7 +4459,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.outbox.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -4608,7 +4495,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4670,7 +4557,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -4706,7 +4593,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4768,7 +4655,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -4804,7 +4691,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4866,7 +4753,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -4902,7 +4789,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4978,7 +4865,7 @@
       },
       "invoke": {
         "capability_id": "local.command.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "command_gid": "example"
@@ -5092,7 +4979,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5165,7 +5052,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -5296,7 +5183,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5358,7 +5245,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -5461,7 +5348,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5577,7 +5464,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "stable_gid": "example"
@@ -5734,7 +5621,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5816,7 +5703,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.resolve",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "term": "example"
@@ -5948,7 +5835,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -6112,7 +5999,7 @@
       },
       "invoke": {
         "capability_id": "ontology.mapping.assess",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "source": {},
@@ -6472,7 +6359,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -6549,7 +6436,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.diff",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_release_gid": "example",
@@ -6961,7 +6848,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -7023,7 +6910,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -7230,7 +7117,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -7292,7 +7179,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -7411,28 +7298,71 @@
       "timeout_seconds": 30,
       "title": "ontology.release.search",
       "use_when": "Release history is required."
-    }
-  ],
-  "capabilities": [
+    },
     {
       "agent_output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "match_reason": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "pattern": "^project:[A-Za-z0-9_.:-]+$",
+                  "type": "string"
+                },
+                "owner": {
+                  "const": "project_management",
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "object_ref",
+                "title",
+                "owner"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "total": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
         "type": "object"
       },
       "artifact_policy": "none",
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
       "data_classification": "internal",
       "delegation_policy": "none",
       "deprecation_message": null,
-      "description": "Search project refs through the owning domain provider.",
-      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "description": "Search visible Project Management refs by name or code.",
+      "do_not_use_when": "A project reference is already known or project rows are requested.",
       "domain_errors_complete": false,
       "evidence_policy": "optional",
       "execution_mode": "cloud_sync",
@@ -7441,12 +7371,11 @@
         "api": true,
         "local_runtime": false,
         "mcp": true,
-        "plugin": false,
+        "plugin": true,
         "web": true,
         "worker": false
       },
       "exposure_blockers": [
-        "legacy_partial_schema",
         "domain_errors_not_declared",
         "experimental_lifecycle"
       ],
@@ -7475,10 +7404,38 @@
       ],
       "id": "base.project.search",
       "idempotency_policy": "none",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "query": {}
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
         },
         "required": [
           "query"
@@ -7487,7 +7444,7 @@
       },
       "invoke": {
         "capability_id": "base.project.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -7498,23 +7455,72 @@
       "minimal_input_example": {
         "query": "example"
       },
+      "name": "base.project.search",
       "operation_policy": "none",
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "match_reason": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "pattern": "^project:[A-Za-z0-9_.:-]+$",
+                  "type": "string"
+                },
+                "owner": {
+                  "const": "project_management",
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "object_ref",
+                "title",
+                "owner"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "total": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
         "type": "object"
       },
-      "owner_domain": "base",
+      "owner_domain": "project_management",
       "rate_limit_cost": 1,
       "required_auth_freshness_seconds": 0,
       "resource_selectors": [],
-      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
-      "schema_precision": "legacy_partial",
+      "schema_hash": "sha256:457b8b11c543ab678195574862eb7c75430674764bdb50f8908f01dd4192b335",
+      "schema_precision": "typed",
       "side_effect_level": "read",
+      "strict": true,
       "timeout_seconds": 30,
       "title": "base.project.search",
-      "use_when": "A bounded shared-system composition is required."
-    },
+      "use_when": "A caller needs a stable project reference before invoking another domain."
+    }
+  ],
+  "capabilities": [
     {
       "agent_output_schema": {
         "additionalProperties": false,
@@ -7525,7 +7531,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -7588,7 +7594,7 @@
       },
       "invoke": {
         "capability_id": "identity.principal.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -7622,7 +7628,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.plugin.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -7687,7 +7693,7 @@
       },
       "invoke": {
         "capability_id": "plugin.disable",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -7721,7 +7727,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.plugin.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -7786,7 +7792,7 @@
       },
       "invoke": {
         "capability_id": "plugin.enable",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -7820,7 +7826,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.plugin.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -7895,7 +7901,7 @@
       },
       "invoke": {
         "capability_id": "plugin.install",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "granted_capabilities": [],
@@ -7933,7 +7939,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.plugin.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -7998,7 +8004,7 @@
       },
       "invoke": {
         "capability_id": "plugin.revoke",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -8032,7 +8038,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.plugin.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -8097,7 +8103,7 @@
       },
       "invoke": {
         "capability_id": "plugin.rollback",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -8131,7 +8137,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8198,7 +8204,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.delete",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "key": "example"
@@ -8236,7 +8242,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8300,7 +8306,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "key": "example"
@@ -8338,7 +8344,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8402,7 +8408,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -8432,7 +8438,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8505,7 +8511,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.put",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "key": "example",
@@ -8541,7 +8547,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.plugin.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -8606,7 +8612,7 @@
       },
       "invoke": {
         "capability_id": "plugin.uninstall",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -8640,7 +8646,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.plugin.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -8715,7 +8721,7 @@
       },
       "invoke": {
         "capability_id": "plugin.upgrade",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "granted_capabilities": [],
@@ -8753,7 +8759,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.plugin.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -8821,7 +8827,7 @@
       },
       "invoke": {
         "capability_id": "plugin.upgrade.finish",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "healthy": false,
@@ -8861,7 +8867,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8924,7 +8930,7 @@
       },
       "invoke": {
         "capability_id": "semantic.context.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "named_view": "example"
@@ -8962,7 +8968,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9020,7 +9026,7 @@
       },
       "invoke": {
         "capability_id": "system.activity.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -9054,7 +9060,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9117,7 +9123,7 @@
       },
       "invoke": {
         "capability_id": "system.change_impact.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "change_ref": "example"
@@ -9155,7 +9161,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9212,7 +9218,7 @@
       },
       "invoke": {
         "capability_id": "system.echo",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -9242,7 +9248,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -9307,7 +9313,7 @@
       },
       "invoke": {
         "capability_id": "system.job.cancel",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "job_gid": "example",
@@ -9347,7 +9353,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9412,7 +9418,7 @@
       },
       "invoke": {
         "capability_id": "system.job.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "job_gid": "example",
@@ -9452,7 +9458,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9515,7 +9521,7 @@
       },
       "invoke": {
         "capability_id": "system.lineage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "object_ref": "example"
@@ -9553,7 +9559,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9616,7 +9622,7 @@
       },
       "invoke": {
         "capability_id": "system.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -9654,7 +9660,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.tech_config",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9711,7 +9717,7 @@
       },
       "invoke": {
         "capability_id": "system.worker.outbox.health",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -9741,7 +9747,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -9804,7 +9810,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.draft.change.apply",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "preview_gid": "example"
@@ -9868,7 +9874,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9935,7 +9941,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.draft.change.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "commands": "example",
@@ -10013,7 +10019,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10078,7 +10084,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -10158,7 +10164,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10227,7 +10233,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "expected_revision": 0,
@@ -10299,7 +10305,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10362,7 +10368,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.import.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document": "example"
@@ -10420,7 +10426,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10485,7 +10491,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.linked_parts.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -10528,7 +10534,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -10593,7 +10599,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.archive",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "expected_revision": "example",
@@ -10659,7 +10665,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10724,7 +10730,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.compare",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_version_gid": "example",
@@ -10773,7 +10779,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -10838,7 +10844,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.create",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "source": "example",
@@ -10904,7 +10910,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10969,7 +10975,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -11031,7 +11037,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11108,7 +11114,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -11174,7 +11180,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11245,7 +11251,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.work_package.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "scope": {},
@@ -11315,7 +11321,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11378,7 +11384,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.knowledge.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -11430,7 +11436,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11489,7 +11495,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -11537,7 +11543,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11600,7 +11606,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.usage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -11652,7 +11658,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11715,7 +11721,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.part.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -11771,7 +11777,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11836,7 +11842,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.compare",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_snapshot_gid": "example",
@@ -11894,7 +11900,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11957,7 +11963,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -12009,7 +12015,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -12074,7 +12080,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.context.retrieve",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -12111,7 +12117,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -12180,7 +12186,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.create",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "markdown": "example",
@@ -12224,7 +12230,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -12291,7 +12297,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.diff",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example",
@@ -12333,7 +12339,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -12396,7 +12402,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -12434,7 +12440,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -12497,7 +12503,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.history.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -12531,7 +12537,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -12598,7 +12604,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.restore",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "base_revision_gid": "example",
@@ -12636,7 +12642,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -12703,7 +12709,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.revise",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "base_revision_gid": "example",
@@ -12745,7 +12751,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -12808,7 +12814,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.revisions",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -12842,7 +12848,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -12909,7 +12915,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.rollback",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "base_revision_gid": "example",
@@ -12951,7 +12957,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13014,7 +13020,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "gid": "example"
@@ -13052,7 +13058,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13109,7 +13115,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.migration.status",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -13143,7 +13149,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13207,7 +13213,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -13245,7 +13251,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13309,7 +13315,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -13343,7 +13349,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13404,7 +13410,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.outbox.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -13434,7 +13440,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -13498,7 +13504,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.outbox.retry",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "outbox_gid": "example"
@@ -13532,7 +13538,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -13603,7 +13609,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.review",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "decision": "example",
@@ -13639,7 +13645,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.view",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -13716,7 +13722,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.propose",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "content_md": "example",
@@ -13756,7 +13762,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13813,7 +13819,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -13843,7 +13849,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -13906,7 +13912,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.create",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "name": "example"
@@ -13944,7 +13950,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -14001,7 +14007,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -14035,7 +14041,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -14092,7 +14098,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -14126,7 +14132,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -14190,7 +14196,7 @@
       },
       "invoke": {
         "capability_id": "local.command.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "command_gid": "example"
@@ -14224,7 +14230,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -14289,7 +14295,7 @@
       },
       "invoke": {
         "capability_id": "vismockup.capture",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "device_gid": "example"
@@ -14323,7 +14329,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -14394,7 +14400,7 @@
       },
       "invoke": {
         "capability_id": "vismockup.highlight",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "catia_names": [],
@@ -14430,7 +14436,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -14495,7 +14501,7 @@
       },
       "invoke": {
         "capability_id": "vismockup.launch",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "device_gid": "example"
@@ -14529,7 +14535,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -14598,7 +14604,7 @@
       },
       "invoke": {
         "capability_id": "vismockup.open_file",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "device_gid": "example",
@@ -14634,7 +14640,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -14699,7 +14705,7 @@
       },
       "invoke": {
         "capability_id": "vismockup.status",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "device_gid": "example"
@@ -14733,7 +14739,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -14803,7 +14809,7 @@
       },
       "invoke": {
         "capability_id": "vismockup.tree",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "device_gid": "example"
@@ -14837,7 +14843,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -14910,7 +14916,7 @@
       },
       "invoke": {
         "capability_id": "vismockup.visibility",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "action": "all_on",
@@ -14946,7 +14952,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -15011,7 +15017,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.create",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "base_release_gid": "example",
@@ -15199,7 +15205,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -15262,7 +15268,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -15370,7 +15376,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:ontology.review",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "strong",
@@ -15439,7 +15445,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.review.submit",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "content_sha256": "example",
@@ -15533,7 +15539,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -15590,7 +15596,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -15691,7 +15697,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -15775,7 +15781,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "stable_gid": "example"
@@ -15930,7 +15936,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -15997,7 +16003,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.resolve",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "term": "example"
@@ -16127,7 +16133,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -16235,7 +16241,7 @@
       },
       "invoke": {
         "capability_id": "ontology.mapping.assess",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "source": {},
@@ -16296,7 +16302,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:ontology.activate",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -16365,7 +16371,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.activate",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "attestations": "example",
@@ -16742,7 +16748,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -16807,7 +16813,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.diff",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_release_gid": "example",
@@ -17217,7 +17223,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -17274,7 +17280,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -17381,7 +17387,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:ontology.publish",
       "automation_level": "A1",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "strong",
@@ -17448,7 +17454,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.publish",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "content_sha256": "example",
@@ -17661,7 +17667,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -17718,7 +17724,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -17835,29 +17841,71 @@
       "timeout_seconds": 30,
       "title": "ontology.release.search",
       "use_when": "Release history is required."
-    }
-  ],
-  "catalog_hash": "sha256:01f9fd2a284a601308cc94da2abcaf909d04f966d37fc22db2592c64cffff507",
-  "mcp_tools": [
+    },
     {
       "agent_output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "match_reason": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "pattern": "^project:[A-Za-z0-9_.:-]+$",
+                  "type": "string"
+                },
+                "owner": {
+                  "const": "project_management",
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "object_ref",
+                "title",
+                "owner"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "total": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
         "type": "object"
       },
       "artifact_policy": "none",
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
       "data_classification": "internal",
       "delegation_policy": "none",
       "deprecation_message": null,
-      "description": "Search project refs through the owning domain provider.",
-      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "description": "Search visible Project Management refs by name or code.",
+      "do_not_use_when": "A project reference is already known or project rows are requested.",
       "domain_errors_complete": false,
       "evidence_policy": "optional",
       "execution_mode": "cloud_sync",
@@ -17866,12 +17914,11 @@
         "api": true,
         "local_runtime": false,
         "mcp": true,
-        "plugin": false,
+        "plugin": true,
         "web": true,
         "worker": false
       },
       "exposure_blockers": [
-        "legacy_partial_schema",
         "domain_errors_not_declared",
         "experimental_lifecycle"
       ],
@@ -17900,20 +17947,19 @@
       ],
       "id": "base.project.search",
       "idempotency_policy": "none",
-      "inputSchema": {
-        "additionalProperties": false,
-        "properties": {
-          "query": {}
-        },
-        "required": [
-          "query"
-        ],
-        "type": "object"
-      },
       "input_schema": {
         "additionalProperties": false,
         "properties": {
-          "query": {}
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
         },
         "required": [
           "query"
@@ -17922,7 +17968,7 @@
       },
       "invoke": {
         "capability_id": "base.project.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -17933,24 +17979,71 @@
       "minimal_input_example": {
         "query": "example"
       },
-      "name": "base.project.search",
       "operation_policy": "none",
       "output_schema": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "match_reason": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "pattern": "^project:[A-Za-z0-9_.:-]+$",
+                  "type": "string"
+                },
+                "owner": {
+                  "const": "project_management",
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "object_ref",
+                "title",
+                "owner"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "total": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
         "type": "object"
       },
-      "owner_domain": "base",
+      "owner_domain": "project_management",
       "rate_limit_cost": 1,
       "required_auth_freshness_seconds": 0,
       "resource_selectors": [],
-      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
-      "schema_precision": "legacy_partial",
+      "schema_hash": "sha256:457b8b11c543ab678195574862eb7c75430674764bdb50f8908f01dd4192b335",
+      "schema_precision": "typed",
       "side_effect_level": "read",
       "timeout_seconds": 30,
       "title": "base.project.search",
-      "use_when": "A bounded shared-system composition is required."
-    },
+      "use_when": "A caller needs a stable project reference before invoking another domain."
+    }
+  ],
+  "catalog_hash": "sha256:9322bdfe651224292d37be91bcb0f647ee98d25d9801b7c035e45b867d1f8d55",
+  "mcp_tools": [
     {
       "agent_output_schema": {
         "additionalProperties": false,
@@ -17961,7 +18054,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18034,7 +18127,7 @@
       },
       "invoke": {
         "capability_id": "identity.principal.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -18073,7 +18166,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18149,7 +18242,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "key": "example"
@@ -18188,7 +18281,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18264,7 +18357,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -18299,7 +18392,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18372,7 +18465,7 @@
       },
       "invoke": {
         "capability_id": "semantic.context.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "named_view": "example"
@@ -18411,7 +18504,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18475,7 +18568,7 @@
       },
       "invoke": {
         "capability_id": "system.activity.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -18510,7 +18603,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18583,7 +18676,7 @@
       },
       "invoke": {
         "capability_id": "system.change_impact.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "change_ref": "example"
@@ -18622,7 +18715,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18684,7 +18777,7 @@
       },
       "invoke": {
         "capability_id": "system.echo",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -18719,7 +18812,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18796,7 +18889,7 @@
       },
       "invoke": {
         "capability_id": "system.job.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "job_gid": "example",
@@ -18837,7 +18930,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18910,7 +19003,7 @@
       },
       "invoke": {
         "capability_id": "system.lineage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "object_ref": "example"
@@ -18949,7 +19042,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19022,7 +19115,7 @@
       },
       "invoke": {
         "capability_id": "system.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -19061,7 +19154,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:system.tech_config",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19123,7 +19216,7 @@
       },
       "invoke": {
         "capability_id": "system.worker.outbox.health",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -19173,7 +19266,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19254,7 +19347,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.draft.change.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "commands": "example",
@@ -19333,7 +19426,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19410,7 +19503,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -19491,7 +19584,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19576,7 +19669,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "expected_revision": 0,
@@ -19649,7 +19742,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19722,7 +19815,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.import.preview",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document": "example"
@@ -19781,7 +19874,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19858,7 +19951,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.linked_parts.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -19919,7 +20012,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19996,7 +20089,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.compare",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_version_gid": "example",
@@ -20065,7 +20158,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20142,7 +20235,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -20205,7 +20298,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20306,7 +20399,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -20373,7 +20466,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20462,7 +20555,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.work_package.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "scope": {},
@@ -20533,7 +20626,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20606,7 +20699,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.knowledge.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -20659,7 +20752,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20724,7 +20817,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -20773,7 +20866,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20846,7 +20939,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.usage.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -20899,7 +20992,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -20972,7 +21065,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.part.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -21029,7 +21122,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21106,7 +21199,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.compare",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_snapshot_gid": "example",
@@ -21165,7 +21258,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21238,7 +21331,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -21291,7 +21384,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21368,7 +21461,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.context.retrieve",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -21410,7 +21503,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21491,7 +21584,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.diff",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example",
@@ -21534,7 +21627,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21607,7 +21700,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -21646,7 +21739,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21719,7 +21812,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.history.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -21758,7 +21851,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21831,7 +21924,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.revisions",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -21870,7 +21963,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -21943,7 +22036,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "gid": "example"
@@ -21982,7 +22075,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22044,7 +22137,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.migration.status",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -22079,7 +22172,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22155,7 +22248,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -22194,7 +22287,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22270,7 +22363,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -22305,7 +22398,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22375,7 +22468,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.outbox.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -22410,7 +22503,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22472,7 +22565,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -22507,7 +22600,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22569,7 +22662,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.list",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -22604,7 +22697,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22666,7 +22759,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -22701,7 +22794,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22777,7 +22870,7 @@
       },
       "invoke": {
         "capability_id": "local.command.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "command_gid": "example"
@@ -22890,7 +22983,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -22963,7 +23056,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -23093,7 +23186,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -23155,7 +23248,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -23257,7 +23350,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -23373,7 +23466,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "stable_gid": "example"
@@ -23529,7 +23622,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -23611,7 +23704,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.resolve",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "term": "example"
@@ -23742,7 +23835,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -23906,7 +23999,7 @@
       },
       "invoke": {
         "capability_id": "ontology.mapping.assess",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "source": {},
@@ -24265,7 +24358,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -24342,7 +24435,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.diff",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {
           "from_release_gid": "example",
@@ -24753,7 +24846,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -24815,7 +24908,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.get",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -25021,7 +25114,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -25083,7 +25176,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.search",
-        "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
         "major_version": 1,
         "payload": {}
       },
@@ -25201,18 +25294,237 @@
       "timeout_seconds": 30,
       "title": "ontology.release.search",
       "use_when": "Release history is required."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "match_reason": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "pattern": "^project:[A-Za-z0-9_.:-]+$",
+                  "type": "string"
+                },
+                "owner": {
+                  "const": "project_management",
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "object_ref",
+                "title",
+                "owner"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "total": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "legacy:authenticated",
+      "automation_level": "A2",
+      "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
+      "concurrency_policy": "none",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "data_classification": "internal",
+      "delegation_policy": "none",
+      "deprecation_message": null,
+      "description": "Search visible Project Management refs by name or code.",
+      "do_not_use_when": "A project reference is already known or project rows are requested.",
+      "domain_errors_complete": false,
+      "evidence_policy": "optional",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": false,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [
+        "domain_errors_not_declared",
+        "experimental_lifecycle"
+      ],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed"
+      ],
+      "id": "base.project.search",
+      "idempotency_policy": "none",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "query": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "base.project.search",
+        "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "major_version": 1,
+        "payload": {
+          "query": "example"
+        }
+      },
+      "lifecycle_status": "experimental",
+      "major_version": 1,
+      "minimal_input_example": {
+        "query": "example"
+      },
+      "name": "base.project.search",
+      "operation_policy": "none",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "match_reason": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "pattern": "^project:[A-Za-z0-9_.:-]+$",
+                  "type": "string"
+                },
+                "owner": {
+                  "const": "project_management",
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "object_ref",
+                "title",
+                "owner"
+              ],
+              "type": "object"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "total": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "project_management",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [],
+      "schema_hash": "sha256:457b8b11c543ab678195574862eb7c75430674764bdb50f8908f01dd4192b335",
+      "schema_precision": "typed",
+      "side_effect_level": "read",
+      "timeout_seconds": 30,
+      "title": "base.project.search",
+      "use_when": "A caller needs a stable project reference before invoking another domain."
     }
   ],
   "openapi_fragment": {
     "info": {
       "title": "AI00 Capability V2",
-      "version": "rel_01f9fd2a284a601308cc94da2abcaf90"
+      "version": "rel_9322bdfe651224292d37be91bcb0f647"
     },
     "openapi": "3.1.0",
     "paths": {
       "/api/v2/capabilities/base.project.search:invoke": {
         "post": {
-          "description": "Search project refs through the owning domain provider.",
+          "description": "Search visible Project Management refs by name or code.",
           "operationId": "invoke_base_project_search_v1",
           "requestBody": {
             "content": {
@@ -25220,7 +25532,16 @@
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
-                    "query": {}
+                    "limit": {
+                      "maximum": 50,
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "query": {
+                      "maxLength": 200,
+                      "minLength": 1,
+                      "type": "string"
+                    }
                   },
                   "required": [
                     "query"
@@ -25302,7 +25623,52 @@
                         "anyOf": [
                           {
                             "additionalProperties": false,
-                            "properties": {},
+                            "properties": {
+                              "items": {
+                                "items": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "match_reason": {
+                                      "type": "string"
+                                    },
+                                    "object_ref": {
+                                      "pattern": "^project:[A-Za-z0-9_.:-]+$",
+                                      "type": "string"
+                                    },
+                                    "owner": {
+                                      "const": "project_management",
+                                      "type": "string"
+                                    },
+                                    "summary": {
+                                      "type": "string"
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "object_ref",
+                                    "title",
+                                    "owner"
+                                  ],
+                                  "type": "object"
+                                },
+                                "maxItems": 50,
+                                "type": "array"
+                              },
+                              "query": {
+                                "type": "string"
+                              },
+                              "total": {
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "items",
+                              "total",
+                              "query"
+                            ],
                             "type": "object"
                           },
                           {
@@ -25430,7 +25796,7 @@
             }
           },
           "summary": "base.project.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -25665,7 +26031,7 @@
             }
           },
           "summary": "craft.bop.draft.change.apply",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -25908,7 +26274,7 @@
             }
           },
           "summary": "craft.bop.draft.change.preview",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -26155,7 +26521,7 @@
             }
           },
           "summary": "craft.bop.execution_structure.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -26406,7 +26772,7 @@
             }
           },
           "summary": "craft.bop.execution_structure.preview",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -26641,7 +27007,7 @@
             }
           },
           "summary": "craft.bop.import.preview",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -26876,7 +27242,7 @@
             }
           },
           "summary": "craft.bop.linked_parts.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -27115,7 +27481,7 @@
             }
           },
           "summary": "craft.bop.version.archive",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -27354,7 +27720,7 @@
             }
           },
           "summary": "craft.bop.version.compare",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -27591,7 +27957,7 @@
             }
           },
           "summary": "craft.bop.version.create",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -27832,7 +28198,7 @@
             }
           },
           "summary": "craft.bop.version.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -28079,7 +28445,7 @@
             }
           },
           "summary": "craft.bop.version.list",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -28334,7 +28700,7 @@
             }
           },
           "summary": "craft.bop.work_package.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -28565,7 +28931,7 @@
             }
           },
           "summary": "craft.gbop.item.knowledge.list",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -28792,7 +29158,7 @@
             }
           },
           "summary": "craft.gbop.item.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -29023,7 +29389,7 @@
             }
           },
           "summary": "craft.gbop.item.usage.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -29254,7 +29620,7 @@
             }
           },
           "summary": "craft.pbom.part.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -29491,7 +29857,7 @@
             }
           },
           "summary": "craft.pbom.snapshot.compare",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -29722,7 +30088,7 @@
             }
           },
           "summary": "craft.pbom.snapshot.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -29946,7 +30312,7 @@
             }
           },
           "summary": "identity.principal.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -30179,7 +30545,7 @@
             }
           },
           "summary": "knowledge.context.retrieve",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -30409,7 +30775,7 @@
             }
           },
           "summary": "knowledge.document.create",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -30637,7 +31003,7 @@
             }
           },
           "summary": "knowledge.document.diff",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -30861,7 +31227,7 @@
             }
           },
           "summary": "knowledge.document.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -31085,7 +31451,7 @@
             }
           },
           "summary": "knowledge.document.history.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -31313,7 +31679,7 @@
             }
           },
           "summary": "knowledge.document.restore",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -31541,7 +31907,7 @@
             }
           },
           "summary": "knowledge.document.revise",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -31765,7 +32131,7 @@
             }
           },
           "summary": "knowledge.document.revisions",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -31993,7 +32359,7 @@
             }
           },
           "summary": "knowledge.document.rollback",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -32217,7 +32583,7 @@
             }
           },
           "summary": "knowledge.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -32436,7 +32802,7 @@
             }
           },
           "summary": "knowledge.migration.status",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -32662,7 +33028,7 @@
             }
           },
           "summary": "knowledge.proposal.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -32888,7 +33254,7 @@
             }
           },
           "summary": "knowledge.proposal.list",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -33111,7 +33477,7 @@
             }
           },
           "summary": "knowledge.proposal.outbox.list",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -33337,7 +33703,7 @@
             }
           },
           "summary": "knowledge.proposal.outbox.retry",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -33570,7 +33936,7 @@
             }
           },
           "summary": "knowledge.proposal.review",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -33809,7 +34175,7 @@
             }
           },
           "summary": "knowledge.propose",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -34028,7 +34394,7 @@
             }
           },
           "summary": "knowledge.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -34252,7 +34618,7 @@
             }
           },
           "summary": "knowledge.space.create",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -34471,7 +34837,7 @@
             }
           },
           "summary": "knowledge.space.list",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -34690,7 +35056,7 @@
             }
           },
           "summary": "knowledge.space.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -34916,7 +35282,7 @@
             }
           },
           "summary": "local.command.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -35216,7 +35582,7 @@
             }
           },
           "summary": "ontology.change.proposal.create",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -35514,7 +35880,7 @@
             }
           },
           "summary": "ontology.change.proposal.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -35777,7 +36143,7 @@
             }
           },
           "summary": "ontology.change.proposal.review.submit",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -36013,7 +36379,7 @@
             }
           },
           "summary": "ontology.change.proposal.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -36309,7 +36675,7 @@
             }
           },
           "summary": "ontology.concept.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -36605,7 +36971,7 @@
             }
           },
           "summary": "ontology.concept.resolve",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -36900,7 +37266,7 @@
             }
           },
           "summary": "ontology.mapping.assess",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -37170,7 +37536,7 @@
             }
           },
           "summary": "ontology.release.activate",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -37689,7 +38055,7 @@
             }
           },
           "summary": "ontology.release.diff",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -37985,7 +38351,7 @@
             }
           },
           "summary": "ontology.release.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -38290,7 +38656,7 @@
             }
           },
           "summary": "ontology.release.publish",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -38603,7 +38969,7 @@
             }
           },
           "summary": "ontology.release.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -38830,7 +39196,7 @@
             }
           },
           "summary": "plugin.disable",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -39057,7 +39423,7 @@
             }
           },
           "summary": "plugin.enable",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -39294,7 +39660,7 @@
             }
           },
           "summary": "plugin.install",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -39521,7 +39887,7 @@
             }
           },
           "summary": "plugin.revoke",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -39748,7 +40114,7 @@
             }
           },
           "summary": "plugin.rollback",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -39977,7 +40343,7 @@
             }
           },
           "summary": "plugin.storage.delete",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -40203,7 +40569,7 @@
             }
           },
           "summary": "plugin.storage.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -40429,7 +40795,7 @@
             }
           },
           "summary": "plugin.storage.list",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -40664,7 +41030,7 @@
             }
           },
           "summary": "plugin.storage.put",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -40891,7 +41257,7 @@
             }
           },
           "summary": "plugin.uninstall",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -41121,7 +41487,7 @@
             }
           },
           "summary": "plugin.upgrade.finish",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -41358,7 +41724,7 @@
             }
           },
           "summary": "plugin.upgrade",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -41582,7 +41948,7 @@
             }
           },
           "summary": "semantic.context.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -41802,7 +42168,7 @@
             }
           },
           "summary": "system.activity.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -42026,7 +42392,7 @@
             }
           },
           "summary": "system.change_impact.preview",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -42245,7 +42611,7 @@
             }
           },
           "summary": "system.echo",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -42471,7 +42837,7 @@
             }
           },
           "summary": "system.job.cancel",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -42697,7 +43063,7 @@
             }
           },
           "summary": "system.job.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -42921,7 +43287,7 @@
             }
           },
           "summary": "system.lineage.get",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -43145,7 +43511,7 @@
             }
           },
           "summary": "system.search",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -43364,7 +43730,7 @@
             }
           },
           "summary": "system.worker.outbox.health",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -43591,7 +43957,7 @@
             }
           },
           "summary": "vismockup.capture",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -43824,7 +44190,7 @@
             }
           },
           "summary": "vismockup.highlight",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -44051,7 +44417,7 @@
             }
           },
           "summary": "vismockup.launch",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -44282,7 +44648,7 @@
             }
           },
           "summary": "vismockup.open_file",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -44509,7 +44875,7 @@
             }
           },
           "summary": "vismockup.status",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -44741,7 +45107,7 @@
             }
           },
           "summary": "vismockup.tree",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       },
@@ -44976,7 +45342,7 @@
             }
           },
           "summary": "vismockup.visibility",
-          "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+          "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
           "x-ai00-major-version": 1
         }
       }
@@ -44988,8 +45354,14 @@
       "module": "craft_backend.capabilities",
       "plugin_id": "official.craft",
       "version": "1.0.0"
+    },
+    {
+      "artifact_hash": "sha256:15bec7ce65ca53100ce79eee368b8f1dd6c79fc596871b5e012336c4a0c2336d",
+      "module": "project_management_backend.capabilities",
+      "plugin_id": "official.project-management",
+      "version": "1.0.0"
     }
   ],
-  "release_id": "rel_01f9fd2a284a601308cc94da2abcaf90",
+  "release_id": "rel_9322bdfe651224292d37be91bcb0f647",
   "schema_version": 2
 }

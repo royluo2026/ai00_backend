@@ -100,16 +100,6 @@ def semantic_context(payload, context):
     return CapabilityOutput(data={"named_view": named_view, "items": items[:limit], "depth": depth})
 
 
-def project_search(payload, context):
-    query=str(payload.get("query") or "").strip(); limit=_limit(payload); items=[]
-    for provider in provider_registry.projects:
-        for raw in provider.search(query, limit, context):
-            ref=stable_ref(dict(raw), str(provider.owner))
-            if ref: items.append(ref)
-            if len(items)>=limit: break
-    return CapabilityOutput(data={"items": items[:limit], "total": min(len(items), limit)})
-
-
 def register_system_shared_capabilities(registry: Any) -> None:
     defs=(
         ("system.search", system_search, "Search stable references across registered domain providers.", "read", (), ["query"]),
@@ -120,7 +110,6 @@ def register_system_shared_capabilities(registry: Any) -> None:
         ("system.lineage.get", lineage_get, "Compose immutable provenance events and completeness.", "read", (), ["object_ref"]),
         ("system.change_impact.preview", preview_impact, "Compose impact from a server-issued preview or diff ref.", "read", (), ["change_ref"]),
         ("semantic.context.get", semantic_context, "Read an allowlisted bounded semantic named view.", "read", (), ["named_view"]),
-        ("base.project.search", project_search, "Search project refs through the owning domain provider.", "read", (), ["query"]),
     )
     for capability_id, handler, description, risk, permissions, required in defs:
         registry.register(CapabilitySpec(

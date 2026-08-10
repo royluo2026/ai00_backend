@@ -88,6 +88,7 @@
       "module_prefixes": ["plugins.project_management"],
       "code_paths": [
         "plugins/project_management/**",
+        "backend/domain_ports/project_management.py",
         "plugins/craft/craft_backend/routers/projects.py",
         "plugins/craft/craft_backend/routers/workbench_home.py"
       ],

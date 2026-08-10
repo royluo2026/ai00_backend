@@ -75,5 +75,5 @@ def test_shared_capability_ids_are_registered_without_overlap():
     assert ids == {
         "system.search", "system.activity.search", "system.job.get", "system.job.cancel",
         "identity.principal.search", "system.lineage.get", "system.change_impact.preview",
-        "semantic.context.get", "base.project.search",
+        "semantic.context.get",
     }

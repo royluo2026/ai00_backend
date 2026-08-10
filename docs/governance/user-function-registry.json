@@ -1189,28 +1189,6 @@
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
       ]
     },
-    "capability:base.project": {
-      "function_id": "capability:base.project",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "base.project",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "project"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_versions.py"
-      ]
-    },
     "capability:base.project.search": {
       "function_id": "capability:base.project.search",
       "domain": "Project Management",
@@ -1231,7 +1209,7 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/system_shared_next.py"
+        "plugins/project_management/project_management_backend/capabilities/projects.py"
       ]
     },
     "capability:craft.bop.draft.change.apply": {
@@ -1280,28 +1258,6 @@
         "plugins/craft/craft_backend/capabilities/bop_writes.py"
       ]
     },
-    "capability:craft.bop.execution_structure": {
-      "function_id": "capability:craft.bop.execution_structure",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.bop.execution_structure",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "bop"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_structure.py"
-      ]
-    },
     "capability:craft.bop.execution_structure.get": {
       "function_id": "capability:craft.bop.execution_structure.get",
       "domain": "Craft",
@@ -1348,28 +1304,6 @@
         "plugins/craft/craft_backend/capabilities/bop_structure.py"
       ]
     },
-    "capability:craft.bop.import": {
-      "function_id": "capability:craft.bop.import",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.bop.import",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "bop"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_writes.py"
-      ]
-    },
     "capability:craft.bop.import.preview": {
       "function_id": "capability:craft.bop.import.preview",
       "domain": "Craft",
@@ -1393,28 +1327,6 @@
         "plugins/craft/craft_backend/capabilities/bop_writes.py"
       ]
     },
-    "capability:craft.bop.linked_parts": {
-      "function_id": "capability:craft.bop.linked_parts",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.bop.linked_parts",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "bop"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_structure.py"
-      ]
-    },
     "capability:craft.bop.linked_parts.get": {
       "function_id": "capability:craft.bop.linked_parts.get",
       "domain": "Craft",
@@ -1436,53 +1348,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/bop_structure.py"
-      ]
-    },
-    "capability:craft.bop.preview": {
-      "function_id": "capability:craft.bop.preview",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.bop.preview",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "bop"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_writes.py"
-      ]
-    },
-    "capability:craft.bop.version": {
-      "function_id": "capability:craft.bop.version",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.bop.version",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "bop"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_compare.py",
-        "plugins/craft/craft_backend/capabilities/bop_structure.py",
-        "plugins/craft/craft_backend/capabilities/bop_versions.py",
-        "plugins/craft/craft_backend/capabilities/bop_writes.py"
       ]
     },
     "capability:craft.bop.version.archive": {
@@ -1600,28 +1465,6 @@
         "plugins/craft/craft_backend/capabilities/bop_versions.py"
       ]
     },
-    "capability:craft.bop.work_package": {
-      "function_id": "capability:craft.bop.work_package",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.bop.work_package",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "bop"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_structure.py"
-      ]
-    },
     "capability:craft.bop.work_package.get": {
       "function_id": "capability:craft.bop.work_package.get",
       "domain": "Craft",
@@ -1645,75 +1488,9 @@
         "plugins/craft/craft_backend/capabilities/bop_structure.py"
       ]
     },
-    "capability:craft.execution_structure": {
-      "function_id": "capability:craft.execution_structure",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.execution_structure",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_structure.py"
-      ]
-    },
-    "capability:craft.gbop": {
-      "function_id": "capability:craft.gbop",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.gbop",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "bop"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/gbop_read.py"
-      ]
-    },
-    "capability:craft.gbop.item": {
-      "function_id": "capability:craft.gbop.item",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.gbop.item",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "bop"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/gbop_read.py"
-      ]
-    },
     "capability:craft.gbop.item.knowledge.list": {
       "function_id": "capability:craft.gbop.item.knowledge.list",
-      "domain": "Knowledge",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -1727,7 +1504,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Knowledge",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -1780,50 +1557,6 @@
         "plugins/craft/craft_backend/capabilities/gbop_read.py"
       ]
     },
-    "capability:craft.pbom": {
-      "function_id": "capability:craft.pbom",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.pbom",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "pbom"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/pbom_read.py"
-      ]
-    },
-    "capability:craft.pbom.part": {
-      "function_id": "capability:craft.pbom.part",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.pbom.part",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "pbom"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_structure.py"
-      ]
-    },
     "capability:craft.pbom.part.search": {
       "function_id": "capability:craft.pbom.part.search",
       "domain": "Craft",
@@ -1844,28 +1577,6 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "plugins/craft/craft_backend/capabilities/pbom_read.py"
-      ]
-    },
-    "capability:craft.pbom.snapshot": {
-      "function_id": "capability:craft.pbom.snapshot",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.pbom.snapshot",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "pbom"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
         "plugins/craft/craft_backend/capabilities/pbom_read.py"
       ]
     },
@@ -1915,50 +1626,6 @@
         "plugins/craft/craft_backend/capabilities/pbom_read.py"
       ]
     },
-    "capability:craft.work_package": {
-      "function_id": "capability:craft.work_package",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.work_package",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_structure.py"
-      ]
-    },
-    "capability:craft.write": {
-      "function_id": "capability:craft.write",
-      "domain": "Craft",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "craft.write",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Craft",
-      "exclusion_reason": null,
-      "source_paths": [
-        "plugins/craft/craft_backend/capabilities/bop_writes.py"
-      ]
-    },
     "capability:identity.principal.search": {
       "function_id": "capability:identity.principal.search",
       "domain": "Base Platform",
@@ -1982,29 +1649,6 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
-    "capability:knowledge.context": {
-      "function_id": "capability:knowledge.context",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.context",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/knowledge_context_next.py"
-      ]
-    },
     "capability:knowledge.context.retrieve": {
       "function_id": "capability:knowledge.context.retrieve",
       "domain": "Knowledge",
@@ -2026,30 +1670,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/knowledge_context_next.py"
-      ]
-    },
-    "capability:knowledge.document": {
-      "function_id": "capability:knowledge.document",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.document",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/knowledge_context_next.py",
-        "backend/capabilities/knowledge_documents_next.py"
       ]
     },
     "capability:knowledge.document.create": {
@@ -2236,50 +1856,6 @@
         "backend/capabilities/knowledge_documents_next.py"
       ]
     },
-    "capability:knowledge.document_head": {
-      "function_id": "capability:knowledge.document_head",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.document_head",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ]
-    },
-    "capability:knowledge.entry": {
-      "function_id": "capability:knowledge.entry",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.entry",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/knowledge_next.py"
-      ]
-    },
     "capability:knowledge.get": {
       "function_id": "capability:knowledge.get",
       "domain": "Knowledge",
@@ -2303,32 +1879,6 @@
         "backend/capabilities/knowledge_next.py"
       ]
     },
-    "capability:knowledge.manage": {
-      "function_id": "capability:knowledge.manage",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.manage",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/knowledge_migration_next.py",
-        "backend/capabilities/outbox_next.py",
-        "backend/capabilities/outbox_retry_next.py",
-        "backend/capabilities/proposal_query_next.py",
-        "backend/capabilities/review_next.py"
-      ]
-    },
     "capability:knowledge.migration.status": {
       "function_id": "capability:knowledge.migration.status",
       "domain": "Knowledge",
@@ -2350,29 +1900,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/knowledge_migration_next.py"
-      ]
-    },
-    "capability:knowledge.proposal": {
-      "function_id": "capability:knowledge.proposal",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.proposal",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/outbox_retry_next.py",
-        "backend/capabilities/review_next.py"
       ]
     },
     "capability:knowledge.proposal.get": {
@@ -2514,29 +2041,6 @@
         "backend/capabilities/proposals_next.py"
       ]
     },
-    "capability:knowledge.revision": {
-      "function_id": "capability:knowledge.revision",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.revision",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/knowledge_context_next.py",
-        "backend/capabilities/knowledge_documents_next.py"
-      ]
-    },
     "capability:knowledge.search": {
       "function_id": "capability:knowledge.search",
       "domain": "Knowledge",
@@ -2558,29 +2062,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/knowledge_next.py"
-      ]
-    },
-    "capability:knowledge.space": {
-      "function_id": "capability:knowledge.space",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.space",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/knowledge_documents_next.py"
       ]
     },
     "capability:knowledge.space.create": {
@@ -2652,29 +2133,6 @@
         "backend/capabilities/knowledge_documents_next.py"
       ]
     },
-    "capability:knowledge.view": {
-      "function_id": "capability:knowledge.view",
-      "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "knowledge.view",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "knowledge"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Knowledge",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/knowledge_next.py",
-        "backend/capabilities/proposals_next.py"
-      ]
-    },
     "capability:local.command.get": {
       "function_id": "capability:local.command.get",
       "domain": "Local Integration",
@@ -2696,50 +2154,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/local_runtime_next.py"
-      ]
-    },
-    "capability:ontology.activate": {
-      "function_id": "capability:ontology.activate",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.activate",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_releases_next.py"
-      ]
-    },
-    "capability:ontology.active_ref": {
-      "function_id": "capability:ontology.active_ref",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.active_ref",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_releases_next.py"
       ]
     },
     "capability:ontology.change.proposal.create": {
@@ -2880,50 +2294,6 @@
         "backend/capabilities/ontology_concepts_next.py"
       ]
     },
-    "capability:ontology.graph.query": {
-      "function_id": "capability:ontology.graph.query",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.graph.query",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py"
-      ]
-    },
-    "capability:ontology.mapping": {
-      "function_id": "capability:ontology.mapping",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.mapping",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_concepts_next.py"
-      ]
-    },
     "capability:ontology.mapping.assess": {
       "function_id": "capability:ontology.mapping.assess",
       "domain": "Ontology",
@@ -2945,139 +2315,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/ontology_concepts_next.py"
-      ]
-    },
-    "capability:ontology.object": {
-      "function_id": "capability:ontology.object",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.object",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_concepts_next.py"
-      ]
-    },
-    "capability:ontology.proposal": {
-      "function_id": "capability:ontology.proposal",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.proposal",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_proposals_next.py"
-      ]
-    },
-    "capability:ontology.proposal_review": {
-      "function_id": "capability:ontology.proposal_review",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.proposal_review",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_proposals_next.py"
-      ]
-    },
-    "capability:ontology.proposal_revision": {
-      "function_id": "capability:ontology.proposal_revision",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.proposal_revision",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_proposals_next.py"
-      ]
-    },
-    "capability:ontology.publish": {
-      "function_id": "capability:ontology.publish",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.publish",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_releases_next.py"
-      ]
-    },
-    "capability:ontology.release": {
-      "function_id": "capability:ontology.release",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.release",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_concepts_next.py",
-        "backend/capabilities/ontology_releases_next.py"
       ]
     },
     "capability:ontology.release.activate": {
@@ -3195,28 +2432,6 @@
         "backend/capabilities/ontology_releases_next.py"
       ]
     },
-    "capability:ontology.review": {
-      "function_id": "capability:ontology.review",
-      "domain": "Ontology",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "ontology.review",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "ontology"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Ontology",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/ontology_proposals_next.py"
-      ]
-    },
     "capability:plugin.disable": {
       "function_id": "capability:plugin.disable",
       "domain": "Base Platform",
@@ -3261,28 +2476,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/plugin_marketplace_next.py"
-      ]
-    },
-    "capability:plugin.host.execute": {
-      "function_id": "capability:plugin.host.execute",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "plugin.host.execute",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py"
       ]
     },
     "capability:plugin.install": {
@@ -3534,28 +2727,6 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
-    "capability:system.activity": {
-      "function_id": "capability:system.activity",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.activity",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py"
-      ]
-    },
     "capability:system.activity.search": {
       "function_id": "capability:system.activity.search",
       "domain": "Base Platform",
@@ -3577,28 +2748,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/system_shared_next.py"
-      ]
-    },
-    "capability:system.change_impact": {
-      "function_id": "capability:system.change_impact",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.change_impact",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py"
       ]
     },
     "capability:system.change_impact.preview": {
@@ -3624,28 +2773,6 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
-    "capability:system.confirmation.respond": {
-      "function_id": "capability:system.confirmation.respond",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.confirmation.respond",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py"
-      ]
-    },
     "capability:system.echo": {
       "function_id": "capability:system.echo",
       "domain": "Base Platform",
@@ -3668,28 +2795,6 @@
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/registry.py",
         "backend/capabilities/registry_next.py"
-      ]
-    },
-    "capability:system.job": {
-      "function_id": "capability:system.job",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.job",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py"
       ]
     },
     "capability:system.job.cancel": {
@@ -3738,50 +2843,6 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
-    "capability:system.job_cancel": {
-      "function_id": "capability:system.job_cancel",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.job_cancel",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/system_shared_next.py"
-      ]
-    },
-    "capability:system.lineage": {
-      "function_id": "capability:system.lineage",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.lineage",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py"
-      ]
-    },
     "capability:system.lineage.get": {
       "function_id": "capability:system.lineage.get",
       "domain": "Base Platform",
@@ -3802,72 +2863,6 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/system_shared_next.py"
-      ]
-    },
-    "capability:system.object_ref": {
-      "function_id": "capability:system.object_ref",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.object_ref",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/system_shared_next.py"
-      ]
-    },
-    "capability:system.plugin.manage": {
-      "function_id": "capability:system.plugin.manage",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.plugin.manage",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/plugin_marketplace_next.py"
-      ]
-    },
-    "capability:system.ref": {
-      "function_id": "capability:system.ref",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.ref",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
         "backend/capabilities/system_shared_next.py"
       ]
     },
@@ -3892,28 +2887,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/system_shared_next.py"
-      ]
-    },
-    "capability:system.tech_config": {
-      "function_id": "capability:system.tech_config",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.tech_config",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/outbox_worker_next.py"
       ]
     },
     "capability:system.worker.outbox.health": {

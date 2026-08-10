@@ -6,6 +6,12 @@
       "module": "craft_backend.capabilities",
       "version": "1.0.0",
       "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
+    },
+    {
+      "plugin_id": "official.project-management",
+      "module": "project_management_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:15bec7ce65ca53100ce79eee368b8f1dd6c79fc596871b5e012336c4a0c2336d"
     }
   ]
 }

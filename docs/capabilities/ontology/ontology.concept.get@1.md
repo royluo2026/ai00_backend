@@ -8,7 +8,7 @@ Read a summary or schema view pinned to an immutable release.
 - 不适用：The caller only has an ambiguous term.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
+- Catalog Release：`rel_9322bdfe651224292d37be91bcb0f647`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -94,7 +94,7 @@ Read a summary or schema view pinned to an immutable release.
 ```json
 {
   "capability_id": "ontology.concept.get",
-  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+  "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
   "major_version": 1,
   "payload": {
     "stable_gid": "example"

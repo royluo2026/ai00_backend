@@ -1,23 +1,23 @@
 # base.project.search@1
 
-Search project refs through the owning domain provider.
+Search visible Project Management refs by name or code.
 
 ## 使用判断
 
-- 适用：A bounded shared-system composition is required.
-- 不适用：A domain-specific stable ref is already known.
+- 适用：A caller needs a stable project reference before invoking another domain.
+- 不适用：A project reference is already known or project rows are requested.
 - 生命周期：`experimental`
-- 所属领域：`base`
-- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
+- 所属领域：`project_management`
+- Catalog Release：`rel_9322bdfe651224292d37be91bcb0f647`
+- Schema 精度：`typed`
+- 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -58,7 +58,16 @@ Search project refs through the owning domain provider.
 {
   "additionalProperties": false,
   "properties": {
-    "query": {}
+    "limit": {
+      "maximum": 50,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "query": {
+      "maxLength": 200,
+      "minLength": 1,
+      "type": "string"
+    }
   },
   "required": [
     "query"
@@ -72,7 +81,7 @@ Search project refs through the owning domain provider.
 ```json
 {
   "capability_id": "base.project.search",
-  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+  "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
   "major_version": 1,
   "payload": {
     "query": "example"
@@ -87,7 +96,52 @@ Search project refs through the owning domain provider.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "match_reason": {
+            "type": "string"
+          },
+          "object_ref": {
+            "pattern": "^project:[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "owner": {
+            "const": "project_management",
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "object_ref",
+          "title",
+          "owner"
+        ],
+        "type": "object"
+      },
+      "maxItems": 50,
+      "type": "array"
+    },
+    "query": {
+      "type": "string"
+    },
+    "total": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "items",
+    "total",
+    "query"
+  ],
   "type": "object"
 }
 ```

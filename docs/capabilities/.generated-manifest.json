@@ -6,7 +6,6 @@
     "README.md",
     "SECURITY.md",
     "agent-tools.v2.json",
-    "base-platform/base.project.search@1.md",
     "base-platform/identity.principal.search@1.md",
     "base-platform/plugin.disable@1.md",
     "base-platform/plugin.enable@1.md",
@@ -90,7 +89,8 @@
     "ontology/ontology.release.get@1.md",
     "ontology/ontology.release.publish@1.md",
     "ontology/ontology.release.search@1.md",
-    "openapi-fragment.v2.json"
+    "openapi-fragment.v2.json",
+    "project-management/base.project.search@1.md"
   ],
   "schema_version": 1
 }

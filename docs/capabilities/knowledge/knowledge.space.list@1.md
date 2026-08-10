@@ -8,7 +8,7 @@ Deprecated compatibility alias for knowledge.space.search.
 - 不适用：New callers must use knowledge.space.search.
 - 生命周期：`experimental`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
+- Catalog Release：`rel_9322bdfe651224292d37be91bcb0f647`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -67,7 +67,7 @@ Deprecated compatibility alias for knowledge.space.search.
 ```json
 {
   "capability_id": "knowledge.space.list",
-  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
+  "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
   "major_version": 1,
   "payload": {}
 }
