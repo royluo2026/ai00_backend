@@ -4,9 +4,12 @@ from __future__ import annotations
 import hashlib
 import json
 from contextlib import contextmanager
-from typing import Any, Callable, Iterator, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Iterator, Mapping, Sequence
 
 from .canonical import canonical_json_bytes, canonicalize_release, normalize_release_objects
+
+if TYPE_CHECKING:
+    from backend.capability_v2.revision.models import CommitRef
 
 
 class StaleActiveRelease(RuntimeError):
@@ -81,13 +84,44 @@ class OntologyReleaseRepository:
             "ois_object_key": ois_object_key,
             "source": source,
             "source_gid": source_gid,
+            "revision_commit_id": None,
         }
+
+    def bind_revision(self, release_gid: str, content_sha256: str, revision_ref: CommitRef) -> None:
+        if revision_ref.repository.owner_domain != "ontology":
+            raise ValueError("ontology release requires an ontology-owned RevisionRef")
+        with _open_connection(self._connection_factory) as conn:
+            try:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "UPDATE workmanship_base_ontology_releases SET revision_commit_id=%s "
+                        "WHERE gid=%s AND content_sha256=%s "
+                        "AND (revision_commit_id IS NULL OR revision_commit_id=%s)",
+                        (revision_ref.commit_id, release_gid, content_sha256, revision_ref.commit_id),
+                    )
+                    if cursor.rowcount != 1:
+                        cursor.execute(
+                            "SELECT revision_commit_id,content_sha256 "
+                            "FROM workmanship_base_ontology_releases WHERE gid=%s",
+                            (release_gid,),
+                        )
+                        current = cursor.fetchone()
+                        if (
+                            not current
+                            or str(current.get("revision_commit_id") or "") != revision_ref.commit_id
+                            or str(current.get("content_sha256") or "") != content_sha256
+                        ):
+                            raise ReleaseIntegrityError("ontology release RevisionRef binding conflict")
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
 
     def find_by_source(self, source: str, source_gid: str | None = None) -> dict[str, Any] | None:
         with _open_connection(self._connection_factory) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "SELECT gid AS release_gid,parent_release_gid,content_sha256,object_count,ois_object_key,source,source_gid "
+                    "SELECT gid AS release_gid,parent_release_gid,content_sha256,object_count,ois_object_key,source,source_gid,revision_commit_id "
                     "FROM workmanship_base_ontology_releases WHERE source=%s AND source_gid <=> %s",
                     (source, source_gid),
                 )
@@ -110,13 +144,13 @@ class OntologyReleaseRepository:
             with conn.cursor() as cursor:
                 if release_gid:
                     cursor.execute(
-                        "SELECT gid AS release_gid,parent_release_gid,content_sha256,object_count,ois_object_key,source,source_gid "
+                        "SELECT gid AS release_gid,parent_release_gid,content_sha256,object_count,ois_object_key,source,source_gid,revision_commit_id "
                         "FROM workmanship_base_ontology_releases WHERE gid=%s",
                         (release_gid,),
                     )
                 else:
                     cursor.execute(
-                        "SELECT r.gid AS release_gid,r.parent_release_gid,r.content_sha256,r.object_count,r.ois_object_key,r.source,r.source_gid "
+                        "SELECT r.gid AS release_gid,r.parent_release_gid,r.content_sha256,r.object_count,r.ois_object_key,r.source,r.source_gid,r.revision_commit_id "
                         "FROM workmanship_base_ontology_active_refs a "
                         "JOIN workmanship_base_ontology_releases r ON r.gid=a.release_gid WHERE a.ref_name='default'",
                     )
@@ -129,7 +163,7 @@ class OntologyReleaseRepository:
         with _open_connection(self._connection_factory) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "SELECT gid AS release_gid,parent_release_gid,content_sha256,object_count,ois_object_key,source,source_gid,created_by,created_at "
+                    "SELECT gid AS release_gid,parent_release_gid,content_sha256,object_count,ois_object_key,source,source_gid,revision_commit_id,created_by,created_at "
                     "FROM workmanship_base_ontology_releases ORDER BY created_at DESC LIMIT %s",
                     (max(1, min(limit, 100)),),
                 )

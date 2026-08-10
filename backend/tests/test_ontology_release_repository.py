@@ -4,6 +4,7 @@ import pytest
 
 from backend.ontology.canonical import canonicalize_release
 from backend.ontology.repository import OntologyReleaseRepository, StaleActiveRelease
+from backend.capability_v2.revision.models import CommitRef, RepositoryRef
 
 
 def _concept(gid: str, name: str) -> dict:
@@ -105,3 +106,33 @@ def test_release_insert_is_append_only_and_stores_canonical_objects():
     assert result["object_count"] == 1
     assert len(result["content_sha256"]) == 64
     assert conn.commits == 1
+
+
+def test_release_revision_binding_is_hash_guarded_and_idempotent():
+    conn = Connection([])
+    conn.cursor_value.rowcount = 1
+    repository = OntologyReleaseRepository(lambda: conn)
+    ref = CommitRef(
+        repository=RepositoryRef(
+            tenant_id="global", repository_id="ontology.default",
+            owner_domain="ontology", resource_id="ontology.default",
+        ),
+        commit_id="cmt_" + "a" * 40,
+        content_hash="sha256:" + "b" * 64,
+    )
+
+    repository.bind_revision("r1", "c" * 64, ref)
+
+    sql, params = conn.cursor_value.executed[0]
+    assert "revision_commit_id IS NULL OR revision_commit_id=%s" in sql
+    assert params == (ref.commit_id, "r1", "c" * 64, ref.commit_id)
+    assert conn.commits == 1
+
+    retry = Connection([{
+        "revision_commit_id": ref.commit_id,
+        "content_sha256": "c" * 64,
+    }])
+    retry.cursor_value.rowcount = 0
+    OntologyReleaseRepository(lambda: retry).bind_revision("r1", "c" * 64, ref)
+    assert retry.commits == 1
+    assert retry.rollbacks == 0

@@ -986,7 +986,15 @@ git commit -m "feat: add revision diff merge and lineage kernel"
 **Files:**
 - Create: `backend/domain_ports/ontology.py`
 - Create: `backend/capability_v2/revision/ontology_adapter.py`
+- Create: `backend/capability_v2/revision/runtime.py`
 - Create: `backend/ontology/impact_analysis.py`
+- Modify: `backend/ontology/repository.py`
+- Modify: `backend/ontology/proposals.py`
+- Modify: `backend/db/connection.py`
+- Create: `backend/db/migrations/202608100008_ontology_revision_refs.sql`
+- Modify: `backend/governance/domain_boundaries.json`
+- Modify: `docs/governance/domain-ownership.json`
+- Modify: `.github/CODEOWNERS`
 - Modify: `backend/capabilities/ontology_concepts_next.py`
 - Modify: `backend/capabilities/ontology_proposals_next.py`
 - Modify: `backend/capabilities/ontology_releases_next.py`
@@ -999,7 +1007,7 @@ git commit -m "feat: add revision diff merge and lineage kernel"
 - Produces: stable ConceptRef and OntologyVersionRef in every read result.
 - Produces: proposal → review → immutable release → compatibility check → activation flow; proposer/Agent cannot self-approve.
 
-- [ ] **Step 1: Write failing rename and impact Golden Cases**
+- [x] **Step 1: Write failing rename and impact Golden Cases**
 
 ```python
 def test_concept_rename_preserves_identity(ontology_diff):
@@ -1008,23 +1016,23 @@ def test_concept_rename_preserves_identity(ontology_diff):
     assert change.resource_ref.concept_id == "concept.operation"
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run: `python -m pytest backend/tests/test_ontology_revision_impact.py -q`
 
 Expected: FAIL because releases are not backed by common Revision/impact analysis.
 
-- [ ] **Step 3: Implement adapter and reference scans across Craft, model mappings, plugins and Agent workflows**
+- [x] **Step 3: Implement adapter and reference scans across Craft, model mappings, plugins and Agent workflows**
 
 Activation is blocked when a breaking change has unresolved consumers. Inference extensions accept only reviewed declarative rules with execution budgets.
 
-- [ ] **Step 4: Run all Ontology regression and Golden Cases**
+- [x] **Step 4: Run all Ontology regression and Golden Cases**
 
 Run: `python -m pytest backend/tests/test_ontology_revision_impact.py backend/tests/test_ontology_concept_capabilities.py backend/tests/test_ontology_proposal_capabilities.py backend/tests/test_ontology_release_capabilities.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/domain_ports/ontology.py backend/capability_v2/revision/ontology_adapter.py backend/ontology/impact_analysis.py backend/capabilities/ontology_concepts_next.py backend/capabilities/ontology_proposals_next.py backend/capabilities/ontology_releases_next.py backend/tests/test_ontology_revision_impact.py backend/tests/golden/ontology

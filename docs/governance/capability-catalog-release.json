@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_d831aa71e46739f4fc8513964972e24f",
-  "catalog_hash": "sha256:d831aa71e46739f4fc8513964972e24f4ed577e74f8b3ee31f17e3e18ef2ccc0",
+  "release_id": "rel_01f9fd2a284a601308cc94da2abcaf90",
+  "catalog_hash": "sha256:01f9fd2a284a601308cc94da2abcaf909d04f966d37fc22db2592c64cffff507",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -3011,11 +3011,85 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "proposal_gid",
+          "proposal_revision_gid",
+          "revision_no",
+          "base_release_gid",
+          "content_sha256",
+          "changes",
+          "status",
+          "author_gid",
+          "base_ontology_version_ref"
+        ],
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          },
+          "proposal_revision_gid": {
+            "type": "string"
+          },
+          "revision_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "base_release_gid": {
+            "type": "string"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "author_gid": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "base_ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": null,
-      "schema_hash": "sha256:b2452fcee9214dc161c525d155e2ce984307738a80eb28dd60359de14c9611f8",
+      "schema_hash": "sha256:636ab3d454724d0dd0ee13dd59e643b5c386dcdd7c21fa30a76868222d0893cf",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3042,7 +3116,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -3067,15 +3141,163 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "proposal_gid",
+          "proposal_revision_gid",
+          "revision_no",
+          "base_release_gid",
+          "content_sha256",
+          "changes",
+          "status",
+          "author_gid",
+          "base_ontology_version_ref"
+        ],
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          },
+          "proposal_revision_gid": {
+            "type": "string"
+          },
+          "revision_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "base_release_gid": {
+            "type": "string"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "author_gid": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "base_ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "proposal_gid",
+          "proposal_revision_gid",
+          "revision_no",
+          "base_release_gid",
+          "content_sha256",
+          "changes",
+          "status",
+          "author_gid",
+          "base_ontology_version_ref"
+        ],
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          },
+          "proposal_revision_gid": {
+            "type": "string"
+          },
+          "revision_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "base_release_gid": {
+            "type": "string"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "author_gid": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "base_ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:cd01ec0766ee98b11203c9dd326d890f51ba28c7d2ca02844238354ba24b13a5",
+      "schema_hash": "sha256:cbba1c07ff27e7d9c93893020d4ff8ebfcd7c12b62c65f08218919dd745e8678",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3133,11 +3355,44 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "review_gid",
+          "proposal_gid",
+          "proposal_revision_gid",
+          "content_sha256",
+          "decision",
+          "reviewer_gid"
+        ],
+        "properties": {
+          "review_gid": {
+            "type": "string"
+          },
+          "proposal_gid": {
+            "type": "string"
+          },
+          "proposal_revision_gid": {
+            "type": "string"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject",
+              "request_changes"
+            ]
+          },
+          "reviewer_gid": {
+            "type": "string"
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": null,
-      "schema_hash": "sha256:3f99641c2331946274fb0236dc2f7eb7cc0630ad4a161660ebc4483e5c0552ba",
+      "schema_hash": "sha256:39cb7133ea7c58415800c12773f4f01bf9c5ff20447074f3f777a1e2fbe1984c",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3164,7 +3419,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -3184,15 +3439,49 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "schema_hash": "sha256:18f4a8bd62d88ee91b2150f4f783cabae66865eaf18ab57922b0eb8dcaaa71da",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3219,7 +3508,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -3266,15 +3555,115 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "concept",
+          "view",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "concept": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "schema"
+            ]
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "concept",
+          "view",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "concept": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "schema"
+            ]
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:ea0c52812936693c338890c34cf94f758fb6babb6d98ddeae17fd1003c7b2ad7",
+      "schema_hash": "sha256:a829d4dece8ffc35254ef33ebcaf087e267823a0585de53706f86d0570c27c3f",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3301,7 +3690,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -3331,15 +3720,149 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "status",
+          "matched_by",
+          "concept",
+          "candidates",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "ambiguous",
+              "candidates",
+              "unresolved"
+            ]
+          },
+          "matched_by": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "concept": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "status",
+          "matched_by",
+          "concept",
+          "candidates",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "ambiguous",
+              "candidates",
+              "unresolved"
+            ]
+          },
+          "matched_by": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "concept": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:bf453a9a6e5b10cb20f83cb6f02944924beb9421d4dc4f34c1452667194e2398",
+      "schema_hash": "sha256:8d2522ec67dd808a246c76afa0d3e37a003fb6e671a0000672a4ad98e9a3f846",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3366,7 +3889,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -3437,15 +3960,65 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "conclusion",
+          "reasons",
+          "checks"
+        ],
+        "properties": {
+          "conclusion": {
+            "type": "string",
+            "enum": [
+              "compatible",
+              "incompatible",
+              "expert_review_required"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "checks": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "conclusion",
+          "reasons",
+          "checks"
+        ],
+        "properties": {
+          "conclusion": {
+            "type": "string",
+            "enum": [
+              "compatible",
+              "incompatible",
+              "expert_review_required"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "checks": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:2d6bb2461ed198c084eefb42edda6eeb48ee41a72bdb3299bfc4b5b35e12d9c8",
+      "schema_hash": "sha256:031de6b9d3e569054f99fe2077df9b7d99e2ea52dd270af6b78553de6e54846a",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3503,11 +4076,51 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "ref_name",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "ref_name": {
+            "type": "string"
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": null,
-      "schema_hash": "sha256:f928f2dd2220fc89de695135c341108113cbc4489fddc6002b4d3105465c9c9f",
+      "schema_hash": "sha256:e35c1da4b4567aee8caf5f28f14d9110d1bfd6b49f9f2f41d020fca600f25f77",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3534,7 +4147,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -3561,15 +4174,601 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "concepts",
+          "properties",
+          "relations",
+          "mappings",
+          "constraints",
+          "compatibility",
+          "from_release_gid",
+          "to_release_gid",
+          "from_ontology_version_ref",
+          "to_ontology_version_ref"
+        ],
+        "properties": {
+          "concepts": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "properties": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "relations": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "mappings": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "constraints": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "compatibility": {
+            "type": "string",
+            "enum": [
+              "backward_compatible",
+              "migration_required",
+              "breaking"
+            ]
+          },
+          "from_release_gid": {
+            "type": "string"
+          },
+          "to_release_gid": {
+            "type": "string"
+          },
+          "from_ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "to_ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "concepts",
+          "properties",
+          "relations",
+          "mappings",
+          "constraints",
+          "compatibility",
+          "from_release_gid",
+          "to_release_gid",
+          "from_ontology_version_ref",
+          "to_ontology_version_ref"
+        ],
+        "properties": {
+          "concepts": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "properties": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "relations": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "mappings": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "constraints": {
+            "type": "object",
+            "required": [
+              "added",
+              "changed",
+              "deprecated",
+              "removed"
+            ],
+            "properties": {
+              "added": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "changed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "deprecated": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              },
+              "removed": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "compatibility": {
+            "type": "string",
+            "enum": [
+              "backward_compatible",
+              "migration_required",
+              "breaking"
+            ]
+          },
+          "from_release_gid": {
+            "type": "string"
+          },
+          "to_release_gid": {
+            "type": "string"
+          },
+          "from_ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "to_ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:11dfa0fa31d3b6f1620301e83fb9b2ed29516c47e74a45ac883cd6ef7fa35dc7",
+      "schema_hash": "sha256:831b04545091f6b6f42c144c35b2f19ba94637125682cda580445bcad6c9bae1",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3596,7 +4795,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -3616,15 +4815,169 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "release_gid",
+          "content_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "release_gid": {
+            "type": "string"
+          },
+          "parent_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "object_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ois_object_key": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision_commit_id": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "compatibility": {
+            "type": "string",
+            "enum": [
+              "backward_compatible",
+              "migration_required",
+              "breaking"
+            ]
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "release_gid",
+          "content_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "release_gid": {
+            "type": "string"
+          },
+          "parent_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "object_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ois_object_key": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision_commit_id": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "compatibility": {
+            "type": "string",
+            "enum": [
+              "backward_compatible",
+              "migration_required",
+              "breaking"
+            ]
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "schema_hash": "sha256:1305002f5615aca9915e5615c16a7ece1233124f5bf68557d8e51658bcf6743e",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3680,11 +5033,88 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "release_gid",
+          "content_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "release_gid": {
+            "type": "string"
+          },
+          "parent_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "object_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ois_object_key": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision_commit_id": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "compatibility": {
+            "type": "string",
+            "enum": [
+              "backward_compatible",
+              "migration_required",
+              "breaking"
+            ]
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": null,
-      "schema_hash": "sha256:43a934a434290a15e06c65b214c208fdc5fde14515518637f2a702ad92727095",
+      "schema_hash": "sha256:04fb98466a2e32fe27f5d37570eedc395e5b403bafe563effb334ecdbc699860",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3711,7 +5141,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -3731,15 +5161,203 @@
       },
       "output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "release_gid",
+                "content_sha256",
+                "ontology_version_ref"
+              ],
+              "properties": {
+                "release_gid": {
+                  "type": "string"
+                },
+                "parent_release_gid": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                },
+                "content_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "object_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "ois_object_key": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "source_gid": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                },
+                "revision_commit_id": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                },
+                "created_by": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                },
+                "compatibility": {
+                  "type": "string",
+                  "enum": [
+                    "backward_compatible",
+                    "migration_required",
+                    "breaking"
+                  ]
+                },
+                "ontology_version_ref": {
+                  "type": "object",
+                  "required": [
+                    "release_gid",
+                    "content_hash",
+                    "revision_ref"
+                  ],
+                  "properties": {
+                    "release_gid": {
+                      "type": "string"
+                    },
+                    "content_hash": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "revision_ref": {
+                      "type": "object",
+                      "properties": {},
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
         "additionalProperties": false
       },
       "agent_output_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "release_gid",
+                "content_sha256",
+                "ontology_version_ref"
+              ],
+              "properties": {
+                "release_gid": {
+                  "type": "string"
+                },
+                "parent_release_gid": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                },
+                "content_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "object_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "ois_object_key": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "source_gid": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                },
+                "revision_commit_id": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                },
+                "created_by": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                },
+                "compatibility": {
+                  "type": "string",
+                  "enum": [
+                    "backward_compatible",
+                    "migration_required",
+                    "breaking"
+                  ]
+                },
+                "ontology_version_ref": {
+                  "type": "object",
+                  "required": [
+                    "release_gid",
+                    "content_hash",
+                    "revision_ref"
+                  ],
+                  "properties": {
+                    "release_gid": {
+                      "type": "string"
+                    },
+                    "content_hash": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "revision_ref": {
+                      "type": "object",
+                      "properties": {},
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "schema_hash": "sha256:6d1f4a15cc0686f33ff40dc25982baea2fdb7ea7a01001f122dc3139cb59ad36",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -5470,5 +7088,5 @@
       "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
     }
   ],
-  "created_at": "2026-08-10T09:14:42.413802Z"
+  "created_at": "2026-08-10T10:07:57.076979Z"
 }

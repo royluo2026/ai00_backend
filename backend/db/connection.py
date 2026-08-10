@@ -82,6 +82,16 @@ def get_conn():
         conn.close()  # 归还到池（PooledDB 语义）
 
 
+def acquire_connection():
+    """Return one raw pooled connection for persistent platform repositories."""
+    global _pool
+    if _pool is None:
+        init_pool()
+    if _pool is None:
+        raise RuntimeError("MySQL 不可用，无法创建持久化平台仓储。")
+    return _pool.connection()
+
+
 def get_pool_status() -> dict:
     """返回连接池基本状态，供 /health 端点使用。"""
     if _pool is None:

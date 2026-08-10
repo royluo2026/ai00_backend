@@ -1,0 +1,12 @@
+{
+  "to_version": {
+    "release_gid": "ontology-v2",
+    "content_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "before": [
+    {"kind": "concept", "stable_gid": "concept.operation", "name": "工序"}
+  ],
+  "after": [
+    {"kind": "concept", "stable_gid": "concept.operation", "name": "工艺操作"}
+  ]
+}

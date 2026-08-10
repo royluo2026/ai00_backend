@@ -57,6 +57,7 @@
 /backend/ontology/** @ai00/ontology-maintainers
 /backend/capabilities/ontology_* @ai00/ontology-maintainers
 /backend/db/migrations/202608060003_base_ontology_release_governance.sql @ai00/ontology-maintainers
+/backend/db/migrations/202608100008_ontology_revision_refs.sql @ai00/ontology-maintainers
 
 # Knowledge
 /backend/knowledge/** @ai00/knowledge-maintainers
@@ -78,3 +79,7 @@
 /docs/governance/domain-ownership.json @ai00/base-maintainers
 /docs/governance/domain-dependency-baseline.json @ai00/base-maintainers
 /docs/governance/capability-catalog-release.json @ai00/base-maintainers
+
+# Domain-specific shared-kernel adapters remain owned by their domain teams.
+/backend/domain_ports/ontology.py @ai00/ontology-maintainers
+/backend/capability_v2/revision/ontology_adapter.py @ai00/ontology-maintainers

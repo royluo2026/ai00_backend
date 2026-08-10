@@ -1,0 +1,12 @@
+{
+  "to_version": {
+    "release_gid": "ontology-v2",
+    "content_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "before": [
+    {"kind": "constraint", "stable_gid": "constraint.operation.duration", "minimum": 0, "required": false}
+  ],
+  "after": [
+    {"kind": "constraint", "stable_gid": "constraint.operation.duration", "minimum": 1, "required": true}
+  ]
+}

@@ -8,7 +8,7 @@ Assess deterministic mapping compatibility without persisting a mapping.
 - 不适用：Only names are available and an automatic decision is expected.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
+- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -17,7 +17,7 @@ Assess deterministic mapping compatibility without persisting a mapping.
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -118,7 +118,7 @@ Assess deterministic mapping compatibility without persisting a mapping.
 ```json
 {
   "capability_id": "ontology.mapping.assess",
-  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
+  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
   "major_version": 1,
   "payload": {
     "source": {},
@@ -134,7 +134,32 @@ Assess deterministic mapping compatibility without persisting a mapping.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "checks": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "conclusion": {
+      "enum": [
+        "compatible",
+        "incompatible",
+        "expert_review_required"
+      ],
+      "type": "string"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "conclusion",
+    "reasons",
+    "checks"
+  ],
   "type": "object"
 }
 ```

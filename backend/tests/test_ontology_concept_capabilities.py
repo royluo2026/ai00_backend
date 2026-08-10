@@ -8,6 +8,7 @@ from backend.capabilities.ontology_concepts_next import (
     resolve_concept,
 )
 from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capability_v2.v1_adapter import adapt_v1_spec
 
 
 CONTEXT = CapabilityContext(user_gid="u1", team_gid="t1")
@@ -52,6 +53,15 @@ def test_resolve_stable_gid_is_deterministic():
     assert result.data["status"] == "resolved"
     assert result.data["concept"]["stable_gid"] == "c-station-a"
     assert result.data["matched_by"] == "stable_gid"
+    assert result.data["concept"]["concept_ref"] == {
+        "concept_id": "c-station-a",
+        "kind": "concept",
+        "ontology_version": {
+            "release_gid": "rel1",
+            "content_hash": "sha256:" + "f" * 64,
+            "revision_ref": None,
+        },
+    }
 
 
 def test_get_schema_is_version_pinned_and_does_not_return_arbitrary_graph():
@@ -63,6 +73,7 @@ def test_get_schema_is_version_pinned_and_does_not_return_arbitrary_graph():
     assert result.data["view"] == "schema"
     assert result.data["release_gid"] == "rel1"
     assert result.data["concept"]["value_type"] == "number"
+    assert result.data["ontology_version_ref"]["release_gid"] == "rel1"
 
 
 def test_mapping_assess_never_claims_semantic_truth_from_names_only():
@@ -109,3 +120,15 @@ def test_registered_schemas_expose_no_arbitrary_query_language():
         assert "graphql" not in schema_text
         assert "raw_table" not in schema_text
         assert "path" not in spec.input_schema.get("properties", {})
+
+
+def test_plugin_and_agent_contracts_declare_stable_ontology_refs():
+    registry = CapabilityRegistry()
+    register_ontology_concept_capabilities(registry)
+
+    for capability_id in ("ontology.concept.resolve", "ontology.concept.get"):
+        descriptor = adapt_v1_spec(registry.get(capability_id).spec)
+        assert descriptor.exposure.plugin is True
+        assert descriptor.exposure.agent is True
+        assert "ontology_version_ref" in descriptor.output_schema["properties"]
+        assert descriptor.output_schema["properties"]

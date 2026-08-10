@@ -8,7 +8,7 @@ Publish an approved proposal as a new immutable inactive release.
 - 不适用：Changing the active release.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
+- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -76,7 +76,7 @@ Publish an approved proposal as a new immutable inactive release.
 ```json
 {
   "capability_id": "ontology.release.publish",
-  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
+  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
   "major_version": 1,
   "payload": {
     "content_sha256": "example",
@@ -93,7 +93,84 @@ Publish an approved proposal as a new immutable inactive release.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "compatibility": {
+      "enum": [
+        "backward_compatible",
+        "migration_required",
+        "breaking"
+      ],
+      "type": "string"
+    },
+    "content_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "created_at": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "object_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "ois_object_key": {
+      "type": "string"
+    },
+    "ontology_version_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "release_gid": {
+          "type": "string"
+        },
+        "revision_ref": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "release_gid",
+        "content_hash",
+        "revision_ref"
+      ],
+      "type": "object"
+    },
+    "parent_release_gid": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "release_gid": {
+      "type": "string"
+    },
+    "revision_commit_id": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_gid": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    }
+  },
+  "required": [
+    "release_gid",
+    "content_sha256",
+    "ontology_version_ref"
+  ],
   "type": "object"
 }
 ```

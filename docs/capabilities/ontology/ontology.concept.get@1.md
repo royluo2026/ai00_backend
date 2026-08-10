@@ -8,7 +8,7 @@ Read a summary or schema view pinned to an immutable release.
 - 不适用：The caller only has an ambiguous term.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
+- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -17,7 +17,7 @@ Read a summary or schema view pinned to an immutable release.
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -94,7 +94,7 @@ Read a summary or schema view pinned to an immutable release.
 ```json
 {
   "capability_id": "ontology.concept.get",
-  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
+  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
   "major_version": 1,
   "payload": {
     "stable_gid": "example"
@@ -109,7 +109,57 @@ Read a summary or schema view pinned to an immutable release.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "concept": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "ontology_version_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "release_gid": {
+          "type": "string"
+        },
+        "revision_ref": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "release_gid",
+        "content_hash",
+        "revision_ref"
+      ],
+      "type": "object"
+    },
+    "release_gid": {
+      "type": "string"
+    },
+    "release_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "view": {
+      "enum": [
+        "summary",
+        "schema"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "concept",
+    "view",
+    "release_gid",
+    "release_sha256",
+    "ontology_version_ref"
+  ],
   "type": "object"
 }
 ```

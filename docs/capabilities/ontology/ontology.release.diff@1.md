@@ -8,7 +8,7 @@ Compute a semantic stable-identity release diff.
 - 不适用：Raw JSON text differences are expected.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
+- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -17,7 +17,7 @@ Compute a semantic stable-identity release diff.
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -74,7 +74,7 @@ Compute a semantic stable-identity release diff.
 ```json
 {
   "capability_id": "ontology.release.diff",
-  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
+  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
   "major_version": 1,
   "payload": {
     "from_release_gid": "example",
@@ -90,7 +90,300 @@ Compute a semantic stable-identity release diff.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "compatibility": {
+      "enum": [
+        "backward_compatible",
+        "migration_required",
+        "breaking"
+      ],
+      "type": "string"
+    },
+    "concepts": {
+      "additionalProperties": false,
+      "properties": {
+        "added": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "changed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "deprecated": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "removed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "added",
+        "changed",
+        "deprecated",
+        "removed"
+      ],
+      "type": "object"
+    },
+    "constraints": {
+      "additionalProperties": false,
+      "properties": {
+        "added": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "changed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "deprecated": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "removed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "added",
+        "changed",
+        "deprecated",
+        "removed"
+      ],
+      "type": "object"
+    },
+    "from_ontology_version_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "release_gid": {
+          "type": "string"
+        },
+        "revision_ref": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "release_gid",
+        "content_hash",
+        "revision_ref"
+      ],
+      "type": "object"
+    },
+    "from_release_gid": {
+      "type": "string"
+    },
+    "mappings": {
+      "additionalProperties": false,
+      "properties": {
+        "added": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "changed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "deprecated": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "removed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "added",
+        "changed",
+        "deprecated",
+        "removed"
+      ],
+      "type": "object"
+    },
+    "properties": {
+      "additionalProperties": false,
+      "properties": {
+        "added": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "changed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "deprecated": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "removed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "added",
+        "changed",
+        "deprecated",
+        "removed"
+      ],
+      "type": "object"
+    },
+    "relations": {
+      "additionalProperties": false,
+      "properties": {
+        "added": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "changed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "deprecated": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "removed": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "added",
+        "changed",
+        "deprecated",
+        "removed"
+      ],
+      "type": "object"
+    },
+    "to_ontology_version_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "release_gid": {
+          "type": "string"
+        },
+        "revision_ref": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "release_gid",
+        "content_hash",
+        "revision_ref"
+      ],
+      "type": "object"
+    },
+    "to_release_gid": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "concepts",
+    "properties",
+    "relations",
+    "mappings",
+    "constraints",
+    "compatibility",
+    "from_release_gid",
+    "to_release_gid",
+    "from_ontology_version_ref",
+    "to_ontology_version_ref"
+  ],
   "type": "object"
 }
 ```

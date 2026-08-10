@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_d831aa71e46739f4fc8513964972e24f"
+    "version": "rel_01f9fd2a284a601308cc94da2abcaf90"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -225,7 +225,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -460,7 +460,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -703,7 +703,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -950,7 +950,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -1201,7 +1201,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -1436,7 +1436,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -1671,7 +1671,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -1910,7 +1910,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -2149,7 +2149,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -2386,7 +2386,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -2627,7 +2627,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -2874,7 +2874,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -3129,7 +3129,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -3360,7 +3360,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -3587,7 +3587,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -3818,7 +3818,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -4049,7 +4049,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -4286,7 +4286,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.compare",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -4517,7 +4517,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -4741,7 +4741,7 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -4974,7 +4974,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -5204,7 +5204,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -5432,7 +5432,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -5656,7 +5656,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -5880,7 +5880,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -6108,7 +6108,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -6336,7 +6336,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -6560,7 +6560,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -6788,7 +6788,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -7012,7 +7012,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -7231,7 +7231,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -7457,7 +7457,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -7683,7 +7683,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -7906,7 +7906,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -8132,7 +8132,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -8365,7 +8365,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -8604,7 +8604,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -8823,7 +8823,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -9047,7 +9047,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -9266,7 +9266,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -9485,7 +9485,7 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -9711,7 +9711,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -9809,7 +9809,81 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "author_gid": {
+                              "type": "string"
+                            },
+                            "base_ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "base_release_gid": {
+                              "type": "string"
+                            },
+                            "changes": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "channel": {
+                              "type": "string"
+                            },
+                            "content_sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "proposal_gid": {
+                              "type": "string"
+                            },
+                            "proposal_revision_gid": {
+                              "type": "string"
+                            },
+                            "revision_no": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "proposal_gid",
+                            "proposal_revision_gid",
+                            "revision_no",
+                            "base_release_gid",
+                            "content_sha256",
+                            "changes",
+                            "status",
+                            "author_gid",
+                            "base_ontology_version_ref"
+                          ],
                           "type": "object"
                         },
                         {
@@ -9937,7 +10011,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -10033,7 +10107,81 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "author_gid": {
+                              "type": "string"
+                            },
+                            "base_ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "base_release_gid": {
+                              "type": "string"
+                            },
+                            "changes": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "channel": {
+                              "type": "string"
+                            },
+                            "content_sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "proposal_gid": {
+                              "type": "string"
+                            },
+                            "proposal_revision_gid": {
+                              "type": "string"
+                            },
+                            "revision_no": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "proposal_gid",
+                            "proposal_revision_gid",
+                            "revision_no",
+                            "base_release_gid",
+                            "content_sha256",
+                            "changes",
+                            "status",
+                            "author_gid",
+                            "base_ontology_version_ref"
+                          ],
                           "type": "object"
                         },
                         {
@@ -10161,7 +10309,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -10263,7 +10411,40 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "content_sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "decision": {
+                              "enum": [
+                                "approve",
+                                "reject",
+                                "request_changes"
+                              ],
+                              "type": "string"
+                            },
+                            "proposal_gid": {
+                              "type": "string"
+                            },
+                            "proposal_revision_gid": {
+                              "type": "string"
+                            },
+                            "review_gid": {
+                              "type": "string"
+                            },
+                            "reviewer_gid": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "review_gid",
+                            "proposal_gid",
+                            "proposal_revision_gid",
+                            "content_sha256",
+                            "decision",
+                            "reviewer_gid"
+                          ],
                           "type": "object"
                         },
                         {
@@ -10391,7 +10572,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -10482,7 +10663,24 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -10610,7 +10808,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -10728,7 +10926,57 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "concept": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "release_sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "view": {
+                              "enum": [
+                                "summary",
+                                "schema"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "concept",
+                            "view",
+                            "release_gid",
+                            "release_sha256",
+                            "ontology_version_ref"
+                          ],
                           "type": "object"
                         },
                         {
@@ -10856,7 +11104,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -10957,7 +11205,74 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "candidates": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "concept": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "matched_by": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "release_sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "resolved",
+                                "ambiguous",
+                                "candidates",
+                                "unresolved"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "matched_by",
+                            "concept",
+                            "candidates",
+                            "release_gid",
+                            "release_sha256",
+                            "ontology_version_ref"
+                          ],
                           "type": "object"
                         },
                         {
@@ -11085,7 +11400,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -11227,7 +11542,32 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "checks": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "conclusion": {
+                              "enum": [
+                                "compatible",
+                                "incompatible",
+                                "expert_review_required"
+                              ],
+                              "type": "string"
+                            },
+                            "reasons": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "conclusion",
+                            "reasons",
+                            "checks"
+                          ],
                           "type": "object"
                         },
                         {
@@ -11355,7 +11695,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -11457,7 +11797,47 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "ref_name": {
+                              "type": "string"
+                            },
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "release_sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "ref_name",
+                            "release_gid",
+                            "release_sha256",
+                            "ontology_version_ref"
+                          ],
                           "type": "object"
                         },
                         {
@@ -11585,7 +11965,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -11683,7 +12063,300 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "compatibility": {
+                              "enum": [
+                                "backward_compatible",
+                                "migration_required",
+                                "breaking"
+                              ],
+                              "type": "string"
+                            },
+                            "concepts": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "added": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "changed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "deprecated": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "removed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "added",
+                                "changed",
+                                "deprecated",
+                                "removed"
+                              ],
+                              "type": "object"
+                            },
+                            "constraints": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "added": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "changed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "deprecated": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "removed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "added",
+                                "changed",
+                                "deprecated",
+                                "removed"
+                              ],
+                              "type": "object"
+                            },
+                            "from_ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "from_release_gid": {
+                              "type": "string"
+                            },
+                            "mappings": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "added": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "changed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "deprecated": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "removed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "added",
+                                "changed",
+                                "deprecated",
+                                "removed"
+                              ],
+                              "type": "object"
+                            },
+                            "properties": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "added": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "changed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "deprecated": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "removed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "added",
+                                "changed",
+                                "deprecated",
+                                "removed"
+                              ],
+                              "type": "object"
+                            },
+                            "relations": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "added": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "changed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "deprecated": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "removed": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "added",
+                                "changed",
+                                "deprecated",
+                                "removed"
+                              ],
+                              "type": "object"
+                            },
+                            "to_ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "to_release_gid": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "concepts",
+                            "properties",
+                            "relations",
+                            "mappings",
+                            "constraints",
+                            "compatibility",
+                            "from_release_gid",
+                            "to_release_gid",
+                            "from_ontology_version_ref",
+                            "to_ontology_version_ref"
+                          ],
                           "type": "object"
                         },
                         {
@@ -11811,7 +12484,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -11902,7 +12575,84 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "compatibility": {
+                              "enum": [
+                                "backward_compatible",
+                                "migration_required",
+                                "breaking"
+                              ],
+                              "type": "string"
+                            },
+                            "content_sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "created_by": {
+                              "type": "string"
+                            },
+                            "object_count": {
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "ois_object_key": {
+                              "type": "string"
+                            },
+                            "ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "parent_release_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "revision_commit_id": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "source": {
+                              "type": "string"
+                            },
+                            "source_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "release_gid",
+                            "content_sha256",
+                            "ontology_version_ref"
+                          ],
                           "type": "object"
                         },
                         {
@@ -12030,7 +12780,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -12130,7 +12880,84 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "compatibility": {
+                              "enum": [
+                                "backward_compatible",
+                                "migration_required",
+                                "breaking"
+                              ],
+                              "type": "string"
+                            },
+                            "content_sha256": {
+                              "pattern": "^[0-9a-f]{64}$",
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "created_by": {
+                              "type": "string"
+                            },
+                            "object_count": {
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "ois_object_key": {
+                              "type": "string"
+                            },
+                            "ontology_version_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "release_gid": {
+                                  "type": "string"
+                                },
+                                "revision_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {},
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "release_gid",
+                                "content_hash",
+                                "revision_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "parent_release_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "release_gid": {
+                              "type": "string"
+                            },
+                            "revision_commit_id": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "source": {
+                              "type": "string"
+                            },
+                            "source_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "release_gid",
+                            "content_sha256",
+                            "ontology_version_ref"
+                          ],
                           "type": "object"
                         },
                         {
@@ -12258,7 +13085,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -12349,7 +13176,101 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "compatibility": {
+                                    "enum": [
+                                      "backward_compatible",
+                                      "migration_required",
+                                      "breaking"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "content_sha256": {
+                                    "pattern": "^[0-9a-f]{64}$",
+                                    "type": "string"
+                                  },
+                                  "created_at": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "created_by": {
+                                    "type": "string"
+                                  },
+                                  "object_count": {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "ois_object_key": {
+                                    "type": "string"
+                                  },
+                                  "ontology_version_ref": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "content_hash": {
+                                        "pattern": "^sha256:[0-9a-f]{64}$",
+                                        "type": "string"
+                                      },
+                                      "release_gid": {
+                                        "type": "string"
+                                      },
+                                      "revision_ref": {
+                                        "additionalProperties": false,
+                                        "properties": {},
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "release_gid",
+                                      "content_hash",
+                                      "revision_ref"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "parent_release_gid": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "release_gid": {
+                                    "type": "string"
+                                  },
+                                  "revision_commit_id": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  },
+                                  "source": {
+                                    "type": "string"
+                                  },
+                                  "source_gid": {
+                                    "additionalProperties": false,
+                                    "properties": {},
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "release_gid",
+                                  "content_sha256",
+                                  "ontology_version_ref"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -12477,7 +13398,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -12704,7 +13625,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -12931,7 +13852,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -13168,7 +14089,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -13395,7 +14316,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -13622,7 +14543,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -13851,7 +14772,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -14077,7 +14998,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -14303,7 +15224,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -14538,7 +15459,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -14765,7 +15686,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -14995,7 +15916,7 @@
           }
         },
         "summary": "plugin.upgrade.finish",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -15232,7 +16153,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -15456,7 +16377,7 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -15676,7 +16597,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -15900,7 +16821,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -16119,7 +17040,7 @@
           }
         },
         "summary": "system.echo",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -16345,7 +17266,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -16571,7 +17492,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -16795,7 +17716,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -17019,7 +17940,7 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -17238,7 +18159,7 @@
           }
         },
         "summary": "system.worker.outbox.health",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -17465,7 +18386,7 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -17698,7 +18619,7 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -17925,7 +18846,7 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -18156,7 +19077,7 @@
           }
         },
         "summary": "vismockup.open_file",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -18383,7 +19304,7 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -18615,7 +19536,7 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     },
@@ -18850,7 +19771,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_d831aa71e46739f4fc8513964972e24f",
+        "x-ai00-catalog-release": "rel_01f9fd2a284a601308cc94da2abcaf90",
         "x-ai00-major-version": 1
       }
     }

@@ -8,7 +8,7 @@ Search immutable release metadata.
 - 不适用：A release identity is known.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
+- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -17,7 +17,7 @@ Search immutable release metadata.
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -67,7 +67,7 @@ Search immutable release metadata.
 ```json
 {
   "capability_id": "ontology.release.search",
-  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
+  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
   "major_version": 1,
   "payload": {}
 }
@@ -80,7 +80,101 @@ Search immutable release metadata.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "compatibility": {
+            "enum": [
+              "backward_compatible",
+              "migration_required",
+              "breaking"
+            ],
+            "type": "string"
+          },
+          "content_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "created_at": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "object_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "ois_object_key": {
+            "type": "string"
+          },
+          "ontology_version_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "content_hash": {
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "release_gid": {
+                "type": "string"
+              },
+              "revision_ref": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              }
+            },
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "type": "object"
+          },
+          "parent_release_gid": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "revision_commit_id": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_gid": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          }
+        },
+        "required": [
+          "release_gid",
+          "content_sha256",
+          "ontology_version_ref"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "total": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "items",
+    "total"
+  ],
   "type": "object"
 }
 ```

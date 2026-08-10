@@ -8,7 +8,7 @@ from typing import Any, Callable, Iterator, Mapping, Sequence
 from backend.ontology.canonical import canonical_json_bytes
 
 ALLOWED_OPERATIONS = frozenset(
-    {f"{kind}.{action}" for kind in ("concept", "property", "relation", "mapping") for action in ("add", "change", "deprecate")}
+    {f"{kind}.{action}" for kind in ("concept", "property", "relation", "mapping", "constraint") for action in ("add", "change", "deprecate")}
     | {"parent.change"}
 )
 REVIEW_DECISIONS = frozenset({"approve", "reject", "request_changes"})

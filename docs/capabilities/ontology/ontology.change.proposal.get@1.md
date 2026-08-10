@@ -8,7 +8,7 @@ Read the current immutable proposal revision.
 - 不适用：Searching proposals.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
+- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -17,7 +17,7 @@ Read the current immutable proposal revision.
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -72,7 +72,7 @@ Read the current immutable proposal revision.
 ```json
 {
   "capability_id": "ontology.change.proposal.get",
-  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
+  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
   "major_version": 1,
   "payload": {
     "proposal_gid": "example"
@@ -87,7 +87,81 @@ Read the current immutable proposal revision.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "author_gid": {
+      "type": "string"
+    },
+    "base_ontology_version_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "release_gid": {
+          "type": "string"
+        },
+        "revision_ref": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "release_gid",
+        "content_hash",
+        "revision_ref"
+      ],
+      "type": "object"
+    },
+    "base_release_gid": {
+      "type": "string"
+    },
+    "changes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "channel": {
+      "type": "string"
+    },
+    "content_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "created_at": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "proposal_gid": {
+      "type": "string"
+    },
+    "proposal_revision_gid": {
+      "type": "string"
+    },
+    "revision_no": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "status": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "proposal_gid",
+    "proposal_revision_gid",
+    "revision_no",
+    "base_release_gid",
+    "content_sha256",
+    "changes",
+    "status",
+    "author_gid",
+    "base_ontology_version_ref"
+  ],
   "type": "object"
 }
 ```

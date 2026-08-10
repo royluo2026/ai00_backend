@@ -8,7 +8,7 @@ Resolve a term without guessing across an immutable release.
 - 不适用：The stable object identity is already known.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
+- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -17,7 +17,7 @@ Resolve a term without guessing across an immutable release.
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -77,7 +77,7 @@ Resolve a term without guessing across an immutable release.
 ```json
 {
   "capability_id": "ontology.concept.resolve",
-  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
+  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
   "major_version": 1,
   "payload": {
     "term": "example"
@@ -92,7 +92,74 @@ Resolve a term without guessing across an immutable release.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "candidates": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "concept": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "matched_by": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "ontology_version_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "release_gid": {
+          "type": "string"
+        },
+        "revision_ref": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "release_gid",
+        "content_hash",
+        "revision_ref"
+      ],
+      "type": "object"
+    },
+    "release_gid": {
+      "type": "string"
+    },
+    "release_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "resolved",
+        "ambiguous",
+        "candidates",
+        "unresolved"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "matched_by",
+    "concept",
+    "candidates",
+    "release_gid",
+    "release_sha256",
+    "ontology_version_ref"
+  ],
   "type": "object"
 }
 ```

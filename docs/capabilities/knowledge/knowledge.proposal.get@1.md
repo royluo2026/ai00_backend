@@ -8,7 +8,7 @@
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`experimental`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
+- Catalog Release：`rel_01f9fd2a284a601308cc94da2abcaf90`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -74,7 +74,7 @@
 ```json
 {
   "capability_id": "knowledge.proposal.get",
-  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
+  "catalog_release": "rel_01f9fd2a284a601308cc94da2abcaf90",
   "major_version": 1,
   "payload": {
     "proposal_gid": "example"

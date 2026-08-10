@@ -141,13 +141,15 @@ class Branch(FrozenModel):
 
 
 class Change(FrozenModel):
-    change_type: Literal["add", "remove", "replace", "move"]
+    change_type: str = Field(pattern=r"^[a-z][a-z0-9_.-]{1,63}$")
     path: str = Field(pattern=r"^/(?:.*)?$")
     before: Any = None
     after: Any = None
     identity: str | None = Field(default=None, max_length=256)
     from_index: int | None = Field(default=None, ge=0)
     to_index: int | None = Field(default=None, ge=0)
+    resource_ref: Any = None
+    breaking: bool = False
 
 
 class DiffRecord(FrozenModel):
