@@ -8,7 +8,7 @@ craft.gbop.item.search
 - 不适用：A historical or draft GBOP release is required.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_88726d21e3ffa53eb69b4580e0b22354`
+- Catalog Release：`rel_7c227d7e540a4795d9d4609fa2f206e3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -77,7 +77,7 @@ craft.gbop.item.search
 ```json
 {
   "capability_id": "craft.gbop.item.search",
-  "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+  "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
   "major_version": 1,
   "payload": {}
 }

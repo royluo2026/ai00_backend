@@ -8,7 +8,7 @@ Read the Knowledge publication worker heartbeat, queue totals, and alert total.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_88726d21e3ffa53eb69b4580e0b22354`
+- Catalog Release：`rel_7c227d7e540a4795d9d4609fa2f206e3`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -68,7 +68,7 @@ Read the Knowledge publication worker heartbeat, queue totals, and alert total.
 ```json
 {
   "capability_id": "system.worker.outbox.health",
-  "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+  "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
   "major_version": 1,
   "payload": {}
 }

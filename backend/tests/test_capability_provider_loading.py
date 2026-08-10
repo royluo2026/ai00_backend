@@ -14,7 +14,9 @@ def test_official_domain_providers_load_without_kernel_importing_domains():
 
     loaded = loader.register_capabilities(CapabilityRegistry())
 
-    assert loaded == ("official.craft", "official.project-management")
+    assert loaded == (
+        "official.craft", "official.digital-model", "official.project-management",
+    )
     kernel_source = (root / "backend/capabilities/registry_next.py").read_text(encoding="utf-8")
     assert "craft_backend" not in kernel_source
     assert "plugins.craft" not in kernel_source

@@ -1,0 +1,4 @@
+{
+  "mutation": {"parent_component_id": "assembly_2"},
+  "expected_change_types": ["move"]
+}

@@ -1183,6 +1183,16 @@ Expected: FAIL because Digital Model is absent and Simulation trusts caller data
 
 Every Simulation Run records exact Craft commit, model snapshot hash, parameter version, solver version and result ArtifactRefs. Large geometry Diff and Simulation use OperationRef.
 
+Digital Model identity/snapshot/diff slice completed on 2026-08-10: the new
+independently owned provider publishes seven stable Plugin/Agent/MCP capabilities
+for model identity, immutable artifact-backed versions, snapshot retrieval,
+component search and semantic comparison. `ModelRef`, `ModelVersionRef`,
+`ModelSnapshotRef` and `ComponentRef` are public opaque contracts; file paths are
+rejected. Component move, geometry-summary change and artifact replacement have
+checked-in golden cases. The domain has an independent database URL, migrations,
+provider artifact hash, CODEOWNERS and generated developer manual. Simulation
+environment/run/result migration remains next.
+
 - [ ] **Step 4: Run domain, Revision and coverage tests**
 
 Run: `python -m pytest backend/tests/test_digital_model_capabilities.py backend/tests/test_simulation_reproducibility.py backend/tests/test_simulation_capabilities.py backend/tests/test_craft_simulation_contract.py backend/tests/test_domain_capability_coverage.py -q`

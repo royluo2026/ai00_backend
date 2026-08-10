@@ -32,4 +32,7 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "craft.bop.version.list", "craft.bop.work_package.get", "craft.gbop.item.knowledge.list",
     "craft.gbop.item.search", "craft.gbop.item.usage.get", "craft.pbom.part.search",
     "craft.pbom.snapshot.compare", "craft.pbom.snapshot.get", "craft.bop.draft.change.preview", "craft.bop.draft.change.apply", "craft.bop.version.create", "craft.bop.version.archive", "craft.bop.import.preview",
+    "digital_model.model.create", "digital_model.model.get", "digital_model.model.search",
+    "digital_model.version.create", "digital_model.snapshot.get", "digital_model.snapshot.compare",
+    "digital_model.component.search",
 })

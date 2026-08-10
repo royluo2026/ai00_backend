@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_88726d21e3ffa53eb69b4580e0b22354"
+    "version": "rel_7c227d7e540a4795d9d4609fa2f206e3"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -279,7 +279,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -549,7 +549,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -856,7 +856,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -1140,7 +1140,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -1429,7 +1429,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -1703,7 +1703,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -1951,7 +1951,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -2216,7 +2216,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -2493,7 +2493,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -2779,7 +2779,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -3132,7 +3132,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -3393,7 +3393,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -3706,7 +3706,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -3954,7 +3954,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -4197,7 +4197,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -4445,7 +4445,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -4695,7 +4695,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -4966,7 +4966,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.compare",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -5238,7 +5238,2092 @@
           }
         },
         "summary": "craft.pbom.snapshot.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v2/capabilities/digital_model.component.search:invoke": {
+      "post": {
+        "description": "Search components in an immutable Digital Model snapshot.",
+        "operationId": "invoke_digital_model_component_search_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "model_id": {
+                    "type": "string"
+                  },
+                  "query": {
+                    "type": "string"
+                  },
+                  "version_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "model_id",
+                  "version_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "digital_model.component.search"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "component_id": {
+                                    "type": "string"
+                                  },
+                                  "component_type": {
+                                    "type": "string"
+                                  },
+                                  "geometry_summary": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "bounding_box_x_mm": {
+                                        "type": "number"
+                                      },
+                                      "bounding_box_y_mm": {
+                                        "type": "number"
+                                      },
+                                      "bounding_box_z_mm": {
+                                        "type": "number"
+                                      },
+                                      "mass_kg": {
+                                        "type": "number"
+                                      },
+                                      "surface_area_mm2": {
+                                        "type": "number"
+                                      },
+                                      "volume_mm3": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "type": "object"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "parent_component_id": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "component_id",
+                                  "name",
+                                  "component_type",
+                                  "geometry_summary"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "model_id": {
+                              "type": "string"
+                            },
+                            "total": {
+                              "type": "integer"
+                            },
+                            "version_id": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "model_id",
+                            "version_id",
+                            "items",
+                            "total"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "digital_model.component.search",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v2/capabilities/digital_model.model.create:invoke": {
+      "post": {
+        "description": "Create a governed Digital Model identity.",
+        "operationId": "invoke_digital_model_model_create_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "project_ref": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "project_ref"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "digital_model.model.create"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "latest_version_id": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "model_id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "type": "string"
+                            },
+                            "project_ref": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "model_id",
+                            "object_ref",
+                            "name",
+                            "project_ref",
+                            "latest_version_id"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "digital_model.model.create",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v2/capabilities/digital_model.model.get:invoke": {
+      "post": {
+        "description": "Read a governed Digital Model identity.",
+        "operationId": "invoke_digital_model_model_get_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "model_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "model_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "digital_model.model.get"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "latest_version_id": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "model_id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "type": "string"
+                            },
+                            "project_ref": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "model_id",
+                            "object_ref",
+                            "name",
+                            "project_ref",
+                            "latest_version_id"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "digital_model.model.get",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v2/capabilities/digital_model.model.search:invoke": {
+      "post": {
+        "description": "Search visible Digital Model identities.",
+        "operationId": "invoke_digital_model_model_search_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "project_ref": {
+                    "type": "string"
+                  },
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "digital_model.model.search"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "latest_version_id": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "model_id": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "object_ref": {
+                                    "type": "string"
+                                  },
+                                  "project_ref": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "model_id",
+                                  "object_ref",
+                                  "name",
+                                  "project_ref",
+                                  "latest_version_id"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "query": {
+                              "type": "string"
+                            },
+                            "total": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total",
+                            "query"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "digital_model.model.search",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v2/capabilities/digital_model.snapshot.compare:invoke": {
+      "post": {
+        "description": "Compare Digital Model snapshots semantically.",
+        "operationId": "invoke_digital_model_snapshot_compare_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "from_version_id": {
+                    "type": "string"
+                  },
+                  "model_id": {
+                    "type": "string"
+                  },
+                  "to_version_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "model_id",
+                  "from_version_id",
+                  "to_version_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "digital_model.snapshot.compare"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "breaking": {
+                              "type": "boolean"
+                            },
+                            "changes": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "from_version_id": {
+                              "type": "string"
+                            },
+                            "model_id": {
+                              "type": "string"
+                            },
+                            "to_version_id": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "model_id",
+                            "from_version_id",
+                            "to_version_id",
+                            "changes",
+                            "breaking"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "digital_model.snapshot.compare",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v2/capabilities/digital_model.snapshot.get:invoke": {
+      "post": {
+        "description": "Read an immutable Digital Model snapshot.",
+        "operationId": "invoke_digital_model_snapshot_get_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "model_id": {
+                    "type": "string"
+                  },
+                  "version_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "model_id",
+                  "version_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "digital_model.snapshot.get"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "components": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "component_id": {
+                                    "type": "string"
+                                  },
+                                  "component_type": {
+                                    "type": "string"
+                                  },
+                                  "geometry_summary": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "bounding_box_x_mm": {
+                                        "type": "number"
+                                      },
+                                      "bounding_box_y_mm": {
+                                        "type": "number"
+                                      },
+                                      "bounding_box_z_mm": {
+                                        "type": "number"
+                                      },
+                                      "mass_kg": {
+                                        "type": "number"
+                                      },
+                                      "surface_area_mm2": {
+                                        "type": "number"
+                                      },
+                                      "volume_mm3": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "type": "object"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "parent_component_id": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "component_id",
+                                  "name",
+                                  "component_type",
+                                  "geometry_summary"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "snapshot_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "artifact_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "artifact_id": {
+                                      "type": "string"
+                                    },
+                                    "byte_size": {
+                                      "type": "integer"
+                                    },
+                                    "media_type": {
+                                      "type": "string"
+                                    },
+                                    "sha256": {
+                                      "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                                      "pattern": "^[0-9a-f]{64}$",
+                                      "type": "string"
+                                    },
+                                    "version": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "artifact_id",
+                                    "media_type",
+                                    "sha256",
+                                    "byte_size",
+                                    "version"
+                                  ],
+                                  "type": "object"
+                                },
+                                "model_id": {
+                                  "type": "string"
+                                },
+                                "snapshot_hash": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "version_id": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "model_id",
+                                "version_id",
+                                "snapshot_hash",
+                                "artifact_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "version_label": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "snapshot_ref",
+                            "version_label",
+                            "components"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "digital_model.snapshot.get",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v2/capabilities/digital_model.version.create:invoke": {
+      "post": {
+        "description": "Create an immutable artifact-backed Digital Model snapshot.",
+        "operationId": "invoke_digital_model_version_create_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "artifact_id": {
+                        "type": "string"
+                      },
+                      "byte_size": {
+                        "type": "integer"
+                      },
+                      "media_type": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "artifact_id",
+                      "media_type",
+                      "sha256",
+                      "byte_size",
+                      "version"
+                    ],
+                    "type": "object"
+                  },
+                  "components": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "component_id": {
+                          "type": "string"
+                        },
+                        "component_type": {
+                          "type": "string"
+                        },
+                        "geometry_summary": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "bounding_box_x_mm": {
+                              "type": "number"
+                            },
+                            "bounding_box_y_mm": {
+                              "type": "number"
+                            },
+                            "bounding_box_z_mm": {
+                              "type": "number"
+                            },
+                            "mass_kg": {
+                              "type": "number"
+                            },
+                            "surface_area_mm2": {
+                              "type": "number"
+                            },
+                            "volume_mm3": {
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "parent_component_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "component_id",
+                        "name",
+                        "component_type",
+                        "geometry_summary"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "expected_head_version_id": {
+                    "type": "string"
+                  },
+                  "model_id": {
+                    "type": "string"
+                  },
+                  "version_label": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "model_id",
+                  "version_label",
+                  "expected_head_version_id",
+                  "artifact_ref",
+                  "components"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "digital_model.version.create"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "component_count": {
+                              "type": "integer"
+                            },
+                            "snapshot_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "artifact_ref": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "artifact_id": {
+                                      "type": "string"
+                                    },
+                                    "byte_size": {
+                                      "type": "integer"
+                                    },
+                                    "media_type": {
+                                      "type": "string"
+                                    },
+                                    "sha256": {
+                                      "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                                      "pattern": "^[0-9a-f]{64}$",
+                                      "type": "string"
+                                    },
+                                    "version": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "artifact_id",
+                                    "media_type",
+                                    "sha256",
+                                    "byte_size",
+                                    "version"
+                                  ],
+                                  "type": "object"
+                                },
+                                "model_id": {
+                                  "type": "string"
+                                },
+                                "snapshot_hash": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "version_id": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "model_id",
+                                "version_id",
+                                "snapshot_hash",
+                                "artifact_ref"
+                              ],
+                              "type": "object"
+                            },
+                            "version_label": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "snapshot_ref",
+                            "version_label",
+                            "component_count"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "digital_model.version.create",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -5483,7 +7568,7 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -5799,7 +7884,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -6101,7 +8186,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -6367,7 +8452,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -6649,7 +8734,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -6984,7 +9069,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -7268,7 +9353,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -7561,7 +9646,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -7896,7 +9981,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -8180,7 +10265,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -8532,7 +10617,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -9042,7 +11127,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -9414,7 +11499,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -9808,7 +11893,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -10152,7 +12237,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -10481,7 +12566,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -10865,7 +12950,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -11254,7 +13339,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -11633,7 +13718,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -11906,7 +13991,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -12181,7 +14266,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -12456,7 +14541,7 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -12682,7 +14767,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -12982,7 +15067,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -13280,7 +15365,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -13543,7 +15628,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -13779,7 +15864,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -14075,7 +16160,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -14371,7 +16456,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -14666,7 +16751,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -14936,7 +17021,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -15455,7 +17540,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -15751,7 +17836,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -16056,7 +18141,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -16369,7 +18454,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -16610,7 +18695,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -16851,7 +18936,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -17103,7 +19188,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -17344,7 +19429,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -17585,7 +19670,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -17825,7 +19910,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -18072,7 +20157,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -18329,7 +20414,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -18575,7 +20660,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -18816,7 +20901,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -19061,7 +21146,7 @@
           }
         },
         "summary": "plugin.upgrade.finish",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -19323,7 +21408,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -19575,7 +21660,7 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -19814,7 +21899,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -20065,7 +22150,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -20296,7 +22381,7 @@
           }
         },
         "summary": "system.echo",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -20545,7 +22630,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -20794,7 +22879,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -21049,7 +23134,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -21318,7 +23403,7 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -21600,7 +23685,7 @@
           }
         },
         "summary": "system.worker.outbox.health",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -21827,7 +23912,7 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -22060,7 +24145,7 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -22287,7 +24372,7 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -22518,7 +24603,7 @@
           }
         },
         "summary": "vismockup.open_file",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -22745,7 +24830,7 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -22977,7 +25062,7 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     },
@@ -23212,7 +25297,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "x-ai00-catalog-release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "x-ai00-major-version": 1
       }
     }

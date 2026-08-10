@@ -1,5 +1,5 @@
 {
-  "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+  "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
   "tools": [
     {
       "agent_output_schema": {
@@ -27,7 +27,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -152,7 +152,7 @@
       },
       "invoke": {
         "capability_id": "identity.principal.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -223,7 +223,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -342,7 +342,7 @@
       },
       "invoke": {
         "capability_id": "plugin.disable",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -418,7 +418,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -537,7 +537,7 @@
       },
       "invoke": {
         "capability_id": "plugin.enable",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -613,7 +613,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -754,7 +754,7 @@
       },
       "invoke": {
         "capability_id": "plugin.install",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "granted_capabilities": [],
@@ -834,7 +834,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -953,7 +953,7 @@
       },
       "invoke": {
         "capability_id": "plugin.revoke",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -1029,7 +1029,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -1148,7 +1148,7 @@
       },
       "invoke": {
         "capability_id": "plugin.rollback",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -1220,7 +1220,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "external",
@@ -1345,7 +1345,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.delete",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "key": "example"
@@ -1423,7 +1423,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1542,7 +1542,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "key": "example"
@@ -1640,7 +1640,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -1759,7 +1759,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.list",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -1837,7 +1837,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "external",
@@ -1974,7 +1974,7 @@
       },
       "invoke": {
         "capability_id": "plugin.storage.put",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "key": "example",
@@ -2048,7 +2048,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -2167,7 +2167,7 @@
       },
       "invoke": {
         "capability_id": "plugin.uninstall",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "plugin_id": "example"
@@ -2253,7 +2253,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -2394,7 +2394,7 @@
       },
       "invoke": {
         "capability_id": "plugin.upgrade",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "granted_capabilities": [],
@@ -2484,7 +2484,7 @@
       "audit_policy": "high_risk",
       "authorization_policy": "base.v2:system.plugin.manage",
       "automation_level": "A0",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "admin",
       "consistency_policy": "external",
@@ -2611,7 +2611,7 @@
       },
       "invoke": {
         "capability_id": "plugin.upgrade.finish",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "healthy": false,
@@ -2694,7 +2694,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -2825,7 +2825,7 @@
       },
       "invoke": {
         "capability_id": "semantic.context.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "named_view": "example"
@@ -2901,7 +2901,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3014,7 +3014,7 @@
       },
       "invoke": {
         "capability_id": "system.activity.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -3091,7 +3091,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3210,7 +3210,7 @@
       },
       "invoke": {
         "capability_id": "system.change_impact.preview",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "change_ref": "example"
@@ -3281,7 +3281,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3398,7 +3398,7 @@
       },
       "invoke": {
         "capability_id": "system.echo",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -3459,7 +3459,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -3586,7 +3586,7 @@
       },
       "invoke": {
         "capability_id": "system.job.cancel",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "job_gid": "example",
@@ -3672,7 +3672,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -3799,7 +3799,7 @@
       },
       "invoke": {
         "capability_id": "system.job.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "job_gid": "example",
@@ -3895,7 +3895,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4014,7 +4014,7 @@
       },
       "invoke": {
         "capability_id": "system.lineage.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "object_ref": "example"
@@ -4123,7 +4123,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4248,7 +4248,7 @@
       },
       "invoke": {
         "capability_id": "system.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "query": "example"
@@ -4391,7 +4391,7 @@
       "audit_policy": "standard",
       "authorization_policy": "base.v2:system.tech_config",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -4496,7 +4496,7 @@
       },
       "invoke": {
         "capability_id": "system.worker.outbox.health",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -4634,7 +4634,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -4808,7 +4808,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.draft.change.apply",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "preview_gid": "example"
@@ -4955,7 +4955,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5157,7 +5157,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.draft.change.preview",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "commands": [],
@@ -5326,7 +5326,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5492,7 +5492,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -5652,7 +5652,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -5828,7 +5828,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.execution_structure.preview",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "expected_revision": 1,
@@ -5960,7 +5960,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -6166,7 +6166,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.import.preview",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "document": {}
@@ -6254,7 +6254,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -6420,7 +6420,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.linked_parts.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -6520,7 +6520,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -6696,7 +6696,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.archive",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "expected_revision": 1,
@@ -6822,7 +6822,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -6998,7 +6998,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.compare",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "from_version_gid": "example",
@@ -7129,7 +7129,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:craft.write",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -7347,7 +7347,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.create",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "source": "empty",
@@ -7548,7 +7548,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -7714,7 +7714,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "version_gid": "example"
@@ -7904,7 +7904,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8102,7 +8102,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.version.list",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -8219,7 +8219,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8431,7 +8431,7 @@
       },
       "invoke": {
         "capability_id": "craft.bop.work_package.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "scope": {
@@ -8569,7 +8569,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8735,7 +8735,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.knowledge.list",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -8817,7 +8817,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -8985,7 +8985,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -9057,7 +9057,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9223,7 +9223,7 @@
       },
       "invoke": {
         "capability_id": "craft.gbop.item.usage.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "item_gid": "example"
@@ -9305,7 +9305,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9487,7 +9487,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.part.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -9587,7 +9587,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -9763,7 +9763,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.compare",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "from_snapshot_gid": "example",
@@ -9900,7 +9900,7 @@
       "audit_policy": "standard",
       "authorization_policy": "craft.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10066,7 +10066,7 @@
       },
       "invoke": {
         "capability_id": "craft.pbom.snapshot.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "snapshot_gid": "example"
@@ -10155,6 +10155,2137 @@
             "items": {
               "additionalProperties": false,
               "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "volume_mm3": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "version_id",
+          "items",
+          "total"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "automation_level": "A2",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+      "concurrency_policy": "none",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Search components in an immutable Digital Model snapshot.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "optional",
+      "execution_mode": "cloud_sync",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": false,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed"
+      ],
+      "id": "digital_model.component.search",
+      "idempotency_policy": "none",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "version_id"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "version_id"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "digital_model.component.search",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "major_version": 1,
+        "payload": {
+          "model_id": "example",
+          "version_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "model_id": "example",
+        "version_id": "example"
+      },
+      "name": "digital_model.component.search",
+      "operation_policy": "none",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "volume_mm3": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "version_id",
+          "items",
+          "total"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "digital_model",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "model_id",
+          "required": true,
+          "resource_type": "digital-model"
+        },
+        {
+          "payload_path": "version_id",
+          "required": true,
+          "resource_type": "digital-model-version"
+        }
+      ],
+      "schema_hash": "sha256:8deeb906ababcf86c3dd0c86c7db275b68432ddafe1895003e93d23be27dcc38",
+      "schema_precision": "typed",
+      "side_effect_level": "read",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "digital_model.component.search",
+      "use_when": "Search components in an immutable Digital Model snapshot."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "latest_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "object_ref",
+          "name",
+          "project_ref",
+          "latest_version_id"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "automation_level": "A1",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+      "concurrency_policy": "none",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Create a governed Digital Model identity.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "optional",
+      "execution_mode": "cloud_sync",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": false,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed"
+      ],
+      "id": "digital_model.model.create",
+      "idempotency_policy": "required",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "project_ref"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "project_ref"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "digital_model.model.create",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "major_version": 1,
+        "payload": {
+          "name": "example",
+          "project_ref": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "name": "example",
+        "project_ref": "example"
+      },
+      "name": "digital_model.model.create",
+      "operation_policy": "optional",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "latest_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "object_ref",
+          "name",
+          "project_ref",
+          "latest_version_id"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "digital_model",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "project_ref",
+          "required": true,
+          "resource_type": "project"
+        }
+      ],
+      "schema_hash": "sha256:06db2bf1c8d5265641d4603438d4f03e74719b5fddbafc286d565df5461a3120",
+      "schema_precision": "typed",
+      "side_effect_level": "write",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "digital_model.model.create",
+      "use_when": "Create a governed Digital Model identity."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "latest_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "object_ref",
+          "name",
+          "project_ref",
+          "latest_version_id"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "automation_level": "A2",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+      "concurrency_policy": "none",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Read a governed Digital Model identity.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "optional",
+      "execution_mode": "cloud_sync",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": false,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed"
+      ],
+      "id": "digital_model.model.get",
+      "idempotency_policy": "none",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "model_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "model_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "digital_model.model.get",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "major_version": 1,
+        "payload": {
+          "model_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "model_id": "example"
+      },
+      "name": "digital_model.model.get",
+      "operation_policy": "none",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "latest_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "object_ref",
+          "name",
+          "project_ref",
+          "latest_version_id"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "digital_model",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "model_id",
+          "required": true,
+          "resource_type": "digital-model"
+        }
+      ],
+      "schema_hash": "sha256:680d0be9a578870d2ae7e0be052e27603eb465fe95d44a845bfbee9a85b8de11",
+      "schema_precision": "typed",
+      "side_effect_level": "read",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "digital_model.model.get",
+      "use_when": "Read a governed Digital Model identity."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "latest_version_id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "model_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "type": "string"
+                },
+                "project_ref": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "model_id",
+                "object_ref",
+                "name",
+                "project_ref",
+                "latest_version_id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "automation_level": "A2",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+      "concurrency_policy": "none",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Search visible Digital Model identities.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "optional",
+      "execution_mode": "cloud_sync",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": false,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed"
+      ],
+      "id": "digital_model.model.search",
+      "idempotency_policy": "none",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "digital_model.model.search",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "major_version": 1,
+        "payload": {}
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {},
+      "name": "digital_model.model.search",
+      "operation_policy": "none",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "latest_version_id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "model_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "type": "string"
+                },
+                "project_ref": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "model_id",
+                "object_ref",
+                "name",
+                "project_ref",
+                "latest_version_id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "query": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "digital_model",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [],
+      "schema_hash": "sha256:887f62cb23bae49c569ba746ce17fcfebc3d98350ac56d4879250ee4048057b6",
+      "schema_precision": "typed",
+      "side_effect_level": "read",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "digital_model.model.search",
+      "use_when": "Search visible Digital Model identities."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "breaking": {
+            "type": "boolean"
+          },
+          "changes": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {},
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "from_version_id": {
+            "type": "string"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "to_version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "from_version_id",
+          "to_version_id",
+          "changes",
+          "breaking"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "automation_level": "A2",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+      "concurrency_policy": "none",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Compare Digital Model snapshots semantically.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "optional",
+      "execution_mode": "cloud_sync",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": false,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed"
+      ],
+      "id": "digital_model.snapshot.compare",
+      "idempotency_policy": "none",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "from_version_id": {
+            "type": "string"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "to_version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "from_version_id",
+          "to_version_id"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "from_version_id": {
+            "type": "string"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "to_version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "from_version_id",
+          "to_version_id"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "digital_model.snapshot.compare",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "major_version": 1,
+        "payload": {
+          "from_version_id": "example",
+          "model_id": "example",
+          "to_version_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "from_version_id": "example",
+        "model_id": "example",
+        "to_version_id": "example"
+      },
+      "name": "digital_model.snapshot.compare",
+      "operation_policy": "none",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "breaking": {
+            "type": "boolean"
+          },
+          "changes": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {},
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "from_version_id": {
+            "type": "string"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "to_version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "from_version_id",
+          "to_version_id",
+          "changes",
+          "breaking"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "digital_model",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "model_id",
+          "required": true,
+          "resource_type": "digital-model"
+        },
+        {
+          "payload_path": "from_version_id",
+          "required": true,
+          "resource_type": "digital-model-version"
+        },
+        {
+          "payload_path": "to_version_id",
+          "required": true,
+          "resource_type": "digital-model-version"
+        }
+      ],
+      "schema_hash": "sha256:2a8f627265c8f23bbf57e3d4d5f72462da5b793a4d47f14e1a363a5e1753daeb",
+      "schema_precision": "typed",
+      "side_effect_level": "read",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "digital_model.snapshot.compare",
+      "use_when": "Compare Digital Model snapshots semantically."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "components": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "volume_mm3": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "snapshot_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_id": {
+                    "type": "string"
+                  },
+                  "byte_size": {
+                    "type": "integer"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ],
+                "type": "object"
+              },
+              "model_id": {
+                "type": "string"
+              },
+              "snapshot_hash": {
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "model_id",
+              "version_id",
+              "snapshot_hash",
+              "artifact_ref"
+            ],
+            "type": "object"
+          },
+          "version_label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_ref",
+          "version_label",
+          "components"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "none",
+      "audit_policy": "standard",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "automation_level": "A2",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+      "concurrency_policy": "none",
+      "confirmation_policy": "none",
+      "consistency_policy": "strong",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Read an immutable Digital Model snapshot.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "cloud_sync",
+      "expected_version_payload_path": null,
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": false,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed"
+      ],
+      "id": "digital_model.snapshot.get",
+      "idempotency_policy": "none",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "version_id"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "version_id"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "digital_model.snapshot.get",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "major_version": 1,
+        "payload": {
+          "model_id": "example",
+          "version_id": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "model_id": "example",
+        "version_id": "example"
+      },
+      "name": "digital_model.snapshot.get",
+      "operation_policy": "none",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "components": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "volume_mm3": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "snapshot_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_id": {
+                    "type": "string"
+                  },
+                  "byte_size": {
+                    "type": "integer"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ],
+                "type": "object"
+              },
+              "model_id": {
+                "type": "string"
+              },
+              "snapshot_hash": {
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "model_id",
+              "version_id",
+              "snapshot_hash",
+              "artifact_ref"
+            ],
+            "type": "object"
+          },
+          "version_label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_ref",
+          "version_label",
+          "components"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "digital_model",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "model_id",
+          "required": true,
+          "resource_type": "digital-model"
+        },
+        {
+          "payload_path": "version_id",
+          "required": true,
+          "resource_type": "digital-model-version"
+        }
+      ],
+      "schema_hash": "sha256:7cba7e0b6b461e7711b2588e5cc0e07a0ec4eba662398b89fccd10091e62e955",
+      "schema_precision": "typed",
+      "side_effect_level": "read",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "digital_model.snapshot.get",
+      "use_when": "Read an immutable Digital Model snapshot."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "component_count": {
+            "type": "integer"
+          },
+          "snapshot_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_id": {
+                    "type": "string"
+                  },
+                  "byte_size": {
+                    "type": "integer"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ],
+                "type": "object"
+              },
+              "model_id": {
+                "type": "string"
+              },
+              "snapshot_hash": {
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "model_id",
+              "version_id",
+              "snapshot_hash",
+              "artifact_ref"
+            ],
+            "type": "object"
+          },
+          "version_label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_ref",
+          "version_label",
+          "component_count"
+        ],
+        "type": "object"
+      },
+      "artifact_policy": "input",
+      "audit_policy": "standard",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "automation_level": "A1",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+      "concurrency_policy": "expected_version",
+      "confirmation_policy": "user",
+      "consistency_policy": "external",
+      "data_classification": "confidential",
+      "delegation_policy": "scoped",
+      "deprecation_message": null,
+      "description": "Create an immutable artifact-backed Digital Model snapshot.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true,
+      "evidence_policy": "required",
+      "execution_mode": "cloud_sync",
+      "expected_version_payload_path": "expected_head_version_id",
+      "exposure": {
+        "agent": true,
+        "api": true,
+        "local_runtime": false,
+        "mcp": true,
+        "plugin": true,
+        "web": true,
+        "worker": false
+      },
+      "exposure_blockers": [],
+      "gateway_errors": [
+        "catalog_resolution_failed",
+        "consumer_not_allowed",
+        "authorization_failed",
+        "permission_denied",
+        "tenant_scope_denied",
+        "resource_scope_denied",
+        "data_scope_denied",
+        "delegation_required",
+        "delegation_expired",
+        "resource_selector_missing",
+        "resource_selector_invalid",
+        "invalid_input",
+        "expected_resource_version_required",
+        "expected_resource_version_payload_missing",
+        "expected_resource_version_mismatch",
+        "confirmation_required",
+        "confirmation_rejected",
+        "idempotency_key_required",
+        "idempotency_payload_conflict",
+        "idempotency_in_progress",
+        "rate_limit_exceeded",
+        "transaction_participant_required",
+        "provider_failed",
+        "outcome_persistence_failed"
+      ],
+      "id": "digital_model.version.create",
+      "idempotency_policy": "required",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "byte_size": {
+                "type": "integer"
+              },
+              "media_type": {
+                "type": "string"
+              },
+              "sha256": {
+                "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "type": "object"
+          },
+          "components": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "volume_mm3": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "expected_head_version_id": {
+            "type": "string"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "version_label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "version_label",
+          "expected_head_version_id",
+          "artifact_ref",
+          "components"
+        ],
+        "type": "object"
+      },
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "byte_size": {
+                "type": "integer"
+              },
+              "media_type": {
+                "type": "string"
+              },
+              "sha256": {
+                "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ],
+            "type": "object"
+          },
+          "components": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "volume_mm3": {
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "expected_head_version_id": {
+            "type": "string"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "version_label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_id",
+          "version_label",
+          "expected_head_version_id",
+          "artifact_ref",
+          "components"
+        ],
+        "type": "object"
+      },
+      "invoke": {
+        "capability_id": "digital_model.version.create",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+        "major_version": 1,
+        "payload": {
+          "artifact_ref": {
+            "artifact_id": "example",
+            "byte_size": 0,
+            "media_type": "example",
+            "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "version": 0
+          },
+          "components": [],
+          "expected_head_version_id": "example",
+          "model_id": "example",
+          "version_label": "example"
+        }
+      },
+      "lifecycle_status": "stable",
+      "major_version": 1,
+      "minimal_input_example": {
+        "artifact_ref": {
+          "artifact_id": "example",
+          "byte_size": 0,
+          "media_type": "example",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "version": 0
+        },
+        "components": [],
+        "expected_head_version_id": "example",
+        "model_id": "example",
+        "version_label": "example"
+      },
+      "name": "digital_model.version.create",
+      "operation_policy": "optional",
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "component_count": {
+            "type": "integer"
+          },
+          "snapshot_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_ref": {
+                "additionalProperties": false,
+                "properties": {
+                  "artifact_id": {
+                    "type": "string"
+                  },
+                  "byte_size": {
+                    "type": "integer"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ],
+                "type": "object"
+              },
+              "model_id": {
+                "type": "string"
+              },
+              "snapshot_hash": {
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "model_id",
+              "version_id",
+              "snapshot_hash",
+              "artifact_ref"
+            ],
+            "type": "object"
+          },
+          "version_label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_ref",
+          "version_label",
+          "component_count"
+        ],
+        "type": "object"
+      },
+      "owner_domain": "digital_model",
+      "rate_limit_cost": 1,
+      "required_auth_freshness_seconds": 0,
+      "resource_selectors": [
+        {
+          "payload_path": "model_id",
+          "required": true,
+          "resource_type": "digital-model"
+        }
+      ],
+      "schema_hash": "sha256:2fdb85f88e0c7634c625d8817ffb026ccc228801783e6354e36ee484dbcaea80",
+      "schema_precision": "typed",
+      "side_effect_level": "write",
+      "strict": true,
+      "timeout_seconds": 30,
+      "title": "digital_model.version.create",
+      "use_when": "Create an immutable artifact-backed Digital Model snapshot."
+    },
+    {
+      "agent_output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
                 "document_gid": {
                   "type": "string"
                 },
@@ -10212,7 +12343,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10391,7 +12522,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.context.retrieve",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -10532,7 +12663,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -10693,7 +12824,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.create",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "markdown": "example",
@@ -10827,7 +12958,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -10952,7 +13083,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.diff",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "document_gid": "example",
@@ -11087,7 +13218,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11202,7 +13333,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -11405,7 +13536,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -11524,7 +13655,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.history.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "document_gid": "example"
@@ -11724,7 +13855,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -11849,7 +13980,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.restore",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "base_revision_gid": "example",
@@ -11999,7 +14130,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "expected_version",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -12142,7 +14273,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.document.revise",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "base_revision_gid": "example",
@@ -12368,7 +14499,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -12477,7 +14608,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "gid": "example"
@@ -12931,7 +15062,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13044,7 +15175,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.migration.status",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -13508,7 +15639,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -13617,7 +15748,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -13977,7 +16108,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -14086,7 +16217,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.list",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -14411,7 +16542,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -14514,7 +16645,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.outbox.list",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -14774,7 +16905,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -14883,7 +17014,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.outbox.retry",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "outbox_gid": "example"
@@ -15178,7 +17309,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.manage",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -15311,7 +17442,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.proposal.review",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "decision": "approved",
@@ -15651,7 +17782,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.view",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -15794,7 +17925,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.propose",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "content_md": "example",
@@ -16130,7 +18261,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:knowledge.view",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -16249,7 +18380,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -16472,7 +18603,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A1",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "user",
       "consistency_policy": "external",
@@ -16597,7 +18728,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.create",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "name": "example"
@@ -16732,7 +18863,7 @@
       "audit_policy": "standard",
       "authorization_policy": "knowledge.v2:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -16827,7 +18958,7 @@
       },
       "invoke": {
         "capability_id": "knowledge.space.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -16919,7 +19050,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:agent.run",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -17000,7 +19131,7 @@
       },
       "invoke": {
         "capability_id": "local.command.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "command_gid": "example"
@@ -17114,7 +19245,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -17192,7 +19323,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "proposal_gid": "example"
@@ -17323,7 +19454,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -17390,7 +19521,7 @@
       },
       "invoke": {
         "capability_id": "ontology.change.proposal.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -17493,7 +19624,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -17614,7 +19745,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "stable_gid": "example"
@@ -17771,7 +19902,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -17858,7 +19989,7 @@
       },
       "invoke": {
         "capability_id": "ontology.concept.resolve",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "term": "example"
@@ -17990,7 +20121,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18159,7 +20290,7 @@
       },
       "invoke": {
         "capability_id": "ontology.mapping.assess",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "source": {},
@@ -18519,7 +20650,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -18601,7 +20732,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.diff",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "from_release_gid": "example",
@@ -19013,7 +21144,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19080,7 +21211,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.get",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -19287,7 +21418,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19354,7 +21485,7 @@
       },
       "invoke": {
         "capability_id": "ontology.release.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {}
       },
@@ -19529,7 +21660,7 @@
       "audit_policy": "standard",
       "authorization_policy": "legacy:authenticated",
       "automation_level": "A2",
-      "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+      "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
       "concurrency_policy": "none",
       "confirmation_policy": "none",
       "consistency_policy": "strong",
@@ -19624,7 +21755,7 @@
       },
       "invoke": {
         "capability_id": "base.project.search",
-        "catalog_release": "rel_88726d21e3ffa53eb69b4580e0b22354",
+        "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
         "major_version": 1,
         "payload": {
           "query": "example"

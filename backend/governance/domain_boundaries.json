@@ -99,6 +99,8 @@
     {"path": "backend/capabilities/outbox_retry_next.py", "domain": "knowledge"},
     {"path": "backend/domain_ports/knowledge.py", "domain": "knowledge"},
     {"path": "backend/domain_ports/craft.py", "domain": "craft"},
+    {"path": "backend/domain_ports/digital_model.py", "domain": "digital_model"},
+    {"path": "backend/capability_v2/revision/digital_model_adapter.py", "domain": "digital_model"},
     {"path": "backend/capabilities/ontology_concepts_next.py", "domain": "ontology"},
     {"path": "backend/capabilities/ontology_proposals_next.py", "domain": "ontology"},
     {"path": "backend/capabilities/ontology_releases_next.py", "domain": "ontology"},

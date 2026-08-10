@@ -227,13 +227,17 @@ def test_official_provider_requires_exact_frozen_release_allowlist():
     ) == provider
 
 
-def test_checked_in_official_provider_hash_matches_exact_source_artifact():
+def test_checked_in_official_provider_hashes_match_exact_source_artifacts():
     root = Path(__file__).resolve().parents[2]
     document = json.loads(
         (root / "backend" / "capability_v2" / "official_providers.json").read_text(encoding="utf-8")
     )
-    provider = document["providers"][0]
-
-    assert provider["artifact_hash"] == hash_provider_artifact(
-        root / "plugins" / "craft", provider["module"]
-    )
+    roots = {
+        "official.craft": root / "plugins" / "craft",
+        "official.digital-model": root / "plugins" / "digital_model",
+        "official.project-management": root / "plugins" / "project_management",
+    }
+    for provider in document["providers"]:
+        assert provider["artifact_hash"] == hash_provider_artifact(
+            roots[provider["plugin_id"]], provider["module"]
+        )

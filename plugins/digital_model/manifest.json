@@ -1,0 +1,9 @@
+{
+  "plugin_id": "official.digital-model",
+  "name": "数字模型",
+  "backend": {
+    "capabilities_module": "digital_model_backend.capabilities",
+    "provider_version": "1.0.0",
+    "owned_schemas": ["digital_model"]
+  }
+}

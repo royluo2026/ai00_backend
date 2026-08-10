@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_88726d21e3ffa53eb69b4580e0b22354",
-  "catalog_hash": "sha256:88726d21e3ffa53eb69b4580e0b22354e982f730e379c9f579ef4bab7508ec62",
+  "release_id": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+  "catalog_hash": "sha256:7c227d7e540a4795d9d4609fa2f206e36f9d877be311a00b4f20c5305aa2ceba",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -4599,6 +4599,1620 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "digital_model.component.search",
+      "major_version": 1,
+      "owner_domain": "digital_model",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "digital_model.component.search",
+      "description": "Search components in an immutable Digital Model snapshot.",
+      "use_when": "Search components in an immutable Digital Model snapshot.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "resource_selectors": [
+        {
+          "resource_type": "digital-model",
+          "payload_path": "model_id",
+          "required": true
+        },
+        {
+          "resource_type": "digital-model-version",
+          "payload_path": "version_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "version_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "type": "object",
+                  "properties": {
+                    "volume_mm3": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "version_id",
+          "items",
+          "total"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "type": "object",
+                  "properties": {
+                    "volume_mm3": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "version_id",
+          "items",
+          "total"
+        ]
+      },
+      "schema_hash": "sha256:8deeb906ababcf86c3dd0c86c7db275b68432ddafe1895003e93d23be27dcc38",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "digital_model.model.create",
+      "major_version": 1,
+      "owner_domain": "digital_model",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "digital_model.model.create",
+      "description": "Create a governed Digital Model identity.",
+      "use_when": "Create a governed Digital Model identity.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "resource_selectors": [
+        {
+          "resource_type": "project",
+          "payload_path": "project_ref",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "project_ref"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "latest_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "object_ref",
+          "name",
+          "project_ref",
+          "latest_version_id"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "latest_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "object_ref",
+          "name",
+          "project_ref",
+          "latest_version_id"
+        ]
+      },
+      "schema_hash": "sha256:06db2bf1c8d5265641d4603438d4f03e74719b5fddbafc286d565df5461a3120",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "digital_model.model.get",
+      "major_version": 1,
+      "owner_domain": "digital_model",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "digital_model.model.get",
+      "description": "Read a governed Digital Model identity.",
+      "use_when": "Read a governed Digital Model identity.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "resource_selectors": [
+        {
+          "resource_type": "digital-model",
+          "payload_path": "model_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "latest_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "object_ref",
+          "name",
+          "project_ref",
+          "latest_version_id"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "object_ref": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "latest_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "object_ref",
+          "name",
+          "project_ref",
+          "latest_version_id"
+        ]
+      },
+      "schema_hash": "sha256:680d0be9a578870d2ae7e0be052e27603eb465fe95d44a845bfbee9a85b8de11",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "digital_model.model.search",
+      "major_version": 1,
+      "owner_domain": "digital_model",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "digital_model.model.search",
+      "description": "Search visible Digital Model identities.",
+      "use_when": "Search visible Digital Model identities.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "model_id": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "project_ref": {
+                  "type": "string"
+                },
+                "latest_version_id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "model_id",
+                "object_ref",
+                "name",
+                "project_ref",
+                "latest_version_id"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "query"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "model_id": {
+                  "type": "string"
+                },
+                "object_ref": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "project_ref": {
+                  "type": "string"
+                },
+                "latest_version_id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "model_id",
+                "object_ref",
+                "name",
+                "project_ref",
+                "latest_version_id"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "query"
+        ]
+      },
+      "schema_hash": "sha256:887f62cb23bae49c569ba746ce17fcfebc3d98350ac56d4879250ee4048057b6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "digital_model.snapshot.compare",
+      "major_version": 1,
+      "owner_domain": "digital_model",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "digital_model.snapshot.compare",
+      "description": "Compare Digital Model snapshots semantically.",
+      "use_when": "Compare Digital Model snapshots semantically.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "resource_selectors": [
+        {
+          "resource_type": "digital-model",
+          "payload_path": "model_id",
+          "required": true
+        },
+        {
+          "resource_type": "digital-model-version",
+          "payload_path": "from_version_id",
+          "required": true
+        },
+        {
+          "resource_type": "digital-model-version",
+          "payload_path": "to_version_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "from_version_id": {
+            "type": "string"
+          },
+          "to_version_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "from_version_id",
+          "to_version_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "from_version_id": {
+            "type": "string"
+          },
+          "to_version_id": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "breaking": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "from_version_id",
+          "to_version_id",
+          "changes",
+          "breaking"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "from_version_id": {
+            "type": "string"
+          },
+          "to_version_id": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "breaking": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "from_version_id",
+          "to_version_id",
+          "changes",
+          "breaking"
+        ]
+      },
+      "schema_hash": "sha256:2a8f627265c8f23bbf57e3d4d5f72462da5b793a4d47f14e1a363a5e1753daeb",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "digital_model.snapshot.get",
+      "major_version": 1,
+      "owner_domain": "digital_model",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "digital_model.snapshot.get",
+      "description": "Read an immutable Digital Model snapshot.",
+      "use_when": "Read an immutable Digital Model snapshot.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "resource_selectors": [
+        {
+          "resource_type": "digital-model",
+          "payload_path": "model_id",
+          "required": true
+        },
+        {
+          "resource_type": "digital-model-version",
+          "payload_path": "version_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "version_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_ref": {
+            "type": "object",
+            "properties": {
+              "model_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "artifact_ref": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "byte_size": {
+                    "type": "integer"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "model_id",
+              "version_id",
+              "snapshot_hash",
+              "artifact_ref"
+            ]
+          },
+          "version_label": {
+            "type": "string"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "type": "object",
+                  "properties": {
+                    "volume_mm3": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_ref",
+          "version_label",
+          "components"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_ref": {
+            "type": "object",
+            "properties": {
+              "model_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "artifact_ref": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "byte_size": {
+                    "type": "integer"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "model_id",
+              "version_id",
+              "snapshot_hash",
+              "artifact_ref"
+            ]
+          },
+          "version_label": {
+            "type": "string"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "type": "object",
+                  "properties": {
+                    "volume_mm3": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_ref",
+          "version_label",
+          "components"
+        ]
+      },
+      "schema_hash": "sha256:7cba7e0b6b461e7711b2588e5cc0e07a0ec4eba662398b89fccd10091e62e955",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "digital_model.version.create",
+      "major_version": 1,
+      "owner_domain": "digital_model",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "digital_model.version.create",
+      "description": "Create an immutable artifact-backed Digital Model snapshot.",
+      "use_when": "Create an immutable artifact-backed Digital Model snapshot.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "digital_model.v2:digital_model.use",
+      "resource_selectors": [
+        {
+          "resource_type": "digital-model",
+          "payload_path": "model_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "version_label": {
+            "type": "string"
+          },
+          "expected_head_version_id": {
+            "type": "string"
+          },
+          "artifact_ref": {
+            "type": "object",
+            "properties": {
+              "artifact_id": {
+                "type": "string"
+              },
+              "media_type": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "example": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "byte_size": {
+                "type": "integer"
+              },
+              "version": {
+                "type": "integer"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "artifact_id",
+              "media_type",
+              "sha256",
+              "byte_size",
+              "version"
+            ]
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "component_id": {
+                  "type": "string"
+                },
+                "parent_component_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "component_type": {
+                  "type": "string"
+                },
+                "geometry_summary": {
+                  "type": "object",
+                  "properties": {
+                    "volume_mm3": {
+                      "type": "number"
+                    },
+                    "surface_area_mm2": {
+                      "type": "number"
+                    },
+                    "bounding_box_x_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_y_mm": {
+                      "type": "number"
+                    },
+                    "bounding_box_z_mm": {
+                      "type": "number"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "component_id",
+                "name",
+                "component_type",
+                "geometry_summary"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "model_id",
+          "version_label",
+          "expected_head_version_id",
+          "artifact_ref",
+          "components"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_ref": {
+            "type": "object",
+            "properties": {
+              "model_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "artifact_ref": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "byte_size": {
+                    "type": "integer"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "model_id",
+              "version_id",
+              "snapshot_hash",
+              "artifact_ref"
+            ]
+          },
+          "version_label": {
+            "type": "string"
+          },
+          "component_count": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_ref",
+          "version_label",
+          "component_count"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "snapshot_ref": {
+            "type": "object",
+            "properties": {
+              "model_id": {
+                "type": "string"
+              },
+              "version_id": {
+                "type": "string"
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "artifact_ref": {
+                "type": "object",
+                "properties": {
+                  "artifact_id": {
+                    "type": "string"
+                  },
+                  "media_type": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "byte_size": {
+                    "type": "integer"
+                  },
+                  "version": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "artifact_id",
+                  "media_type",
+                  "sha256",
+                  "byte_size",
+                  "version"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "model_id",
+              "version_id",
+              "snapshot_hash",
+              "artifact_ref"
+            ]
+          },
+          "version_label": {
+            "type": "string"
+          },
+          "component_count": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "snapshot_ref",
+          "version_label",
+          "component_count"
+        ]
+      },
+      "schema_hash": "sha256:2fdb85f88e0c7634c625d8817ffb026ccc228801783e6354e36ee484dbcaea80",
+      "artifact_policy": "input",
+      "operation_policy": "optional",
+      "concurrency_policy": "expected_version",
+      "expected_version_payload_path": "expected_head_version_id",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "model_not_found",
+          "meaning": "The Digital Model identity does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "snapshot_not_found",
+          "meaning": "The immutable Digital Model snapshot does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Digital Model head differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "artifact_not_found",
+          "meaning": "The geometry artifact is unavailable or does not match its digest.",
+          "retryable": false
+        },
+        {
+          "code": "component_not_found",
+          "meaning": "A referenced component does not exist in the selected snapshot.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Digital Model request.",
           "retryable": false
         }
       ],
@@ -17330,11 +18944,17 @@
       "artifact_hash": "sha256:bb1c77bc337576b92e081b60f976fe6ac9d6a266d7dc14e1d5b1fd1f1c6db121"
     },
     {
+      "plugin_id": "official.digital-model",
+      "module": "digital_model_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:9e81577f700819567627fd7072fb68ddf98d7b4b4ab57636f37493aa43df2e19"
+    },
+    {
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
       "artifact_hash": "sha256:15bec7ce65ca53100ce79eee368b8f1dd6c79fc596871b5e012336c4a0c2336d"
     }
   ],
-  "created_at": "2026-08-10T11:23:59.774673Z"
+  "created_at": "2026-08-10T11:36:03.776883Z"
 }

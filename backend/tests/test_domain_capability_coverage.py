@@ -13,12 +13,14 @@ DOMAINS = {
     "Project Management": "project_management",
     "Knowledge": "knowledge",
     "Craft": "craft",
+    "Digital Model": "digital_model",
 }
 MIGRATED_DOMAINS = {
     "Base Platform": "base",
     "Project Management": "project_management",
     "Knowledge": "knowledge",
     "Craft": "craft",
+    "Digital Model": "digital_model",
 }
 
 

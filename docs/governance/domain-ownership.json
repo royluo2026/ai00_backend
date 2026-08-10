@@ -82,7 +82,7 @@
       "module_prefixes": ["plugins.digital_model"],
       "code_paths": ["plugins/digital_model/**"],
       "provider_paths": ["plugins/digital_model/digital_model_backend/capabilities/**"],
-      "migration_paths": [],
+      "migration_paths": ["backend/db/migrations/202608100009_digital_model_snapshots.sql"],
       "test_paths": ["plugins/digital_model/tests/**", "backend/tests/test_digital_model_*.py"],
       "documentation_paths": ["docs/capabilities/digital-model/**"]
     },

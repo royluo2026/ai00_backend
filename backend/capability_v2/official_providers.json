@@ -2,6 +2,12 @@
   "schema_version": 1,
   "providers": [
     {
+      "plugin_id": "official.digital-model",
+      "module": "digital_model_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:9e81577f700819567627fd7072fb68ddf98d7b4b4ab57636f37493aa43df2e19"
+    },
+    {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.1.0",

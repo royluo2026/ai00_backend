@@ -31,7 +31,7 @@ DOMAINS = (
 )
 VALID_EXCLUSIONS = {"internal", "operations", "ui_transient"}
 ROUTE_METHODS = {"get", "post", "put", "patch", "delete", "head", "options"}
-CAPABILITY_PATTERN = r"(?:base|craft|identity|knowledge|local|ontology|plugin|semantic|system|vismockup)\.[a-z0-9_.]+"
+CAPABILITY_PATTERN = r"(?:base|craft|digital_model|identity|knowledge|local|ontology|plugin|semantic|simulation|system|vismockup)\.[a-z0-9_.]+"
 CAPABILITY_RE = re.compile(rf"(?<![a-z0-9_.])({CAPABILITY_PATTERN})(?![a-z0-9_.])")
 FETCH_CALL_RE = re.compile(
     r"\b(?:fetch|_cloudFetch)\s*\(\s*(?P<quote>[\"'])(?P<endpoint>[^\"'\x60${]+)(?P=quote)(?P<options>\s*,\s*\{[^{}]*\})?\s*\)"
@@ -71,6 +71,7 @@ def _domain(value: str, path: str = "") -> str:
             return "Project Management"
         for prefix, domain in (
             ("craft.", "Craft"),
+            ("digital_model.", "Digital Model"),
             ("knowledge.", "Knowledge"),
             ("ontology.", "Ontology"),
             ("agent.", "Agent"),

@@ -1,0 +1,4 @@
+{
+  "mutation": {"artifact_id": "artifact_geometry_b", "artifact_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+  "expected_change_types": ["replace"]
+}
