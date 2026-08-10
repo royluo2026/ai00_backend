@@ -614,11 +614,16 @@ git commit -m "feat: make capability outcomes and approvals durable"
 **Files:**
 - Create: `backend/capability_v2/artifacts.py`
 - Create: `backend/capability_v2/operations.py`
-- Create: `backend/db/migrations/202608100004_artifacts_and_operations.sql`
+- Create: `backend/db/migrations/202608100004_base_artifacts_and_operations.sql`
 - Create: `backend/routers/capability_artifacts.py`
 - Create: `backend/routers/capability_operations.py`
 - Create: `backend/tests/test_artifact_operation_protocol.py`
-- Modify: `backend/main.py`
+- Modify: `backend/core/ois_storage.py`
+- Modify: `backend/capability_v2/__init__.py`
+- Modify: `docs/governance/user-function-registry.json`
+- Modify: `docs/governance/domain-ownership.json`
+- Modify: `backend/governance/table_inventory.json`
+- Modify: `.github/CODEOWNERS`
 
 **Interfaces:**
 - Produces: host-mediated upload session returning `ArtifactRef` after hash verification.
@@ -656,7 +661,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add backend/capability_v2/artifacts.py backend/capability_v2/operations.py backend/db/migrations/202608100004_artifacts_and_operations.sql backend/routers/capability_artifacts.py backend/routers/capability_operations.py backend/tests/test_artifact_operation_protocol.py backend/main.py
+git add backend/capability_v2/artifacts.py backend/capability_v2/operations.py backend/capability_v2/__init__.py backend/core/ois_storage.py backend/db/migrations/202608100004_base_artifacts_and_operations.sql backend/routers/capability_artifacts.py backend/routers/capability_operations.py backend/tests/test_artifact_operation_protocol.py docs/governance/user-function-registry.json docs/governance/domain-ownership.json backend/governance/table_inventory.json .github/CODEOWNERS docs/superpowers/plans/2026-08-10-capability-v2-implementation.md
 git commit -m "feat: add governed artifact and operation protocols"
 ```
 

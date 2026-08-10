@@ -1,6 +1,7 @@
 """Capability V2 contracts and migration services."""
 
 from .catalog import CatalogRelease, CatalogResolver, ProviderArtifact
+from .artifacts import ArtifactService, SqlArtifactStore, UploadSession
 from .delegation import DelegationGrant, SqlDelegationStore
 from .identity import AuthenticatedPrincipal, IdentityBroker
 from .gateway import CapabilityGatewayService
@@ -24,9 +25,11 @@ from .contracts import (
     InvocationEnvelope,
     OperationRef,
 )
+from .operations import OperationRecord, OperationService, SqlOperationStore
 
 __all__ = [
     "ArtifactRef",
+    "ArtifactService",
     "ApprovalChallenge",
     "ApprovalService",
     "AuthenticatedPrincipal",
@@ -43,8 +46,13 @@ __all__ = [
     "IdentityBroker",
     "InvocationEnvelope",
     "OperationRef",
+    "OperationRecord",
+    "OperationService",
     "OutcomeRecord",
     "ProviderArtifact",
+    "SqlArtifactStore",
+    "SqlOperationStore",
+    "UploadSession",
     "SqlDelegationStore",
     "SqlApprovalStore",
     "SqlOutcomeStore",

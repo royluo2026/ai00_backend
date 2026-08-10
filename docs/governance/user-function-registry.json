@@ -9604,6 +9604,50 @@
         "backend/routers/plugin_marketplace.py"
       ]
     },
+    "rest:GET:/api/v2/capability-artifacts/{artifact_id}": {
+      "function_id": "rest:GET:/api/v2/capability-artifacts/{artifact_id}",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/capability_artifacts.py"
+      ]
+    },
+    "rest:GET:/api/v2/capability-operations/{operation_id}": {
+      "function_id": "rest:GET:/api/v2/capability-operations/{operation_id}",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/capability_operations.py"
+      ]
+    },
     "rest:GET:/api/views": {
       "function_id": "rest:GET:/api/views",
       "domain": "Base Platform",
@@ -16053,6 +16097,50 @@
         "backend/routers/plugin_marketplace.py"
       ]
     },
+    "rest:POST:/api/v2/capability-artifacts/uploads": {
+      "function_id": "rest:POST:/api/v2/capability-artifacts/uploads",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/capability_artifacts.py"
+      ]
+    },
+    "rest:POST:/api/v2/capability-artifacts/uploads/{upload_id}:finalize": {
+      "function_id": "rest:POST:/api/v2/capability-artifacts/uploads/{upload_id}:finalize",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/capability_artifacts.py"
+      ]
+    },
     "rest:POST:/api/views": {
       "function_id": "rest:POST:/api/views",
       "domain": "Base Platform",
@@ -16733,6 +16821,28 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/uploads.py"
+      ]
+    },
+    "rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content": {
+      "function_id": "rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/capability_artifacts.py"
       ]
     },
     "rest:PUT:/api/workbenches/{gid}/override": {

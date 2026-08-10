@@ -220,6 +220,40 @@ def put_immutable(object_key: str, data: bytes, mime: str) -> dict | None:
         _log.error("OIS immutable upload failed: %s | object_key=%s", exc, normalized)
         return None
 
+
+def put_immutable_stream(object_key: str, stream) -> str | None:
+    """Upload a host-verified stream under an exact immutable object key."""
+    normalized = str(object_key or "").strip().lstrip("/")
+    if not normalized or ".." in normalized.split("/") or "//" in normalized:
+        raise ValueError("object_key must be a normalized relative OIS key")
+    if not hasattr(stream, "read") or not hasattr(stream, "seek"):
+        raise TypeError("stream must be a seekable binary stream")
+    if not is_enabled():
+        return None
+    cfg = _get_ois_config()
+    client, err = _make_client()
+    if not client:
+        _log.error("OIS client unavailable: %s", err)
+        return None
+    try:
+        stream.seek(0)
+        response = client.put_object(cfg.get("identify", ""), normalized, stream)
+        if not (hasattr(response, "is_succeed") and response.is_succeed()):
+            _log.error(
+                "OIS immutable stream upload failed: code=%s key=%s",
+                getattr(response, "code", "?"), normalized,
+            )
+            return None
+        uploaded_key = getattr(getattr(response, "data", None), "object_key", normalized)
+        if uploaded_key != normalized:
+            raise RuntimeError(
+                f"OIS changed immutable object key: expected {normalized!r}, got {uploaded_key!r}"
+            )
+        return normalized
+    except Exception as exc:
+        _log.error("OIS immutable stream upload failed: %s | object_key=%s", exc, normalized)
+        return None
+
 def get_immutable(object_key: str, expected_sha256: str = "") -> bytes | None:
     """Read an immutable OIS object and optionally verify its SHA-256 digest."""
     import hashlib
