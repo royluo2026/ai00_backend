@@ -1,0 +1,71 @@
+# Generated from docs/governance/domain-ownership.json. Keep both files in sync.
+
+# Base Platform
+/backend/system_capabilities/** @ai00/base-maintainers
+/backend/plugin_platform/** @ai00/base-maintainers
+/backend/config.py @ai00/base-maintainers
+/backend/core/** @ai00/base-maintainers
+/backend/db/connection.py @ai00/base-maintainers
+/backend/utils/gid.py @ai00/base-maintainers
+/backend/capabilities/registry_next.py @ai00/base-maintainers
+/backend/db/migrations/202608030006_base_platform_runtime_tables.sql @ai00/base-maintainers
+/backend/db/migrations/202608030010_base_self_annotations.sql @ai00/base-maintainers
+/backend/db/migrations/202608040001_base_plugin_namespace_storage.sql @ai00/base-maintainers
+/backend/db/migrations/202608040002_base_plugin_usage_metrics.sql @ai00/base-maintainers
+/backend/db/migrations/202608050001_base_permission_grants.sql @ai00/base-maintainers
+
+# Agent
+/plugins/agent/** @ai00/agent-maintainers
+/services/agent-runtime/** @ai00/agent-maintainers
+/backend/db/migrations/202608030001_agent_private_sessions.sql @ai00/agent-maintainers
+/backend/db/migrations/202608030002_agent_memory_skills_audit.sql @ai00/agent-maintainers
+/backend/db/migrations/202608030003_agent_private_flows.sql @ai00/agent-maintainers
+/backend/db/migrations/202608050005_agent_audit_updated_at.sql @ai00/agent-maintainers
+
+# Craft
+/plugins/craft/** @ai00/craft-maintainers
+/backend/db/migrations/202608030005_craft_legacy_auxiliary_tables.sql @ai00/craft-maintainers
+/backend/db/migrations/202608030008_craft_runtime_schema.sql @ai00/craft-maintainers
+/backend/db/migrations/202608050004_craft_bop_version_contract.sql @ai00/craft-maintainers
+/backend/db/migrations/202608060001_craft_bop_revision.sql @ai00/craft-maintainers
+/backend/db/migrations/202608060004_craft_validation_policies.sql @ai00/craft-maintainers
+/backend/db/migrations/202608070001_craft_bop_write_governance.sql @ai00/craft-maintainers
+
+# Digital Model
+/plugins/digital_model/** @ai00/digital-model-maintainers
+
+# Project Management (specific legacy rules must follow the broad Craft rule)
+/plugins/project_management/** @ai00/project-management-maintainers
+/plugins/craft/craft_backend/routers/projects.py @ai00/project-management-maintainers
+/plugins/craft/craft_backend/routers/workbench_home.py @ai00/project-management-maintainers
+/backend/db/migrations/202608050002_craft_work_collaboration_tables.sql @ai00/project-management-maintainers
+/backend/db/migrations/202608050003_craft_list_team_visibility.sql @ai00/project-management-maintainers
+
+# Simulation
+/plugins/simulation/** @ai00/simulation-maintainers
+/backend/db/migrations/202608030009_simulation_environments.sql @ai00/simulation-maintainers
+
+# Ontology
+/backend/ontology/** @ai00/ontology-maintainers
+/backend/capabilities/ontology_* @ai00/ontology-maintainers
+/backend/db/migrations/202608060003_base_ontology_release_governance.sql @ai00/ontology-maintainers
+
+# Knowledge
+/backend/knowledge/** @ai00/knowledge-maintainers
+/backend/capabilities/knowledge_* @ai00/knowledge-maintainers
+/backend/db/migrations/202608030007_knowledge_proposal_outbox.sql @ai00/knowledge-maintainers
+/backend/db/migrations/202608040003_knowledge_markdown_revisions.sql @ai00/knowledge-maintainers
+/backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql @ai00/knowledge-maintainers
+/backend/db/migrations/202608060002_knowledge_revision_attribution.sql @ai00/knowledge-maintainers
+
+# Local Integration
+/plugins/device/** @ai00/local-integration-maintainers
+/local-runtime/** @ai00/local-integration-maintainers
+/backend/capabilities/local_runtime_next.py @ai00/local-integration-maintainers
+/backend/db/migrations/202608030004_device_control_plane.sql @ai00/local-integration-maintainers
+
+# Shared kernel and governance require platform review in addition to domain contract tests.
+/backend/capability_v2/** @ai00/base-maintainers
+/backend/domain_ports/** @ai00/base-maintainers
+/docs/governance/domain-ownership.json @ai00/base-maintainers
+/docs/governance/domain-dependency-baseline.json @ai00/base-maintainers

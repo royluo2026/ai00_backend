@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "resolution": "The most specific matching code path wins; equal-specificity claims are invalid.",
+  "shared_import_prefixes": [
+    "backend.capability_v2",
+    "backend.capabilities.models_next",
+    "backend.contracts",
+    "backend.platform_sdk"
+  ],
+  "domains": {
+    "Base Platform": {
+      "maintainers": ["@ai00/base-maintainers"],
+      "artifact": "ai00-base-platform",
+      "module_prefixes": ["backend.system_capabilities", "backend.plugin_platform"],
+      "code_paths": [
+        "backend/system_capabilities/**",
+        "backend/plugin_platform/**",
+        "backend/config.py",
+        "backend/core/**",
+        "backend/db/connection.py",
+        "backend/utils/gid.py",
+        "backend/capabilities/registry_next.py"
+      ],
+      "provider_paths": ["backend/system_capabilities/base_provider.py"],
+      "migration_paths": [
+        "backend/db/migrations/202608030006_base_platform_runtime_tables.sql",
+        "backend/db/migrations/202608030010_base_self_annotations.sql",
+        "backend/db/migrations/202608040001_base_plugin_namespace_storage.sql",
+        "backend/db/migrations/202608040002_base_plugin_usage_metrics.sql",
+        "backend/db/migrations/202608050001_base_permission_grants.sql"
+      ],
+      "test_paths": ["backend/tests/test_base_*.py"],
+      "documentation_paths": ["docs/capabilities/base-platform/**"]
+    },
+    "Agent": {
+      "maintainers": ["@ai00/agent-maintainers"],
+      "artifact": "ai00-agent-runtime",
+      "module_prefixes": ["plugins.agent"],
+      "code_paths": ["plugins/agent/**", "services/agent-runtime/**"],
+      "provider_paths": ["plugins/agent/agent_backend/capabilities/**", "services/agent-runtime/src/**"],
+      "migration_paths": [
+        "backend/db/migrations/202608030001_agent_private_sessions.sql",
+        "backend/db/migrations/202608030002_agent_memory_skills_audit.sql",
+        "backend/db/migrations/202608030003_agent_private_flows.sql",
+        "backend/db/migrations/202608050005_agent_audit_updated_at.sql"
+      ],
+      "test_paths": ["plugins/agent/**/test_*.py", "services/agent-runtime/test/**"],
+      "documentation_paths": ["docs/capabilities/agent/**"]
+    },
+    "Craft": {
+      "maintainers": ["@ai00/craft-maintainers"],
+      "artifact": "ai00-craft-plugin",
+      "module_prefixes": ["plugins.craft"],
+      "code_paths": ["plugins/craft/**"],
+      "provider_paths": ["plugins/craft/craft_backend/capabilities/**"],
+      "migration_paths": [
+        "backend/db/migrations/202608030005_craft_legacy_auxiliary_tables.sql",
+        "backend/db/migrations/202608030008_craft_runtime_schema.sql",
+        "backend/db/migrations/202608050004_craft_bop_version_contract.sql",
+        "backend/db/migrations/202608060001_craft_bop_revision.sql",
+        "backend/db/migrations/202608060004_craft_validation_policies.sql",
+        "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
+      ],
+      "test_paths": ["plugins/craft/**/test_*.py", "backend/tests/test_craft_*.py"],
+      "documentation_paths": ["docs/capabilities/craft/**"]
+    },
+    "Digital Model": {
+      "maintainers": ["@ai00/digital-model-maintainers"],
+      "artifact": "ai00-digital-model-plugin",
+      "module_prefixes": ["plugins.digital_model"],
+      "code_paths": ["plugins/digital_model/**"],
+      "provider_paths": ["plugins/digital_model/digital_model_backend/capabilities/**"],
+      "migration_paths": [],
+      "test_paths": ["plugins/digital_model/tests/**", "backend/tests/test_digital_model_*.py"],
+      "documentation_paths": ["docs/capabilities/digital-model/**"]
+    },
+    "Project Management": {
+      "maintainers": ["@ai00/project-management-maintainers"],
+      "artifact": "ai00-project-management-plugin",
+      "module_prefixes": ["plugins.project_management"],
+      "code_paths": [
+        "plugins/project_management/**",
+        "plugins/craft/craft_backend/routers/projects.py",
+        "plugins/craft/craft_backend/routers/workbench_home.py"
+      ],
+      "provider_paths": ["plugins/project_management/project_management_backend/capabilities/**"],
+      "migration_paths": [
+        "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql",
+        "backend/db/migrations/202608050003_craft_list_team_visibility.sql"
+      ],
+      "test_paths": ["plugins/project_management/tests/**", "backend/tests/test_project_management_*.py"],
+      "documentation_paths": ["docs/capabilities/project-management/**"]
+    },
+    "Simulation": {
+      "maintainers": ["@ai00/simulation-maintainers"],
+      "artifact": "ai00-simulation-plugin",
+      "module_prefixes": ["plugins.simulation"],
+      "code_paths": ["plugins/simulation/**"],
+      "provider_paths": ["plugins/simulation/simulation_backend/capabilities/**"],
+      "migration_paths": ["backend/db/migrations/202608030009_simulation_environments.sql"],
+      "test_paths": ["plugins/simulation/**/test_*.py", "backend/tests/test_simulation_*.py"],
+      "documentation_paths": ["docs/capabilities/simulation/**"]
+    },
+    "Ontology": {
+      "maintainers": ["@ai00/ontology-maintainers"],
+      "artifact": "ai00-ontology-domain",
+      "module_prefixes": ["backend.ontology"],
+      "code_paths": ["backend/ontology/**", "backend/capabilities/ontology_*"],
+      "provider_paths": ["backend/capabilities/ontology_*"],
+      "migration_paths": ["backend/db/migrations/202608060003_base_ontology_release_governance.sql"],
+      "test_paths": ["backend/tests/test_ontology_*.py"],
+      "documentation_paths": ["docs/capabilities/ontology/**"]
+    },
+    "Knowledge": {
+      "maintainers": ["@ai00/knowledge-maintainers"],
+      "artifact": "ai00-knowledge-domain",
+      "module_prefixes": ["backend.knowledge"],
+      "code_paths": ["backend/knowledge/**", "backend/capabilities/knowledge_*"],
+      "provider_paths": ["backend/capabilities/knowledge_*"],
+      "migration_paths": [
+        "backend/db/migrations/202608030007_knowledge_proposal_outbox.sql",
+        "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql",
+        "backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql",
+        "backend/db/migrations/202608060002_knowledge_revision_attribution.sql"
+      ],
+      "test_paths": ["backend/tests/test_knowledge_*.py"],
+      "documentation_paths": ["docs/capabilities/knowledge/**"]
+    },
+    "Local Integration": {
+      "maintainers": ["@ai00/local-integration-maintainers"],
+      "artifact": "ai00-local-runtime",
+      "module_prefixes": ["plugins.device"],
+      "code_paths": ["plugins/device/**", "local-runtime/**", "backend/capabilities/local_runtime_next.py"],
+      "provider_paths": ["backend/capabilities/local_runtime_next.py", "local-runtime/src/**"],
+      "migration_paths": ["backend/db/migrations/202608030004_device_control_plane.sql"],
+      "test_paths": ["plugins/device/**/test_*.py", "backend/tests/test_local_runtime_*.py", "local-runtime/**/Tests/**"],
+      "documentation_paths": ["docs/capabilities/local-integration/**"]
+    }
+  }
+}

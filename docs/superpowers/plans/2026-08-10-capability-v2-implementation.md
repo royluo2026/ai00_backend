@@ -6,6 +6,8 @@
 
 **Architecture:** 以不可变 User Function Registry 和 Catalog Release 为事实来源，所有入口先构造服务端可信 ConsumerIdentity，再经唯一 CapabilityGatewayService 调用领域 Application Port。迁移采用领域纵切片和旧接口绞杀策略，Revision/Lineage、Ontology、Artifact、Operation、审批、Outcome 与 Audit Outbox 是一级平台能力。
 
+**Domain ownership:** Base Platform、Agent、Craft、Digital Model 和 Project Management 为必须独立维护和发布的一级域；Simulation、Ontology、Knowledge 和 Local Integration 遵守同样边界。领域间只通过 Gateway、Application Port、ResourceRef 或 Domain Event 协作。
+
 **Tech Stack:** Python 3 / FastAPI / Pydantic / pytest，OceanBase MySQL 兼容 SQL，Node.js 22 / TypeScript / Node Test Runner，Electron Web，.NET 8 / C#，OIS 对象存储，JSON Schema Draft 2020-12。
 
 ## Global Constraints
@@ -14,6 +16,9 @@
 - 使用 TDD：每个行为先写失败测试、确认失败原因、实现最小变更、再跑聚焦与回归测试。
 - 所有稳定用户业务功能必须存在于 User Function Registry，并映射正式 Capability；纯内部、运维和非稳定 UI 功能必须记录排除理由。
 - 所有消费者只能调用 `CapabilityGatewayService.invoke()`；禁止新增 `capability_registry.invoke()` 消费者旁路。
+- Base Platform、Agent、Craft、Digital Model、Project Management、Simulation、Ontology、Knowledge 和 Local Integration 分别拥有代码、Provider、数据/Migration、测试、文档、版本和 CODEOWNERS。
+- 禁止领域 A 直接导入领域 B 的 Router、Repository、ORM、Migration 或实现类；迁移前历史违规必须锁定基线并逐项清零，不得新增。
+- Base Platform 不得承接项目/任务/问题/里程碑业务；Agent 不得内置工艺、数模或项目管理业务实现。
 - 客户端不得通过 `X-AI00-Source`、插件 ID、插件版本、Agent Run ID 或自报 permissions 构造可信身份。
 - 所有公开对象 Schema 必须 `additionalProperties: false`；输入、输出、错误和示例必须通过契约测试。
 - 禁止新增 `plugin_callable`；使用 Web/Plugin/Agent/API/MCP 的结构化 Exposure Policy。
@@ -43,6 +48,10 @@
 - `backend/capability_v2/revision/`：Commit、Branch、Snapshot、Diff、Merge 和 Lineage。
 - `backend/capability_v2/docs/`：Catalog/SDK/OpenAPI/MCP/开发者手册生成器。
 - `backend/domain_ports/`：Base、Craft、Digital Model、Simulation、Ontology、Knowledge、Local Integration 的公开端口协议。
+- `backend/domains/`：迁移期领域包；每域内部按 `application/capabilities/domain/data/tests/docs` 分层，成熟后可独立制品发布。
+- `docs/governance/domain-ownership.json`：领域路径、数据表、Migration、Provider、制品、负责人和允许依赖的事实来源。
+- `docs/governance/domain-dependency-baseline.json`：审计过的历史跨域依赖债务，只允许减少。
+- `.github/CODEOWNERS`：将每个领域的代码、Migration、测试和文档绑定到对应维护组。
 - `docs/governance/user-function-registry.json`：完整用户功能覆盖事实来源。
 - `docs/capabilities/`：自动生成且版本化的开发者手册。
 
@@ -107,7 +116,7 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
 
 Run: `python backend/scripts/build_user_function_registry.py --check`
 
-Expected: PASS with counts by Base, Craft, Digital Model, Simulation, Ontology, Knowledge and Local Integration.
+Expected: PASS with counts by Base Platform, Agent, Craft, Digital Model, Project Management, Simulation, Ontology, Knowledge and Local Integration.
 
 - [ ] **Step 5: Commit**
 
@@ -167,6 +176,52 @@ Run on Windows .NET CI: `dotnet test local-runtime/Ai00.LocalRuntime.sln -c Rele
 ```bash
 git add services/agent-runtime services/mcp-gateway local-runtime .github/workflows/capability-v2-services.yml backend/tests/test_external_service_ownership.py
 git commit -m "build: bring capability consumers under release control"
+```
+
+### Task 2A: 建立领域所有权与依赖门禁
+
+**Files:**
+- Create: `docs/governance/domain-ownership.json`
+- Create: `docs/governance/domain-dependency-baseline.json`
+- Create: `backend/scripts/check_domain_dependencies.py`
+- Create: `backend/tests/test_domain_independence_v2.py`
+- Modify: `.github/CODEOWNERS`
+- Modify: `docs/governance/user-function-registry.schema.json`
+- Modify: `backend/scripts/build_user_function_registry.py`
+- Modify: `backend/tests/test_user_function_registry.py`
+
+**Interfaces:**
+- Produces: 一级域 `Base Platform`, `Agent`, `Craft`, `Digital Model`, `Project Management`, `Simulation`, `Ontology`, `Knowledge`, `Local Integration` 的机器可验证所有权清单。
+- Produces: `python backend/scripts/check_domain_dependencies.py --check` command that rejects new cross-domain implementation imports, cross-domain table writes, undeclared providers and dependency cycles.
+- Requires: 历史违规使用精确文件+符号基线，基线只可减少；禁止用宽泛 allowlist 掩盖新违规。
+
+- [ ] **Step 1: Write failing domain classification and architecture tests**
+
+Tests must prove Agent and Project Management are not classified as Base/Craft, every owned path has one owner, every table/Migration has one owner, and domains cannot import another domain's implementation.
+
+- [ ] **Step 2: Inventory existing ownership and exact dependency debt**
+
+Record source evidence and owner for every legacy exception. Mark unresolved ownership as a release blocker rather than assigning it silently to Base.
+
+- [ ] **Step 3: Implement dependency scanner and regenerate User Function Registry**
+
+Run:
+
+```bash
+python backend/scripts/build_user_function_registry.py --write
+python backend/scripts/build_user_function_registry.py --check
+python backend/scripts/check_domain_dependencies.py --check
+```
+
+- [ ] **Step 4: Add CODEOWNERS and per-domain CI matrix**
+
+Each domain's provider, migrations, tests and docs must be reviewable independently. Catalog Release records the domain artifact version and schema hash.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add docs/governance/domain-ownership.json docs/governance/domain-dependency-baseline.json backend/scripts/check_domain_dependencies.py backend/tests/test_domain_independence_v2.py .github/CODEOWNERS docs/governance/user-function-registry.schema.json backend/scripts/build_user_function_registry.py backend/tests/test_user_function_registry.py
+git commit -m "arch: enforce independently owned domain boundaries"
 ```
 
 ## Wave 1 — Capability V2 Kernel
@@ -927,12 +982,18 @@ git add backend/domain_ports/ontology.py backend/capability_v2/revision/ontology
 git commit -m "feat: version ontology changes and analyze impact"
 ```
 
-### Task 16: 迁移 Base、Knowledge 与 Craft 纵切片
+### Task 16: 迁移 Base Platform、Project Management、Knowledge 与 Craft 独立纵切片
 
 **Files:**
 - Create: `backend/domain_ports/base.py`
+- Create: `backend/domain_ports/project_management.py`
 - Create: `backend/domain_ports/knowledge.py`
 - Create: `backend/domain_ports/craft.py`
+- Create: `plugins/project_management/manifest.json`
+- Create: `plugins/project_management/project_management_backend/application/`
+- Create: `plugins/project_management/project_management_backend/capabilities/`
+- Create: `plugins/project_management/project_management_backend/data/migrations/`
+- Create: `plugins/project_management/tests/`
 - Modify: `backend/system_capabilities/base_provider.py`
 - Modify: `backend/capabilities/knowledge_context_next.py`
 - Modify: `backend/capabilities/knowledge_documents_next.py`
@@ -949,13 +1010,14 @@ git commit -m "feat: version ontology changes and analyze impact"
 - Create: `backend/tests/golden/craft/material-replacement.json`
 
 **Interfaces:**
-- Consumes: reviewed User Function Registry records for Base, Knowledge and Craft.
+- Consumes: reviewed User Function Registry records for Base Platform, Project Management, Knowledge and Craft.
 - Produces: one V2 Descriptor and Gateway Provider for every stable record; no direct Router/Repository consumer access.
+- Requires: project/workspace/task/issue/milestone/member-role/change-coordination behavior is owned by Project Management, not Base Platform or Craft.
 
 - [ ] **Step 1: Write a failing data-driven domain coverage test**
 
 ```python
-@pytest.mark.parametrize("domain", ["base", "knowledge", "craft"])
+@pytest.mark.parametrize("domain", ["Base Platform", "Project Management", "Knowledge", "Craft"])
 def test_stable_domain_functions_have_v2_descriptors(domain, user_functions, catalog):
     expected = {r["target_capability"] for r in user_functions if r["domain"] == domain and r["stability"] == "stable"}
     actual = {d.id for d in catalog.descriptors if d.owner_domain == domain}
@@ -970,11 +1032,11 @@ Expected: FAIL with the registry-derived missing IDs; attach the list to the Tas
 
 - [ ] **Step 3: Implement one complete vertical slice at a time**
 
-For every missing ID: add Descriptor, closed schemas, resource selectors, automation policy, Application Port method, Provider, success/error tests, Plugin/Agent contract examples and generated docs. Migrate read/validate first, draft writes second, publish/restore/bulk writes last. Craft writes create ChangeSet/Commit; Knowledge revisions preserve Evidence and immutable history.
+For every missing ID: add Descriptor, closed schemas, resource selectors, automation policy, Application Port method, Provider, success/error tests, Plugin/Agent contract examples and generated docs. Migrate read/validate first, draft writes second, publish/restore/bulk writes last. Craft writes create ChangeSet/Commit; Knowledge revisions preserve Evidence and immutable history. Project Management stores only stable refs to Craft/Model/Simulation/Knowledge resources and cannot write their tables.
 
 - [ ] **Step 4: Require zero missing stable records and run domain regressions**
 
-Run: `python -m pytest backend/tests/test_domain_capability_coverage.py backend/tests/test_base_capability_providers.py backend/tests/test_knowledge_document_capabilities.py backend/tests/test_craft_bop_version_capabilities.py backend/tests/test_craft_write_capabilities.py -q`
+Run: `python -m pytest backend/tests/test_domain_capability_coverage.py backend/tests/test_base_capability_providers.py plugins/project_management/tests backend/tests/test_knowledge_document_capabilities.py backend/tests/test_craft_bop_version_capabilities.py backend/tests/test_craft_write_capabilities.py -q`
 
 Expected: PASS with zero skipped stable Capability rows.
 
@@ -1244,7 +1306,7 @@ git commit -m "test: gate capability v2 releases on full acceptance"
 
 ### Checkpoint A — Kernel 可用
 
-Tasks 1–9 完成后必须证明：完整功能基线存在；服务源码可复现；V2 Contract/Catalog/Identity/Gateway 生效；没有消费者 Registry 旁路；审批、幂等、Outcome、Audit、Artifact 和 Operation 通过故障测试。未达到不得开放业务 Plugin/Agent 写能力。
+Tasks 1–9（含 Task 2A）完成后必须证明：完整功能基线存在；服务源码可复现；领域所有权唯一且无新增跨域实现依赖；V2 Contract/Catalog/Identity/Gateway 生效；没有消费者 Registry 旁路；审批、幂等、Outcome、Audit、Artifact 和 Operation 通过故障测试。未达到不得开放业务 Plugin/Agent 写能力。
 
 ### Checkpoint B — 消费者安全可用
 
@@ -1252,7 +1314,7 @@ Tasks 10–13 完成后必须证明：开发者手册可自动生成；PluginMou
 
 ### Checkpoint C — 领域覆盖完成
 
-Tasks 14–18 完成后必须证明：Revision、Diff、Ontology、Base、Knowledge、Craft、Digital Model、Simulation 和 Local Integration 的稳定功能覆盖差集为零，语义 Golden Cases 通过。
+Tasks 14–18 完成后必须证明：Revision、Diff、Ontology、Base Platform、Project Management、Knowledge、Craft、Digital Model、Simulation 和 Local Integration 的稳定功能覆盖差集为零，语义 Golden Cases 通过，每域能独立测试、发布和回滚。
 
 ### Checkpoint D — 旧架构退出
 

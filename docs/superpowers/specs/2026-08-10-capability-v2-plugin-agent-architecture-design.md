@@ -1,8 +1,8 @@
 # AI00 Capability V2、插件与 AI Agent 架构设计
 
 > 日期：2026-08-10  
-> 状态：设计已逐节确认，等待实施计划  
-> 适用范围：Base、Craft、Digital Model、Simulation、Ontology、Knowledge、Revision、Plugin、Agent Runtime、MCP、Local Runtime  
+> 状态：设计已确认，实施中
+> 适用范围：Base Platform、Agent、Craft、Digital Model、Project Management、Simulation、Ontology、Knowledge、Revision、Plugin、MCP、Local Runtime
 > 决策级别：目标架构与迁移约束  
 > 取代关系：与 `2026-08-05-capability-consensus-round-1-design.md` 冲突时以本文为准；本体治理细节继续兼容 `2026-08-05-ontology-capabilities-design.md`
 
@@ -18,7 +18,7 @@ AI00 已经具备 Capability Registry、Catalog、部分 Provider、插件沙箱
 
 ### 2.1 目标
 
-1. Base、Craft、Digital Model、Simulation、Ontology、Knowledge 和 Local Integration 的全部稳定用户业务功能都有正式 Capability。
+1. Base Platform、Agent、Craft、Digital Model、Project Management、Simulation、Ontology、Knowledge 和 Local Integration 的全部稳定用户业务功能都有正式 Capability。
 2. 插件和 AI Agent 能发现这些能力；是否执行由消费者、租户、资源、数据范围和自动化策略决定。
 3. Web 迁移到相同 Capability，旧 REST 业务实现最终退役。
 4. 版本、差异、谱系和本体成为跨领域一级能力。
@@ -84,6 +84,8 @@ AI00 已经具备 Capability Registry、Catalog、部分 Provider、插件沙箱
 8. 大对象通过引用传递，长操作通过状态机管理。
 9. AI 和插件默认最小权限；可发现不等于可自主执行。
 10. 文档、SDK、Agent Tool、OpenAPI 和 MCP 描述必须从同一描述符生成。
+11. Base Platform、Agent、Craft、Digital Model 和 Project Management 是一级独立维护单元；每域独立拥有代码、数据与 Migration、Provider、测试、文档、发布版本和 CODEOWNERS。
+12. 领域之间不得直接导入实现、Repository、Router 或数据表；只允许通过 Capability Gateway、窄 Application Port、ResourceRef 或 Domain Event 协作。
 
 ## 5. 目标架构
 
@@ -103,8 +105,8 @@ resolve → expose → authorize → validate → approve → quota/idempotency
         → dispatch → outcome/outbox → project → result
           │
 Domain Application Ports
-Base / Craft / Digital Model / Simulation / Ontology / Knowledge
-Revision & Lineage / Local Integration
+Base Platform / Agent / Craft / Digital Model / Project Management
+Simulation / Ontology / Knowledge / Revision & Lineage / Local Integration
           │
 Repositories / OceanBase / OIS / Desktop Runtime / Device Adapters
 ```
@@ -298,11 +300,23 @@ CapabilityDescriptorV2
 
 ## 10. 领域边界
 
-### 10.1 Base
+### 10.1 独立维护与依赖规则
 
-Base 负责身份、租户、项目/工作区、Artifact、协作、搜索、Operation、审批、审计、插件安装和 Catalog 等公共业务基础。Base 不解释工艺、数模或仿真语义，不代理其他领域 CRUD，也不直接导入 Device/Craft 实现。
+领域边界同时是组织与发布边界。Base Platform、Agent、Craft、Digital Model、Project Management、Simulation、Ontology、Knowledge 和 Local Integration 都必须能被不同团队独立测试、评审、发布和回滚。共享 Kernel 只包含稳定契约、Gateway 和通用可靠性机制，不得放入任一领域的业务规则。
 
-### 10.2 Craft
+目标源码布局采用“共享 Kernel + 领域包”：`backend/capability_v2/` 只作 Kernel，每个领域在自己的 `plugins/<domain>/` 或迁移期 `backend/domains/<domain>/` 下拥有 `application`、`capabilities`、`domain`、`data/migrations`、`tests` 和 `docs`。迁移期允许旧代码保留原位，但必须在领域所有权清单和依赖基线中登记，不得新增跨域实现依赖。
+
+每个 Catalog Release 记录域 Provider 制品、版本、Schema Hash 和负责人。每域数据表和 Migration 必须有唯一所有者；其他域只能保存稳定 Ref，不得跨域写表。CI 使用 import graph、表/Migration 所有权、Provider Manifest、契约测试和循环依赖检查阻止边界回退。
+
+### 10.2 Base Platform
+
+Base Platform 负责身份、租户、Artifact、Operation、审批、审计、插件安装、Catalog 和通用搜索基础。项目、工作区、任务、问题、里程碑和项目协作归 Project Management，不得因为“通用”而沉入 Base。Base 不解释 Agent、工艺、数模、项目管理或仿真语义，不代理其他领域 CRUD，也不直接导入任一领域实现。
+
+### 10.3 Agent
+
+Agent 域负责 AgentDefinition、Run、Step、Checkpoint、Approval、Budget、ToolSelection、Delegation 和恢复编排。Agent 通过 Catalog 发现其他域 Capability，通过 Gateway 执行；不得导入 Craft、Digital Model 或 Project Management 的实现代码，也不得把领域业务逻辑复制到 Tool 中。
+
+### 10.4 Craft
 
 核心能力族包括：
 
@@ -327,27 +341,31 @@ craft.import.* / craft.export.* / craft.lineage.*
 
 正式写入必须支持资源授权、乐观并发、幂等、变更理由、前后 Evidence、发布状态约束和领域 Commit。查询和校验通常允许 Agent 自主调用；草稿受控；发布、回滚和批量修改必须审批。
 
-### 10.3 Digital Model
+### 10.5 Digital Model
 
 数模为独立领域，而不是文件附件。核心能力族包括模型、版本、结构、组件、几何元数据、属性、标注、视图、快照、变换、验证、谱系、导入、导出、转换和协作。
 
 原始 CAD 和完整几何通过 ArtifactRef 和数据范围授权访问。AI 和插件默认获得结构摘要、元数据、属性、标注、轻量视图和受控局部结果，不获得服务器路径或任意原始文件访问。
 
-### 10.4 Simulation
+### 10.6 Project Management
+
+Project Management 域负责项目、工作区、成员与项目角色、计划、任务、问题、里程碑、看板、交付物关联、变更协调和项目级视图。它保存 Craft/Model/Simulation/Knowledge 等资源的稳定 Ref，不解释或直接修改这些资源的领域内容。
+
+### 10.7 Simulation
 
 Simulation 负责环境、场景、输入、参数集、运行、批处理、状态、结果、指标、比较、报告、取消和归档。它不复制 Craft 或 Digital Model 数据。
 
 创建环境使用服务端可验证的 `execution_plan_ref`、`model_snapshot_ref`、`parameter_set_ref` 和 `simulation_profile_ref`。运行返回 OperationRef，并记录输入版本、内容哈希、求解器版本和可复现 Evidence。
 
-### 10.5 Local Integration 与 Device
+### 10.8 Local Integration 与 Device
 
 本地集成为独立边界。云端提交签名 Operation Envelope，本地 Runtime 返回签名 Outcome。协议明确区分 accepted、claimed、running、completed、failed 和 outcome_unknown。调用只传 ModelRef/ArtifactRef，不接受本地 `file_path`。
 
-### 10.6 Knowledge
+### 10.9 Knowledge
 
 Knowledge 负责文档、知识条目、规范、案例、事实、检索索引、修订和证据。Agent 默认使用带业务锚点、固定修订和检索 Evidence 的受控上下文检索，不直接获取全库内容。
 
-### 10.7 领域协作
+### 10.10 领域协作
 
 领域之间只允许：
 

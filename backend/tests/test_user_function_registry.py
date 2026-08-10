@@ -42,6 +42,55 @@ def test_every_stable_user_function_has_capability_or_valid_exclusion(registry):
     assert invalid == []
 
 
+def test_first_class_domains_include_independent_maintainer_boundaries():
+    builder = _builder_module()
+
+    assert set(builder.DOMAINS) == {
+        "Base Platform",
+        "Agent",
+        "Craft",
+        "Digital Model",
+        "Project Management",
+        "Simulation",
+        "Ontology",
+        "Knowledge",
+        "Local Integration",
+    }
+
+
+def test_domain_classification_uses_business_owner_not_consumer_surface():
+    builder = _builder_module()
+
+    assert builder._domain(
+        "agent_tool:get_bop_entries", "services/agent-runtime/src/tools.ts"
+    ) == "Craft"
+    assert builder._domain(
+        "rest:POST:/api/agents/{agent_id}/runs", "backend/routers/agents.py"
+    ) == "Agent"
+    assert builder._domain(
+        "rest:GET:/api/projects", "backend/routers/projects.py"
+    ) == "Project Management"
+    assert builder._domain(
+        "rest:PATCH:/api/tasks/{task_id}", "backend/routers/tasks.py"
+    ) == "Project Management"
+    assert builder._domain(
+        "agent_tool:create_task", "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+    ) == "Project Management"
+    assert builder._domain(
+        "rest:GET:/api/ai/sessions", "plugins/agent/agent_backend/routers/ai_chat.py"
+    ) == "Agent"
+    assert builder._domain(
+        "rest:GET:/api/health", "backend/routers/health.py"
+    ) == "Base Platform"
+
+
+def test_registry_schema_exposes_every_independently_owned_domain():
+    builder = _builder_module()
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+
+    assert set(schema["$defs"]["UserFunctionRecord"]["properties"]["domain"]["enum"]) == set(builder.DOMAINS)
+
+
 def test_stable_unmapped_function_requires_specific_reviewed_exclusion():
     builder = _builder_module()
     row = {
@@ -113,7 +162,7 @@ def test_merge_discovery_preserves_reviewed_governance_fields():
     existing = {
         "rest:GET:/api/example": {
             "function_id": "rest:GET:/api/example",
-            "domain": "Base",
+            "domain": "Base Platform",
             "stability": "stable",
             "current_consumers": ["REST"],
             "target_capability": "base.project.search",
@@ -130,7 +179,7 @@ def test_merge_discovery_preserves_reviewed_governance_fields():
     }
     discovered = [{
         "function_id": "rest:GET:/api/example",
-        "domain": "Base",
+        "domain": "Base Platform",
         "stability": "stable",
         "current_consumers": ["REST", "Web"],
         "source_paths": ["backend/routers/example.py"]
@@ -143,6 +192,42 @@ def test_merge_discovery_preserves_reviewed_governance_fields():
         "current_consumers": ["REST", "Web"],
         "source_paths": ["backend/routers/example.py"]
     }]
+
+
+def test_merge_migrates_retired_base_domain_without_losing_reviewed_governance():
+    builder = _builder_module()
+    existing = {
+        "capability:base.project.search": {
+            "function_id": "capability:base.project.search",
+            "domain": "Base",
+            "stability": "stable",
+            "current_consumers": ["Capability"],
+            "target_capability": "base.project.search",
+            "exposure": "Capability",
+            "automation_level": "automated",
+            "resource_types": ["project"],
+            "data_classification": "internal",
+            "classification": "mapped",
+            "migration_status": "registered",
+            "owner": "Base",
+            "exclusion_reason": None,
+            "source_paths": ["backend/system_capabilities/base_provider.py"],
+            "review_notes": ["Reviewed metadata must survive."],
+        }
+    }
+    discovered = [{
+        "function_id": "capability:base.project.search",
+        "domain": "Project Management",
+        "stability": "stable",
+        "current_consumers": ["Capability"],
+        "source_paths": ["backend/system_capabilities/base_provider.py"],
+    }]
+
+    row = builder.merge_discovery(existing, discovered)[0]
+
+    assert row["domain"] == "Project Management"
+    assert row["owner"] == "Project Management"
+    assert row["review_notes"] == ["Reviewed metadata must survive."]
 
 
 def test_check_reports_missing_stable_function():
@@ -234,6 +319,22 @@ def test_discovery_preserves_experimental_stability_for_dynamic_web_gaps():
     discovered = {row["function_id"]: row for row in builder.discover_user_functions()}
 
     assert discovered["web_gap:dynamic_fetch:dist/web/core/auth_state.js:55"]["stability"] == "experimental"
+
+
+def test_agent_runtime_scanner_registers_static_and_parameterized_endpoints():
+    builder = _builder_module()
+    found = builder.scan_agent_runtime_routes(REPOSITORY_ROOT)
+
+    assert {
+        "agent_runtime:GET:/v1/tools",
+        "agent_runtime:GET:/v1/sessions",
+        "agent_runtime:POST:/v1/sessions",
+        "agent_runtime:GET:/v1/sessions/{session_gid}",
+        "agent_runtime:DELETE:/v1/sessions/{session_gid}",
+        "agent_runtime:POST:/v1/sessions/{session_gid}/messages",
+        "agent_runtime:POST:/v1/sessions/{session_gid}/messages/stream",
+    } <= set(found)
+    assert all(row["domain"] == "Agent" for row in found.values())
 
 
 def test_check_cli_passes_when_source_evidence_matches_with_governance_candidates():

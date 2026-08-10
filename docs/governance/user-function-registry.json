@@ -1,9 +1,185 @@
 {
   "schema_version": 1,
   "functions": {
+    "agent_runtime:DELETE:/v1/sessions/{session_gid}": {
+      "function_id": "agent_runtime:DELETE:/v1/sessions/{session_gid}",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:GET:/health": {
+      "function_id": "agent_runtime:GET:/health",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:GET:/v1/sessions": {
+      "function_id": "agent_runtime:GET:/v1/sessions",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:GET:/v1/sessions/{session_gid}": {
+      "function_id": "agent_runtime:GET:/v1/sessions/{session_gid}",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:GET:/v1/tools": {
+      "function_id": "agent_runtime:GET:/v1/tools",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:POST:/v1/sessions": {
+      "function_id": "agent_runtime:POST:/v1/sessions",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:POST:/v1/sessions/{session_gid}/messages": {
+      "function_id": "agent_runtime:POST:/v1/sessions/{session_gid}/messages",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:POST:/v1/sessions/{session_gid}/messages/stream": {
+      "function_id": "agent_runtime:POST:/v1/sessions/{session_gid}/messages/stream",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
     "agent_tool:add_task_progress_log": {
       "function_id": "agent_tool:add_task_progress_log",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -17,7 +193,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -25,7 +201,7 @@
     },
     "agent_tool:aggregate_history": {
       "function_id": "agent_tool:aggregate_history",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -39,7 +215,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -47,7 +223,7 @@
     },
     "agent_tool:ask_for_clarification": {
       "function_id": "agent_tool:ask_for_clarification",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -61,7 +237,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -69,7 +245,7 @@
     },
     "agent_tool:audit_entry_rules": {
       "function_id": "agent_tool:audit_entry_rules",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -83,7 +259,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -91,7 +267,7 @@
     },
     "agent_tool:calculate": {
       "function_id": "agent_tool:calculate",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -105,7 +281,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -113,7 +289,7 @@
     },
     "agent_tool:check_rules": {
       "function_id": "agent_tool:check_rules",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -127,7 +303,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -135,7 +311,7 @@
     },
     "agent_tool:create_approval_order": {
       "function_id": "agent_tool:create_approval_order",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -149,7 +325,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -157,7 +333,7 @@
     },
     "agent_tool:create_discussion_topic": {
       "function_id": "agent_tool:create_discussion_topic",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -171,7 +347,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -179,7 +355,7 @@
     },
     "agent_tool:create_issue": {
       "function_id": "agent_tool:create_issue",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -193,7 +369,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -201,7 +377,7 @@
     },
     "agent_tool:create_task": {
       "function_id": "agent_tool:create_task",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -215,7 +391,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -223,7 +399,7 @@
     },
     "agent_tool:find_similar_cases": {
       "function_id": "agent_tool:find_similar_cases",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -237,7 +413,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -245,7 +421,7 @@
     },
     "agent_tool:flag_for_review": {
       "function_id": "agent_tool:flag_for_review",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -259,7 +435,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -267,7 +443,7 @@
     },
     "agent_tool:generate_canvas": {
       "function_id": "agent_tool:generate_canvas",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -281,7 +457,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -289,7 +465,7 @@
     },
     "agent_tool:get_canvas_state": {
       "function_id": "agent_tool:get_canvas_state",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -303,7 +479,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -311,7 +487,7 @@
     },
     "agent_tool:get_entry_relations": {
       "function_id": "agent_tool:get_entry_relations",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -325,7 +501,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -333,7 +509,7 @@
     },
     "agent_tool:get_issue": {
       "function_id": "agent_tool:get_issue",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -347,7 +523,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -421,7 +597,7 @@
     },
     "agent_tool:get_selected_elements": {
       "function_id": "agent_tool:get_selected_elements",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -435,7 +611,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -443,7 +619,7 @@
     },
     "agent_tool:get_task": {
       "function_id": "agent_tool:get_task",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -457,7 +633,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -465,7 +641,7 @@
     },
     "agent_tool:global_search": {
       "function_id": "agent_tool:global_search",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -479,7 +655,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -487,7 +663,7 @@
     },
     "agent_tool:list_approval_orders": {
       "function_id": "agent_tool:list_approval_orders",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -501,7 +677,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -509,7 +685,7 @@
     },
     "agent_tool:list_issue_lists": {
       "function_id": "agent_tool:list_issue_lists",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -523,7 +699,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -531,7 +707,7 @@
     },
     "agent_tool:list_issues": {
       "function_id": "agent_tool:list_issues",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -545,7 +721,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -553,7 +729,7 @@
     },
     "agent_tool:list_memories": {
       "function_id": "agent_tool:list_memories",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -567,7 +743,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -575,7 +751,7 @@
     },
     "agent_tool:list_preferences": {
       "function_id": "agent_tool:list_preferences",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -589,7 +765,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -597,7 +773,7 @@
     },
     "agent_tool:list_projects": {
       "function_id": "agent_tool:list_projects",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -611,7 +787,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -619,7 +795,7 @@
     },
     "agent_tool:list_rules": {
       "function_id": "agent_tool:list_rules",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -633,7 +809,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -641,7 +817,7 @@
     },
     "agent_tool:list_task_lists": {
       "function_id": "agent_tool:list_task_lists",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -655,7 +831,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -663,7 +839,7 @@
     },
     "agent_tool:list_tasks": {
       "function_id": "agent_tool:list_tasks",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -677,7 +853,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -685,7 +861,7 @@
     },
     "agent_tool:open_in_container": {
       "function_id": "agent_tool:open_in_container",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -699,7 +875,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -707,7 +883,7 @@
     },
     "agent_tool:recall_memory": {
       "function_id": "agent_tool:recall_memory",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -721,7 +897,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -729,7 +905,7 @@
     },
     "agent_tool:recommend_practice": {
       "function_id": "agent_tool:recommend_practice",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -743,7 +919,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -751,7 +927,7 @@
     },
     "agent_tool:run_skill_canvas": {
       "function_id": "agent_tool:run_skill_canvas",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -765,7 +941,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -773,7 +949,7 @@
     },
     "agent_tool:save_memory": {
       "function_id": "agent_tool:save_memory",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -787,7 +963,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -795,7 +971,7 @@
     },
     "agent_tool:save_preference": {
       "function_id": "agent_tool:save_preference",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -809,7 +985,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -817,7 +993,7 @@
     },
     "agent_tool:search": {
       "function_id": "agent_tool:search",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -831,7 +1007,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -861,7 +1037,7 @@
     },
     "agent_tool:update_issue": {
       "function_id": "agent_tool:update_issue",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -875,7 +1051,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -883,7 +1059,7 @@
     },
     "agent_tool:update_task": {
       "function_id": "agent_tool:update_task",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -897,7 +1073,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -927,7 +1103,7 @@
     },
     "capability:base.project.search": {
       "function_id": "capability:base.project.search",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -941,7 +1117,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -1675,7 +1851,7 @@
     },
     "capability:identity.principal.search": {
       "function_id": "capability:identity.principal.search",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -1689,7 +1865,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -2934,7 +3110,7 @@
     },
     "capability:plugin.disable": {
       "function_id": "capability:plugin.disable",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -2948,7 +3124,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -2957,7 +3133,7 @@
     },
     "capability:plugin.enable": {
       "function_id": "capability:plugin.enable",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -2971,7 +3147,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -2980,7 +3156,7 @@
     },
     "capability:plugin.host.execute": {
       "function_id": "capability:plugin.host.execute",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -2994,7 +3170,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3002,7 +3178,7 @@
     },
     "capability:plugin.install": {
       "function_id": "capability:plugin.install",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3016,7 +3192,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3025,7 +3201,7 @@
     },
     "capability:plugin.revoke": {
       "function_id": "capability:plugin.revoke",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3039,7 +3215,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3048,7 +3224,7 @@
     },
     "capability:plugin.rollback": {
       "function_id": "capability:plugin.rollback",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3062,7 +3238,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3071,7 +3247,7 @@
     },
     "capability:plugin.storage.delete": {
       "function_id": "capability:plugin.storage.delete",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3085,7 +3261,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3093,7 +3269,7 @@
     },
     "capability:plugin.storage.get": {
       "function_id": "capability:plugin.storage.get",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3107,7 +3283,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3115,7 +3291,7 @@
     },
     "capability:plugin.storage.list": {
       "function_id": "capability:plugin.storage.list",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3129,7 +3305,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3137,7 +3313,7 @@
     },
     "capability:plugin.storage.put": {
       "function_id": "capability:plugin.storage.put",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3151,7 +3327,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3159,7 +3335,7 @@
     },
     "capability:plugin.uninstall": {
       "function_id": "capability:plugin.uninstall",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3173,7 +3349,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3182,7 +3358,7 @@
     },
     "capability:plugin.upgrade": {
       "function_id": "capability:plugin.upgrade",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3196,7 +3372,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3205,7 +3381,7 @@
     },
     "capability:plugin.upgrade.finish": {
       "function_id": "capability:plugin.upgrade.finish",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3219,7 +3395,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3228,7 +3404,7 @@
     },
     "capability:semantic.context.get": {
       "function_id": "capability:semantic.context.get",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3242,7 +3418,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3251,7 +3427,7 @@
     },
     "capability:system.activity": {
       "function_id": "capability:system.activity",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3265,7 +3441,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3273,7 +3449,7 @@
     },
     "capability:system.activity.search": {
       "function_id": "capability:system.activity.search",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3287,7 +3463,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3296,7 +3472,7 @@
     },
     "capability:system.change_impact": {
       "function_id": "capability:system.change_impact",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3310,7 +3486,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3318,7 +3494,7 @@
     },
     "capability:system.change_impact.preview": {
       "function_id": "capability:system.change_impact.preview",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3332,7 +3508,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3341,7 +3517,7 @@
     },
     "capability:system.confirmation.respond": {
       "function_id": "capability:system.confirmation.respond",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3355,7 +3531,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3363,7 +3539,7 @@
     },
     "capability:system.echo": {
       "function_id": "capability:system.echo",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3377,7 +3553,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3387,7 +3563,7 @@
     },
     "capability:system.job": {
       "function_id": "capability:system.job",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3401,7 +3577,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3409,7 +3585,7 @@
     },
     "capability:system.job.cancel": {
       "function_id": "capability:system.job.cancel",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3423,7 +3599,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3432,7 +3608,7 @@
     },
     "capability:system.job.get": {
       "function_id": "capability:system.job.get",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3446,7 +3622,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3455,7 +3631,7 @@
     },
     "capability:system.job_cancel": {
       "function_id": "capability:system.job_cancel",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3469,7 +3645,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/system_shared_next.py"
@@ -3477,7 +3653,7 @@
     },
     "capability:system.lineage": {
       "function_id": "capability:system.lineage",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3491,7 +3667,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
@@ -3499,7 +3675,7 @@
     },
     "capability:system.lineage.get": {
       "function_id": "capability:system.lineage.get",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3513,7 +3689,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3522,7 +3698,7 @@
     },
     "capability:system.object_ref": {
       "function_id": "capability:system.object_ref",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3536,7 +3712,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/system_shared_next.py"
@@ -3544,7 +3720,7 @@
     },
     "capability:system.plugin.manage": {
       "function_id": "capability:system.plugin.manage",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3558,7 +3734,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/plugin_marketplace_next.py"
@@ -3566,7 +3742,7 @@
     },
     "capability:system.ref": {
       "function_id": "capability:system.ref",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3580,7 +3756,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/system_shared_next.py"
@@ -3588,7 +3764,7 @@
     },
     "capability:system.search": {
       "function_id": "capability:system.search",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3602,7 +3778,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3611,7 +3787,7 @@
     },
     "capability:system.tech_config": {
       "function_id": "capability:system.tech_config",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3625,7 +3801,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/outbox_worker_next.py"
@@ -3633,7 +3809,7 @@
     },
     "capability:system.worker.outbox.health": {
       "function_id": "capability:system.worker.outbox.health",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3647,7 +3823,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3971,7 +4147,7 @@
     },
     "rest:DELETE:/admin/config/{key}": {
       "function_id": "rest:DELETE:/admin/config/{key}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -3985,7 +4161,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -3993,7 +4169,7 @@
     },
     "rest:DELETE:/api/ai/sessions/{gid}": {
       "function_id": "rest:DELETE:/api/ai/sessions/{gid}",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4007,7 +4183,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -4455,7 +4631,7 @@
     },
     "rest:DELETE:/api/ext-datasources/{gid}": {
       "function_id": "rest:DELETE:/api/ext-datasources/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4469,7 +4645,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -4477,7 +4653,7 @@
     },
     "rest:DELETE:/api/ext-mappings/{gid}": {
       "function_id": "rest:DELETE:/api/ext-mappings/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4491,7 +4667,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -4609,7 +4785,7 @@
     },
     "rest:DELETE:/api/flows/{gid}": {
       "function_id": "rest:DELETE:/api/flows/{gid}",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4623,7 +4799,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -4631,7 +4807,7 @@
     },
     "rest:DELETE:/api/follows/{gid}": {
       "function_id": "rest:DELETE:/api/follows/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4645,7 +4821,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -4763,7 +4939,7 @@
     },
     "rest:DELETE:/api/grants/{gid}": {
       "function_id": "rest:DELETE:/api/grants/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4777,7 +4953,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/grants.py"
@@ -5115,7 +5291,7 @@
     },
     "rest:DELETE:/api/self_ann/{item_gid}": {
       "function_id": "rest:DELETE:/api/self_ann/{item_gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5129,7 +5305,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/self_annotations.py"
@@ -5203,7 +5379,7 @@
     },
     "rest:DELETE:/api/skills/{gid}": {
       "function_id": "rest:DELETE:/api/skills/{gid}",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5217,7 +5393,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/skills.py"
@@ -5357,7 +5533,7 @@
     },
     "rest:DELETE:/api/views/{gid}": {
       "function_id": "rest:DELETE:/api/views/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5371,7 +5547,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/views.py"
@@ -5379,7 +5555,7 @@
     },
     "rest:DELETE:/api/workbenches/{gid}": {
       "function_id": "rest:DELETE:/api/workbenches/{gid}",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5393,7 +5569,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/workbenches.py"
@@ -5401,7 +5577,7 @@
     },
     "rest:DELETE:/api/workbenches/{gid}/override": {
       "function_id": "rest:DELETE:/api/workbenches/{gid}/override",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5415,7 +5591,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/workbenches.py"
@@ -5423,7 +5599,7 @@
     },
     "rest:DELETE:/teams/{gid}": {
       "function_id": "rest:DELETE:/teams/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5437,7 +5613,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/teams.py"
@@ -5445,7 +5621,7 @@
     },
     "rest:DELETE:/teams/{gid}/members/{user_gid}": {
       "function_id": "rest:DELETE:/teams/{gid}/members/{user_gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5459,7 +5635,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/teams.py"
@@ -5467,7 +5643,7 @@
     },
     "rest:GET:/": {
       "function_id": "rest:GET:/",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5481,7 +5657,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/capabilities.py"
@@ -5489,7 +5665,7 @@
     },
     "rest:GET:/admin/cloud-db-config": {
       "function_id": "rest:GET:/admin/cloud-db-config",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5503,7 +5679,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -5511,7 +5687,7 @@
     },
     "rest:GET:/admin/config": {
       "function_id": "rest:GET:/admin/config",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5525,7 +5701,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -5533,7 +5709,7 @@
     },
     "rest:GET:/admin/config/{key}": {
       "function_id": "rest:GET:/admin/config/{key}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5547,7 +5723,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -5555,7 +5731,7 @@
     },
     "rest:GET:/admin/debug-logs": {
       "function_id": "rest:GET:/admin/debug-logs",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5569,7 +5745,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -5577,7 +5753,7 @@
     },
     "rest:GET:/admin/plugin-registry": {
       "function_id": "rest:GET:/admin/plugin-registry",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5591,7 +5767,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -5599,7 +5775,7 @@
     },
     "rest:GET:/api/ai/admin-config": {
       "function_id": "rest:GET:/api/ai/admin-config",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5613,7 +5789,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -5621,7 +5797,7 @@
     },
     "rest:GET:/api/ai/audit-logs": {
       "function_id": "rest:GET:/api/ai/audit-logs",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5635,7 +5811,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_audit.py"
@@ -5643,7 +5819,7 @@
     },
     "rest:GET:/api/ai/balance": {
       "function_id": "rest:GET:/api/ai/balance",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5657,7 +5833,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_audit.py"
@@ -5665,7 +5841,7 @@
     },
     "rest:GET:/api/ai/sessions": {
       "function_id": "rest:GET:/api/ai/sessions",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5679,7 +5855,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -5687,7 +5863,7 @@
     },
     "rest:GET:/api/ai/sessions/{gid}": {
       "function_id": "rest:GET:/api/ai/sessions/{gid}",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5701,7 +5877,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -5709,7 +5885,7 @@
     },
     "rest:GET:/api/ai/tools": {
       "function_id": "rest:GET:/api/ai/tools",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5723,7 +5899,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -5731,7 +5907,7 @@
     },
     "rest:GET:/api/annotations/{key}": {
       "function_id": "rest:GET:/api/annotations/{key}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5745,7 +5921,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/annotations.py"
@@ -7073,7 +7249,7 @@
     },
     "rest:GET:/api/deploy": {
       "function_id": "rest:GET:/api/deploy",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7087,7 +7263,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/deploy.py"
@@ -7095,7 +7271,7 @@
     },
     "rest:GET:/api/deploy/current": {
       "function_id": "rest:GET:/api/deploy/current",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7109,7 +7285,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/deploy.py"
@@ -7117,7 +7293,7 @@
     },
     "rest:GET:/api/deploy/history": {
       "function_id": "rest:GET:/api/deploy/history",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7131,7 +7307,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/deploy.py"
@@ -7139,7 +7315,7 @@
     },
     "rest:GET:/api/deploy/pipeline": {
       "function_id": "rest:GET:/api/deploy/pipeline",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7153,7 +7329,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/deploy.py"
@@ -7271,7 +7447,7 @@
     },
     "rest:GET:/api/ext-datasources": {
       "function_id": "rest:GET:/api/ext-datasources",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7285,7 +7461,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7293,7 +7469,7 @@
     },
     "rest:GET:/api/ext-datasources/{gid}/tables": {
       "function_id": "rest:GET:/api/ext-datasources/{gid}/tables",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7307,7 +7483,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7315,7 +7491,7 @@
     },
     "rest:GET:/api/ext-field-mappings": {
       "function_id": "rest:GET:/api/ext-field-mappings",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7329,7 +7505,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7337,7 +7513,7 @@
     },
     "rest:GET:/api/ext-mappings": {
       "function_id": "rest:GET:/api/ext-mappings",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7351,7 +7527,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7359,7 +7535,7 @@
     },
     "rest:GET:/api/ext-mappings/{gid}/columns": {
       "function_id": "rest:GET:/api/ext-mappings/{gid}/columns",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7373,7 +7549,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7381,7 +7557,7 @@
     },
     "rest:GET:/api/ext-mappings/{gid}/preview": {
       "function_id": "rest:GET:/api/ext-mappings/{gid}/preview",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7395,7 +7571,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7513,7 +7689,7 @@
     },
     "rest:GET:/api/feishu/im/contact-messages": {
       "function_id": "rest:GET:/api/feishu/im/contact-messages",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7527,7 +7703,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_im.py"
@@ -7535,7 +7711,7 @@
     },
     "rest:GET:/api/feishu/im/mentions": {
       "function_id": "rest:GET:/api/feishu/im/mentions",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7549,7 +7725,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_im.py"
@@ -7557,7 +7733,7 @@
     },
     "rest:GET:/api/file-store/config": {
       "function_id": "rest:GET:/api/file-store/config",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7571,7 +7747,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/file_store.py"
@@ -7579,7 +7755,7 @@
     },
     "rest:GET:/api/flows": {
       "function_id": "rest:GET:/api/flows",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7593,7 +7769,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -7601,7 +7777,7 @@
     },
     "rest:GET:/api/flows/capability-manifest": {
       "function_id": "rest:GET:/api/flows/capability-manifest",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7615,7 +7791,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -7623,7 +7799,7 @@
     },
     "rest:GET:/api/flows/runs": {
       "function_id": "rest:GET:/api/flows/runs",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7637,7 +7813,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -7645,7 +7821,7 @@
     },
     "rest:GET:/api/flows/runs/{run_gid}": {
       "function_id": "rest:GET:/api/flows/runs/{run_gid}",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7659,7 +7835,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -7667,7 +7843,7 @@
     },
     "rest:GET:/api/flows/{gid}": {
       "function_id": "rest:GET:/api/flows/{gid}",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7681,7 +7857,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -7689,7 +7865,7 @@
     },
     "rest:GET:/api/follows": {
       "function_id": "rest:GET:/api/follows",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7703,7 +7879,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -7711,7 +7887,7 @@
     },
     "rest:GET:/api/follows/check": {
       "function_id": "rest:GET:/api/follows/check",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7725,7 +7901,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -7931,7 +8107,7 @@
     },
     "rest:GET:/api/grants": {
       "function_id": "rest:GET:/api/grants",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7945,7 +8121,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/grants.py"
@@ -7953,7 +8129,7 @@
     },
     "rest:GET:/api/grants/me": {
       "function_id": "rest:GET:/api/grants/me",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7967,7 +8143,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/grants.py"
@@ -8283,7 +8459,7 @@
     },
     "rest:GET:/api/notifications": {
       "function_id": "rest:GET:/api/notifications",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST",
@@ -8298,7 +8474,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py",
@@ -8307,7 +8483,7 @@
     },
     "rest:GET:/api/notifications/prefs": {
       "function_id": "rest:GET:/api/notifications/prefs",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8321,7 +8497,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py"
@@ -8329,7 +8505,7 @@
     },
     "rest:GET:/api/notifications/unread_count": {
       "function_id": "rest:GET:/api/notifications/unread_count",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST",
@@ -8344,7 +8520,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py",
@@ -8639,7 +8815,7 @@
     },
     "rest:GET:/api/plugin/list": {
       "function_id": "rest:GET:/api/plugin/list",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8653,7 +8829,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugins.py"
@@ -8837,7 +9013,7 @@
     },
     "rest:GET:/api/self_ann/batch": {
       "function_id": "rest:GET:/api/self_ann/batch",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8851,7 +9027,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/self_annotations.py"
@@ -8859,7 +9035,7 @@
     },
     "rest:GET:/api/self_ann/list": {
       "function_id": "rest:GET:/api/self_ann/list",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8873,7 +9049,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/self_annotations.py"
@@ -8881,7 +9057,7 @@
     },
     "rest:GET:/api/self_ann/{item_gid}": {
       "function_id": "rest:GET:/api/self_ann/{item_gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8895,7 +9071,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/self_annotations.py"
@@ -8991,7 +9167,7 @@
     },
     "rest:GET:/api/skills": {
       "function_id": "rest:GET:/api/skills",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9005,7 +9181,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/skills.py"
@@ -9189,7 +9365,7 @@
     },
     "rest:GET:/api/users/": {
       "function_id": "rest:GET:/api/users/",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9203,7 +9379,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/users.py"
@@ -9211,7 +9387,7 @@
     },
     "rest:GET:/api/users/me": {
       "function_id": "rest:GET:/api/users/me",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9225,7 +9401,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/users.py"
@@ -9233,7 +9409,7 @@
     },
     "rest:GET:/api/users/search": {
       "function_id": "rest:GET:/api/users/search",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9247,7 +9423,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/users.py"
@@ -9277,7 +9453,7 @@
     },
     "rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path}": {
       "function_id": "rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9291,7 +9467,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -9299,7 +9475,7 @@
     },
     "rest:GET:/api/v1/plugin-marketplace/catalog": {
       "function_id": "rest:GET:/api/v1/plugin-marketplace/catalog",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9313,7 +9489,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -9321,7 +9497,7 @@
     },
     "rest:GET:/api/v1/plugin-marketplace/installations": {
       "function_id": "rest:GET:/api/v1/plugin-marketplace/installations",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9335,7 +9511,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -9343,7 +9519,7 @@
     },
     "rest:GET:/api/v1/plugin-marketplace/installations/{plugin_id}/events": {
       "function_id": "rest:GET:/api/v1/plugin-marketplace/installations/{plugin_id}/events",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9357,7 +9533,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -9365,7 +9541,7 @@
     },
     "rest:GET:/api/v1/plugin-marketplace/registry": {
       "function_id": "rest:GET:/api/v1/plugin-marketplace/registry",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9379,7 +9555,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -9387,7 +9563,7 @@
     },
     "rest:GET:/api/v1/plugin-marketplace/releases": {
       "function_id": "rest:GET:/api/v1/plugin-marketplace/releases",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9401,7 +9577,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -9409,7 +9585,7 @@
     },
     "rest:GET:/api/v1/plugin-marketplace/usage/months/{month}": {
       "function_id": "rest:GET:/api/v1/plugin-marketplace/usage/months/{month}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9423,7 +9599,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -9431,7 +9607,7 @@
     },
     "rest:GET:/api/views": {
       "function_id": "rest:GET:/api/views",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9445,7 +9621,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/views.py"
@@ -9541,7 +9717,7 @@
     },
     "rest:GET:/api/workbenches": {
       "function_id": "rest:GET:/api/workbenches",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9555,7 +9731,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/workbenches.py"
@@ -9563,7 +9739,7 @@
     },
     "rest:GET:/api/workbenches/{gid}/override": {
       "function_id": "rest:GET:/api/workbenches/{gid}/override",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9577,7 +9753,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/workbenches.py"
@@ -9585,7 +9761,7 @@
     },
     "rest:GET:/auth/feishu/callback": {
       "function_id": "rest:GET:/auth/feishu/callback",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9599,7 +9775,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/auth.py"
@@ -9607,7 +9783,7 @@
     },
     "rest:GET:/auth/feishu/login-url": {
       "function_id": "rest:GET:/auth/feishu/login-url",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9621,7 +9797,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/auth.py"
@@ -9629,7 +9805,7 @@
     },
     "rest:GET:/auth/feishu/poll/{state}": {
       "function_id": "rest:GET:/auth/feishu/poll/{state}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9643,7 +9819,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/auth.py"
@@ -9651,7 +9827,7 @@
     },
     "rest:GET:/auth/me": {
       "function_id": "rest:GET:/auth/me",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9665,7 +9841,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/auth.py"
@@ -9673,7 +9849,7 @@
     },
     "rest:GET:/feishu/cache/debug": {
       "function_id": "rest:GET:/feishu/cache/debug",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9687,7 +9863,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9695,7 +9871,7 @@
     },
     "rest:GET:/feishu/calendar/events/{event_id}": {
       "function_id": "rest:GET:/feishu/calendar/events/{event_id}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9709,7 +9885,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9717,7 +9893,7 @@
     },
     "rest:GET:/feishu/calendar/today": {
       "function_id": "rest:GET:/feishu/calendar/today",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9731,7 +9907,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9739,7 +9915,7 @@
     },
     "rest:GET:/feishu/org/dept-search": {
       "function_id": "rest:GET:/feishu/org/dept-search",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9753,7 +9929,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9761,7 +9937,7 @@
     },
     "rest:GET:/feishu/org/users": {
       "function_id": "rest:GET:/feishu/org/users",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9775,7 +9951,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9783,7 +9959,7 @@
     },
     "rest:GET:/feishu/org/users/search": {
       "function_id": "rest:GET:/feishu/org/users/search",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9797,7 +9973,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9805,7 +9981,7 @@
     },
     "rest:GET:/feishu/search/chats": {
       "function_id": "rest:GET:/feishu/search/chats",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9819,7 +9995,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9827,7 +10003,7 @@
     },
     "rest:GET:/feishu/search/docs": {
       "function_id": "rest:GET:/feishu/search/docs",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9841,7 +10017,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9849,7 +10025,7 @@
     },
     "rest:GET:/feishu/search/events": {
       "function_id": "rest:GET:/feishu/search/events",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9863,7 +10039,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9871,7 +10047,7 @@
     },
     "rest:GET:/feishu/search/meetings": {
       "function_id": "rest:GET:/feishu/search/meetings",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9885,7 +10061,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9893,7 +10069,7 @@
     },
     "rest:GET:/feishu/search/users": {
       "function_id": "rest:GET:/feishu/search/users",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9907,7 +10083,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9915,7 +10091,7 @@
     },
     "rest:GET:/feishu/sync/org/status": {
       "function_id": "rest:GET:/feishu/sync/org/status",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9929,7 +10105,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -9937,7 +10113,7 @@
     },
     "rest:GET:/health": {
       "function_id": "rest:GET:/health",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9951,7 +10127,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/health.py"
@@ -9959,7 +10135,7 @@
     },
     "rest:GET:/ready": {
       "function_id": "rest:GET:/ready",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9973,7 +10149,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/health.py"
@@ -9981,7 +10157,7 @@
     },
     "rest:GET:/share/issues": {
       "function_id": "rest:GET:/share/issues",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9995,7 +10171,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/share_page.py"
@@ -10003,7 +10179,7 @@
     },
     "rest:GET:/teams": {
       "function_id": "rest:GET:/teams",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10017,7 +10193,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/org.py",
@@ -10026,7 +10202,7 @@
     },
     "rest:GET:/teams/{gid}/members": {
       "function_id": "rest:GET:/teams/{gid}/members",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10040,7 +10216,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/teams.py"
@@ -10048,7 +10224,7 @@
     },
     "rest:GET:/users/": {
       "function_id": "rest:GET:/users/",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10062,7 +10238,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/users_compat.py"
@@ -10070,7 +10246,7 @@
     },
     "rest:GET:/users/me": {
       "function_id": "rest:GET:/users/me",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10084,7 +10260,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/users_compat.py"
@@ -10092,7 +10268,7 @@
     },
     "rest:GET:/{capability_id}": {
       "function_id": "rest:GET:/{capability_id}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10106,7 +10282,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/capabilities.py"
@@ -10708,7 +10884,7 @@
     },
     "rest:PATCH:/api/ext-datasources/{gid}": {
       "function_id": "rest:PATCH:/api/ext-datasources/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10722,7 +10898,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -10730,7 +10906,7 @@
     },
     "rest:PATCH:/api/ext-mappings/{gid}": {
       "function_id": "rest:PATCH:/api/ext-mappings/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10744,7 +10920,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -10862,7 +11038,7 @@
     },
     "rest:PATCH:/api/follows/{gid}": {
       "function_id": "rest:PATCH:/api/follows/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10876,7 +11052,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -11104,7 +11280,7 @@
     },
     "rest:PATCH:/api/notifications/prefs": {
       "function_id": "rest:PATCH:/api/notifications/prefs",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11118,7 +11294,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py"
@@ -11126,7 +11302,7 @@
     },
     "rest:PATCH:/api/notifications/read_all": {
       "function_id": "rest:PATCH:/api/notifications/read_all",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST",
@@ -11141,7 +11317,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py",
@@ -11150,7 +11326,7 @@
     },
     "rest:PATCH:/api/notifications/{gid}/read": {
       "function_id": "rest:PATCH:/api/notifications/{gid}/read",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11164,7 +11340,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py"
@@ -11392,7 +11568,7 @@
     },
     "rest:PATCH:/api/users/{user_gid}/role": {
       "function_id": "rest:PATCH:/api/users/{user_gid}/role",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11406,7 +11582,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/users.py"
@@ -11414,7 +11590,7 @@
     },
     "rest:PATCH:/api/views/{gid}": {
       "function_id": "rest:PATCH:/api/views/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11428,7 +11604,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/views.py"
@@ -11436,7 +11612,7 @@
     },
     "rest:PATCH:/api/workbenches/{gid}": {
       "function_id": "rest:PATCH:/api/workbenches/{gid}",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11450,7 +11626,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/workbenches.py"
@@ -11458,7 +11634,7 @@
     },
     "rest:PATCH:/feishu/calendar/events/{event_id}": {
       "function_id": "rest:PATCH:/feishu/calendar/events/{event_id}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11472,7 +11648,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -11480,7 +11656,7 @@
     },
     "rest:PATCH:/feishu/calendar/events/{event_id}/rsvp": {
       "function_id": "rest:PATCH:/feishu/calendar/events/{event_id}/rsvp",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11494,7 +11670,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -11502,7 +11678,7 @@
     },
     "rest:PATCH:/teams/{gid}": {
       "function_id": "rest:PATCH:/teams/{gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11516,7 +11692,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/teams.py"
@@ -11524,7 +11700,7 @@
     },
     "rest:PATCH:/teams/{gid}/config": {
       "function_id": "rest:PATCH:/teams/{gid}/config",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11538,7 +11714,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/teams.py"
@@ -11546,7 +11722,7 @@
     },
     "rest:POST:/admin/cloud-db-config": {
       "function_id": "rest:POST:/admin/cloud-db-config",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11560,7 +11736,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -11568,7 +11744,7 @@
     },
     "rest:POST:/admin/cloud-db-config/test": {
       "function_id": "rest:POST:/admin/cloud-db-config/test",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11582,7 +11758,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -11590,7 +11766,7 @@
     },
     "rest:POST:/admin/config/reload": {
       "function_id": "rest:POST:/admin/config/reload",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11604,7 +11780,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -11612,7 +11788,7 @@
     },
     "rest:POST:/admin/server-restart": {
       "function_id": "rest:POST:/admin/server-restart",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11626,7 +11802,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -11634,7 +11810,7 @@
     },
     "rest:POST:/api/ai/abort": {
       "function_id": "rest:POST:/api/ai/abort",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11648,7 +11824,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -11656,7 +11832,7 @@
     },
     "rest:POST:/api/ai/admin-config": {
       "function_id": "rest:POST:/api/ai/admin-config",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11670,7 +11846,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -11678,7 +11854,7 @@
     },
     "rest:POST:/api/ai/audit": {
       "function_id": "rest:POST:/api/ai/audit",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11692,7 +11868,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_audit.py"
@@ -11700,7 +11876,7 @@
     },
     "rest:POST:/api/ai/chat": {
       "function_id": "rest:POST:/api/ai/chat",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11714,7 +11890,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -11722,7 +11898,7 @@
     },
     "rest:POST:/api/ai/chat/stream": {
       "function_id": "rest:POST:/api/ai/chat/stream",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11736,7 +11912,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -11744,7 +11920,7 @@
     },
     "rest:POST:/api/ai/confirm": {
       "function_id": "rest:POST:/api/ai/confirm",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11758,7 +11934,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -11766,7 +11942,7 @@
     },
     "rest:POST:/api/ai/confirm/sync": {
       "function_id": "rest:POST:/api/ai/confirm/sync",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11780,7 +11956,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -11788,7 +11964,7 @@
     },
     "rest:POST:/api/ai/sessions/new": {
       "function_id": "rest:POST:/api/ai/sessions/new",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11802,7 +11978,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -11810,7 +11986,7 @@
     },
     "rest:POST:/api/ai/test-connection": {
       "function_id": "rest:POST:/api/ai/test-connection",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11824,7 +12000,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
@@ -13372,7 +13548,7 @@
     },
     "rest:POST:/api/deploy/rollback": {
       "function_id": "rest:POST:/api/deploy/rollback",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13386,7 +13562,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/deploy.py"
@@ -13460,7 +13636,7 @@
     },
     "rest:POST:/api/ext-datasources": {
       "function_id": "rest:POST:/api/ext-datasources",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13474,7 +13650,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -13482,7 +13658,7 @@
     },
     "rest:POST:/api/ext-datasources/{gid}/test": {
       "function_id": "rest:POST:/api/ext-datasources/{gid}/test",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13496,7 +13672,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -13504,7 +13680,7 @@
     },
     "rest:POST:/api/ext-mappings": {
       "function_id": "rest:POST:/api/ext-mappings",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13518,7 +13694,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -13526,7 +13702,7 @@
     },
     "rest:POST:/api/ext-mappings/{gid}/import": {
       "function_id": "rest:POST:/api/ext-mappings/{gid}/import",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13540,7 +13716,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -13856,7 +14032,7 @@
     },
     "rest:POST:/api/feishu/doc/read": {
       "function_id": "rest:POST:/api/feishu/doc/read",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13870,7 +14046,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_doc.py"
@@ -13878,7 +14054,7 @@
     },
     "rest:POST:/api/feishu/doc/write-cells": {
       "function_id": "rest:POST:/api/feishu/doc/write-cells",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13892,7 +14068,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_doc.py"
@@ -13900,7 +14076,7 @@
     },
     "rest:POST:/api/file-store/config": {
       "function_id": "rest:POST:/api/file-store/config",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13914,7 +14090,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/file_store.py"
@@ -13922,7 +14098,7 @@
     },
     "rest:POST:/api/file-store/ois-config": {
       "function_id": "rest:POST:/api/file-store/ois-config",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13936,7 +14112,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/file_store.py"
@@ -13944,7 +14120,7 @@
     },
     "rest:POST:/api/file-store/ois-test": {
       "function_id": "rest:POST:/api/file-store/ois-test",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13958,7 +14134,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/file_store.py"
@@ -13966,7 +14142,7 @@
     },
     "rest:POST:/api/file-store/test": {
       "function_id": "rest:POST:/api/file-store/test",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13980,7 +14156,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/file_store.py"
@@ -13988,7 +14164,7 @@
     },
     "rest:POST:/api/flows": {
       "function_id": "rest:POST:/api/flows",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14002,7 +14178,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -14010,7 +14186,7 @@
     },
     "rest:POST:/api/flows/gen-script": {
       "function_id": "rest:POST:/api/flows/gen-script",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14024,7 +14200,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -14032,7 +14208,7 @@
     },
     "rest:POST:/api/flows/runs/{run_gid}/step": {
       "function_id": "rest:POST:/api/flows/runs/{run_gid}/step",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14046,7 +14222,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -14054,7 +14230,7 @@
     },
     "rest:POST:/api/flows/{gid}/run": {
       "function_id": "rest:POST:/api/flows/{gid}/run",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14068,7 +14244,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -14076,7 +14252,7 @@
     },
     "rest:POST:/api/follows": {
       "function_id": "rest:POST:/api/follows",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14090,7 +14266,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -14428,7 +14604,7 @@
     },
     "rest:POST:/api/grants": {
       "function_id": "rest:POST:/api/grants",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14442,7 +14618,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/grants.py"
@@ -14868,7 +15044,7 @@
     },
     "rest:POST:/api/mentions/notify": {
       "function_id": "rest:POST:/api/mentions/notify",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14882,7 +15058,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/mentions.py"
@@ -15044,7 +15220,7 @@
     },
     "rest:POST:/api/org/sync-from-feishu": {
       "function_id": "rest:POST:/api/org/sync-from-feishu",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15058,7 +15234,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/org.py"
@@ -15352,7 +15528,7 @@
     },
     "rest:POST:/api/skills": {
       "function_id": "rest:POST:/api/skills",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15366,7 +15542,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/skills.py"
@@ -15374,7 +15550,7 @@
     },
     "rest:POST:/api/skills/seed-system": {
       "function_id": "rest:POST:/api/skills/seed-system",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15388,7 +15564,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/skills.py"
@@ -15616,7 +15792,7 @@
     },
     "rest:POST:/api/uploads": {
       "function_id": "rest:POST:/api/uploads",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15630,7 +15806,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/uploads.py"
@@ -15638,7 +15814,7 @@
     },
     "rest:POST:/api/uploads/ois/resolve": {
       "function_id": "rest:POST:/api/uploads/ois/resolve",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15652,7 +15828,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/uploads.py"
@@ -15770,7 +15946,7 @@
     },
     "rest:POST:/api/v1/plugin-marketplace/publishers": {
       "function_id": "rest:POST:/api/v1/plugin-marketplace/publishers",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15784,7 +15960,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -15792,7 +15968,7 @@
     },
     "rest:POST:/api/v1/plugin-marketplace/releases": {
       "function_id": "rest:POST:/api/v1/plugin-marketplace/releases",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15806,7 +15982,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -15814,7 +15990,7 @@
     },
     "rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/review": {
       "function_id": "rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/review",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15828,7 +16004,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -15836,7 +16012,7 @@
     },
     "rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/revoke": {
       "function_id": "rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/revoke",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15850,7 +16026,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -15858,7 +16034,7 @@
     },
     "rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close": {
       "function_id": "rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15872,7 +16048,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
@@ -15880,7 +16056,7 @@
     },
     "rest:POST:/api/views": {
       "function_id": "rest:POST:/api/views",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15894,7 +16070,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/views.py"
@@ -15902,7 +16078,7 @@
     },
     "rest:POST:/api/views/{gid}/copy": {
       "function_id": "rest:POST:/api/views/{gid}/copy",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15916,7 +16092,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/views.py"
@@ -15968,7 +16144,7 @@
     },
     "rest:POST:/api/workbenches": {
       "function_id": "rest:POST:/api/workbenches",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15982,7 +16158,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/workbenches.py"
@@ -15990,7 +16166,7 @@
     },
     "rest:POST:/auth/logout": {
       "function_id": "rest:POST:/auth/logout",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16004,7 +16180,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/auth.py"
@@ -16012,7 +16188,7 @@
     },
     "rest:POST:/auth/refresh": {
       "function_id": "rest:POST:/auth/refresh",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16026,7 +16202,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/auth.py"
@@ -16034,7 +16210,7 @@
     },
     "rest:POST:/feishu/cache/refresh": {
       "function_id": "rest:POST:/feishu/cache/refresh",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16048,7 +16224,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -16056,7 +16232,7 @@
     },
     "rest:POST:/feishu/chat-message/share-list": {
       "function_id": "rest:POST:/feishu/chat-message/share-list",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16070,7 +16246,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -16078,7 +16254,7 @@
     },
     "rest:POST:/feishu/message/send": {
       "function_id": "rest:POST:/feishu/message/send",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16092,7 +16268,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -16100,7 +16276,7 @@
     },
     "rest:POST:/feishu/sync/org": {
       "function_id": "rest:POST:/feishu/sync/org",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16114,7 +16290,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -16122,7 +16298,7 @@
     },
     "rest:POST:/feishu/sync/org/structure": {
       "function_id": "rest:POST:/feishu/sync/org/structure",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16136,7 +16312,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -16144,7 +16320,7 @@
     },
     "rest:POST:/feishu/webhook/bitable": {
       "function_id": "rest:POST:/feishu/webhook/bitable",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16158,7 +16334,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
@@ -16166,7 +16342,7 @@
     },
     "rest:POST:/teams": {
       "function_id": "rest:POST:/teams",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16180,7 +16356,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/teams.py"
@@ -16188,7 +16364,7 @@
     },
     "rest:POST:/teams/{gid}/members": {
       "function_id": "rest:POST:/teams/{gid}/members",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16202,7 +16378,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/teams.py"
@@ -16210,7 +16386,7 @@
     },
     "rest:POST:/{capability_id}:confirm": {
       "function_id": "rest:POST:/{capability_id}:confirm",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16224,7 +16400,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/capabilities.py"
@@ -16232,7 +16408,7 @@
     },
     "rest:POST:/{capability_id}:invoke": {
       "function_id": "rest:POST:/{capability_id}:invoke",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16246,7 +16422,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/capabilities.py"
@@ -16254,7 +16430,7 @@
     },
     "rest:PUT:/admin/config/{key}": {
       "function_id": "rest:PUT:/admin/config/{key}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16268,7 +16444,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/admin.py"
@@ -16276,7 +16452,7 @@
     },
     "rest:PUT:/api/annotations/{key}": {
       "function_id": "rest:PUT:/api/annotations/{key}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16290,7 +16466,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/annotations.py"
@@ -16342,7 +16518,7 @@
     },
     "rest:PUT:/api/ext-field-mappings/batch": {
       "function_id": "rest:PUT:/api/ext-field-mappings/batch",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16356,7 +16532,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -16364,7 +16540,7 @@
     },
     "rest:PUT:/api/flows/{gid}": {
       "function_id": "rest:PUT:/api/flows/{gid}",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16378,7 +16554,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
@@ -16452,7 +16628,7 @@
     },
     "rest:PUT:/api/self_ann/{item_gid}": {
       "function_id": "rest:PUT:/api/self_ann/{item_gid}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16466,7 +16642,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/self_annotations.py"
@@ -16474,7 +16650,7 @@
     },
     "rest:PUT:/api/skills/{gid}": {
       "function_id": "rest:PUT:/api/skills/{gid}",
-      "domain": "Base",
+      "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16488,7 +16664,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/routers/skills.py"
@@ -16540,7 +16716,7 @@
     },
     "rest:PUT:/api/uploads/{filename}": {
       "function_id": "rest:PUT:/api/uploads/{filename}",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16554,7 +16730,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/uploads.py"
@@ -16562,7 +16738,7 @@
     },
     "rest:PUT:/api/workbenches/{gid}/override": {
       "function_id": "rest:PUT:/api/workbenches/{gid}/override",
-      "domain": "Base",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16576,7 +16752,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/workbenches.py"
@@ -16584,7 +16760,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/assets/lib/occt/occt-import-js.js:9": {
       "function_id": "web_gap:dynamic_fetch:dist/web/assets/lib/occt/occt-import-js.js:9",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16598,7 +16774,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/assets/lib/occt/occt-import-js.js"
@@ -16606,7 +16782,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/canvas/types/flow_type.js:768": {
       "function_id": "web_gap:dynamic_fetch:dist/web/canvas/types/flow_type.js:768",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16620,7 +16796,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/canvas/types/flow_type.js"
@@ -16628,7 +16804,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:109": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:109",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16642,7 +16818,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/bitable_sync_manager.js"
@@ -16650,7 +16826,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:163": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:163",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16664,7 +16840,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/bitable_sync_manager.js"
@@ -16672,7 +16848,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:246": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:246",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16686,7 +16862,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/bitable_sync_manager.js"
@@ -16694,7 +16870,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:262": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:262",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16708,7 +16884,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/bitable_sync_manager.js"
@@ -16716,7 +16892,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:271": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:271",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16730,7 +16906,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/bitable_sync_manager.js"
@@ -16738,7 +16914,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:50": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:50",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16752,7 +16928,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/bitable_sync_manager.js"
@@ -16760,7 +16936,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:79": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:79",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16774,7 +16950,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/bitable_sync_manager.js"
@@ -16782,7 +16958,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:94": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/bitable_sync_manager.js:94",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16796,7 +16972,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/bitable_sync_manager.js"
@@ -16804,7 +16980,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/feishu_mention_chip.js:18": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/feishu_mention_chip.js:18",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16818,7 +16994,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/feishu_mention_chip.js"
@@ -16826,7 +17002,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/import_export.js:976": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/import_export.js:976",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16840,7 +17016,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/import_export.js"
@@ -16848,7 +17024,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1151": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1151",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16862,7 +17038,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/list_shell.js"
@@ -16870,7 +17046,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1165": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1165",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16884,7 +17060,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/list_shell.js"
@@ -16892,7 +17068,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1228": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/list_shell.js:1228",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16906,7 +17082,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/list_shell.js"
@@ -16914,7 +17090,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/list_sidebar.js:78": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/list_sidebar.js:78",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16928,7 +17104,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/list_sidebar.js"
@@ -16936,7 +17112,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/list_sidebar.js:93": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/list_sidebar.js:93",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16950,7 +17126,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/list_sidebar.js"
@@ -16958,7 +17134,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/components/overlay_edit_modal.js:564": {
       "function_id": "web_gap:dynamic_fetch:dist/web/components/overlay_edit_modal.js:564",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16972,7 +17148,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/components/overlay_edit_modal.js"
@@ -16980,7 +17156,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/container_card/modes/container_item_detail.js:91": {
       "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/container_item_detail.js:91",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -16994,7 +17170,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/container_card/modes/container_item_detail.js"
@@ -17002,7 +17178,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_markdown.js:62": {
       "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_markdown.js:62",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17016,7 +17192,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/container_card/modes/mode_markdown.js"
@@ -17024,7 +17200,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_markdown.js:77": {
       "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_markdown.js:77",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17038,7 +17214,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/container_card/modes/mode_markdown.js"
@@ -17046,7 +17222,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_spreadsheet.js:115": {
       "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_spreadsheet.js:115",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17060,7 +17236,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/container_card/modes/mode_spreadsheet.js"
@@ -17068,7 +17244,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_spreadsheet.js:134": {
       "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_spreadsheet.js:134",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17082,7 +17258,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/container_card/modes/mode_spreadsheet.js"
@@ -17090,7 +17266,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_spreadsheet.js:57": {
       "function_id": "web_gap:dynamic_fetch:dist/web/container_card/modes/mode_spreadsheet.js:57",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17104,7 +17280,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/container_card/modes/mode_spreadsheet.js"
@@ -17112,7 +17288,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/auth_state.js:55": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/auth_state.js:55",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17126,7 +17302,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/auth_state.js"
@@ -17134,7 +17310,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:117": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:117",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17148,7 +17324,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17156,7 +17332,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:118": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:118",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17170,7 +17346,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17178,7 +17354,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:138": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:138",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17192,7 +17368,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17200,7 +17376,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:139": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:139",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17214,7 +17390,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17222,7 +17398,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:177": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:177",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17236,7 +17412,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17244,7 +17420,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:180": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:180",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17258,7 +17434,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17266,7 +17442,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:183": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:183",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17280,7 +17456,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17288,7 +17464,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:191": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:191",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17302,7 +17478,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17310,7 +17486,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:198": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:198",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17324,7 +17500,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17332,7 +17508,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:205": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:205",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17346,7 +17522,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17354,7 +17530,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:208": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:208",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17368,7 +17544,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17376,7 +17552,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:215": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:215",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17390,7 +17566,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17398,7 +17574,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:218": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:218",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17412,7 +17588,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17420,7 +17596,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:226": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:226",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17434,7 +17610,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17442,7 +17618,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:229": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:229",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17456,7 +17632,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17464,7 +17640,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:60": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:60",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17478,7 +17654,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17486,7 +17662,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:61": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:61",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17500,7 +17676,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17508,7 +17684,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:62": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:62",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17522,7 +17698,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17530,7 +17706,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:88": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:88",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17544,7 +17720,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17552,7 +17728,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:98": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:98",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17566,7 +17742,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17574,7 +17750,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/global_search.js:99": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/global_search.js:99",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17588,7 +17764,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/global_search.js"
@@ -17596,7 +17772,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/notification_manager.js:16": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/notification_manager.js:16",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17610,7 +17786,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/notification_manager.js"
@@ -17618,7 +17794,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/notification_manager.js:17": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/notification_manager.js:17",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17632,7 +17808,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/notification_manager.js"
@@ -17640,7 +17816,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/notification_manager.js:66": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/notification_manager.js:66",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17654,7 +17830,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/notification_manager.js"
@@ -17662,7 +17838,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:167": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:167",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17676,7 +17852,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17684,7 +17860,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:197": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:197",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17698,7 +17874,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17706,7 +17882,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:236": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:236",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17720,7 +17896,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17728,7 +17904,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:278": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:278",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17742,7 +17918,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17750,7 +17926,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:286": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:286",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17764,7 +17940,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17772,7 +17948,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:296": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:296",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17786,7 +17962,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17794,7 +17970,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:306": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:306",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17808,7 +17984,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17816,7 +17992,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:33": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:33",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17830,7 +18006,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17838,7 +18014,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/core/web_compat.js:361": {
       "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:361",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17852,7 +18028,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/core/web_compat.js"
@@ -17860,7 +18036,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/main.js:1043": {
       "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1043",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17874,7 +18050,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/main.js"
@@ -17882,7 +18058,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/main.js:1073": {
       "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1073",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17896,7 +18072,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/main.js"
@@ -17904,7 +18080,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/main.js:1183": {
       "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1183",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17918,7 +18094,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/main.js"
@@ -17926,7 +18102,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/main.js:1457": {
       "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1457",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17940,7 +18116,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/main.js"
@@ -17948,7 +18124,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/main.js:1467": {
       "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1467",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17962,7 +18138,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/main.js"
@@ -17970,7 +18146,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/main.js:1500": {
       "function_id": "web_gap:dynamic_fetch:dist/web/main.js:1500",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -17984,7 +18160,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/main.js"
@@ -17992,7 +18168,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/main.js:635": {
       "function_id": "web_gap:dynamic_fetch:dist/web/main.js:635",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -18006,7 +18182,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/main.js"
@@ -18014,7 +18190,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/main.js:676": {
       "function_id": "web_gap:dynamic_fetch:dist/web/main.js:676",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -18028,7 +18204,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/main.js"
@@ -18036,7 +18212,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/settings/settings.js:1216": {
       "function_id": "web_gap:dynamic_fetch:dist/web/settings/settings.js:1216",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -18050,7 +18226,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/settings/settings.js"
@@ -18058,7 +18234,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/team_space/team_space.js:29": {
       "function_id": "web_gap:dynamic_fetch:dist/web/team_space/team_space.js:29",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -18072,7 +18248,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/team_space/team_space.js"
@@ -18080,7 +18256,7 @@
     },
     "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5630": {
       "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5630",
-      "domain": "Base",
+      "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
         "Web"
@@ -18094,7 +18270,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "dist/web/workbench/workbench.js"

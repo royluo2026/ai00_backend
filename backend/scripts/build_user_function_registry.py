@@ -18,7 +18,17 @@ from typing import Iterable
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = REPOSITORY_ROOT / "docs" / "governance" / "user-function-registry.json"
-DOMAINS = ("Base", "Craft", "Digital Model", "Simulation", "Ontology", "Knowledge", "Local Integration")
+DOMAINS = (
+    "Base Platform",
+    "Agent",
+    "Craft",
+    "Digital Model",
+    "Project Management",
+    "Simulation",
+    "Ontology",
+    "Knowledge",
+    "Local Integration",
+)
 VALID_EXCLUSIONS = {"internal", "operations", "ui_transient"}
 ROUTE_METHODS = {"get", "post", "put", "patch", "delete", "head", "options"}
 CAPABILITY_PATTERN = r"(?:base|craft|identity|knowledge|local|ontology|plugin|semantic|system|vismockup)\.[a-z0-9_.]+"
@@ -29,6 +39,12 @@ FETCH_CALL_RE = re.compile(
 FETCH_START_RE = re.compile(r"\b(?:fetch|_cloudFetch)\s*\(")
 FETCH_METHOD_RE = re.compile(r"(?:[\"']method[\"']|method)\s*:\s*[\"'](?P<method>[A-Za-z]+)[\"']")
 BRIDGE_INVOKE_RE = re.compile(r"\bbridge\.invoke\s*\(\s*[\"'](?P<name>[^\"']+)[\"']")
+AGENT_RUNTIME_STATIC_ROUTE_RE = re.compile(
+    r'req\.method\s*===\s*"(?P<method>GET|POST|PUT|PATCH|DELETE)"\s*&&\s*url\.pathname\s*===\s*"(?P<route>/[^\"]+)"'
+)
+AGENT_RUNTIME_MATCH_RE = re.compile(
+    r"const\s+(?P<variable>\w+)\s*=\s*url\.pathname\.match\(/\^(?P<route>.+?)\$/\);"
+)
 DEFAULT_EXCLUSION_REASON = "Operations or transient interface; not selected for a Capability migration."
 
 TARGET_CAPABILITIES = {
@@ -61,7 +77,28 @@ def _domain(value: str, path: str = "") -> str:
         return "Knowledge"
     if "craft" in subject or "bop" in subject or "pbom" in subject or "gbop" in subject:
         return "Craft"
-    return "Base"
+    if value.lower() in {
+        "agent_tool:search", "agent_tool:list_tasks", "agent_tool:get_task",
+        "agent_tool:list_task_lists", "agent_tool:list_issues", "agent_tool:get_issue",
+        "agent_tool:list_issue_lists", "agent_tool:list_projects",
+        "agent_tool:list_approval_orders", "agent_tool:create_task",
+        "agent_tool:update_task", "agent_tool:create_issue", "agent_tool:update_issue",
+        "agent_tool:create_approval_order", "agent_tool:add_task_progress_log",
+    }:
+        return "Project Management"
+    if any(marker in subject for marker in (
+        "/api/projects", "/api/project/", "base.project.",
+        "/api/tasks", "/api/issues", "/api/milestones", "/api/workbenches",
+        "/api/workspaces", "project_management", "project-management",
+        "routers/projects.py", "routers/tasks.py", "routers/issues.py",
+    )):
+        return "Project Management"
+    if any(marker in subject for marker in (
+        "/api/agents", "agent.", "agent_runtime", "agent-runtime",
+        "plugins/agent", "routers/agents.py", "capabilities/agent_",
+    )):
+        return "Agent"
+    return "Base Platform"
 
 
 def _resource_types(value: str) -> list[str]:
@@ -259,11 +296,49 @@ def scan_local_runtime_commands(root: Path) -> dict[str, dict]:
     return found
 
 
+def _runtime_route_template(route_pattern: str) -> str:
+    route = route_pattern.replace(r"\/", "/")
+    parameter_number = 0
+
+    def replace_parameter(_match: re.Match) -> str:
+        nonlocal parameter_number
+        parameter_number += 1
+        return "{session_gid}" if parameter_number == 1 else f"{{parameter_{parameter_number}}}"
+
+    return re.sub(r"\(\[\^/\]\+\)", replace_parameter, route)
+
+
+def scan_agent_runtime_routes(root: Path) -> dict[str, dict]:
+    """Discover the checked-in TypeScript runtime's user-facing HTTP contract."""
+    found: dict[str, dict] = {}
+    path = root / "services" / "agent-runtime" / "src" / "server.ts"
+    if not path.exists():
+        return found
+    content = path.read_text(encoding="utf-8")
+    source_path = _relative(path)
+    for match in AGENT_RUNTIME_STATIC_ROUTE_RE.finditer(content):
+        _add(found, f"agent_runtime:{match.group('method')}:{match.group('route')}",
+             consumer="Agent Runtime API", source_path=source_path, domain="Agent")
+    for match in AGENT_RUNTIME_MATCH_RE.finditer(content):
+        variable = match.group("variable")
+        route = _runtime_route_template(match.group("route"))
+        conditions = (
+            re.compile(rf'if\s*\(\s*{re.escape(variable)}\s*&&\s*req\.method\s*===\s*"(?P<method>GET|POST|PUT|PATCH|DELETE)"'),
+            re.compile(rf'if\s*\(\s*req\.method\s*===\s*"(?P<method>GET|POST|PUT|PATCH|DELETE)"\s*&&\s*{re.escape(variable)}'),
+        )
+        for condition in conditions:
+            for method_match in condition.finditer(content):
+                _add(found, f"agent_runtime:{method_match.group('method')}:{route}",
+                     consumer="Agent Runtime API", source_path=source_path, domain="Agent")
+    return found
+
+
 def discover_user_functions(root: Path = REPOSITORY_ROOT) -> list[dict]:
     """Return sorted records discovered from every supported public-function surface."""
     found: dict[str, dict] = {}
     for scanner in (scan_fastapi_routes, scan_web_calls, scan_capability_registrations,
-                    scan_agent_tools, scan_mcp_tools, scan_local_runtime_commands):
+                    scan_agent_tools, scan_mcp_tools, scan_local_runtime_commands,
+                    scan_agent_runtime_routes):
         for function_id, row in scanner(root).items():
             for consumer in row["current_consumers"]:
                 _add(found, function_id, consumer=consumer, source_path=next(iter(row["source_paths"])),
@@ -327,6 +402,14 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
         previous = existing.get(function_id)
         if previous:
             generated.update(previous)
+            # Domain labels are generated evidence, not a governance override.
+            # Migrate retired taxonomy values deterministically while retaining
+            # reviewed exposure, lifecycle, and explanatory metadata.
+            previous_domain = previous.get("domain")
+            if previous_domain not in DOMAINS:
+                generated["domain"] = discovered_by_id[function_id]["domain"]
+                if previous.get("owner") == previous_domain:
+                    generated["owner"] = generated["domain"]
             generated["current_consumers"] = discovered_by_id[function_id]["current_consumers"]
             generated["source_paths"] = discovered_by_id[function_id]["source_paths"]
             if (previous.get("classification") == "unreviewed"

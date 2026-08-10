@@ -1,0 +1,109 @@
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+from fnmatch import fnmatch
+from pathlib import Path
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+OWNERSHIP_PATH = REPOSITORY_ROOT / "docs" / "governance" / "domain-ownership.json"
+BASELINE_PATH = REPOSITORY_ROOT / "docs" / "governance" / "domain-dependency-baseline.json"
+CHECKER_PATH = REPOSITORY_ROOT / "backend" / "scripts" / "check_domain_dependencies.py"
+CODEOWNERS_PATH = REPOSITORY_ROOT / ".github" / "CODEOWNERS"
+EXPECTED_DOMAINS = {
+    "Base Platform",
+    "Agent",
+    "Craft",
+    "Digital Model",
+    "Project Management",
+    "Simulation",
+    "Ontology",
+    "Knowledge",
+    "Local Integration",
+}
+
+
+def _ownership() -> dict:
+    return json.loads(OWNERSHIP_PATH.read_text(encoding="utf-8"))
+
+
+def test_every_first_class_domain_has_an_independent_release_owner():
+    document = _ownership()
+
+    assert document["schema_version"] == 1
+    assert set(document["domains"]) == EXPECTED_DOMAINS
+    for name, domain in document["domains"].items():
+        assert domain["maintainers"], name
+        assert domain["artifact"], name
+        assert domain["provider_paths"], name
+        assert domain["test_paths"], name
+        assert domain["documentation_paths"], name
+
+
+def test_owned_code_patterns_are_unique_and_project_management_overrides_craft_legacy_paths():
+    document = _ownership()
+    claims: dict[str, str] = {}
+    for domain, descriptor in document["domains"].items():
+        for pattern in descriptor["code_paths"]:
+            assert pattern not in claims, f"{pattern} is claimed by {claims[pattern]} and {domain}"
+            claims[pattern] = domain
+
+    project_patterns = set(document["domains"]["Project Management"]["code_paths"])
+    assert "plugins/craft/craft_backend/routers/projects.py" in project_patterns
+    assert "plugins/craft/craft_backend/routers/workbench_home.py" in project_patterns
+
+
+def test_every_versioned_migration_has_exactly_one_domain_owner():
+    document = _ownership()
+    migrations = {
+        path.relative_to(REPOSITORY_ROOT).as_posix()
+        for path in (REPOSITORY_ROOT / "backend" / "db" / "migrations").glob("*.sql")
+    }
+    claims = {
+        domain: descriptor["migration_paths"]
+        for domain, descriptor in document["domains"].items()
+    }
+
+    for migration in migrations:
+        owners = [domain for domain, patterns in claims.items() if any(fnmatch(migration, p) for p in patterns)]
+        assert len(owners) == 1, f"{migration}: owners={owners}"
+    declared = {pattern for patterns in claims.values() for pattern in patterns if "*" not in pattern}
+    assert declared <= migrations
+
+
+def test_dependency_baseline_is_exact_and_checker_rejects_new_violations():
+    baseline = json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
+    assert baseline["schema_version"] == 1
+    for violation in baseline["violations"]:
+        assert set(violation) == {"source", "imported_module", "source_domain", "target_domain", "reason"}
+        assert "*" not in violation["source"]
+        assert "*" not in violation["imported_module"]
+
+    result = subprocess.run(
+        [sys.executable, str(CHECKER_PATH), "--check"],
+        cwd=REPOSITORY_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_codeowners_names_every_domain_maintainer_group():
+    document = _ownership()
+    rules = {
+        (parts[0], owner)
+        for line in CODEOWNERS_PATH.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+        for parts in [line.split()]
+        for owner in parts[1:]
+    }
+
+    for domain_name, domain in document["domains"].items():
+        for owned_path in domain["code_paths"] + domain["migration_paths"]:
+            assert any((f"/{owned_path}", maintainer) in rules for maintainer in domain["maintainers"]), (
+                domain_name,
+                owned_path,
+            )
