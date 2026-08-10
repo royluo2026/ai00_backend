@@ -225,6 +225,20 @@ def get_snapshot(payload: dict[str, Any], context: CapabilityContext) -> Capabil
     return CapabilityOutput(data=_snapshot(row))
 
 
+def resolve_snapshot_reference(reference: Mapping[str, Any], context: CapabilityContext) -> dict[str, Any]:
+    """Resolve and verify an exact immutable model snapshot for downstream domains."""
+    row = repository.get_snapshot(str(reference.get("model_id") or ""), str(reference.get("version_id") or ""), context)
+    if not row:
+        raise CapabilityBusinessError("snapshot_not_found", "Digital Model snapshot not found")
+    actual = _snapshot(row)["snapshot_ref"]
+    if actual != dict(reference):
+        raise CapabilityBusinessError(
+            "source_version_mismatch", "Digital Model snapshot no longer matches the pinned reference",
+            details={"expected_snapshot_hash": reference.get("snapshot_hash"), "actual_snapshot_hash": actual["snapshot_hash"]},
+        )
+    return actual
+
+
 def compare_snapshots(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     model_id = str(payload["model_id"])
     before_row = repository.get_snapshot(model_id, str(payload["from_version_id"]), context)

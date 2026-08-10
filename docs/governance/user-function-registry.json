@@ -2933,6 +2933,253 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
+    "capability:simulation.environment.create": {
+      "function_id": "capability:simulation.environment.create",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.environment.get": {
+      "function_id": "capability:simulation.environment.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.environment.list": {
+      "function_id": "capability:simulation.environment.list",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.list",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py"
+      ]
+    },
+    "capability:simulation.parameter_set.create": {
+      "function_id": "capability:simulation.parameter_set.create",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.parameter_set.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py"
+      ]
+    },
+    "capability:simulation.parameter_set.get": {
+      "function_id": "capability:simulation.parameter_set.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.parameter_set.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.profile.create": {
+      "function_id": "capability:simulation.profile.create",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.profile.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py"
+      ]
+    },
+    "capability:simulation.profile.get": {
+      "function_id": "capability:simulation.profile.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.profile.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.result.get": {
+      "function_id": "capability:simulation.result.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.result.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.run.get": {
+      "function_id": "capability:simulation.run.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.run.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.run.start": {
+      "function_id": "capability:simulation.run.start",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.run.start",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
     "capability:system.activity.search": {
       "function_id": "capability:system.activity.search",
       "domain": "Base Platform",
@@ -8415,15 +8662,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "simulation.environment.list",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "mapped",
+      "migration_status": "mapped",
       "owner": "Simulation",
       "exclusion_reason": null,
       "source_paths": [
@@ -8437,15 +8684,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "simulation.environment.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "mapped",
+      "migration_status": "mapped",
       "owner": "Simulation",
       "exclusion_reason": null,
       "source_paths": [
@@ -14886,15 +15133,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "simulation.environment.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "mapped",
+      "migration_status": "mapped",
       "owner": "Simulation",
       "exclusion_reason": null,
       "source_paths": [

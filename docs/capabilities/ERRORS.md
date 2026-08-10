@@ -28,5 +28,8 @@
 | `transaction_participant_required` | 强一致写 Provider 未加入领域事务。 |
 | `provider_failed` | 领域 Provider 执行失败；错误正文不会泄露内部细节。 |
 | `outcome_persistence_failed` | 领域可能已提交但 Outcome 未能确认，必须查询 OperationRef。 |
+| `operation_service_unavailable` | 能力要求异步 Operation，但持久化 Operation 服务未配置。 |
+| `operation_create_failed` | 异步 Operation 无法持久化，领域任务未派发。 |
+| `operation_create_outcome_failed` | 异步 Operation 创建后的命令 Outcome 无法持久化，领域任务未派发。 |
 
 对于写操作，网络超时不等于失败。先用同一幂等键查询/重放 Outcome；若为 `outcome_unknown`，按 Operation 协议对账。

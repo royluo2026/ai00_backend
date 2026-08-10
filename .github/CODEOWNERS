@@ -11,6 +11,7 @@
 /backend/db/connection.py @ai00/base-maintainers
 /backend/utils/gid.py @ai00/base-maintainers
 /backend/capabilities/registry_next.py @ai00/base-maintainers
+/backend/domain_ports/versioned_resources.py @ai00/base-maintainers
 /services/mcp-gateway/** @ai00/base-maintainers
 /backend/db/migrations/202608030006_base_platform_runtime_tables.sql @ai00/base-maintainers
 /backend/db/migrations/202608030010_base_self_annotations.sql @ai00/base-maintainers
@@ -59,6 +60,9 @@
 # Simulation
 /plugins/simulation/** @ai00/simulation-maintainers
 /backend/db/migrations/202608030009_simulation_environments.sql @ai00/simulation-maintainers
+/backend/db/migrations/202608100010_simulation_reproducibility.sql @ai00/simulation-maintainers
+/backend/domain_ports/simulation.py @ai00/simulation-maintainers
+/backend/capability_v2/revision/simulation_adapter.py @ai00/simulation-maintainers
 
 # Ontology
 /backend/ontology/** @ai00/ontology-maintainers

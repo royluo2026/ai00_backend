@@ -8,7 +8,7 @@ craft.pbom.part.search
 - 不适用：No exact PBOM snapshot is known.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_7c227d7e540a4795d9d4609fa2f206e3`
+- Catalog Release：`rel_62702938fc287d57bd0a2e4e3bf7385c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -84,7 +84,7 @@ craft.pbom.part.search
 ```json
 {
   "capability_id": "craft.pbom.part.search",
-  "catalog_release": "rel_7c227d7e540a4795d9d4609fa2f206e3",
+  "catalog_release": "rel_62702938fc287d57bd0a2e4e3bf7385c",
   "major_version": 1,
   "payload": {
     "snapshot_gid": "example"
@@ -145,6 +145,9 @@ craft.pbom.part.search
 - `transaction_participant_required`：强一致写 Provider 未加入领域事务。
 - `provider_failed`：领域 Provider 执行失败；错误正文不会泄露内部细节。
 - `outcome_persistence_failed`：领域可能已提交但 Outcome 未能确认，必须查询 OperationRef。
+- `operation_service_unavailable`：能力要求异步 Operation，但持久化 Operation 服务未配置。
+- `operation_create_failed`：异步 Operation 无法持久化，领域任务未派发。
+- `operation_create_outcome_failed`：异步 Operation 创建后的命令 Outcome 无法持久化，领域任务未派发。
 
 领域错误：
 

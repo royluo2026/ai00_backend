@@ -1193,6 +1193,17 @@ checked-in golden cases. The domain has an independent database URL, migrations,
 provider artifact hash, CODEOWNERS and generated developer manual. Simulation
 environment/run/result migration remains next.
 
+Simulation reproducibility slice completed on 2026-08-10: the independently
+owned `official.simulation` provider publishes ten stable Plugin/Agent/MCP
+capabilities for immutable parameter sets, versioned solver profiles,
+reference-only environments, asynchronous runs and ArtifactRef-only results.
+Environment creation rejects caller-supplied plans, URIs and file paths; it
+resolves exact published Craft execution plans and Digital Model snapshots
+through a shared public versioned-resource port, then persists the Craft
+commit reference, model snapshot hash, parameter version, solver version and a
+canonical source fingerprint. Simulation owns its database URL, migration,
+Revision adapter, tests, provider artifact and generated developer manual.
+
 - [ ] **Step 4: Run domain, Revision and coverage tests**
 
 Run: `python -m pytest backend/tests/test_digital_model_capabilities.py backend/tests/test_simulation_reproducibility.py backend/tests/test_simulation_capabilities.py backend/tests/test_craft_simulation_contract.py backend/tests/test_domain_capability_coverage.py -q`

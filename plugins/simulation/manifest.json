@@ -3,6 +3,8 @@
   "name": "数模与仿真",
   "backend": {
     "routers_module": "simulation_backend.routers",
+    "capabilities_module": "simulation_backend.capabilities",
+    "provider_version": "1.0.0",
     "owned_schemas": ["simulation"]
   }
 }

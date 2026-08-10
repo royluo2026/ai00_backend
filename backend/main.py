@@ -215,6 +215,7 @@ _plugin_capability_providers = _plugin_loader.register_capabilities(_capability_
 from backend.capability_v2.gateway import configure_default_gateway as _configure_capability_gateway
 from backend.capability_v2.policies import LegacyServerGatewayPolicy as _LegacyGatewayPolicy
 from backend.capability_v2.outcomes import SqlOutcomeStore as _SqlOutcomeStore
+from backend.capability_v2.operations import OperationService as _OperationService, SqlOperationStore as _SqlOperationStore
 from backend.capability_v2.reliability import (
     ApprovalService as _ApprovalService,
     ReliabilityCoordinator as _ReliabilityCoordinator,
@@ -239,6 +240,7 @@ _capability_gateway = _configure_capability_gateway(
         _SqlOutcomeStore(_capability_connection),
         _SqlRateLimiter(_capability_connection, limit=1000, window_seconds=60),
     ),
+    operations=_OperationService(_SqlOperationStore(_capability_connection)),
 )
 
 # 收集所有插件声明的 OWNED_MODULES（这些模块由插件管理，不走 auto-scan）

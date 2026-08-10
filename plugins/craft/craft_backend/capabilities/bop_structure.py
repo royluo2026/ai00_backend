@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from backend.capabilities.models_next import (
+    CapabilityBusinessError,
     CapabilityContext,
     CapabilityOutput,
     CapabilitySpec,
@@ -63,6 +64,32 @@ def get_execution_structure(
         preview=False,
     )
     return CapabilityOutput(data=structure, evidence=(_structure_evidence(structure),))
+
+
+def resolve_execution_plan_reference(
+    reference: Mapping[str, Any], context: CapabilityContext,
+) -> dict[str, Any]:
+    """Resolve and verify an exact published execution plan for downstream domains."""
+    version_gid = _required_text(reference, "version_gid")
+    expected_revision = reference.get("revision")
+    expected_hash = str(reference.get("content_hash") or "")
+    structure = build_execution_structure(version_gid, expected_revision=None, preview=False)
+    source = structure["source"]
+    actual_revision = int(source["revision"])
+    actual_hash = str(structure["content_hash"])
+    if actual_revision != expected_revision or actual_hash != expected_hash:
+        raise CapabilityBusinessError(
+            "source_version_mismatch", "Craft execution plan no longer matches the pinned reference",
+            details={"expected_revision": expected_revision, "actual_revision": actual_revision,
+                     "expected_hash": expected_hash, "actual_hash": actual_hash},
+        )
+    return {
+        "version_gid": version_gid,
+        "revision": actual_revision,
+        "content_hash": actual_hash,
+        "craft_commit_ref": f"craft://bop/version/{version_gid}/execution-structure/r{actual_revision}",
+        "node_count": len(structure.get("nodes") or ()),
+    }
 
 
 def preview_execution_structure(

@@ -35,4 +35,8 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "digital_model.model.create", "digital_model.model.get", "digital_model.model.search",
     "digital_model.version.create", "digital_model.snapshot.get", "digital_model.snapshot.compare",
     "digital_model.component.search",
+    "simulation.parameter_set.create", "simulation.parameter_set.get",
+    "simulation.profile.create", "simulation.profile.get",
+    "simulation.environment.create", "simulation.environment.get", "simulation.environment.list",
+    "simulation.run.start", "simulation.run.get", "simulation.result.get",
 })

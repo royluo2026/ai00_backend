@@ -4,20 +4,26 @@
     {
       "plugin_id": "official.digital-model",
       "module": "digital_model_backend.capabilities",
-      "version": "1.0.0",
-      "artifact_hash": "sha256:9e81577f700819567627fd7072fb68ddf98d7b4b4ab57636f37493aa43df2e19"
+      "version": "1.1.0",
+      "artifact_hash": "sha256:9ddf2440ddd5d929aafd5682c5f006393757cbcb7b76bee588d448378a7cb326"
     },
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
-      "version": "1.1.0",
-      "artifact_hash": "sha256:bb1c77bc337576b92e081b60f976fe6ac9d6a266d7dc14e1d5b1fd1f1c6db121"
+      "version": "1.2.0",
+      "artifact_hash": "sha256:50f0b1ed106f16a801e92114a4bf2103939c08be91d48c1996bf3ac9f464171f"
     },
     {
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
       "artifact_hash": "sha256:15bec7ce65ca53100ce79eee368b8f1dd6c79fc596871b5e012336c4a0c2336d"
+    },
+    {
+      "plugin_id": "official.simulation",
+      "module": "simulation_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:7c593c94096c99fb5101472da2df37b5229668bd0995ff2611441bc61a551bc0"
     }
   ]
 }

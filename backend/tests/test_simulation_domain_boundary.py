@@ -18,7 +18,7 @@ class SimulationDomainBoundaryTests(unittest.TestCase):
                 _params()
 
     def test_simulation_does_not_import_base_internals(self):
-        allowed = ("backend.contracts", "backend.platform_sdk")
+        allowed = ("backend.contracts", "backend.platform_sdk", "backend.capability_v2", "backend.domain_ports")
         for path in SIM_ROOT.rglob("*.py"):
             tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
             for node in ast.walk(tree):
@@ -29,6 +29,12 @@ class SimulationDomainBoundaryTests(unittest.TestCase):
     def test_simulation_never_reads_craft_tables(self):
         for path in SIM_ROOT.rglob("*.py"):
             self.assertNotIn("workmanship_bop_", path.read_text(encoding="utf-8"), str(path))
+
+    def test_simulation_rest_adapter_invokes_only_the_governed_gateway(self):
+        source = (SIM_ROOT / "simulation_backend" / "routers" / "environments.py").read_text(encoding="utf-8")
+        self.assertIn("get_default_gateway", source)
+        self.assertIn("gateway.invoke", source)
+        self.assertNotIn("from ..public import", source)
 
 
 if __name__ == "__main__":

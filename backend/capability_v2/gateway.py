@@ -26,6 +26,7 @@ from .policies import (
     GatewayPolicy,
     GatewayPolicyError,
 )
+from .operations import OperationService
 from .projection import project_result
 from .reliability import (
     InvocationLease, ReliabilityCoordinator, ReliabilityError, TransactionalCapabilityOutput,
@@ -35,10 +36,12 @@ from .reliability import IssuedApproval
 
 class CapabilityGatewayService:
     def __init__(self, resolver: CatalogResolver, policy: GatewayPolicy | None = None,
-                 *, reliability: ReliabilityCoordinator | None = None) -> None:
+                 *, reliability: ReliabilityCoordinator | None = None,
+                 operations: OperationService | None = None) -> None:
         self._resolver = resolver
         self._policy = policy or FailClosedGatewayPolicy()
         self._reliability = reliability
+        self._operations = operations
         self._catalog_release: str | None = None
 
     @property
@@ -145,6 +148,11 @@ class CapabilityGatewayService:
             )
 
         is_write = descriptor.side_effect_level is not SideEffectLevel.READ
+        if descriptor.operation_policy == "required" and self._operations is None:
+            return self._rejected(
+                envelope, "operation_service_unavailable",
+                "Durable asynchronous operations are not configured.",
+            )
         if is_write and self._reliability is None:
             return self._rejected(
                 envelope, "reliability_unavailable",
@@ -207,7 +215,31 @@ class CapabilityGatewayService:
                     data_scopes=authorization.data_scopes if authorization is not None else (),
                 )
 
-        context = self._legacy_context(envelope)
+        async_operation = None
+        if descriptor.operation_policy == "required":
+            try:
+                async_operation = self._operations.create(
+                    kind=descriptor.id,
+                    requested_by=envelope.identity,
+                    resource_refs=(authorization.resource_refs if authorization is not None else ()),
+                )
+            except Exception:
+                result = self._failed(
+                    envelope, "operation_create_failed", "The asynchronous operation could not be created."
+                )
+                if lease is not None:
+                    try:
+                        self._reliability.complete(lease, result)
+                    except Exception:
+                        return self._failed(
+                            envelope, "operation_create_outcome_failed",
+                            "The asynchronous operation was not dispatched.",
+                        )
+                return result
+
+        context = self._legacy_context(
+            envelope, operation_id=(async_operation.operation_id if async_operation else None)
+        )
         transaction = None
         try:
             try:
@@ -259,24 +291,43 @@ class CapabilityGatewayService:
                 transaction = None
             result = self._failed(envelope, "provider_failed", "Capability provider failed.")
         else:
-            result = CapabilityResultV2(
-                ok=True,
-                status=CapabilityStatus.COMPLETED,
-                capability_id=envelope.capability_id,
-                major_version=envelope.major_version,
-                data=projected,
-                evidence=evidence,
-                correlation=CorrelationRef(request_id=envelope.request_id, trace_id=envelope.trace_id),
-            )
+            if async_operation is not None:
+                result = CapabilityResultV2.accepted(
+                    envelope.capability_id, envelope.major_version,
+                    envelope.request_id, async_operation,
+                ).model_copy(update={"evidence": evidence})
+            else:
+                result = CapabilityResultV2(
+                    ok=True,
+                    status=CapabilityStatus.COMPLETED,
+                    capability_id=envelope.capability_id,
+                    major_version=envelope.major_version,
+                    data=projected,
+                    evidence=evidence,
+                    correlation=CorrelationRef(request_id=envelope.request_id, trace_id=envelope.trace_id),
+                )
+        if async_operation is not None and not result.ok:
+            try:
+                failed_ref = self._operations.transition(
+                    async_operation.operation_id, OperationStatus.FAILED,
+                    expected_version=async_operation.version,
+                    requested_by=envelope.identity,
+                    error_code=result.error.code if result.error else "provider_failed",
+                    granted_resources=(authorization.resource_refs if authorization is not None else ()),
+                )
+                result = result.model_copy(update={"operation_ref": failed_ref})
+            except Exception:
+                pass
         if lease is not None:
             operation_status = (
                 OperationStatus.COMPLETED if result.ok else OperationStatus.FAILED
             )
-            result = result.model_copy(update={
-                "operation_ref": OperationRef(
-                    operation_id=lease.operation_id, status=operation_status
-                )
-            })
+            if async_operation is None:
+                result = result.model_copy(update={
+                    "operation_ref": OperationRef(
+                        operation_id=lease.operation_id, status=operation_status
+                    )
+                })
             try:
                 self._reliability.complete(lease, result, transaction=transaction)
                 if transaction is not None:
@@ -329,7 +380,7 @@ class CapabilityGatewayService:
         )
 
     @staticmethod
-    def _legacy_context(envelope: InvocationEnvelope) -> CapabilityContext:
+    def _legacy_context(envelope: InvocationEnvelope, *, operation_id: str | None = None) -> CapabilityContext:
         actor = envelope.identity.actor
         return CapabilityContext(
             user_gid=actor.user_id or actor.service_id or "",
@@ -337,6 +388,7 @@ class CapabilityGatewayService:
             source=envelope.identity.consumer.type.value,
             request_id=envelope.request_id,
             confirmation_token=envelope.approval_reference,
+            operation_id=operation_id,
             agent_run_id=envelope.identity.consumer.agent_run_id,
             # Plugin storage uses a server-derived consumer namespace. Agents receive
             # their own delegated consumer namespace; they cannot select another
@@ -406,6 +458,7 @@ _default_gateway: CapabilityGatewayService | None = None
 
 def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
                               reliability: ReliabilityCoordinator | None = None,
+                              operations: OperationService | None = None,
                               release_path: Path | None = None) -> CapabilityGatewayService:
     global _default_gateway
     path = release_path or Path(__file__).resolve().parents[2] / "docs" / "governance" / "capability-catalog-release.json"
@@ -416,6 +469,7 @@ def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
         CatalogResolver(store, registry),
         policy or FailClosedGatewayPolicy(),
         reliability=reliability,
+        operations=operations,
     ).bind_release(release.release_id)
     return _default_gateway
 

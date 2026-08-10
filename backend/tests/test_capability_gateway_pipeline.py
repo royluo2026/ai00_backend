@@ -26,6 +26,7 @@ from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.capability_v2.authorization import AuthorizationDecision
 from backend.capability_v2.policies import GatewayPolicyError
 from backend.capability_v2.outcomes import InMemoryOutcomeStore
+from backend.capability_v2.operations import InMemoryOperationStore, OperationService
 from backend.capability_v2.reliability import (
     InMemoryRateLimiter, ReliabilityCoordinator, TransactionalCapabilityOutput,
     transactional_provider,
@@ -60,7 +61,7 @@ def _identity(consumer_type: ConsumerType) -> ConsumerIdentity:
     )
 
 
-def _gateway(descriptor, handler, policy, reliability=None):
+def _gateway(descriptor, handler, policy, reliability=None, operations=None):
     registry = CapabilityRegistry()
     registry.register(
         CapabilitySpec(
@@ -74,7 +75,7 @@ def _gateway(descriptor, handler, policy, reliability=None):
     store = InMemoryCatalogStore()
     store.publish(release)
     return CapabilityGatewayService(
-        CatalogResolver(store, registry), policy, reliability=reliability
+        CatalogResolver(store, registry), policy, reliability=reliability, operations=operations
     ), release
 
 
@@ -127,6 +128,48 @@ def test_gateway_executes_fixed_validate_authorize_approve_dispatch_project_orde
     assert result.ok is True
     assert result.data == {"routing_id": "routing_1"}
     assert events == ["authorize", "approve", "dispatch", "project"]
+
+
+def test_required_async_operation_is_created_before_dispatch_and_returned_as_accepted():
+    operation_store = InMemoryOperationStore()
+    operation_service = OperationService(operation_store)
+    seen = {}
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="p1", resource_refs=("craft-bop-version:v1",))
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    def handler(payload, context):
+        seen["operation_id"] = context.operation_id
+        return {"routing_id": "routing_1"}
+
+    descriptor = _descriptor().model_copy(update={"operation_policy": "required"})
+    gateway, release = _gateway(descriptor, handler, Policy(), operations=operation_service)
+    result = asyncio.run(gateway.invoke(_envelope(release)))
+
+    assert result.status.value == "accepted"
+    assert result.data is None
+    assert result.operation_ref.operation_id == seen["operation_id"]
+    assert operation_store.get(seen["operation_id"]).resource_refs == ("craft-bop-version:v1",)
+
+
+def test_required_async_operation_fails_closed_when_operation_store_is_unavailable():
+    dispatched = []
+
+    class Policy:
+        def authorize(self, *_args):
+            return AuthorizationDecision(allowed=True, code="allowed", policy_version="p1")
+        def approve(self, *_args): dispatched.append("approve")
+        def project(self, _descriptor, _identity, data): return data
+
+    descriptor = _descriptor().model_copy(update={"operation_policy": "required"})
+    gateway, release = _gateway(descriptor, lambda *_args: dispatched.append("dispatch"), Policy())
+    result = asyncio.run(gateway.invoke(_envelope(release)))
+
+    assert result.error.code == "operation_service_unavailable"
+    assert dispatched == []
 
 
 def test_gateway_fails_closed_when_authorization_backend_crashes():

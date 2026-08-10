@@ -14,6 +14,7 @@ DOMAINS = {
     "Knowledge": "knowledge",
     "Craft": "craft",
     "Digital Model": "digital_model",
+    "Simulation": "simulation",
 }
 MIGRATED_DOMAINS = {
     "Base Platform": "base",
@@ -21,6 +22,7 @@ MIGRATED_DOMAINS = {
     "Knowledge": "knowledge",
     "Craft": "craft",
     "Digital Model": "digital_model",
+    "Simulation": "simulation",
 }
 
 

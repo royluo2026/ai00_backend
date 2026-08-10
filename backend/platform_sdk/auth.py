@@ -6,6 +6,7 @@ from backend.routers.deps import (
     build_profile,
     get_current_user,
     get_current_user_optional,
+    get_authenticated_principal,
     require_role,
     scope_visible_clause,
 )
@@ -13,4 +14,5 @@ from backend.routers.deps import (
 __all__ = [
     "build_profile", "derive_org_role", "get_current_user", "get_user_grants",
     "require_role", "scope_visible_clause", "get_current_user_optional",
+    "get_authenticated_principal",
 ]

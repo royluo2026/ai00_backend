@@ -34,6 +34,9 @@ STANDARD_ERRORS = (
     ("transaction_participant_required", "强一致写 Provider 未加入领域事务。"),
     ("provider_failed", "领域 Provider 执行失败；错误正文不会泄露内部细节。"),
     ("outcome_persistence_failed", "领域可能已提交但 Outcome 未能确认，必须查询 OperationRef。"),
+    ("operation_service_unavailable", "能力要求异步 Operation，但持久化 Operation 服务未配置。"),
+    ("operation_create_failed", "异步 Operation 无法持久化，领域任务未派发。"),
+    ("operation_create_outcome_failed", "异步 Operation 创建后的命令 Outcome 无法持久化，领域任务未派发。"),
 )
 
 CANONICAL_DOMAINS = (
@@ -357,6 +360,12 @@ def _capability_page(item: dict[str, Any]) -> str:
         f"- 信封 `expected_resource_version` 必须等于 payload `{item['expected_version_payload_path']}`。"
         if item.get("expected_version_payload_path") else "- 无预期版本信封要求。"
     )
+    output_note = (
+        "首次调用返回 `status=accepted`、`data=null` 和持久化 `operation_ref`；"
+        "下列输出 Schema 适用于 Operation 完成后的领域结果。"
+        if item["operation_policy"] == "required"
+        else "领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中："
+    )
     return f"""# {item['id']}@{item['major_version']}
 
 {item['description']}
@@ -420,7 +429,7 @@ def _capability_page(item: dict[str, Any]) -> str:
 
 ## 输出 Schema
 
-领域数据必须符合下列 Schema，并封装在完整 `CapabilityResultV2` 中：
+{output_note}
 
 ```json
 {json.dumps(item['output_schema'], ensure_ascii=False, sort_keys=True, indent=2)}

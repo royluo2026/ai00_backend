@@ -24,6 +24,7 @@
         "backend/capabilities/registry_next.py",
         "backend/capabilities/system_shared_next.py",
         "backend/capabilities/plugin_marketplace_next.py",
+        "backend/domain_ports/versioned_resources.py",
         "services/mcp-gateway/**"
       ],
       "provider_paths": ["backend/system_capabilities/base_provider.py"],
@@ -108,9 +109,9 @@
       "maintainers": ["@ai00/simulation-maintainers"],
       "artifact": "ai00-simulation-plugin",
       "module_prefixes": ["plugins.simulation"],
-      "code_paths": ["plugins/simulation/**"],
+      "code_paths": ["plugins/simulation/**", "backend/domain_ports/simulation.py", "backend/capability_v2/revision/simulation_adapter.py"],
       "provider_paths": ["plugins/simulation/simulation_backend/capabilities/**"],
-      "migration_paths": ["backend/db/migrations/202608030009_simulation_environments.sql"],
+      "migration_paths": ["backend/db/migrations/202608030009_simulation_environments.sql", "backend/db/migrations/202608100010_simulation_reproducibility.sql"],
       "test_paths": ["plugins/simulation/**/test_*.py", "backend/tests/test_simulation_*.py"],
       "documentation_paths": ["docs/capabilities/simulation/**"]
     },
