@@ -556,6 +556,72 @@ tenant + consumer + capability + major_version
 
 至少覆盖 Web、Plugin、Agent、MCP、Local Runtime 五类入口，以及 Craft→Revision→Simulation、Digital Model→Diff、Ontology Proposal→Release。验收必须使用真实 OceanBase 兼容环境、OIS、JWT/OAuth 和多实例部署，不能只依赖内存替身。
 
+### 18.7 必须交付的测试用例资产
+
+本次重构的完成物不仅是实现代码，还必须包含可重复执行、可追溯到 Capability 和 Catalog Release 的测试用例系列。测试用例、Fixture、Golden File、模拟适配器、环境准备脚本和执行说明必须纳入版本控制，不能只保留人工测试记录。
+
+每个进入 `stable` 的 Capability 至少具备：
+
+1. 正常成功用例；
+2. 输入 Schema、业务规则和前置条件失败用例；
+3. 未认证、无权限、跨租户、超出资源范围和超出数据范围用例；
+4. 不允许的消费者入口和自动化等级用例；
+5. 输出 Schema、Evidence、Correlation 和审计记录用例；
+6. Provider Contract 与各开放消费者的 Consumer Contract 用例；
+7. 版本固定、Schema Hash 和兼容性用例；
+8. 超时、取消和结构化错误用例。
+
+写入 Capability 还必须具备：
+
+- 幂等重试和不同 Payload 复用幂等键的冲突用例；
+- 乐观并发、重复提交和并发竞争用例；
+- 审批签发、拒绝、过期、重放和审批期间权限变化用例；
+- 领域 Commit、ChangeSet、Outcome 和 Audit Outbox 一致性用例；
+- 提交后响应丢失、重试和 `outcome_unknown` 用例；
+- 能够补偿或 Revert 时的恢复用例。
+
+异步、本地、设备和仿真 Capability 还必须覆盖：
+
+- accepted、claimed、running、completed、failed、cancelled 和 outcome_unknown 状态迁移；
+- Worker、Agent Runtime、Gateway 或 Local Runtime 重启恢复；
+- 离线、重复领取、重复回执、乱序回执和过期操作；
+- 跨语言 Canonical JSON、签名、重放保护和共享测试向量；
+- Artifact 缺失、损坏、越权和内容哈希不一致。
+
+Revision、Diff 和 Ontology 必须分别提供：
+
+- 分支、Commit、Snapshot、Baseline 和历史恢复用例；
+- 三方合并、字段/结构/顺序/语义冲突和受保护分支用例；
+- Craft、Digital Model、Simulation、Ontology 的语义 Diff Golden Cases；
+- 概念稳定 ID、重命名、弃用、约束变化、影响分析和 Proposal 审批用例；
+- 大型模型 Diff 的异步、分页、可视化 Artifact 和资源上限用例。
+
+插件和 Agent 测试套件必须包括：
+
+- Manifest 权限交集、版本范围、安装身份、Mount Session 过期与实时撤销；
+- 插件伪造 ID、跨安装复用令牌、结果截断回归和宿主审批闭环；
+- Agent ToolSelection、Delegation、预算、暂停、恢复、取消和审批闭环；
+- Prompt Injection、不可信工具结果、敏感数据投影和上下文大小限制；
+- Web、Plugin、Agent、REST 和 MCP 对同一 Capability 的业务结果一致性。
+
+### 18.8 测试分层与发布门禁
+
+测试按以下层级运行：
+
+```text
+本地/每次提交：Schema、单元、Provider Contract、架构边界
+Pull Request：消费者契约、授权矩阵、领域集成、迁移静态检查
+Nightly：并发、故障注入、多实例、插件/Agent/MCP 端到端
+Release Candidate：真实 OceanBase、OIS、JWT/OAuth、Local Runtime 全链路
+正式发布前：目标 Catalog Release 的完整验收与安全回归
+```
+
+测试报告必须记录 Git Commit、Catalog Release、Schema Hash、数据库 Migration 版本、Provider 制品版本和测试环境。失败、跳过或未覆盖的强制用例都会阻断 Capability 进入 `stable` 或阻断对应入口开放。
+
+破坏性、设备和大规模测试只能在明确隔离的测试租户、测试数据库和测试设备上运行；测试工具必须拒绝生产连接。性能与容量基线至少覆盖 Catalog 查询、Gateway 延迟、大型 Diff、Artifact 传输、Agent 并发、仿真队列和审计 Outbox 积压。
+
+开发者手册中的所有示例都必须作为可执行文档测试运行。示例与实际 Schema、SDK 或结果契约不一致时，CI 直接失败。
+
 ## 19. 风险控制
 
 | 风险 | 控制 |
@@ -591,8 +657,9 @@ tenant + consumer + capability + major_version
 8. 大型数据与长任务使用 ArtifactRef 和 OperationRef；
 9. Outcome、领域写入和 Audit Outbox 具备可靠一致性；
 10. 开发者手册与 Catalog、SDK、Agent Tool、OpenAPI 和 MCP 自动同步；
-11. 真实环境契约、安全、故障恢复和多入口端到端测试通过；
-12. Registry 直调、来源 Header、插件结果截断、运行时 DDL、旧 REST 业务实现和未版本化外部服务已退出，或存在已批准的短期退役期限。
+11. 每项稳定 Capability 的强制测试用例、Fixture、Golden Case 和执行说明已经纳入版本控制；
+12. 真实环境契约、安全、故障恢复、性能容量和多入口端到端测试通过，并生成绑定 Catalog Release 的验收报告；
+13. Registry 直调、来源 Header、插件结果截断、运行时 DDL、旧 REST 业务实现和未版本化外部服务已退出，或存在已批准的短期退役期限。
 
 ## 21. 已批准决策与实施前约束
 
