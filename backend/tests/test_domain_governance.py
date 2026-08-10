@@ -4,6 +4,7 @@ from pathlib import Path
 
 from backend.db.versioned_migrations import Migration, MigrationError, split_sql, validate_migration
 from backend.governance import OwnershipError, load_registry
+from backend.scripts.audit_domain_boundaries import audit_repository
 
 
 class DomainGovernanceTests(unittest.TestCase):
@@ -21,6 +22,24 @@ class DomainGovernanceTests(unittest.TestCase):
         self.assertEqual(registry.table_owner("workmanship_app_wfc_canvases").owner, "craft")
         self.assertEqual(registry.table_owner("workmanship_app_system_config").owner, "base")
         self.assertIsNone(registry.table_owner("workmanship_app_unknown"))
+
+    def test_source_overrides_align_legacy_files_with_first_class_domains(self):
+        registry = load_registry()
+        self.assertEqual(registry.source_domain("backend/capabilities/knowledge_context_next.py"), "knowledge")
+        self.assertEqual(registry.source_domain("backend/capabilities/ontology_releases_next.py"), "ontology")
+        self.assertEqual(
+            registry.source_domain("plugins/craft/craft_backend/routers/workbench_home.py"),
+            "project_management",
+        )
+
+    def test_audit_does_not_report_same_domain_import_as_base_internal(self):
+        root = Path(__file__).resolve().parents[2]
+        violations, _ = audit_repository(root, load_registry())
+        self.assertFalse([
+            item for item in violations
+            if item.path == "backend/ontology/proposals.py"
+            and item.target == "backend.ontology.canonical"
+        ])
 
     def test_sql_splitter_preserves_semicolons_inside_literals_and_comments(self):
         sql = "INSERT INTO t VALUES ('a;b'); -- x;y\nUPDATE t SET c=\"z;z\";"

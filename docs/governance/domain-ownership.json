@@ -28,7 +28,8 @@
         "backend/db/migrations/202608040001_base_plugin_namespace_storage.sql",
         "backend/db/migrations/202608040002_base_plugin_usage_metrics.sql",
         "backend/db/migrations/202608050001_base_permission_grants.sql",
-        "backend/db/migrations/202608100001_base_capability_catalog_releases.sql"
+        "backend/db/migrations/202608100001_base_capability_catalog_releases.sql",
+        "backend/db/migrations/202608100002_base_consumer_delegations.sql"
       ],
       "test_paths": ["backend/tests/test_base_*.py"],
       "documentation_paths": ["docs/capabilities/base-platform/**"]

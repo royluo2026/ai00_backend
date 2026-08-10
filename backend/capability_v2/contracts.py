@@ -104,6 +104,8 @@ class ActorIdentity(FrozenModel):
     def one_actor_kind(self) -> "ActorIdentity":
         if (self.user_id is None) == (self.service_id is None):
             raise ValueError("actor identity requires exactly one of user_id or service_id")
+        if self.authenticated_at.tzinfo is None or self.authenticated_at.utcoffset() is None:
+            raise ValueError("authenticated_at must be timezone-aware")
         return self
 
 
@@ -128,6 +130,8 @@ class DelegationContext(FrozenModel):
     capability_scopes: tuple[str, ...] = ()
     resource_scopes: tuple[str, ...] = ()
     data_scopes: tuple[str, ...] = ()
+    catalog_release: str = Field(min_length=1, max_length=128)
+    maximum_automation_level: AutomationLevel
     expires_at: datetime
 
 

@@ -354,7 +354,7 @@ git commit -m "feat: add immutable capability catalog releases"
 **Files:**
 - Create: `backend/capability_v2/identity.py`
 - Create: `backend/capability_v2/delegation.py`
-- Create: `backend/db/migrations/202608100002_consumer_delegations.sql`
+- Create: `backend/db/migrations/202608100002_base_consumer_delegations.sql`
 - Create: `backend/tests/test_consumer_identity_broker.py`
 - Modify: `backend/routers/deps.py`
 
@@ -405,7 +405,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add backend/capability_v2/identity.py backend/capability_v2/delegation.py backend/db/migrations/202608100002_consumer_delegations.sql backend/tests/test_consumer_identity_broker.py backend/routers/deps.py
+git add backend/capability_v2/identity.py backend/capability_v2/delegation.py backend/db/migrations/202608100002_base_consumer_delegations.sql backend/tests/test_consumer_identity_broker.py backend/routers/deps.py docs/governance/domain-ownership.json .github/CODEOWNERS
 git commit -m "feat: add trusted capability consumer identities"
 ```
 

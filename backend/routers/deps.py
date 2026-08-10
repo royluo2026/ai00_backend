@@ -4,12 +4,14 @@ backend/routers/deps.py
 FastAPI 依赖项：JWT 验证、权限门控。
 """
 import logging
+from datetime import UTC, datetime
 from typing import Optional
 import jwt as pyjwt
 
 from fastapi import Header, HTTPException, status
 
 from backend.services import jwt_service, user_service
+from backend.capability_v2.identity import AuthenticatedPrincipal
 
 _log = logging.getLogger(__name__)
 
@@ -130,6 +132,45 @@ def get_current_user(x_ai00_token: str = Header(alias="X-AI00-Token")) -> dict:
         or _derive_org_role(user.get("system_role", "external"))
     )
     return user
+
+
+def get_authenticated_principal(
+    x_ai00_token: str = Header(alias="X-AI00-Token"),
+) -> AuthenticatedPrincipal:
+    """Build a trusted Web principal without accepting client source or permission headers."""
+    try:
+        payload = jwt_service.verify(x_ai00_token)
+    except pyjwt.InvalidTokenError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token: {exc}") from exc
+    try:
+        user = user_service.get_by_gid(payload["sub"])
+    except Exception as exc:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"User lookup failed: {exc}") from exc
+    if not user or not user.get("is_active"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive")
+    authenticated_at = _authentication_time(payload)
+    return AuthenticatedPrincipal(
+        user_id=str(user["gid"]),
+        authentication_method="jwt",
+        authenticated_at=authenticated_at,
+    )
+
+
+def _authentication_time(payload: dict) -> datetime:
+    value = payload.get("auth_time", payload.get("iat"))
+    if isinstance(value, (int, float)):
+        return datetime.fromtimestamp(value, tz=UTC)
+    if isinstance(value, str):
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Invalid authentication time") from exc
+        if parsed.tzinfo is not None and parsed.utcoffset() is not None:
+            return parsed
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Authentication time is required")
 
 
 def _derive_org_role(system_role: str) -> str:

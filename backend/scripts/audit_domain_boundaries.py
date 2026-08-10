@@ -76,7 +76,14 @@ class PythonAudit(ast.NodeVisitor):
     def _audit_import(self, module: str) -> None:
         if self.domain == "base" or not module.startswith("backend.") or self.registry.is_public_import(module):
             return
-        self._add("internal_import", module, f"{self.domain} imports Base internal module {module}")
+        target_domain = self.registry.source_domain(module.replace(".", "/") + ".py")
+        if target_domain == self.domain:
+            return
+        self._add(
+            "internal_import",
+            module,
+            f"{self.domain} imports {(target_domain or 'unowned')} internal module {module}",
+        )
 
     def visit_Constant(self, node: ast.Constant) -> None:
         if not isinstance(node.value, str):

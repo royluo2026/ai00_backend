@@ -46,6 +46,13 @@ def test_actor_identity_requires_exactly_one_actor_kind():
             authenticated_at=datetime.now(UTC),
         )
 
+    with pytest.raises(ValidationError, match="timezone-aware"):
+        ActorIdentity(
+            user_id="user_1",
+            authentication_method="jwt",
+            authenticated_at=datetime(2026, 8, 10, 8, 0),
+        )
+
 
 def test_result_distinguishes_accepted_from_completed():
     result = CapabilityResultV2.accepted(

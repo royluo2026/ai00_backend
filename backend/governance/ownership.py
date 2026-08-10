@@ -27,6 +27,7 @@ class DomainRegistry:
         self.product_domains = tuple(data["product_domains"])
         self.data_owners = data["data_owners"]
         self.source_roots = tuple(data["source_roots"])
+        self.source_overrides = tuple(data.get("source_overrides", ()))
         self.public_import_prefixes = tuple(data.get("public_import_prefixes", ()))
         self.migration_paths = tuple(data.get("migration_paths", ()))
         self.non_runtime_paths = tuple(data.get("non_runtime_paths", ()))
@@ -45,6 +46,9 @@ class DomainRegistry:
         for owner, config in self.data_owners.items():
             if config["runtime_domain"] not in self.product_domains:
                 raise OwnershipError(f"{owner} has invalid runtime_domain")
+        for rule in self.source_overrides:
+            if rule.get("domain") not in self.product_domains or not rule.get("path"):
+                raise OwnershipError(f"invalid source override: {rule}")
         for rule in self.table_prefix_owners:
             if rule["owner"] not in known:
                 raise OwnershipError(f"unknown owner in prefix rule: {rule}")
@@ -66,6 +70,9 @@ class DomainRegistry:
 
     def source_domain(self, relative_path: str | Path) -> str | None:
         normalized = Path(relative_path).as_posix().lstrip("./")
+        for rule in self.source_overrides:
+            if normalized == rule["path"]:
+                return rule["domain"]
         for rule in self.source_roots:
             root = rule["path"].rstrip("/")
             if normalized == root or normalized.startswith(root + "/"):

@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 136,
+  "table_count": 149,
   "tables": [
     {
       "table": "workmanship_app_ai_audit_logs",
@@ -74,8 +74,8 @@
     },
     {
       "table": "workmanship_app_wb_annotations",
-      "owner": "base",
-      "runtime_domain": "base"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_app_wfc_canvases",
@@ -84,13 +84,13 @@
     },
     {
       "table": "workmanship_app_workbench_configs",
-      "owner": "base",
-      "runtime_domain": "base"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_app_workbench_member_overrides",
-      "owner": "base",
-      "runtime_domain": "base"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_app_worker_heartbeats",
@@ -131,6 +131,46 @@
       "table": "workmanship_auth_users",
       "owner": "base",
       "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_catalog_releases",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_consumer_delegations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_ontology_active_refs",
+      "owner": "ontology",
+      "runtime_domain": "ontology"
+    },
+    {
+      "table": "workmanship_base_ontology_change_proposals",
+      "owner": "ontology",
+      "runtime_domain": "ontology"
+    },
+    {
+      "table": "workmanship_base_ontology_proposal_reviews",
+      "owner": "ontology",
+      "runtime_domain": "ontology"
+    },
+    {
+      "table": "workmanship_base_ontology_proposal_revisions",
+      "owner": "ontology",
+      "runtime_domain": "ontology"
+    },
+    {
+      "table": "workmanship_base_ontology_release_objects",
+      "owner": "ontology",
+      "runtime_domain": "ontology"
+    },
+    {
+      "table": "workmanship_base_ontology_releases",
+      "owner": "ontology",
+      "runtime_domain": "ontology"
     },
     {
       "table": "workmanship_base_schema_migrations",
@@ -308,6 +348,31 @@
       "runtime_domain": "craft"
     },
     {
+      "table": "workmanship_craft_bop_change_previews",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_bop_import_previews",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_bop_write_idempotency",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_validation_policies",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_validation_policy_checks",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
       "table": "workmanship_display_id_counters",
       "owner": "base",
       "runtime_domain": "base"
@@ -375,87 +440,87 @@
     {
       "table": "workmanship_know_document_acl",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_documents",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_entries",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_favorites",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_folders",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_items",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_migration_items",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_migration_runs",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_proposals",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_publish_outbox",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_recent",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_revisions",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_spaces",
       "owner": "knowledge",
-      "runtime_domain": "base"
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_onto_axioms",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "ontology",
+      "runtime_domain": "ontology"
     },
     {
       "table": "workmanship_onto_classes",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "ontology",
+      "runtime_domain": "ontology"
     },
     {
       "table": "workmanship_onto_properties",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "ontology",
+      "runtime_domain": "ontology"
     },
     {
       "table": "workmanship_onto_relations",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "ontology",
+      "runtime_domain": "ontology"
     },
     {
       "table": "workmanship_plugin_installations",
@@ -499,38 +564,38 @@
     },
     {
       "table": "workmanship_proj_approval_orders",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_proj_collab_sessions",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_proj_issues",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_proj_projects",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_proj_task_dependencies",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_proj_tasks",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_proj_vehicle_models",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_runtime_commands",
@@ -604,83 +669,83 @@
     },
     {
       "table": "workmanship_work_follows",
-      "owner": "base",
-      "runtime_domain": "base"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_issues",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_item_change_logs",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_item_entries",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_item_shares",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_list_bitable_bindings",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_list_bitable_record_map",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_list_shares",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_lists",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_notifications",
-      "owner": "base",
-      "runtime_domain": "base"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_permission_requests",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_share_links",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_task_dependencies",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_task_template_items",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_task_templates",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     },
     {
       "table": "workmanship_work_tasks",
-      "owner": "craft",
-      "runtime_domain": "craft"
+      "owner": "project_management",
+      "runtime_domain": "project_management"
     }
   ]
 }

@@ -308,6 +308,8 @@ CapabilityDescriptorV2
 
 每个 Catalog Release 记录域 Provider 制品、版本、Schema Hash 和负责人。每域数据表和 Migration 必须有唯一所有者；其他域只能保存稳定 Ref，不得跨域写表。CI 使用 import graph、表/Migration 所有权、Provider Manifest、契约测试和循环依赖检查阻止边界回退。
 
+迁移基线在重新按一级域归属 149 张已发现表后，精确记录 292 条历史边界债务：262 条跨域 SQL/表访问、30 条内部实现导入。指纹基线仅允许减少，不代表这些依赖被设计许可；各领域纵切迁移的验收条件是相应债务清零。
+
 ### 10.2 Base Platform
 
 Base Platform 负责身份、租户、Artifact、Operation、审批、审计、插件安装、Catalog 和通用搜索基础。项目、工作区、任务、问题、里程碑和项目协作归 Project Management，不得因为“通用”而沉入 Base。Base 不解释 Agent、工艺、数模、项目管理或仿真语义，不代理其他领域 CRUD，也不直接导入任一领域实现。

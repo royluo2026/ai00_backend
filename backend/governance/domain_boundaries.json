@@ -87,6 +87,17 @@
       "domain": "base"
     }
   ],
+  "source_overrides": [
+    {"path": "backend/capabilities/knowledge_context_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/knowledge_documents_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/knowledge_migration_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/knowledge_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/ontology_concepts_next.py", "domain": "ontology"},
+    {"path": "backend/capabilities/ontology_proposals_next.py", "domain": "ontology"},
+    {"path": "backend/capabilities/ontology_releases_next.py", "domain": "ontology"},
+    {"path": "plugins/craft/craft_backend/routers/projects.py", "domain": "project_management"},
+    {"path": "plugins/craft/craft_backend/routers/workbench_home.py", "domain": "project_management"}
+  ],
   "public_import_prefixes": [
     "backend.contracts",
     "backend.capability_v2",
