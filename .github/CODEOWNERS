@@ -19,6 +19,7 @@
 /backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql @ai00/base-maintainers
 /backend/db/migrations/202608100004_base_artifacts_and_operations.sql @ai00/base-maintainers
 /backend/db/migrations/202608100005_base_plugin_mount_sessions.sql @ai00/base-maintainers
+/backend/db/migrations/202608100007_base_revision_lineage.sql @ai00/base-maintainers
 
 # Agent
 /plugins/agent/** @ai00/agent-maintainers

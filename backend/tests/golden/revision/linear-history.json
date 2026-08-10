@@ -1,0 +1,7 @@
+{
+  "snapshots": [
+    {"operation": {"stable_gid": "op-1", "name": "钻孔", "duration": 10}},
+    {"operation": {"stable_gid": "op-1", "name": "精钻", "duration": 10}},
+    {"operation": {"stable_gid": "op-1", "name": "精钻", "duration": 12}}
+  ]
+}

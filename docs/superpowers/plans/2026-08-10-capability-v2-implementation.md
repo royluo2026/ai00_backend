@@ -928,11 +928,14 @@ git commit -m "feat: pin mcp sessions to delegated catalog releases"
 
 **Files:**
 - Create: `backend/capability_v2/revision/models.py`
+- Create: `backend/capability_v2/revision/canonical.py`
 - Create: `backend/capability_v2/revision/repository.py`
 - Create: `backend/capability_v2/revision/service.py`
 - Create: `backend/capability_v2/revision/diff.py`
 - Create: `backend/capability_v2/revision/merge.py`
-- Create: `backend/db/migrations/202608100007_revision_lineage.sql`
+- Create: `backend/db/migrations/202608100007_base_revision_lineage.sql`
+- Modify: `docs/governance/domain-ownership.json`
+- Modify: `.github/CODEOWNERS`
 - Create: `backend/tests/test_revision_kernel.py`
 - Create: `backend/tests/golden/revision/linear-history.json`
 - Create: `backend/tests/golden/revision/three-way-field-conflict.json`
@@ -942,7 +945,7 @@ git commit -m "feat: pin mcp sessions to delegated catalog releases"
 - Produces: RepositoryRef, BranchRef, CommitRef, SnapshotRef, ChangeSetRef, DiffRef, BaselineRef and three-way MergeResult.
 - Domain adapter protocol: `normalize()`, `diff()`, `validate_changeset()`, `apply_changeset()`, `classify_conflict()`.
 
-- [ ] **Step 1: Write failing immutable history and three-way merge tests**
+- [x] **Step 1: Write failing immutable history and three-way merge tests**
 
 ```python
 def test_restore_creates_new_commit_without_rewriting_history(service):
@@ -955,26 +958,26 @@ def test_move_is_not_delete_plus_add(craft_diff_adapter):
     assert [c.change_type for c in diff.changes] == ["move"]
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run: `python -m pytest backend/tests/test_revision_kernel.py -q`
 
 Expected: FAIL on missing Revision service.
 
-- [ ] **Step 3: Implement immutable commits, snapshots, semantic adapters and protected branches**
+- [x] **Step 3: Implement immutable commits, snapshots, semantic adapters and protected branches**
 
-All hashes use the same canonical JSON as Catalog. Merge to protected branches returns ApprovalChallenge. Snapshot policy is deterministic by change count and byte size.
+All hashes use the same canonical JSON as Catalog. Merge to protected branches returns ApprovalChallenge. Every accepted commit materializes an immutable full snapshot; canonical byte size and structured change count are deterministically bounded, and larger work is handed to ArtifactRef/OperationRef flows.
 
-- [ ] **Step 4: Run Revision Golden Cases and migration tests**
+- [x] **Step 4: Run Revision Golden Cases and migration tests**
 
 Run: `python -m pytest backend/tests/test_revision_kernel.py backend/tests/test_versioned_migration_files.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add backend/capability_v2/revision backend/db/migrations/202608100007_revision_lineage.sql backend/tests/test_revision_kernel.py backend/tests/golden/revision
+git add backend/capability_v2/revision backend/db/migrations/202608100007_base_revision_lineage.sql backend/tests/test_revision_kernel.py backend/tests/golden/revision docs/governance/domain-ownership.json .github/CODEOWNERS
 git commit -m "feat: add revision diff merge and lineage kernel"
 ```
 
