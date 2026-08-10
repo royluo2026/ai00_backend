@@ -1878,6 +1878,75 @@
         "backend/capabilities/knowledge_context_next.py"
       ]
     },
+    "capability:knowledge.document.acl.grant": {
+      "function_id": "capability:knowledge.document.acl.grant",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "knowledge.document.acl.grant",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "backend/capabilities/knowledge_documents_next.py"
+      ]
+    },
+    "capability:knowledge.document.acl.list": {
+      "function_id": "capability:knowledge.document.acl.list",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "knowledge.document.acl.list",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "backend/capabilities/knowledge_documents_next.py"
+      ]
+    },
+    "capability:knowledge.document.acl.revoke": {
+      "function_id": "capability:knowledge.document.acl.revoke",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "knowledge.document.acl.revoke",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "backend/capabilities/knowledge_documents_next.py"
+      ]
+    },
     "capability:knowledge.document.create": {
       "function_id": "capability:knowledge.document.create",
       "domain": "Knowledge",
@@ -2047,6 +2116,29 @@
         "Capability Registry"
       ],
       "target_capability": "knowledge.document.rollback",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "knowledge"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Knowledge",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "backend/capabilities/knowledge_documents_next.py"
+      ]
+    },
+    "capability:knowledge.document.search": {
+      "function_id": "capability:knowledge.document.search",
+      "domain": "Knowledge",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "knowledge.document.search",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [

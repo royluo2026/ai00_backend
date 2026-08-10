@@ -10,7 +10,8 @@ AGREED_WAVE_PREFIXES = ("craft.", "ontology.", "semantic.", "identity.", "base."
 APPROVED_CAPABILITY_IDS = frozenset({
     "base.project.search", "identity.principal.search", "knowledge.context.retrieve",
     "knowledge.document.create", "knowledge.document.diff", "knowledge.document.get",
-    "knowledge.document.history.get", "knowledge.document.restore", "knowledge.document.revise",
+    "knowledge.document.history.get", "knowledge.document.restore", "knowledge.document.revise", "knowledge.document.search",
+    "knowledge.document.acl.list", "knowledge.document.acl.grant", "knowledge.document.acl.revoke",
     "knowledge.document.revisions", "knowledge.document.rollback", "knowledge.get",
     "knowledge.migration.status", "knowledge.proposal.get", "knowledge.proposal.list",
     "knowledge.proposal.outbox.list", "knowledge.proposal.outbox.retry", "knowledge.proposal.review",

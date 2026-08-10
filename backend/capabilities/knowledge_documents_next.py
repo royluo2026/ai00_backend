@@ -21,6 +21,55 @@ from backend.knowledge.ids import new_knowledge_id
 _SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,254}$")
 _PERMISSIONS = {"view", "edit", "admin"}
 
+DOCUMENT_SEARCH_SCHEMA = {
+    "type": "object", "additionalProperties": False,
+    "required": ["items", "total", "query"],
+    "properties": {
+        "items": {"type": "array", "maxItems": 50, "items": {
+            "type": "object", "additionalProperties": False,
+            "required": ["object_ref", "revision_ref", "space_ref", "title", "slug", "space_gid", "document_gid", "revision_gid", "revision_no", "state"],
+            "properties": {
+                "object_ref": {"type": "string", "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"},
+                "revision_ref": {"type": "string", "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$"},
+                "space_ref": {"type": "string", "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$"},
+                "title": {"type": "string"}, "slug": {"type": "string"}, "space_gid": {"type": "string"},
+                "document_gid": {"type": "string"}, "revision_gid": {"type": "string"},
+                "revision_no": {"type": "integer", "minimum": 1}, "state": {"type": "string"},
+            },
+        }},
+        "total": {"type": "integer", "minimum": 0}, "query": {"type": "string"},
+    },
+}
+ACL_ENTRY_SCHEMA = {
+    "type": "object", "additionalProperties": False,
+    "required": ["subject_type", "subject_gid", "permission"],
+    "properties": {
+        "subject_type": {"type": "string", "enum": ["user", "team"]},
+        "subject_gid": {"type": "string"}, "permission": {"type": "string", "enum": ["view", "edit", "admin"]},
+        "created_by": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+        "created_at": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+    },
+}
+ACL_LIST_SCHEMA = {
+    "type": "object", "additionalProperties": False,
+    "required": ["document_ref", "document_gid", "items", "total"],
+    "properties": {
+        "document_ref": {"type": "string", "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"},
+        "document_gid": {"type": "string"}, "items": {"type": "array", "items": ACL_ENTRY_SCHEMA},
+        "total": {"type": "integer", "minimum": 0},
+    },
+}
+ACL_WRITE_SCHEMA = {
+    "type": "object", "additionalProperties": False,
+    "required": ["document_ref", "document_gid", "subject_type", "subject_gid"],
+    "properties": {
+        "document_ref": {"type": "string", "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"},
+        "document_gid": {"type": "string"}, "subject_type": {"type": "string", "enum": ["user", "team"]},
+        "subject_gid": {"type": "string"}, "permission": {"type": "string", "enum": ["view", "edit", "admin"]},
+        "revoked": {"type": "boolean"},
+    },
+}
+
 
 def _tenant(context: CapabilityContext) -> str:
     tenant = str(context.team_gid or "").strip()
@@ -57,6 +106,14 @@ def _evidence(row: dict[str, Any]) -> EvidenceRef:
             "revision_no": int(row["revision_no"]),
             "state": row["state"],
         },
+    )
+
+
+def _acl_evidence(document_gid: str) -> EvidenceRef:
+    return EvidenceRef(
+        kind="knowledge.document.acl",
+        reference=document_ref(document_gid),
+        summary="Governed document access-control state",
     )
 
 
@@ -240,7 +297,12 @@ def search_documents(payload: dict[str, Any], context: CapabilityContext) -> Cap
             )
             rows = [dict(row) for row in cur.fetchall()]
     items = [
-        {key: row[key] for key in ("title", "slug", "space_gid", "document_gid", "revision_gid", "revision_no", "state")}
+        {
+            **{key: row[key] for key in ("title", "slug", "space_gid", "document_gid", "revision_gid", "revision_no", "state")},
+            "object_ref": document_ref(row["document_gid"]),
+            "revision_ref": revision_ref(row["revision_gid"]),
+            "space_ref": space_ref(row["space_gid"]),
+        }
         for row in rows
     ]
     return CapabilityOutput(data={"items": items, "total": len(items), "query": query}, evidence=tuple(_evidence(row) for row in rows))
@@ -353,8 +415,11 @@ def list_document_acl(payload: dict[str, Any], context: CapabilityContext) -> di
                 "ORDER BY subject_type,subject_gid",
                 (document_gid,),
             )
-            items = [dict(row) for row in cur.fetchall()]
-    return {"document_gid": document_gid, "items": items, "total": len(items)}
+            items = [transport_value(dict(row)) for row in cur.fetchall()]
+    return CapabilityOutput(
+        data={"document_ref": document_ref(document_gid), "document_gid": document_gid, "items": items, "total": len(items)},
+        evidence=(_acl_evidence(document_gid),),
+    )
 
 
 def revoke_document_acl(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
@@ -386,12 +451,13 @@ def revoke_document_acl(payload: dict[str, Any], context: CapabilityContext) -> 
             )
             deleted = int(cur.rowcount or 0)
         conn.commit()
-    return {
+    return CapabilityOutput(data={
+        "document_ref": document_ref(document_gid),
         "document_gid": document_gid,
         "subject_type": subject_type,
         "subject_gid": subject_gid,
         "revoked": deleted > 0,
-    }
+    }, evidence=(_acl_evidence(document_gid),))
 
 def grant_document_acl(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
     tenant = _tenant(context)
@@ -423,7 +489,10 @@ def grant_document_acl(payload: dict[str, Any], context: CapabilityContext) -> d
                 (document_gid, subject_type, subject_gid, permission, context.user_gid),
             )
         conn.commit()
-    return {"document_gid": document_gid, "subject_type": subject_type, "subject_gid": subject_gid, "permission": permission}
+    return CapabilityOutput(data={
+        "document_ref": document_ref(document_gid), "document_gid": document_gid,
+        "subject_type": subject_type, "subject_gid": subject_gid, "permission": permission,
+    }, evidence=(_acl_evidence(document_gid),))
 
 
 def register_knowledge_document_capabilities(registry) -> None:
@@ -446,6 +515,11 @@ def register_knowledge_document_capabilities(registry) -> None:
         use_when="An exact document or revision is required.", do_not_use_when="Only bounded decision context is needed.",
         effects=("read:knowledge.document",), input_schema={"type": "object", "required": ["document_gid"], "properties": {"document_gid": {"type": "string"}, "revision_gid": {"type": "string"}}},
         output_schema=DOCUMENT_SCHEMA, tags=("knowledge", "document", "read")), get_document)
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.document.search", description="Search published immutable Knowledge Workspace documents.",
+        use_when="A caller needs to discover a document before using its stable reference.", do_not_use_when="The document gid is already known.",
+        effects=("read:knowledge.document",), input_schema={"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 50}}},
+        output_schema=DOCUMENT_SEARCH_SCHEMA, tags=("knowledge", "document", "read")), search_documents)
     register_capability(registry, CapabilitySpec(
         **common, id="knowledge.document.create", description="Create a published Markdown document revision in immutable OIS storage.",
         use_when="A new knowledge document is required.", do_not_use_when="Updating an existing document.",
@@ -474,6 +548,28 @@ def register_knowledge_document_capabilities(registry) -> None:
         effects=("create:knowledge.revision", "update:knowledge.document_head"), risk="write", confirmation="user", idempotent=False,
         input_schema={"type": "object", "required": ["document_gid", "base_revision_gid", "target_revision_gid"], "properties": {"document_gid": {"type": "string"}, "base_revision_gid": {"type": "string"}, "target_revision_gid": {"type": "string"}}},
         output_schema=DOCUMENT_WRITE_SCHEMA, tags=("knowledge", "document", "write")), rollback_document)
+    acl_subject = {
+        "document_gid": {"type": "string"},
+        "subject_type": {"type": "string", "enum": ["user", "team"]},
+        "subject_gid": {"type": "string"},
+    }
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.document.acl.list", description="List governed access grants for a document the caller administers.",
+        use_when="A document administrator needs its explicit grants.", do_not_use_when="Only document content is required.",
+        effects=("read:knowledge.document_acl",), input_schema={"type": "object", "required": ["document_gid"], "properties": {"document_gid": {"type": "string"}}},
+        output_schema=ACL_LIST_SCHEMA, tags=("knowledge", "document", "acl", "read")), list_document_acl)
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.document.acl.grant", description="Grant bounded document access to a same-tenant subject.",
+        use_when="A document administrator approved a new access grant.", do_not_use_when="The subject is outside the current tenant.",
+        effects=("create:knowledge.document_acl",), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "required": ["document_gid", "subject_type", "subject_gid", "permission"], "properties": {**acl_subject, "permission": {"type": "string", "enum": ["view", "edit", "admin"]}}},
+        output_schema=ACL_WRITE_SCHEMA, tags=("knowledge", "document", "acl", "write")), grant_document_acl)
+    register_capability(registry, CapabilitySpec(
+        **common, id="knowledge.document.acl.revoke", description="Revoke one explicit document access grant.",
+        use_when="A document administrator approved removal of an existing grant.", do_not_use_when="Revoking the creator's mandatory administrator access.",
+        effects=("delete:knowledge.document_acl",), risk="write", confirmation="user", idempotent=False,
+        input_schema={"type": "object", "required": ["document_gid", "subject_type", "subject_gid"], "properties": acl_subject},
+        output_schema=ACL_WRITE_SCHEMA, tags=("knowledge", "document", "acl", "write")), revoke_document_acl)
 
     aliases = (
         ("knowledge.space.list", "knowledge.space.search", list_spaces, {"type": "object"}, "read", SPACE_LIST_SCHEMA),

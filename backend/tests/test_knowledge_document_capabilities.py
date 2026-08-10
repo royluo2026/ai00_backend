@@ -1,9 +1,11 @@
 import unittest
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 from backend.capabilities.knowledge_documents_next import (
     _evidence,
     diff_document_revisions,
+    list_document_acl,
     rollback_document,
     register_knowledge_document_capabilities,
 )
@@ -40,10 +42,46 @@ class KnowledgeDocumentCapabilityTests(unittest.TestCase):
         self.assertEqual(spec.confirmation, "none")
         self.assertEqual(spec.permissions, ())
 
-    def test_document_acl_helpers_are_not_public_capabilities(self):
+    def test_document_search_and_acl_are_governed_public_capabilities(self):
         registry = CapabilityRegistry()
         register_knowledge_document_capabilities(registry)
-        self.assertFalse(any(spec.id.startswith("knowledge.document.acl.") for spec in registry.list()))
+        ids = {spec.id for spec in registry.list()}
+        self.assertIn("knowledge.document.search", ids)
+        self.assertTrue({
+            "knowledge.document.acl.list",
+            "knowledge.document.acl.grant",
+            "knowledge.document.acl.revoke",
+        } <= ids)
+        self.assertEqual(registry.get("knowledge.document.acl.list").spec.confirmation, "none")
+        self.assertEqual(registry.get("knowledge.document.acl.grant").spec.confirmation, "user")
+        self.assertEqual(registry.get("knowledge.document.acl.revoke").spec.confirmation, "user")
+
+    def test_acl_list_serializes_database_values_and_returns_stable_document_evidence(self):
+        class Cursor:
+            def __init__(self): self.query = 0
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def execute(self, *_args): self.query += 1
+            def fetchone(self): return {"gid": "doc_1"}
+            def fetchall(self):
+                return [{
+                    "subject_type": "user", "subject_gid": "user_2", "permission": "view",
+                    "created_by": "user_1", "created_at": datetime(2026, 8, 10, 12, 0, tzinfo=timezone.utc),
+                }]
+
+        class Connection:
+            def __enter__(self): return self
+            def __exit__(self, *_args): return False
+            def cursor(self): return Cursor()
+
+        with patch("backend.knowledge.data.connection.get_knowledge_conn", return_value=Connection()):
+            result = list_document_acl(
+                {"document_gid": "doc_1"}, CapabilityContext(user_gid="user_1", team_gid="tenant_1")
+            )
+
+        self.assertEqual(result.data["document_ref"], "knowledge-document:doc_1")
+        self.assertEqual(result.data["items"][0]["created_at"], "2026-08-10T12:00:00+00:00")
+        self.assertEqual(result.evidence[0].reference, "knowledge-document:doc_1")
 
     def test_diff_returns_both_revision_evidence(self):
         context = CapabilityContext(user_gid="u", team_gid="t")

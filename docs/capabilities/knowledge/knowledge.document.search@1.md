@@ -1,13 +1,13 @@
-# plugin.uninstall@1
+# knowledge.document.search@1
 
-Uninstall a disabled or revoked plugin.
+Search published immutable Knowledge Workspace documents.
 
 ## 使用判断
 
-- 适用：Uninstall a disabled or revoked plugin.
-- 不适用：Use a governed Capability V2 contract when one is available.
+- 适用：A caller needs to discover a document before using its stable reference.
+- 不适用：The document gid is already known.
 - 生命周期：`stable`
-- 所属领域：`base`
+- 所属领域：`knowledge`
 - Catalog Release：`rel_515f4828b3d683f2be3116e82670d12e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
@@ -28,29 +28,29 @@ Uninstall a disabled or revoked plugin.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:system.plugin.manage`
-- 自动化等级：`A0`
-- 数据分类：`restricted`
+- 授权策略：`knowledge.v2:authenticated`
+- 自动化等级：`A2`
+- 数据分类：`confidential`
 - Delegation：`scoped`
-- 认证新鲜度：300 秒
+- 认证新鲜度：0 秒
 
 资源选择器：
-- `plugin-installation` ← `plugin_id`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
-- 副作用：`write`
+- 副作用：`read`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
-- 审批：`admin`
-- 幂等：`required`
+- 审批：`none`
+- 幂等：`none`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`external`
-- Operation：`optional`
+- 一致性：`strong`
+- Operation：`none`
 - Artifact：`none`
-- 审计：`high_risk`
-- Evidence：`optional`
+- 审计：`standard`
+- Evidence：`required`
 - 配额成本：1
 
 ## 输入 Schema
@@ -59,13 +59,15 @@ Uninstall a disabled or revoked plugin.
 {
   "additionalProperties": false,
   "properties": {
-    "plugin_id": {
+    "limit": {
+      "maximum": 50,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "query": {
       "type": "string"
     }
   },
-  "required": [
-    "plugin_id"
-  ],
   "type": "object"
 }
 ```
@@ -74,12 +76,10 @@ Uninstall a disabled or revoked plugin.
 
 ```json
 {
-  "capability_id": "plugin.uninstall",
+  "capability_id": "knowledge.document.search",
   "catalog_release": "rel_515f4828b3d683f2be3116e82670d12e",
   "major_version": 1,
-  "payload": {
-    "plugin_id": "example"
-  }
+  "payload": {}
 }
 ```
 
@@ -91,20 +91,74 @@ Uninstall a disabled or revoked plugin.
 {
   "additionalProperties": false,
   "properties": {
-    "plugin_id": {
+    "items": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "document_gid": {
+            "type": "string"
+          },
+          "object_ref": {
+            "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "revision_gid": {
+            "type": "string"
+          },
+          "revision_no": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "revision_ref": {
+            "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "space_gid": {
+            "type": "string"
+          },
+          "space_ref": {
+            "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "object_ref",
+          "revision_ref",
+          "space_ref",
+          "title",
+          "slug",
+          "space_gid",
+          "document_gid",
+          "revision_gid",
+          "revision_no",
+          "state"
+        ],
+        "type": "object"
+      },
+      "maxItems": 50,
+      "type": "array"
+    },
+    "query": {
       "type": "string"
     },
-    "state": {
-      "type": "string"
-    },
-    "version": {
-      "type": "string"
+    "total": {
+      "minimum": 0,
+      "type": "integer"
     }
   },
   "required": [
-    "plugin_id",
-    "version",
-    "state"
+    "items",
+    "total",
+    "query"
   ],
   "type": "object"
 }
@@ -142,14 +196,12 @@ Uninstall a disabled or revoked plugin.
 
 领域错误：
 
-- `resource_not_found`：The requested Base resource does not exist or is not visible.（retryable=false）
-- `permission_denied`：The caller lacks a required Base Platform permission.（retryable=false）
-- `approval_required`：The governed operation requires a valid approval.（retryable=false）
-- `authentication_stale`：The caller must authenticate again before this high-risk operation.（retryable=false）
-- `idempotency_conflict`：The idempotency key is bound to a different request.（retryable=false）
-- `version_conflict`：The resource version differs from the expected version.（retryable=false）
-- `provider_unavailable`：A required domain provider is not registered.（retryable=true）
-- `plugin_state_conflict`：The plugin installation cannot perform this lifecycle transition.（retryable=false）
+- `resource_not_found`：The scoped Knowledge resource does not exist or is not visible.（retryable=false）
+- `revision_conflict`：The document head differs from the supplied base revision.（retryable=false）
+- `proposal_state_conflict`：The proposal is no longer in a state that accepts this transition.（retryable=false）
+- `knowledge_storage_unavailable`：The immutable Knowledge object store is unavailable.（retryable=true）
+- `publication_in_progress`：Another worker owns the current publication lease.（retryable=true）
+- `self_review_forbidden`：Proposal creators cannot approve or reject their own proposal.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

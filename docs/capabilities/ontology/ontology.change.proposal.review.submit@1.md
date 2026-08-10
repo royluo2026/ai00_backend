@@ -8,7 +8,7 @@ Append a human review bound to an immutable proposal revision Hash.
 - 不适用：An Agent is attempting to approve.
 - 生命周期：`experimental`
 - 所属领域：`ontology`
-- Catalog Release：`rel_240296a5c4f1835b2ccabd56169c67e6`
+- Catalog Release：`rel_515f4828b3d683f2be3116e82670d12e`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -79,7 +79,7 @@ Append a human review bound to an immutable proposal revision Hash.
 ```json
 {
   "capability_id": "ontology.change.proposal.review.submit",
-  "catalog_release": "rel_240296a5c4f1835b2ccabd56169c67e6",
+  "catalog_release": "rel_515f4828b3d683f2be3116e82670d12e",
   "major_version": 1,
   "payload": {
     "content_sha256": "example",

@@ -21,7 +21,12 @@ def test_team_collaboration_reads_and_revisions_need_no_document_acl_permission(
     assert registry.get("knowledge.document.revise").spec.permissions == ()
     assert registry.get("knowledge.document.create").spec.permissions == ()
     ids = {spec.id for spec in registry.list()}
-    assert not any(value.startswith("knowledge.document.acl.") for value in ids)
+    assert {
+        "knowledge.document.search",
+        "knowledge.document.acl.list",
+        "knowledge.document.acl.grant",
+        "knowledge.document.acl.revoke",
+    } <= ids
 
 
 def test_approved_names_and_deprecated_aliases_are_explicit():

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_240296a5c4f1835b2ccabd56169c67e6",
-  "catalog_hash": "sha256:240296a5c4f1835b2ccabd56169c67e6735765cfc6499f16a8d84802ff428492",
+  "release_id": "rel_515f4828b3d683f2be3116e82670d12e",
+  "catalog_hash": "sha256:515f4828b3d683f2be3116e82670d12e6231823325094fd3ecef92fa44556149",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -6601,6 +6601,625 @@
       "domain_errors_complete": true
     },
     {
+      "id": "knowledge.document.acl.grant",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.document.acl.grant",
+      "description": "Grant bounded document access to a same-tenant subject.",
+      "use_when": "A document administrator approved a new access grant.",
+      "do_not_use_when": "The subject is outside the current tenant.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "knowledge.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "knowledge-document",
+          "payload_path": "document_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid",
+          "subject_type",
+          "subject_gid",
+          "permission"
+        ],
+        "properties": {
+          "document_gid": {
+            "type": "string"
+          },
+          "subject_type": {
+            "type": "string",
+            "enum": [
+              "user",
+              "team"
+            ]
+          },
+          "subject_gid": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string",
+            "enum": [
+              "view",
+              "edit",
+              "admin"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_ref",
+          "document_gid",
+          "subject_type",
+          "subject_gid"
+        ],
+        "properties": {
+          "document_ref": {
+            "type": "string",
+            "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"
+          },
+          "document_gid": {
+            "type": "string"
+          },
+          "subject_type": {
+            "type": "string",
+            "enum": [
+              "user",
+              "team"
+            ]
+          },
+          "subject_gid": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string",
+            "enum": [
+              "view",
+              "edit",
+              "admin"
+            ]
+          },
+          "revoked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_ref",
+          "document_gid",
+          "subject_type",
+          "subject_gid"
+        ],
+        "properties": {
+          "document_ref": {
+            "type": "string",
+            "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"
+          },
+          "document_gid": {
+            "type": "string"
+          },
+          "subject_type": {
+            "type": "string",
+            "enum": [
+              "user",
+              "team"
+            ]
+          },
+          "subject_gid": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string",
+            "enum": [
+              "view",
+              "edit",
+              "admin"
+            ]
+          },
+          "revoked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "schema_hash": "sha256:c99adb79eaf7c4d59b4f7ab45c7b1681a9a078ee33645a00ddb5d0183de4519a",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "knowledge.document.acl.list",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.document.acl.list",
+      "description": "List governed access grants for a document the caller administers.",
+      "use_when": "A document administrator needs its explicit grants.",
+      "do_not_use_when": "Only document content is required.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "knowledge.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "knowledge-document",
+          "payload_path": "document_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid"
+        ],
+        "properties": {
+          "document_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_ref",
+          "document_gid",
+          "items",
+          "total"
+        ],
+        "properties": {
+          "document_ref": {
+            "type": "string",
+            "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"
+          },
+          "document_gid": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "subject_type",
+                "subject_gid",
+                "permission"
+              ],
+              "properties": {
+                "subject_type": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "team"
+                  ]
+                },
+                "subject_gid": {
+                  "type": "string"
+                },
+                "permission": {
+                  "type": "string",
+                  "enum": [
+                    "view",
+                    "edit",
+                    "admin"
+                  ]
+                },
+                "created_by": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "created_at": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_ref",
+          "document_gid",
+          "items",
+          "total"
+        ],
+        "properties": {
+          "document_ref": {
+            "type": "string",
+            "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"
+          },
+          "document_gid": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "subject_type",
+                "subject_gid",
+                "permission"
+              ],
+              "properties": {
+                "subject_type": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "team"
+                  ]
+                },
+                "subject_gid": {
+                  "type": "string"
+                },
+                "permission": {
+                  "type": "string",
+                  "enum": [
+                    "view",
+                    "edit",
+                    "admin"
+                  ]
+                },
+                "created_by": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "created_at": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "schema_hash": "sha256:07dbbff235db7d96380150a1b3f7788f829001d2b71e5d466a12b4ad880c5154",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "knowledge.document.acl.revoke",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.document.acl.revoke",
+      "description": "Revoke one explicit document access grant.",
+      "use_when": "A document administrator approved removal of an existing grant.",
+      "do_not_use_when": "Revoking the creator's mandatory administrator access.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "knowledge.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "knowledge-document",
+          "payload_path": "document_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid",
+          "subject_type",
+          "subject_gid"
+        ],
+        "properties": {
+          "document_gid": {
+            "type": "string"
+          },
+          "subject_type": {
+            "type": "string",
+            "enum": [
+              "user",
+              "team"
+            ]
+          },
+          "subject_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_ref",
+          "document_gid",
+          "subject_type",
+          "subject_gid"
+        ],
+        "properties": {
+          "document_ref": {
+            "type": "string",
+            "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"
+          },
+          "document_gid": {
+            "type": "string"
+          },
+          "subject_type": {
+            "type": "string",
+            "enum": [
+              "user",
+              "team"
+            ]
+          },
+          "subject_gid": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string",
+            "enum": [
+              "view",
+              "edit",
+              "admin"
+            ]
+          },
+          "revoked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_ref",
+          "document_gid",
+          "subject_type",
+          "subject_gid"
+        ],
+        "properties": {
+          "document_ref": {
+            "type": "string",
+            "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"
+          },
+          "document_gid": {
+            "type": "string"
+          },
+          "subject_type": {
+            "type": "string",
+            "enum": [
+              "user",
+              "team"
+            ]
+          },
+          "subject_gid": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string",
+            "enum": [
+              "view",
+              "edit",
+              "admin"
+            ]
+          },
+          "revoked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "schema_hash": "sha256:0ab4b24a78262f4f850d16bff52dd35f0e240f71e245d431645faff83089a93d",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
       "id": "knowledge.document.create",
       "major_version": 1,
       "owner_domain": "knowledge",
@@ -8436,6 +9055,242 @@
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": "Use knowledge.document.restore.",
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "knowledge.document.search",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.document.search",
+      "description": "Search published immutable Knowledge Workspace documents.",
+      "use_when": "A caller needs to discover a document before using its stable reference.",
+      "do_not_use_when": "The document gid is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "knowledge.v2:authenticated",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "object_ref",
+                "revision_ref",
+                "space_ref",
+                "title",
+                "slug",
+                "space_gid",
+                "document_gid",
+                "revision_gid",
+                "revision_no",
+                "state"
+              ],
+              "properties": {
+                "object_ref": {
+                  "type": "string",
+                  "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"
+                },
+                "revision_ref": {
+                  "type": "string",
+                  "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$"
+                },
+                "space_ref": {
+                  "type": "string",
+                  "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "space_gid": {
+                  "type": "string"
+                },
+                "document_gid": {
+                  "type": "string"
+                },
+                "revision_gid": {
+                  "type": "string"
+                },
+                "revision_no": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "query": {
+            "type": "string"
+          }
+        }
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "query"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "object_ref",
+                "revision_ref",
+                "space_ref",
+                "title",
+                "slug",
+                "space_gid",
+                "document_gid",
+                "revision_gid",
+                "revision_no",
+                "state"
+              ],
+              "properties": {
+                "object_ref": {
+                  "type": "string",
+                  "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$"
+                },
+                "revision_ref": {
+                  "type": "string",
+                  "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$"
+                },
+                "space_ref": {
+                  "type": "string",
+                  "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "space_gid": {
+                  "type": "string"
+                },
+                "document_gid": {
+                  "type": "string"
+                },
+                "revision_gid": {
+                  "type": "string"
+                },
+                "revision_no": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "query": {
+            "type": "string"
+          }
+        }
+      },
+      "schema_hash": "sha256:594fbf2805ba47eb78970684488e6258722c8a26174ded2c973de232ca853eb8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
       "domain_errors": [
         {
           "code": "resource_not_found",
@@ -23728,5 +24583,5 @@
       "artifact_hash": "sha256:7c593c94096c99fb5101472da2df37b5229668bd0995ff2611441bc61a551bc0"
     }
   ],
-  "created_at": "2026-08-10T12:36:45.816612Z"
+  "created_at": "2026-08-10T12:58:57.453795Z"
 }

@@ -18,6 +18,9 @@ from backend.capability_v2.v1_adapter import adapt_v1_spec
 _RESOURCE_FIELDS = {
     "knowledge.get": ("knowledge-entry", "gid"),
     "knowledge.document.get": ("knowledge-document", "document_gid"),
+    "knowledge.document.acl.list": ("knowledge-document", "document_gid"),
+    "knowledge.document.acl.grant": ("knowledge-document", "document_gid"),
+    "knowledge.document.acl.revoke": ("knowledge-document", "document_gid"),
     "knowledge.document.diff": ("knowledge-document", "document_gid"),
     "knowledge.document.history.get": ("knowledge-document", "document_gid"),
     "knowledge.document.create": ("knowledge-space", "space_gid"),
