@@ -40,6 +40,9 @@ class CapabilityRegistry:
         if tag: result = [spec for spec in result if tag in spec.tags]
         if plugin_callable is not None: result = [spec for spec in result if spec.plugin_callable is plugin_callable]
         return sorted(result, key=lambda spec: (spec.id, spec.version))
+    def snapshot(self) -> tuple[RegisteredCapability, ...]:
+        """Return an exact, deterministically ordered provider registration snapshot."""
+        return tuple(self._items[key] for key in sorted(self._items))
     async def invoke(self, capability_id: str, payload: dict[str, Any], context: CapabilityContext, *, version: int | None = None) -> CapabilityResult:
         item = self.get(capability_id, version)
         validate_payload(dict(item.spec.input_schema), payload)

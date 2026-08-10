@@ -294,8 +294,9 @@ git commit -m "feat: define capability v2 contracts"
 - Create: `backend/capability_v2/catalog.py`
 - Create: `backend/capability_v2/catalog_store.py`
 - Create: `backend/capability_v2/official_providers.json`
-- Create: `backend/db/migrations/202608100001_capability_catalog_releases.sql`
+- Create: `backend/db/migrations/202608100001_base_capability_catalog_releases.sql`
 - Create: `backend/scripts/build_capability_catalog.py`
+- Create: `docs/governance/capability-catalog-release.json`
 - Create: `backend/tests/test_capability_catalog_release.py`
 - Modify: `backend/capabilities/registry_next.py`
 - Modify: `backend/plugin_loader.py`
@@ -344,7 +345,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add backend/capability_v2/catalog.py backend/capability_v2/catalog_store.py backend/capability_v2/official_providers.json backend/db/migrations/202608100001_capability_catalog_releases.sql backend/scripts/build_capability_catalog.py backend/tests/test_capability_catalog_release.py backend/capabilities/registry_next.py backend/plugin_loader.py
+git add backend/capability_v2/catalog.py backend/capability_v2/catalog_store.py backend/capability_v2/official_providers.json backend/db/migrations/202608100001_base_capability_catalog_releases.sql backend/scripts/build_capability_catalog.py docs/governance/capability-catalog-release.json backend/tests/test_capability_catalog_release.py backend/capabilities/registry_next.py backend/plugin_loader.py plugins/craft/manifest.json docs/governance/domain-ownership.json .github/CODEOWNERS
 git commit -m "feat: add immutable capability catalog releases"
 ```
 

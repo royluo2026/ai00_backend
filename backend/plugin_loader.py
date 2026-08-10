@@ -8,25 +8,78 @@ backend/plugin_loader.py — 后端插件路由加载器
 两个目录均不存在时，后端以无插件模式启动（仅 warning）。
 """
 import importlib
+import hashlib
 import json
 import logging
 import sys
 from pathlib import Path
+
+from backend.capability_v2.catalog import ProviderArtifact
 
 logger = logging.getLogger(__name__)
 
 _PROJECT_ROOT = Path(__file__).parent.parent
 _PACKAGES_DIR = _PROJECT_ROOT / "packages"
 _PLUGINS_DIR  = _PROJECT_ROOT / "plugins"
+_OFFICIAL_PROVIDERS_PATH = Path(__file__).with_name("capability_v2") / "official_providers.json"
+
+
+class ProviderTrustError(RuntimeError):
+    pass
+
+
+def hash_provider_artifact(package_dir: Path, module: str) -> str:
+    """Hash the provider's whole importable package, including transitive code."""
+    package_root = package_dir.resolve()
+    artifact_root = package_root / module.split(".", 1)[0]
+    module_root = package_root.joinpath(*module.split("."))
+    if artifact_root.is_dir() and (module_root.is_dir() or module_root.with_suffix(".py").is_file()):
+        files = sorted(artifact_root.rglob("*.py"))
+    else:
+        raise ProviderTrustError(f"provider_module_not_found: {module}")
+    digest = hashlib.sha256()
+    for path in files:
+        resolved = path.resolve()
+        try:
+            relative = resolved.relative_to(package_root).as_posix()
+        except ValueError as exc:
+            raise ProviderTrustError(f"provider_path_escape: {module}") from exc
+        content = resolved.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        digest.update(relative.encode("utf-8") + b"\0" + content + b"\0")
+    return "sha256:" + digest.hexdigest()
+
+
+def _load_official_providers(path: Path = _OFFICIAL_PROVIDERS_PATH) -> tuple[ProviderArtifact, ...]:
+    if not path.is_file():
+        return ()
+    document = json.loads(path.read_text(encoding="utf-8"))
+    return tuple(ProviderArtifact.model_validate(item) for item in document.get("providers", ()))
 
 
 class PluginLoader:
-    def __init__(self, packages_dir: Path = _PACKAGES_DIR, plugins_dir: Path = _PLUGINS_DIR):
+    def __init__(self, packages_dir: Path = _PACKAGES_DIR, plugins_dir: Path = _PLUGINS_DIR,
+                 *, provider_artifacts=None):
         self._packages_dir = packages_dir
         self._plugins_dir  = plugins_dir
         self._plugins: list[dict] = []
         self._plugin_dirs: dict[str, Path] = {}         # plugin_id → 插件目录（web 路径用）
         self._plugin_backend_dirs: dict[str, Path] = {} # plugin_id → 后端代码目录（sys.path 注入用）
+        artifacts = _load_official_providers() if provider_artifacts is None else tuple(provider_artifacts)
+        self._provider_artifacts = {
+            item.plugin_id: item if isinstance(item, ProviderArtifact) else ProviderArtifact.model_validate(item)
+            for item in artifacts
+        }
+
+    def authorize_capability_provider(self, plugin_id: str, *, module: str, version: str,
+                                      artifact_hash: str) -> ProviderArtifact:
+        expected = self._provider_artifacts.get(plugin_id)
+        if expected is None:
+            raise ProviderTrustError(f"provider_not_in_release: {plugin_id}")
+        actual = (module, version, artifact_hash)
+        frozen = (expected.module, expected.version, expected.artifact_hash)
+        if actual != frozen:
+            raise ProviderTrustError(f"provider_artifact_mismatch: {plugin_id}")
+        return expected
 
     def _scan_dir(self, base_dir: Path, seen_ids: set, is_backend_dir: bool = False) -> None:
         """扫描一个目录下的 manifest.json，写入 self._plugins / self._plugin_dirs。
@@ -129,7 +182,7 @@ class PluginLoader:
         return routers
 
     def register_capabilities(self, registry) -> tuple[str, ...]:
-        """Load Capability providers declared by official backend manifests."""
+        """Load only Capability providers pinned by the frozen build allowlist."""
         loaded: list[str] = []
         for manifest in self._plugins:
             plugin_id = str(manifest.get("plugin_id") or "")
@@ -140,6 +193,16 @@ class PluginLoader:
                 continue
 
             pkg_dir = self._plugin_backend_dirs.get(plugin_id) or self._plugin_dirs.get(plugin_id)
+            provider_version = manifest.get("backend", {}).get("provider_version")
+            if not pkg_dir or not provider_version:
+                raise ProviderTrustError(f"provider_metadata_missing: {plugin_id}")
+            artifact_hash = hash_provider_artifact(pkg_dir, module_path)
+            self.authorize_capability_provider(
+                plugin_id,
+                module=module_path,
+                version=str(provider_version),
+                artifact_hash=artifact_hash,
+            )
             pkg_dir_str = str(pkg_dir) if pkg_dir else None
             injected = False
             if pkg_dir_str and pkg_dir_str not in sys.path:

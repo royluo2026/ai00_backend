@@ -1,0 +1,4807 @@
+{
+  "release_id": "rel_b5b6e3eb50eb02adacaeb2e35f179455",
+  "catalog_hash": "sha256:b5b6e3eb50eb02adacaeb2e35f1794554be692788b0d0eea10bb97a12684cc4d",
+  "descriptors": [
+    {
+      "id": "base.project.search",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "base.project.search",
+      "description": "Search project refs through the owning domain provider.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:f826ccd74c4c0ca2d8c94f9d7d9c3654fd2f00546c0bebbe5100d729b0703f0b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.draft.change.apply",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.draft.change.apply",
+      "description": "Apply one exact typed BOP draft preview atomically.",
+      "use_when": "Apply one exact typed BOP draft preview atomically.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:craft.write",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "preview_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "revision",
+          "before_hash",
+          "after_hash"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:bd2632a124e55694c68f7c3f3bbbce92a5897ef3567da10571499de1077c369c",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.draft.change.preview",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.draft.change.preview",
+      "description": "Preview a typed BOP draft change without side effects.",
+      "use_when": "Preview a typed BOP draft change without side effects.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:craft.write",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "expected_revision",
+          "commands"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "preview_gid",
+          "version_gid",
+          "base_revision",
+          "before_hash",
+          "after_hash",
+          "expires_at"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:3cff9a2447a164a1ef809dc24f1398be7222a07509f7a879121b50bc63bd014e",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.execution_structure.get",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.execution_structure.get",
+      "description": "Read the deterministic official execution structure of a published BOP.",
+      "use_when": "A downstream system needs the official published execution source.",
+      "do_not_use_when": "The BOP is a draft or the caller is editing it.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "version_gid"
+        ],
+        "properties": {
+          "version_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "contract_id",
+          "contract_version",
+          "official",
+          "source",
+          "nodes",
+          "operations",
+          "dependencies",
+          "conditions",
+          "content_hash"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:8f35f89696535a040e34cc22977310f182b56706528eafc6b5d703f6b699c4c4",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.execution_structure.preview",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.execution_structure.preview",
+      "description": "Preview a draft BOP execution structure at an exact revision.",
+      "use_when": "The caller needs a non-official structure for review or analysis.",
+      "do_not_use_when": "The caller needs an official execution source.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "expected_revision"
+        ],
+        "properties": {
+          "version_gid": {
+            "type": "string"
+          },
+          "expected_revision": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "contract_id",
+          "contract_version",
+          "official",
+          "source",
+          "nodes",
+          "operations",
+          "dependencies",
+          "conditions",
+          "content_hash"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:bb5415a86480059069c91b71650ff2b0bf0c08e553b8f6d122ac0a14625e764f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.import.preview",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.import.preview",
+      "description": "Parse and hash a BOP import document without mutating Craft state.",
+      "use_when": "Parse and hash a BOP import document without mutating Craft state.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:craft.write",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "import_preview_gid",
+          "content_hash",
+          "entry_count",
+          "expires_at"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:427da7b56ca997449c00aacdd7c4ddba6bc1496d988f475656fa6624666f9b05",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.linked_parts.get",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.linked_parts.get",
+      "description": "Read PBOM parts explicitly linked to a BOP and their usage locations.",
+      "use_when": "The caller needs parts already used by a BOP.",
+      "do_not_use_when": "The caller is searching PBOM candidate parts.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "version_gid"
+        ],
+        "properties": {
+          "version_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "revision",
+          "items"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:273d4ed214a4ba40832f596c47ed68302287eefa95574bd14c93e6045f6fefed",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.version.archive",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.version.archive",
+      "description": "Archive a BOP version without deleting its snapshot or references.",
+      "use_when": "Archive a BOP version without deleting its snapshot or references.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:craft.write",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "expected_revision"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "status",
+          "revision",
+          "before_hash",
+          "after_hash"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:856c732df1dd40c2a6b62b0f0bc377b1318525e4e9cc8bf1a4b808187d5a9abc",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.version.compare",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.version.compare",
+      "description": "Compare two BOP versions as semantic structure changes.",
+      "use_when": "The caller needs additions, removals, moves and field changes.",
+      "do_not_use_when": "A raw database JSON diff is requested.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "from_version_gid",
+          "to_version_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "comparability",
+          "added",
+          "removed",
+          "moved",
+          "changed"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:ffff969a6c59b5cabfba5ce0df04a7b445f8ad2190d1a865f404445df7d9e646",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.version.create",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.version.create",
+      "description": "Create a BOP draft from an empty, version, template or import preview source.",
+      "use_when": "Create a BOP draft from an empty, version, template or import preview source.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:craft.write",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "source",
+          "version_tag"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "status",
+          "revision",
+          "entries_count"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:a526133f0cfc55102c1000e8470c1ffb368ea04ababe91d159bda4d801be20ba",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.version.get",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.version.get",
+      "description": "Read one BOP version identity, lifecycle and revision evidence.",
+      "use_when": "The caller already has an exact BOP version GID.",
+      "do_not_use_when": "The caller needs to discover or compare versions.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "version_gid"
+        ],
+        "properties": {
+          "version_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "revision",
+          "family_gid",
+          "project_gid",
+          "lifecycle",
+          "content_hash"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e3f115d3417537dd55be12798f2c5bd340ab15ba9261406b402c09330f72b642",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.version.list",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.version.list",
+      "description": "Discover BOP version summaries with bounded cursor pagination.",
+      "use_when": "The caller needs to find BOP versions by project, state or text.",
+      "do_not_use_when": "The caller already has one exact version GID.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "project_gid": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "include_archived": {
+            "type": "boolean"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "page_size": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array"
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e8b0712acab9a6f55fd8d42d7f52c7e5b12f20d9b4e6da0d317552ebe5ed7b43",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.bop.work_package.get",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.bop.work_package.get",
+      "description": "Project one BOP structure into a line, station or role work package.",
+      "use_when": "The caller needs bounded execution context for one governed scope.",
+      "do_not_use_when": "The caller needs the complete BOP structure.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "scope"
+        ],
+        "properties": {
+          "version_gid": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "revision",
+          "scope",
+          "work_items",
+          "parts",
+          "tools",
+          "fixtures",
+          "equipment_requirements",
+          "knowledge_refs",
+          "rule_refs"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:a8f3c26b966fca99a2e73b6eb4cf7e3dc647aa2a1eb81d0633f269815b9a870b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.gbop.item.knowledge.list",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.gbop.item.knowledge.list",
+      "description": "craft.gbop.item.knowledge.list",
+      "use_when": "The current active GBOP release is the required source.",
+      "do_not_use_when": "A historical or draft GBOP release is required.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "item_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "active_release_gid",
+          "items"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:bdd6882b46e6df82e93abd9adb698a6fc35f220c5e04e041135fd6b02ca70e35",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.gbop.item.search",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.gbop.item.search",
+      "description": "craft.gbop.item.search",
+      "use_when": "The current active GBOP release is the required source.",
+      "do_not_use_when": "A historical or draft GBOP release is required.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "active_release_gid",
+          "items"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:f608979bf85fd01c3d951cc255006fa44bdf65eed58c9e800884701566b00b68",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.gbop.item.usage.get",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.gbop.item.usage.get",
+      "description": "craft.gbop.item.usage.get",
+      "use_when": "The current active GBOP release is the required source.",
+      "do_not_use_when": "A historical or draft GBOP release is required.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "item_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "active_release_gid",
+          "items"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:bdd6882b46e6df82e93abd9adb698a6fc35f220c5e04e041135fd6b02ca70e35",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.pbom.part.search",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.pbom.part.search",
+      "description": "craft.pbom.part.search",
+      "use_when": "A PBOM snapshot is explicitly selected.",
+      "do_not_use_when": "No exact PBOM snapshot is known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "snapshot_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "snapshot_gid",
+          "items"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:35e634caf5e9bfa9225b9c5e9b1eb81171fab36db2478b2f57971667969d1da9",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.pbom.snapshot.compare",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.pbom.snapshot.compare",
+      "description": "craft.pbom.snapshot.compare",
+      "use_when": "A PBOM snapshot is explicitly selected.",
+      "do_not_use_when": "No exact PBOM snapshot is known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "from_snapshot_gid",
+          "to_snapshot_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "comparability",
+          "added",
+          "removed",
+          "changed"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:51a1df56aa9966cb75b7e4cd5ac1439873e858a9f9e5097a958d00dd085ce9f5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "craft.pbom.snapshot.get",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "craft.pbom.snapshot.get",
+      "description": "craft.pbom.snapshot.get",
+      "use_when": "A PBOM snapshot is explicitly selected.",
+      "do_not_use_when": "No exact PBOM snapshot is known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "snapshot_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "gid",
+          "part_count"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7a01ada4d80198b2888cbcade9338e78ae36837e9bf368e35f87609993aec2db",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "identity.principal.search",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "identity.principal.search",
+      "description": "Search bounded principal summaries.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:f826ccd74c4c0ca2d8c94f9d7d9c3654fd2f00546c0bebbe5100d729b0703f0b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.context.retrieve",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.context.retrieve",
+      "description": "Retrieve bounded immutable Knowledge revision references for one task.",
+      "use_when": "A person or model needs decision context, not whole documents.",
+      "do_not_use_when": "The caller already knows an exact document revision.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "query"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:9de9b5079f7e2ff6b9044d5251e887412ede46d126ecf9ecc9138f6c554abd5d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.document.create",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.document.create",
+      "description": "Create a published Markdown document revision in immutable OIS storage.",
+      "use_when": "A new knowledge document is required.",
+      "do_not_use_when": "Updating an existing document.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "space_gid",
+          "title",
+          "slug",
+          "markdown"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:88cbb94d968109bf0bc3bc6e95e5c52e27d225beeeafb270728bfdedafaa09f8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.document.diff",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.document.diff",
+      "description": "Diff two immutable Markdown revisions.",
+      "use_when": "A caller needs exact changes between revisions.",
+      "do_not_use_when": "Only revision metadata is required.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid",
+          "from_revision_gid",
+          "to_revision_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b063ace944302a4717f2b8da187a3604e620bbcad190729f463f3d5f5eb7c90f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.document.get",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.document.get",
+      "description": "Read one immutable Markdown revision with evidence.",
+      "use_when": "An exact document or revision is required.",
+      "do_not_use_when": "Only bounded decision context is needed.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:a5856e55223d743abcc97b4f734e2433dcddde44b4bb705510f612a38f34509d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.document.history.get",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.document.history.get",
+      "description": "List immutable revision metadata for a document.",
+      "use_when": "A caller needs attribution or revision history.",
+      "do_not_use_when": "The exact revision is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:a5856e55223d743abcc97b4f734e2433dcddde44b4bb705510f612a38f34509d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.document.restore",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.document.restore",
+      "description": "Restore historical content by publishing a new immutable revision.",
+      "use_when": "Historical content must become the new head without deleting history.",
+      "do_not_use_when": "Only reading old content.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid",
+          "base_revision_gid",
+          "target_revision_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d55c5be1000ffba086d2ccd5eee78b20f0799c68aa85c7fb74bdf7ec4028cc99",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.document.revise",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.document.revise",
+      "description": "Publish a new immutable revision with optimistic concurrency.",
+      "use_when": "Updating a document from a known base revision.",
+      "do_not_use_when": "The caller has not loaded the current revision.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid",
+          "base_revision_gid",
+          "markdown"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d7ee381f9acdbf4cab5f88c9c000560c6b503c352e5ac44478854d76a20b26d3",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.document.revisions",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.document.revisions",
+      "description": "Deprecated compatibility alias for knowledge.document.history.get.",
+      "use_when": "Migrating a legacy internal consumer.",
+      "do_not_use_when": "New callers must use knowledge.document.history.get.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:a5856e55223d743abcc97b4f734e2433dcddde44b4bb705510f612a38f34509d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.document.rollback",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.document.rollback",
+      "description": "Deprecated compatibility alias for knowledge.document.restore.",
+      "use_when": "Migrating a legacy internal consumer.",
+      "do_not_use_when": "New callers must use knowledge.document.restore.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "document_gid",
+          "base_revision_gid",
+          "target_revision_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d55c5be1000ffba086d2ccd5eee78b20f0799c68aa85c7fb74bdf7ec4028cc99",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.get",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.get",
+      "description": "读取当前用户有权访问的知识条目及 Markdown 正文.",
+      "use_when": "读取当前用户有权访问的知识条目及 Markdown 正文.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:knowledge.view",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:c5271509a51083c549ca0eb96f6cd771aa750e2035f25de0a5e6e48a3d94d3c2",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.migration.status",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.migration.status",
+      "description": "Inspect tenant-safe legacy Markdown migration readiness and audited runs.",
+      "use_when": "Inspect tenant-safe legacy Markdown migration readiness and audited runs.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:knowledge.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.proposal.get",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.proposal.get",
+      "description": "获取一份知识提案的完整 Markdown 和审核状态。",
+      "use_when": "获取一份知识提案的完整 Markdown 和审核状态。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:knowledge.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "proposal_gid"
+        ],
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:dd6a850a9a993be664caecc10018af6aed642aebbbd74ace6f860c75c57ed2e6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.proposal.list",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.proposal.list",
+      "description": "列出当前管理员可审核的知识提案。",
+      "use_when": "列出当前管理员可审核的知识提案。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:knowledge.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:8f143cada1407429b846249a248401008d6f503a0e4dd060570d747b1f3269c3",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.proposal.outbox.list",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.proposal.outbox.list",
+      "description": "查看当前用户或团队可见的知识发布补偿队列。",
+      "use_when": "查看当前用户或团队可见的知识发布补偿队列。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:knowledge.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:1034a31abe777915995aacf0ae64f4a618ca1b679b701d8adc33d99992a6df71",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.proposal.outbox.retry",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.proposal.outbox.retry",
+      "description": "重试一个 OIS 知识发布补偿任务，幂等创建正式知识条目。",
+      "use_when": "重试一个 OIS 知识发布补偿任务，幂等创建正式知识条目。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:knowledge.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "outbox_gid"
+        ],
+        "properties": {
+          "outbox_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5634ddbd085bb0affd6514aa93fb7cb4b120f31f6b93ff993040a0fc238e58e3",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.proposal.review",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.proposal.review",
+      "description": "审核知识提案；通过后将 Markdown 写入 OIS 并生成正式知识条目。",
+      "use_when": "审核知识提案；通过后将 Markdown 写入 OIS 并生成正式知识条目。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:knowledge.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "proposal_gid",
+          "decision"
+        ],
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string"
+          },
+          "review_note": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:14af95d2de245451f0a67167556b9d3f49761202c43acbaef8b76174de7a0ca8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.propose",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.propose",
+      "description": "提交一份待评审的 Markdown 知识提案，不直接修改正式知识库。",
+      "use_when": "提交一份待评审的 Markdown 知识提案，不直接修改正式知识库。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:knowledge.view",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "title",
+          "content_md"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content_md": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "base_gid": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:8af528f85f1655e0e388fa90532ca9200d8f892d3e0eceed79e0bdf04414678e",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.search",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.search",
+      "description": "按标题、Markdown 正文和标签搜索知识条目.",
+      "use_when": "按标题、Markdown 正文和标签搜索知识条目.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:knowledge.view",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.space.create",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.space.create",
+      "description": "Create a tenant Knowledge Workspace space.",
+      "use_when": "A new collaboration boundary is required.",
+      "do_not_use_when": "A suitable space already exists.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:55ab8cd9d1022d5505e5d1d0d30b2fd44fed019bafeaea0206788117142322ea",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.space.list",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.space.list",
+      "description": "Deprecated compatibility alias for knowledge.space.search.",
+      "use_when": "Migrating a legacy internal consumer.",
+      "do_not_use_when": "New callers must use knowledge.space.search.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "knowledge.space.search",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "knowledge.space.search",
+      "description": "Search spaces available in the current tenant.",
+      "use_when": "A caller needs a knowledge space.",
+      "do_not_use_when": "The space gid is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "local.command.get",
+      "major_version": 1,
+      "owner_domain": "runtime",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "local.command.get",
+      "description": "读取本人发起的本地命令状态和结果。",
+      "use_when": "读取本人发起的本地命令状态和结果。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:agent.run",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "command_gid"
+        ],
+        "properties": {
+          "command_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0a76234b1111ad7f3c2b657c8688405daac0d1907ca33ecfd77b7bb1efdafda9",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.change.proposal.create",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.change.proposal.create",
+      "description": "Create an immutable typed proposal against the exact active release.",
+      "use_when": "A governed ontology change is being proposed.",
+      "do_not_use_when": "Direct mutation of an active release is expected.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "base_release_gid",
+          "changes"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:27836205ea58a17f7feba03d8316faaf37bdeab183c538ebe1158f79eee0a15e",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.change.proposal.get",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.change.proposal.get",
+      "description": "Read the current immutable proposal revision.",
+      "use_when": "A proposal GID is known.",
+      "do_not_use_when": "Searching proposals.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "proposal_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:04485bbcd2d141b704d4b7ad750c801cd4d4f33fca86b9f41f329f3c6d875f0f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.change.proposal.review.submit",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.change.proposal.review.submit",
+      "description": "Append a human review bound to an immutable proposal revision Hash.",
+      "use_when": "A human reviewer makes a formal decision.",
+      "do_not_use_when": "An Agent is attempting to approve.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:ontology.review",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "proposal_gid",
+          "proposal_revision_gid",
+          "content_sha256",
+          "decision"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:06d417814e520d4032b9f8f9b5cc117e0b63d4caf1e935ad8072c6dd84d53b1d",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.change.proposal.search",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.change.proposal.search",
+      "description": "Search proposal metadata by governed status.",
+      "use_when": "A review queue or proposal list is required.",
+      "do_not_use_when": "A proposal GID is known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.concept.get",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.concept.get",
+      "description": "Read a summary or schema view pinned to an immutable release.",
+      "use_when": "A stable ontology identity is known.",
+      "do_not_use_when": "The caller only has an ambiguous term.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "stable_gid"
+        ],
+        "properties": {
+          "stable_gid": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "concept",
+              "property",
+              "relation",
+              "mapping",
+              "constraint"
+            ]
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "schema"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:ea0c52812936693c338890c34cf94f758fb6babb6d98ddeae17fd1003c7b2ad7",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.concept.resolve",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.concept.resolve",
+      "description": "Resolve a term without guessing across an immutable release.",
+      "use_when": "A caller has a human term or external identity.",
+      "do_not_use_when": "The stable object identity is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "term"
+        ],
+        "properties": {
+          "term": {
+            "type": "string"
+          },
+          "release_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:bf453a9a6e5b10cb20f83cb6f02944924beb9421d4dc4f34c1452667194e2398",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.mapping.assess",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.mapping.assess",
+      "description": "Assess deterministic mapping compatibility without persisting a mapping.",
+      "use_when": "Two typed ontology objects may correspond.",
+      "do_not_use_when": "Only names are available and an automatic decision is expected.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "source",
+          "target"
+        ],
+        "properties": {
+          "source": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "concept",
+                  "property",
+                  "relation",
+                  "mapping",
+                  "constraint"
+                ]
+              },
+              "stable_gid": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "target": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "concept",
+                  "property",
+                  "relation",
+                  "mapping",
+                  "constraint"
+                ]
+              },
+              "stable_gid": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "existing_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:2d6bb2461ed198c084eefb42edda6eeb48ee41a72bdb3299bfc4b5b35e12d9c8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.release.activate",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.release.activate",
+      "description": "Atomically activate a verified direct forward release.",
+      "use_when": "All compatibility providers report zero blockers.",
+      "do_not_use_when": "Publishing or rolling back directly.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:ontology.activate",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "release_gid",
+          "release_sha256",
+          "expected_active_release_gid",
+          "attestations"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0136a4888113c107be21c139f32fdbe9f822b3d060be2c76755ec5b0b5f167ba",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.release.diff",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.release.diff",
+      "description": "Compute a semantic stable-identity release diff.",
+      "use_when": "Change impact between two releases is needed.",
+      "do_not_use_when": "Raw JSON text differences are expected.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "from_release_gid",
+          "to_release_gid"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:73521f3c2cf27198d7f853bb099226579774a487c3277e244e4e03db0896a525",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.release.get",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.release.get",
+      "description": "Read one immutable or active release.",
+      "use_when": "A release identity or current active release is needed.",
+      "do_not_use_when": "Comparing two releases.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.release.publish",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.release.publish",
+      "description": "Publish an approved proposal as a new immutable inactive release.",
+      "use_when": "An exact proposal revision has independent approval.",
+      "do_not_use_when": "Changing the active release.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:ontology.publish",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "proposal_gid",
+          "proposal_revision_gid",
+          "content_sha256"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:9d2d69ce0a3d374d7918e2104951cfc62010f4c85b1ef400bfe4fe805775b3af",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "ontology.release.search",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "ontology.release.search",
+      "description": "Search immutable release metadata.",
+      "use_when": "Release history is required.",
+      "do_not_use_when": "A release identity is known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.disable",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.disable",
+      "description": "Disable an installed plugin.",
+      "use_when": "Disable an installed plugin.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:system.plugin.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "plugin_id"
+        ],
+        "properties": {
+          "plugin_id": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.enable",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.enable",
+      "description": "Enable an installed plugin.",
+      "use_when": "Enable an installed plugin.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:system.plugin.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "plugin_id"
+        ],
+        "properties": {
+          "plugin_id": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.install",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.install",
+      "description": "Install a platform-signed release in disabled state.",
+      "use_when": "Install a platform-signed release in disabled state.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:system.plugin.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "plugin_id",
+          "version",
+          "granted_capabilities"
+        ],
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "granted_capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7fd6541339a8a14ff38ee70766b713073e5ce1ccf7b9a7b5d35ade5c91f0a355",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.revoke",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.revoke",
+      "description": "Revoke an installed plugin immediately.",
+      "use_when": "Revoke an installed plugin immediately.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:system.plugin.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "plugin_id"
+        ],
+        "properties": {
+          "plugin_id": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.rollback",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.rollback",
+      "description": "Roll back to the previous platform-signed version.",
+      "use_when": "Roll back to the previous platform-signed version.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:system.plugin.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "plugin_id"
+        ],
+        "properties": {
+          "plugin_id": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.storage.delete",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.storage.delete",
+      "description": "Delete a value using optional optimistic versioning.",
+      "use_when": "Delete a value using optional optimistic versioning.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:658b7ed0e5465c0a8880c00062a97cca4b3823de3bc8adfb6f08bff1983d07b6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.storage.get",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.storage.get",
+      "description": "Read a value from the caller plugin namespace.",
+      "use_when": "Read a value from the caller plugin namespace.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e170a9c1953900bc7e16800051f41c0870713c77cbc78c633ca0e5461d2328bf",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.storage.list",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.storage.list",
+      "description": "List keys in the caller plugin namespace.",
+      "use_when": "List keys in the caller plugin namespace.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "prefix": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:bb88ea9b5c1610243ea5b1339aa555812bf40d66c05e40764b809f5bb053f071",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.storage.put",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.storage.put",
+      "description": "Create or replace a value using optimistic versioning.",
+      "use_when": "Create or replace a value using optimistic versioning.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "key",
+          "value"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:065e6f8f26a030782da29d65580f568d0608ac902624be5301d5d1b11643f5d4",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.uninstall",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.uninstall",
+      "description": "Uninstall a disabled or revoked plugin.",
+      "use_when": "Uninstall a disabled or revoked plugin.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:system.plugin.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "plugin_id"
+        ],
+        "properties": {
+          "plugin_id": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.upgrade",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.upgrade",
+      "description": "Stage a signed version upgrade pending health result.",
+      "use_when": "Stage a signed version upgrade pending health result.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:system.plugin.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "plugin_id",
+          "version",
+          "granted_capabilities"
+        ],
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "granted_capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7fd6541339a8a14ff38ee70766b713073e5ce1ccf7b9a7b5d35ade5c91f0a355",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "plugin.upgrade.finish",
+      "major_version": 1,
+      "owner_domain": "plugin",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "plugin.upgrade.finish",
+      "description": "Complete or fail a staged upgrade after health validation.",
+      "use_when": "Complete or fail a staged upgrade after health validation.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:system.plugin.manage",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "plugin_id",
+          "healthy"
+        ],
+        "properties": {
+          "plugin_id": {
+            "type": "string"
+          },
+          "healthy": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:c6fbbd7aba9fc663f1b468dcac508a5c1da18169a46c2a82c6fadf3ded776ac9",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "semantic.context.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "semantic.context.get",
+      "description": "Read an allowlisted bounded semantic named view.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "named_view"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:4d26c390dae4400583fe8a22eadb17da2a38a728070dfe3d7e9d531806363e23",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "system.activity.search",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "system.activity.search",
+      "description": "Search immutable activity summaries.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:15961aca8cb6ee2259e6ea275755616228a9c37f094f6f6aa50291aaf4b803c0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "system.change_impact.preview",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "system.change_impact.preview",
+      "description": "Compose impact from a server-issued preview or diff ref.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "change_ref"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7460ab86e4a0cecbf60a1305abe556cd788b03a13bb94964d685466540d48df9",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "system.echo",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "system.echo",
+      "description": "Return the supplied JSON payload; used to verify adapters.",
+      "use_when": "Return the supplied JSON payload; used to verify adapters.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "system.job.cancel",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "system.job.cancel",
+      "description": "Request job cancellation without claiming rollback.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "job_gid",
+          "owner"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:471b60021d4c039000053aac5e3ddd99991aa03db4ba3eba63fa537895d43e78",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "system.job.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "system.job.get",
+      "description": "Read one owner-scoped asynchronous job.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "job_gid",
+          "owner"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:471b60021d4c039000053aac5e3ddd99991aa03db4ba3eba63fa537895d43e78",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "system.lineage.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "system.lineage.get",
+      "description": "Compose immutable provenance events and completeness.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "object_ref"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:07b192df60ea65dbac109788b9e7560ade237b0dcdd09ee701e8402f1f58c47b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "system.search",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "system.search",
+      "description": "Search stable references across registered domain providers.",
+      "use_when": "A bounded shared-system composition is required.",
+      "do_not_use_when": "A domain-specific stable ref is already known.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:authenticated",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:f826ccd74c4c0ca2d8c94f9d7d9c3654fd2f00546c0bebbe5100d729b0703f0b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "system.worker.outbox.health",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "system.worker.outbox.health",
+      "description": "查看知识发布 worker 心跳、队列数量和告警数量。",
+      "use_when": "查看知识发布 worker 心跳、队列数量和告警数量。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "vismockup.capture",
+      "major_version": 1,
+      "owner_domain": "vismockup",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "vismockup.capture",
+      "description": "捕获当前 VisMockup 视图。",
+      "use_when": "捕获当前 VisMockup 视图。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "local",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:agent.run",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "device_gid"
+        ],
+        "properties": {
+          "device_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "vismockup.highlight",
+      "major_version": 1,
+      "owner_domain": "vismockup",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "vismockup.highlight",
+      "description": "按 CATIA occurrence 名称高亮节点。",
+      "use_when": "按 CATIA occurrence 名称高亮节点。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "local",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:agent.run",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "device_gid",
+          "catia_names"
+        ],
+        "properties": {
+          "device_gid": {
+            "type": "string"
+          },
+          "catia_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:540ab17f01bb895ddf75ac67e2482c54c92af008d71f6e67adcf09da656d155f",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "vismockup.launch",
+      "major_version": 1,
+      "owner_domain": "vismockup",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "vismockup.launch",
+      "description": "启动或连接 VisMockup。",
+      "use_when": "启动或连接 VisMockup。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "local",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:agent.run",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "device_gid"
+        ],
+        "properties": {
+          "device_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "vismockup.open_file",
+      "major_version": 1,
+      "owner_domain": "vismockup",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "vismockup.open_file",
+      "description": "打开允许目录中的 PLMXML/JT 文件。",
+      "use_when": "打开允许目录中的 PLMXML/JT 文件。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "local",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:agent.run",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "device_gid",
+          "file_path"
+        ],
+        "properties": {
+          "device_gid": {
+            "type": "string"
+          },
+          "file_path": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:f8f67a691922555db93ccc846a2a3f741855e3b3cd01ce9e594cfbca13434102",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "vismockup.status",
+      "major_version": 1,
+      "owner_domain": "vismockup",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "vismockup.status",
+      "description": "读取 VisMockup 连接状态。",
+      "use_when": "读取 VisMockup 连接状态。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "local",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:agent.run",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "device_gid"
+        ],
+        "properties": {
+          "device_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "vismockup.tree",
+      "major_version": 1,
+      "owner_domain": "vismockup",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "vismockup.tree",
+      "description": "读取 VisMockup 结构树。",
+      "use_when": "读取 VisMockup 结构树。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "local",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "legacy:agent.run",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "device_gid"
+        ],
+        "properties": {
+          "device_gid": {
+            "type": "string"
+          },
+          "max_depth": {
+            "type": "integer"
+          },
+          "force": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:193ae44d1e7fdf3c18f6f2fe117be988e0afe40e8671f2b75439e5a891220422",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    },
+    {
+      "id": "vismockup.visibility",
+      "major_version": 1,
+      "owner_domain": "vismockup",
+      "lifecycle_status": "experimental",
+      "catalog_release": null,
+      "title": "vismockup.visibility",
+      "description": "执行全显、全隐或取消选择。",
+      "use_when": "执行全显、全隐或取消选择。",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "local",
+      "exposure": {
+        "web": true,
+        "plugin": false,
+        "agent": false,
+        "api": true,
+        "mcp": false,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "legacy:agent.run",
+      "resource_selectors": [],
+      "data_classification": "internal",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "none",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "device_gid",
+          "action"
+        ],
+        "properties": {
+          "device_gid": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "all_on",
+              "all_off",
+              "deselect"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:4b817eaefe9e181f83bd5f0e3af80d057093209c52e8e42a1ce4a83a26ffa0bf",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "idempotency_policy": "optional",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null
+    }
+  ],
+  "provider_artifacts": [
+    {
+      "plugin_id": "official.craft",
+      "module": "craft_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
+    }
+  ],
+  "created_at": "2026-08-10T06:21:52.772717Z"
+}

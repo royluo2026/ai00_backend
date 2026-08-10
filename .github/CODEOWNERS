@@ -13,6 +13,7 @@
 /backend/db/migrations/202608040001_base_plugin_namespace_storage.sql @ai00/base-maintainers
 /backend/db/migrations/202608040002_base_plugin_usage_metrics.sql @ai00/base-maintainers
 /backend/db/migrations/202608050001_base_permission_grants.sql @ai00/base-maintainers
+/backend/db/migrations/202608100001_base_capability_catalog_releases.sql @ai00/base-maintainers
 
 # Agent
 /plugins/agent/** @ai00/agent-maintainers
@@ -69,3 +70,4 @@
 /backend/domain_ports/** @ai00/base-maintainers
 /docs/governance/domain-ownership.json @ai00/base-maintainers
 /docs/governance/domain-dependency-baseline.json @ai00/base-maintainers
+/docs/governance/capability-catalog-release.json @ai00/base-maintainers
