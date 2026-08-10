@@ -98,6 +98,7 @@
     {"path": "backend/capabilities/outbox_next.py", "domain": "knowledge"},
     {"path": "backend/capabilities/outbox_retry_next.py", "domain": "knowledge"},
     {"path": "backend/domain_ports/knowledge.py", "domain": "knowledge"},
+    {"path": "backend/domain_ports/craft.py", "domain": "craft"},
     {"path": "backend/capabilities/ontology_concepts_next.py", "domain": "ontology"},
     {"path": "backend/capabilities/ontology_proposals_next.py", "domain": "ontology"},
     {"path": "backend/capabilities/ontology_releases_next.py", "domain": "ontology"},

@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_fcfe3a6edf64a6840ae4d616cdd6524a"
+    "version": "rel_7eb69937273ad75a0e0781788fa7ac11"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -279,7 +279,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -293,7 +293,14 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "preview_gid": {}
+                  "idempotency_key": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "preview_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "preview_gid"
@@ -376,16 +383,44 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "after_hash": {},
-                            "before_hash": {},
-                            "revision": {},
-                            "version_gid": {}
+                            "after_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "before_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "idempotency_key": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "preview_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "revision": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "version_gid",
                             "revision",
                             "before_hash",
-                            "after_hash"
+                            "after_hash",
+                            "preview_gid",
+                            "idempotency_key"
                           ],
                           "type": "object"
                         },
@@ -514,7 +549,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -528,9 +563,26 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "commands": {},
-                  "expected_revision": {},
-                  "version_gid": {}
+                  "commands": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {},
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "expected_revision": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "idempotency_key": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "version_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "version_gid",
@@ -615,19 +667,66 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "after_hash": {},
-                            "base_revision": {},
-                            "before_hash": {},
-                            "expires_at": {},
-                            "preview_gid": {},
-                            "version_gid": {}
+                            "after_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "base_revision": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "before_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "commands": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "created_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "expires_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "idempotency_key": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "payload_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "preview_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "preview_gid",
                             "version_gid",
                             "base_revision",
+                            "commands",
                             "before_hash",
                             "after_hash",
+                            "payload_hash",
+                            "created_at",
                             "expires_at"
                           ],
                           "type": "object"
@@ -757,7 +856,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -772,6 +871,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "version_gid": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
@@ -856,15 +956,51 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "conditions": {},
-                            "content_hash": {},
-                            "contract_id": {},
-                            "contract_version": {},
-                            "dependencies": {},
-                            "nodes": {},
-                            "official": {},
-                            "operations": {},
-                            "source": {}
+                            "conditions": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "content_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "contract_id": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "contract_version": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "dependencies": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "nodes": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "official": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "operations": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "source": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "contract_id",
@@ -1004,7 +1140,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -1019,9 +1155,11 @@
                 "additionalProperties": false,
                 "properties": {
                   "expected_revision": {
+                    "minimum": 1,
                     "type": "integer"
                   },
                   "version_gid": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
@@ -1107,15 +1245,51 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "conditions": {},
-                            "content_hash": {},
-                            "contract_id": {},
-                            "contract_version": {},
-                            "dependencies": {},
-                            "nodes": {},
-                            "official": {},
-                            "operations": {},
-                            "source": {}
+                            "conditions": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "content_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "contract_id": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "contract_version": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "dependencies": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "nodes": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "official": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "operations": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "source": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "contract_id",
@@ -1255,7 +1429,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -1269,7 +1443,30 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "document": {}
+                  "document": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "bop_name": {
+                        "additionalProperties": false,
+                        "properties": {},
+                        "type": "object"
+                      },
+                      "entries": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {},
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "version_tag": {
+                        "additionalProperties": false,
+                        "properties": {},
+                        "type": "object"
+                      }
+                    },
+                    "type": "object"
+                  }
                 },
                 "required": [
                   "document"
@@ -1352,10 +1549,26 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "content_hash": {},
-                            "entry_count": {},
-                            "expires_at": {},
-                            "import_preview_gid": {}
+                            "content_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "entry_count": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "expires_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "import_preview_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "import_preview_gid",
@@ -1490,7 +1703,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -1505,6 +1718,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "version_gid": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
@@ -1589,9 +1803,21 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "items": {},
-                            "revision": {},
-                            "version_gid": {}
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "revision": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "version_gid",
@@ -1725,7 +1951,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -1739,8 +1965,14 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "expected_revision": {},
-                  "version_gid": {}
+                  "expected_revision": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "version_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "version_gid",
@@ -1824,11 +2056,31 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "after_hash": {},
-                            "before_hash": {},
-                            "revision": {},
-                            "status": {},
-                            "version_gid": {}
+                            "after_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "before_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "revision": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "status": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "version_gid",
@@ -1964,7 +2216,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -1978,8 +2230,14 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "from_version_gid": {},
-                  "to_version_gid": {}
+                  "from_version_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "to_version_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "from_version_gid",
@@ -2063,14 +2321,46 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "added": {},
-                            "changed": {},
-                            "comparability": {},
-                            "moved": {},
-                            "removed": {}
+                            "added": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "changed": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "comparability": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "from_version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "moved": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "removed": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "to_version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "comparability",
+                            "from_version_gid",
+                            "to_version_gid",
                             "added",
                             "removed",
                             "moved",
@@ -2203,7 +2493,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -2217,8 +2507,35 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "source": {},
-                  "version_tag": {}
+                  "import_preview_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "source": {
+                    "enum": [
+                      "empty",
+                      "bop_version",
+                      "template",
+                      "import_preview"
+                    ],
+                    "type": "string"
+                  },
+                  "source_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "template_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "version_family_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "version_tag": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "source",
@@ -2302,15 +2619,37 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "entries_count": {},
-                            "revision": {},
-                            "status": {},
-                            "version_gid": {}
+                            "entries_count": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "parent_version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "revision": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "status": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "version_gid",
                             "status",
                             "revision",
+                            "parent_version_gid",
                             "entries_count"
                           ],
                           "type": "object"
@@ -2440,7 +2779,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -2455,6 +2794,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "version_gid": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
@@ -2539,20 +2879,131 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "content_hash": {},
-                            "family_gid": {},
-                            "lifecycle": {},
-                            "project_gid": {},
-                            "revision": {},
-                            "version_gid": {}
+                            "archived": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "bop_name": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "change_note": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "content_hash": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "created_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "data_stage": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "factory_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "family_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "lifecycle": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "lifecycle_phase": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "maturity": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "owner_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "parent_version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "pbom_version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "project_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "revision": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "status": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "takt_time": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "updated_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "vehicle_model_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_tag": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_type": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "visibility": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "version_gid",
                             "revision",
-                            "family_gid",
-                            "project_gid",
-                            "lifecycle",
-                            "content_hash"
+                            "lifecycle"
                           ],
                           "type": "object"
                         },
@@ -2681,7 +3132,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -2696,21 +3147,26 @@
                 "additionalProperties": false,
                 "properties": {
                   "cursor": {
+                    "minLength": 1,
                     "type": "string"
                   },
                   "include_archived": {
                     "type": "boolean"
                   },
                   "page_size": {
+                    "maximum": 100,
+                    "minimum": 1,
                     "type": "integer"
                   },
                   "project_gid": {
+                    "minLength": 1,
                     "type": "string"
                   },
                   "query": {
                     "type": "string"
                   },
                   "status": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
@@ -2793,9 +3249,18 @@
                           "additionalProperties": false,
                           "properties": {
                             "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
                               "type": "array"
                             },
-                            "next_cursor": {}
+                            "next_cursor": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "items",
@@ -2928,7 +3393,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -2944,10 +3409,28 @@
                 "properties": {
                   "scope": {
                     "additionalProperties": false,
-                    "properties": {},
+                    "properties": {
+                      "gid": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "kind": {
+                        "enum": [
+                          "line",
+                          "station",
+                          "role"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "gid"
+                    ],
                     "type": "object"
                   },
                   "version_gid": {
+                    "minLength": 1,
                     "type": "string"
                   }
                 },
@@ -3033,16 +3516,56 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "equipment_requirements": {},
-                            "fixtures": {},
-                            "knowledge_refs": {},
-                            "parts": {},
-                            "revision": {},
-                            "rule_refs": {},
-                            "scope": {},
-                            "tools": {},
-                            "version_gid": {},
-                            "work_items": {}
+                            "equipment_requirements": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "fixtures": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "knowledge_refs": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "parts": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "revision": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "rule_refs": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "scope": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "tools": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "work_items": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "version_gid",
@@ -3183,7 +3706,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -3197,7 +3720,10 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "item_gid": {}
+                  "item_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "item_gid"
@@ -3280,11 +3806,25 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "active_release_gid": {},
-                            "items": {}
+                            "active_release_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "item_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "active_release_gid",
+                            "item_gid",
                             "items"
                           ],
                           "type": "object"
@@ -3414,7 +3954,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -3427,8 +3967,16 @@
             "application/json": {
               "schema": {
                 "additionalProperties": false,
-                "properties": {},
-                "required": [],
+                "properties": {
+                  "limit": {
+                    "maximum": 100,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "query": {
+                    "type": "string"
+                  }
+                },
                 "type": "object"
               }
             }
@@ -3507,8 +4055,16 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "active_release_gid": {},
-                            "items": {}
+                            "active_release_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "active_release_gid",
@@ -3641,7 +4197,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -3655,7 +4211,10 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "item_gid": {}
+                  "item_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "item_gid"
@@ -3738,11 +4297,25 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "active_release_gid": {},
-                            "items": {}
+                            "active_release_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "item_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "active_release_gid",
+                            "item_gid",
                             "items"
                           ],
                           "type": "object"
@@ -3872,7 +4445,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -3886,7 +4459,18 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "snapshot_gid": {}
+                  "limit": {
+                    "maximum": 100,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "query": {
+                    "type": "string"
+                  },
+                  "snapshot_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "snapshot_gid"
@@ -3969,8 +4553,16 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "items": {},
-                            "snapshot_gid": {}
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "snapshot_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "snapshot_gid",
@@ -4103,7 +4695,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -4117,8 +4709,14 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "from_snapshot_gid": {},
-                  "to_snapshot_gid": {}
+                  "from_snapshot_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "to_snapshot_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "from_snapshot_gid",
@@ -4202,13 +4800,41 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "added": {},
-                            "changed": {},
-                            "comparability": {},
-                            "removed": {}
+                            "added": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "changed": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "comparability": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "from_snapshot_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "removed": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "to_snapshot_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "comparability",
+                            "from_snapshot_gid",
+                            "to_snapshot_gid",
                             "added",
                             "removed",
                             "changed"
@@ -4340,7 +4966,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.compare",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -4354,7 +4980,10 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "snapshot_gid": {}
+                  "snapshot_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "snapshot_gid"
@@ -4437,8 +5066,46 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "gid": {},
-                            "part_count": {}
+                            "created_at": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "name": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "part_count": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "project_gid": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "source_type": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "status": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            },
+                            "version_tag": {
+                              "additionalProperties": false,
+                              "properties": {},
+                              "type": "object"
+                            }
                           },
                           "required": [
                             "gid",
@@ -4571,7 +5238,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -4795,7 +5462,7 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -5111,7 +5778,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -5413,7 +6080,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -5679,7 +6346,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -5961,7 +6628,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -6296,7 +6963,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -6580,7 +7247,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -6873,7 +7540,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -7208,7 +7875,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -7492,7 +8159,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -7844,7 +8511,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -8354,7 +9021,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -8726,7 +9393,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -9120,7 +9787,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -9464,7 +10131,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -9793,7 +10460,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -10177,7 +10844,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -10566,7 +11233,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -10945,7 +11612,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -11218,7 +11885,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -11493,7 +12160,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -11768,7 +12435,7 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -11994,7 +12661,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -12294,7 +12961,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -12592,7 +13259,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -12855,7 +13522,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -13091,7 +13758,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -13387,7 +14054,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -13683,7 +14350,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -13978,7 +14645,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -14248,7 +14915,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -14767,7 +15434,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -15063,7 +15730,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -15368,7 +16035,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -15681,7 +16348,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -15908,7 +16575,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -16135,7 +16802,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -16372,7 +17039,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -16599,7 +17266,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -16826,7 +17493,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -17055,7 +17722,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -17281,7 +17948,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -17507,7 +18174,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -17742,7 +18409,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -17969,7 +18636,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -18199,7 +18866,7 @@
           }
         },
         "summary": "plugin.upgrade.finish",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -18436,7 +19103,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -18660,7 +19327,7 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -18880,7 +19547,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -19104,7 +19771,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -19323,7 +19990,7 @@
           }
         },
         "summary": "system.echo",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -19549,7 +20216,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -19775,7 +20442,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -19999,7 +20666,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -20223,7 +20890,7 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -20442,7 +21109,7 @@
           }
         },
         "summary": "system.worker.outbox.health",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -20669,7 +21336,7 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -20902,7 +21569,7 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -21129,7 +21796,7 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -21360,7 +22027,7 @@
           }
         },
         "summary": "vismockup.open_file",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -21587,7 +22254,7 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -21819,7 +22486,7 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     },
@@ -22054,7 +22721,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+        "x-ai00-catalog-release": "rel_7eb69937273ad75a0e0781788fa7ac11",
         "x-ai00-major-version": 1
       }
     }

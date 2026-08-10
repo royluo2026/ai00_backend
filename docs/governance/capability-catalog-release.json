@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
-  "catalog_hash": "sha256:fcfe3a6edf64a6840ae4d616cdd6524ade70381f3646b82fc3b2b48bce7e5917",
+  "release_id": "rel_7eb69937273ad75a0e0781788fa7ac11",
+  "catalog_hash": "sha256:7eb69937273ad75a0e0781788fa7ac11d704295905ddc84b024be838d5475390",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -168,7 +168,7 @@
       "id": "craft.bop.draft.change.apply",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.draft.change.apply",
       "description": "Apply one exact typed BOP draft preview atomically.",
@@ -178,67 +178,237 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:craft.write",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-preview",
+          "payload_path": "preview_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "preview_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "preview_gid"
-        ],
-        "properties": {
-          "preview_gid": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "before_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "after_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "preview_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "idempotency_key": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "revision",
           "before_hash",
-          "after_hash"
-        ],
-        "properties": {
-          "version_gid": {},
-          "revision": {},
-          "before_hash": {},
-          "after_hash": {}
-        },
-        "additionalProperties": false
+          "after_hash",
+          "preview_gid",
+          "idempotency_key"
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:6a6f0359549e6b4986c5a046cfed7080b6e59328e758785c88b3d86d045440eb",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "before_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "after_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "preview_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "idempotency_key": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "version_gid",
+          "revision",
+          "before_hash",
+          "after_hash",
+          "preview_gid",
+          "idempotency_key"
+        ]
+      },
+      "schema_hash": "sha256:da40e12ca2425cc0b71e4b8f9f3a524f857b5acaa743b3692b38ce089729de55",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.draft.change.preview",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.draft.change.preview",
       "description": "Preview a typed BOP draft change without side effects.",
@@ -248,7 +418,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -256,70 +426,187 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:craft.write",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "commands": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "expected_revision",
           "commands"
-        ],
-        "properties": {
-          "version_gid": {},
-          "expected_revision": {},
-          "commands": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "preview_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "base_revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "commands": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "before_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "after_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "payload_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "idempotency_key": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expires_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "preview_gid",
           "version_gid",
           "base_revision",
+          "commands",
           "before_hash",
           "after_hash",
+          "payload_hash",
+          "created_at",
           "expires_at"
-        ],
-        "properties": {
-          "preview_gid": {},
-          "version_gid": {},
-          "base_revision": {},
-          "before_hash": {},
-          "after_hash": {},
-          "expires_at": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "preview_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "base_revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "commands": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "before_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "after_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "payload_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "idempotency_key": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expires_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "preview_gid",
           "version_gid",
           "base_revision",
+          "commands",
           "before_hash",
           "after_hash",
+          "payload_hash",
+          "created_at",
           "expires_at"
-        ],
-        "properties": {
-          "preview_gid": {},
-          "version_gid": {},
-          "base_revision": {},
-          "before_hash": {},
-          "after_hash": {},
-          "expires_at": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:aaec092c934e40de725cc87a5ad5d1f157883c19a79453740a0813a6291efe18",
+      "schema_hash": "sha256:bac6b6e5548df7e85d6835c83c2bd12a2f44bbcd5f7e3f23d46a1d27bf7ce35c",
       "artifact_policy": "none",
       "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
+      "concurrency_policy": "expected_version",
+      "expected_version_payload_path": "expected_revision",
       "idempotency_policy": "none",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
@@ -328,14 +615,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.execution_structure.get",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.execution_structure.get",
       "description": "Read the deterministic official execution structure of a published BOP.",
@@ -345,7 +718,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -353,25 +726,80 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "version_gid"
-        ],
         "properties": {
           "version_gid": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "version_gid"
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "contract_id": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "contract_version": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "official": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "source": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "nodes": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "operations": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "dependencies": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "conditions": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "contract_id",
           "contract_version",
@@ -382,22 +810,58 @@
           "dependencies",
           "conditions",
           "content_hash"
-        ],
-        "properties": {
-          "contract_id": {},
-          "contract_version": {},
-          "official": {},
-          "source": {},
-          "nodes": {},
-          "operations": {},
-          "dependencies": {},
-          "conditions": {},
-          "content_hash": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "contract_id": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "contract_version": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "official": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "source": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "nodes": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "operations": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "dependencies": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "conditions": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "contract_id",
           "contract_version",
@@ -408,21 +872,9 @@
           "dependencies",
           "conditions",
           "content_hash"
-        ],
-        "properties": {
-          "contract_id": {},
-          "contract_version": {},
-          "official": {},
-          "source": {},
-          "nodes": {},
-          "operations": {},
-          "dependencies": {},
-          "conditions": {},
-          "content_hash": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:5962a703875e4e1852c0a97a168bca0b661a1b5f143b7f40b55991a6732ebf54",
+      "schema_hash": "sha256:41a7738d2bec8c6e8d5e75185b41d2d4b604605f7f44eec565909d5f59d65652",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -435,14 +887,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.execution_structure.preview",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.execution_structure.preview",
       "description": "Preview a draft BOP execution structure at an exact revision.",
@@ -452,7 +990,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -460,29 +998,85 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "expected_revision"
-        ],
-        "properties": {
-          "version_gid": {
-            "type": "string"
-          },
-          "expected_revision": {
-            "type": "integer"
-          }
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "contract_id": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "contract_version": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "official": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "source": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "nodes": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "operations": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "dependencies": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "conditions": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "contract_id",
           "contract_version",
@@ -493,22 +1087,58 @@
           "dependencies",
           "conditions",
           "content_hash"
-        ],
-        "properties": {
-          "contract_id": {},
-          "contract_version": {},
-          "official": {},
-          "source": {},
-          "nodes": {},
-          "operations": {},
-          "dependencies": {},
-          "conditions": {},
-          "content_hash": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "contract_id": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "contract_version": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "official": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "source": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "nodes": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "operations": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "dependencies": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "conditions": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "contract_id",
           "contract_version",
@@ -519,25 +1149,13 @@
           "dependencies",
           "conditions",
           "content_hash"
-        ],
-        "properties": {
-          "contract_id": {},
-          "contract_version": {},
-          "official": {},
-          "source": {},
-          "nodes": {},
-          "operations": {},
-          "dependencies": {},
-          "conditions": {},
-          "content_hash": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:a7f7e1e6498def038cdbe7714dc0fd0397d0b30e609ebf178f5ccf2f4da3f6ae",
+      "schema_hash": "sha256:65b35d6a2101b3f97bb8325cbde0c257478b5d89e846a31201e7396de6465d4d",
       "artifact_policy": "none",
       "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
+      "concurrency_policy": "expected_version",
+      "expected_version_payload_path": "expected_revision",
       "idempotency_policy": "none",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
@@ -546,14 +1164,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.import.preview",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.import.preview",
       "description": "Parse and hash a BOP import document without mutating Craft state.",
@@ -563,7 +1267,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -571,54 +1275,109 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:craft.write",
+      "authorization_policy": "craft.v2:craft.write",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "document": {
+            "type": "object",
+            "properties": {
+              "version_tag": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "bop_name": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "document"
-        ],
-        "properties": {
-          "document": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "import_preview_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "entry_count": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expires_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "import_preview_gid",
           "content_hash",
           "entry_count",
           "expires_at"
-        ],
-        "properties": {
-          "import_preview_gid": {},
-          "content_hash": {},
-          "entry_count": {},
-          "expires_at": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "import_preview_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "entry_count": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expires_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "import_preview_gid",
           "content_hash",
           "entry_count",
           "expires_at"
-        ],
-        "properties": {
-          "import_preview_gid": {},
-          "content_hash": {},
-          "entry_count": {},
-          "expires_at": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:de6bc2000aab9aa846dd05316d6b4891d501f1511444dd409c047b9bfbd5c8a8",
+      "schema_hash": "sha256:f454aac5e0971c75c8121724a94008beae5ca2754ab2c6a317c7c95a4fdeb847",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -631,14 +1390,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.linked_parts.get",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.linked_parts.get",
       "description": "Read PBOM parts explicitly linked to a BOP and their usage locations.",
@@ -648,7 +1493,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -656,52 +1501,83 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "version_gid"
-        ],
         "properties": {
           "version_gid": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "version_gid"
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "revision",
           "items"
-        ],
-        "properties": {
-          "version_gid": {},
-          "revision": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "revision",
           "items"
-        ],
-        "properties": {
-          "version_gid": {},
-          "revision": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:c2d1e56e79a983b7d70c5955b228cb6f800f2e880889db0287b195e000beef32",
+      "schema_hash": "sha256:d4e7862eb15d22a44599290b758c4485bd7baac937ac290e68a00bef0c398cf7",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -714,14 +1590,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.version.archive",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.version.archive",
       "description": "Archive a BOP version without deleting its snapshot or references.",
@@ -731,71 +1693,226 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:craft.write",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "expected_revision"
-        ],
-        "properties": {
-          "version_gid": {},
-          "expected_revision": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "before_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "after_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "status",
           "revision",
           "before_hash",
           "after_hash"
-        ],
-        "properties": {
-          "version_gid": {},
-          "status": {},
-          "revision": {},
-          "before_hash": {},
-          "after_hash": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:0fd30e5c87644b8600050947405920f7188249271ff317060e7a5279b986ae60",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "before_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "after_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "version_gid",
+          "status",
+          "revision",
+          "before_hash",
+          "after_hash"
+        ]
+      },
+      "schema_hash": "sha256:53dddf15a3c816c0268177320d80ea4310270cf66c9d44211a3263b0caed221b",
       "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "optional",
-      "consistency_policy": "strong",
+      "operation_policy": "optional",
+      "concurrency_policy": "expected_version",
+      "expected_version_payload_path": "expected_revision",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.version.compare",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.version.compare",
       "description": "Compare two BOP versions as semantic structure changes.",
@@ -805,7 +1922,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -813,60 +1930,141 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "from_version_gid",
+          "required": true
+        },
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "to_version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "from_version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "to_version_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "from_version_gid",
           "to_version_gid"
-        ],
-        "properties": {
-          "from_version_gid": {},
-          "to_version_gid": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "comparability": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "from_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "to_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "added": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "removed": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "moved": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "changed": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "comparability",
+          "from_version_gid",
+          "to_version_gid",
           "added",
           "removed",
           "moved",
           "changed"
-        ],
-        "properties": {
-          "comparability": {},
-          "added": {},
-          "removed": {},
-          "moved": {},
-          "changed": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "comparability": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "from_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "to_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "added": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "removed": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "moved": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "changed": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "comparability",
+          "from_version_gid",
+          "to_version_gid",
           "added",
           "removed",
           "moved",
           "changed"
-        ],
-        "properties": {
-          "comparability": {},
-          "added": {},
-          "removed": {},
-          "moved": {},
-          "changed": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:0dae93cbe7d873d8b4ced31dbcbd016f86258d50ba809c25bdab5df26c775c96",
+      "schema_hash": "sha256:9a2b40ac10bd3bb98eb15d0939d1232b02a59cd3f79ea2f302f1785d6b4851e0",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -879,14 +2077,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.version.create",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.version.create",
       "description": "Create a BOP draft from an empty, version, template or import preview source.",
@@ -896,69 +2180,241 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:craft.write",
+      "authorization_policy": "craft.v2:craft.write",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "empty",
+              "bop_version",
+              "template",
+              "import_preview"
+            ]
+          },
+          "version_tag": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "template_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "import_preview_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version_family_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "source",
           "version_tag"
-        ],
-        "properties": {
-          "source": {},
-          "version_tag": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "parent_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "entries_count": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "status",
           "revision",
+          "parent_version_gid",
           "entries_count"
-        ],
-        "properties": {
-          "version_gid": {},
-          "status": {},
-          "revision": {},
-          "entries_count": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "agent_output_schema": null,
-      "schema_hash": "sha256:904c54233bf885467c5d850635788ac7e474f6577218cd1e095bb36463313117",
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "parent_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "entries_count": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "version_gid",
+          "status",
+          "revision",
+          "parent_version_gid",
+          "entries_count"
+        ]
+      },
+      "schema_hash": "sha256:a9b7a59499de78055a6c8b72a84c8e7a334fa4619e73268a9f28e9ad47ce59a7",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.version.get",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.version.get",
       "description": "Read one BOP version identity, lifecycle and revision evidence.",
@@ -968,7 +2424,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -976,64 +2432,293 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [
-          "version_gid"
-        ],
         "properties": {
           "version_gid": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "version_gid"
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version_tag": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "bop_name": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "family_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "project_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "lifecycle_phase": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "updated_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "archived": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "factory_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "vehicle_model_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "parent_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "pbom_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "owner_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version_type": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "maturity": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "data_stage": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "visibility": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "takt_time": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "change_note": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "lifecycle": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "revision",
-          "family_gid",
-          "project_gid",
-          "lifecycle",
-          "content_hash"
-        ],
-        "properties": {
-          "version_gid": {},
-          "revision": {},
-          "family_gid": {},
-          "project_gid": {},
-          "lifecycle": {},
-          "content_hash": {}
-        },
-        "additionalProperties": false
+          "lifecycle"
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version_tag": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "bop_name": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "family_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "project_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "lifecycle_phase": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "updated_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "archived": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "factory_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "vehicle_model_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "parent_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "pbom_version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "owner_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version_type": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "maturity": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "data_stage": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "visibility": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "takt_time": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "change_note": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "lifecycle": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_hash": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "revision",
-          "family_gid",
-          "project_gid",
-          "lifecycle",
-          "content_hash"
-        ],
-        "properties": {
-          "version_gid": {},
-          "revision": {},
-          "family_gid": {},
-          "project_gid": {},
-          "lifecycle": {},
-          "content_hash": {}
-        },
-        "additionalProperties": false
+          "lifecycle"
+        ]
       },
-      "schema_hash": "sha256:f78ba790281fbf4da8f94cdfbf859abe45700b9dbd80a88209c97a28fec06140",
+      "schema_hash": "sha256:b083d1d223bbdba8bcfa24c0460120d0ede9e60bb048a5f962b8d032ac594504",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1046,14 +2731,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.version.list",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.version.list",
       "description": "Discover BOP version summaries with bounded cursor pagination.",
@@ -1063,7 +2834,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -1071,19 +2842,21 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "craft.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "properties": {
           "project_gid": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "query": {
             "type": "string"
@@ -1092,43 +2865,64 @@
             "type": "boolean"
           },
           "cursor": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "page_size": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
           }
         },
         "additionalProperties": false
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "next_cursor": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "items",
           "next_cursor"
-        ],
-        "properties": {
-          "items": {
-            "type": "array"
-          },
-          "next_cursor": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "next_cursor": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "items",
           "next_cursor"
-        ],
-        "properties": {
-          "items": {
-            "type": "array"
-          },
-          "next_cursor": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:ccf6bc6947bbe7234952e458a91631da1d452b8cf232bc621bc202d05c970b86",
+      "schema_hash": "sha256:fa6fd4904f6999300aa229a0a1829784c3aa87d9809320c03a288edb2f00d6f9",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1141,14 +2935,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.bop.work_package.get",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.bop.work_package.get",
       "description": "Project one BOP structure into a line, station or role work package.",
@@ -1158,7 +3038,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -1166,31 +3046,108 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-bop-version",
+          "payload_path": "version_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "line",
+                  "station",
+                  "role"
+                ]
+              },
+              "gid": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "gid"
+            ]
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "scope"
-        ],
+        ]
+      },
+      "output_schema": {
+        "type": "object",
         "properties": {
           "version_gid": {
-            "type": "string"
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
           },
           "scope": {
             "type": "object",
             "properties": {},
             "additionalProperties": false
+          },
+          "work_items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "parts": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "tools": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "fixtures": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "equipment_requirements": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "knowledge_refs": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "rule_refs": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
           }
         },
-        "additionalProperties": false
-      },
-      "output_schema": {
-        "type": "object",
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "revision",
@@ -1202,23 +3159,63 @@
           "equipment_requirements",
           "knowledge_refs",
           "rule_refs"
-        ],
-        "properties": {
-          "version_gid": {},
-          "revision": {},
-          "scope": {},
-          "work_items": {},
-          "parts": {},
-          "tools": {},
-          "fixtures": {},
-          "equipment_requirements": {},
-          "knowledge_refs": {},
-          "rule_refs": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "version_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "scope": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "work_items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "parts": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "tools": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "fixtures": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "equipment_requirements": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "knowledge_refs": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "rule_refs": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "version_gid",
           "revision",
@@ -1230,22 +3227,9 @@
           "equipment_requirements",
           "knowledge_refs",
           "rule_refs"
-        ],
-        "properties": {
-          "version_gid": {},
-          "revision": {},
-          "scope": {},
-          "work_items": {},
-          "parts": {},
-          "tools": {},
-          "fixtures": {},
-          "equipment_requirements": {},
-          "knowledge_refs": {},
-          "rule_refs": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:fcfe3ad8d0f2d493cb86a52a4c9b4f8a3fd4221c32e7e07521222228768fb67d",
+      "schema_hash": "sha256:4283f367822c16698635716476394c3647a8b02dd172fb2d6875f633dc3a212b",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1258,14 +3242,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.gbop.item.knowledge.list",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.gbop.item.knowledge.list",
       "description": "craft.gbop.item.knowledge.list",
@@ -1275,7 +3345,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -1283,46 +3353,83 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-gbop-item",
+          "payload_path": "item_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "item_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "item_gid"
-        ],
-        "properties": {
-          "item_gid": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "active_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "item_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "active_release_gid",
+          "item_gid",
           "items"
-        ],
-        "properties": {
-          "active_release_gid": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "active_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "item_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "active_release_gid",
+          "item_gid",
           "items"
-        ],
-        "properties": {
-          "active_release_gid": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:1aa274da4b8a3fcee8bbfaedcc6e1cf530097825f83b8be9d574c2dd34ea7684",
+      "schema_hash": "sha256:1a3400a71ba4fcbf6972f84de5d26cd48c1087abf4969dcaa6ddfaef3708fd6b",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1335,14 +3442,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.gbop.item.search",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.gbop.item.search",
       "description": "craft.gbop.item.search",
@@ -1352,7 +3545,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -1360,42 +3553,66 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "craft.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "required": [],
-        "properties": {},
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "active_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "active_release_gid",
           "items"
-        ],
-        "properties": {
-          "active_release_gid": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "active_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "active_release_gid",
           "items"
-        ],
-        "properties": {
-          "active_release_gid": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:43322d9804a5c0a6819e61b32367f44afffc2897435609c73585b5412355ac06",
+      "schema_hash": "sha256:ce5322950e65ce760c18645d94f54f926745a18f1c82790cd9cacde96dd3f549",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1408,14 +3625,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.gbop.item.usage.get",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.gbop.item.usage.get",
       "description": "craft.gbop.item.usage.get",
@@ -1425,7 +3728,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -1433,46 +3736,83 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-gbop-item",
+          "payload_path": "item_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "item_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "item_gid"
-        ],
-        "properties": {
-          "item_gid": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "active_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "item_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "active_release_gid",
+          "item_gid",
           "items"
-        ],
-        "properties": {
-          "active_release_gid": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "active_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "item_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "active_release_gid",
+          "item_gid",
           "items"
-        ],
-        "properties": {
-          "active_release_gid": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:1aa274da4b8a3fcee8bbfaedcc6e1cf530097825f83b8be9d574c2dd34ea7684",
+      "schema_hash": "sha256:1a3400a71ba4fcbf6972f84de5d26cd48c1087abf4969dcaa6ddfaef3708fd6b",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1485,14 +3825,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.pbom.part.search",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.pbom.part.search",
       "description": "craft.pbom.part.search",
@@ -1502,7 +3928,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -1510,46 +3936,79 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-pbom-snapshot",
+          "payload_path": "snapshot_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "snapshot_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "snapshot_gid"
-        ],
-        "properties": {
-          "snapshot_gid": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "snapshot_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "snapshot_gid",
           "items"
-        ],
-        "properties": {
-          "snapshot_gid": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "snapshot_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "items": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "snapshot_gid",
           "items"
-        ],
-        "properties": {
-          "snapshot_gid": {},
-          "items": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:2eac5bae718dead8e9e4f67777ee9f79ecc35d3e087f2464f44a1a1e266c9bb7",
+      "schema_hash": "sha256:9e35d4f6d97926d0e1d5e83d22b5e027097dd890049056dfd83406283bf26e4f",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1562,14 +4021,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.pbom.snapshot.compare",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.pbom.snapshot.compare",
       "description": "craft.pbom.snapshot.compare",
@@ -1579,7 +4124,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -1587,56 +4132,129 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-pbom-snapshot",
+          "payload_path": "from_snapshot_gid",
+          "required": true
+        },
+        {
+          "resource_type": "craft-pbom-snapshot",
+          "payload_path": "to_snapshot_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "from_snapshot_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "to_snapshot_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "from_snapshot_gid",
           "to_snapshot_gid"
-        ],
-        "properties": {
-          "from_snapshot_gid": {},
-          "to_snapshot_gid": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "comparability": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "from_snapshot_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "to_snapshot_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "added": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "removed": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "changed": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "comparability",
+          "from_snapshot_gid",
+          "to_snapshot_gid",
           "added",
           "removed",
           "changed"
-        ],
-        "properties": {
-          "comparability": {},
-          "added": {},
-          "removed": {},
-          "changed": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "comparability": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "from_snapshot_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "to_snapshot_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "added": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "removed": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "changed": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "comparability",
+          "from_snapshot_gid",
+          "to_snapshot_gid",
           "added",
           "removed",
           "changed"
-        ],
-        "properties": {
-          "comparability": {},
-          "added": {},
-          "removed": {},
-          "changed": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:194dd17db5def8995099cd16b50cb369ef02b816ffe18018b166ae7eb6158328",
+      "schema_hash": "sha256:768bf8e1f92af1a158eea1406bdef9ab3ea3af420d1dfbafc4941a4b41e80213",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1649,14 +4267,100 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "craft.pbom.snapshot.get",
       "major_version": 1,
       "owner_domain": "craft",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "craft.pbom.snapshot.get",
       "description": "craft.pbom.snapshot.get",
@@ -1666,7 +4370,7 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
+        "plugin": true,
         "agent": true,
         "api": true,
         "mcp": true,
@@ -1674,46 +4378,131 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
-      "resource_selectors": [],
-      "data_classification": "internal",
+      "authorization_policy": "craft.v2:authenticated",
+      "resource_selectors": [
+        {
+          "resource_type": "craft-pbom-snapshot",
+          "payload_path": "snapshot_gid",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "snapshot_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "snapshot_gid"
-        ],
-        "properties": {
-          "snapshot_gid": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "output_schema": {
         "type": "object",
+        "properties": {
+          "gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "project_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version_tag": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "name": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "source_type": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "part_count": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "gid",
           "part_count"
-        ],
-        "properties": {
-          "gid": {},
-          "part_count": {}
-        },
-        "additionalProperties": false
+        ]
       },
       "agent_output_schema": {
         "type": "object",
+        "properties": {
+          "gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "project_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "version_tag": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "name": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "source_type": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "status": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "part_count": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
         "required": [
           "gid",
           "part_count"
-        ],
-        "properties": {
-          "gid": {},
-          "part_count": {}
-        },
-        "additionalProperties": false
+        ]
       },
-      "schema_hash": "sha256:482c0bc3beab81237852be2985140043ce6f12cd4a1727df45b791a4515532f8",
+      "schema_hash": "sha256:788d64ce3772a0ea655355d27795f346754b1e546bf7f0b0847428110e45b9a2",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1726,8 +4515,94 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "identity.principal.search",
@@ -12479,8 +15354,8 @@
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
-      "version": "1.0.0",
-      "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
+      "version": "1.1.0",
+      "artifact_hash": "sha256:bb1c77bc337576b92e081b60f976fe6ac9d6a266d7dc14e1d5b1fd1f1c6db121"
     },
     {
       "plugin_id": "official.project-management",
@@ -12489,5 +15364,5 @@
       "artifact_hash": "sha256:15bec7ce65ca53100ce79eee368b8f1dd6c79fc596871b5e012336c4a0c2336d"
     }
   ],
-  "created_at": "2026-08-10T10:58:23.552304Z"
+  "created_at": "2026-08-10T11:15:17.121580Z"
 }

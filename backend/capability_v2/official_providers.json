@@ -4,8 +4,8 @@
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
-      "version": "1.0.0",
-      "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
+      "version": "1.1.0",
+      "artifact_hash": "sha256:bb1c77bc337576b92e081b60f976fe6ac9d6a266d7dc14e1d5b1fd1f1c6db121"
     },
     {
       "plugin_id": "official.project-management",

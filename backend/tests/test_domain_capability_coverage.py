@@ -17,6 +17,7 @@ DOMAINS = {
 MIGRATED_DOMAINS = {
     "Project Management": "project_management",
     "Knowledge": "knowledge",
+    "Craft": "craft",
 }
 
 

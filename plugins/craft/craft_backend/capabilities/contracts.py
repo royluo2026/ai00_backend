@@ -1,0 +1,187 @@
+"""Closed transport contracts owned by the Craft provider."""
+from __future__ import annotations
+
+from typing import Any
+
+
+def _object(
+    properties: dict[str, Any],
+    *,
+    required: tuple[str, ...] = (),
+) -> dict[str, Any]:
+    schema: dict[str, Any] = {
+        "type": "object",
+        "properties": properties,
+        "additionalProperties": False,
+    }
+    if required:
+        schema["required"] = list(required)
+    return schema
+
+
+def _fields(*names: str) -> dict[str, Any]:
+    # Nullable legacy database columns deliberately use unconstrained leaf values;
+    # the public object shape itself remains closed and versioned.
+    return {name: {} for name in names}
+
+
+STRING = {"type": "string", "minLength": 1}
+INTEGER = {"type": "integer"}
+BOOLEAN = {"type": "boolean"}
+ARRAY = {"type": "array", "items": {}}
+
+
+INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
+    "craft.bop.version.get": _object({"version_gid": STRING}, required=("version_gid",)),
+    "craft.bop.version.list": _object({
+        "project_gid": STRING,
+        "status": STRING,
+        "query": {"type": "string"},
+        "include_archived": BOOLEAN,
+        "cursor": STRING,
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 100},
+    }),
+    "craft.bop.execution_structure.get": _object(
+        {"version_gid": STRING}, required=("version_gid",)
+    ),
+    "craft.bop.execution_structure.preview": _object(
+        {"version_gid": STRING, "expected_revision": {"type": "integer", "minimum": 1}},
+        required=("version_gid", "expected_revision"),
+    ),
+    "craft.bop.linked_parts.get": _object(
+        {"version_gid": STRING}, required=("version_gid",)
+    ),
+    "craft.bop.work_package.get": _object(
+        {
+            "version_gid": STRING,
+            "scope": _object(
+                {"kind": {"type": "string", "enum": ["line", "station", "role"]}, "gid": STRING},
+                required=("kind", "gid"),
+            ),
+        },
+        required=("version_gid", "scope"),
+    ),
+    "craft.bop.version.compare": _object(
+        {"from_version_gid": STRING, "to_version_gid": STRING},
+        required=("from_version_gid", "to_version_gid"),
+    ),
+    "craft.pbom.snapshot.get": _object(
+        {"snapshot_gid": STRING}, required=("snapshot_gid",)
+    ),
+    "craft.pbom.snapshot.compare": _object(
+        {"from_snapshot_gid": STRING, "to_snapshot_gid": STRING},
+        required=("from_snapshot_gid", "to_snapshot_gid"),
+    ),
+    "craft.pbom.part.search": _object(
+        {"snapshot_gid": STRING, "query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 100}},
+        required=("snapshot_gid",),
+    ),
+    "craft.gbop.item.search": _object(
+        {"query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 100}}
+    ),
+    "craft.gbop.item.usage.get": _object({"item_gid": STRING}, required=("item_gid",)),
+    "craft.gbop.item.knowledge.list": _object({"item_gid": STRING}, required=("item_gid",)),
+    "craft.bop.draft.change.preview": _object(
+        {
+            "version_gid": STRING,
+            "expected_revision": {"type": "integer", "minimum": 1},
+            "commands": ARRAY,
+            "idempotency_key": STRING,
+        },
+        required=("version_gid", "expected_revision", "commands"),
+    ),
+    "craft.bop.draft.change.apply": _object(
+        {"preview_gid": STRING, "idempotency_key": STRING}, required=("preview_gid",)
+    ),
+    "craft.bop.version.create": _object(
+        {
+            "source": {"type": "string", "enum": ["empty", "bop_version", "template", "import_preview"]},
+            "version_tag": STRING,
+            "source_gid": STRING,
+            "template_gid": STRING,
+            "import_preview_gid": STRING,
+            "version_family_gid": STRING,
+        },
+        required=("source", "version_tag"),
+    ),
+    "craft.bop.version.archive": _object(
+        {"version_gid": STRING, "expected_revision": {"type": "integer", "minimum": 1}},
+        required=("version_gid", "expected_revision"),
+    ),
+    "craft.bop.import.preview": _object(
+        {
+            "document": _object({
+                "version_tag": {},
+                "bop_name": {},
+                "entries": ARRAY,
+            })
+        },
+        required=("document",),
+    ),
+}
+
+
+_VERSION_DETAIL = (
+    "version_gid", "version_tag", "bop_name", "family_gid", "project_gid", "status",
+    "lifecycle_phase", "revision", "updated_at", "archived", "factory_gid",
+    "vehicle_model_gid", "parent_version_gid", "pbom_version_gid", "owner_gid",
+    "version_type", "maturity", "data_stage", "visibility", "takt_time", "change_note",
+    "lifecycle", "content_hash", "created_at",
+)
+
+OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
+    "craft.bop.version.get": _object(_fields(*_VERSION_DETAIL), required=("version_gid", "revision", "lifecycle")),
+    "craft.bop.version.list": _object({"items": ARRAY, "next_cursor": {}}, required=("items", "next_cursor")),
+    "craft.bop.execution_structure.get": _object(
+        _fields("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
+        required=("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
+    ),
+    "craft.bop.execution_structure.preview": _object(
+        _fields("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
+        required=("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
+    ),
+    "craft.bop.linked_parts.get": _object(_fields("version_gid", "revision", "items"), required=("version_gid", "revision", "items")),
+    "craft.bop.work_package.get": _object(
+        _fields("version_gid", "revision", "scope", "work_items", "parts", "tools", "fixtures", "equipment_requirements", "knowledge_refs", "rule_refs"),
+        required=("version_gid", "revision", "scope", "work_items", "parts", "tools", "fixtures", "equipment_requirements", "knowledge_refs", "rule_refs"),
+    ),
+    "craft.bop.version.compare": _object(
+        _fields("comparability", "from_version_gid", "to_version_gid", "added", "removed", "moved", "changed"),
+        required=("comparability", "from_version_gid", "to_version_gid", "added", "removed", "moved", "changed"),
+    ),
+    "craft.pbom.snapshot.get": _object(
+        _fields("gid", "project_gid", "version_tag", "name", "source_type", "status", "created_at", "part_count"),
+        required=("gid", "part_count"),
+    ),
+    "craft.pbom.snapshot.compare": _object(
+        _fields("comparability", "from_snapshot_gid", "to_snapshot_gid", "added", "removed", "changed"),
+        required=("comparability", "from_snapshot_gid", "to_snapshot_gid", "added", "removed", "changed"),
+    ),
+    "craft.pbom.part.search": _object(_fields("snapshot_gid", "items"), required=("snapshot_gid", "items")),
+    "craft.gbop.item.search": _object(_fields("active_release_gid", "items"), required=("active_release_gid", "items")),
+    "craft.gbop.item.usage.get": _object(_fields("active_release_gid", "item_gid", "items"), required=("active_release_gid", "item_gid", "items")),
+    "craft.gbop.item.knowledge.list": _object(_fields("active_release_gid", "item_gid", "items"), required=("active_release_gid", "item_gid", "items")),
+    "craft.bop.draft.change.preview": _object(
+        _fields("preview_gid", "version_gid", "base_revision", "commands", "before_hash", "after_hash", "payload_hash", "idempotency_key", "created_at", "expires_at"),
+        required=("preview_gid", "version_gid", "base_revision", "commands", "before_hash", "after_hash", "payload_hash", "created_at", "expires_at"),
+    ),
+    "craft.bop.draft.change.apply": _object(
+        _fields("version_gid", "revision", "before_hash", "after_hash", "preview_gid", "idempotency_key"),
+        required=("version_gid", "revision", "before_hash", "after_hash", "preview_gid", "idempotency_key"),
+    ),
+    "craft.bop.version.create": _object(
+        _fields("version_gid", "status", "revision", "parent_version_gid", "entries_count"),
+        required=("version_gid", "status", "revision", "parent_version_gid", "entries_count"),
+    ),
+    "craft.bop.version.archive": _object(
+        _fields("version_gid", "status", "revision", "before_hash", "after_hash"),
+        required=("version_gid", "status", "revision", "before_hash", "after_hash"),
+    ),
+    "craft.bop.import.preview": _object(
+        _fields("import_preview_gid", "content_hash", "entry_count", "expires_at"),
+        required=("import_preview_gid", "content_hash", "entry_count", "expires_at"),
+    ),
+}
+
+
+__all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

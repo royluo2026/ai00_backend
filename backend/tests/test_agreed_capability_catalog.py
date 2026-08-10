@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from backend.capabilities.agreed_catalog import (
-    AGREED_WAVE_PREFIXES,
     APPROVED_CAPABILITY_IDS,
     FORBIDDEN_INTERNAL_PROTOCOL_IDS,
 )
@@ -16,12 +15,11 @@ def test_catalog_contains_only_implemented_approved_ids():
     assert implemented.isdisjoint(FORBIDDEN_INTERNAL_PROTOCOL_IDS)
 
 
-def test_first_wave_plugin_exposure_remains_closed():
+def test_migrated_craft_is_plugin_callable():
     craft = CapabilityRegistry(); register_capabilities(craft)
-    specs = capability_registry.list() + craft.list()
-    governed = [spec for spec in specs if spec.id.startswith(AGREED_WAVE_PREFIXES)]
-    assert governed
-    assert all(spec.plugin_callable is False for spec in governed)
+    craft_specs = craft.list()
+    assert craft_specs
+    assert all(spec.plugin_callable is True for spec in craft_specs)
 
 
 def test_agent_adapter_uses_bounded_context_and_never_advertises_discovery_tool():

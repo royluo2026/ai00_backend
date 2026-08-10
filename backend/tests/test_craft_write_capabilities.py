@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import contextmanager
 from unittest.mock import patch
 
 import pytest
@@ -10,6 +11,7 @@ from backend.capabilities.registry_next import CapabilityRegistry
 from plugins.craft.craft_backend.capabilities import register_capabilities
 from plugins.craft.craft_backend.capabilities.bop_writes import (
     BopWriteRepository,
+    MysqlBopWriteRepository,
     apply_draft_change,
     archive_bop_version,
     create_bop_version,
@@ -43,6 +45,12 @@ class MemoryRepository(BopWriteRepository):
     def get_preview(self, preview_gid):
         return self.previews.get(preview_gid)
 
+    def get_preview_by_idempotency(self, version_gid, key):
+        return next((
+            item for item in self.previews.values()
+            if item["version_gid"] == version_gid and item.get("idempotency_key") == key
+        ), None)
+
     def mark_applied(self, preview_gid, result):
         self.previews[preview_gid]["applied"] = result
 
@@ -51,6 +59,13 @@ class MemoryRepository(BopWriteRepository):
 
     def put_applied(self, key, result):
         self.applied[key] = result
+
+    def put_import_preview(self, preview):
+        self.imports[preview["import_preview_gid"]] = dict(preview)
+
+    def get_import_preview(self, preview_gid):
+        preview = self.imports.get(preview_gid)
+        return dict(preview["document"]) if preview else None
 
     def issue_confirmation(self, preview_gid, user_gid):
         self.tokens[(preview_gid, user_gid)] = "ok"; return "ok"
@@ -75,7 +90,7 @@ def test_registry_exposes_only_the_approved_write_slice():
     } <= ids
     assert "craft.bop.version.validate" not in ids
     assert "craft.bop.version.publish" not in ids
-    assert all(not registry.get(cap).spec.plugin_callable for cap in {
+    assert all(registry.get(cap).spec.plugin_callable for cap in {
         "craft.bop.draft.change.preview",
         "craft.bop.draft.change.apply",
         "craft.bop.version.create",
@@ -115,7 +130,25 @@ def test_preview_rejects_json_patch_sql_and_unknown_commands():
                 preview_draft_change({"version_gid": "v1", "expected_revision": 1, "commands": commands}, ctx())
 
 
-def test_apply_requires_preview_confirmation_is_one_time_and_is_idempotent():
+def test_preview_idempotency_returns_same_preview_and_rejects_payload_rebinding():
+    repository = MemoryRepository()
+    payload = {
+        "version_gid": "v1", "expected_revision": 1, "idempotency_key": "preview-1",
+        "commands": [{"kind": "version.metadata.update", "changes": {"bop_name": "A"}}],
+    }
+    with patch("plugins.craft.craft_backend.capabilities.bop_writes.repository", repository):
+        first = preview_draft_change(payload, ctx()).data
+        repeated = preview_draft_change(payload, ctx()).data
+        with pytest.raises(Exception, match="idempotency"):
+            preview_draft_change({
+                **payload,
+                "commands": [{"kind": "version.metadata.update", "changes": {"bop_name": "B"}}],
+            }, ctx())
+    assert repeated == first
+    assert len(repository.previews) == 1
+
+
+def test_apply_consumes_gateway_approved_preview_and_is_idempotent():
     repository = MemoryRepository()
     preview_payload = {
         "version_gid": "v1", "expected_revision": 1, "idempotency_key": "change-2",
@@ -123,12 +156,25 @@ def test_apply_requires_preview_confirmation_is_one_time_and_is_idempotent():
     }
     with patch("plugins.craft.craft_backend.capabilities.bop_writes.repository", repository):
         preview = preview_draft_change(preview_payload, ctx()).data
-        token = repository.issue_confirmation(preview["preview_gid"], "u1")
-        applied = apply_draft_change({"preview_gid": preview["preview_gid"], "idempotency_key": "change-2"}, ctx(token)).data
+        applied = apply_draft_change({"preview_gid": preview["preview_gid"], "idempotency_key": "change-2"}, ctx("gateway-approved")).data
         repeated = apply_draft_change({"preview_gid": preview["preview_gid"], "idempotency_key": "change-2"}, ctx("wrong")).data
     assert applied["revision"] == 2
     assert repeated == applied
     assert len(repository.versions["v1"]["entries"]) == 2
+
+
+def test_apply_cannot_replace_the_idempotency_key_bound_by_preview():
+    repository = MemoryRepository()
+    with patch("plugins.craft.craft_backend.capabilities.bop_writes.repository", repository):
+        preview = preview_draft_change({
+            "version_gid": "v1", "expected_revision": 1,
+            "idempotency_key": "bound-key", "commands": [],
+        }, ctx()).data
+        with pytest.raises(Exception, match="idempotency"):
+            apply_draft_change({
+                "preview_gid": preview["preview_gid"], "idempotency_key": "replacement-key",
+            }, ctx("gateway-approved"))
+    assert repository.versions["v1"]["revision"] == 1
 
 
 def test_apply_rejects_stale_revision_and_expired_preview():
@@ -158,6 +204,116 @@ def test_create_allows_only_governed_sources_and_archive_is_non_destructive():
         create_bop_version({"source": "clone", "source_gid": "v1", "version_tag": "V3"}, ctx())
 
 
+def test_create_remaps_cloned_entry_parent_references_to_the_new_version():
+    repository = MemoryRepository()
+    repository.versions["v1"]["entries"].append({
+        "gid": "e2", "parent_gid": "e1", "node_type": "operation",
+        "sort_order": 20, "title": "Torque", "meta": {},
+    })
+    with patch("plugins.craft.craft_backend.capabilities.bop_writes.repository", repository):
+        created = create_bop_version(
+            {"source": "bop_version", "source_gid": "v1", "version_tag": "V2"}, ctx()
+        ).data
+    entries = repository.versions[created["version_gid"]]["entries"]
+    root = next(item for item in entries if item["title"] == "Line")
+    child = next(item for item in entries if item["title"] == "Torque")
+    assert root["gid"] not in {"e1", "e2"}
+    assert child["gid"] not in {"e1", "e2"}
+    assert child["parent_gid"] == root["gid"]
+
+
+class _SqlCursor:
+    def __init__(self, *, update_count=1):
+        self.rowcount = update_count
+        self.calls = []
+
+    def __enter__(self): return self
+    def __exit__(self, *_args): return False
+    def execute(self, sql, params=()):
+        self.calls.append((" ".join(sql.split()), params))
+        if sql.lstrip().startswith("UPDATE workmanship_bop_bop_versions"):
+            self.rowcount = self.rowcount
+
+
+class _SqlConnection:
+    def __init__(self, cursor):
+        self._cursor = cursor; self.commits = 0; self.rollbacks = 0
+    def cursor(self): return self._cursor
+    def commit(self): self.commits += 1
+    def rollback(self): self.rollbacks += 1
+
+
+def _connection_factory(connection):
+    @contextmanager
+    def factory():
+        yield connection
+    return factory
+
+
+def test_mysql_write_repository_commits_revision_entries_and_links_atomically():
+    cursor = _SqlCursor(update_count=1)
+    connection = _SqlConnection(cursor)
+    version = {
+        "gid": "v1", "revision": 1, "version_tag": "V1", "bop_name": "Assembly",
+        "status": "active", "meta": {},
+        "entries": [{"gid": "e1", "node_type": "operation", "title": "Torque"}],
+        "links": [{"gid": "l1", "entry_gid": "e1", "link_type": "part", "entity_gid": "p1"}],
+    }
+    with patch(
+        "plugins.craft.craft_backend.capabilities.bop_writes.get_craft_conn",
+        _connection_factory(connection),
+    ):
+        saved = MysqlBopWriteRepository().save_version(version, expected_revision=1)
+    statements = [sql for sql, _params in cursor.calls]
+    assert saved["revision"] == 2
+    assert connection.commits == 1
+    assert connection.rollbacks == 0
+    assert any("revision=revision+1" in sql and "revision=%s" in sql for sql in statements)
+    assert any("INSERT INTO workmanship_bop_bop_entries" in sql for sql in statements)
+    assert any("INSERT INTO workmanship_bop_bop_entry_links" in sql for sql in statements)
+
+
+def test_mysql_write_repository_rolls_back_on_revision_conflict():
+    cursor = _SqlCursor(update_count=0)
+    connection = _SqlConnection(cursor)
+    with patch(
+        "plugins.craft.craft_backend.capabilities.bop_writes.get_craft_conn",
+        _connection_factory(connection),
+    ), pytest.raises(Exception, match="revision"):
+        MysqlBopWriteRepository().save_version(
+            {"gid": "v1", "status": "active", "entries": [], "links": []},
+            expected_revision=1,
+        )
+    assert connection.commits == 0
+    assert connection.rollbacks == 1
+
+
+def test_mysql_preview_commit_has_one_transaction_for_state_and_idempotency():
+    cursor = _SqlCursor(update_count=1)
+    connection = _SqlConnection(cursor)
+    preview = {"preview_gid": "preview-1", "base_revision": 1}
+    version = {
+        "gid": "v1", "revision": 2, "version_tag": "V1", "bop_name": "Assembly",
+        "status": "active", "meta": {}, "entries": [], "links": [],
+    }
+    result = {
+        "version_gid": "v1", "revision": 2, "before_hash": "before",
+        "after_hash": "after", "preview_gid": "preview-1", "idempotency_key": "idem-1",
+    }
+    with patch(
+        "plugins.craft.craft_backend.capabilities.bop_writes.get_craft_conn",
+        _connection_factory(connection),
+    ):
+        MysqlBopWriteRepository().commit_preview(
+            preview, version, result, idempotency_key="idem-1", actor_id="u1"
+        )
+    statements = [sql for sql, _params in cursor.calls]
+    assert connection.commits == 1
+    assert connection.rollbacks == 0
+    assert any("workmanship_craft_bop_change_previews" in sql for sql in statements)
+    assert any("workmanship_craft_bop_write_idempotency" in sql for sql in statements)
+
+
 def test_import_preview_does_not_write_business_state():
     repository = MemoryRepository()
     document = {"version_tag": "V9", "bop_name": "Imported", "entries": [{"node_type": "operation", "title": "Torque"}]}
@@ -167,3 +323,27 @@ def test_import_preview_does_not_write_business_state():
     assert result.data["entry_count"] == 1
     assert repository.versions.keys() == {"v1"}
     assert set(repository.versions) == {"v1"}
+
+
+def test_import_preview_is_a_production_repository_source_for_version_create():
+    repository = MemoryRepository()
+    del repository.imports
+    repository._import_previews = {}
+    repository.put_import_preview = lambda preview: repository._import_previews.__setitem__(
+        preview["import_preview_gid"], dict(preview)
+    )
+    repository.get_import_preview = lambda preview_gid: (
+        repository._import_previews.get(preview_gid) or {}
+    ).get("document")
+    with patch("plugins.craft.craft_backend.capabilities.bop_writes.repository", repository):
+        imported = import_preview({
+            "document": {"version_tag": "I1", "bop_name": "Imported", "entries": [
+                {"node_type": "operation", "title": "Torque"}
+            ]}
+        }, ctx()).data
+        created = create_bop_version({
+            "source": "import_preview",
+            "import_preview_gid": imported["import_preview_gid"],
+            "version_tag": "V2",
+        }, ctx()).data
+    assert created["entries_count"] == 1

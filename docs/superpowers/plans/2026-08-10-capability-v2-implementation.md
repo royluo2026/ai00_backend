@@ -1092,7 +1092,7 @@ registry scanner to exclude permission/resource literals. The real migration gap
 were one owner mismatch (`base.project.search`), 43 empty output contracts, and
 59 Base/Knowledge/Craft/Project-Management contracts without joint Plugin+Agent
 exposure. The Project Management slice is now green; Base, Knowledge and Craft
-remain gated by `test_domain_capability_coverage.py` until migrated.
+were initially gated by `test_domain_capability_coverage.py` until migrated.
 
 Knowledge slice completed on 2026-08-10: 18 supported stable capabilities now
 publish native V2 descriptors with closed typed schemas, stable resource refs,
@@ -1102,7 +1102,20 @@ compatibility aliases remain callable only by legacy internal consumers and are
 published as `deprecated`. Knowledge now owns its database URL, opaque IDs,
 ArtifactPort adapter, public domain port, CODEOWNERS rules and publication Saga;
 the boundary audit resolves 36 historical findings with zero new violations.
-Project Management and Knowledge are green; Base and Craft remain gated.
+Project Management and Knowledge are green; Base remains gated.
+
+Craft Capability slice completed on 2026-08-10: all 18 stable BOP/GBOP/PBOM
+capabilities now publish native V2 descriptors with closed domain-owned schemas,
+stable resource selectors, complete error contracts and Plugin/Agent/MCP exposure.
+Writes require Gateway approval and idempotency; revision-bound preview/archive
+operations enforce expected versions. The provider is released as `1.1.0`, owns
+an explicit public application port and an isolated `AI00_CRAFT_DB_URL`. The prior
+production write placeholders were replaced with Craft-DB preview/import/idempotency
+persistence plus transactional revision-CAS updates for versions, entries and links;
+clone parent references are remapped to the new version. Capability coverage is green.
+Physical extraction of the legacy Project Management routers still hosted below
+`plugins/craft` and replacement of cross-domain convenience calls in `public.py`
+remain explicit boundary-debt work and must not be interpreted as completed here.
 
 - [ ] **Step 3: Implement one complete vertical slice at a time**
 

@@ -6,18 +6,18 @@ Compare two BOP versions as semantic structure changes.
 
 - 适用：The caller needs additions, removals, moves and field changes.
 - 不适用：A raw database JSON diff is requested.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_fcfe3a6edf64a6840ae4d616cdd6524a`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
+- Catalog Release：`rel_7eb69937273ad75a0e0781788fa7ac11`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
+| plugin | 可用 |
 | agent | 可用 |
 | api | 可用 |
 | mcp | 可用 |
@@ -28,14 +28,15 @@ Compare two BOP versions as semantic structure changes.
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:authenticated`
+- 授权策略：`craft.v2:authenticated`
 - 自动化等级：`A2`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `craft-bop-version` ← `from_version_gid`（必填）
+- `craft-bop-version` ← `to_version_gid`（必填）
 
 ## 执行与可靠性
 
@@ -59,8 +60,14 @@ Compare two BOP versions as semantic structure changes.
 {
   "additionalProperties": false,
   "properties": {
-    "from_version_gid": {},
-    "to_version_gid": {}
+    "from_version_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "to_version_gid": {
+      "minLength": 1,
+      "type": "string"
+    }
   },
   "required": [
     "from_version_gid",
@@ -75,7 +82,7 @@ Compare two BOP versions as semantic structure changes.
 ```json
 {
   "capability_id": "craft.bop.version.compare",
-  "catalog_release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+  "catalog_release": "rel_7eb69937273ad75a0e0781788fa7ac11",
   "major_version": 1,
   "payload": {
     "from_version_gid": "example",
@@ -92,14 +99,46 @@ Compare two BOP versions as semantic structure changes.
 {
   "additionalProperties": false,
   "properties": {
-    "added": {},
-    "changed": {},
-    "comparability": {},
-    "moved": {},
-    "removed": {}
+    "added": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "changed": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "comparability": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "from_version_gid": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "moved": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "removed": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "to_version_gid": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    }
   },
   "required": [
     "comparability",
+    "from_version_gid",
+    "to_version_gid",
     "added",
     "removed",
     "moved",
@@ -138,9 +177,25 @@ Compare two BOP versions as semantic structure changes.
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `bop_version_not_found`：The scoped BOP version does not exist.（retryable=false）
+- `bop_revision_unavailable`：The BOP has no authoritative revision.（retryable=false）
+- `revision_conflict`：The current BOP revision differs from the expected revision.（retryable=false）
+- `bop_entry_not_found`：A referenced BOP entry does not exist.（retryable=false）
+- `bop_link_not_found`：A referenced BOP link does not exist.（retryable=false）
+- `bop_project_unassigned`：The BOP is not assigned to a project.（retryable=false）
+- `version_not_published`：An official execution structure requires a published BOP.（retryable=false）
+- `preview_not_found`：The requested BOP change preview does not exist.（retryable=false）
+- `preview_expired`：The requested BOP change preview has expired.（retryable=false）
+- `preview_already_applied`：The requested BOP change preview was already committed.（retryable=false）
+- `idempotency_conflict`：The idempotency key is already bound to another Craft payload.（retryable=false）
+- `source_not_found`：The requested version creation source does not exist.（retryable=false）
+- `archive_forbidden`：The BOP lifecycle forbids archiving this version.（retryable=false）
+- `pbom_snapshot_not_found`：The scoped PBOM snapshot does not exist.（retryable=false）
+- `active_gbop_not_found`：No active GBOP release exists.（retryable=false）
+- `multiple_active_gbop_releases`：More than one active GBOP release exists.（retryable=false）
+- `active_gbop_item_not_found`：The GBOP item is not in the active release.（retryable=false）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

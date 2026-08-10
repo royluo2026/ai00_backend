@@ -4,7 +4,7 @@
   "backend": {
     "routers_module": "craft_backend.routers",
     "capabilities_module": "craft_backend.capabilities",
-    "provider_version": "1.0.0",
+    "provider_version": "1.1.0",
     "owned_schemas": ["bop", "template", "factory", "proj"]
   }
 }

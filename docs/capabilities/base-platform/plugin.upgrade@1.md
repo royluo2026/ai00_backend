@@ -8,7 +8,7 @@ Stage a signed version upgrade pending health result.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`experimental`
 - 所属领域：`base`
-- Catalog Release：`rel_fcfe3a6edf64a6840ae4d616cdd6524a`
+- Catalog Release：`rel_7eb69937273ad75a0e0781788fa7ac11`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -86,7 +86,7 @@ Stage a signed version upgrade pending health result.
 ```json
 {
   "capability_id": "plugin.upgrade",
-  "catalog_release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+  "catalog_release": "rel_7eb69937273ad75a0e0781788fa7ac11",
   "major_version": 1,
   "payload": {
     "granted_capabilities": [],

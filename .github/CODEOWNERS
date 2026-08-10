@@ -32,6 +32,7 @@
 
 # Craft
 /plugins/craft/** @ai00/craft-maintainers
+/backend/domain_ports/craft.py @ai00/craft-maintainers
 /backend/db/migrations/202608030005_craft_legacy_auxiliary_tables.sql @ai00/craft-maintainers
 /backend/db/migrations/202608030008_craft_runtime_schema.sql @ai00/craft-maintainers
 /backend/db/migrations/202608050004_craft_bop_version_contract.sql @ai00/craft-maintainers

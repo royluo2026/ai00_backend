@@ -60,7 +60,7 @@
       "maintainers": ["@ai00/craft-maintainers"],
       "artifact": "ai00-craft-plugin",
       "module_prefixes": ["plugins.craft"],
-      "code_paths": ["plugins/craft/**"],
+      "code_paths": ["plugins/craft/**", "backend/domain_ports/craft.py"],
       "provider_paths": ["plugins/craft/craft_backend/capabilities/**"],
       "migration_paths": [
         "backend/db/migrations/202608030005_craft_legacy_auxiliary_tables.sql",

@@ -6,21 +6,21 @@ Create a BOP draft from an empty, version, template or import preview source.
 
 - 适用：Create a BOP draft from an empty, version, template or import preview source.
 - 不适用：Use a governed Capability V2 contract when one is available.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_fcfe3a6edf64a6840ae4d616cdd6524a`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
+- Catalog Release：`rel_7eb69937273ad75a0e0781788fa7ac11`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
-| agent | 不可用 |
+| plugin | 可用 |
+| agent | 可用 |
 | api | 可用 |
-| mcp | 不可用 |
+| mcp | 可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -28,10 +28,10 @@ Create a BOP draft from an empty, version, template or import preview source.
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:craft.write`
+- 授权策略：`craft.v2:craft.write`
 - 自动化等级：`A1`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
@@ -43,11 +43,11 @@ Create a BOP draft from an empty, version, template or import preview source.
 - 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`user`
-- 幂等：`none`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
-- Operation：`none`
+- 一致性：`external`
+- Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`optional`
@@ -59,8 +59,35 @@ Create a BOP draft from an empty, version, template or import preview source.
 {
   "additionalProperties": false,
   "properties": {
-    "source": {},
-    "version_tag": {}
+    "import_preview_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "empty",
+        "bop_version",
+        "template",
+        "import_preview"
+      ],
+      "type": "string"
+    },
+    "source_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "template_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version_family_gid": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version_tag": {
+      "minLength": 1,
+      "type": "string"
+    }
   },
   "required": [
     "source",
@@ -75,10 +102,10 @@ Create a BOP draft from an empty, version, template or import preview source.
 ```json
 {
   "capability_id": "craft.bop.version.create",
-  "catalog_release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
+  "catalog_release": "rel_7eb69937273ad75a0e0781788fa7ac11",
   "major_version": 1,
   "payload": {
-    "source": "example",
+    "source": "empty",
     "version_tag": "example"
   }
 }
@@ -92,15 +119,37 @@ Create a BOP draft from an empty, version, template or import preview source.
 {
   "additionalProperties": false,
   "properties": {
-    "entries_count": {},
-    "revision": {},
-    "status": {},
-    "version_gid": {}
+    "entries_count": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "parent_version_gid": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "revision": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "status": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "version_gid": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    }
   },
   "required": [
     "version_gid",
     "status",
     "revision",
+    "parent_version_gid",
     "entries_count"
   ],
   "type": "object"
@@ -136,9 +185,25 @@ Create a BOP draft from an empty, version, template or import preview source.
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `bop_version_not_found`：The scoped BOP version does not exist.（retryable=false）
+- `bop_revision_unavailable`：The BOP has no authoritative revision.（retryable=false）
+- `revision_conflict`：The current BOP revision differs from the expected revision.（retryable=false）
+- `bop_entry_not_found`：A referenced BOP entry does not exist.（retryable=false）
+- `bop_link_not_found`：A referenced BOP link does not exist.（retryable=false）
+- `bop_project_unassigned`：The BOP is not assigned to a project.（retryable=false）
+- `version_not_published`：An official execution structure requires a published BOP.（retryable=false）
+- `preview_not_found`：The requested BOP change preview does not exist.（retryable=false）
+- `preview_expired`：The requested BOP change preview has expired.（retryable=false）
+- `preview_already_applied`：The requested BOP change preview was already committed.（retryable=false）
+- `idempotency_conflict`：The idempotency key is already bound to another Craft payload.（retryable=false）
+- `source_not_found`：The requested version creation source does not exist.（retryable=false）
+- `archive_forbidden`：The BOP lifecycle forbids archiving this version.（retryable=false）
+- `pbom_snapshot_not_found`：The scoped PBOM snapshot does not exist.（retryable=false）
+- `active_gbop_not_found`：No active GBOP release exists.（retryable=false）
+- `multiple_active_gbop_releases`：More than one active GBOP release exists.（retryable=false）
+- `active_gbop_item_not_found`：The GBOP item is not in the active release.（retryable=false）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 
