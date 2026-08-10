@@ -2215,7 +2215,6 @@
         "backend/capabilities/knowledge_migration_next.py",
         "backend/capabilities/outbox_next.py",
         "backend/capabilities/outbox_retry_next.py",
-        "backend/capabilities/outbox_worker_next.py",
         "backend/capabilities/proposal_query_next.py",
         "backend/capabilities/review_next.py"
       ]

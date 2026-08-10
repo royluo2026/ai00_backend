@@ -6,6 +6,7 @@ import json
 import logging
 import socket
 import uuid
+from datetime import UTC, datetime
 from typing import Any
 
 _log = logging.getLogger(__name__)
@@ -59,22 +60,38 @@ async def run_once(limit: int = 20) -> dict[str, Any]:
             results: list[dict[str, Any]] = []
             for outbox_gid in job_ids:
                 try:
-                    from backend.capabilities import CapabilityContext, capability_registry
-                    from backend.capabilities.confirmation_next import confirmation_manager
+                    from backend.capability_v2.contracts import (
+                        ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType,
+                        InvocationEnvelope, TenantIdentity,
+                    )
+                    from backend.capability_v2.gateway import get_default_gateway
 
                     payload = {"outbox_gid": outbox_gid}
-                    token = confirmation_manager.issue("knowledge.proposal.outbox.retry", 1, "system:outbox-worker", payload)
-                    result = await capability_registry.invoke(
-                        "knowledge.proposal.outbox.retry",
-                        payload,
-                        CapabilityContext(
-                            user_gid="system:outbox-worker",
-                            source="worker",
-                            request_id=f"worker:{_WORKER_ID}:{outbox_gid}",
-                            permissions=("knowledge.manage",),
-                            confirmation_token=token,
+                    request_id = f"worker:{_WORKER_ID}:{outbox_gid}"
+                    gateway = get_default_gateway()
+                    result = await gateway.invoke(InvocationEnvelope(
+                        capability_id="knowledge.proposal.outbox.retry",
+                        major_version=1,
+                        catalog_release=gateway.catalog_release,
+                        payload=payload,
+                        identity=ConsumerIdentity(
+                            actor=ActorIdentity(
+                                service_id="system:outbox-worker",
+                                authentication_method="service_runtime",
+                                authenticated_at=datetime.now(UTC),
+                            ),
+                            tenant=TenantIdentity(
+                                tenant_id="system", membership="service", active_roles=("outbox_worker",),
+                            ),
+                            consumer=ConsumerDescriptor(
+                                type=ConsumerType.WORKER, consumer_id="knowledge-outbox",
+                            ),
                         ),
-                    )
+                        request_id=request_id,
+                        trace_id=request_id,
+                    ))
+                    if not result.ok:
+                        raise RuntimeError(result.error.code if result.error else "capability_failed")
                     result_status = str((result.data or {}).get("status") or "completed")
                     results.append({"outbox_gid": outbox_gid, "status": result_status, "data": result.data})
                     if result_status == "dead":

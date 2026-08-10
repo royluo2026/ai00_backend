@@ -3,6 +3,7 @@
 from .catalog import CatalogRelease, CatalogResolver, ProviderArtifact
 from .delegation import DelegationGrant, SqlDelegationStore
 from .identity import AuthenticatedPrincipal, IdentityBroker
+from .gateway import CapabilityGatewayService
 from .contracts import (
     ArtifactRef,
     CapabilityDescriptorV2,
@@ -18,6 +19,7 @@ __all__ = [
     "CatalogRelease",
     "CatalogResolver",
     "CapabilityDescriptorV2",
+    "CapabilityGatewayService",
     "CapabilityResultV2",
     "ConsumerIdentity",
     "DelegationGrant",

@@ -416,9 +416,15 @@ git commit -m "feat: add trusted capability consumer identities"
 - Create: `backend/capability_v2/policies.py`
 - Create: `backend/tests/test_capability_gateway_pipeline.py`
 - Create: `backend/tests/test_no_registry_consumer_bypass.py`
+- Modify: `backend/capability_v2/catalog.py`
+- Modify: `backend/capability_v2/__init__.py`
+- Modify: `backend/main.py`
 - Modify: `backend/routers/capabilities.py`
 - Modify: `backend/platform_sdk/capabilities.py`
-- Modify: `backend/capabilities/registry_next.py`
+- Modify: `backend/capabilities/outbox_worker_next.py`
+- Modify: `backend/capabilities/validation_next.py`
+- Modify: `backend/tests/test_capability_consumer_e2e.py`
+- Modify: `docs/governance/user-function-registry.json`
 
 **Interfaces:**
 - Consumes: `CatalogResolver`, `IdentityBroker`, `InvocationEnvelope`.
@@ -465,7 +471,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add backend/capability_v2/gateway.py backend/capability_v2/policies.py backend/tests/test_capability_gateway_pipeline.py backend/tests/test_no_registry_consumer_bypass.py backend/routers/capabilities.py backend/platform_sdk/capabilities.py backend/capabilities/registry_next.py
+git add backend/capability_v2/gateway.py backend/capability_v2/policies.py backend/capability_v2/catalog.py backend/capability_v2/__init__.py backend/tests/test_capability_gateway_pipeline.py backend/tests/test_no_registry_consumer_bypass.py backend/tests/test_capability_consumer_e2e.py backend/routers/capabilities.py backend/platform_sdk/capabilities.py backend/capabilities/outbox_worker_next.py backend/capabilities/validation_next.py backend/main.py docs/governance/user-function-registry.json docs/superpowers/plans/2026-08-10-capability-v2-implementation.md
 git commit -m "feat: route every capability through one gateway"
 ```
 

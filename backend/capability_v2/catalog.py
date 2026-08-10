@@ -162,6 +162,18 @@ class CatalogResolver:
         except KeyError as exc:
             raise CatalogResolutionError("provider_registration_missing") from exc
 
+    def descriptor(self, release_id: str, capability_id: str,
+                   major_version: int | None) -> CapabilityDescriptorV2:
+        if major_version is None:
+            raise CatalogResolutionError("major_version_required")
+        release = self._store.get(release_id)
+        if release is None:
+            raise CatalogResolutionError("catalog_release_not_found")
+        descriptor = release.descriptor(capability_id, major_version)
+        if descriptor is None:
+            raise CatalogResolutionError("capability_not_in_release")
+        return descriptor
+
 
 __all__ = [
     "CatalogRelease",
