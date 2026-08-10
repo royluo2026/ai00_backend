@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "User Function Registry",
+  "type": "object",
+  "required": ["schema_version", "functions"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "functions": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/UserFunctionRecord"}
+    }
+  },
+  "$defs": {
+    "UserFunctionRecord": {
+      "type": "object",
+      "required": [
+        "function_id", "domain", "stability", "current_consumers", "target_capability",
+        "exposure", "automation_level", "resource_types", "data_classification",
+        "migration_status", "owner", "exclusion_reason"
+      ],
+      "properties": {
+        "function_id": {"type": "string", "minLength": 1},
+        "domain": {"enum": ["Base", "Craft", "Digital Model", "Simulation", "Ontology", "Knowledge", "Local Integration"]},
+        "stability": {"enum": ["stable", "experimental", "deprecated"]},
+        "current_consumers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "target_capability": {"type": ["string", "null"]},
+        "exposure": {"type": "string"},
+        "automation_level": {"type": "string"},
+        "resource_types": {"type": "array", "items": {"type": "string"}},
+        "data_classification": {"type": "string"},
+        "classification": {"type": "string"},
+        "migration_status": {"type": "string"},
+        "owner": {"type": "string"},
+        "exclusion_reason": {"type": ["string", "null"]},
+        "source_paths": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
