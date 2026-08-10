@@ -18,6 +18,8 @@ URLS = {
     "simulation": "AI00_SIMULATION_DB_URL",
     "agent": "AI00_AGENT_DB_URL",
     "device": "AI00_DEVICE_DB_URL",
+    "project_management": "AI00_PROJECT_MANAGEMENT_DB_URL",
+    "knowledge": "AI00_KNOWLEDGE_DB_URL",
 }
 DENIED_CODES = {1044, 1045, 1142, 1143, 1227}
 

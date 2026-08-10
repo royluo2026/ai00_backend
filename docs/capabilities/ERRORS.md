@@ -16,6 +16,9 @@
 | `resource_selector_missing` | 描述符要求的资源定位字段缺失。 |
 | `resource_selector_invalid` | 资源定位字段不是允许的标量标识。 |
 | `invalid_input` | 请求不符合该 release 中冻结的输入 Schema。 |
+| `expected_resource_version_required` | 该能力要求信封提供预期资源版本。 |
+| `expected_resource_version_payload_missing` | 描述符声明的基线版本字段未出现在 payload。 |
+| `expected_resource_version_mismatch` | 信封预期版本与 payload 基线版本不一致。 |
 | `confirmation_required` | 写操作需要绑定本次请求的一次性审批。 |
 | `confirmation_rejected` | 审批无效、已用、已过期或与请求绑定不一致。 |
 | `idempotency_key_required` | 描述符要求写请求提供幂等键。 |

@@ -99,7 +99,7 @@ def test_stale_revision_is_rejected_before_ois_write():
         def __exit__(self, *_args): return False
         def cursor(self): return Cursor()
 
-    with patch("backend.db.connection.get_conn", return_value=Connection()), patch(
+    with patch("backend.knowledge.data.connection.get_knowledge_conn", return_value=Connection()), patch(
         "backend.capabilities.knowledge_documents_next.store_markdown_revision"
     ) as store:
         with pytest.raises(CapabilityBusinessError) as caught:

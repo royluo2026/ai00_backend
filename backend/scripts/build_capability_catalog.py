@@ -42,7 +42,10 @@ def current_release() -> CatalogRelease:
     expected_count = len(capability_registry.snapshot()) + len(provider_registry.snapshot())
     if len(registrations) != expected_count:
         raise ValueError("duplicate capability registration across official providers")
-    descriptors = [adapt_v1_spec(registrations[key].spec) for key in sorted(registrations)]
+    descriptors = [
+        registrations[key].descriptor or adapt_v1_spec(registrations[key].spec)
+        for key in sorted(registrations)
+    ]
     return build_release(descriptors, _providers())
 
 

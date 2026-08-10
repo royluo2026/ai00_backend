@@ -22,6 +22,9 @@ STANDARD_ERRORS = (
     ("resource_selector_missing", "描述符要求的资源定位字段缺失。"),
     ("resource_selector_invalid", "资源定位字段不是允许的标量标识。"),
     ("invalid_input", "请求不符合该 release 中冻结的输入 Schema。"),
+    ("expected_resource_version_required", "该能力要求信封提供预期资源版本。"),
+    ("expected_resource_version_payload_missing", "描述符声明的基线版本字段未出现在 payload。"),
+    ("expected_resource_version_mismatch", "信封预期版本与 payload 基线版本不一致。"),
     ("confirmation_required", "写操作需要绑定本次请求的一次性审批。"),
     ("confirmation_rejected", "审批无效、已用、已过期或与请求绑定不一致。"),
     ("idempotency_key_required", "描述符要求写请求提供幂等键。"),
@@ -132,11 +135,11 @@ def _machine_item(descriptor: CapabilityDescriptorV2, release_id: str) -> dict[s
     item["schema_precision"] = "legacy_partial" if partial_schema else "typed"
     item["exposure_blockers"] = [
         *(["legacy_partial_schema"] if partial_schema else []),
-        "domain_errors_not_declared",
+        *([] if descriptor.domain_errors_complete else ["domain_errors_not_declared"]),
         *(["experimental_lifecycle"] if descriptor.lifecycle_status.value == "experimental" else []),
     ]
     item["gateway_errors"] = [code for code, _meaning in STANDARD_ERRORS]
-    item["domain_errors_complete"] = False
+    item["domain_errors_complete"] = descriptor.domain_errors_complete
     return item
 
 
@@ -298,7 +301,9 @@ def _integration_guide(machine) -> str:
 4. `completed` 可消费结果；`accepted` 必须轮询 `OperationRef`；`outcome_unknown` 禁止盲目重试写操作。
 5. 大型数模、CAD、仿真结果只通过 `ArtifactRef` 交换，内部对象键不属于公共合同。
 
-最小调用信封可从 `catalog.v2.json` 每项的 `invoke` 字段读取。示例仅用于结构验证，业务标识必须替换为当前租户内已授权资源。
+完整调用信封至少包含 `catalog_release`、`capability_id`、`major_version`、`payload`、可信 `identity`、`request_id` 和 `trace_id`。`idempotency_policy=required` 时必须增加 `idempotency_key`；`concurrency_policy=expected_version` 时必须增加 `expected_resource_version`，并令其与描述符 `expected_version_payload_path` 指向的 payload 值完全一致；需要确认时再传服务端签发的 `approval_reference`。
+
+`catalog.v2.json` 每项的 `invoke` 只给出能力定位与 payload 最小结构，不包含可信身份、幂等、并发和审批字段。示例仅用于结构验证，业务标识必须替换为当前租户内已授权资源。
 """
 
 
@@ -344,6 +349,14 @@ def _capability_page(item: dict[str, Any]) -> str:
         ) or "- 无资源选择器；仍受租户、身份与权限策略约束。"
     )
     errors = "\n".join(f"- `{code}`：{meaning}" for code, meaning in STANDARD_ERRORS)
+    domain_errors = "\n".join(
+        f"- `{value['code']}`：{value['meaning']}（retryable={str(value['retryable']).lower()}）"
+        for value in item["domain_errors"]
+    ) or "- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。"
+    concurrency_note = (
+        f"- 信封 `expected_resource_version` 必须等于 payload `{item['expected_version_payload_path']}`。"
+        if item.get("expected_version_payload_path") else "- 无预期版本信封要求。"
+    )
     return f"""# {item['id']}@{item['major_version']}
 
 {item['description']}
@@ -385,6 +398,7 @@ def _capability_page(item: dict[str, Any]) -> str:
 - 审批：`{item['confirmation_policy']}`
 - 幂等：`{item['idempotency_policy']}`
 - 并发：`{item['concurrency_policy']}`
+{concurrency_note}
 - 一致性：`{item['consistency_policy']}`
 - Operation：`{item['operation_policy']}`
 - Artifact：`{item['artifact_policy']}`
@@ -416,7 +430,11 @@ def _capability_page(item: dict[str, Any]) -> str:
 
 {errors}
 
-当前 V1 适配描述符尚未完整声明领域业务错误，`catalog.v2.json` 中 `domain_errors_complete=false`。在领域完成 V2 原生迁移前，插件/Agent exposure 必须保持关闭。
+领域错误：
+
+{domain_errors}
+
+`domain_errors_complete={str(item['domain_errors_complete']).lower()}`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

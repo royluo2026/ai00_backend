@@ -1094,6 +1094,16 @@ were one owner mismatch (`base.project.search`), 43 empty output contracts, and
 exposure. The Project Management slice is now green; Base, Knowledge and Craft
 remain gated by `test_domain_capability_coverage.py` until migrated.
 
+Knowledge slice completed on 2026-08-10: 18 supported stable capabilities now
+publish native V2 descriptors with closed typed schemas, stable resource refs,
+complete domain-error contracts, Plugin/Agent/MCP exposure, approval and required
+idempotency for writes, and expected-version enforcement for revise/restore. Three
+compatibility aliases remain callable only by legacy internal consumers and are
+published as `deprecated`. Knowledge now owns its database URL, opaque IDs,
+ArtifactPort adapter, public domain port, CODEOWNERS rules and publication Saga;
+the boundary audit resolves 36 historical findings with zero new violations.
+Project Management and Knowledge are green; Base and Craft remain gated.
+
 - [ ] **Step 3: Implement one complete vertical slice at a time**
 
 For every missing ID: add Descriptor, closed schemas, resource selectors, automation policy, Application Port method, Provider, success/error tests, Plugin/Agent contract examples and generated docs. Migrate read/validate first, draft writes second, publish/restore/bulk writes last. Craft writes create ChangeSet/Commit; Knowledge revisions preserve Evidence and immutable history. Project Management stores only stable refs to Craft/Model/Simulation/Knowledge resources and cannot write their tables.

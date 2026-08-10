@@ -19,13 +19,20 @@ class CapabilityConfirmationError(PermissionError):
 class RegisteredCapability:
     spec: CapabilitySpec
     handler: CapabilityHandler
+    descriptor: Any | None = None
 
 class CapabilityRegistry:
     def __init__(self) -> None: self._items: dict[tuple[str, int], RegisteredCapability] = {}
-    def register(self, spec: CapabilitySpec, handler: CapabilityHandler) -> None:
+    def register(self, spec: CapabilitySpec, handler: CapabilityHandler, *, descriptor: Any | None = None) -> None:
         key = (spec.id, spec.version)
         if key in self._items: raise ValueError(f"Capability already registered: {spec.id}@{spec.version}")
-        self._items[key] = RegisteredCapability(spec, handler)
+        if descriptor is not None and (
+            getattr(descriptor, "id", None) != spec.id
+            or getattr(descriptor, "major_version", None) != spec.version
+            or getattr(descriptor, "owner_domain", None) != spec.owner
+        ):
+            raise ValueError("native_descriptor_identity_mismatch")
+        self._items[key] = RegisteredCapability(spec, handler, descriptor)
     def get(self, capability_id: str, version: int | None = None) -> RegisteredCapability:
         if version is not None:
             item = self._items.get((capability_id, version))

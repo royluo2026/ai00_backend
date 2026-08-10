@@ -5,6 +5,9 @@ import json
 from typing import Any
 
 from .models_next import CapabilityContext
+from backend.knowledge.contracts import PROPOSAL_SCHEMA, proposal_ref
+from backend.knowledge.provider import register_capability
+from backend.knowledge.ids import new_knowledge_id
 
 
 
@@ -23,10 +26,8 @@ def propose_knowledge(payload: dict[str, Any], context: CapabilityContext) -> di
     if not isinstance(tags, list) or len(tags) > 50:
         raise ValueError("tags must be an array with at most 50 items")
 
-    from backend.db.connection import get_conn
-    from backend.utils.gid import next_gid
-
-    gid = str(next_gid())
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
+    gid = new_knowledge_id("proposal")
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -47,6 +48,7 @@ def propose_knowledge(payload: dict[str, Any], context: CapabilityContext) -> di
             )
         conn.commit()
     return {
+        "object_ref": proposal_ref(gid),
         "proposal_gid": gid,
         "status": "pending",
         "title": title,
@@ -58,7 +60,7 @@ def propose_knowledge(payload: dict[str, Any], context: CapabilityContext) -> di
 def register_proposal_capability(registry) -> None:
     from .models_next import CapabilitySpec
 
-    registry.register(
+    register_capability(registry,
         CapabilitySpec(owner="knowledge",
             id="knowledge.propose",
             version=1,
@@ -74,10 +76,10 @@ def register_proposal_capability(registry) -> None:
                     "content_md": {"type": "string"},
                     "summary": {"type": "string"},
                     "base_gid": {"type": "string"},
-                    "tags": {"type": "array"},
+                    "tags": {"type": "array", "maxItems": 50, "items": {"type": "string"}},
                 },
             },
-            output_schema={"type": "object"},
+            output_schema=PROPOSAL_SCHEMA,
             idempotent=False,
             tags=("knowledge", "write", "proposal"),
         ),

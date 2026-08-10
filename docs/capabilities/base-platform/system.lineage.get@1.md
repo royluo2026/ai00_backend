@@ -8,7 +8,7 @@ Compose immutable provenance events and completeness.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`experimental`
 - 所属领域：`base`
-- Catalog Release：`rel_9322bdfe651224292d37be91bcb0f647`
+- Catalog Release：`rel_fcfe3a6edf64a6840ae4d616cdd6524a`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -45,6 +45,7 @@ Compose immutable provenance events and completeness.
 - 审批：`none`
 - 幂等：`none`
 - 并发：`none`
+- 无预期版本信封要求。
 - 一致性：`strong`
 - Operation：`none`
 - Artifact：`none`
@@ -72,7 +73,7 @@ Compose immutable provenance events and completeness.
 ```json
 {
   "capability_id": "system.lineage.get",
-  "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
+  "catalog_release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
   "major_version": 1,
   "payload": {
     "object_ref": "example"
@@ -106,6 +107,9 @@ Compose immutable provenance events and completeness.
 - `resource_selector_missing`：描述符要求的资源定位字段缺失。
 - `resource_selector_invalid`：资源定位字段不是允许的标量标识。
 - `invalid_input`：请求不符合该 release 中冻结的输入 Schema。
+- `expected_resource_version_required`：该能力要求信封提供预期资源版本。
+- `expected_resource_version_payload_missing`：描述符声明的基线版本字段未出现在 payload。
+- `expected_resource_version_mismatch`：信封预期版本与 payload 基线版本不一致。
 - `confirmation_required`：写操作需要绑定本次请求的一次性审批。
 - `confirmation_rejected`：审批无效、已用、已过期或与请求绑定不一致。
 - `idempotency_key_required`：描述符要求写请求提供幂等键。
@@ -116,7 +120,11 @@ Compose immutable provenance events and completeness.
 - `provider_failed`：领域 Provider 执行失败；错误正文不会泄露内部细节。
 - `outcome_persistence_failed`：领域可能已提交但 Outcome 未能确认，必须查询 OperationRef。
 
-当前 V1 适配描述符尚未完整声明领域业务错误，`catalog.v2.json` 中 `domain_errors_complete=false`。在领域完成 V2 原生迁移前，插件/Agent exposure 必须保持关闭。
+领域错误：
+
+- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+
+`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

@@ -10,6 +10,13 @@ from backend.knowledge.revision_store import (
     prepare_markdown_revision,
     store_markdown_revision,
 )
+from backend.knowledge.contracts import (
+    DOCUMENT_DIFF_SCHEMA, DOCUMENT_SCHEMA, DOCUMENT_WRITE_SCHEMA,
+    REVISION_HISTORY_SCHEMA, SPACE_LIST_SCHEMA, SPACE_SCHEMA,
+    document_ref, revision_ref, space_ref, transport_value,
+)
+from backend.knowledge.provider import register_capability
+from backend.knowledge.ids import new_knowledge_id
 
 _SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,254}$")
 _PERMISSIONS = {"view", "edit", "admin"}
@@ -18,7 +25,9 @@ _PERMISSIONS = {"view", "edit", "admin"}
 def _tenant(context: CapabilityContext) -> str:
     tenant = str(context.team_gid or "").strip()
     if not tenant:
-        raise PermissionError("Knowledge Workspace requires a team tenant")
+        raise CapabilityBusinessError(
+            "tenant_scope_denied", "Knowledge Workspace requires a team tenant."
+        )
     return tenant
 
 
@@ -59,9 +68,8 @@ def create_space(payload: dict[str, Any], context: CapabilityContext) -> dict[st
         raise ValueError("valid space name is required")
     if visibility != "team":
         raise ValueError("Knowledge spaces are tenant-wide; visibility must be team")
-    from backend.db.connection import get_conn
-    from backend.utils.gid import next_gid
-    gid = str(next_gid())
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
+    gid = new_knowledge_id("space")
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -69,12 +77,12 @@ def create_space(payload: dict[str, Any], context: CapabilityContext) -> dict[st
                 (gid, tenant, name, visibility, context.user_gid),
             )
         conn.commit()
-    return {"gid": gid, "tenant_gid": tenant, "name": name, "visibility": visibility}
+    return {"object_ref": space_ref(gid), "gid": gid, "tenant_gid": tenant, "name": name, "visibility": visibility}
 
 
 def list_spaces(_payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
     tenant = _tenant(context)
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -82,7 +90,7 @@ def list_spaces(_payload: dict[str, Any], context: CapabilityContext) -> dict[st
                 "WHERE tenant_gid=%s ORDER BY updated_at DESC",
                 (tenant,),
             )
-            items = [dict(row) for row in cur.fetchall()]
+            items = [{**transport_value(dict(row)), "object_ref": space_ref(row["gid"])} for row in cur.fetchall()]
     return {"items": items, "total": len(items)}
 def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, existing: bool) -> CapabilityOutput:
     tenant = _tenant(context)
@@ -93,8 +101,7 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
     visibility = str(payload.get("visibility") or "team")
     if not existing and visibility != "team":
         raise ValueError("Knowledge documents are tenant-wide; visibility must be team")
-    from backend.db.connection import get_conn
-    from backend.utils.gid import next_gid
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
 
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -139,11 +146,11 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
                 )
                 if not cur.fetchone():
                     raise LookupError("knowledge space not found")
-                document_gid = str(next_gid())
+                document_gid = new_knowledge_id("document")
                 revision_no = 1
                 base_revision_gid = None
                 before_sha256 = None
-            revision_gid = str(next_gid())
+            revision_gid = new_knowledge_id("revision")
             prepared = prepare_markdown_revision(
                 tenant_gid=tenant, space_gid=space_gid, document_gid=document_gid,
                 revision_gid=revision_gid, markdown=markdown,
@@ -175,6 +182,7 @@ def _create_revision(payload: dict[str, Any], context: CapabilityContext, *, exi
                 )
         conn.commit()
     row = {
+        "object_ref": document_ref(document_gid), "revision_ref": revision_ref(revision_gid), "space_ref": space_ref(space_gid),
         "title": title, "tenant_gid": tenant, "space_gid": space_gid,
         "document_gid": document_gid, "revision_gid": revision_gid,
         "revision_no": revision_no, "state": "published",
@@ -197,7 +205,7 @@ def get_document(payload: dict[str, Any], context: CapabilityContext) -> Capabil
     revision_gid = str(payload.get("revision_gid") or "").strip()
     if not document_gid:
         raise ValueError("document_gid is required")
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -211,7 +219,7 @@ def get_document(payload: dict[str, Any], context: CapabilityContext) -> Capabil
         raise LookupError("document or revision not found")
     row = dict(row)
     markdown = load_markdown_revision(row["object_key"], row["content_sha256"])
-    data = {**row, "markdown": markdown}
+    data = {**row, "object_ref": document_ref(document_gid), "revision_ref": revision_ref(row["revision_gid"]), "space_ref": space_ref(row["space_gid"]), "markdown": markdown}
     return CapabilityOutput(data=data, evidence=(_evidence(row),))
 
 
@@ -220,7 +228,7 @@ def search_documents(payload: dict[str, Any], context: CapabilityContext) -> Cap
     query = str(payload.get("query") or "").strip()
     limit = max(1, min(int(payload.get("limit") or 10), 50))
     like = f"%{query}%"
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -242,7 +250,7 @@ def list_document_revisions(payload: dict[str, Any], context: CapabilityContext)
     limit = max(1, min(int(payload.get("limit") or 50), 200))
     if not document_gid:
         raise ValueError("document_gid is required")
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -258,15 +266,15 @@ def list_document_revisions(payload: dict[str, Any], context: CapabilityContext)
     if not rows:
         raise LookupError("document not found")
     items = [
-        {key: row.get(key) for key in (
+        {**transport_value({key: row.get(key) for key in (
             "document_gid", "revision_gid", "revision_no", "base_revision_gid",
             "restored_from_revision_gid", "content_sha256", "byte_size", "state",
             "created_by", "created_at",
-        )}
+        )}), "object_ref": revision_ref(row["revision_gid"]), "document_ref": document_ref(document_gid)}
         for row in rows
     ]
     return CapabilityOutput(
-        data={"document_gid": document_gid, "items": items, "total": len(items)},
+        data={"document_ref": document_ref(document_gid), "document_gid": document_gid, "items": items, "total": len(items)},
         evidence=tuple(_evidence(row) for row in rows),
     )
 
@@ -294,8 +302,11 @@ def diff_document_revisions(payload: dict[str, Any], context: CapabilityContext)
         raise ValueError("revision diff exceeds 200000 characters")
     return CapabilityOutput(
         data={
+            "document_ref": document_ref(document_gid),
             "document_gid": document_gid,
+            "from_revision_ref": revision_ref(from_revision_gid),
             "from_revision_gid": from_revision_gid,
+            "to_revision_ref": revision_ref(to_revision_gid),
             "to_revision_gid": to_revision_gid,
             "diff": diff,
         },
@@ -327,7 +338,7 @@ def list_document_acl(payload: dict[str, Any], context: CapabilityContext) -> di
     document_gid = str(payload.get("document_gid") or "").strip()
     if not document_gid:
         raise ValueError("document_gid is required")
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -355,7 +366,7 @@ def revoke_document_acl(payload: dict[str, Any], context: CapabilityContext) -> 
         raise ValueError("invalid ACL subject")
     if subject_type == "team" and subject_gid != tenant:
         raise PermissionError("cannot revoke access from another tenant")
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -397,7 +408,7 @@ def grant_document_acl(payload: dict[str, Any], context: CapabilityContext) -> d
         target = get_user_summaries([subject_gid]).get(subject_gid)
         if not target or str(target.get("team_id") or "") != tenant:
             raise PermissionError("target user is not an active member of this tenant")
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -419,62 +430,61 @@ def register_knowledge_document_capabilities(registry) -> None:
     common = {
         "owner": "knowledge",
         "subject_concepts": ("knowledge.document", "knowledge.revision"),
-        "plugin_callable": False,
-        "output_schema": {"type": "object"},
+        "plugin_callable": True,
     }
-    registry.register(CapabilitySpec(
+    register_capability(registry, CapabilitySpec(
         **common, id="knowledge.space.search", description="Search spaces available in the current tenant.",
         use_when="A caller needs a knowledge space.", do_not_use_when="The space gid is already known.",
-        effects=("read:knowledge.space",), input_schema={"type": "object"}, tags=("knowledge", "space", "read")), list_spaces)
-    registry.register(CapabilitySpec(
+        effects=("read:knowledge.space",), input_schema={"type": "object"}, output_schema=SPACE_LIST_SCHEMA, tags=("knowledge", "space", "read")), list_spaces)
+    register_capability(registry, CapabilitySpec(
         **common, id="knowledge.space.create", description="Create a tenant Knowledge Workspace space.",
         use_when="A new collaboration boundary is required.", do_not_use_when="A suitable space already exists.",
         effects=("create:knowledge.space",), risk="write", confirmation="user", idempotent=False,
-        input_schema={"type": "object", "required": ["name"]}, tags=("knowledge", "space", "write")), create_space)
-    registry.register(CapabilitySpec(
+        input_schema={"type": "object", "required": ["name"], "properties": {"name": {"type": "string", "minLength": 1, "maxLength": 512}, "visibility": {"type": "string", "enum": ["team"]}}}, output_schema=SPACE_SCHEMA, tags=("knowledge", "space", "write")), create_space)
+    register_capability(registry, CapabilitySpec(
         **common, id="knowledge.document.get", description="Read one immutable Markdown revision with evidence.",
         use_when="An exact document or revision is required.", do_not_use_when="Only bounded decision context is needed.",
-        effects=("read:knowledge.document",), input_schema={"type": "object", "required": ["document_gid"]},
-        tags=("knowledge", "document", "read")), get_document)
-    registry.register(CapabilitySpec(
+        effects=("read:knowledge.document",), input_schema={"type": "object", "required": ["document_gid"], "properties": {"document_gid": {"type": "string"}, "revision_gid": {"type": "string"}}},
+        output_schema=DOCUMENT_SCHEMA, tags=("knowledge", "document", "read")), get_document)
+    register_capability(registry, CapabilitySpec(
         **common, id="knowledge.document.create", description="Create a published Markdown document revision in immutable OIS storage.",
         use_when="A new knowledge document is required.", do_not_use_when="Updating an existing document.",
         effects=("create:knowledge.document", "create:knowledge.revision"), risk="write", confirmation="user", idempotent=False,
-        input_schema={"type": "object", "required": ["space_gid", "title", "slug", "markdown"]},
-        tags=("knowledge", "document", "write")), create_document)
-    registry.register(CapabilitySpec(
+        input_schema={"type": "object", "required": ["space_gid", "title", "slug", "markdown"], "properties": {"space_gid": {"type": "string"}, "title": {"type": "string", "minLength": 1, "maxLength": 512}, "slug": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,254}$"}, "markdown": {"type": "string", "minLength": 1}, "visibility": {"type": "string", "enum": ["team"]}, "change_summary": {"type": "string", "maxLength": 2048}}},
+        output_schema=DOCUMENT_WRITE_SCHEMA, tags=("knowledge", "document", "write")), create_document)
+    register_capability(registry, CapabilitySpec(
         **common, id="knowledge.document.revise", description="Publish a new immutable revision with optimistic concurrency.",
         use_when="Updating a document from a known base revision.", do_not_use_when="The caller has not loaded the current revision.",
         effects=("create:knowledge.revision", "update:knowledge.document_head"), risk="write", confirmation="user", idempotent=False,
-        input_schema={"type": "object", "required": ["document_gid", "base_revision_gid", "markdown"]},
-        tags=("knowledge", "document", "write")), revise_document)
-    registry.register(CapabilitySpec(
+        input_schema={"type": "object", "required": ["document_gid", "base_revision_gid", "markdown"], "properties": {"document_gid": {"type": "string"}, "base_revision_gid": {"type": "string"}, "markdown": {"type": "string", "minLength": 1}, "title": {"type": "string", "maxLength": 512}, "change_summary": {"type": "string", "maxLength": 2048}}},
+        output_schema=DOCUMENT_WRITE_SCHEMA, tags=("knowledge", "document", "write")), revise_document)
+    register_capability(registry, CapabilitySpec(
         **common, id="knowledge.document.diff", description="Diff two immutable Markdown revisions.",
         use_when="A caller needs exact changes between revisions.", do_not_use_when="Only revision metadata is required.",
-        effects=("read:knowledge.revision",), input_schema={"type": "object", "required": ["document_gid", "from_revision_gid", "to_revision_gid"]},
-        tags=("knowledge", "document", "read")), diff_document_revisions)
-    registry.register(CapabilitySpec(
+        effects=("read:knowledge.revision",), input_schema={"type": "object", "required": ["document_gid", "from_revision_gid", "to_revision_gid"], "properties": {"document_gid": {"type": "string"}, "from_revision_gid": {"type": "string"}, "to_revision_gid": {"type": "string"}}},
+        output_schema=DOCUMENT_DIFF_SCHEMA, tags=("knowledge", "document", "read")), diff_document_revisions)
+    register_capability(registry, CapabilitySpec(
         **common, id="knowledge.document.history.get", description="List immutable revision metadata for a document.",
         use_when="A caller needs attribution or revision history.", do_not_use_when="The exact revision is already known.",
-        effects=("read:knowledge.revision",), input_schema={"type": "object", "required": ["document_gid"]},
-        tags=("knowledge", "document", "read")), list_document_revisions)
-    registry.register(CapabilitySpec(
+        effects=("read:knowledge.revision",), input_schema={"type": "object", "required": ["document_gid"], "properties": {"document_gid": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 200}}},
+        output_schema=REVISION_HISTORY_SCHEMA, tags=("knowledge", "document", "read")), list_document_revisions)
+    register_capability(registry, CapabilitySpec(
         **common, id="knowledge.document.restore", description="Restore historical content by publishing a new immutable revision.",
         use_when="Historical content must become the new head without deleting history.", do_not_use_when="Only reading old content.",
         effects=("create:knowledge.revision", "update:knowledge.document_head"), risk="write", confirmation="user", idempotent=False,
-        input_schema={"type": "object", "required": ["document_gid", "base_revision_gid", "target_revision_gid"]},
-        tags=("knowledge", "document", "write")), rollback_document)
+        input_schema={"type": "object", "required": ["document_gid", "base_revision_gid", "target_revision_gid"], "properties": {"document_gid": {"type": "string"}, "base_revision_gid": {"type": "string"}, "target_revision_gid": {"type": "string"}}},
+        output_schema=DOCUMENT_WRITE_SCHEMA, tags=("knowledge", "document", "write")), rollback_document)
 
     aliases = (
-        ("knowledge.space.list", "knowledge.space.search", list_spaces, {"type": "object"}, "read"),
-        ("knowledge.document.revisions", "knowledge.document.history.get", list_document_revisions, {"type": "object", "required": ["document_gid"]}, "read"),
-        ("knowledge.document.rollback", "knowledge.document.restore", rollback_document, {"type": "object", "required": ["document_gid", "base_revision_gid", "target_revision_gid"]}, "write"),
+        ("knowledge.space.list", "knowledge.space.search", list_spaces, {"type": "object"}, "read", SPACE_LIST_SCHEMA),
+        ("knowledge.document.revisions", "knowledge.document.history.get", list_document_revisions, {"type": "object", "required": ["document_gid"], "properties": {"document_gid": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 200}}}, "read", REVISION_HISTORY_SCHEMA),
+        ("knowledge.document.rollback", "knowledge.document.restore", rollback_document, {"type": "object", "required": ["document_gid", "base_revision_gid", "target_revision_gid"], "properties": {"document_gid": {"type": "string"}, "base_revision_gid": {"type": "string"}, "target_revision_gid": {"type": "string"}}}, "write", DOCUMENT_WRITE_SCHEMA),
     )
-    for alias, replacement, handler, input_schema, risk in aliases:
-        registry.register(CapabilitySpec(
+    for alias, replacement, handler, input_schema, risk, output_schema in aliases:
+        register_capability(registry, CapabilitySpec(
             owner="knowledge", id=alias, description=f"Deprecated compatibility alias for {replacement}.",
             use_when="Migrating a legacy internal consumer.", do_not_use_when=f"New callers must use {replacement}.",
             subject_concepts=("knowledge.document", "knowledge.revision"), effects=("compatibility:knowledge",),
             deprecated=True, replaced_by=replacement, plugin_callable=False, risk=risk,
             confirmation="user" if risk == "write" else "none", idempotent=risk != "write",
-            input_schema=input_schema, output_schema={"type": "object"}, tags=("knowledge", "deprecated")), handler)
+            input_schema=input_schema, output_schema=output_schema, tags=("knowledge", "deprecated")), handler)

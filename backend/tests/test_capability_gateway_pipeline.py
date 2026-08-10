@@ -202,6 +202,75 @@ def test_gateway_rejects_closed_schema_unknown_fields_before_dispatch():
     assert dispatched == []
 
 
+def test_gateway_enforces_expected_resource_version_against_declared_payload_path():
+    dispatched = []
+    descriptor = _descriptor(plugin=True).model_copy(update={
+        "side_effect_level": SideEffectLevel.WRITE,
+        "consistency_policy": "external",
+        "confirmation_policy": "none",
+        "idempotency_policy": "required",
+        "concurrency_policy": "expected_version",
+        "expected_version_payload_path": "base_revision_gid",
+        "input_schema": {
+            "type": "object",
+            "properties": {"base_revision_gid": {"type": "string"}},
+            "required": ["base_revision_gid"],
+            "additionalProperties": False,
+        },
+    })
+
+    class Policy:
+        def authorize(self, *_args): return None
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    gateway, release = _gateway(
+        descriptor,
+        lambda _payload, _context: dispatched.append(True) or {"routing_id": "routing_1"},
+        Policy(),
+        ReliabilityCoordinator(InMemoryOutcomeStore(), InMemoryRateLimiter(limit=100)),
+    )
+    base = _envelope(release, ConsumerType.PLUGIN).model_copy(update={
+        "payload": {"base_revision_gid": "rev_2"},
+        "idempotency_key": "idem_1",
+    })
+
+    missing = asyncio.run(gateway.invoke(base))
+    mismatch = asyncio.run(gateway.invoke(base.model_copy(update={
+        "request_id": "request_2", "idempotency_key": "idem_2",
+        "expected_resource_version": "rev_1",
+    })))
+    matched = asyncio.run(gateway.invoke(base.model_copy(update={
+        "request_id": "request_3", "idempotency_key": "idem_3",
+        "expected_resource_version": "rev_2",
+    })))
+
+    assert missing.error.code == "expected_resource_version_required"
+    assert mismatch.error.code == "expected_resource_version_mismatch"
+    assert matched.ok is True
+    assert dispatched == [True]
+
+
+@pytest.mark.parametrize("error,code", [
+    (LookupError("secret row id"), "resource_not_found"),
+    (ValueError("secret invalid state"), "invalid_input"),
+])
+def test_gateway_maps_provider_boundary_errors_without_leaking_details(error, code):
+    class Policy:
+        def authorize(self, *_args): return None
+        def approve(self, *_args): return None
+        def project(self, _descriptor, _identity, data): return data
+
+    def handler(_payload, _context):
+        raise error
+
+    gateway, release = _gateway(_descriptor(), handler, Policy())
+    result = asyncio.run(gateway.invoke(_envelope(release)))
+
+    assert result.error.code == code
+    assert "secret" not in result.error.message
+
+
 def test_gateway_applies_ai_projection_with_authorized_data_scopes():
     descriptor = _descriptor().model_copy(update={
         "exposure": ExposurePolicy(web=True, agent=True),

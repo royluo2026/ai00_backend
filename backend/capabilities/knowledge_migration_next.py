@@ -3,13 +3,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from .models_next import CapabilityContext, CapabilitySpec
+from .models_next import CapabilityBusinessError, CapabilityContext, CapabilitySpec
+from backend.knowledge.contracts import MIGRATION_STATUS_SCHEMA, transport_value
+from backend.knowledge.provider import register_capability
 
 
 def _tenant(context: CapabilityContext) -> str:
     tenant = str(context.team_gid or "").strip()
     if not tenant:
-        raise PermissionError("Knowledge migration status requires a team tenant")
+        raise CapabilityBusinessError(
+            "tenant_scope_denied", "Knowledge migration status requires a team tenant."
+        )
     return tenant
 
 
@@ -17,7 +21,7 @@ def migration_status(payload: dict[str, Any], context: CapabilityContext) -> dic
     tenant = _tenant(context)
     scan_limit = max(1, min(int(payload.get("scan_limit") or 10000), 100000))
     run_gid = str(payload.get("run_gid") or "").strip()
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     from backend.platform_sdk.identity import get_user_summaries
 
     with get_conn() as conn:
@@ -42,7 +46,7 @@ def migration_status(payload: dict[str, Any], context: CapabilityContext) -> dic
                 "ORDER BY created_at DESC LIMIT 20",
                 (tenant,),
             )
-            runs = [dict(row) for row in cur.fetchall()]
+            runs = [transport_value(dict(row)) for row in cur.fetchall()]
             items: list[dict] = []
             if run_gid:
                 cur.execute(
@@ -53,7 +57,7 @@ def migration_status(payload: dict[str, Any], context: CapabilityContext) -> dic
                     "WHERE i.run_gid=%s AND r.tenant_gid=%s ORDER BY i.entry_gid LIMIT 1000",
                     (run_gid, tenant),
                 )
-                items = [dict(row) for row in cur.fetchall()]
+                items = [transport_value(dict(row)) for row in cur.fetchall()]
 
     identities = get_user_summaries(row.get("creator_gid") for row in source_rows)
     eligible: list[dict] = []
@@ -91,14 +95,15 @@ def migration_status(payload: dict[str, Any], context: CapabilityContext) -> dic
 
 
 def register_knowledge_migration_capabilities(registry) -> None:
-    registry.register(
+    register_capability(registry,
         CapabilitySpec(owner="knowledge",
             id="knowledge.migration.status",
             version=1,
             description="Inspect tenant-safe legacy Markdown migration readiness and audited runs.",
             permissions=("knowledge.manage",),
-            input_schema={"type": "object"},
-            output_schema={"type": "object"},
+            plugin_callable=True,
+            input_schema={"type": "object", "properties": {"scan_limit": {"type": "integer", "minimum": 1, "maximum": 100000}, "run_gid": {"type": "string"}}},
+            output_schema=MIGRATION_STATUS_SCHEMA,
             tags=("knowledge", "migration", "read"),
         ),
         migration_status,

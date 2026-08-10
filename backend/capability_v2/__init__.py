@@ -22,6 +22,7 @@ from .contracts import (
     CapabilityDescriptorV2,
     CapabilityResultV2,
     ConsumerIdentity,
+    DomainErrorContract,
     InvocationEnvelope,
     OperationRef,
 )
@@ -42,6 +43,7 @@ __all__ = [
     "CapabilityAuthorizer",
     "CapabilityResultV2",
     "ConsumerIdentity",
+    "DomainErrorContract",
     "DelegationGrant",
     "IdentityBroker",
     "InvocationEnvelope",

@@ -66,7 +66,7 @@ def prepare_markdown_revision(
 
 
 def store_markdown_revision(prepared: PreparedMarkdownRevision) -> dict:
-    from backend.core.ois_storage import put_immutable
+    from backend.knowledge.storage import put_immutable
 
     result = put_immutable(prepared.object_key, prepared.data, prepared.media_type)
     if not result:
@@ -76,7 +76,7 @@ def store_markdown_revision(prepared: PreparedMarkdownRevision) -> dict:
     return result
 
 def load_markdown_revision(object_key: str, expected_sha256: str) -> str:
-    from backend.core.ois_storage import get_immutable
+    from backend.knowledge.storage import get_immutable
 
     data = get_immutable(object_key, expected_sha256)
     if data is None:

@@ -6,21 +6,21 @@ Publish a new immutable revision with optimistic concurrency.
 
 - 适用：Updating a document from a known base revision.
 - 不适用：The caller has not loaded the current revision.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_9322bdfe651224292d37be91bcb0f647`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
+- Catalog Release：`rel_fcfe3a6edf64a6840ae4d616cdd6524a`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
-| agent | 不可用 |
+| plugin | 可用 |
+| agent | 可用 |
 | api | 可用 |
-| mcp | 不可用 |
+| mcp | 可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -28,14 +28,14 @@ Publish a new immutable revision with optimistic concurrency.
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:authenticated`
+- 授权策略：`knowledge.v2:authenticated`
 - 自动化等级：`A1`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
-- 无资源选择器；仍受租户、身份与权限策略约束。
+- `knowledge-document` ← `document_gid`（必填）
 
 ## 执行与可靠性
 
@@ -43,13 +43,14 @@ Publish a new immutable revision with optimistic concurrency.
 - 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`user`
-- 幂等：`none`
-- 并发：`none`
-- 一致性：`strong`
-- Operation：`none`
+- 幂等：`required`
+- 并发：`expected_version`
+- 信封 `expected_resource_version` 必须等于 payload `base_revision_gid`。
+- 一致性：`external`
+- Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
-- Evidence：`optional`
+- Evidence：`required`
 - 配额成本：1
 
 ## 输入 Schema
@@ -58,9 +59,24 @@ Publish a new immutable revision with optimistic concurrency.
 {
   "additionalProperties": false,
   "properties": {
-    "base_revision_gid": {},
-    "document_gid": {},
-    "markdown": {}
+    "base_revision_gid": {
+      "type": "string"
+    },
+    "change_summary": {
+      "maxLength": 2048,
+      "type": "string"
+    },
+    "document_gid": {
+      "type": "string"
+    },
+    "markdown": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 512,
+      "type": "string"
+    }
   },
   "required": [
     "document_gid",
@@ -76,7 +92,7 @@ Publish a new immutable revision with optimistic concurrency.
 ```json
 {
   "capability_id": "knowledge.document.revise",
-  "catalog_release": "rel_9322bdfe651224292d37be91bcb0f647",
+  "catalog_release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
   "major_version": 1,
   "payload": {
     "base_revision_gid": "example",
@@ -93,7 +109,57 @@ Publish a new immutable revision with optimistic concurrency.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "content_sha256": {
+      "type": "string"
+    },
+    "document_gid": {
+      "type": "string"
+    },
+    "object_key": {
+      "type": "string"
+    },
+    "object_ref": {
+      "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+      "type": "string"
+    },
+    "revision_gid": {
+      "type": "string"
+    },
+    "revision_no": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "revision_ref": {
+      "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+      "type": "string"
+    },
+    "space_gid": {
+      "type": "string"
+    },
+    "space_ref": {
+      "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "tenant_gid": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "object_ref",
+    "revision_ref",
+    "space_ref",
+    "document_gid",
+    "revision_gid",
+    "revision_no",
+    "state"
+  ],
   "type": "object"
 }
 ```
@@ -112,6 +178,9 @@ Publish a new immutable revision with optimistic concurrency.
 - `resource_selector_missing`：描述符要求的资源定位字段缺失。
 - `resource_selector_invalid`：资源定位字段不是允许的标量标识。
 - `invalid_input`：请求不符合该 release 中冻结的输入 Schema。
+- `expected_resource_version_required`：该能力要求信封提供预期资源版本。
+- `expected_resource_version_payload_missing`：描述符声明的基线版本字段未出现在 payload。
+- `expected_resource_version_mismatch`：信封预期版本与 payload 基线版本不一致。
 - `confirmation_required`：写操作需要绑定本次请求的一次性审批。
 - `confirmation_rejected`：审批无效、已用、已过期或与请求绑定不一致。
 - `idempotency_key_required`：描述符要求写请求提供幂等键。
@@ -122,7 +191,16 @@ Publish a new immutable revision with optimistic concurrency.
 - `provider_failed`：领域 Provider 执行失败；错误正文不会泄露内部细节。
 - `outcome_persistence_failed`：领域可能已提交但 Outcome 未能确认，必须查询 OperationRef。
 
-当前 V1 适配描述符尚未完整声明领域业务错误，`catalog.v2.json` 中 `domain_errors_complete=false`。在领域完成 V2 原生迁移前，插件/Agent exposure 必须保持关闭。
+领域错误：
+
+- `resource_not_found`：The scoped Knowledge resource does not exist or is not visible.（retryable=false）
+- `revision_conflict`：The document head differs from the supplied base revision.（retryable=false）
+- `proposal_state_conflict`：The proposal is no longer in a state that accepts this transition.（retryable=false）
+- `knowledge_storage_unavailable`：The immutable Knowledge object store is unavailable.（retryable=true）
+- `publication_in_progress`：Another worker owns the current publication lease.（retryable=true）
+- `self_review_forbidden`：Proposal creators cannot approve or reject their own proposal.（retryable=false）
+
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

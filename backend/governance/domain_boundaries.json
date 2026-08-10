@@ -92,6 +92,12 @@
     {"path": "backend/capabilities/knowledge_documents_next.py", "domain": "knowledge"},
     {"path": "backend/capabilities/knowledge_migration_next.py", "domain": "knowledge"},
     {"path": "backend/capabilities/knowledge_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/proposals_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/proposal_query_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/review_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/outbox_next.py", "domain": "knowledge"},
+    {"path": "backend/capabilities/outbox_retry_next.py", "domain": "knowledge"},
+    {"path": "backend/domain_ports/knowledge.py", "domain": "knowledge"},
     {"path": "backend/capabilities/ontology_concepts_next.py", "domain": "ontology"},
     {"path": "backend/capabilities/ontology_proposals_next.py", "domain": "ontology"},
     {"path": "backend/capabilities/ontology_releases_next.py", "domain": "ontology"},
@@ -104,6 +110,8 @@
   "public_import_prefixes": [
     "backend.contracts",
     "backend.capability_v2",
+    "backend.capabilities.models_next",
+    "backend.domain_ports",
     "backend.platform_sdk"
   ],
   "migration_paths": [

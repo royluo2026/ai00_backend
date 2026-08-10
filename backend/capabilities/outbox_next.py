@@ -2,9 +2,11 @@
 from __future__ import annotations
 import json
 from typing import Any
+from backend.knowledge.contracts import OUTBOX_LIST_SCHEMA, outbox_ref, proposal_ref, transport_value
+from backend.knowledge.provider import register_capability
 
 def enqueue_publish(proposal_gid: str, payload: dict[str, Any], *, gid: str, error: str) -> None:
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""INSERT INTO workmanship_know_publish_outbox
@@ -16,7 +18,7 @@ def enqueue_publish(proposal_gid: str, payload: dict[str, Any], *, gid: str, err
 def list_outbox(payload: dict[str, Any], context) -> dict[str, Any]:
     limit = max(1, min(int(payload.get("limit") or 50), 200))
     team = context.team_gid or ""
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -28,20 +30,31 @@ def list_outbox(payload: dict[str, Any], context) -> dict[str, Any]:
                 (context.user_gid, team, team, limit),
             )
             rows = cur.fetchall()
-    return {"items": [dict(row) for row in rows], "total": len(rows)}
+    return {
+        "items": [
+            {
+                **transport_value(dict(row)),
+                "object_ref": outbox_ref(row["gid"]),
+                "proposal_ref": proposal_ref(row["proposal_gid"]),
+            }
+            for row in rows
+        ],
+        "total": len(rows),
+    }
 
 def register_outbox_capability(registry) -> None:
     from .models_next import CapabilitySpec
-    registry.register(CapabilitySpec(owner="knowledge",
+    register_capability(registry, CapabilitySpec(owner="knowledge",
         id="knowledge.proposal.outbox.list", version=1,
         description="查看当前用户或团队可见的知识发布补偿队列。",
         permissions=("knowledge.manage",),
+        plugin_callable=True,
         input_schema={"type": "object", "properties": {"limit": {"type": "integer"}}},
-        output_schema={"type": "object"}, tags=("knowledge", "review", "operations"),
+        output_schema=OUTBOX_LIST_SCHEMA, tags=("knowledge", "review", "operations"),
     ), list_outbox)
 
 def mark_complete(gid: str) -> None:
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("UPDATE workmanship_know_publish_outbox SET status='completed', updated_at=NOW() WHERE gid=%s", (gid,))

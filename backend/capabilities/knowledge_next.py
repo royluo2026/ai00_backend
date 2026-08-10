@@ -2,6 +2,8 @@
 from __future__ import annotations
 from typing import Any
 from .models_next import CapabilityContext, CapabilityOutput, EvidenceRef
+from backend.knowledge.contracts import ENTRY_SCHEMA, ENTRY_SEARCH_SCHEMA, entry_ref
+from backend.knowledge.provider import register_capability
 
 def _json_value(value: Any, default: Any) -> Any:
     if value is None: return default
@@ -25,14 +27,30 @@ def _visible_clause(context: CapabilityContext, alias: str = "k") -> tuple[str, 
     return "(" + " OR ".join(clauses) + ")", params
 
 def _entry(row: dict[str, Any], *, include_content: bool = False) -> dict[str, Any]:
-    result = {"gid": row.get("gid", ""), "display_id": row.get("display_id") or "", "title": row.get("title") or "",
+    tags = [str(value) for value in (_json_value(row.get("tags"), []) or [])]
+    result = {"object_ref": entry_ref(row.get("gid", "")), "gid": row.get("gid", ""), "display_id": row.get("display_id") or "", "title": row.get("title") or "",
               "entry_type": row.get("entry_type") or "guide", "status": row.get("status") or "draft",
-              "share_scope": row.get("share_scope") or "team", "tags": _json_value(row.get("tags"), []),
+              "share_scope": row.get("share_scope") or "team", "tags": tags,
               "creator_gid": row.get("creator_gid") or "", "updated_at": str(row.get("updated_at") or "")}
     if include_content:
-        result.update({"content_md": row.get("content_md") or "", "content_ref": _json_value(row.get("content_ref"), {}),
-                       "related_part_nos": _json_value(row.get("related_part_nos"), []), "related_operation_gids": _json_value(row.get("related_operation_gids"), []),
-                       "attachments": _json_value(row.get("attachments"), []), "source_gid": row.get("source_gid"), "source_label": row.get("source_label") or "", "maintainer_gid": row.get("maintainer_gid") or ""})
+        content_ref = _json_value(row.get("content_ref"), {}) or {}
+        content_ref = {
+            key: str(content_ref[key])
+            for key in ("object_key", "ois_url", "sha256", "document_gid", "revision_gid", "proposal_gid")
+            if content_ref.get(key) is not None
+        }
+        attachments = []
+        for raw in _json_value(row.get("attachments"), []) or []:
+            if not isinstance(raw, dict):
+                continue
+            attachments.append({
+                key: (int(raw[key]) if key == "byte_size" else str(raw[key]))
+                for key in ("name", "url", "object_key", "sha256", "media_type", "byte_size")
+                if raw.get(key) is not None
+            })
+        result.update({"content_md": row.get("content_md") or "", "content_ref": content_ref,
+                       "related_part_nos": [str(value) for value in (_json_value(row.get("related_part_nos"), []) or [])], "related_operation_gids": [str(value) for value in (_json_value(row.get("related_operation_gids"), []) or [])],
+                       "attachments": attachments, "source_gid": str(row["source_gid"]) if row.get("source_gid") is not None else None, "source_label": row.get("source_label") or "", "maintainer_gid": row.get("maintainer_gid") or ""})
     return result
 
 def _entry_evidence(row: dict[str, Any]) -> EvidenceRef:
@@ -53,7 +71,7 @@ def _entry_evidence(row: dict[str, Any]) -> EvidenceRef:
 def get_knowledge(payload: dict[str, Any], context: CapabilityContext) -> dict[str, Any]:
     gid = str(payload.get("gid") or "").strip()
     if not gid: raise ValueError("gid is required")
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     visible, params = _visible_clause(context)
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -67,7 +85,7 @@ def search_knowledge(payload: dict[str, Any], context: CapabilityContext) -> dic
     query = str(payload.get("query") or "").strip()
     limit = max(1, min(int(payload.get("limit") or 20), 100))
     entry_type = str(payload.get("entry_type") or "").strip()
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     visible, params = _visible_clause(context)
     clauses = [visible]; query_params: list[Any] = list(params)
     if query:
@@ -86,5 +104,5 @@ def search_knowledge(payload: dict[str, Any], context: CapabilityContext) -> dic
 
 def register_knowledge_capabilities(registry) -> None:
     from .models_next import CapabilitySpec
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.get", version=1, description="读取当前用户有权访问的知识条目及 Markdown 正文.", permissions=("knowledge.view",), input_schema={"type": "object", "required": ["gid"]}, output_schema={"type": "object"}, tags=("knowledge", "read")), get_knowledge)
-    registry.register(CapabilitySpec(owner="knowledge", id="knowledge.search", version=1, description="按标题、Markdown 正文和标签搜索知识条目.", permissions=("knowledge.view",), input_schema={"type": "object"}, output_schema={"type": "object"}, tags=("knowledge", "read")), search_knowledge)
+    register_capability(registry, CapabilitySpec(owner="knowledge", id="knowledge.get", version=1, description="读取当前用户有权访问的知识条目及 Markdown 正文.", permissions=("knowledge.view",), plugin_callable=True, input_schema={"type": "object", "required": ["gid"], "properties": {"gid": {"type": "string"}}}, output_schema=ENTRY_SCHEMA, tags=("knowledge", "read")), get_knowledge)
+    register_capability(registry, CapabilitySpec(owner="knowledge", id="knowledge.search", version=1, description="按标题、Markdown 正文和标签搜索知识条目.", permissions=("knowledge.view",), plugin_callable=True, input_schema={"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 100}, "entry_type": {"type": "string"}}}, output_schema=ENTRY_SEARCH_SCHEMA, tags=("knowledge", "read")), search_knowledge)

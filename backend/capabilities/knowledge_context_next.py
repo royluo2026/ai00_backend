@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from typing import Any, Mapping
 
 from .models_next import CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.knowledge.contracts import CONTEXT_RETRIEVAL_SCHEMA, document_ref, revision_ref
+from backend.knowledge.provider import register_capability
 
 _METHODS = frozenset({"explicit_attachment", "ontology_relation", "metadata", "fulltext", "semantic_similarity"})
 
@@ -36,6 +38,7 @@ def _candidate(raw: Mapping[str, Any], method: str) -> dict[str, Any] | None:
     document_gid = raw.get("document_gid"); revision_gid = raw.get("revision_gid")
     if not document_gid or not revision_gid or method not in _METHODS: return None
     return {
+        "document_ref": document_ref(document_gid), "revision_ref": revision_ref(revision_gid),
         "document_gid": str(document_gid), "revision_gid": str(revision_gid),
         "title": raw.get("title"), "summary": str(raw.get("summary") or "")[:1000],
         "retrieval_method": method, "evidence": raw.get("evidence"),
@@ -54,7 +57,7 @@ def ontology_relation_candidates(request: ContextRequest, _context: CapabilityCo
 def scoped_text_candidates(request: ContextRequest, context: CapabilityContext, *, exclude: list[dict[str, Any]]) -> list[dict[str, Any]]:
     tenant = str(context.team_gid or "").strip()
     if not tenant or not request.query: return []
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     pattern = f"%{request.query}%"
     with get_conn() as conn:
         with conn.cursor() as cursor:
@@ -94,9 +97,9 @@ def retrieve_context(payload: dict[str, Any], context: CapabilityContext) -> Cap
 
 
 def register_knowledge_context_capability(registry: Any) -> None:
-    registry.register(CapabilitySpec(
+    register_capability(registry, CapabilitySpec(
         id="knowledge.context.retrieve", owner="knowledge", description="Retrieve bounded immutable Knowledge revision references for one task.",
         use_when="A person or model needs decision context, not whole documents.", do_not_use_when="The caller already knows an exact document revision.",
-        subject_concepts=("knowledge.document", "knowledge.revision"), effects=("read:knowledge.context",), plugin_callable=False,
-        input_schema={"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer"}}},
-        output_schema={"type": "object", "required": ["items", "query"]}, tags=("knowledge", "context", "read")), retrieve_context)
+        subject_concepts=("knowledge.document", "knowledge.revision"), effects=("read:knowledge.context",), plugin_callable=True,
+        input_schema={"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 10}, "attachments": {"type": "array", "maxItems": 50, "items": {"type": "object", "required": ["document_gid", "revision_gid"], "properties": {"document_gid": {"type": "string"}, "revision_gid": {"type": "string"}, "title": {"type": "string"}, "summary": {"type": "string"}}}}, "concept_refs": {"type": "array", "maxItems": 100, "items": {"type": "string"}}}},
+        output_schema=CONTEXT_RETRIEVAL_SCHEMA, tags=("knowledge", "context", "read")), retrieve_context)

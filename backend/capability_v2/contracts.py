@@ -94,6 +94,12 @@ class ResourceSelector(FrozenModel):
     required: bool = True
 
 
+class DomainErrorContract(FrozenModel):
+    code: str = Field(pattern=CAPABILITY_ID_PATTERN)
+    meaning: str = Field(min_length=1, max_length=2000)
+    retryable: bool = False
+
+
 class ActorIdentity(FrozenModel):
     user_id: str | None = Field(default=None, pattern=IDENTITY_PATTERN)
     service_id: str | None = Field(default=None, pattern=IDENTITY_PATTERN)
@@ -279,6 +285,7 @@ class CapabilityDescriptorV2(FrozenModel):
     artifact_policy: Literal["none", "input", "output", "input_output"] = "none"
     operation_policy: Literal["none", "optional", "required"] = "none"
     concurrency_policy: Literal["none", "expected_version"] = "none"
+    expected_version_payload_path: str | None = Field(default=None, min_length=1, max_length=512)
     idempotency_policy: Literal["none", "optional", "required"] = "none"
     consistency_policy: Literal["strong", "eventual", "external"] = "strong"
     timeout_seconds: int = Field(default=30, ge=1, le=86400)
@@ -287,6 +294,8 @@ class CapabilityDescriptorV2(FrozenModel):
     evidence_policy: Literal["none", "optional", "required"] = "optional"
     audit_policy: Literal["standard", "high_risk"] = "standard"
     deprecation_message: str | None = Field(default=None, max_length=2000)
+    domain_errors: tuple[DomainErrorContract, ...] = ()
+    domain_errors_complete: bool = False
 
     @model_validator(mode="after")
     def public_schemas_are_closed(self) -> "CapabilityDescriptorV2":
@@ -294,4 +303,13 @@ class CapabilityDescriptorV2(FrozenModel):
         _assert_closed_schema(self.output_schema, "output_schema")
         if self.agent_output_schema is not None:
             _assert_closed_schema(self.agent_output_schema, "agent_output_schema")
+        if self.domain_errors_complete and not self.domain_errors:
+            raise ValueError("complete domain error contract cannot be empty")
+        if self.concurrency_policy == "expected_version" and not self.expected_version_payload_path:
+            raise ValueError("expected_version concurrency requires a payload path")
+        if self.concurrency_policy == "none" and self.expected_version_payload_path is not None:
+            raise ValueError("expected version payload path requires expected_version concurrency")
+        codes = [item.code for item in self.domain_errors]
+        if len(codes) != len(set(codes)):
+            raise ValueError("duplicate domain error contract")
         return self

@@ -37,7 +37,7 @@ def _open_dead_alert(cur, outbox_gid: str, error: str) -> None:
 def deliver_capability_audit_once(limit: int = 100) -> int:
     """Deliver the V2 audit outbox idempotently into the immutable audit ledger."""
     from backend.capability_v2.outcomes import SqlOutcomeStore
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
 
     store = SqlOutcomeStore(get_conn)
 
@@ -65,7 +65,7 @@ def deliver_capability_audit_once(limit: int = 100) -> int:
 
 async def run_once(limit: int = 20) -> dict[str, Any]:
     """Run one locked batch. MySQL GET_LOCK prevents duplicate workers."""
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
 
     limit = max(1, min(int(limit or 20), 100))
     with get_conn() as lock_conn:
@@ -161,7 +161,7 @@ async def run_forever(interval_seconds: int = 30, batch_size: int = 20) -> None:
 
 
 def worker_health(_payload: dict[str, Any], _context) -> dict[str, Any]:
-    from backend.db.connection import get_conn
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT worker_name, worker_id, status, details, heartbeat_at, started_at FROM workmanship_app_worker_heartbeats WHERE worker_name='knowledge-outbox'")

@@ -95,6 +95,12 @@ FRONTEND_DIR=/path/to/workmanship-web bash scripts/sync_frontend_dist.sh
 - `FEISHU_REDIRECT_URI`
 - `JWT_SECRET`
 - `USERS_DB_URL`
+- `AI00_CRAFT_DB_URL`
+- `AI00_AGENT_DB_URL`
+- `AI00_SIMULATION_DB_URL`
+- `AI00_DEVICE_DB_URL`
+- `AI00_PROJECT_MANAGEMENT_DB_URL`
+- `AI00_KNOWLEDGE_DB_URL`
 
 ## 6.1 容器 / Pipeline 部署约定
 
@@ -120,6 +126,12 @@ gunicorn backend.main:app -c backend/gunicorn.conf.py
 - `FEISHU_REDIRECT_URI`
 - `JWT_SECRET`
 - `USERS_DB_URL`
+- `AI00_CRAFT_DB_URL`
+- `AI00_AGENT_DB_URL`
+- `AI00_SIMULATION_DB_URL`
+- `AI00_DEVICE_DB_URL`
+- `AI00_PROJECT_MANAGEMENT_DB_URL`
+- `AI00_KNOWLEDGE_DB_URL`
 - `PUBLIC_URL`
 - `CORS_ALLOW_ORIGINS`
 - `OIS_IDENTIFY`
@@ -185,6 +197,12 @@ JWT_SECRET=replace-with-real-secret
 JWT_EXPIRE_HOURS=72
 
 USERS_DB_URL=mysql://user:password@db-host:3306/database
+AI00_CRAFT_DB_URL=mysql://craft_user:password@db-host:3306/database
+AI00_AGENT_DB_URL=mysql://agent_user:password@db-host:3306/database
+AI00_SIMULATION_DB_URL=mysql://simulation_user:password@db-host:3306/database
+AI00_DEVICE_DB_URL=mysql://device_user:password@db-host:3306/database
+AI00_PROJECT_MANAGEMENT_DB_URL=mysql://project_user:password@db-host:3306/database
+AI00_KNOWLEDGE_DB_URL=mysql://knowledge_user:password@db-host:3306/database
 
 HOST=0.0.0.0
 PORT=8080
@@ -220,6 +238,12 @@ JWT_SECRET=${JWT_SECRET}
 JWT_EXPIRE_HOURS=72
 
 USERS_DB_URL=${USERS_DB_URL}
+AI00_CRAFT_DB_URL=${AI00_CRAFT_DB_URL}
+AI00_AGENT_DB_URL=${AI00_AGENT_DB_URL}
+AI00_SIMULATION_DB_URL=${AI00_SIMULATION_DB_URL}
+AI00_DEVICE_DB_URL=${AI00_DEVICE_DB_URL}
+AI00_PROJECT_MANAGEMENT_DB_URL=${AI00_PROJECT_MANAGEMENT_DB_URL}
+AI00_KNOWLEDGE_DB_URL=${AI00_KNOWLEDGE_DB_URL}
 
 HOST=0.0.0.0
 PORT=8080

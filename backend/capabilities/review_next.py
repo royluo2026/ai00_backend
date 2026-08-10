@@ -2,8 +2,11 @@
 from __future__ import annotations
 
 import json
-import hashlib
 from typing import Any
+from backend.knowledge.contracts import PROPOSAL_SCHEMA, proposal_ref
+from backend.knowledge.provider import register_capability
+from backend.knowledge.ids import new_knowledge_id
+from backend.capabilities.models_next import CapabilityBusinessError
 
 def review_proposal(payload: dict[str, Any], context) -> dict[str, Any]:
     proposal_gid = str(payload.get("proposal_gid") or "").strip()
@@ -14,22 +17,35 @@ def review_proposal(payload: dict[str, Any], context) -> dict[str, Any]:
     if decision not in {"approved", "rejected"}:
         raise ValueError("decision must be approved or rejected")
 
-    from backend.db.connection import get_conn
-    from backend.utils.gid import next_gid
-    from backend.capabilities.outbox_next import enqueue_publish, mark_complete
+    from backend.knowledge.data.connection import get_knowledge_conn as get_conn
+    from backend.capabilities.outbox_retry_next import retry_publish
+
+    team_gid = str(context.team_gid or "").strip()
+    if not team_gid:
+        raise CapabilityBusinessError(
+            "tenant_scope_denied", "Knowledge proposal review requires a team tenant."
+        )
 
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT * FROM workmanship_know_proposals WHERE gid = %s FOR UPDATE",
-                (proposal_gid,),
+                "SELECT * FROM workmanship_know_proposals WHERE gid=%s AND team_gid=%s FOR UPDATE",
+                (proposal_gid, team_gid),
             )
             proposal = cur.fetchone()
             if not proposal:
                 raise LookupError("知识提案不存在")
             proposal = dict(proposal)
             if proposal.get("status") != "pending":
-                raise ValueError(f"提案当前状态为 {proposal.get('status')}，不能重复审核")
+                raise CapabilityBusinessError(
+                    "proposal_state_conflict",
+                    "The proposal is no longer pending review.",
+                    details={"proposal_gid": proposal_gid, "status": proposal.get("status")},
+                )
+            if str(proposal.get("creator_gid") or "") == str(context.user_gid):
+                raise CapabilityBusinessError(
+                    "self_review_forbidden", "Proposal creators cannot review their own proposal."
+                )
 
             if decision == "rejected":
                 cur.execute(
@@ -37,62 +53,48 @@ def review_proposal(payload: dict[str, Any], context) -> dict[str, Any]:
                     (context.user_gid, note, proposal_gid),
                 )
                 conn.commit()
-                return {"proposal_gid": proposal_gid, "status": "rejected", "reviewer_gid": context.user_gid}
+                return {"object_ref": proposal_ref(proposal_gid), "proposal_gid": proposal_gid, "status": "rejected", "reviewer_gid": context.user_gid}
 
-            outbox_gid = str(next_gid())
-            enqueue_publish(
-                proposal_gid,
-                {"proposal_gid": proposal_gid},
-                gid=outbox_gid,
-                error="publication_started",
-            )
-
-            # OIS is authoritative for published Markdown. Do not publish a
-            # formal entry when OIS is unavailable.
-            from backend.core.ois_storage import upload
-
-            content_md = str(proposal.get("content_md") or "")
-            ois_url = upload(content_md.encode("utf-8"), ".md", "text/markdown", prefix="knowledge")
-            if not ois_url:
-                raise RuntimeError("OIS 不可用，提案保持 pending，未发布正式知识")
-
-            published_gid = str(next_gid())
-            content_sha256 = hashlib.sha256(content_md.encode("utf-8")).hexdigest()
-            content_ref = json.dumps({"ois_url": ois_url, "proposal_gid": proposal_gid, "sha256": content_sha256}, ensure_ascii=False)
-            tags = proposal.get("tags") or []
-            if isinstance(tags, str):
-                try:
-                    tags = json.loads(tags)
-                except (TypeError, ValueError):
-                    tags = []
-            cur.execute(
-                """INSERT INTO workmanship_know_entries
-                   (gid, display_id, title, entry_type, content_ref, content_md,
-                    tags, status, share_scope, creator_gid, source_gid, source_label,
-                    created_at, updated_at)
-                   VALUES (%s, '', %s, 'guide', %s, %s, %s, 'published',
-                           'team', %s, %s, 'knowledge.proposal', NOW(), NOW())""",
-                (
-                    published_gid,
-                    proposal.get("title") or "",
-                    content_ref,
-                    content_md,
-                    json.dumps(tags, ensure_ascii=False),
-                    proposal.get("creator_gid") or context.user_gid,
-                    proposal_gid,
-                ),
-            )
-            cur.execute(
-                "UPDATE workmanship_know_proposals SET status='approved', reviewer_gid=%s, review_note=%s, reviewed_at=NOW(), published_gid=%s, ois_url=%s, updated_at=NOW() WHERE gid=%s",
-                (context.user_gid, note, published_gid, ois_url, proposal_gid),
-            )
+            if proposal.get("reviewer_gid"):
+                if str(proposal["reviewer_gid"]) != str(context.user_gid):
+                    raise CapabilityBusinessError(
+                        "proposal_state_conflict",
+                        "Another reviewer already accepted this proposal publication.",
+                    )
+                cur.execute(
+                    "SELECT gid FROM workmanship_know_publish_outbox WHERE proposal_gid=%s "
+                    "ORDER BY created_at DESC LIMIT 1 FOR UPDATE",
+                    (proposal_gid,),
+                )
+                existing_outbox = cur.fetchone()
+                if not existing_outbox:
+                    raise CapabilityBusinessError(
+                        "proposal_state_conflict",
+                        "Reviewed proposal is missing its publication operation.",
+                    )
+                outbox_gid = str(existing_outbox["gid"])
+            else:
+                outbox_gid = new_knowledge_id("outbox")
+                cur.execute(
+                    "INSERT INTO workmanship_know_publish_outbox "
+                    "(gid,proposal_gid,payload,status,attempts,last_error,created_at,updated_at) "
+                    "VALUES (%s,%s,%s,'pending',0,NULL,NOW(),NOW())",
+                    (outbox_gid, proposal_gid, json.dumps({"proposal_gid": proposal_gid})),
+                )
+                cur.execute(
+                    "UPDATE workmanship_know_proposals SET status='publishing',reviewer_gid=%s,review_note=%s,"
+                    "reviewed_at=NOW(),updated_at=NOW() WHERE gid=%s AND status='pending'",
+                    (context.user_gid, note, proposal_gid),
+                )
         conn.commit()
-    mark_complete(outbox_gid)
+
+    publication = retry_publish({"outbox_gid": outbox_gid}, context)
     return {
+        "object_ref": proposal_ref(proposal_gid),
         "proposal_gid": proposal_gid,
         "status": "approved",
-        "published_gid": published_gid,
-        "ois_url": ois_url,
+        "published_gid": publication.get("published_gid"),
+        "published_ref": publication.get("published_ref"),
         "reviewer_gid": context.user_gid,
     }
 
@@ -100,7 +102,7 @@ def review_proposal(payload: dict[str, Any], context) -> dict[str, Any]:
 def register_review_capability(registry) -> None:
     from .models_next import CapabilitySpec
 
-    registry.register(
+    register_capability(registry,
         CapabilitySpec(owner="knowledge",
             id="knowledge.proposal.review",
             version=1,
@@ -113,11 +115,11 @@ def register_review_capability(registry) -> None:
                 "required": ["proposal_gid", "decision"],
                 "properties": {
                     "proposal_gid": {"type": "string"},
-                    "decision": {"type": "string"},
-                    "review_note": {"type": "string"},
+                    "decision": {"type": "string", "enum": ["approved", "rejected"]},
+                    "review_note": {"type": "string", "maxLength": 4000},
                 },
             },
-            output_schema={"type": "object"},
+            output_schema=PROPOSAL_SCHEMA,
             idempotent=False,
             tags=("knowledge", "write", "review"),
         ),

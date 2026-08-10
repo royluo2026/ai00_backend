@@ -93,6 +93,9 @@ class CapabilityGatewayService:
             validate_payload(dict(descriptor.input_schema), dict(envelope.payload))
         except (TypeError, ValueError) as exc:
             raise GatewayPolicyError("invalid_input", str(exc)) from exc
+        concurrency_error = self._concurrency_error(descriptor, envelope)
+        if concurrency_error:
+            raise GatewayPolicyError(concurrency_error, "Expected resource version is invalid.")
         try:
             return self._policy.issue_approval(descriptor, envelope, provider, authorization)
         except GatewayPolicyError:
@@ -135,6 +138,11 @@ class CapabilityGatewayService:
             validate_payload(dict(descriptor.input_schema), dict(envelope.payload))
         except (TypeError, ValueError) as exc:
             return self._rejected(envelope, "invalid_input", str(exc))
+        concurrency_error = self._concurrency_error(descriptor, envelope)
+        if concurrency_error:
+            return self._rejected(
+                envelope, concurrency_error, "Expected resource version is invalid."
+            )
 
         is_write = descriptor.side_effect_level is not SideEffectLevel.READ
         if is_write and self._reliability is None:
@@ -202,9 +210,18 @@ class CapabilityGatewayService:
         context = self._legacy_context(envelope)
         transaction = None
         try:
-            value = provider.handler(dict(envelope.payload), context)
-            if inspect.isawaitable(value):
-                value = await value
+            try:
+                value = provider.handler(dict(envelope.payload), context)
+                if inspect.isawaitable(value):
+                    value = await value
+            except LookupError as exc:
+                raise CapabilityBusinessError(
+                    "resource_not_found", "The requested resource was not found."
+                ) from exc
+            except (TypeError, ValueError) as exc:
+                raise CapabilityBusinessError(
+                    "invalid_input", "The provider rejected the supplied input."
+                ) from exc
             evidence = ()
             if isinstance(value, TransactionalCapabilityOutput):
                 transaction = value.transaction
@@ -325,6 +342,27 @@ class CapabilityGatewayService:
                        if envelope.identity.consumer.type.value == "plugin" else None),
             plugin_version=envelope.identity.consumer.consumer_version,
         )
+
+    @staticmethod
+    def _concurrency_error(descriptor, envelope: InvocationEnvelope) -> str | None:
+        if descriptor.concurrency_policy != "expected_version":
+            return None
+        expected = envelope.expected_resource_version
+        if not expected:
+            return "expected_resource_version_required"
+        current: Any = envelope.payload
+        path = descriptor.expected_version_payload_path or ""
+        parts = (
+            [part.replace("~1", "/").replace("~0", "~") for part in path.lstrip("/").split("/")]
+            if path.startswith("/") else path.split(".")
+        )
+        for part in parts:
+            if not part or not isinstance(current, dict) or part not in current:
+                return "expected_resource_version_payload_missing"
+            current = current[part]
+        if isinstance(current, (dict, list, tuple, set, bool)) or str(current) != expected:
+            return "expected_resource_version_mismatch"
+        return None
 
     @staticmethod
     def _rollback_and_close(transaction) -> None:

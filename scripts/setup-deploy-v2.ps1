@@ -65,6 +65,12 @@ JWT_SECRET=
 JWT_EXPIRE_HOURS=72
 
 USERS_DB_URL=
+AI00_CRAFT_DB_URL=
+AI00_AGENT_DB_URL=
+AI00_SIMULATION_DB_URL=
+AI00_DEVICE_DB_URL=
+AI00_PROJECT_MANAGEMENT_DB_URL=
+AI00_KNOWLEDGE_DB_URL=
 
 HOST=0.0.0.0
 PORT=${PORT}
@@ -88,7 +94,7 @@ OIS_IDAAS_SERVICE_ID=
 OIS_PUBLIC_BASE_URL=
 "@ | Set-Content -Path $ENV_FILE -Encoding ASCII
     Write-Host "  Config template created: $ENV_FILE" -ForegroundColor Green
-    Write-Host "  !!! Please fill in: JWT_SECRET, USERS_DB_URL, OIS_* etc." -ForegroundColor Yellow
+    Write-Host "  !!! Please fill in: JWT_SECRET, all AI00_*_DB_URL values, USERS_DB_URL, OIS_* etc." -ForegroundColor Yellow
 } else {
     Write-Host "  Config already exists, skip: $ENV_FILE" -ForegroundColor Gray
 }

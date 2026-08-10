@@ -62,6 +62,25 @@ class ObjectStorage(Protocol):
     def stat(self, object_key: str) -> tuple[str, int]: ...
 
 
+class ImmutableObjectStorage(Protocol):
+    def put_immutable(self, object_key: str, data: bytes, media_type: str) -> dict | None: ...
+    def get_immutable(self, object_key: str, expected_sha256: str) -> bytes | None: ...
+
+
+class OisImmutableObjectStorage:
+    """Shared ArtifactPort adapter; domains do not import Base OIS internals."""
+
+    def put_immutable(self, object_key: str, data: bytes, media_type: str) -> dict | None:
+        from backend.core.ois_storage import put_immutable
+
+        return put_immutable(object_key, data, media_type)
+
+    def get_immutable(self, object_key: str, expected_sha256: str) -> bytes | None:
+        from backend.core.ois_storage import get_immutable
+
+        return get_immutable(object_key, expected_sha256)
+
+
 class InMemoryObjectStorage:
     def __init__(self) -> None:
         self._objects: dict[str, bytes] = {}
@@ -474,6 +493,7 @@ def _scopes_allow(granted: tuple[str, ...], requested: tuple[str, ...]) -> bool:
 __all__ = [
     "ArtifactAuthorizationError", "ArtifactError", "ArtifactIntegrityError",
     "ArtifactRecord", "ArtifactService", "ArtifactStore", "InMemoryArtifactStore",
-    "InMemoryObjectStorage", "ObjectStorage", "OisObjectStorage", "SqlArtifactStore",
+    "ImmutableObjectStorage", "InMemoryObjectStorage", "ObjectStorage",
+    "OisImmutableObjectStorage", "OisObjectStorage", "SqlArtifactStore",
     "UploadSession",
 ]

@@ -52,6 +52,8 @@ def ready(request: Request):
         "AI00_AGENT_DB_URL",
         "AI00_SIMULATION_DB_URL",
         "AI00_DEVICE_DB_URL",
+        "AI00_PROJECT_MANAGEMENT_DB_URL",
+        "AI00_KNOWLEDGE_DB_URL",
     )
     missing_urls = [name for name in required_urls if not os.getenv(name, "").strip()]
     checks["domain_db_config"] = "ok" if not missing_urls else "missing: " + ", ".join(missing_urls)

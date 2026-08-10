@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_9322bdfe651224292d37be91bcb0f647"
+    "version": "rel_fcfe3a6edf64a6840ae4d616cdd6524a"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -279,7 +279,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -514,7 +514,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -757,7 +757,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -1004,7 +1004,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -1255,7 +1255,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -1490,7 +1490,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -1725,7 +1725,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -1964,7 +1964,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -2203,7 +2203,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -2440,7 +2440,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -2681,7 +2681,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -2928,7 +2928,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -3183,7 +3183,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -3414,7 +3414,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -3641,7 +3641,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -3872,7 +3872,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -4103,7 +4103,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -4340,7 +4340,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.compare",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -4571,7 +4571,7 @@
           }
         },
         "summary": "craft.pbom.snapshot.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -4795,7 +4795,7 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -4809,7 +4809,42 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "attachments": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "document_gid": {
+                          "type": "string"
+                        },
+                        "revision_gid": {
+                          "type": "string"
+                        },
+                        "summary": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "document_gid",
+                        "revision_gid"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "concept_refs": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 100,
+                    "type": "array"
+                  },
                   "limit": {
+                    "maximum": 10,
+                    "minimum": 1,
                     "type": "integer"
                   },
                   "query": {
@@ -4894,8 +4929,56 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "items": {},
-                            "query": {}
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "document_gid": {
+                                    "type": "string"
+                                  },
+                                  "document_ref": {
+                                    "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "retrieval_method": {
+                                    "type": "string"
+                                  },
+                                  "revision_gid": {
+                                    "type": "string"
+                                  },
+                                  "revision_ref": {
+                                    "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "summary": {
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "document_ref",
+                                  "revision_ref",
+                                  "document_gid",
+                                  "revision_gid",
+                                  "retrieval_method"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 10,
+                              "type": "array"
+                            },
+                            "query": {
+                              "type": "string"
+                            }
                           },
                           "required": [
                             "items",
@@ -5028,7 +5111,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -5042,10 +5125,32 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "markdown": {},
-                  "slug": {},
-                  "space_gid": {},
-                  "title": {}
+                  "change_summary": {
+                    "maxLength": 2048,
+                    "type": "string"
+                  },
+                  "markdown": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "slug": {
+                    "pattern": "^[a-z0-9][a-z0-9._-]{0,254}$",
+                    "type": "string"
+                  },
+                  "space_gid": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "visibility": {
+                    "enum": [
+                      "team"
+                    ],
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "space_gid",
@@ -5130,7 +5235,57 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "content_sha256": {
+                              "type": "string"
+                            },
+                            "document_gid": {
+                              "type": "string"
+                            },
+                            "object_key": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "revision_gid": {
+                              "type": "string"
+                            },
+                            "revision_no": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "revision_ref": {
+                              "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "space_gid": {
+                              "type": "string"
+                            },
+                            "space_ref": {
+                              "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "tenant_gid": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "revision_ref",
+                            "space_ref",
+                            "document_gid",
+                            "revision_gid",
+                            "revision_no",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -5258,7 +5413,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -5272,9 +5427,15 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "document_gid": {},
-                  "from_revision_gid": {},
-                  "to_revision_gid": {}
+                  "document_gid": {
+                    "type": "string"
+                  },
+                  "from_revision_gid": {
+                    "type": "string"
+                  },
+                  "to_revision_gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "document_gid",
@@ -5358,7 +5519,39 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "diff": {
+                              "maxLength": 200000,
+                              "type": "string"
+                            },
+                            "document_gid": {
+                              "type": "string"
+                            },
+                            "document_ref": {
+                              "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "from_revision_gid": {
+                              "type": "string"
+                            },
+                            "from_revision_ref": {
+                              "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "to_revision_gid": {
+                              "type": "string"
+                            },
+                            "to_revision_ref": {
+                              "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "document_ref",
+                            "from_revision_ref",
+                            "to_revision_ref",
+                            "diff"
+                          ],
                           "type": "object"
                         },
                         {
@@ -5486,7 +5679,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -5500,7 +5693,12 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "document_gid": {}
+                  "document_gid": {
+                    "type": "string"
+                  },
+                  "revision_gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "document_gid"
@@ -5582,7 +5780,60 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "content_sha256": {
+                              "type": "string"
+                            },
+                            "document_gid": {
+                              "type": "string"
+                            },
+                            "markdown": {
+                              "type": "string"
+                            },
+                            "object_key": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "revision_gid": {
+                              "type": "string"
+                            },
+                            "revision_no": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "revision_ref": {
+                              "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "space_gid": {
+                              "type": "string"
+                            },
+                            "space_ref": {
+                              "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "tenant_gid": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "revision_ref",
+                            "space_ref",
+                            "document_gid",
+                            "revision_gid",
+                            "revision_no",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -5710,7 +5961,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -5724,7 +5975,14 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "document_gid": {}
+                  "document_gid": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
                 },
                 "required": [
                   "document_gid"
@@ -5806,7 +6064,111 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "document_gid": {
+                              "type": "string"
+                            },
+                            "document_ref": {
+                              "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "base_revision_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "byte_size": {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "content_sha256": {
+                                    "type": "string"
+                                  },
+                                  "created_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "created_by": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "document_gid": {
+                                    "type": "string"
+                                  },
+                                  "document_ref": {
+                                    "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "object_ref": {
+                                    "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "restored_from_revision_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "revision_gid": {
+                                    "type": "string"
+                                  },
+                                  "revision_no": {
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  "state": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "object_ref",
+                                  "document_ref",
+                                  "document_gid",
+                                  "revision_gid",
+                                  "revision_no",
+                                  "state"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 200,
+                              "type": "array"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "document_ref",
+                            "document_gid",
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -5934,7 +6296,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -5948,9 +6310,15 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "base_revision_gid": {},
-                  "document_gid": {},
-                  "target_revision_gid": {}
+                  "base_revision_gid": {
+                    "type": "string"
+                  },
+                  "document_gid": {
+                    "type": "string"
+                  },
+                  "target_revision_gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "document_gid",
@@ -6034,7 +6402,57 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "content_sha256": {
+                              "type": "string"
+                            },
+                            "document_gid": {
+                              "type": "string"
+                            },
+                            "object_key": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "revision_gid": {
+                              "type": "string"
+                            },
+                            "revision_no": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "revision_ref": {
+                              "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "space_gid": {
+                              "type": "string"
+                            },
+                            "space_ref": {
+                              "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "tenant_gid": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "revision_ref",
+                            "space_ref",
+                            "document_gid",
+                            "revision_gid",
+                            "revision_no",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -6162,7 +6580,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -6176,9 +6594,24 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "base_revision_gid": {},
-                  "document_gid": {},
-                  "markdown": {}
+                  "base_revision_gid": {
+                    "type": "string"
+                  },
+                  "change_summary": {
+                    "maxLength": 2048,
+                    "type": "string"
+                  },
+                  "document_gid": {
+                    "type": "string"
+                  },
+                  "markdown": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 512,
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "document_gid",
@@ -6262,7 +6695,57 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "content_sha256": {
+                              "type": "string"
+                            },
+                            "document_gid": {
+                              "type": "string"
+                            },
+                            "object_key": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "revision_gid": {
+                              "type": "string"
+                            },
+                            "revision_no": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "revision_ref": {
+                              "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "space_gid": {
+                              "type": "string"
+                            },
+                            "space_ref": {
+                              "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "tenant_gid": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "revision_ref",
+                            "space_ref",
+                            "document_gid",
+                            "revision_gid",
+                            "revision_no",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -6390,7 +6873,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -6404,7 +6887,14 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "document_gid": {}
+                  "document_gid": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
                 },
                 "required": [
                   "document_gid"
@@ -6486,7 +6976,111 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "document_gid": {
+                              "type": "string"
+                            },
+                            "document_ref": {
+                              "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "base_revision_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "byte_size": {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "content_sha256": {
+                                    "type": "string"
+                                  },
+                                  "created_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "created_by": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "document_gid": {
+                                    "type": "string"
+                                  },
+                                  "document_ref": {
+                                    "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "object_ref": {
+                                    "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "restored_from_revision_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "revision_gid": {
+                                    "type": "string"
+                                  },
+                                  "revision_no": {
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  "state": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "object_ref",
+                                  "document_ref",
+                                  "document_gid",
+                                  "revision_gid",
+                                  "revision_no",
+                                  "state"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 200,
+                              "type": "array"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "document_ref",
+                            "document_gid",
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -6614,7 +7208,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -6628,9 +7222,15 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "base_revision_gid": {},
-                  "document_gid": {},
-                  "target_revision_gid": {}
+                  "base_revision_gid": {
+                    "type": "string"
+                  },
+                  "document_gid": {
+                    "type": "string"
+                  },
+                  "target_revision_gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "document_gid",
@@ -6714,7 +7314,57 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "content_sha256": {
+                              "type": "string"
+                            },
+                            "document_gid": {
+                              "type": "string"
+                            },
+                            "object_key": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "revision_gid": {
+                              "type": "string"
+                            },
+                            "revision_no": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "revision_ref": {
+                              "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "space_gid": {
+                              "type": "string"
+                            },
+                            "space_ref": {
+                              "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "tenant_gid": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "revision_ref",
+                            "space_ref",
+                            "document_gid",
+                            "revision_gid",
+                            "revision_no",
+                            "state"
+                          ],
                           "type": "object"
                         },
                         {
@@ -6842,7 +7492,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -6856,7 +7506,9 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "gid": {}
+                  "gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "gid"
@@ -6938,7 +7590,133 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "attachments": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "byte_size": {
+                                    "type": "integer"
+                                  },
+                                  "media_type": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "object_key": {
+                                    "type": "string"
+                                  },
+                                  "sha256": {
+                                    "type": "string"
+                                  },
+                                  "url": {
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "content_md": {
+                              "type": "string"
+                            },
+                            "content_preview": {
+                              "type": "string"
+                            },
+                            "content_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "document_gid": {
+                                  "type": "string"
+                                },
+                                "object_key": {
+                                  "type": "string"
+                                },
+                                "ois_url": {
+                                  "type": "string"
+                                },
+                                "proposal_gid": {
+                                  "type": "string"
+                                },
+                                "revision_gid": {
+                                  "type": "string"
+                                },
+                                "sha256": {
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "creator_gid": {
+                              "type": "string"
+                            },
+                            "display_id": {
+                              "type": "string"
+                            },
+                            "entry_type": {
+                              "type": "string"
+                            },
+                            "gid": {
+                              "type": "string"
+                            },
+                            "maintainer_gid": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-entry:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "related_operation_gids": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "related_part_nos": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "share_scope": {
+                              "type": "string"
+                            },
+                            "source_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "source_label": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "type": "string"
+                            },
+                            "tags": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "gid",
+                            "title",
+                            "status"
+                          ],
                           "type": "object"
                         },
                         {
@@ -7066,7 +7844,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -7079,7 +7857,16 @@
             "application/json": {
               "schema": {
                 "additionalProperties": false,
-                "properties": {},
+                "properties": {
+                  "run_gid": {
+                    "type": "string"
+                  },
+                  "scan_limit": {
+                    "maximum": 100000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
                 "type": "object"
               }
             }
@@ -7157,7 +7944,289 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "inventory": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "eligible": {
+                                  "type": "integer"
+                                },
+                                "eligible_bytes": {
+                                  "type": "integer"
+                                },
+                                "migrated": {
+                                  "type": "integer"
+                                },
+                                "other_tenant": {
+                                  "type": "integer"
+                                },
+                                "pending": {
+                                  "type": "integer"
+                                },
+                                "quarantined": {
+                                  "type": "integer"
+                                },
+                                "scan_limit": {
+                                  "type": "integer"
+                                },
+                                "scan_truncated": {
+                                  "type": "boolean"
+                                },
+                                "scanned": {
+                                  "type": "integer"
+                                },
+                                "source_retained": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "content_sha256": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "document_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "entry_gid": {
+                                    "type": "string"
+                                  },
+                                  "error_message": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "finished_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "object_key": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "revision_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "source_sha256": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "started_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "status": {
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "runs": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "actor_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "copied_count": {
+                                    "anyOf": [
+                                      {
+                                        "type": "integer"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "created_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "failed_count": {
+                                    "anyOf": [
+                                      {
+                                        "type": "integer"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "finished_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "gid": {
+                                    "type": "string"
+                                  },
+                                  "last_error": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "skipped_count": {
+                                    "anyOf": [
+                                      {
+                                        "type": "integer"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "source_bytes": {
+                                    "anyOf": [
+                                      {
+                                        "type": "integer"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "source_count": {
+                                    "anyOf": [
+                                      {
+                                        "type": "integer"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "space_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "started_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "status": {
+                                    "type": "string"
+                                  },
+                                  "verified_count": {
+                                    "anyOf": [
+                                      {
+                                        "type": "integer"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "selected_run_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "inventory",
+                            "runs",
+                            "items"
+                          ],
                           "type": "object"
                         },
                         {
@@ -7285,7 +8354,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -7383,7 +8452,153 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "base_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "content_md": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "creator_gid": {
+                              "type": "string"
+                            },
+                            "gid": {
+                              "type": "string"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-proposal:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "ois_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "proposal_gid": {
+                              "type": "string"
+                            },
+                            "published_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "published_ref": {
+                              "anyOf": [
+                                {
+                                  "pattern": "^knowledge-entry:[A-Za-z0-9_.:-]+$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "review_note": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reviewed_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reviewer_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "publishing",
+                                "approved",
+                                "rejected"
+                              ],
+                              "type": "string"
+                            },
+                            "summary": {
+                              "type": "string"
+                            },
+                            "tags": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "team_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "status"
+                          ],
                           "type": "object"
                         },
                         {
@@ -7511,7 +8726,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -7609,7 +8824,175 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "base_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "content_md": {
+                                    "type": "string"
+                                  },
+                                  "created_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "creator_gid": {
+                                    "type": "string"
+                                  },
+                                  "gid": {
+                                    "type": "string"
+                                  },
+                                  "message": {
+                                    "type": "string"
+                                  },
+                                  "object_ref": {
+                                    "pattern": "^knowledge-proposal:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "ois_url": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "proposal_gid": {
+                                    "type": "string"
+                                  },
+                                  "published_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "published_ref": {
+                                    "anyOf": [
+                                      {
+                                        "pattern": "^knowledge-entry:[A-Za-z0-9_.:-]+$",
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "review_note": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "reviewed_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "reviewer_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "status": {
+                                    "enum": [
+                                      "pending",
+                                      "publishing",
+                                      "approved",
+                                      "rejected"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "summary": {
+                                    "type": "string"
+                                  },
+                                  "tags": {
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "team_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "object_ref",
+                                  "status"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 200,
+                              "type": "array"
+                            },
+                            "status": {
+                              "type": "string"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total",
+                            "status"
+                          ],
                           "type": "object"
                         },
                         {
@@ -7737,7 +9120,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -7832,7 +9215,128 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "attempts": {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  "created_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "gid": {
+                                    "type": "string"
+                                  },
+                                  "idempotent": {
+                                    "type": "boolean"
+                                  },
+                                  "last_error": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "next_retry_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "object_ref": {
+                                    "pattern": "^knowledge-outbox:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "outbox_gid": {
+                                    "type": "string"
+                                  },
+                                  "proposal_gid": {
+                                    "type": "string"
+                                  },
+                                  "proposal_ref": {
+                                    "pattern": "^knowledge-proposal:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "published_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "published_ref": {
+                                    "anyOf": [
+                                      {
+                                        "pattern": "^knowledge-entry:[A-Za-z0-9_.:-]+$",
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "sha256": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "status": {
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "object_ref",
+                                  "status"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 200,
+                              "type": "array"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -7960,7 +9464,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -8058,7 +9562,110 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "attempts": {
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "created_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "gid": {
+                              "type": "string"
+                            },
+                            "idempotent": {
+                              "type": "boolean"
+                            },
+                            "last_error": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "next_retry_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-outbox:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "outbox_gid": {
+                              "type": "string"
+                            },
+                            "proposal_gid": {
+                              "type": "string"
+                            },
+                            "proposal_ref": {
+                              "pattern": "^knowledge-proposal:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "published_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "published_ref": {
+                              "anyOf": [
+                                {
+                                  "pattern": "^knowledge-entry:[A-Za-z0-9_.:-]+$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "sha256": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "status": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "status"
+                          ],
                           "type": "object"
                         },
                         {
@@ -8186,7 +9793,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -8201,12 +9808,17 @@
                 "additionalProperties": false,
                 "properties": {
                   "decision": {
+                    "enum": [
+                      "approved",
+                      "rejected"
+                    ],
                     "type": "string"
                   },
                   "proposal_gid": {
                     "type": "string"
                   },
                   "review_note": {
+                    "maxLength": 4000,
                     "type": "string"
                   }
                 },
@@ -8291,7 +9903,153 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "base_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "content_md": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "creator_gid": {
+                              "type": "string"
+                            },
+                            "gid": {
+                              "type": "string"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-proposal:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "ois_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "proposal_gid": {
+                              "type": "string"
+                            },
+                            "published_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "published_ref": {
+                              "anyOf": [
+                                {
+                                  "pattern": "^knowledge-entry:[A-Za-z0-9_.:-]+$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "review_note": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reviewed_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reviewer_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "publishing",
+                                "approved",
+                                "rejected"
+                              ],
+                              "type": "string"
+                            },
+                            "summary": {
+                              "type": "string"
+                            },
+                            "tags": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "team_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "status"
+                          ],
                           "type": "object"
                         },
                         {
@@ -8419,7 +10177,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -8443,6 +10201,10 @@
                     "type": "string"
                   },
                   "tags": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 50,
                     "type": "array"
                   },
                   "title": {
@@ -8530,7 +10292,153 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "base_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "content_md": {
+                              "type": "string"
+                            },
+                            "created_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "creator_gid": {
+                              "type": "string"
+                            },
+                            "gid": {
+                              "type": "string"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-proposal:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "ois_url": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "proposal_gid": {
+                              "type": "string"
+                            },
+                            "published_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "published_ref": {
+                              "anyOf": [
+                                {
+                                  "pattern": "^knowledge-entry:[A-Za-z0-9_.:-]+$",
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "review_note": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reviewed_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "reviewer_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "publishing",
+                                "approved",
+                                "rejected"
+                              ],
+                              "type": "string"
+                            },
+                            "summary": {
+                              "type": "string"
+                            },
+                            "tags": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "team_gid": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "status"
+                          ],
                           "type": "object"
                         },
                         {
@@ -8658,7 +10566,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -8671,7 +10579,19 @@
             "application/json": {
               "schema": {
                 "additionalProperties": false,
-                "properties": {},
+                "properties": {
+                  "entry_type": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 100,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "query": {
+                    "type": "string"
+                  }
+                },
                 "type": "object"
               }
             }
@@ -8749,7 +10669,155 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "attachments": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "byte_size": {
+                                          "type": "integer"
+                                        },
+                                        "media_type": {
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "object_key": {
+                                          "type": "string"
+                                        },
+                                        "sha256": {
+                                          "type": "string"
+                                        },
+                                        "url": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "content_md": {
+                                    "type": "string"
+                                  },
+                                  "content_preview": {
+                                    "type": "string"
+                                  },
+                                  "content_ref": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "document_gid": {
+                                        "type": "string"
+                                      },
+                                      "object_key": {
+                                        "type": "string"
+                                      },
+                                      "ois_url": {
+                                        "type": "string"
+                                      },
+                                      "proposal_gid": {
+                                        "type": "string"
+                                      },
+                                      "revision_gid": {
+                                        "type": "string"
+                                      },
+                                      "sha256": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "object"
+                                  },
+                                  "creator_gid": {
+                                    "type": "string"
+                                  },
+                                  "display_id": {
+                                    "type": "string"
+                                  },
+                                  "entry_type": {
+                                    "type": "string"
+                                  },
+                                  "gid": {
+                                    "type": "string"
+                                  },
+                                  "maintainer_gid": {
+                                    "type": "string"
+                                  },
+                                  "object_ref": {
+                                    "pattern": "^knowledge-entry:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "related_operation_gids": {
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "related_part_nos": {
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "share_scope": {
+                                    "type": "string"
+                                  },
+                                  "source_gid": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "source_label": {
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "type": "string"
+                                  },
+                                  "tags": {
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "object_ref",
+                                  "gid",
+                                  "title",
+                                  "status"
+                                ],
+                                "type": "object"
+                              },
+                              "maxItems": 100,
+                              "type": "array"
+                            },
+                            "query": {
+                              "type": "string"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total",
+                            "query"
+                          ],
                           "type": "object"
                         },
                         {
@@ -8877,7 +10945,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -8891,7 +10959,17 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "name": {}
+                  "name": {
+                    "maxLength": 512,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "visibility": {
+                    "enum": [
+                      "team"
+                    ],
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "name"
@@ -8973,7 +11051,46 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "created_by": {
+                              "type": "string"
+                            },
+                            "gid": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "object_ref": {
+                              "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+                              "type": "string"
+                            },
+                            "tenant_gid": {
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "visibility": {
+                              "enum": [
+                                "team"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "object_ref",
+                            "gid",
+                            "name",
+                            "visibility"
+                          ],
                           "type": "object"
                         },
                         {
@@ -9101,7 +11218,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -9192,7 +11309,63 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "created_by": {
+                                    "type": "string"
+                                  },
+                                  "gid": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "object_ref": {
+                                    "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "tenant_gid": {
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "visibility": {
+                                    "enum": [
+                                      "team"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "object_ref",
+                                  "gid",
+                                  "name",
+                                  "visibility"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -9320,7 +11493,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -9411,7 +11584,63 @@
                       "anyOf": [
                         {
                           "additionalProperties": false,
-                          "properties": {},
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "created_by": {
+                                    "type": "string"
+                                  },
+                                  "gid": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "object_ref": {
+                                    "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
+                                    "type": "string"
+                                  },
+                                  "tenant_gid": {
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "visibility": {
+                                    "enum": [
+                                      "team"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "object_ref",
+                                  "gid",
+                                  "name",
+                                  "visibility"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "total": {
+                              "minimum": 0,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total"
+                          ],
                           "type": "object"
                         },
                         {
@@ -9539,7 +11768,7 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -9765,7 +11994,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -10065,7 +12294,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -10363,7 +12592,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -10626,7 +12855,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -10862,7 +13091,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -11158,7 +13387,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -11454,7 +13683,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -11749,7 +13978,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -12019,7 +14248,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -12538,7 +14767,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -12834,7 +15063,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -13139,7 +15368,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -13452,7 +15681,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -13679,7 +15908,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -13906,7 +16135,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -14143,7 +16372,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -14370,7 +16599,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -14597,7 +16826,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -14826,7 +17055,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -15052,7 +17281,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -15278,7 +17507,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -15513,7 +17742,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -15740,7 +17969,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -15970,7 +18199,7 @@
           }
         },
         "summary": "plugin.upgrade.finish",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -16207,7 +18436,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -16431,7 +18660,7 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -16651,7 +18880,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -16875,7 +19104,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -17094,7 +19323,7 @@
           }
         },
         "summary": "system.echo",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -17320,7 +19549,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -17546,7 +19775,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -17770,7 +19999,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -17994,7 +20223,7 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -18213,7 +20442,7 @@
           }
         },
         "summary": "system.worker.outbox.health",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -18440,7 +20669,7 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -18673,7 +20902,7 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -18900,7 +21129,7 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -19131,7 +21360,7 @@
           }
         },
         "summary": "vismockup.open_file",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -19358,7 +21587,7 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -19590,7 +21819,7 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     },
@@ -19825,7 +22054,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_9322bdfe651224292d37be91bcb0f647",
+        "x-ai00-catalog-release": "rel_fcfe3a6edf64a6840ae4d616cdd6524a",
         "x-ai00-major-version": 1
       }
     }

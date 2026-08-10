@@ -62,6 +62,12 @@
 # Knowledge
 /backend/knowledge/** @ai00/knowledge-maintainers
 /backend/capabilities/knowledge_* @ai00/knowledge-maintainers
+/backend/capabilities/proposals_next.py @ai00/knowledge-maintainers
+/backend/capabilities/proposal_query_next.py @ai00/knowledge-maintainers
+/backend/capabilities/review_next.py @ai00/knowledge-maintainers
+/backend/capabilities/outbox_next.py @ai00/knowledge-maintainers
+/backend/capabilities/outbox_retry_next.py @ai00/knowledge-maintainers
+/backend/domain_ports/knowledge.py @ai00/knowledge-maintainers
 /backend/db/migrations/202608030007_knowledge_proposal_outbox.sql @ai00/knowledge-maintainers
 /backend/db/migrations/202608040003_knowledge_markdown_revisions.sql @ai00/knowledge-maintainers
 /backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql @ai00/knowledge-maintainers
@@ -84,3 +90,4 @@
 /backend/domain_ports/ontology.py @ai00/ontology-maintainers
 /backend/capability_v2/revision/ontology_adapter.py @ai00/ontology-maintainers
 /backend/domain_ports/project_management.py @ai00/project-management-maintainers
+/backend/domain_ports/knowledge.py @ai00/knowledge-maintainers

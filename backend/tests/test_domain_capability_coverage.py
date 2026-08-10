@@ -14,7 +14,10 @@ DOMAINS = {
     "Knowledge": "knowledge",
     "Craft": "craft",
 }
-MIGRATED_DOMAINS = {"Project Management": "project_management"}
+MIGRATED_DOMAINS = {
+    "Project Management": "project_management",
+    "Knowledge": "knowledge",
+}
 
 
 def _documents() -> tuple[list[dict], dict[str, dict]]:
@@ -76,6 +79,7 @@ def test_stable_domain_capabilities_are_available_to_plugins_and_agents(domain: 
         capability_id
         for capability_id in _stable_targets(domain, records)
         if capability_id in descriptors
+        and descriptors[capability_id]["lifecycle_status"] != "deprecated"
         and not (
             descriptors[capability_id]["exposure"].get("plugin")
             and descriptors[capability_id]["exposure"].get("agent")

@@ -83,6 +83,12 @@ def _descriptor_document(item: CapabilityDescriptorV2) -> dict:
     # Preserve hashes of releases created before this additive optional field existed.
     if document.get("agent_output_schema") is None:
         document.pop("agent_output_schema", None)
+    if not document.get("domain_errors"):
+        document.pop("domain_errors", None)
+    if not document.get("domain_errors_complete"):
+        document.pop("domain_errors_complete", None)
+    if document.get("expected_version_payload_path") is None:
+        document.pop("expected_version_payload_path", None)
     return document
 
 

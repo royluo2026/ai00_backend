@@ -105,7 +105,7 @@ def test_authenticated_tenant_member_can_revise_without_document_acl_predicate()
     }
     context = CapabilityContext(user_gid="member-2", team_gid="t1", request_id="req-1")
 
-    with patch("backend.db.connection.get_conn", return_value=connection), patch(
+    with patch("backend.knowledge.data.connection.get_knowledge_conn", return_value=connection), patch(
         "backend.capabilities.knowledge_documents_next.next_gid",
         create=True,
         side_effect=["r2"],

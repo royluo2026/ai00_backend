@@ -52,6 +52,7 @@ def evaluate(env: dict[str, str] | None = None) -> list[Check]:
     database_urls = (
         "AI00_DDL_DB_URL", "USERS_DB_URL", "AI00_CRAFT_DB_URL",
         "AI00_SIMULATION_DB_URL", "AI00_AGENT_DB_URL", "AI00_DEVICE_DB_URL",
+        "AI00_PROJECT_MANAGEMENT_DB_URL", "AI00_KNOWLEDGE_DB_URL",
     )
     for name in database_urls:
         value = env.get(name, "").strip()

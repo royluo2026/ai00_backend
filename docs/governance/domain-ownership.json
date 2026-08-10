@@ -4,6 +4,7 @@
   "shared_import_prefixes": [
     "backend.capability_v2",
     "backend.capabilities.models_next",
+    "backend.domain_ports",
     "backend.contracts",
     "backend.platform_sdk"
   ],
@@ -132,8 +133,24 @@
       "maintainers": ["@ai00/knowledge-maintainers"],
       "artifact": "ai00-knowledge-domain",
       "module_prefixes": ["backend.knowledge"],
-      "code_paths": ["backend/knowledge/**", "backend/capabilities/knowledge_*"],
-      "provider_paths": ["backend/capabilities/knowledge_*"],
+      "code_paths": [
+        "backend/knowledge/**",
+        "backend/domain_ports/knowledge.py",
+        "backend/capabilities/knowledge_*",
+        "backend/capabilities/proposals_next.py",
+        "backend/capabilities/proposal_query_next.py",
+        "backend/capabilities/review_next.py",
+        "backend/capabilities/outbox_next.py",
+        "backend/capabilities/outbox_retry_next.py"
+      ],
+      "provider_paths": [
+        "backend/capabilities/knowledge_*",
+        "backend/capabilities/proposals_next.py",
+        "backend/capabilities/proposal_query_next.py",
+        "backend/capabilities/review_next.py",
+        "backend/capabilities/outbox_next.py",
+        "backend/capabilities/outbox_retry_next.py"
+      ],
       "migration_paths": [
         "backend/db/migrations/202608030007_knowledge_proposal_outbox.sql",
         "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql",
