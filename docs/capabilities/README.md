@@ -2,8 +2,8 @@
 
 本目录由不可变 Catalog Release 自动生成，不接受手工修改。
 
-- Catalog Release：`rel_7263b81c7344960ad9df52f6fb8fdd30`
-- Catalog Hash：`sha256:7263b81c7344960ad9df52f6fb8fdd30364aeea65bad7d5a231c5608ba00ef57`
+- Catalog Release：`rel_8401bc95baae88e2d2e45d16bda37e94`
+- Catalog Hash：`sha256:8401bc95baae88e2d2e45d16bda37e94b80b35a65b97be1c2c84a1086329872c`
 - 描述符数量：82
 
 ## 重要边界
@@ -32,7 +32,7 @@
 |---|---:|
 | web | 82 |
 | plugin | 3 |
-| agent | 0 |
+| agent | 49 |
 | api | 82 |
 | mcp | 0 |
 | worker | 0 |

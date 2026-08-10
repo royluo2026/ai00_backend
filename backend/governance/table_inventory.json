@@ -1,7 +1,27 @@
 {
   "registry_version": 1,
-  "table_count": 158,
+  "table_count": 162,
   "tables": [
+    {
+      "table": "workmanship_agent_run_approvals",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_agent_run_participants",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_agent_run_tool_results",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_agent_runs",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
     {
       "table": "workmanship_app_ai_audit_logs",
       "owner": "agent",

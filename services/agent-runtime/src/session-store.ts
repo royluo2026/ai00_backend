@@ -9,17 +9,11 @@ export interface SessionMeta { gid: string; channelType: ChannelType; createdAt:
 export class SessionStore {
   private readonly pool: Pool;
   constructor(databaseUrl: string, private readonly encryptionKey: Buffer) {
-    this.pool = mysql.createPool({ uri: databaseUrl, connectionLimit: 10, enableKeepAlive: true });
+    this.pool = mysql.createPool({ uri: databaseUrl, connectionLimit: 10, enableKeepAlive: true, timezone: "Z" });
   }
   async initialize(): Promise<void> {
-    await this.pool.execute(`CREATE TABLE IF NOT EXISTS workmanship_agent_sessions (
-      gid VARCHAR(64) PRIMARY KEY, owner_user_gid VARCHAR(128) NOT NULL,
-      channel_type VARCHAR(32) NOT NULL, external_channel_hash CHAR(64) NULL,
-      state_ciphertext MEDIUMTEXT NOT NULL,
-      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      INDEX idx_agent_session_owner (owner_user_gid, updated_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+    // Schema is deployment-owned. Runtime startup deliberately has no DDL authority.
+    await this.pool.query("SELECT 1 FROM workmanship_agent_sessions LIMIT 0");
   }
   async create(ownerUserGid: string, channelType: ChannelType = "web", externalChannelId?: string): Promise<SessionMeta> {
     const gid = `as_${randomUUID().replaceAll("-", "")}`;

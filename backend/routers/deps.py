@@ -377,11 +377,20 @@ def build_capability_authorization_grants(
     if profile.get("org_role") == "super_admin":
         resource_scopes.add("*")
         data_scopes.add("*")
+    capability_scopes = ("*",) if consumer_type in {"web", "api"} else ()
+    policy_version = "legacy-rbac-to-abac-v1"
+    if consumer_type in {"agent", "mcp"}:
+        if identity is None or identity.delegation is None:
+            raise PermissionError("delegation identity is required")
+        capability_scopes = identity.delegation.capability_scopes
+        resource_scopes &= set(identity.delegation.resource_scopes)
+        data_scopes &= set(identity.delegation.data_scopes)
+        policy_version = f"delegation-v2:{identity.delegation.delegation_id}"
     return AuthorizationGrants(
         permissions=tuple(sorted(profile.get("permissions", ()))),
-        capability_scopes=("*",) if consumer_type in {"web", "api"} else (),
+        capability_scopes=tuple(sorted(capability_scopes)),
         resource_scopes=tuple(sorted(resource_scopes)),
         data_scopes=tuple(sorted(data_scopes)),
-        policy_version="legacy-rbac-to-abac-v1",
+        policy_version=policy_version,
         tenant_id=tenant_id,
     )

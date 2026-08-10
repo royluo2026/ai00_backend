@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_7263b81c7344960ad9df52f6fb8fdd30",
-  "catalog_hash": "sha256:7263b81c7344960ad9df52f6fb8fdd30364aeea65bad7d5a231c5608ba00ef57",
+  "release_id": "rel_8401bc95baae88e2d2e45d16bda37e94",
+  "catalog_hash": "sha256:8401bc95baae88e2d2e45d16bda37e94b80b35a65b97be1c2c84a1086329872c",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -17,7 +17,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -44,7 +44,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -140,7 +144,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -186,7 +190,26 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "preview_gid",
+          "version_gid",
+          "base_revision",
+          "before_hash",
+          "after_hash",
+          "expires_at"
+        ],
+        "properties": {
+          "preview_gid": {},
+          "version_gid": {},
+          "base_revision": {},
+          "before_hash": {},
+          "after_hash": {},
+          "expires_at": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:aaec092c934e40de725cc87a5ad5d1f157883c19a79453740a0813a6291efe18",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -215,7 +238,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -265,7 +288,32 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "contract_id",
+          "contract_version",
+          "official",
+          "source",
+          "nodes",
+          "operations",
+          "dependencies",
+          "conditions",
+          "content_hash"
+        ],
+        "properties": {
+          "contract_id": {},
+          "contract_version": {},
+          "official": {},
+          "source": {},
+          "nodes": {},
+          "operations": {},
+          "dependencies": {},
+          "conditions": {},
+          "content_hash": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:5962a703875e4e1852c0a97a168bca0b661a1b5f143b7f40b55991a6732ebf54",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -294,7 +342,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -348,7 +396,32 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "contract_id",
+          "contract_version",
+          "official",
+          "source",
+          "nodes",
+          "operations",
+          "dependencies",
+          "conditions",
+          "content_hash"
+        ],
+        "properties": {
+          "contract_id": {},
+          "contract_version": {},
+          "official": {},
+          "source": {},
+          "nodes": {},
+          "operations": {},
+          "dependencies": {},
+          "conditions": {},
+          "content_hash": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:a7f7e1e6498def038cdbe7714dc0fd0397d0b30e609ebf178f5ccf2f4da3f6ae",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -377,7 +450,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -415,7 +488,22 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "import_preview_gid",
+          "content_hash",
+          "entry_count",
+          "expires_at"
+        ],
+        "properties": {
+          "import_preview_gid": {},
+          "content_hash": {},
+          "entry_count": {},
+          "expires_at": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:de6bc2000aab9aa846dd05316d6b4891d501f1511444dd409c047b9bfbd5c8a8",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -444,7 +532,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -482,7 +570,20 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "revision",
+          "items"
+        ],
+        "properties": {
+          "version_gid": {},
+          "revision": {},
+          "items": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:c2d1e56e79a983b7d70c5955b228cb6f800f2e880889db0287b195e000beef32",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -582,7 +683,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -624,7 +725,24 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "comparability",
+          "added",
+          "removed",
+          "moved",
+          "changed"
+        ],
+        "properties": {
+          "comparability": {},
+          "added": {},
+          "removed": {},
+          "moved": {},
+          "changed": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0dae93cbe7d873d8b4ced31dbcbd016f86258d50ba809c25bdab5df26c775c96",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -722,7 +840,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -766,7 +884,26 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "revision",
+          "family_gid",
+          "project_gid",
+          "lifecycle",
+          "content_hash"
+        ],
+        "properties": {
+          "version_gid": {},
+          "revision": {},
+          "family_gid": {},
+          "project_gid": {},
+          "lifecycle": {},
+          "content_hash": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:f78ba790281fbf4da8f94cdfbf859abe45700b9dbd80a88209c97a28fec06140",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -795,7 +932,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -845,7 +982,20 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "properties": {
+          "items": {
+            "type": "array"
+          },
+          "next_cursor": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:ccf6bc6947bbe7234952e458a91631da1d452b8cf232bc621bc202d05c970b86",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -874,7 +1024,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -932,7 +1082,34 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "version_gid",
+          "revision",
+          "scope",
+          "work_items",
+          "parts",
+          "tools",
+          "fixtures",
+          "equipment_requirements",
+          "knowledge_refs",
+          "rule_refs"
+        ],
+        "properties": {
+          "version_gid": {},
+          "revision": {},
+          "scope": {},
+          "work_items": {},
+          "parts": {},
+          "tools": {},
+          "fixtures": {},
+          "equipment_requirements": {},
+          "knowledge_refs": {},
+          "rule_refs": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:fcfe3ad8d0f2d493cb86a52a4c9b4f8a3fd4221c32e7e07521222228768fb67d",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -961,7 +1138,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -995,7 +1172,18 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "active_release_gid",
+          "items"
+        ],
+        "properties": {
+          "active_release_gid": {},
+          "items": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:1aa274da4b8a3fcee8bbfaedcc6e1cf530097825f83b8be9d574c2dd34ea7684",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1024,7 +1212,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1054,7 +1242,18 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "active_release_gid",
+          "items"
+        ],
+        "properties": {
+          "active_release_gid": {},
+          "items": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:43322d9804a5c0a6819e61b32367f44afffc2897435609c73585b5412355ac06",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1083,7 +1282,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1117,7 +1316,18 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "active_release_gid",
+          "items"
+        ],
+        "properties": {
+          "active_release_gid": {},
+          "items": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:1aa274da4b8a3fcee8bbfaedcc6e1cf530097825f83b8be9d574c2dd34ea7684",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1146,7 +1356,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1180,7 +1390,18 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "snapshot_gid",
+          "items"
+        ],
+        "properties": {
+          "snapshot_gid": {},
+          "items": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:2eac5bae718dead8e9e4f67777ee9f79ecc35d3e087f2464f44a1a1e266c9bb7",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1209,7 +1430,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1249,7 +1470,22 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "comparability",
+          "added",
+          "removed",
+          "changed"
+        ],
+        "properties": {
+          "comparability": {},
+          "added": {},
+          "removed": {},
+          "changed": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:194dd17db5def8995099cd16b50cb369ef02b816ffe18018b166ae7eb6158328",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1278,7 +1514,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1312,7 +1548,18 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "gid",
+          "part_count"
+        ],
+        "properties": {
+          "gid": {},
+          "part_count": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:482c0bc3beab81237852be2985140043ce6f12cd4a1727df45b791a4515532f8",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1341,7 +1588,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1368,7 +1615,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1397,7 +1648,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1433,7 +1684,18 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "items",
+          "query"
+        ],
+        "properties": {
+          "items": {},
+          "query": {}
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:cbd2339137fed96d8e0fa28fab85ca127d8e834631f096983f468da27fc57773",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1524,7 +1786,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1555,7 +1817,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:1bbcdb6a8b8f26818320f7609a89f282fb3da5a7317e90b00f55c8de0415a533",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1584,7 +1850,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1611,7 +1877,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:4fa5378c8390f30c1b6df66484fc8d5d7d3b95bf9915a6f0e5fdf114af239a89",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1640,7 +1910,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1667,7 +1937,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:4fa5378c8390f30c1b6df66484fc8d5d7d3b95bf9915a6f0e5fdf114af239a89",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1816,7 +2090,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1843,7 +2117,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:4fa5378c8390f30c1b6df66484fc8d5d7d3b95bf9915a6f0e5fdf114af239a89",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1932,7 +2210,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -1959,7 +2237,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:6c35fe6a816e7faaf611578cd5faf73aba2d48e28341089e0742ceb8edaf064d",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1988,7 +2270,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2010,7 +2292,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2039,7 +2325,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2068,7 +2354,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:dd6a850a9a993be664caecc10018af6aed642aebbbd74ace6f860c75c57ed2e6",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2097,7 +2387,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2126,7 +2416,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:8f143cada1407429b846249a248401008d6f503a0e4dd060570d747b1f3269c3",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2155,7 +2449,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2181,7 +2475,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:1034a31abe777915995aacf0ae64f4a618ca1b679b701d8adc33d99992a6df71",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2404,7 +2702,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2426,7 +2724,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2511,7 +2813,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2533,7 +2835,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2562,7 +2868,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2584,7 +2890,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2613,7 +2923,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2642,7 +2952,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0a76234b1111ad7f3c2b657c8688405daac0d1907ca33ecfd77b7bb1efdafda9",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2729,7 +3043,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2756,7 +3070,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:cd01ec0766ee98b11203c9dd326d890f51ba28c7d2ca02844238354ba24b13a5",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2847,7 +3165,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2869,7 +3187,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2898,7 +3220,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -2947,7 +3269,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:ea0c52812936693c338890c34cf94f758fb6babb6d98ddeae17fd1003c7b2ad7",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2976,7 +3302,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -3008,7 +3334,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:bf453a9a6e5b10cb20f83cb6f02944924beb9421d4dc4f34c1452667194e2398",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3037,7 +3367,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -3110,7 +3440,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:2d6bb2461ed198c084eefb42edda6eeb48ee41a72bdb3299bfc4b5b35e12d9c8",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3201,7 +3535,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -3230,7 +3564,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:11dfa0fa31d3b6f1620301e83fb9b2ed29516c47e74a45ac883cd6ef7fa35dc7",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3259,7 +3597,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -3281,7 +3619,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3370,7 +3712,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -3392,7 +3734,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3787,7 +4133,7 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -3816,7 +4162,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:e170a9c1953900bc7e16800051f41c0870713c77cbc78c633ca0e5461d2328bf",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3845,7 +4195,7 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -3874,7 +4224,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:bb88ea9b5c1610243ea5b1339aa555812bf40d66c05e40764b809f5bb053f071",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4160,7 +4514,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -4187,7 +4541,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:e4db2afad3f9fd2d101906d3d8d63a7630e535350e3a13ad32907d2578b0b6bc",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4216,7 +4574,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -4239,7 +4597,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:15961aca8cb6ee2259e6ea275755616228a9c37f094f6f6aa50291aaf4b803c0",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4268,7 +4630,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -4295,7 +4657,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:769caa7b49c4a788bd09b04f0971b01cecbecc178f95206fab59481295319933",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4324,7 +4690,7 @@
       "exposure": {
         "web": true,
         "plugin": true,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -4346,7 +4712,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4433,7 +4803,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -4462,7 +4832,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:62000ddac5d6c1c8b9b47520857f8bfce186037823ea4cd7ac142e4efcf4a885",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4491,7 +4865,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -4518,7 +4892,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:c06f8e28727241209f09e2f0834abba683fc01e88f3c797d23f209b8e420340d",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4547,7 +4925,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -4574,7 +4952,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4603,7 +4985,7 @@
       "exposure": {
         "web": true,
         "plugin": false,
-        "agent": false,
+        "agent": true,
         "api": true,
         "mcp": false,
         "worker": false,
@@ -4625,7 +5007,11 @@
         "properties": {},
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -5084,5 +5470,5 @@
       "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
     }
   ],
-  "created_at": "2026-08-10T08:33:53.621132Z"
+  "created_at": "2026-08-10T09:05:23.759853Z"
 }

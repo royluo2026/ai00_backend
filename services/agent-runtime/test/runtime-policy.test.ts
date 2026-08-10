@@ -21,7 +21,7 @@ test("session state is authenticated encryption", () => {
   assert.deepEqual(open(encoded, key), { messages: ["private"] });
   assert.throws(() => open(encoded.slice(0, -1) + "x", key));
 });
-test("agent discovery is server-filtered and invocation preserves CapabilityResult", async () => {
+test("delegated invocation preserves CapabilityResult", async () => {
   const originalFetch = globalThis.fetch;
   const urls: string[] = [];
   globalThis.fetch = (async (input: string | URL | Request) => {
@@ -29,19 +29,17 @@ test("agent discovery is server-filtered and invocation preserves CapabilityResu
     return {
       ok: true,
       status: 200,
-      json: async () => ({
-        success: true,
-        data: { ok: true, capability_id: "system.echo", version: 1, data: { value: 1 }, error: null, evidence: [{ kind: "test.ref", reference: "test://1", digest: null, summary: "", metadata: {} }], audit: {} },
-      }),
+      json: async () => ({ ok: true, capability_id: "system.echo", version: 1, data: { value: 1 }, error: null,
+        evidence: [{ kind: "test.ref", reference: "test://1", digest: null, summary: "", metadata: {} }], audit: {} }),
     } as Response;
   }) as typeof fetch;
   try {
-    const client = new CapabilityClient("http://base");
-    const result = await client.invoke("token", { ...base, id: "system.echo", risk: "read", confirmation: "none" }, { value: 1 });
+    const client = new CapabilityClient("http://base", "service-secret");
+    const result: any = await client.invokeDelegated("delegation-secret", "system.echo", 1,
+      "rel_0123456789abcdef0123456789abcdef", { value: 1 }, "req_1");
     assert.equal(result.capability_id, "system.echo");
     assert.equal(result.evidence.at(0)?.reference, "test://1");
-    await client.list("token");
-    assert.equal(urls[1], "http://base/api/v1/capabilities?consumer=agent");
+    assert.equal(urls[0], "http://base/api/v2/agent-capabilities/system.echo:invoke");
   } finally {
     globalThis.fetch = originalFetch;
   }

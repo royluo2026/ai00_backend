@@ -8,7 +8,7 @@
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`experimental`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_7263b81c7344960ad9df52f6fb8fdd30`
+- Catalog Release：`rel_8401bc95baae88e2d2e45d16bda37e94`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -74,7 +74,7 @@
 ```json
 {
   "capability_id": "knowledge.proposal.outbox.retry",
-  "catalog_release": "rel_7263b81c7344960ad9df52f6fb8fdd30",
+  "catalog_release": "rel_8401bc95baae88e2d2e45d16bda37e94",
   "major_version": 1,
   "payload": {
     "outbox_gid": "example"

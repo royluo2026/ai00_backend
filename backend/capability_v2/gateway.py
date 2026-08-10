@@ -51,6 +51,9 @@ class CapabilityGatewayService:
         self._catalog_release = release_id
         return self
 
+    def catalog(self, release_id: str | None = None) -> CatalogRelease:
+        return self._resolver.catalog(release_id or self.catalog_release)
+
     async def request_approval(self, envelope: InvocationEnvelope) -> IssuedApproval:
         try:
             descriptor = self._resolver.descriptor(

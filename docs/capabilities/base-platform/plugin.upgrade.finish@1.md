@@ -8,7 +8,7 @@ Complete or fail a staged upgrade after health validation.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`experimental`
 - 所属领域：`base`
-- Catalog Release：`rel_7263b81c7344960ad9df52f6fb8fdd30`
+- Catalog Release：`rel_8401bc95baae88e2d2e45d16bda37e94`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -78,7 +78,7 @@ Complete or fail a staged upgrade after health validation.
 ```json
 {
   "capability_id": "plugin.upgrade.finish",
-  "catalog_release": "rel_7263b81c7344960ad9df52f6fb8fdd30",
+  "catalog_release": "rel_8401bc95baae88e2d2e45d16bda37e94",
   "major_version": 1,
   "payload": {
     "healthy": false,

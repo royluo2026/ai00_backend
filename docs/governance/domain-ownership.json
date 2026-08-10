@@ -47,7 +47,8 @@
         "backend/db/migrations/202608030001_agent_private_sessions.sql",
         "backend/db/migrations/202608030002_agent_memory_skills_audit.sql",
         "backend/db/migrations/202608030003_agent_private_flows.sql",
-        "backend/db/migrations/202608050005_agent_audit_updated_at.sql"
+        "backend/db/migrations/202608050005_agent_audit_updated_at.sql",
+        "backend/db/migrations/202608100006_agent_runs.sql"
       ],
       "test_paths": ["plugins/agent/**/test_*.py", "services/agent-runtime/test/**"],
       "documentation_paths": ["docs/capabilities/agent/**"]

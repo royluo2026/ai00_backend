@@ -816,6 +816,13 @@ Web commit: `feat: preserve capability results in the plugin host`.
 - Modify: `services/agent-runtime/src/capability-client.ts`
 - Modify: `services/agent-runtime/src/pi-runtime.ts`
 - Modify: `services/agent-runtime/src/server.ts`
+- Create: `backend/routers/agent_capabilities.py`
+- Modify: `backend/capability_v2/catalog.py`
+- Modify: `backend/capability_v2/gateway.py`
+- Modify: `backend/capability_v2/v1_adapter.py`
+- Modify: `backend/routers/deps.py`
+- Modify: `plugins/agent/agent_backend/routers/agent_runtime_proxy_next.py`
+- Create: `backend/tests/test_agent_consumer_catalog.py`
 - Create: `services/agent-runtime/test/run-lifecycle.test.ts`
 - Create: `services/agent-runtime/test/approval.test.ts`
 
@@ -824,7 +831,7 @@ Web commit: `feat: preserve capability results in the plugin host`.
 - Produces: `ToolSelector.select(goal, catalogRelease, identity) -> ToolSelection` with a bounded selected set.
 - Produces: pause/resume/cancel endpoints and host-facing ApprovalRequest endpoints.
 
-- [ ] **Step 1: Write failing restart, group membership and approval tests**
+- [x] **Step 1: Write failing restart, group membership and approval tests**
 
 ```ts
 test("run resumes after runtime restart", async () => {
@@ -835,17 +842,17 @@ test("run resumes after runtime restart", async () => {
 });
 ```
 
-- [ ] **Step 2: Verify current session-only Runtime fails**
+- [x] **Step 2: Verify current session-only Runtime fails**
 
 Run: `npm test` in `services/agent-runtime`.
 
 Expected: FAIL because RunStore and approval state do not exist; test also asserts `SessionStore.initialize()` issues no DDL.
 
-- [ ] **Step 3: Implement Run state, group participants, delegation and bounded ToolSelection**
+- [x] **Step 3: Implement Run state, group participants, delegation and bounded ToolSelection**
 
 The Runtime sends only a service credential plus DelegationGrant reference to Backend. UI context is structured untrusted input, not appended to system prompt. Tool results use Agent projection and size limits.
 
-- [ ] **Step 4: Run service and Backend Agent suites**
+- [x] **Step 4: Run service and Backend Agent suites**
 
 Run: `npm test` in `services/agent-runtime`.
 
@@ -853,10 +860,10 @@ Run: `python -m pytest backend/tests/test_agent_consumer_catalog.py backend/test
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add backend/db/migrations/202608100006_agent_runs.sql services/agent-runtime
+git add backend/db/migrations/202608100006_agent_runs.sql backend/routers/agent_capabilities.py backend/capability_v2 backend/routers/deps.py backend/tests/test_agent_consumer_catalog.py plugins/agent/agent_backend/routers/agent_runtime_proxy_next.py services/agent-runtime docs/capabilities docs/governance .github/CODEOWNERS
 git commit -m "feat: persist agent runs delegations and approvals"
 ```
 

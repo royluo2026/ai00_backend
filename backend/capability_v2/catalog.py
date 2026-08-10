@@ -187,6 +187,12 @@ class CatalogResolver:
             raise CatalogResolutionError("capability_not_in_release")
         return descriptor
 
+    def catalog(self, release_id: str) -> CatalogRelease:
+        release = self._store.get(release_id)
+        if release is None:
+            raise CatalogResolutionError("catalog_release_not_found")
+        return release
+
 
 __all__ = [
     "CatalogRelease",

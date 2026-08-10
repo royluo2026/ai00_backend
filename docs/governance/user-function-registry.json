@@ -45,6 +45,50 @@
         "services/agent-runtime/src/server.ts"
       ]
     },
+    "agent_runtime:GET:/v1/runs/{session_gid}": {
+      "function_id": "agent_runtime:GET:/v1/runs/{session_gid}",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:GET:/v1/runs/{session_gid}/approvals": {
+      "function_id": "agent_runtime:GET:/v1/runs/{session_gid}/approvals",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
     "agent_runtime:GET:/v1/sessions": {
       "function_id": "agent_runtime:GET:/v1/sessions",
       "domain": "Agent",
@@ -111,52 +155,118 @@
         "services/agent-runtime/src/server.ts"
       ]
     },
+    "agent_runtime:POST:/v1/runs": {
+      "function_id": "agent_runtime:POST:/v1/runs",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:POST:/v1/runs/{session_gid}/(pause|resume|cancel)": {
+      "function_id": "agent_runtime:POST:/v1/runs/{session_gid}/(pause|resume|cancel)",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:POST:/v1/runs/{session_gid}/approvals/{parameter_2}/decision": {
+      "function_id": "agent_runtime:POST:/v1/runs/{session_gid}/approvals/{parameter_2}/decision",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:POST:/v1/runs/{session_gid}/messages": {
+      "function_id": "agent_runtime:POST:/v1/runs/{session_gid}/messages",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
+    "agent_runtime:POST:/v1/runs/{session_gid}/messages/stream": {
+      "function_id": "agent_runtime:POST:/v1/runs/{session_gid}/messages/stream",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Agent Runtime API"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "services/agent-runtime/src/server.ts"
+      ]
+    },
     "agent_runtime:POST:/v1/sessions": {
       "function_id": "agent_runtime:POST:/v1/sessions",
-      "domain": "Agent",
-      "stability": "stable",
-      "current_consumers": [
-        "Agent Runtime API"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Agent",
-      "exclusion_reason": null,
-      "source_paths": [
-        "services/agent-runtime/src/server.ts"
-      ]
-    },
-    "agent_runtime:POST:/v1/sessions/{session_gid}/messages": {
-      "function_id": "agent_runtime:POST:/v1/sessions/{session_gid}/messages",
-      "domain": "Agent",
-      "stability": "stable",
-      "current_consumers": [
-        "Agent Runtime API"
-      ],
-      "target_capability": null,
-      "exposure": "Web/REST",
-      "automation_level": "interactive",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Agent",
-      "exclusion_reason": null,
-      "source_paths": [
-        "services/agent-runtime/src/server.ts"
-      ]
-    },
-    "agent_runtime:POST:/v1/sessions/{session_gid}/messages/stream": {
-      "function_id": "agent_runtime:POST:/v1/sessions/{session_gid}/messages/stream",
       "domain": "Agent",
       "stability": "stable",
       "current_consumers": [
@@ -9604,6 +9714,50 @@
         "backend/routers/plugin_marketplace.py"
       ]
     },
+    "rest:GET:/api/v2/agent-capabilities/catalog": {
+      "function_id": "rest:GET:/api/v2/agent-capabilities/catalog",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/agent_capabilities.py"
+      ]
+    },
+    "rest:GET:/api/v2/agent-capabilities/catalog-preview": {
+      "function_id": "rest:GET:/api/v2/agent-capabilities/catalog-preview",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/agent_capabilities.py"
+      ]
+    },
     "rest:GET:/api/v2/capability-artifacts/{artifact_id}": {
       "function_id": "rest:GET:/api/v2/capability-artifacts/{artifact_id}",
       "domain": "Base Platform",
@@ -16139,6 +16293,72 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
+      ]
+    },
+    "rest:POST:/api/v2/agent-capabilities/delegations": {
+      "function_id": "rest:POST:/api/v2/agent-capabilities/delegations",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/agent_capabilities.py"
+      ]
+    },
+    "rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm": {
+      "function_id": "rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/agent_capabilities.py"
+      ]
+    },
+    "rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke": {
+      "function_id": "rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/agent_capabilities.py"
       ]
     },
     "rest:POST:/api/v2/capability-artifacts/uploads": {

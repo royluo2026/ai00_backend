@@ -331,8 +331,12 @@ def test_agent_runtime_scanner_registers_static_and_parameterized_endpoints():
         "agent_runtime:POST:/v1/sessions",
         "agent_runtime:GET:/v1/sessions/{session_gid}",
         "agent_runtime:DELETE:/v1/sessions/{session_gid}",
-        "agent_runtime:POST:/v1/sessions/{session_gid}/messages",
-        "agent_runtime:POST:/v1/sessions/{session_gid}/messages/stream",
+        "agent_runtime:POST:/v1/runs",
+        "agent_runtime:GET:/v1/runs/{session_gid}",
+        "agent_runtime:GET:/v1/runs/{session_gid}/approvals",
+        "agent_runtime:POST:/v1/runs/{session_gid}/messages",
+        "agent_runtime:POST:/v1/runs/{session_gid}/messages/stream",
+        "agent_runtime:POST:/v1/runs/{session_gid}/approvals/{parameter_2}/decision",
     } <= set(found)
     assert all(row["domain"] == "Agent" for row in found.values())
 
