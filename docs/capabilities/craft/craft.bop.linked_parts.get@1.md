@@ -8,7 +8,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 - 不适用：The caller is searching PBOM candidate parts.
 - 生命周期：`experimental`
 - 所属领域：`craft`
-- Catalog Release：`rel_8401bc95baae88e2d2e45d16bda37e94`
+- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -20,7 +20,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 | plugin | 不可用 |
 | agent | 可用 |
 | api | 可用 |
-| mcp | 不可用 |
+| mcp | 可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -74,7 +74,7 @@ Read PBOM parts explicitly linked to a BOP and their usage locations.
 ```json
 {
   "capability_id": "craft.bop.linked_parts.get",
-  "catalog_release": "rel_8401bc95baae88e2d2e45d16bda37e94",
+  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
   "major_version": 1,
   "payload": {
     "version_gid": "example"

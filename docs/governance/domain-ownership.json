@@ -19,7 +19,8 @@
         "backend/core/**",
         "backend/db/connection.py",
         "backend/utils/gid.py",
-        "backend/capabilities/registry_next.py"
+        "backend/capabilities/registry_next.py",
+        "services/mcp-gateway/**"
       ],
       "provider_paths": ["backend/system_capabilities/base_provider.py"],
       "migration_paths": [

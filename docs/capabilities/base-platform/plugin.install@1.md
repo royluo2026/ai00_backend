@@ -8,7 +8,7 @@ Install a platform-signed release in disabled state.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`experimental`
 - 所属领域：`base`
-- Catalog Release：`rel_8401bc95baae88e2d2e45d16bda37e94`
+- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -85,7 +85,7 @@ Install a platform-signed release in disabled state.
 ```json
 {
   "capability_id": "plugin.install",
-  "catalog_release": "rel_8401bc95baae88e2d2e45d16bda37e94",
+  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
   "major_version": 1,
   "payload": {
     "granted_capabilities": [],

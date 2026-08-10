@@ -8,7 +8,7 @@ Archive a BOP version without deleting its snapshot or references.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`experimental`
 - 所属领域：`craft`
-- Catalog Release：`rel_8401bc95baae88e2d2e45d16bda37e94`
+- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -74,7 +74,7 @@ Archive a BOP version without deleting its snapshot or references.
 ```json
 {
   "capability_id": "craft.bop.version.archive",
-  "catalog_release": "rel_8401bc95baae88e2d2e45d16bda37e94",
+  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
   "major_version": 1,
   "payload": {
     "expected_revision": "example",

@@ -8,7 +8,7 @@ Revoke an installed plugin immediately.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`experimental`
 - 所属领域：`base`
-- Catalog Release：`rel_8401bc95baae88e2d2e45d16bda37e94`
+- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
 - Schema 精度：`typed`
 - 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -75,7 +75,7 @@ Revoke an installed plugin immediately.
 ```json
 {
   "capability_id": "plugin.revoke",
-  "catalog_release": "rel_8401bc95baae88e2d2e45d16bda37e94",
+  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
   "major_version": 1,
   "payload": {
     "plugin_id": "example"

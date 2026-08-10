@@ -85,7 +85,7 @@ def adapt_v1_spec(spec: CapabilitySpec) -> CapabilityDescriptorV2:
             api=True,
             plugin=bool(is_read and spec.plugin_callable),
             agent=bool(is_read and execution_mode is not ExecutionMode.LOCAL),
-            mcp=False,
+            mcp=bool(is_read and execution_mode is not ExecutionMode.LOCAL),
         ),
         automation_level=AutomationLevel.A2 if is_read and spec.confirmation == "none" else AutomationLevel.A1,
         authorization_policy=f"legacy:{permissions}",

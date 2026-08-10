@@ -1,20 +1,21 @@
 # AI00 MCP Gateway
 
-把 Capability Kernel 映射为远程 MCP Streamable HTTP 服务，端点为 `/mcp`。实现使用 MCP TypeScript SDK v2；每个请求创建无状态 transport，便于横向扩容。
+把 Capability V2 映射为远程 MCP Streamable HTTP 服务，端点为 `/mcp`。MCP Gateway 属于 Base Platform 协议适配层，不依赖 Agent Runtime。
 
-鉴权使用 `Authorization: Bearer <AI00 JWT>`，JWT 继续由主后端验证并决定能力权限。当前只发布 `cloud + read + confirmation=none` 能力：外部客户端不能借 MCP 绕过 AI00 的写操作确认。
+## 信任与目录边界
+
+- 外部 `Authorization: Bearer` 只用于首次向 Backend 兑换短期、可撤销的 MCP Delegation；缓存键仅保存 Bearer 的 SHA-256。
+- 后续能力调用只发送 `MCP_GATEWAY_SERVICE_TOKEN + X-AI00-Delegation`，不转发用户 Bearer、consumer/source 或客户端声明的权限。
+- 每个外部认证会话固定一个不可变 Catalog Release 和精确 major；相同 release 内容漂移、重复 MCP 工具名都会 fail closed。
+- 当前仅发布 `cloud_sync + read + confirmation=none + exposure.mcp=true` 能力。写能力在 MCP elicitation 审批闭环完成前保持关闭。
+- `structuredContent` 和文本只包含按 `agent_output_schema` allowlist 投影的 CapabilityResultV2；保留 Artifact/Operation/Evidence 引用，移除内部 details 和秘密字段。
+
+## 部署
+
+配置 `.env.example` 中的 Backend 地址、允许 Host 和至少 32 字符的服务密钥；Backend 必须注入相同的 `MCP_GATEWAY_SERVICE_TOKEN`。公网入口由反向代理终止 TLS，并限制请求体、连接数和速率。
 
 ```bash
 npm install
 npm run build
 npm start
 ```
-
-公网部署必须将 `AI00_MCP_ALLOWED_HOSTS` 配为真实域名，并由网关终止 TLS。后续开放写能力时，应先完成独立 OAuth resource server、scope 到 Capability permission 的映射，以及 MCP elicitation 到一次性确认 token 的闭环。
-## CapabilityResult 与错误契约
-
-MCP Tool 与后端 Capability 一一对应。成功调用的 `structuredContent` 和文本内容都保留完整 `CapabilityResult`：`ok`、`capability_id`、`version`、`data`、`error`、`evidence`、`audit`。
-
-失败调用也不会降成只有一段文本：后端的 HTTP `code/message/retryable/details` 会转换为 `ok=false` 的 `CapabilityResult`，并保留 `capability_id`、`version`、空 evidence、`source=mcp`、`request_id` 和 HTTP 状态审计信息。网络不可达或响应协议异常则使用 `transport_unavailable` 或 `capability_protocol_error`，不伪造业务成功。
-
-网关为每次调用发送 `X-AI00-Source: mcp` 和稳定 `X-Request-ID`。后端 `consumer=mcp` 目录也会再次过滤，只返回 `cloud + read + confirmation=none` 的非 deprecated 能力；写能力和需要确认的能力必须等 MCP OAuth scope 与 elicitation 确认闭环完成后另行开放。

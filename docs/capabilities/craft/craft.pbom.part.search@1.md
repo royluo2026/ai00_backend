@@ -8,7 +8,7 @@ craft.pbom.part.search
 - 不适用：No exact PBOM snapshot is known.
 - 生命周期：`experimental`
 - 所属领域：`craft`
-- Catalog Release：`rel_8401bc95baae88e2d2e45d16bda37e94`
+- Catalog Release：`rel_d831aa71e46739f4fc8513964972e24f`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
 
@@ -20,7 +20,7 @@ craft.pbom.part.search
 | plugin | 不可用 |
 | agent | 可用 |
 | api | 可用 |
-| mcp | 不可用 |
+| mcp | 可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -72,7 +72,7 @@ craft.pbom.part.search
 ```json
 {
   "capability_id": "craft.pbom.part.search",
-  "catalog_release": "rel_8401bc95baae88e2d2e45d16bda37e94",
+  "catalog_release": "rel_d831aa71e46739f4fc8513964972e24f",
   "major_version": 1,
   "payload": {
     "snapshot_gid": "example"

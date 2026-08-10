@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { CapabilityClient, CapabilityInvocationError } from "../src/capability-client.js";
+import { CapabilityClient, CapabilityInvocationError, CapabilityTransportError } from "../src/capability-client.js";
+import { projectResult } from "../src/projection.js";
 import { jsonSchemaToZod } from "../src/schema.js";
 
 test("converts required object properties and rejects missing values", () => {
@@ -9,85 +10,51 @@ test("converts required object properties and rejects missing values", () => {
   assert.equal(schema.safeParse({ limit: 2 }).success, false);
 });
 
-test("MCP discovery is filtered and invocation preserves error and evidence fields", async () => {
-  const originalFetch = globalThis.fetch;
-  const urls: string[] = [];
-  globalThis.fetch = (async (input: string | URL | Request) => {
-    urls.push(String(input));
-    return {
-      ok: true,
-      status: 200,
-      json: async () => ({
-        success: true,
-        data: { ok: true, capability_id: "system.echo", version: 1, data: { value: 1 }, error: null, evidence: [{ kind: "test.ref", reference: "test://1", digest: null, summary: "", metadata: {} }], audit: {} },
-      }),
-    } as Response;
-  }) as typeof fetch;
+test("delegated invocation preserves full CapabilityResultV2 transport", async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = (async () => ({ ok: true, status: 200, json: async () => ({
+    ok: true, status: "completed", capability_id: "system.echo", major_version: 1,
+    data: { value: 1 }, operation_ref: null, artifact_refs: [], error: null,
+    evidence: [{ kind: "test.ref", reference: "test://1" }], warnings: [], correlation: { request_id: "req_1" },
+  }) })) as unknown as typeof fetch;
   try {
-    const client = new CapabilityClient("http://base");
-    const spec: any = { id: "system.echo", version: 1 };
-    const result = await client.invoke("token", spec, { value: 1 });
-    assert.equal(result.error, null);
-    assert.equal(result.evidence.at(0)?.reference, "test://1");
-    await client.list("token");
-    assert.equal(urls[1], "http://base/api/v1/capabilities?execution=cloud&consumer=mcp");
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
+    const client = new CapabilityClient("http://base", "service-secret-with-at-least-32-bytes");
+    const result: any = await client.invoke("delegation", { id: "system.echo", major_version: 1 } as any,
+      "rel_0123456789abcdef0123456789abcdef", {}, "req_1");
+    assert.equal(result.status, "completed");
+    assert.equal(result.evidence[0].reference, "test://1");
+  } finally { globalThis.fetch = original; }
 });
 
-test("MCP HTTP failures become structured CapabilityResult errors", async () => {
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = (async () => ({
-    ok: false,
-    status: 409,
-    headers: { get: (name: string) => name === "X-Request-ID" ? "mcp-error-1" : null },
-    json: async () => ({ success: false, detail: { code: "confirmation_required", message: "Confirmation is required", retryable: false, details: { capability_id: "system.job.cancel" } } }),
-  })) as unknown as typeof fetch;
+test("HTTP and protocol failures remain distinguishable", async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = (async () => ({ ok: false, status: 409, json: async () => ({ error: { code: "conflict" } }) })) as unknown as typeof fetch;
   try {
-    const client = new CapabilityClient("http://base");
-    const spec: any = { id: "system.job.cancel", version: 1 };
-    await assert.rejects(
-      client.invoke("token", spec, { job_gid: "job-1" }, "mcp-error-1"),
-      (error: unknown) => {
-        assert.equal(error instanceof CapabilityInvocationError, true);
-        const result = (error as CapabilityInvocationError).toResult();
-        assert.equal(result.ok, false);
-        assert.equal(result.capability_id, "system.job.cancel");
-        assert.equal(result.error?.code, "confirmation_required");
-        assert.equal(result.error?.retryable, false);
-        assert.equal(result.audit.request_id, "mcp-error-1");
-        assert.deepEqual(result.evidence, []);
-        return true;
-      },
-    );
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
+    const client = new CapabilityClient("http://base", "service-secret-with-at-least-32-bytes");
+    await assert.rejects(client.invoke("delegation", { id: "system.echo", major_version: 1 } as any,
+      "rel_0123456789abcdef0123456789abcdef", {}, "req_1"), CapabilityInvocationError);
+  } finally { globalThis.fetch = original; }
+  globalThis.fetch = (async () => { throw new Error("offline"); }) as typeof fetch;
+  try {
+    const client = new CapabilityClient("http://base", "service-secret-with-at-least-32-bytes");
+    await assert.rejects(client.invoke("delegation", { id: "system.echo", major_version: 1 } as any,
+      "rel_0123456789abcdef0123456789abcdef", {}, "req_1"), CapabilityTransportError);
+  } finally { globalThis.fetch = original; }
 });
-test("MCP client sends a stable request id and normalizes success audit", async () => {
-  const originalFetch = globalThis.fetch;
-  let seenHeaders: Record<string, string> | undefined;
-  globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
-    seenHeaders = init?.headers as Record<string, string>;
-    return {
-      ok: true,
-      status: 200,
-      headers: { get: () => "mcp-request-1" },
-      json: async () => ({
-        success: true,
-        data: { ok: true, capability_id: "system.echo", version: 1, data: { value: 1 }, error: null, evidence: [], audit: {} },
-      }),
-    } as unknown as Response;
-  }) as typeof fetch;
-  try {
-    const client = new CapabilityClient("http://base");
-    const result = await client.invoke("token", { id: "system.echo", version: 1 } as any, { value: 1 }, "mcp-request-1");
-    assert.equal(seenHeaders?.["X-AI00-Source"], "mcp");
-    assert.equal(seenHeaders?.["X-Request-ID"], "mcp-request-1");
-    assert.equal(result.audit.source, "mcp");
-    assert.equal(result.audit.request_id, "mcp-request-1");
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
+
+test("MCP projection uses output allowlist and preserves references", () => {
+  const projected: any = projectResult({ ok: true, status: "completed", capability_id: "x", major_version: 1,
+    data: { allowed: "yes", secret_token: "no" }, artifact_refs: [{ artifact_id: "a1" }],
+    evidence: [{ kind: "source", reference: "doc://1", metadata: { secret: "no" } }] },
+    { type: "object", additionalProperties: false, properties: { allowed: { type: "string" }, secret_token: { type: "string" } } });
+  assert.deepEqual(projected.data, { allowed: "yes" });
+  assert.deepEqual(projected.artifact_refs, [{ artifact_id: "a1" }]);
+  assert.equal(JSON.stringify(projected).includes("secret"), false);
+});
+
+test("MCP projection bounds large model-visible results", () => {
+  const projected: any = projectResult({ ok: true, data: { value: "x".repeat(10_000) } },
+    { type: "object", additionalProperties: false, properties: { value: { type: "string" } } }, 256);
+  assert.equal(projected.truncated, true);
+  assert.ok(JSON.stringify(projected.data).length < 600);
 });

@@ -79,6 +79,7 @@ def test_approval_is_bound_to_agent_run_resource_policy_and_payload_and_is_one_t
         _descriptor(), _envelope(), resource_refs=("project:p1",),
         policy_version="policy-7", ttl_seconds=60,
     )
+    assert issued.token.startswith("apr_")
 
     assert service.consume(
         issued.token, _descriptor(), _envelope("run_b"),

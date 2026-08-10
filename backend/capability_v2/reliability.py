@@ -168,7 +168,9 @@ class ApprovalService:
             & {"super_admin", "team_admin", "system_admin"}
         ):
             raise ReliabilityError("admin_approval_required")
-        token = secrets.token_urlsafe(32)
+        # InvocationEnvelope approval references must start with an alphanumeric
+        # character; token_urlsafe may otherwise randomly start with '-' or '_'.
+        token = f"apr_{secrets.token_urlsafe(32)}"
         challenge = self._challenge(
             token, descriptor, envelope, resource_refs, policy_version,
             expires_at=self._clock() + timedelta(seconds=ttl_seconds),

@@ -16405,6 +16405,50 @@
         "backend/routers/capability_artifacts.py"
       ]
     },
+    "rest:POST:/api/v2/mcp-capabilities/delegations": {
+      "function_id": "rest:POST:/api/v2/mcp-capabilities/delegations",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/mcp_capabilities.py"
+      ]
+    },
+    "rest:POST:/api/v2/mcp-capabilities/{capability_id}:invoke": {
+      "function_id": "rest:POST:/api/v2/mcp-capabilities/{capability_id}:invoke",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "unreviewed",
+      "migration_status": "candidate",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/routers/mcp_capabilities.py"
+      ]
+    },
     "rest:POST:/api/views": {
       "function_id": "rest:POST:/api/views",
       "domain": "Base Platform",

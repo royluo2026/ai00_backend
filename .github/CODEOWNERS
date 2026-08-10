@@ -8,6 +8,7 @@
 /backend/db/connection.py @ai00/base-maintainers
 /backend/utils/gid.py @ai00/base-maintainers
 /backend/capabilities/registry_next.py @ai00/base-maintainers
+/services/mcp-gateway/** @ai00/base-maintainers
 /backend/db/migrations/202608030006_base_platform_runtime_tables.sql @ai00/base-maintainers
 /backend/db/migrations/202608030010_base_self_annotations.sql @ai00/base-maintainers
 /backend/db/migrations/202608040001_base_plugin_namespace_storage.sql @ai00/base-maintainers

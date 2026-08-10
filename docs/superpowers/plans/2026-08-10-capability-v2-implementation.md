@@ -878,12 +878,16 @@ git commit -m "feat: persist agent runs delegations and approvals"
 - Create: `services/mcp-gateway/test/catalog-release.test.ts`
 - Create: `services/mcp-gateway/test/delegation.test.ts`
 - Create: `backend/tests/test_mcp_gateway_identity.py`
+- Create: `backend/routers/mcp_capabilities.py`
+- Modify: `backend/capability_v2/v1_adapter.py`
+- Modify: `docs/governance/domain-ownership.json`
+- Modify: `.github/CODEOWNERS`
 
 **Interfaces:**
 - MCP session exchanges external authentication for a server-side delegation; it does not forward raw long-lived Bearer tokens.
 - Tool names resolve one pinned major version from one Catalog Release; duplicate names fail service startup.
 
-- [ ] **Step 1: Write failing raw-token and catalog-drift tests**
+- [x] **Step 1: Write failing raw-token and catalog-drift tests**
 
 ```ts
 test("mcp backend calls use delegation reference, not user bearer", async () => {
@@ -893,17 +897,17 @@ test("mcp backend calls use delegation reference, not user bearer", async () => 
 });
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run: `npm test` in `services/mcp-gateway`.
 
 Expected: FAIL because the current server constructs a catalog per request and forwards Bearer token.
 
-- [ ] **Step 3: Implement service identity, delegation exchange and immutable catalog cache**
+- [x] **Step 3: Implement service identity, delegation exchange and immutable catalog cache**
 
 Write CapabilityResultV2 to MCP `structuredContent`; apply Agent-safe projection and Artifact/Operation references. Keep writes disabled until ApprovalChallenge transport is proven by tests.
 
-- [ ] **Step 4: Run MCP and Backend identity tests**
+- [x] **Step 4: Run MCP and Backend identity tests**
 
 Run: `npm test` in `services/mcp-gateway`.
 
@@ -911,10 +915,10 @@ Run: `python -m pytest backend/tests/test_mcp_gateway_identity.py backend/tests/
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add services/mcp-gateway backend/tests/test_mcp_gateway_identity.py
+git add services/mcp-gateway backend/routers/mcp_capabilities.py backend/tests/test_mcp_gateway_identity.py backend/capability_v2/v1_adapter.py backend/.env.example backend/.env.test.example docs/capabilities docs/governance .github/CODEOWNERS
 git commit -m "feat: pin mcp sessions to delegated catalog releases"
 ```
 
