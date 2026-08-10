@@ -181,5 +181,4 @@ def _build_router(prefix: str) -> APIRouter:
 
 
 router = APIRouter()
-router.include_router(_build_router("/api/capabilities"))
 router.include_router(_build_router("/api/v1/capabilities"))
