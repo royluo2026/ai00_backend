@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "scripts": { "test": "node --test --test-isolation=none" },
   "exports": { ".": { "types": "./src/index.ts", "default": "./src/index.js" }, "./host": "./src/host.ts" },
   "files": ["src", "manifest-v2.schema.json", "README.md"]
 }

@@ -676,6 +676,10 @@ git commit -m "feat: add governed artifact and operation protocols"
 - Create: `docs/capabilities/README.md`
 - Create: `docs/capabilities/catalog.v2.json`
 - Create: `backend/tests/test_capability_docs_generation.py`
+- Create: `packages/plugin-sdk/test/index.test.js`
+- Modify: `backend/capability_v2/v1_adapter.py`
+- Modify: `docs/governance/capability-catalog-release.json`
+- Modify: `packages/plugin-sdk/package.json`
 - Modify: `packages/plugin-sdk/src/index.ts`
 - Modify: `packages/plugin-sdk/src/index.js`
 
@@ -723,7 +727,7 @@ Run: `npm test` in `packages/plugin-sdk`.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add backend/capability_v2/docs backend/scripts/generate_capability_docs.py docs/capabilities packages/plugin-sdk/src backend/tests/test_capability_docs_generation.py
+git add backend/capability_v2/docs backend/capability_v2/v1_adapter.py backend/scripts/generate_capability_docs.py docs/capabilities docs/governance/capability-catalog-release.json packages/plugin-sdk/package.json packages/plugin-sdk/src packages/plugin-sdk/test backend/tests/test_capability_docs_generation.py docs/superpowers/plans/2026-08-10-capability-v2-implementation.md
 git commit -m "docs: generate the capability developer manual"
 ```
 

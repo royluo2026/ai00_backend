@@ -1,8 +1,61 @@
-export type CapabilityResult<T = unknown> = {
-  success: boolean;
-  data?: T;
-  error?: { code: string; message: string };
+export type CapabilityStatus = "completed" | "accepted" | "rejected" | "failed" | "outcome_unknown";
+export type OperationStatus = "accepted" | "claimed" | "preparing" | "running" | "post_processing" | "completed" | "failed" | "cancelled" | "outcome_unknown";
+
+export type ArtifactRef = {
+  artifact_id: string;
+  media_type: string;
+  sha256: string;
+  byte_size: number;
+  version: number;
 };
+
+export type OperationRef = {
+  operation_id: string;
+  status: OperationStatus;
+  version: number;
+};
+
+export type EvidenceRef = {
+  kind: string;
+  reference: string;
+  digest: string | null;
+  summary: string;
+};
+
+export type CapabilityError = {
+  code: string;
+  message: string;
+  retryable: boolean;
+  details: Readonly<Record<string, unknown>>;
+};
+
+export type CapabilityResult<T = unknown> = {
+  ok: boolean;
+  status: CapabilityStatus;
+  capability_id: string;
+  major_version: number;
+  data: T | null;
+  operation_ref: OperationRef | null;
+  artifact_refs: readonly ArtifactRef[];
+  error: CapabilityError | null;
+  evidence: readonly EvidenceRef[];
+  warnings: readonly string[];
+  correlation: { request_id: string; trace_id: string | null };
+  /** @deprecated Transitional bridge alias; new plugins must use `ok`. */
+  success?: boolean;
+};
+
+export function isCapabilityResultV2(value: unknown): value is CapabilityResult {
+  if (!value || typeof value !== "object") return false;
+  const result = value as Partial<CapabilityResult>;
+  return typeof result.ok === "boolean"
+    && typeof result.status === "string"
+    && typeof result.capability_id === "string"
+    && Number.isInteger(result.major_version)
+    && Array.isArray(result.artifact_refs)
+    && Array.isArray(result.evidence)
+    && !!result.correlation;
+}
 
 type InitMessage = {
   type: "ai00.plugin.init";

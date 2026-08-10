@@ -1,0 +1,29 @@
+# 统一错误处理
+
+调用方只依赖 `error.code`、`retryable`、`operation_ref` 和 correlation；不得解析展示文案或内部异常。
+
+| 错误码 | 含义 |
+|---|---|
+| `catalog_resolution_failed` | 目录 release、能力 ID 或主版本无法解析。 |
+| `consumer_not_allowed` | 当前消费者类型未获 exposure 授权。 |
+| `authorization_failed` | 授权后端不可用或无法形成可信决策。 |
+| `permission_denied` | 调用者缺少能力要求的权限。 |
+| `tenant_scope_denied` | 身份与授权租户不一致。 |
+| `resource_scope_denied` | 目标资源不在授权或 Delegation 范围内。 |
+| `data_scope_denied` | 数据分类不在授权范围内。 |
+| `delegation_required` | Agent/委托消费者缺少服务端 Delegation。 |
+| `delegation_expired` | Delegation 已过期。 |
+| `resource_selector_missing` | 描述符要求的资源定位字段缺失。 |
+| `resource_selector_invalid` | 资源定位字段不是允许的标量标识。 |
+| `invalid_input` | 请求不符合该 release 中冻结的输入 Schema。 |
+| `confirmation_required` | 写操作需要绑定本次请求的一次性审批。 |
+| `confirmation_rejected` | 审批无效、已用、已过期或与请求绑定不一致。 |
+| `idempotency_key_required` | 描述符要求写请求提供幂等键。 |
+| `idempotency_payload_conflict` | 同一幂等范围被用于不同 payload。 |
+| `idempotency_in_progress` | 同一幂等请求仍在执行。 |
+| `rate_limit_exceeded` | 租户及消费者配额不足，可按 retryable 指示重试。 |
+| `transaction_participant_required` | 强一致写 Provider 未加入领域事务。 |
+| `provider_failed` | 领域 Provider 执行失败；错误正文不会泄露内部细节。 |
+| `outcome_persistence_failed` | 领域可能已提交但 Outcome 未能确认，必须查询 OperationRef。 |
+
+对于写操作，网络超时不等于失败。先用同一幂等键查询/重放 Outcome；若为 `outcome_unknown`，按 Operation 协议对账。

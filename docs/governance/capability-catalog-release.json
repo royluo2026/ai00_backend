@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_b5b6e3eb50eb02adacaeb2e35f179455",
-  "catalog_hash": "sha256:b5b6e3eb50eb02adacaeb2e35f1794554be692788b0d0eea10bb97a12684cc4d",
+  "release_id": "rel_2a2db4d509b4862334ad8872762ef39f",
+  "catalog_hash": "sha256:2a2db4d509b4862334ad8872762ef39fd3809eaf412bfa51ee9320a6366f8748",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -34,7 +34,9 @@
         "required": [
           "query"
         ],
-        "properties": {},
+        "properties": {
+          "query": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -42,7 +44,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f826ccd74c4c0ca2d8c94f9d7d9c3654fd2f00546c0bebbe5100d729b0703f0b",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -87,7 +90,9 @@
         "required": [
           "preview_gid"
         ],
-        "properties": {},
+        "properties": {
+          "preview_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -98,10 +103,16 @@
           "before_hash",
           "after_hash"
         ],
-        "properties": {},
+        "properties": {
+          "version_gid": {},
+          "revision": {},
+          "before_hash": {},
+          "after_hash": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:bd2632a124e55694c68f7c3f3bbbce92a5897ef3567da10571499de1077c369c",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:6a6f0359549e6b4986c5a046cfed7080b6e59328e758785c88b3d86d045440eb",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -148,7 +159,11 @@
           "expected_revision",
           "commands"
         ],
-        "properties": {},
+        "properties": {
+          "version_gid": {},
+          "expected_revision": {},
+          "commands": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -161,10 +176,18 @@
           "after_hash",
           "expires_at"
         ],
-        "properties": {},
+        "properties": {
+          "preview_gid": {},
+          "version_gid": {},
+          "base_revision": {},
+          "before_hash": {},
+          "after_hash": {},
+          "expires_at": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:3cff9a2447a164a1ef809dc24f1398be7222a07509f7a879121b50bc63bd014e",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:aaec092c934e40de725cc87a5ad5d1f157883c19a79453740a0813a6291efe18",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -229,10 +252,21 @@
           "conditions",
           "content_hash"
         ],
-        "properties": {},
+        "properties": {
+          "contract_id": {},
+          "contract_version": {},
+          "official": {},
+          "source": {},
+          "nodes": {},
+          "operations": {},
+          "dependencies": {},
+          "conditions": {},
+          "content_hash": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:8f35f89696535a040e34cc22977310f182b56706528eafc6b5d703f6b699c4c4",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:5962a703875e4e1852c0a97a168bca0b661a1b5f143b7f40b55991a6732ebf54",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -301,10 +335,21 @@
           "conditions",
           "content_hash"
         ],
-        "properties": {},
+        "properties": {
+          "contract_id": {},
+          "contract_version": {},
+          "official": {},
+          "source": {},
+          "nodes": {},
+          "operations": {},
+          "dependencies": {},
+          "conditions": {},
+          "content_hash": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:bb5415a86480059069c91b71650ff2b0bf0c08e553b8f6d122ac0a14625e764f",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:a7f7e1e6498def038cdbe7714dc0fd0397d0b30e609ebf178f5ccf2f4da3f6ae",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -349,7 +394,9 @@
         "required": [
           "document"
         ],
-        "properties": {},
+        "properties": {
+          "document": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -360,10 +407,16 @@
           "entry_count",
           "expires_at"
         ],
-        "properties": {},
+        "properties": {
+          "import_preview_gid": {},
+          "content_hash": {},
+          "entry_count": {},
+          "expires_at": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:427da7b56ca997449c00aacdd7c4ddba6bc1496d988f475656fa6624666f9b05",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:de6bc2000aab9aa846dd05316d6b4891d501f1511444dd409c047b9bfbd5c8a8",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -422,10 +475,15 @@
           "revision",
           "items"
         ],
-        "properties": {},
+        "properties": {
+          "version_gid": {},
+          "revision": {},
+          "items": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:273d4ed214a4ba40832f596c47ed68302287eefa95574bd14c93e6045f6fefed",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:c2d1e56e79a983b7d70c5955b228cb6f800f2e880889db0287b195e000beef32",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -471,7 +529,10 @@
           "version_gid",
           "expected_revision"
         ],
-        "properties": {},
+        "properties": {
+          "version_gid": {},
+          "expected_revision": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -483,10 +544,17 @@
           "before_hash",
           "after_hash"
         ],
-        "properties": {},
+        "properties": {
+          "version_gid": {},
+          "status": {},
+          "revision": {},
+          "before_hash": {},
+          "after_hash": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:856c732df1dd40c2a6b62b0f0bc377b1318525e4e9cc8bf1a4b808187d5a9abc",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:0fd30e5c87644b8600050947405920f7188249271ff317060e7a5279b986ae60",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -532,7 +600,10 @@
           "from_version_gid",
           "to_version_gid"
         ],
-        "properties": {},
+        "properties": {
+          "from_version_gid": {},
+          "to_version_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -544,10 +615,17 @@
           "moved",
           "changed"
         ],
-        "properties": {},
+        "properties": {
+          "comparability": {},
+          "added": {},
+          "removed": {},
+          "moved": {},
+          "changed": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:ffff969a6c59b5cabfba5ce0df04a7b445f8ad2190d1a865f404445df7d9e646",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:0dae93cbe7d873d8b4ced31dbcbd016f86258d50ba809c25bdab5df26c775c96",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -593,7 +671,10 @@
           "source",
           "version_tag"
         ],
-        "properties": {},
+        "properties": {
+          "source": {},
+          "version_tag": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -604,10 +685,16 @@
           "revision",
           "entries_count"
         ],
-        "properties": {},
+        "properties": {
+          "version_gid": {},
+          "status": {},
+          "revision": {},
+          "entries_count": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a526133f0cfc55102c1000e8470c1ffb368ea04ababe91d159bda4d801be20ba",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:904c54233bf885467c5d850635788ac7e474f6577218cd1e095bb36463313117",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -669,10 +756,18 @@
           "lifecycle",
           "content_hash"
         ],
-        "properties": {},
+        "properties": {
+          "version_gid": {},
+          "revision": {},
+          "family_gid": {},
+          "project_gid": {},
+          "lifecycle": {},
+          "content_hash": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:e3f115d3417537dd55be12798f2c5bd340ab15ba9261406b402c09330f72b642",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:f78ba790281fbf4da8f94cdfbf859abe45700b9dbd80a88209c97a28fec06140",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -745,11 +840,13 @@
         "properties": {
           "items": {
             "type": "array"
-          }
+          },
+          "next_cursor": {}
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:e8b0712acab9a6f55fd8d42d7f52c7e5b12f20d9b4e6da0d317552ebe5ed7b43",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:ccf6bc6947bbe7234952e458a91631da1d452b8cf232bc621bc202d05c970b86",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -821,10 +918,22 @@
           "knowledge_refs",
           "rule_refs"
         ],
-        "properties": {},
+        "properties": {
+          "version_gid": {},
+          "revision": {},
+          "scope": {},
+          "work_items": {},
+          "parts": {},
+          "tools": {},
+          "fixtures": {},
+          "equipment_requirements": {},
+          "knowledge_refs": {},
+          "rule_refs": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a8f3c26b966fca99a2e73b6eb4cf7e3dc647aa2a1eb81d0633f269815b9a870b",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:fcfe3ad8d0f2d493cb86a52a4c9b4f8a3fd4221c32e7e07521222228768fb67d",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -869,7 +978,9 @@
         "required": [
           "item_gid"
         ],
-        "properties": {},
+        "properties": {
+          "item_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -878,10 +989,14 @@
           "active_release_gid",
           "items"
         ],
-        "properties": {},
+        "properties": {
+          "active_release_gid": {},
+          "items": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:bdd6882b46e6df82e93abd9adb698a6fc35f220c5e04e041135fd6b02ca70e35",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:1aa274da4b8a3fcee8bbfaedcc6e1cf530097825f83b8be9d574c2dd34ea7684",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -933,10 +1048,14 @@
           "active_release_gid",
           "items"
         ],
-        "properties": {},
+        "properties": {
+          "active_release_gid": {},
+          "items": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f608979bf85fd01c3d951cc255006fa44bdf65eed58c9e800884701566b00b68",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:43322d9804a5c0a6819e61b32367f44afffc2897435609c73585b5412355ac06",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -981,7 +1100,9 @@
         "required": [
           "item_gid"
         ],
-        "properties": {},
+        "properties": {
+          "item_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -990,10 +1111,14 @@
           "active_release_gid",
           "items"
         ],
-        "properties": {},
+        "properties": {
+          "active_release_gid": {},
+          "items": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:bdd6882b46e6df82e93abd9adb698a6fc35f220c5e04e041135fd6b02ca70e35",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:1aa274da4b8a3fcee8bbfaedcc6e1cf530097825f83b8be9d574c2dd34ea7684",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1038,7 +1163,9 @@
         "required": [
           "snapshot_gid"
         ],
-        "properties": {},
+        "properties": {
+          "snapshot_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1047,10 +1174,14 @@
           "snapshot_gid",
           "items"
         ],
-        "properties": {},
+        "properties": {
+          "snapshot_gid": {},
+          "items": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:35e634caf5e9bfa9225b9c5e9b1eb81171fab36db2478b2f57971667969d1da9",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:2eac5bae718dead8e9e4f67777ee9f79ecc35d3e087f2464f44a1a1e266c9bb7",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1096,7 +1227,10 @@
           "from_snapshot_gid",
           "to_snapshot_gid"
         ],
-        "properties": {},
+        "properties": {
+          "from_snapshot_gid": {},
+          "to_snapshot_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1107,10 +1241,16 @@
           "removed",
           "changed"
         ],
-        "properties": {},
+        "properties": {
+          "comparability": {},
+          "added": {},
+          "removed": {},
+          "changed": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:51a1df56aa9966cb75b7e4cd5ac1439873e858a9f9e5097a958d00dd085ce9f5",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:194dd17db5def8995099cd16b50cb369ef02b816ffe18018b166ae7eb6158328",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1155,7 +1295,9 @@
         "required": [
           "snapshot_gid"
         ],
-        "properties": {},
+        "properties": {
+          "snapshot_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1164,10 +1306,14 @@
           "gid",
           "part_count"
         ],
-        "properties": {},
+        "properties": {
+          "gid": {},
+          "part_count": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7a01ada4d80198b2888cbcade9338e78ae36837e9bf368e35f87609993aec2db",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:482c0bc3beab81237852be2985140043ce6f12cd4a1727df45b791a4515532f8",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1212,7 +1358,9 @@
         "required": [
           "query"
         ],
-        "properties": {},
+        "properties": {
+          "query": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1220,7 +1368,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f826ccd74c4c0ca2d8c94f9d7d9c3654fd2f00546c0bebbe5100d729b0703f0b",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1278,10 +1427,14 @@
           "items",
           "query"
         ],
-        "properties": {},
+        "properties": {
+          "items": {},
+          "query": {}
+        },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:9de9b5079f7e2ff6b9044d5251e887412ede46d126ecf9ecc9138f6c554abd5d",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:cbd2339137fed96d8e0fa28fab85ca127d8e834631f096983f468da27fc57773",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1329,7 +1482,12 @@
           "slug",
           "markdown"
         ],
-        "properties": {},
+        "properties": {
+          "space_gid": {},
+          "title": {},
+          "slug": {},
+          "markdown": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1337,7 +1495,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:88cbb94d968109bf0bc3bc6e95e5c52e27d225beeeafb270728bfdedafaa09f8",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:dbb3e632732a86e78544de88d05ef6d300dd764251503a30ffef27b01aefdc66",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1384,7 +1543,11 @@
           "from_revision_gid",
           "to_revision_gid"
         ],
-        "properties": {},
+        "properties": {
+          "document_gid": {},
+          "from_revision_gid": {},
+          "to_revision_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1392,7 +1555,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b063ace944302a4717f2b8da187a3604e620bbcad190729f463f3d5f5eb7c90f",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:1bbcdb6a8b8f26818320f7609a89f282fb3da5a7317e90b00f55c8de0415a533",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1437,7 +1601,9 @@
         "required": [
           "document_gid"
         ],
-        "properties": {},
+        "properties": {
+          "document_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1445,7 +1611,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a5856e55223d743abcc97b4f734e2433dcddde44b4bb705510f612a38f34509d",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:4fa5378c8390f30c1b6df66484fc8d5d7d3b95bf9915a6f0e5fdf114af239a89",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1490,7 +1657,9 @@
         "required": [
           "document_gid"
         ],
-        "properties": {},
+        "properties": {
+          "document_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1498,7 +1667,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a5856e55223d743abcc97b4f734e2433dcddde44b4bb705510f612a38f34509d",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:4fa5378c8390f30c1b6df66484fc8d5d7d3b95bf9915a6f0e5fdf114af239a89",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1545,7 +1715,11 @@
           "base_revision_gid",
           "target_revision_gid"
         ],
-        "properties": {},
+        "properties": {
+          "document_gid": {},
+          "base_revision_gid": {},
+          "target_revision_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1553,7 +1727,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:d55c5be1000ffba086d2ccd5eee78b20f0799c68aa85c7fb74bdf7ec4028cc99",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:27f3a634d83d1c192df82114c6fccb4379c90af8681ea7d51104f7231868d38e",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1600,7 +1775,11 @@
           "base_revision_gid",
           "markdown"
         ],
-        "properties": {},
+        "properties": {
+          "document_gid": {},
+          "base_revision_gid": {},
+          "markdown": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1608,7 +1787,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:d7ee381f9acdbf4cab5f88c9c000560c6b503c352e5ac44478854d76a20b26d3",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:c6515860a5bdda793b09ea56b4e8291f93e5b77fb82327e2482d6aa41572feca",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1653,7 +1833,9 @@
         "required": [
           "document_gid"
         ],
-        "properties": {},
+        "properties": {
+          "document_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1661,7 +1843,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a5856e55223d743abcc97b4f734e2433dcddde44b4bb705510f612a38f34509d",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:4fa5378c8390f30c1b6df66484fc8d5d7d3b95bf9915a6f0e5fdf114af239a89",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1708,7 +1891,11 @@
           "base_revision_gid",
           "target_revision_gid"
         ],
-        "properties": {},
+        "properties": {
+          "document_gid": {},
+          "base_revision_gid": {},
+          "target_revision_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1716,7 +1903,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:d55c5be1000ffba086d2ccd5eee78b20f0799c68aa85c7fb74bdf7ec4028cc99",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:27f3a634d83d1c192df82114c6fccb4379c90af8681ea7d51104f7231868d38e",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1761,7 +1949,9 @@
         "required": [
           "gid"
         ],
-        "properties": {},
+        "properties": {
+          "gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -1769,7 +1959,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:c5271509a51083c549ca0eb96f6cd771aa750e2035f25de0a5e6e48a3d94d3c2",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:6c35fe6a816e7faaf611578cd5faf73aba2d48e28341089e0742ceb8edaf064d",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1819,6 +2010,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1876,6 +2068,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:dd6a850a9a993be664caecc10018af6aed642aebbbd74ace6f860c75c57ed2e6",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1933,6 +2126,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:8f143cada1407429b846249a248401008d6f503a0e4dd060570d747b1f3269c3",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -1987,6 +2181,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:1034a31abe777915995aacf0ae64f4a618ca1b679b701d8adc33d99992a6df71",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2044,6 +2239,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:5634ddbd085bb0affd6514aa93fb7cb4b120f31f6b93ff993040a0fc238e58e3",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2108,6 +2304,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:14af95d2de245451f0a67167556b9d3f49761202c43acbaef8b76174de7a0ca8",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2178,6 +2375,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:8af528f85f1655e0e388fa90532ca9200d8f892d3e0eceed79e0bdf04414678e",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2228,6 +2426,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2273,7 +2472,9 @@
         "required": [
           "name"
         ],
-        "properties": {},
+        "properties": {
+          "name": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -2281,7 +2482,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:55ab8cd9d1022d5505e5d1d0d30b2fd44fed019bafeaea0206788117142322ea",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:6320f5df23684969c69a2e14966c35783c563281cde3389fec5ffde2dd0c9825",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -2331,6 +2533,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2381,6 +2584,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2397,7 +2601,7 @@
     {
       "id": "local.command.get",
       "major_version": 1,
-      "owner_domain": "runtime",
+      "owner_domain": "local_integration",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "local.command.get",
@@ -2438,6 +2642,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0a76234b1111ad7f3c2b657c8688405daac0d1907ca33ecfd77b7bb1efdafda9",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2484,7 +2689,10 @@
           "base_release_gid",
           "changes"
         ],
-        "properties": {},
+        "properties": {
+          "base_release_gid": {},
+          "changes": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -2492,7 +2700,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:27836205ea58a17f7feba03d8316faaf37bdeab183c538ebe1158f79eee0a15e",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:b2452fcee9214dc161c525d155e2ce984307738a80eb28dd60359de14c9611f8",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -2537,7 +2746,9 @@
         "required": [
           "proposal_gid"
         ],
-        "properties": {},
+        "properties": {
+          "proposal_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -2545,7 +2756,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:04485bbcd2d141b704d4b7ad750c801cd4d4f33fca86b9f41f329f3c6d875f0f",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:cd01ec0766ee98b11203c9dd326d890f51ba28c7d2ca02844238354ba24b13a5",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -2593,7 +2805,12 @@
           "content_sha256",
           "decision"
         ],
-        "properties": {},
+        "properties": {
+          "proposal_gid": {},
+          "proposal_revision_gid": {},
+          "content_sha256": {},
+          "decision": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -2601,7 +2818,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:06d417814e520d4032b9f8f9b5cc117e0b63d4caf1e935ad8072c6dd84d53b1d",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:3f99641c2331946274fb0236dc2f7eb7cc0630ad4a161660ebc4483e5c0552ba",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -2651,6 +2869,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2728,6 +2947,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:ea0c52812936693c338890c34cf94f758fb6babb6d98ddeae17fd1003c7b2ad7",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2788,6 +3008,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:bf453a9a6e5b10cb20f83cb6f02944924beb9421d4dc4f34c1452667194e2398",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2889,6 +3110,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:2d6bb2461ed198c084eefb42edda6eeb48ee41a72bdb3299bfc4b5b35e12d9c8",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -2937,7 +3159,12 @@
           "expected_active_release_gid",
           "attestations"
         ],
-        "properties": {},
+        "properties": {
+          "release_gid": {},
+          "release_sha256": {},
+          "expected_active_release_gid": {},
+          "attestations": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -2945,7 +3172,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:0136a4888113c107be21c139f32fdbe9f822b3d060be2c76755ec5b0b5f167ba",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:f928f2dd2220fc89de695135c341108113cbc4489fddc6002b4d3105465c9c9f",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -2991,7 +3219,10 @@
           "from_release_gid",
           "to_release_gid"
         ],
-        "properties": {},
+        "properties": {
+          "from_release_gid": {},
+          "to_release_gid": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -2999,7 +3230,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:73521f3c2cf27198d7f853bb099226579774a487c3277e244e4e03db0896a525",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:11dfa0fa31d3b6f1620301e83fb9b2ed29516c47e74a45ac883cd6ef7fa35dc7",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3049,6 +3281,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3096,7 +3329,11 @@
           "proposal_revision_gid",
           "content_sha256"
         ],
-        "properties": {},
+        "properties": {
+          "proposal_gid": {},
+          "proposal_revision_gid": {},
+          "content_sha256": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -3104,7 +3341,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:9d2d69ce0a3d374d7918e2104951cfc62010f4c85b1ef400bfe4fe805775b3af",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:43a934a434290a15e06c65b214c208fdc5fde14515518637f2a702ad92727095",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3154,6 +3392,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3170,7 +3409,7 @@
     {
       "id": "plugin.disable",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.disable",
@@ -3212,6 +3451,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3228,7 +3468,7 @@
     {
       "id": "plugin.enable",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.enable",
@@ -3270,6 +3510,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3286,7 +3527,7 @@
     {
       "id": "plugin.install",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.install",
@@ -3338,6 +3579,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:7fd6541339a8a14ff38ee70766b713073e5ce1ccf7b9a7b5d35ade5c91f0a355",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3354,7 +3596,7 @@
     {
       "id": "plugin.revoke",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.revoke",
@@ -3396,6 +3638,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3412,7 +3655,7 @@
     {
       "id": "plugin.rollback",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.rollback",
@@ -3454,6 +3697,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3470,7 +3714,7 @@
     {
       "id": "plugin.storage.delete",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.storage.delete",
@@ -3514,6 +3758,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:658b7ed0e5465c0a8880c00062a97cca4b3823de3bc8adfb6f08bff1983d07b6",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3530,7 +3775,7 @@
     {
       "id": "plugin.storage.get",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.storage.get",
@@ -3571,6 +3816,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:e170a9c1953900bc7e16800051f41c0870713c77cbc78c633ca0e5461d2328bf",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3587,7 +3833,7 @@
     {
       "id": "plugin.storage.list",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.storage.list",
@@ -3628,6 +3874,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:bb88ea9b5c1610243ea5b1339aa555812bf40d66c05e40764b809f5bb053f071",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3644,7 +3891,7 @@
     {
       "id": "plugin.storage.put",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.storage.put",
@@ -3694,6 +3941,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:065e6f8f26a030782da29d65580f568d0608ac902624be5301d5d1b11643f5d4",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3710,7 +3958,7 @@
     {
       "id": "plugin.uninstall",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.uninstall",
@@ -3752,6 +4000,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:d89f846fd6c01e9a8240ebb30649b9bc564858022d8d7ba105bd35d4c24e4242",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3768,7 +4017,7 @@
     {
       "id": "plugin.upgrade",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.upgrade",
@@ -3820,6 +4069,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:7fd6541339a8a14ff38ee70766b713073e5ce1ccf7b9a7b5d35ade5c91f0a355",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3836,7 +4086,7 @@
     {
       "id": "plugin.upgrade.finish",
       "major_version": 1,
-      "owner_domain": "plugin",
+      "owner_domain": "base",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "plugin.upgrade.finish",
@@ -3881,6 +4131,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:c6fbbd7aba9fc663f1b468dcac508a5c1da18169a46c2a82c6fadf3ded776ac9",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -3926,7 +4177,9 @@
         "required": [
           "named_view"
         ],
-        "properties": {},
+        "properties": {
+          "named_view": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -3934,7 +4187,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:4d26c390dae4400583fe8a22eadb17da2a38a728070dfe3d7e9d531806363e23",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:e4db2afad3f9fd2d101906d3d8d63a7630e535350e3a13ad32907d2578b0b6bc",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -3985,6 +4239,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:15961aca8cb6ee2259e6ea275755616228a9c37f094f6f6aa50291aaf4b803c0",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4030,7 +4285,9 @@
         "required": [
           "change_ref"
         ],
-        "properties": {},
+        "properties": {
+          "change_ref": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -4038,7 +4295,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7460ab86e4a0cecbf60a1305abe556cd788b03a13bb94964d685466540d48df9",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:769caa7b49c4a788bd09b04f0971b01cecbecc178f95206fab59481295319933",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4088,6 +4346,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4134,7 +4393,10 @@
           "job_gid",
           "owner"
         ],
-        "properties": {},
+        "properties": {
+          "job_gid": {},
+          "owner": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -4142,7 +4404,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:471b60021d4c039000053aac5e3ddd99991aa03db4ba3eba63fa537895d43e78",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:62000ddac5d6c1c8b9b47520857f8bfce186037823ea4cd7ac142e4efcf4a885",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4188,7 +4451,10 @@
           "job_gid",
           "owner"
         ],
-        "properties": {},
+        "properties": {
+          "job_gid": {},
+          "owner": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -4196,7 +4462,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:471b60021d4c039000053aac5e3ddd99991aa03db4ba3eba63fa537895d43e78",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:62000ddac5d6c1c8b9b47520857f8bfce186037823ea4cd7ac142e4efcf4a885",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4241,7 +4508,9 @@
         "required": [
           "object_ref"
         ],
-        "properties": {},
+        "properties": {
+          "object_ref": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -4249,7 +4518,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:07b192df60ea65dbac109788b9e7560ade237b0dcdd09ee701e8402f1f58c47b",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:c06f8e28727241209f09e2f0834abba683fc01e88f3c797d23f209b8e420340d",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4294,7 +4564,9 @@
         "required": [
           "query"
         ],
-        "properties": {},
+        "properties": {
+          "query": {}
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -4302,7 +4574,8 @@
         "properties": {},
         "additionalProperties": false
       },
-      "schema_hash": "sha256:f826ccd74c4c0ca2d8c94f9d7d9c3654fd2f00546c0bebbe5100d729b0703f0b",
+      "agent_output_schema": null,
+      "schema_hash": "sha256:7f7cf9f3cbf4ec07da98127075e9a4d442ed8228e3dc2682a85d655f0361c128",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -4352,6 +4625,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:0520089c136a2eb0ebd1244dd2b89cc6410f4c33b70dc1768bfa97393102a285",
       "artifact_policy": "none",
       "operation_policy": "none",
@@ -4368,7 +4642,7 @@
     {
       "id": "vismockup.capture",
       "major_version": 1,
-      "owner_domain": "vismockup",
+      "owner_domain": "local_integration",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "vismockup.capture",
@@ -4410,6 +4684,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
       "artifact_policy": "none",
       "operation_policy": "required",
@@ -4426,7 +4701,7 @@
     {
       "id": "vismockup.highlight",
       "major_version": 1,
-      "owner_domain": "vismockup",
+      "owner_domain": "local_integration",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "vismockup.highlight",
@@ -4474,6 +4749,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:540ab17f01bb895ddf75ac67e2482c54c92af008d71f6e67adcf09da656d155f",
       "artifact_policy": "none",
       "operation_policy": "required",
@@ -4490,7 +4766,7 @@
     {
       "id": "vismockup.launch",
       "major_version": 1,
-      "owner_domain": "vismockup",
+      "owner_domain": "local_integration",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "vismockup.launch",
@@ -4532,6 +4808,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
       "artifact_policy": "none",
       "operation_policy": "required",
@@ -4548,7 +4825,7 @@
     {
       "id": "vismockup.open_file",
       "major_version": 1,
-      "owner_domain": "vismockup",
+      "owner_domain": "local_integration",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "vismockup.open_file",
@@ -4594,6 +4871,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:f8f67a691922555db93ccc846a2a3f741855e3b3cd01ce9e594cfbca13434102",
       "artifact_policy": "none",
       "operation_policy": "required",
@@ -4610,7 +4888,7 @@
     {
       "id": "vismockup.status",
       "major_version": 1,
-      "owner_domain": "vismockup",
+      "owner_domain": "local_integration",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "vismockup.status",
@@ -4652,6 +4930,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:6884c621c27a1271bdd4d6aa748b2cd193c00b87b1abda42d780f6cdb8f80d9f",
       "artifact_policy": "none",
       "operation_policy": "required",
@@ -4668,7 +4947,7 @@
     {
       "id": "vismockup.tree",
       "major_version": 1,
-      "owner_domain": "vismockup",
+      "owner_domain": "local_integration",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "vismockup.tree",
@@ -4715,6 +4994,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:193ae44d1e7fdf3c18f6f2fe117be988e0afe40e8671f2b75439e5a891220422",
       "artifact_policy": "none",
       "operation_policy": "required",
@@ -4731,7 +5011,7 @@
     {
       "id": "vismockup.visibility",
       "major_version": 1,
-      "owner_domain": "vismockup",
+      "owner_domain": "local_integration",
       "lifecycle_status": "experimental",
       "catalog_release": null,
       "title": "vismockup.visibility",
@@ -4781,6 +5061,7 @@
         "properties": {},
         "additionalProperties": false
       },
+      "agent_output_schema": null,
       "schema_hash": "sha256:4b817eaefe9e181f83bd5f0e3af80d057093209c52e8e42a1ce4a83a26ffa0bf",
       "artifact_policy": "none",
       "operation_policy": "required",
@@ -4803,5 +5084,5 @@
       "artifact_hash": "sha256:9511828d1b11db4dbab9236041341cca316fc9386d52a22b0e680518ce8e4e77"
     }
   ],
-  "created_at": "2026-08-10T06:21:52.772717Z"
+  "created_at": "2026-08-10T08:08:58.865706Z"
 }

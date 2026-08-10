@@ -16,6 +16,13 @@ from .contracts import (
 )
 
 
+_OWNER_ALIASES = {
+    "plugin": "base",
+    "runtime": "local_integration",
+    "vismockup": "local_integration",
+}
+
+
 def _closed_schema(value: Mapping[str, Any] | None) -> dict[str, Any]:
     schema = dict(value or {})
     if not schema:
@@ -31,6 +38,8 @@ def _closed_schema(value: Mapping[str, Any] | None) -> dict[str, Any]:
         schema["items"] = _closed_schema(items)
     if schema.get("type") == "object":
         schema.setdefault("properties", {})
+        for name in schema.get("required") or ():
+            schema["properties"].setdefault(name, {})
         schema["additionalProperties"] = False
     return schema
 
@@ -63,7 +72,7 @@ def adapt_v1_spec(spec: CapabilitySpec) -> CapabilityDescriptorV2:
     return CapabilityDescriptorV2(
         id=spec.id,
         major_version=spec.version,
-        owner_domain=spec.owner,
+        owner_domain=_OWNER_ALIASES.get(spec.owner, spec.owner),
         lifecycle_status="experimental",
         title=spec.id,
         description=description,

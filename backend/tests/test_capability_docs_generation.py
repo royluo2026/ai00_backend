@@ -1,0 +1,78 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from backend.capabilities.models_next import CapabilitySpec
+from backend.capabilities.validation_next import validate_payload
+from backend.capability_v2.catalog import CatalogRelease
+from backend.capability_v2.docs.generator import (
+    DOMAIN_DOC_PATHS, build_documentation, example_for_schema, generated_files,
+)
+from backend.capability_v2.v1_adapter import adapt_v1_spec
+
+
+ROOT = Path(__file__).resolve().parents[2]
+CATALOG_PATH = ROOT / "docs/governance/capability-catalog-release.json"
+DOCS_ROOT = ROOT / "docs/capabilities"
+
+
+def _catalog() -> CatalogRelease:
+    return CatalogRelease.model_validate_json(CATALOG_PATH.read_text(encoding="utf-8"))
+
+
+def test_v1_adapter_makes_required_fields_possible_under_closed_schema():
+    descriptor = adapt_v1_spec(CapabilitySpec(
+        id="craft.example.get", owner="craft",
+        input_schema={"type": "object", "required": ["version_gid"]},
+    ))
+    assert "version_gid" in descriptor.input_schema["properties"]
+    validate_payload(dict(descriptor.input_schema), {"version_gid": "example"})
+
+
+def test_every_descriptor_has_generated_page_and_valid_minimal_example():
+    catalog = _catalog()
+    files = generated_files(catalog)
+    for descriptor in catalog.descriptors:
+        page = f"{DOMAIN_DOC_PATHS[descriptor.owner_domain]}/{descriptor.id}@{descriptor.major_version}.md"
+        assert page in files
+        example = example_for_schema(descriptor.input_schema)
+        validate_payload(dict(descriptor.input_schema), example)
+        assert descriptor.id in files[page]
+        assert "插件" in files[page] and "Agent" in files[page]
+
+
+def test_machine_catalog_contains_release_bound_agent_mcp_and_openapi_views():
+    document = build_documentation(_catalog())
+    machine = document.machine_catalog
+    assert machine["release_id"] == _catalog().release_id
+    assert machine["catalog_hash"] == _catalog().catalog_hash
+    assert len(machine["capabilities"]) == len(_catalog().descriptors)
+    assert all(item["catalog_release"] == machine["release_id"] for item in machine["capabilities"])
+    assert all("schema_precision" in item and "exposure_blockers" in item for item in machine["capabilities"])
+    assert all(item["exposure"]["agent"] for item in machine["agent_tools"])
+    assert all(item["exposure"]["mcp"] for item in machine["mcp_tools"])
+    assert machine["openapi_fragment"]["openapi"] == "3.1.0"
+    api_operation = next(iter(machine["openapi_fragment"]["paths"].values()))["post"]
+    response_schema = api_operation["responses"]["200"]["content"]["application/json"]["schema"]
+    assert "operation_ref" in response_schema["properties"]
+    assert {item["owner_domain"] for item in machine["capabilities"]} <= {
+        "base", "agent", "craft", "digital_model", "project_management",
+        "simulation", "ontology", "knowledge", "local_integration",
+    }
+
+
+def test_checked_in_manual_has_no_generation_drift():
+    expected = generated_files(_catalog())
+    actual = {
+        path.relative_to(DOCS_ROOT).as_posix(): path.read_text(encoding="utf-8")
+        for path in DOCS_ROOT.rglob("*") if path.is_file()
+    }
+    assert actual == expected
+
+
+def test_plugin_sdk_declares_full_v2_result_contract():
+    source = (ROOT / "packages/plugin-sdk/src/index.ts").read_text(encoding="utf-8")
+    for field in ("operation_ref", "artifact_refs", "evidence", "correlation"):
+        assert field in source
+    assert '"outcome_unknown"' in source

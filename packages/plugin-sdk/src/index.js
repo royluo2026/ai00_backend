@@ -1,3 +1,14 @@
+export function isCapabilityResultV2(value) {
+  return !!value && typeof value === "object"
+    && typeof value.ok === "boolean"
+    && typeof value.status === "string"
+    && typeof value.capability_id === "string"
+    && Number.isInteger(value.major_version)
+    && Array.isArray(value.artifact_refs)
+    && Array.isArray(value.evidence)
+    && !!value.correlation;
+}
+
 export class Ai00PluginClient {
   #init; #pending = new Map(); #readyResolve;
   #ready = new Promise((resolve) => { this.#readyResolve = resolve; });
