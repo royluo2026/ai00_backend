@@ -1,0 +1,847 @@
+{
+  "schema_version": 1,
+  "domain": "Ontology",
+  "reviewed_against": {
+    "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
+    "registry_sha256": "sha256:d20e0541378b3f1a8b6fedc39cf95771bc8140a65672f3335aee5bde26038723",
+    "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
+    "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
+  },
+  "unreviewed_functions": {
+    "rest:DELETE:/api/ontology/axioms/{gid}": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:DELETE:/api/ontology/classes/{gid}": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:DELETE:/api/ontology/properties/{gid}": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:DELETE:/api/ontology/relations/{gid}": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/bop/entries/{entry_gid}/entity-props": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/agent-schema": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/classes": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/classes/{gid}/axioms": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/classes/{gid}/full": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/classes/{gid}/individuals": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/db-tables": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/graph": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/node-type-config": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/node-type-suggestions": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/schema-diff": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:GET:/api/ontology/unbound-classes": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:PATCH:/api/bop/entries/{entry_gid}/entity-props": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:PATCH:/api/ontology/classes/{gid}": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:PATCH:/api/ontology/properties/{gid}": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:PATCH:/api/ontology/relations/{gid}": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/api/ontology/axioms": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/api/ontology/classes": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/api/ontology/classes/{gid}/sync-from-table": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/api/ontology/properties": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/api/ontology/relations": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/api/ontology/seed": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    },
+    "rest:POST:/api/ontology/validate/{entry_gid}": {
+      "resolution": "unreviewed",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner": "Ontology",
+      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+    }
+  },
+  "excluded_functions": {},
+  "capabilities": {
+    "ontology.change.proposal.create": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.change.proposal.create": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_proposals_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.change.proposal.get": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.change.proposal.get": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_proposals_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.change.proposal.review.submit": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.change.proposal.review.submit": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_proposals_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.change.proposal.search": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.change.proposal.search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_proposals_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.concept.get": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.concept.get": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_concepts_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.concept.resolve": {
+      "kind": "existing",
+      "function_dispositions": {
+        "agent_tool:get_ontology_schema": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:ontology.concept.resolve": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_concepts_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/schema/{node_type}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": true,
+          "reason": "Existing Registry evidence includes this consumer.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.mapping.assess": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.mapping.assess": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_concepts_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.release.activate": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.release.activate": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_releases_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.release.diff": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.release.diff": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_releases_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.release.get": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.release.get": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_releases_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.release.publish": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.release.publish": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_releases_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "ontology.release.search": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:ontology.release.search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "backend/capabilities/ontology_releases_next.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    }
+  },
+  "code_extractions": [],
+  "database_boundaries": [],
+  "debt_dispositions": [],
+  "review": {
+    "reviewer": "pending-domain-review",
+    "reviewed_at": "2026-08-11",
+    "status": "draft"
+  }
+}

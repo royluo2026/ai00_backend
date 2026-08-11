@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import os
 from pathlib import Path
 
@@ -12,6 +13,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = ROOT / "docs" / "governance" / "capability-coverage-review.schema.json"
 FIXTURE_DIR = ROOT / "backend" / "tests" / "fixtures" / "capability_coverage_review"
+BUILDER_PATH = ROOT / "backend" / "scripts" / "build_capability_coverage_review.py"
 
 
 @pytest.fixture
@@ -26,6 +28,15 @@ def fixture():
         return json.loads((FIXTURE_DIR / name).read_text(encoding="utf-8"))
 
     return load
+
+
+@pytest.fixture
+def builder():
+    spec = importlib.util.spec_from_file_location("build_capability_coverage_review", BUILDER_PATH)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
 
 
 def _validate(schema: dict, document: dict) -> None:
@@ -128,3 +139,34 @@ def test_draft_unreviewed_function_does_not_forge_review_approval(review_schema,
     document["review"]["status"] = "approved"
     with pytest.raises(jsonschema.ValidationError):
         _validate(review_schema, document)
+
+
+def test_merge_preserves_reviewed_dispositions_and_adds_new_candidates(builder, fixture):
+    reviewed = fixture("minimal-valid.json")
+    discovered = [
+        {
+            "function_id": "rest:GET:/api/projects",
+            "domain": "Project Management",
+            "source_paths": ["backend/routers/projects.py"],
+        },
+        {
+            "function_id": "rest:GET:/api/new-route",
+            "domain": "Project Management",
+            "source_paths": ["backend/routers/new_route.py"],
+        },
+    ]
+
+    merged = builder.merge_domain_review(reviewed, discovered)
+
+    assert merged["capabilities"]["project.project.list"]["function_dispositions"][
+        "rest:GET:/api/projects"
+    ]["resolution"] == "existing_capability"
+    assert merged["unreviewed_functions"]["rest:GET:/api/new-route"]["resolution"] == "unreviewed"
+
+
+def test_generated_views_are_order_independent(builder, fixture):
+    project = fixture("minimal-valid.json")
+    base = fixture("minimal-valid.json")
+    base["domain"] = "Base Platform"
+
+    assert builder.render_views([project, base]) == builder.render_views([base, project])

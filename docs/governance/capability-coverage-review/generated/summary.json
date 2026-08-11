@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "domains": 9,
+  "stable_functions": 753,
+  "resolutions": {
+    "existing_capability": 119,
+    "new_capability": 0,
+    "excluded": 6,
+    "unreviewed": 628
+  },
+  "candidate_capabilities": 0
+}
