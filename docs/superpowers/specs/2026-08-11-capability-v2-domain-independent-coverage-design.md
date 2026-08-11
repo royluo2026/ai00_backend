@@ -17,7 +17,8 @@ Completion means all stable records have a reviewed disposition, every mapped Ca
 - 628 stable records remain unresolved: Craft 342, Base Platform 146, Agent 67, Ontology 27, Project Management 22, Knowledge 21, and Local Integration 3.
 - The frozen Catalog contains 87 stable Capabilities. Their contract and acceptance coverage is green, but that does not prove product-function coverage.
 - The current domain coverage test filters out records whose `target_capability` is null. It therefore proves only that existing mappings resolve, not that every stable function has a disposition.
-- The dependency baseline contains seven historical cross-domain implementation imports.
+- The dependency baseline contains seven historical module-level cross-domain implementation imports.
+- The deeper domain-boundary baseline contains 292 historical violations: 262 cross-domain SQL accesses and 30 internal implementation imports. The table inventory currently assigns 162 tables to runtime domains.
 - Project Management still owns source files physically hosted below `plugins/craft`, and its migrations still use Craft-prefixed filenames. That is ownership metadata, not independent maintenance.
 
 ## 3. Design Principles
@@ -48,7 +49,7 @@ A domain may consume another domain only through a versioned public port, `Capab
 
 Every table and migration has exactly one owning domain. Shared physical database infrastructure is allowed, but schema ownership and migration release units remain independent. A domain cannot write another domain's tables. Cross-domain workflows use ports and outbox-backed events, not multi-domain table transactions.
 
-The current exceptions in `domain-dependency-baseline.json` are debt to remove. The baseline must reach zero; it cannot be retained as the completion state.
+The current exceptions in `docs/governance/domain-dependency-baseline.json` and `backend/governance/boundary_baseline.json` are debt to remove. Both baselines must reach zero; neither can be retained as the completion state.
 
 ## 5. Five Coupled Inventories
 
@@ -178,7 +179,8 @@ Release requires all of the following:
 - every owned table and migration has exactly one domain owner;
 - cross-domain table writes are zero;
 - cross-domain Router, Repository, ORM, migration, concrete service, and database-helper imports are zero;
-- `domain-dependency-baseline.json` contains zero violations;
+- `docs/governance/domain-dependency-baseline.json` contains zero violations;
+- `backend/governance/boundary_baseline.json` contains zero cross-domain SQL and internal-import violations;
 - each domain builds, migrates, tests, publishes, and rolls back without requiring another domain's private implementation;
 - generated Registry, Catalog, SDK, documentation, CODEOWNERS, and acceptance artifacts have no drift;
 - offline strict acceptance passes with no mandatory skips;
