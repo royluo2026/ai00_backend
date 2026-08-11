@@ -3,61 +3,60 @@
 | Domain | Function | Resolution | Capability |
 |---|---|---|---|
 
-| Agent | `agent_runtime:DELETE:/v1/sessions/{session_gid}` | unreviewed | — |
-| Agent | `agent_runtime:GET:/health` | unreviewed | — |
-| Agent | `agent_runtime:GET:/v1/runs/{session_gid}` | unreviewed | — |
-| Agent | `agent_runtime:GET:/v1/runs/{session_gid}/approvals` | unreviewed | — |
-| Agent | `agent_runtime:GET:/v1/sessions` | unreviewed | — |
-| Agent | `agent_runtime:GET:/v1/sessions/{session_gid}` | unreviewed | — |
-| Agent | `agent_runtime:GET:/v1/tools` | unreviewed | — |
-| Agent | `agent_runtime:POST:/v1/runs` | unreviewed | — |
-| Agent | `agent_runtime:POST:/v1/runs/{session_gid}/(pause|resume|cancel)` | unreviewed | — |
-| Agent | `agent_runtime:POST:/v1/runs/{session_gid}/approvals/{parameter_2}/decision` | unreviewed | — |
-| Agent | `agent_runtime:POST:/v1/runs/{session_gid}/messages` | unreviewed | — |
-| Agent | `agent_runtime:POST:/v1/runs/{session_gid}/messages/stream` | unreviewed | — |
-| Agent | `agent_runtime:POST:/v1/sessions` | unreviewed | — |
-| Agent | `agent_tool:aggregate_history` | unreviewed | — |
-| Agent | `agent_tool:ask_for_clarification` | unreviewed | — |
-| Agent | `agent_tool:calculate` | unreviewed | — |
-| Agent | `agent_tool:create_discussion_topic` | unreviewed | — |
-| Agent | `agent_tool:flag_for_review` | unreviewed | — |
-| Agent | `agent_tool:list_memories` | unreviewed | — |
-| Agent | `agent_tool:list_preferences` | unreviewed | — |
-| Agent | `agent_tool:recall_memory` | unreviewed | — |
-| Agent | `agent_tool:save_memory` | unreviewed | — |
-| Agent | `agent_tool:save_preference` | unreviewed | — |
-| Agent | `rest:DELETE:/api/ai/sessions/{gid}` | unreviewed | — |
-| Agent | `rest:DELETE:/api/flows/{gid}` | unreviewed | — |
-| Agent | `rest:DELETE:/api/skills/{gid}` | unreviewed | — |
-| Agent | `rest:GET:/api/ai/admin-config` | unreviewed | — |
-| Agent | `rest:GET:/api/ai/audit-logs` | unreviewed | — |
-| Agent | `rest:GET:/api/ai/balance` | unreviewed | — |
-| Agent | `rest:GET:/api/ai/sessions` | unreviewed | — |
-| Agent | `rest:GET:/api/ai/sessions/{gid}` | unreviewed | — |
-| Agent | `rest:GET:/api/ai/tools` | unreviewed | — |
-| Agent | `rest:GET:/api/flows` | unreviewed | — |
-| Agent | `rest:GET:/api/flows/capability-manifest` | unreviewed | — |
-| Agent | `rest:GET:/api/flows/runs` | unreviewed | — |
-| Agent | `rest:GET:/api/flows/runs/{run_gid}` | unreviewed | — |
-| Agent | `rest:GET:/api/flows/{gid}` | unreviewed | — |
-| Agent | `rest:GET:/api/skills` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/abort` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/admin-config` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/audit` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/chat` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/chat/stream` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/confirm` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/confirm/sync` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/sessions/new` | unreviewed | — |
-| Agent | `rest:POST:/api/ai/test-connection` | unreviewed | — |
-| Agent | `rest:POST:/api/flows` | unreviewed | — |
-| Agent | `rest:POST:/api/flows/gen-script` | unreviewed | — |
-| Agent | `rest:POST:/api/flows/runs/{run_gid}/step` | unreviewed | — |
-| Agent | `rest:POST:/api/flows/{gid}/run` | unreviewed | — |
-| Agent | `rest:POST:/api/skills` | unreviewed | — |
-| Agent | `rest:POST:/api/skills/seed-system` | unreviewed | — |
-| Agent | `rest:PUT:/api/flows/{gid}` | unreviewed | — |
-| Agent | `rest:PUT:/api/skills/{gid}` | unreviewed | — |
+| Agent | `agent_runtime:GET:/health` | excluded | — |
+| Agent | `agent_runtime:GET:/v1/tools` | excluded | — |
+| Agent | `agent_tool:calculate` | excluded | — |
+| Agent | `rest:GET:/api/ai/admin-config` | excluded | — |
+| Agent | `rest:GET:/api/ai/tools` | excluded | — |
+| Agent | `rest:GET:/api/flows/capability-manifest` | excluded | — |
+| Agent | `rest:POST:/api/ai/admin-config` | excluded | — |
+| Agent | `rest:POST:/api/ai/test-connection` | excluded | — |
+| Agent | `rest:POST:/api/skills/seed-system` | excluded | — |
+| Agent | `rest:GET:/api/ai/audit-logs` | new_capability | `agent.audit.read` |
+| Agent | `rest:GET:/api/ai/balance` | new_capability | `agent.audit.read` |
+| Agent | `rest:POST:/api/ai/audit` | new_capability | `agent.audit.record` |
+| Agent | `rest:DELETE:/api/flows/{gid}` | new_capability | `agent.flow.change.apply` |
+| Agent | `rest:POST:/api/flows` | new_capability | `agent.flow.change.apply` |
+| Agent | `rest:POST:/api/flows/gen-script` | new_capability | `agent.flow.change.apply` |
+| Agent | `rest:POST:/api/flows/runs/{run_gid}/step` | new_capability | `agent.flow.change.apply` |
+| Agent | `rest:POST:/api/flows/{gid}/run` | new_capability | `agent.flow.change.apply` |
+| Agent | `rest:PUT:/api/flows/{gid}` | new_capability | `agent.flow.change.apply` |
+| Agent | `rest:GET:/api/flows` | new_capability | `agent.flow.read` |
+| Agent | `rest:GET:/api/flows/runs` | new_capability | `agent.flow.read` |
+| Agent | `rest:GET:/api/flows/runs/{run_gid}` | new_capability | `agent.flow.read` |
+| Agent | `rest:GET:/api/flows/{gid}` | new_capability | `agent.flow.read` |
+| Agent | `agent_tool:ask_for_clarification` | new_capability | `agent.interaction.request` |
+| Agent | `agent_tool:create_discussion_topic` | new_capability | `agent.interaction.request` |
+| Agent | `agent_tool:flag_for_review` | new_capability | `agent.interaction.request` |
+| Agent | `agent_tool:save_memory` | new_capability | `agent.memory.change.apply` |
+| Agent | `agent_tool:save_preference` | new_capability | `agent.memory.change.apply` |
+| Agent | `agent_tool:list_memories` | new_capability | `agent.memory.read` |
+| Agent | `agent_tool:list_preferences` | new_capability | `agent.memory.read` |
+| Agent | `agent_tool:recall_memory` | new_capability | `agent.memory.read` |
+| Agent | `agent_runtime:POST:/v1/runs` | new_capability | `agent.run.change.apply` |
+| Agent | `agent_runtime:POST:/v1/runs/{session_gid}/(pause|resume|cancel)` | new_capability | `agent.run.change.apply` |
+| Agent | `agent_runtime:POST:/v1/runs/{session_gid}/approvals/{parameter_2}/decision` | new_capability | `agent.run.change.apply` |
+| Agent | `agent_runtime:POST:/v1/runs/{session_gid}/messages` | new_capability | `agent.run.change.apply` |
+| Agent | `agent_runtime:POST:/v1/runs/{session_gid}/messages/stream` | new_capability | `agent.run.change.apply` |
+| Agent | `rest:POST:/api/ai/abort` | new_capability | `agent.run.change.apply` |
+| Agent | `rest:POST:/api/ai/chat` | new_capability | `agent.run.change.apply` |
+| Agent | `rest:POST:/api/ai/chat/stream` | new_capability | `agent.run.change.apply` |
+| Agent | `rest:POST:/api/ai/confirm` | new_capability | `agent.run.change.apply` |
+| Agent | `rest:POST:/api/ai/confirm/sync` | new_capability | `agent.run.change.apply` |
+| Agent | `agent_runtime:GET:/v1/runs/{session_gid}` | new_capability | `agent.run.read` |
+| Agent | `agent_runtime:GET:/v1/runs/{session_gid}/approvals` | new_capability | `agent.run.read` |
+| Agent | `agent_runtime:DELETE:/v1/sessions/{session_gid}` | new_capability | `agent.session.change.apply` |
+| Agent | `agent_runtime:POST:/v1/sessions` | new_capability | `agent.session.change.apply` |
+| Agent | `rest:DELETE:/api/ai/sessions/{gid}` | new_capability | `agent.session.change.apply` |
+| Agent | `rest:POST:/api/ai/sessions/new` | new_capability | `agent.session.change.apply` |
+| Agent | `agent_runtime:GET:/v1/sessions` | new_capability | `agent.session.read` |
+| Agent | `agent_runtime:GET:/v1/sessions/{session_gid}` | new_capability | `agent.session.read` |
+| Agent | `rest:GET:/api/ai/sessions` | new_capability | `agent.session.read` |
+| Agent | `rest:GET:/api/ai/sessions/{gid}` | new_capability | `agent.session.read` |
+| Agent | `rest:DELETE:/api/skills/{gid}` | new_capability | `agent.skill.change.apply` |
+| Agent | `rest:POST:/api/skills` | new_capability | `agent.skill.change.apply` |
+| Agent | `rest:PUT:/api/skills/{gid}` | new_capability | `agent.skill.change.apply` |
+| Agent | `rest:GET:/api/skills` | new_capability | `agent.skill.read` |
 | Base Platform | `rest:DELETE:/admin/config/{key}` | excluded | — |
 | Base Platform | `rest:GET:/` | excluded | — |
 | Base Platform | `rest:GET:/admin/cloud-db-config` | excluded | — |
@@ -623,6 +622,7 @@
 | Project Management | `agent_tool:list_projects` | existing_capability | `base.project.search` |
 | Project Management | `capability:base.project.search` | existing_capability | `base.project.search` |
 | Project Management | `rest:GET:/api/projects` | existing_capability | `base.project.search` |
+| Project Management | `agent_tool:aggregate_history` | new_capability | `project.activity.aggregate` |
 | Project Management | `agent_tool:create_approval_order` | new_capability | `project.approval.change.apply` |
 | Project Management | `rest:POST:/api/approval/orders` | new_capability | `project.approval.change.apply` |
 | Project Management | `rest:POST:/api/approval/orders/scope_upgrade` | new_capability | `project.approval.change.apply` |

@@ -4,11 +4,11 @@
   "stable_functions": 753,
   "resolutions": {
     "existing_capability": 151,
-    "new_capability": 199,
-    "excluded": 83,
-    "unreviewed": 320
+    "new_capability": 245,
+    "excluded": 92,
+    "unreviewed": 265
   },
-  "candidate_capabilities": 58,
+  "candidate_capabilities": 72,
   "evidence": {
     "module_dependencies": 7,
     "boundary_violations": 292,

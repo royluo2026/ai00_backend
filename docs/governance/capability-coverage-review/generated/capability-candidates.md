@@ -3,6 +3,19 @@
 | Domain | Business outcome | Capability |
 |---|---|---|
 
+| Agent | Deliver the governed audit read business outcome for Agent. | `agent.audit.read` |
+| Agent | Deliver the governed audit record business outcome for Agent. | `agent.audit.record` |
+| Agent | Deliver the governed flow change apply business outcome for Agent. | `agent.flow.change.apply` |
+| Agent | Deliver the governed flow read business outcome for Agent. | `agent.flow.read` |
+| Agent | Deliver the governed interaction request business outcome for Agent. | `agent.interaction.request` |
+| Agent | Deliver the governed memory change apply business outcome for Agent. | `agent.memory.change.apply` |
+| Agent | Deliver the governed memory read business outcome for Agent. | `agent.memory.read` |
+| Agent | Deliver the governed run change apply business outcome for Agent. | `agent.run.change.apply` |
+| Agent | Deliver the governed run read business outcome for Agent. | `agent.run.read` |
+| Agent | Deliver the governed session change apply business outcome for Agent. | `agent.session.change.apply` |
+| Agent | Deliver the governed session read business outcome for Agent. | `agent.session.read` |
+| Agent | Deliver the governed skill change apply business outcome for Agent. | `agent.skill.change.apply` |
+| Agent | Deliver the governed skill read business outcome for Agent. | `agent.skill.read` |
 | Base Platform | Deliver the governed annotation change apply business outcome for Base Platform. | `base.annotation.change.apply` |
 | Base Platform | Deliver the governed annotation read business outcome for Base Platform. | `base.annotation.read` |
 | Base Platform | Deliver the governed authorization grant change apply business outcome for Base Platform. | `base.authorization.grant.change.apply` |
@@ -31,6 +44,7 @@
 | Knowledge | Deliver the governed space change apply business outcome for Knowledge. | `knowledge.space.change.apply` |
 | Ontology | Deliver the governed mapping change apply business outcome for Ontology. | `ontology.mapping.change.apply` |
 | Ontology | Deliver the governed schema change apply business outcome for Ontology. | `ontology.schema.change.apply` |
+| Project Management | Deliver the governed activity aggregate business outcome for Project Management. | `project.activity.aggregate` |
 | Project Management | Deliver the governed approval change apply business outcome for Project Management. | `project.approval.change.apply` |
 | Project Management | Deliver the governed approval read business outcome for Project Management. | `project.approval.read` |
 | Project Management | Deliver the governed bitable binding change apply business outcome for Project Management. | `project.bitable_binding.change.apply` |

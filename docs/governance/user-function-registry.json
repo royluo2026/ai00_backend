@@ -294,15 +294,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -311,7 +311,7 @@
     },
     "agent_tool:aggregate_history": {
       "function_id": "agent_tool:aggregate_history",
-      "domain": "Agent",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -325,7 +325,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -426,15 +426,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -470,15 +470,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -492,15 +492,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -514,14 +514,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.search",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -624,15 +624,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -646,14 +646,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.document.get",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -668,14 +668,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.get",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -734,15 +734,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -756,14 +756,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "system.search",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -778,15 +778,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -800,15 +800,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -822,15 +822,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -888,14 +888,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "base.project.search",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Project Management",
       "exclusion_reason": null,
@@ -932,15 +932,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -954,15 +954,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -1020,14 +1020,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.context.retrieve",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -1108,14 +1108,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "system.search",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -1152,15 +1152,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -1174,15 +1174,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -3795,10 +3795,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:DELETE:/admin/config/{key} is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -3832,15 +3832,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4272,15 +4272,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_datasource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -4294,15 +4294,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -4448,15 +4448,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.follow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4580,15 +4580,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.authorization.grant.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -4624,15 +4624,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4646,15 +4646,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.list.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4668,15 +4668,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.entry.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -4690,15 +4690,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.space.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -4712,15 +4712,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.document.archive",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -4734,15 +4734,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.list.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4756,15 +4756,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -4778,15 +4778,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -4800,15 +4800,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -4822,15 +4822,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -4844,15 +4844,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4866,15 +4866,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4888,15 +4888,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.member.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4932,15 +4932,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.annotation.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -4954,15 +4954,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.sharing.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4976,15 +4976,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.sharing.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -4998,15 +4998,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.sharing.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5064,15 +5064,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5086,15 +5086,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5108,15 +5108,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5130,15 +5130,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5174,15 +5174,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.saved_view.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -5196,15 +5196,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5218,15 +5218,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5240,15 +5240,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.team.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -5262,15 +5262,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.team.membership.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -5291,10 +5291,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/ is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capabilities.py"
       ]
@@ -5313,10 +5313,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/admin/cloud-db-config is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -5335,10 +5335,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/admin/config is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -5357,10 +5357,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/admin/config/{key} is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -5379,10 +5379,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/admin/debug-logs is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -5401,10 +5401,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/admin/plugin-registry is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -5548,15 +5548,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.annotation.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -5570,15 +5570,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5592,15 +5592,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5614,15 +5614,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5636,15 +5636,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5658,15 +5658,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5680,15 +5680,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5746,14 +5746,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.mapping.assess",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -6714,15 +6714,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.change_log.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -6736,15 +6736,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.collaboration.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -6758,15 +6758,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.collaboration.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -6897,10 +6897,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/deploy is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/deploy.py"
       ]
@@ -6919,10 +6919,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/deploy/current is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/deploy.py"
       ]
@@ -6941,10 +6941,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/deploy/history is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/deploy.py"
       ]
@@ -6963,10 +6963,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/deploy/pipeline is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/deploy.py"
       ]
@@ -7088,15 +7088,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_datasource.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -7110,15 +7110,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_datasource.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -7132,15 +7132,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -7154,15 +7154,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -7176,15 +7176,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -7198,15 +7198,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -7337,10 +7337,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/feishu/im/contact-messages is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_im.py"
       ]
@@ -7359,10 +7359,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/feishu/im/mentions is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_im.py"
       ]
@@ -7381,10 +7381,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/file-store/config is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/file_store.py"
       ]
@@ -7506,15 +7506,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.follow.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7528,15 +7528,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.follow.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7748,15 +7748,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.authorization.grant.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -7770,15 +7770,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.authorization.grant.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -7814,15 +7814,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7836,15 +7836,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7858,15 +7858,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7880,15 +7880,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.list.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7902,14 +7902,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -7924,14 +7924,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -7946,15 +7946,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.personalization.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -7968,14 +7968,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.space.list",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -8012,14 +8012,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.document.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -8034,14 +8034,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.document.history.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -8056,15 +8056,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.personalization.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -8078,15 +8078,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.list.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8101,15 +8101,15 @@
         "REST",
         "Web"
       ],
-      "target_capability": null,
+      "target_capability": "project.notification.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8124,15 +8124,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.notification.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8147,15 +8147,15 @@
         "REST",
         "Web"
       ],
-      "target_capability": null,
+      "target_capability": "project.notification.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8170,14 +8170,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.resolve",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8192,14 +8192,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.resolve",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8214,14 +8214,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8236,14 +8236,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8258,14 +8258,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8287,10 +8287,10 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Ontology",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/ontology/db-tables is a database-introspection endpoint used to configure Ontology bindings; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ]
@@ -8302,14 +8302,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.resolve",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8324,14 +8324,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.resolve",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8346,14 +8346,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.resolve",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8368,14 +8368,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.release.diff",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8412,14 +8412,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.concept.resolve",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -8434,15 +8434,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.permission_request.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8456,15 +8456,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -8478,14 +8478,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.project.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Project Management",
       "exclusion_reason": null,
@@ -8500,15 +8500,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.member.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8522,15 +8522,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8544,15 +8544,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8566,15 +8566,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.craft_scope.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8588,15 +8588,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.member.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8654,15 +8654,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.annotation.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -8676,15 +8676,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.annotation.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -8698,15 +8698,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.annotation.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -8720,15 +8720,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.sharing.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8742,15 +8742,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.sharing.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8874,15 +8874,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8896,15 +8896,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8918,15 +8918,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8940,15 +8940,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8962,15 +8962,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -8984,15 +8984,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -9006,14 +9006,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "identity.principal.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9028,15 +9028,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.identity.session.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9050,14 +9050,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "identity.principal.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9123,10 +9123,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path} is a signed marketplace asset or mounted Capability transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
       ]
@@ -9138,15 +9138,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9160,15 +9160,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9182,15 +9182,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9204,15 +9204,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9226,15 +9226,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9248,15 +9248,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9277,10 +9277,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/v2/agent-capabilities/catalog is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ]
@@ -9299,10 +9299,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/v2/agent-capabilities/catalog-preview is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ]
@@ -9321,10 +9321,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/v2/capability-artifacts/{artifact_id} is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capability_artifacts.py"
       ]
@@ -9343,10 +9343,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/v2/capability-operations/{operation_id} is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capability_operations.py"
       ]
@@ -9358,15 +9358,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.saved_view.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9424,15 +9424,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -9446,15 +9446,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -9468,15 +9468,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -9490,15 +9490,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -9519,10 +9519,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/auth/feishu/callback is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/auth.py"
       ]
@@ -9541,10 +9541,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/auth/feishu/login-url is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/auth.py"
       ]
@@ -9563,10 +9563,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/auth/feishu/poll/{state} is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/auth.py"
       ]
@@ -9585,10 +9585,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/auth/me is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/auth.py"
       ]
@@ -9607,10 +9607,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/cache/debug is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9629,10 +9629,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/calendar/events/{event_id} is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9651,10 +9651,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/calendar/today is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9673,10 +9673,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/org/dept-search is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9695,10 +9695,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/org/users is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9717,10 +9717,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/org/users/search is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9739,10 +9739,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/search/chats is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9761,10 +9761,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/search/docs is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9783,10 +9783,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/search/events is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9805,10 +9805,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/search/meetings is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9827,10 +9827,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/search/users is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9849,10 +9849,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/feishu/sync/org/status is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -9871,10 +9871,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/health is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/health.py"
       ]
@@ -9893,10 +9893,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/ready is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/health.py"
       ]
@@ -9915,10 +9915,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "ui_transient",
+      "migration_status": "excluded",
       "owner": "Project Management",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/share/issues is a transient public share page composed from governed Issue data; it is retained as ui transient infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/share_page.py"
       ]
@@ -9930,15 +9930,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.team.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9953,15 +9953,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.team.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -9975,14 +9975,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "identity.principal.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9997,15 +9997,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.identity.session.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -10026,10 +10026,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/{capability_id} is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capabilities.py"
       ]
@@ -10063,15 +10063,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.mapping.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -10635,15 +10635,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_datasource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -10657,15 +10657,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -10789,15 +10789,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.follow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -10921,15 +10921,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -10943,15 +10943,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.entry.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -10965,15 +10965,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.space.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -10987,14 +10987,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.document.revise",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -11009,15 +11009,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.list.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11031,15 +11031,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.notification.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11054,15 +11054,15 @@
         "REST",
         "Web"
       ],
-      "target_capability": null,
+      "target_capability": "project.notification.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11077,15 +11077,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.notification.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11099,15 +11099,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -11121,15 +11121,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -11143,15 +11143,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -11165,15 +11165,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11187,15 +11187,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11253,15 +11253,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11275,15 +11275,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11297,15 +11297,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11319,15 +11319,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.identity.role.assign",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -11341,15 +11341,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.saved_view.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -11363,15 +11363,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11392,10 +11392,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:PATCH:/feishu/calendar/events/{event_id} is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -11414,10 +11414,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:PATCH:/feishu/calendar/events/{event_id}/rsvp is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -11429,15 +11429,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.team.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -11451,15 +11451,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.team.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -11480,10 +11480,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/admin/cloud-db-config is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -11502,10 +11502,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/admin/cloud-db-config/test is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -11524,10 +11524,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/admin/config/reload is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -11546,10 +11546,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/admin/server-restart is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -11759,15 +11759,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11781,15 +11781,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11803,15 +11803,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11825,15 +11825,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11847,15 +11847,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.approval.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11869,15 +11869,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11891,15 +11891,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11913,15 +11913,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -11935,15 +11935,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -12991,15 +12991,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.collaboration.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -13013,15 +13013,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.collaboration.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -13035,15 +13035,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.collaboration.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -13306,10 +13306,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/deploy/rollback is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/deploy.py"
       ]
@@ -13387,15 +13387,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_datasource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -13409,15 +13409,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_datasource.connection.test",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -13431,15 +13431,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -13453,15 +13453,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -13790,10 +13790,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/feishu/doc/read is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_doc.py"
       ]
@@ -13812,10 +13812,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/feishu/doc/write-cells is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_doc.py"
       ]
@@ -13834,10 +13834,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/file-store/config is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/file_store.py"
       ]
@@ -13856,10 +13856,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/file-store/ois-config is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/file_store.py"
       ]
@@ -13878,10 +13878,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/file-store/ois-test is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/file_store.py"
       ]
@@ -13900,10 +13900,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/file-store/test is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/file_store.py"
       ]
@@ -14003,15 +14003,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.follow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -14355,15 +14355,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.authorization.grant.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -14575,15 +14575,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -14597,15 +14597,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -14619,15 +14619,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.entry.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -14641,14 +14641,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -14663,14 +14663,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.space.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -14685,14 +14685,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.document.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Knowledge",
       "exclusion_reason": null,
@@ -14707,15 +14707,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.personalization.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -14729,15 +14729,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "knowledge.personalization.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "knowledge"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -14751,15 +14751,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.list.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -14773,15 +14773,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.list.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -14795,15 +14795,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.notification.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -14817,15 +14817,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -14839,15 +14839,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -14861,15 +14861,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -14883,15 +14883,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -14905,15 +14905,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -14927,15 +14927,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.schema.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -14949,14 +14949,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "ontology.mapping.assess",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Ontology",
       "exclusion_reason": null,
@@ -14971,15 +14971,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.identity.directory.sync",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -14993,15 +14993,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.permission_request.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15015,15 +15015,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.permission_request.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15037,15 +15037,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.permission_request.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15059,15 +15059,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15081,15 +15081,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15103,15 +15103,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.member.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15191,15 +15191,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.sharing.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15213,15 +15213,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.sharing.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15235,15 +15235,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.sharing.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15411,15 +15411,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15433,15 +15433,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15455,15 +15455,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15477,15 +15477,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15499,15 +15499,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15521,15 +15521,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -15550,10 +15550,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/uploads is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/uploads.py"
       ]
@@ -15572,10 +15572,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/uploads/ois/resolve is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/uploads.py"
       ]
@@ -15704,10 +15704,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:confirm is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
       ]
@@ -15726,10 +15726,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:invoke is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
       ]
@@ -15741,15 +15741,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.publisher.register",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -15763,15 +15763,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.release.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -15785,15 +15785,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.release.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -15807,15 +15807,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.release.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -15829,15 +15829,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.plugin.marketplace.usage.close",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -15858,10 +15858,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v2/agent-capabilities/delegations is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ]
@@ -15880,10 +15880,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ]
@@ -15902,10 +15902,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ]
@@ -15924,10 +15924,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v2/capability-artifacts/uploads is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capability_artifacts.py"
       ]
@@ -15946,10 +15946,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v2/capability-artifacts/uploads/{upload_id}:finalize is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capability_artifacts.py"
       ]
@@ -15968,10 +15968,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v2/mcp-capabilities/delegations is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/mcp_capabilities.py"
       ]
@@ -15990,10 +15990,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/v2/mcp-capabilities/{capability_id}:invoke is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/mcp_capabilities.py"
       ]
@@ -16005,15 +16005,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.saved_view.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -16027,15 +16027,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.saved_view.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -16093,15 +16093,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -16122,10 +16122,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/auth/logout is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/auth.py"
       ]
@@ -16144,10 +16144,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/auth/refresh is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/auth.py"
       ]
@@ -16166,10 +16166,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/feishu/cache/refresh is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -16188,10 +16188,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/feishu/chat-message/share-list is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -16210,10 +16210,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/feishu/message/send is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -16232,10 +16232,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/feishu/sync/org is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -16254,10 +16254,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/feishu/sync/org/structure is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -16276,10 +16276,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/feishu/webhook/bitable is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ]
@@ -16291,15 +16291,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.team.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -16313,15 +16313,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.team.membership.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -16342,10 +16342,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/{capability_id}:confirm is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capabilities.py"
       ]
@@ -16364,10 +16364,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/{capability_id}:invoke is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capabilities.py"
       ]
@@ -16386,10 +16386,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:PUT:/admin/config/{key} is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
       ]
@@ -16401,15 +16401,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.annotation.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -16423,15 +16423,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -16467,15 +16467,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.external_mapping.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -16511,15 +16511,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.issue.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -16533,15 +16533,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.list.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -16555,15 +16555,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.project.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "project"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -16577,15 +16577,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.annotation.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
@@ -16621,15 +16621,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -16643,15 +16643,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.task.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -16672,10 +16672,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:PUT:/api/uploads/{filename} is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/uploads.py"
       ]
@@ -16716,10 +16716,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/capability_artifacts.py"
       ]
@@ -16731,15 +16731,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "project.workbench.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [

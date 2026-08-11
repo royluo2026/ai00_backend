@@ -122,6 +122,7 @@ def _domain(value: str, path: str = "") -> str:
         "agent_tool:list_approval_orders", "agent_tool:create_task",
         "agent_tool:update_task", "agent_tool:create_issue", "agent_tool:update_issue",
         "agent_tool:create_approval_order", "agent_tool:add_task_progress_log",
+        "agent_tool:aggregate_history",
     }:
         return "Project Management"
     if any(marker in subject for marker in (

@@ -3,6 +3,7 @@
 | Domain | Extraction | Disposition |
 |---|---|---|
 
+| Agent | `extract:agent:5604ca0d5dffdc59` | planned |
 | Knowledge | `extract:knowledge:411a1539a47ff563` | planned |
 | Knowledge | `extract:knowledge:48d18d2ef080ca94` | planned |
 | Knowledge | `extract:knowledge:61e6a9390870638f` | planned |

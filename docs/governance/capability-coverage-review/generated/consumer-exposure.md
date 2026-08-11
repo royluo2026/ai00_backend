@@ -3,6 +3,19 @@
 | Domain | Capability | Enabled consumers |
 |---|---|---|
 
+| Agent | `agent.audit.read` | rest |
+| Agent | `agent.audit.record` | rest |
+| Agent | `agent.flow.change.apply` | rest |
+| Agent | `agent.flow.read` | rest |
+| Agent | `agent.interaction.request` | agent |
+| Agent | `agent.memory.change.apply` | agent |
+| Agent | `agent.memory.read` | agent |
+| Agent | `agent.run.change.apply` | rest, agent |
+| Agent | `agent.run.read` | agent |
+| Agent | `agent.session.change.apply` | rest, agent |
+| Agent | `agent.session.read` | rest, agent |
+| Agent | `agent.skill.change.apply` | rest |
+| Agent | `agent.skill.read` | rest |
 | Base Platform | `base.annotation.change.apply` | rest |
 | Base Platform | `base.annotation.read` | rest |
 | Base Platform | `base.authorization.grant.change.apply` | rest |
@@ -124,6 +137,7 @@
 | Ontology | `ontology.release.search` | none |
 | Ontology | `ontology.schema.change.apply` | rest |
 | Project Management | `base.project.search` | rest, agent |
+| Project Management | `project.activity.aggregate` | agent |
 | Project Management | `project.approval.change.apply` | rest, agent |
 | Project Management | `project.approval.read` | rest, agent |
 | Project Management | `project.bitable_binding.change.apply` | rest |
