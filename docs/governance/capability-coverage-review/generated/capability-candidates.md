@@ -24,6 +24,13 @@
 | Base Platform | Deliver the governed team change apply business outcome for Base Platform. | `base.team.change.apply` |
 | Base Platform | Deliver the governed team membership change apply business outcome for Base Platform. | `base.team.membership.change.apply` |
 | Base Platform | Deliver the governed team read business outcome for Base Platform. | `base.team.read` |
+| Knowledge | Deliver the governed document archive business outcome for Knowledge. | `knowledge.document.archive` |
+| Knowledge | Deliver the governed entry change apply business outcome for Knowledge. | `knowledge.entry.change.apply` |
+| Knowledge | Deliver the governed personalization change apply business outcome for Knowledge. | `knowledge.personalization.change.apply` |
+| Knowledge | Deliver the governed personalization read business outcome for Knowledge. | `knowledge.personalization.read` |
+| Knowledge | Deliver the governed space change apply business outcome for Knowledge. | `knowledge.space.change.apply` |
+| Ontology | Deliver the governed mapping change apply business outcome for Ontology. | `ontology.mapping.change.apply` |
+| Ontology | Deliver the governed schema change apply business outcome for Ontology. | `ontology.schema.change.apply` |
 | Project Management | Deliver the governed approval change apply business outcome for Project Management. | `project.approval.change.apply` |
 | Project Management | Deliver the governed approval read business outcome for Project Management. | `project.approval.read` |
 | Project Management | Deliver the governed bitable binding change apply business outcome for Project Management. | `project.bitable_binding.change.apply` |

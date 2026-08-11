@@ -71,30 +71,35 @@
 | Digital Model | `digital_model.snapshot.compare` | none |
 | Digital Model | `digital_model.snapshot.get` | none |
 | Digital Model | `digital_model.version.create` | none |
-| Knowledge | `knowledge.context.retrieve` | agent |
+| Knowledge | `knowledge.context.retrieve` | rest, agent |
 | Knowledge | `knowledge.document.acl.grant` | none |
 | Knowledge | `knowledge.document.acl.list` | none |
 | Knowledge | `knowledge.document.acl.revoke` | none |
-| Knowledge | `knowledge.document.create` | none |
+| Knowledge | `knowledge.document.archive` | rest |
+| Knowledge | `knowledge.document.create` | rest |
 | Knowledge | `knowledge.document.diff` | none |
-| Knowledge | `knowledge.document.get` | none |
-| Knowledge | `knowledge.document.history.get` | none |
+| Knowledge | `knowledge.document.get` | rest, agent |
+| Knowledge | `knowledge.document.history.get` | rest |
 | Knowledge | `knowledge.document.restore` | none |
-| Knowledge | `knowledge.document.revise` | none |
+| Knowledge | `knowledge.document.revise` | rest |
 | Knowledge | `knowledge.document.revisions` | none |
 | Knowledge | `knowledge.document.rollback` | none |
 | Knowledge | `knowledge.document.search` | none |
-| Knowledge | `knowledge.get` | none |
+| Knowledge | `knowledge.entry.change.apply` | rest |
+| Knowledge | `knowledge.get` | rest, agent |
 | Knowledge | `knowledge.migration.status` | none |
+| Knowledge | `knowledge.personalization.change.apply` | rest |
+| Knowledge | `knowledge.personalization.read` | rest |
 | Knowledge | `knowledge.proposal.get` | none |
 | Knowledge | `knowledge.proposal.list` | none |
 | Knowledge | `knowledge.proposal.outbox.list` | none |
 | Knowledge | `knowledge.proposal.outbox.retry` | none |
 | Knowledge | `knowledge.proposal.review` | none |
 | Knowledge | `knowledge.propose` | none |
-| Knowledge | `knowledge.search` | none |
-| Knowledge | `knowledge.space.create` | none |
-| Knowledge | `knowledge.space.list` | none |
+| Knowledge | `knowledge.search` | rest, agent |
+| Knowledge | `knowledge.space.change.apply` | rest |
+| Knowledge | `knowledge.space.create` | rest |
+| Knowledge | `knowledge.space.list` | rest |
 | Knowledge | `knowledge.space.search` | none |
 | Local Integration | `local.command.get` | none |
 | Local Integration | `vismockup.capture` | none |
@@ -108,14 +113,16 @@
 | Ontology | `ontology.change.proposal.get` | none |
 | Ontology | `ontology.change.proposal.review.submit` | none |
 | Ontology | `ontology.change.proposal.search` | none |
-| Ontology | `ontology.concept.get` | none |
-| Ontology | `ontology.concept.resolve` | agent |
-| Ontology | `ontology.mapping.assess` | none |
+| Ontology | `ontology.concept.get` | rest |
+| Ontology | `ontology.concept.resolve` | rest, agent |
+| Ontology | `ontology.mapping.assess` | rest |
+| Ontology | `ontology.mapping.change.apply` | rest |
 | Ontology | `ontology.release.activate` | none |
-| Ontology | `ontology.release.diff` | none |
+| Ontology | `ontology.release.diff` | rest |
 | Ontology | `ontology.release.get` | none |
 | Ontology | `ontology.release.publish` | none |
 | Ontology | `ontology.release.search` | none |
+| Ontology | `ontology.schema.change.apply` | rest |
 | Project Management | `base.project.search` | rest, agent |
 | Project Management | `project.approval.change.apply` | rest, agent |
 | Project Management | `project.approval.read` | rest, agent |

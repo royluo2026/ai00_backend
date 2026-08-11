@@ -7,197 +7,22 @@
     "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
     "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
   },
-  "unreviewed_functions": {
-    "agent_tool:find_similar_cases": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:get_knowledge_document": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:get_knowledge_entry": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:recommend_practice": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/knowledge_entries/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/knowledge_hub/folders/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/knowledge_hub/items/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/knowledge_entries": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/knowledge_entries/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/knowledge_hub/favorites": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/knowledge_hub/folders": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/knowledge_hub/items/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/knowledge_hub/items/{gid}/history": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/knowledge_hub/recent": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/knowledge_entries/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/knowledge_hub/folders/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/knowledge_hub/items/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/knowledge_entries": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/knowledge_entries/vector-search": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/knowledge_hub/folders": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/knowledge_hub/items": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/knowledge_hub/items/{gid}/favorite": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/knowledge_hub/items/{gid}/recent": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/knowledge_hub.py"
-      ],
-      "owner": "Knowledge",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    }
-  },
+  "unreviewed_functions": {},
   "excluded_functions": {},
   "capabilities": {
     "knowledge.context.retrieve": {
       "kind": "existing",
       "function_dispositions": {
+        "agent_tool:recommend_practice": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface agent_tool:recommend_practice implements the reviewed knowledge.context.retrieve business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
         "agent_tool:search_knowledge": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -234,33 +59,33 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.context.retrieve"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.context.retrieve"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.context.retrieve"
         },
         "agent": {
           "enabled": true,
-          "reason": "Existing Registry evidence includes this consumer.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.context.retrieve"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.context.retrieve"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.context.retrieve"
         }
       }
     },
@@ -411,6 +236,68 @@
         }
       }
     },
+    "knowledge.document.archive": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/knowledge_hub/items/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:DELETE:/api/knowledge_hub/items/{gid} implements the reviewed knowledge.document.archive business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.archive"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.document.archive"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.archive"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.archive"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.archive"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.archive"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed document archive business outcome for Knowledge.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "knowledge",
+        "application_port": "knowledge.document.archive",
+        "provider_artifact": "ai00-knowledge-domain",
+        "owned_tables": [
+          "workmanship_know_documents",
+          "workmanship_know_revisions"
+        ],
+        "migration_stream": "knowledge"
+      }
+    },
     "knowledge.document.create": {
       "kind": "existing",
       "function_dispositions": {
@@ -424,39 +311,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/knowledge_hub/items": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:POST:/api/knowledge_hub/items implements the reviewed knowledge.document.create business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.create"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.document.create"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.create"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.create"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.create"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.create"
         }
       }
     },
@@ -512,6 +409,16 @@
     "knowledge.document.get": {
       "kind": "existing",
       "function_dispositions": {
+        "agent_tool:get_knowledge_document": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface agent_tool:get_knowledge_document implements the reviewed knowledge.document.get business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
         "capability:knowledge.document.get": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -522,39 +429,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/knowledge_hub/items/{gid}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:GET:/api/knowledge_hub/items/{gid} implements the reviewed knowledge.document.get business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.get"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.document.get"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.get"
         },
         "agent": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.document.get"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.get"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.get"
         }
       }
     },
@@ -571,39 +488,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/knowledge_hub/items/{gid}/history": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:GET:/api/knowledge_hub/items/{gid}/history implements the reviewed knowledge.document.history.get business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.history.get"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.document.history.get"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.history.get"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.history.get"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.history.get"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.history.get"
         }
       }
     },
@@ -669,39 +596,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/knowledge_hub/items/{gid}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:PATCH:/api/knowledge_hub/items/{gid} implements the reviewed knowledge.document.revise business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.revise"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.document.revise"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.revise"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.revise"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.revise"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.document.revise"
         }
       }
     },
@@ -852,9 +789,100 @@
         }
       }
     },
+    "knowledge.entry.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/knowledge_entries/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:DELETE:/api/knowledge_entries/{gid} implements the reviewed knowledge.entry.change.apply business outcome from backend/routers/knowledge.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/knowledge_entries/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:PATCH:/api/knowledge_entries/{gid} implements the reviewed knowledge.entry.change.apply business outcome from backend/routers/knowledge.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/knowledge_entries": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:POST:/api/knowledge_entries implements the reviewed knowledge.entry.change.apply business outcome from backend/routers/knowledge.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.entry.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.entry.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.entry.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.entry.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.entry.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.entry.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed entry change apply business outcome for Knowledge.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "knowledge",
+        "application_port": "knowledge.entry.change.apply",
+        "provider_artifact": "ai00-knowledge-domain",
+        "owned_tables": [
+          "workmanship_know_entries"
+        ],
+        "migration_stream": "knowledge"
+      }
+    },
     "knowledge.get": {
       "kind": "existing",
       "function_dispositions": {
+        "agent_tool:get_knowledge_entry": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface agent_tool:get_knowledge_entry implements the reviewed knowledge.get business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
         "capability:knowledge.get": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -865,39 +893,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/knowledge_entries/{gid}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:GET:/api/knowledge_entries/{gid} implements the reviewed knowledge.get business outcome from backend/routers/knowledge.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.get"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.get"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.get"
         },
         "agent": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.get"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.get"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.get"
         }
       }
     },
@@ -948,6 +986,150 @@
           "reason": "No approved exposure for this consumer in the existing Registry.",
           "policy_ref": "existing-registry-policy"
         }
+      }
+    },
+    "knowledge.personalization.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/knowledge_hub/items/{gid}/favorite": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:POST:/api/knowledge_hub/items/{gid}/favorite implements the reviewed knowledge.personalization.change.apply business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/knowledge_hub/items/{gid}/recent": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:POST:/api/knowledge_hub/items/{gid}/recent implements the reviewed knowledge.personalization.change.apply business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.personalization.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed personalization change apply business outcome for Knowledge.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "knowledge",
+        "application_port": "knowledge.personalization.change.apply",
+        "provider_artifact": "ai00-knowledge-domain",
+        "owned_tables": [
+          "workmanship_know_favorites",
+          "workmanship_know_recent"
+        ],
+        "migration_stream": "knowledge"
+      }
+    },
+    "knowledge.personalization.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/knowledge_hub/favorites": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:GET:/api/knowledge_hub/favorites implements the reviewed knowledge.personalization.read business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/knowledge_hub/recent": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:GET:/api/knowledge_hub/recent implements the reviewed knowledge.personalization.read business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.personalization.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.personalization.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed personalization read business outcome for Knowledge.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "knowledge",
+        "application_port": "knowledge.personalization.read",
+        "provider_artifact": "ai00-knowledge-domain",
+        "owned_tables": [
+          "workmanship_know_favorites",
+          "workmanship_know_recent"
+        ],
+        "migration_stream": "knowledge"
       }
     },
     "knowledge.proposal.get": {
@@ -1248,6 +1430,16 @@
     "knowledge.search": {
       "kind": "existing",
       "function_dispositions": {
+        "agent_tool:find_similar_cases": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface agent_tool:find_similar_cases implements the reviewed knowledge.search business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
         "capability:knowledge.search": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -1258,40 +1450,132 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/knowledge_entries": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:GET:/api/knowledge_entries implements the reviewed knowledge.search business outcome from backend/routers/knowledge.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/knowledge_entries/vector-search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:POST:/api/knowledge_entries/vector-search implements the reviewed knowledge.search business outcome from backend/routers/knowledge.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.search"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.search"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.search"
         },
         "agent": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.search"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.search"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.search"
         }
+      }
+    },
+    "knowledge.space.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/knowledge_hub/folders/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:DELETE:/api/knowledge_hub/folders/{gid} implements the reviewed knowledge.space.change.apply business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/knowledge_hub/folders/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:PATCH:/api/knowledge_hub/folders/{gid} implements the reviewed knowledge.space.change.apply business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.space.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed space change apply business outcome for Knowledge.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "knowledge",
+        "application_port": "knowledge.space.change.apply",
+        "provider_artifact": "ai00-knowledge-domain",
+        "owned_tables": [
+          "workmanship_know_folders",
+          "workmanship_know_spaces"
+        ],
+        "migration_stream": "knowledge"
       }
     },
     "knowledge.space.create": {
@@ -1307,39 +1591,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/knowledge_hub/folders": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:POST:/api/knowledge_hub/folders implements the reviewed knowledge.space.create business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.create"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.space.create"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.create"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.create"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.create"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.create"
         }
       }
     },
@@ -1356,39 +1650,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/knowledge_hub/folders": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/knowledge_hub.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The stable surface rest:GET:/api/knowledge_hub/folders implements the reviewed knowledge.space.list business outcome from backend/routers/knowledge_hub.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.list"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "knowledge.space.list"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.list"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.list"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.list"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "knowledge.space.list"
         }
       }
     },
@@ -1442,7 +1746,108 @@
       }
     }
   },
-  "code_extractions": [],
+  "code_extractions": [
+    {
+      "id": "extract:knowledge:411a1539a47ff563",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:48d18d2ef080ca94",
+      "source_paths": [
+        "backend/capabilities/outbox_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:61e6a9390870638f",
+      "source_paths": [
+        "backend/knowledge/revision_store.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "base.artifact_port",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:743dee7b76735fd0",
+      "source_paths": [
+        "backend/capabilities/knowledge_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:8f3c810da5ea092d",
+      "source_paths": [
+        "backend/capabilities/knowledge_context_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:9b1b16fc0bf36318",
+      "source_paths": [
+        "backend/capabilities/proposal_query_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:b996f00c7995d529",
+      "source_paths": [
+        "backend/capabilities/outbox_retry_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:bd818f944b148465",
+      "source_paths": [
+        "backend/capabilities/review_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:d6073e7c78e0f8f5",
+      "source_paths": [
+        "backend/capabilities/knowledge_migration_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:knowledge:e28ec0ca0bbd8551",
+      "source_paths": [
+        "backend/capabilities/proposals_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "target_application_port": "knowledge.repository",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    }
+  ],
   "database_boundaries": [
     {
       "table": "workmanship_know_document_acl",

@@ -3,12 +3,12 @@
   "domains": 9,
   "stable_functions": 753,
   "resolutions": {
-    "existing_capability": 126,
-    "new_capability": 175,
-    "excluded": 82,
-    "unreviewed": 370
+    "existing_capability": 151,
+    "new_capability": 199,
+    "excluded": 83,
+    "unreviewed": 320
   },
-  "candidate_capabilities": 51,
+  "candidate_capabilities": 58,
   "evidence": {
     "module_dependencies": 7,
     "boundary_violations": 292,

@@ -7,225 +7,22 @@
     "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
     "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
   },
-  "unreviewed_functions": {
-    "rest:DELETE:/api/ontology/axioms/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/ontology/classes/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/ontology/properties/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/ontology/relations/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/bop/entries/{entry_gid}/entity-props": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/agent-schema": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/classes": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/classes/{gid}/axioms": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/classes/{gid}/full": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/classes/{gid}/individuals": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
+  "unreviewed_functions": {},
+  "excluded_functions": {
     "rest:GET:/api/ontology/db-tables": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/ontology.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/ontology/db-tables is implemented at plugins/craft/craft_backend/routers/ontology.py.",
+      "reason": "rest:GET:/api/ontology/db-tables is a database-introspection endpoint used to configure Ontology bindings; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/graph": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/node-type-config": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/node-type-suggestions": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/schema-diff": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ontology/unbound-classes": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/bop/entries/{entry_gid}/entity-props": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/ontology/classes/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/ontology/properties/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/ontology/relations/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ontology/axioms": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ontology/classes": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ontology/classes/{gid}/sync-from-table": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ontology/properties": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ontology/relations": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ontology/seed": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ontology/validate/{entry_gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/ontology.py"
-      ],
-      "owner": "Ontology",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     }
   },
-  "excluded_functions": {},
   "capabilities": {
     "ontology.change.proposal.create": {
       "kind": "existing",
@@ -436,39 +233,69 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/classes/{gid}/axioms": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/classes/{gid}/axioms implements the reviewed ontology.concept.get business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/classes/{gid}/full": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/classes/{gid}/full implements the reviewed ontology.concept.get business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/classes/{gid}/individuals": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/classes/{gid}/individuals implements the reviewed ontology.concept.get business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.get"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "ontology.concept.get"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.get"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.get"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.get"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.get"
         }
       }
     },
@@ -496,6 +323,56 @@
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         },
+        "rest:GET:/api/ontology/agent-schema": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/agent-schema implements the reviewed ontology.concept.resolve business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/classes": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/classes implements the reviewed ontology.concept.resolve business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/graph": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/graph implements the reviewed ontology.concept.resolve business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/node-type-config": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/node-type-config implements the reviewed ontology.concept.resolve business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/node-type-suggestions": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/node-type-suggestions implements the reviewed ontology.concept.resolve business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
         "rest:GET:/api/ontology/schema/{node_type}": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -505,39 +382,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/unbound-classes": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/unbound-classes implements the reviewed ontology.concept.resolve business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.resolve"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "ontology.concept.resolve"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.resolve"
         },
         "agent": {
           "enabled": true,
-          "reason": "Existing Registry evidence includes this consumer.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "ontology.concept.resolve"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.resolve"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "ontology.concept.resolve"
         }
       }
     },
@@ -554,40 +441,124 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/bop/entries/{entry_gid}/entity-props": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/bop/entries/{entry_gid}/entity-props implements the reviewed ontology.mapping.assess business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ontology/validate/{entry_gid}": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:POST:/api/ontology/validate/{entry_gid} implements the reviewed ontology.mapping.assess business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.assess"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "ontology.mapping.assess"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.assess"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.assess"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.assess"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.assess"
         }
+      }
+    },
+    "ontology.mapping.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:PATCH:/api/bop/entries/{entry_gid}/entity-props": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:PATCH:/api/bop/entries/{entry_gid}/entity-props implements the reviewed ontology.mapping.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "ontology.mapping.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "ontology.mapping.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed mapping change apply business outcome for Ontology.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "ontology",
+        "application_port": "ontology.mapping.change.apply",
+        "provider_artifact": "ai00-ontology-domain",
+        "owned_tables": [
+          "workmanship_onto_axioms",
+          "workmanship_onto_classes",
+          "workmanship_onto_properties",
+          "workmanship_onto_relations"
+        ],
+        "migration_stream": "ontology"
       }
     },
     "ontology.release.activate": {
@@ -652,39 +623,49 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ontology/schema-diff": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:GET:/api/ontology/schema-diff implements the reviewed ontology.release.diff business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "ontology.release.diff"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "ontology.release.diff"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "ontology.release.diff"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "ontology.release.diff"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "ontology.release.diff"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "ontology.release.diff"
         }
       }
     },
@@ -834,9 +815,234 @@
           "policy_ref": "existing-registry-policy"
         }
       }
+    },
+    "ontology.schema.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/ontology/axioms/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:DELETE:/api/ontology/axioms/{gid} implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/ontology/classes/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:DELETE:/api/ontology/classes/{gid} implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/ontology/properties/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:DELETE:/api/ontology/properties/{gid} implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/ontology/relations/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:DELETE:/api/ontology/relations/{gid} implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/ontology/classes/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:PATCH:/api/ontology/classes/{gid} implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/ontology/properties/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:PATCH:/api/ontology/properties/{gid} implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/ontology/relations/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:PATCH:/api/ontology/relations/{gid} implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ontology/axioms": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:POST:/api/ontology/axioms implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ontology/classes": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:POST:/api/ontology/classes implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ontology/classes/{gid}/sync-from-table": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:POST:/api/ontology/classes/{gid}/sync-from-table implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ontology/properties": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:POST:/api/ontology/properties implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ontology/relations": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:POST:/api/ontology/relations implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ontology/seed": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/ontology.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The stable surface rest:POST:/api/ontology/seed implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "ontology.schema.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "ontology.schema.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "ontology.schema.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "ontology.schema.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "ontology.schema.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "ontology.schema.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed schema change apply business outcome for Ontology.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "ontology",
+        "application_port": "ontology.schema.change.apply",
+        "provider_artifact": "ai00-ontology-domain",
+        "owned_tables": [
+          "workmanship_onto_axioms",
+          "workmanship_onto_classes",
+          "workmanship_onto_properties",
+          "workmanship_onto_relations"
+        ],
+        "migration_stream": "ontology"
+      }
     }
   },
-  "code_extractions": [],
+  "code_extractions": [
+    {
+      "id": "extract:ontology:2547ec449a8b6ed4",
+      "source_paths": [
+        "backend/capabilities/ontology_proposals_next.py"
+      ],
+      "owner_domain": "Ontology",
+      "target_application_port": "ontology.public_port",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:ontology:3ef87728b354263a",
+      "source_paths": [
+        "backend/capabilities/ontology_releases_next.py"
+      ],
+      "owner_domain": "Ontology",
+      "target_application_port": "ontology.public_port",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:ontology:c6327fc97c7b11d2",
+      "source_paths": [
+        "backend/ontology/repository.py"
+      ],
+      "owner_domain": "Ontology",
+      "target_application_port": "ontology.public_port",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:ontology:c641a223a572393f",
+      "source_paths": [
+        "backend/ontology/proposals.py"
+      ],
+      "owner_domain": "Ontology",
+      "target_application_port": "ontology.public_port",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    }
+  ],
   "database_boundaries": [
     {
       "table": "workmanship_base_ontology_active_refs",
