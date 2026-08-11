@@ -8,15 +8,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.session.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -37,10 +37,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "agent_runtime:GET:/health is a Agent runtime health, tool catalog, or administrator connectivity endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "services/agent-runtime/src/server.ts"
       ]
@@ -52,15 +52,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -74,15 +74,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -96,15 +96,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.session.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -118,15 +118,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.session.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -147,10 +147,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "agent_runtime:GET:/v1/tools is a Agent runtime health, tool catalog, or administrator connectivity endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "services/agent-runtime/src/server.ts"
       ]
@@ -162,15 +162,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -184,15 +184,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -206,15 +206,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -228,15 +228,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -250,15 +250,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -272,15 +272,15 @@
       "current_consumers": [
         "Agent Runtime API"
       ],
-      "target_capability": null,
+      "target_capability": "agent.session.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -316,15 +316,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "project.activity.aggregate",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -338,15 +338,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "agent.interaction.request",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -360,14 +360,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -389,10 +389,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "internal",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "agent_tool:calculate is a deterministic arithmetic helper with no governed domain state or side effect; it is retained as internal infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
       ]
@@ -404,14 +404,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -448,15 +448,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "agent.interaction.request",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -536,15 +536,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "agent.interaction.request",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -558,15 +558,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -580,15 +580,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -602,14 +602,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -712,15 +712,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -844,15 +844,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "agent.memory.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -866,15 +866,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "agent.memory.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -910,15 +910,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "craft.rule.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -976,14 +976,14 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "vismockup.launch",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Local Integration",
       "exclusion_reason": null,
@@ -998,15 +998,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "agent.memory.read",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -1042,15 +1042,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -1064,15 +1064,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "agent.memory.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -1086,15 +1086,15 @@
       "current_consumers": [
         "Agent"
       ],
-      "target_capability": null,
+      "target_capability": "agent.memory.change.apply",
       "exposure": "Agent",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -3810,15 +3810,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.session.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -3854,14 +3854,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -3876,14 +3876,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -3898,15 +3898,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -3920,15 +3920,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -3942,15 +3942,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -3964,14 +3964,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -3986,15 +3986,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4008,14 +4008,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -4030,14 +4030,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -4052,14 +4052,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -4074,14 +4074,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -4096,14 +4096,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -4118,14 +4118,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.archive",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -4140,15 +4140,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4162,15 +4162,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4184,15 +4184,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4206,15 +4206,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4228,15 +4228,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4250,15 +4250,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4316,15 +4316,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4338,15 +4338,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4360,15 +4360,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4382,15 +4382,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4404,15 +4404,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4426,15 +4426,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -4470,15 +4470,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4492,15 +4492,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4514,15 +4514,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4536,15 +4536,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4558,15 +4558,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -4597,21 +4597,21 @@
     },
     "rest:DELETE:/api/import-export/templates/{gid}": {
       "function_id": "rest:DELETE:/api/import-export/templates/{gid}",
-      "domain": "Craft",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.export_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Craft",
+      "classification": "proposed",
+      "migration_status": "proposed",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/import_export.py"
@@ -4910,15 +4910,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.rule.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -5020,15 +5020,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.skill.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -5042,15 +5042,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -5152,15 +5152,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "local.device.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "device"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -5423,10 +5423,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/ai/admin-config is a Agent runtime health, tool catalog, or administrator connectivity endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
       ]
@@ -5438,15 +5438,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.audit.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -5460,15 +5460,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.audit.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -5482,15 +5482,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.session.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -5504,15 +5504,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.session.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -5533,10 +5533,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/ai/tools is a Agent tool-catalog introspection endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
       ]
@@ -5702,14 +5702,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -5724,14 +5724,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -5768,14 +5768,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -5790,14 +5790,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -5812,14 +5812,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -5834,15 +5834,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -5856,15 +5856,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -5878,15 +5878,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -5900,15 +5900,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -5922,15 +5922,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -5944,14 +5944,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -5966,14 +5966,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -5988,15 +5988,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6010,14 +6010,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6032,14 +6032,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.work_package.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6054,14 +6054,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.pbom.snapshot.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6076,14 +6076,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.pbom.snapshot.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6098,14 +6098,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.pbom.snapshot.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6120,14 +6120,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.pbom.part.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6164,14 +6164,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6186,14 +6186,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6208,14 +6208,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6230,14 +6230,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6252,14 +6252,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6274,14 +6274,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6296,14 +6296,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6318,14 +6318,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6340,14 +6340,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.linked_parts.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6362,14 +6362,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6384,14 +6384,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6406,14 +6406,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6428,14 +6428,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6450,14 +6450,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6494,14 +6494,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6516,14 +6516,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.linked_parts.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6538,14 +6538,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6560,14 +6560,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6582,14 +6582,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.linked_parts.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6604,14 +6604,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.linked_parts.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6626,14 +6626,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6648,14 +6648,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.execution_structure.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -6670,15 +6670,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6692,15 +6692,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6780,15 +6780,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6802,15 +6802,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6824,15 +6824,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6846,15 +6846,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6868,15 +6868,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6978,15 +6978,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7000,15 +7000,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7022,15 +7022,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7044,15 +7044,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7066,15 +7066,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7220,15 +7220,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7242,15 +7242,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7264,15 +7264,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7286,15 +7286,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7308,15 +7308,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7396,15 +7396,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -7425,10 +7425,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:GET:/api/flows/capability-manifest is a generated manifest or system seed maintenance endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/agent/agent_backend/routers/flows.py"
       ]
@@ -7440,15 +7440,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -7462,15 +7462,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -7484,15 +7484,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -7550,15 +7550,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7572,15 +7572,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7594,15 +7594,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7616,15 +7616,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7638,15 +7638,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7660,15 +7660,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7682,15 +7682,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7704,15 +7704,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7726,15 +7726,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7787,21 +7787,21 @@
     },
     "rest:GET:/api/import-export/templates": {
       "function_id": "rest:GET:/api/import-export/templates",
-      "domain": "Craft",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.export_template.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Craft",
+      "classification": "proposed",
+      "migration_status": "proposed",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/import_export.py"
@@ -8610,15 +8610,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.rule.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8632,15 +8632,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.rule.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8808,15 +8808,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.skill.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -8830,15 +8830,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8852,15 +8852,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9094,15 +9094,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "local.device.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "device"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -9380,14 +9380,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -9402,14 +9402,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10041,14 +10041,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10085,14 +10085,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10107,15 +10107,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10129,15 +10129,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10151,15 +10151,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10173,14 +10173,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10195,15 +10195,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10217,14 +10217,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10239,14 +10239,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10261,14 +10261,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10283,14 +10283,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10305,14 +10305,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10327,14 +10327,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10349,14 +10349,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10371,14 +10371,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10393,14 +10393,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -10415,15 +10415,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10437,15 +10437,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10459,15 +10459,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10481,15 +10481,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10503,15 +10503,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10525,15 +10525,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10547,15 +10547,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10569,15 +10569,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10591,15 +10591,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10613,15 +10613,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10679,15 +10679,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10701,15 +10701,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10723,15 +10723,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10745,15 +10745,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10767,15 +10767,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10811,15 +10811,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10833,15 +10833,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10855,15 +10855,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10877,15 +10877,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10894,21 +10894,21 @@
     },
     "rest:PATCH:/api/import-export/templates/{gid}": {
       "function_id": "rest:PATCH:/api/import-export/templates/{gid}",
-      "domain": "Craft",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.export_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Craft",
+      "classification": "proposed",
+      "migration_status": "proposed",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/import_export.py"
@@ -11209,15 +11209,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.rule.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -11231,15 +11231,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -11561,15 +11561,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -11590,10 +11590,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/ai/admin-config is a Agent runtime health, tool catalog, or administrator connectivity endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
       ]
@@ -11605,15 +11605,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.audit.record",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -11627,15 +11627,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -11649,15 +11649,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -11671,15 +11671,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -11693,15 +11693,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.run.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -11715,15 +11715,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.session.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -11744,10 +11744,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/ai/test-connection is a Agent runtime health, tool catalog, or administrator connectivity endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/agent/agent_backend/routers/ai_chat.py"
       ]
@@ -11957,14 +11957,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -11979,14 +11979,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12001,14 +12001,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12023,14 +12023,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12045,15 +12045,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -12067,15 +12067,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -12089,15 +12089,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -12111,15 +12111,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -12133,14 +12133,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12155,15 +12155,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -12177,14 +12177,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12199,14 +12199,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12221,14 +12221,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12243,14 +12243,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12272,10 +12272,10 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Craft",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/bop/pics/upload is a binary upload or legacy identifier-resolution adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/_bop/entries.py"
       ]
@@ -12287,14 +12287,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12316,10 +12316,10 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Craft",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/bop/resolve-gids is a binary upload or legacy identifier-resolution adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/_bop/entries.py"
       ]
@@ -12331,14 +12331,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12353,14 +12353,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.archive",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12375,14 +12375,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12397,14 +12397,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12419,14 +12419,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12441,14 +12441,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12463,14 +12463,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12485,14 +12485,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12507,14 +12507,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12529,14 +12529,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12551,14 +12551,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12573,14 +12573,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12595,14 +12595,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12617,14 +12617,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12639,14 +12639,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12661,14 +12661,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12683,14 +12683,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12705,14 +12705,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12727,14 +12727,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12749,14 +12749,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.version.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12771,14 +12771,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12793,14 +12793,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12815,14 +12815,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12837,14 +12837,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12859,14 +12859,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12881,14 +12881,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12903,14 +12903,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12925,14 +12925,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12947,14 +12947,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -12969,15 +12969,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.canvas.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13057,15 +13057,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13079,15 +13079,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13101,15 +13101,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13123,15 +13123,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13145,15 +13145,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13167,15 +13167,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13189,15 +13189,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13211,15 +13211,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "pbom"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13233,15 +13233,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13255,15 +13255,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13277,15 +13277,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13321,15 +13321,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13343,15 +13343,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13365,15 +13365,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.ebom.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13475,15 +13475,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13497,15 +13497,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13519,15 +13519,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13541,15 +13541,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13563,15 +13563,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13585,15 +13585,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13607,15 +13607,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13629,15 +13629,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13651,15 +13651,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13673,15 +13673,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13695,15 +13695,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13717,15 +13717,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13739,15 +13739,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13761,15 +13761,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13915,15 +13915,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13937,15 +13937,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13959,15 +13959,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13981,15 +13981,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -14025,15 +14025,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14047,15 +14047,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14069,15 +14069,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14091,15 +14091,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14113,15 +14113,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14135,15 +14135,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14157,15 +14157,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14179,15 +14179,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14201,15 +14201,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14223,15 +14223,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14245,15 +14245,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14267,15 +14267,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14289,15 +14289,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14311,15 +14311,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14333,15 +14333,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.gbop.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14377,15 +14377,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.data_exchange.export",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14399,15 +14399,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.data_exchange.export",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14421,15 +14421,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.data_exchange.export",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14443,14 +14443,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.import.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -14472,10 +14472,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Craft",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/import-export/lark-bitable/read is a raw Lark sheet or bitable transfer adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/import_export.py"
       ]
@@ -14494,10 +14494,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Craft",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/import-export/lark-bitable/write is a raw Lark sheet or bitable transfer adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/import_export.py"
       ]
@@ -14516,10 +14516,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Craft",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/import-export/lark-sheets/read is a raw Lark sheet or bitable transfer adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/import_export.py"
       ]
@@ -14538,31 +14538,31 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "transport_adapter",
+      "migration_status": "excluded",
       "owner": "Craft",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/import-export/lark-sheets/write is a raw Lark sheet or bitable transfer adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/craft/craft_backend/routers/import_export.py"
       ]
     },
     "rest:POST:/api/import-export/templates": {
       "function_id": "rest:POST:/api/import-export/templates",
-      "domain": "Craft",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "base.export_template.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
-      "owner": "Craft",
+      "classification": "proposed",
+      "migration_status": "proposed",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/import_export.py"
@@ -15125,14 +15125,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -15147,14 +15147,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -15169,15 +15169,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.rule.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15279,15 +15279,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.skill.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -15308,10 +15308,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Agent",
-      "exclusion_reason": null,
+      "exclusion_reason": "rest:POST:/api/skills/seed-system is a generated manifest or system seed maintenance endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "plugins/agent/agent_backend/routers/skills.py"
       ]
@@ -15323,15 +15323,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15345,15 +15345,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15367,15 +15367,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15389,15 +15389,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.manufacturing_resource.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15675,15 +15675,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "local.device.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "device"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -16049,14 +16049,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -16071,14 +16071,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -16445,14 +16445,14 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "craft.bop.draft.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
+      "classification": "mapped",
       "migration_status": "candidate",
       "owner": "Craft",
       "exclusion_reason": null,
@@ -16489,15 +16489,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.flow.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -16599,15 +16599,15 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": null,
+      "target_capability": "agent.skill.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "proposed",
+      "migration_status": "proposed",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [

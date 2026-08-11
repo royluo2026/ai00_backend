@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 import importlib.util
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 import jsonschema
@@ -185,3 +187,33 @@ def test_every_baseline_violation_and_table_has_one_generated_review_row(builder
     assert {row["category"] for document in documents for row in document["debt_dispositions"]} == {
         "dependency", "database"
     }
+
+
+def test_complete_audit_has_zero_unreviewed_and_consistent_candidates(builder):
+    sources = builder.load_sources(ROOT)
+    existing = builder._load_documents()
+    documents = builder.initialize_documents(sources, existing)
+    summary = json.loads(builder.render_evidence_views(builder.render_views(documents), sources)["summary.json"])
+
+    assert builder.audit_consistency_errors(documents, sources) == []
+    assert summary["resolutions"]["unreviewed"] == 0
+    assert summary["candidate_capabilities"] == 87
+    assert summary["proposed_final_catalog_capabilities"] == 174
+    assert max(summary["candidate_additions_by_domain"].values()) == 31
+
+
+def test_strict_stops_at_architecture_threshold_with_exact_counts():
+    result = subprocess.run(
+        [sys.executable, str(BUILDER_PATH), "--strict"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 3
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "architecture_review_required"
+    assert payload["current_catalog_capabilities"] == 87
+    assert payload["candidate_capabilities"] == 87
+    assert payload["proposed_final_catalog_capabilities"] == 174

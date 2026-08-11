@@ -97,6 +97,8 @@ def _domain(value: str, path: str = "") -> str:
         return "Ontology"
     if "knowledge" in subject:
         return "Knowledge"
+    if "/api/import-export/templates" in subject:
+        return "Base Platform"
     if value.lower() in {
         "agent_tool:find_similar_cases", "agent_tool:recommend_practice",
     }:
@@ -602,6 +604,7 @@ def review_disposition_errors(
     """Validate the one-way link from reviewed domain decisions to Registry evidence."""
     dispositions, duplicates = _reviewed_dispositions(reviews)
     errors = [f"duplicate reviewed disposition: {function_id}" for function_id in duplicates]
+    proposed_capabilities: set[str] = set()
     for function_id, row in sorted(registry.items()):
         if row.get("stability") != "stable":
             continue
@@ -625,8 +628,14 @@ def review_disposition_errors(
             definition = disposition.get("candidate_definition") or {}
             if definition.get("owner_domain") != _owner_key(row["domain"]):
                 errors.append(f"capability owner mismatch: {function_id}")
+            else:
+                proposed_capabilities.add(disposition["capability_id"])
         elif resolution != "excluded":
             errors.append(f"missing reviewed disposition: {function_id}")
+    errors.extend(
+        f"proposed Capability is not published in Catalog: {capability_id}"
+        for capability_id in sorted(proposed_capabilities)
+    )
     return sorted(set(errors))
 
 

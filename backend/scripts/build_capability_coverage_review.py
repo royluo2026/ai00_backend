@@ -7,7 +7,7 @@ import hashlib
 import json
 import subprocess
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from fnmatch import fnmatch
 from pathlib import Path
 from typing import NamedTuple
@@ -353,35 +353,63 @@ def render_views(documents: list[dict]) -> dict[str, str]:
     """Return all generated views with canonical ordering independent of input order."""
     functions, candidates, exposures, extractions, databases = [], [], [], [], []
     counts = Counter()
+    functions_by_domain: dict[str, Counter] = defaultdict(Counter)
+    candidates_by_domain = Counter()
+    exposure_counts = Counter()
+    debt_counts = Counter()
     for document in sorted(documents, key=lambda item: item["domain"]):
         domain = document["domain"]
         for function_id in sorted(document["unreviewed_functions"]):
             functions.append(f"| {domain} | `{function_id}` | unreviewed | — |")
             counts["unreviewed"] += 1
+            functions_by_domain[domain]["unreviewed"] += 1
         for function_id in sorted(document["excluded_functions"]):
             functions.append(f"| {domain} | `{function_id}` | excluded | — |")
             counts["excluded"] += 1
+            functions_by_domain[domain]["excluded"] += 1
         for capability_id, group in sorted(document["capabilities"].items()):
             if group["kind"] == "candidate":
                 outcome = group["candidate_definition"]["business_outcome"].replace("|", "\\|")
                 candidates.append(f"| {domain} | {outcome} | `{capability_id}` |")
                 counts["candidate_capabilities"] += 1
+                candidates_by_domain[domain] += 1
             exposure = group["consumer_exposure"]
             flags = [name for name in CONSUMERS if exposure[name]["enabled"]]
+            exposure_counts.update(flags)
             exposures.append(f"| {domain} | `{capability_id}` | {', '.join(flags) or 'none'} |")
             for function_id, disposition in sorted(group["function_dispositions"].items()):
                 functions.append(f"| {domain} | `{function_id}` | {disposition['resolution']} | `{capability_id}` |")
                 counts[disposition["resolution"]] += 1
+                functions_by_domain[domain][disposition["resolution"]] += 1
         for row in sorted(document["code_extractions"], key=lambda item: item["id"]):
             extractions.append(f"| {domain} | `{row['id']}` | {row['disposition']} |")
         for row in sorted(document["database_boundaries"], key=lambda item: item["table"]):
             databases.append(f"| {domain} | `{row['table']}` | {row['owner_domain']} | {row['migration_stream']} |")
+        for row in sorted(document["debt_dispositions"], key=lambda item: item["id"]):
+            debt_counts[row["category"]] += 1
+            if row["category"] in {"database", "migration"}:
+                databases.append(f"| {domain} | `{row['id']}` | debt:{row['target_owner']} | {row['disposition']} |")
+            else:
+                extractions.append(f"| {domain} | `{row['id']}` | debt:{row['disposition']} |")
     summary = {
         "schema_version": 1,
         "domains": len(documents),
         "stable_functions": counts["unreviewed"] + counts["excluded"] + counts["existing_capability"] + counts["new_capability"],
         "resolutions": {key: counts[key] for key in ("existing_capability", "new_capability", "excluded", "unreviewed")},
         "candidate_capabilities": counts["candidate_capabilities"],
+        "candidate_additions_by_domain": dict(sorted(candidates_by_domain.items())),
+        "function_dispositions_by_domain": {
+            domain: {key: functions_by_domain[domain][key] for key in ("existing_capability", "new_capability", "excluded", "unreviewed")}
+            for domain in sorted(functions_by_domain)
+        },
+        "consolidation_ratio": {
+            "new_function_dispositions": counts["new_capability"],
+            "candidate_capabilities": counts["candidate_capabilities"],
+            "functions_per_candidate": round(counts["new_capability"] / counts["candidate_capabilities"], 3) if counts["candidate_capabilities"] else 0,
+        },
+        "enabled_exposures": {consumer: exposure_counts[consumer] for consumer in CONSUMERS},
+        "code_extractions": sum(len(document["code_extractions"]) for document in documents),
+        "debt_backlog": {category: debt_counts[category] for category in sorted(debt_counts)},
     }
     return {
         "function-dispositions.md": _lines("Function dispositions", "| Domain | Function | Resolution | Capability |\n|---|---|---|---|", functions),
@@ -423,6 +451,13 @@ def render_evidence_views(views: dict[str, str], sources: AuditSources) -> dict[
         views["database-ownership-migrations.md"].rstrip() + "\n" + "\n".join(migration_lines) + "\n"
     )
     summary = json.loads(views["summary.json"])
+    summary["catalog_descriptors"] = len(sources.catalog["capabilities"])
+    summary["current_catalog_capabilities"] = sum(
+        row.get("lifecycle_status") == "stable" for row in sources.catalog["capabilities"]
+    )
+    summary["proposed_final_catalog_capabilities"] = (
+        summary["current_catalog_capabilities"] + summary["candidate_capabilities"]
+    )
     categories = Counter(row["category"] for row in sources.boundary_baseline["violations"])
     summary["evidence"] = {
         "module_dependencies": len(sources.dependency_baseline["violations"]),
@@ -445,9 +480,25 @@ def _load_documents() -> dict[str, dict]:
     return result
 
 
-def _manifest(sources: AuditSources) -> dict:
+def _manifest(sources: AuditSources, documents: list[dict]) -> dict:
+    candidate_counts = {
+        document["domain"]: sum(group["kind"] == "candidate" for group in document["capabilities"].values())
+        for document in documents
+    }
+    candidate_total = sum(candidate_counts.values())
+    stable_catalog_total = sum(
+        row.get("lifecycle_status") == "stable" for row in sources.catalog["capabilities"]
+    )
+    proposed_total = stable_catalog_total + candidate_total
     return {
         "schema_version": 1,
+        "discussion_status": "architecture_review_required" if proposed_total > 170 or max(candidate_counts.values()) > 40 else "ready_for_domain_approval",
+        "thresholds": {"maximum_catalog_capabilities": 170, "maximum_domain_additions": 40},
+        "catalog_descriptors": len(sources.catalog["capabilities"]),
+        "current_catalog_capabilities": stable_catalog_total,
+        "candidate_capabilities": candidate_total,
+        "proposed_final_catalog_capabilities": proposed_total,
+        "candidate_additions_by_domain": candidate_counts,
         "reviewed_against": sources.reviewed_against,
         "ownership_sha256": _sha256(OWNERSHIP_PATH),
         "table_inventory_sha256": _sha256(TABLE_INVENTORY_PATH),
@@ -475,10 +526,56 @@ def _validate(documents: list[dict], strict: bool) -> list[str]:
     return sorted(errors)
 
 
+def audit_consistency_errors(documents: list[dict], sources: AuditSources) -> list[str]:
+    errors: list[str] = []
+    function_counts = Counter()
+    capability_domains: dict[str, str] = {}
+    table_counts = Counter()
+    debt_counts = Counter()
+    catalog_ids = {row["id"] for row in sources.catalog["capabilities"]}
+    for document in documents:
+        domain = document["domain"]
+        function_counts.update(document["unreviewed_functions"].keys())
+        function_counts.update(document["excluded_functions"].keys())
+        table_counts.update(row["table"] for row in document["database_boundaries"])
+        debt_counts.update(row["id"] for row in document["debt_dispositions"])
+        for capability_id, group in document["capabilities"].items():
+            previous = capability_domains.setdefault(capability_id, domain)
+            if previous != domain:
+                errors.append(f"Capability appears in multiple domain reviews: {capability_id}")
+            if group["kind"] == "existing" and capability_id not in catalog_ids:
+                errors.append(f"dangling existing Capability: {capability_id}")
+            if group["kind"] == "candidate" and capability_id in catalog_ids:
+                errors.append(f"candidate collides with existing Catalog Capability: {capability_id}")
+            function_counts.update(group["function_dispositions"].keys())
+    stable_ids = {
+        function_id for function_id, row in sources.registry["functions"].items()
+        if row.get("stability") == "stable"
+    }
+    for function_id in sorted(stable_ids - set(function_counts)):
+        errors.append(f"missing stable function disposition: {function_id}")
+    for function_id in sorted(set(function_counts) - stable_ids):
+        errors.append(f"unknown stable function disposition: {function_id}")
+    for function_id, count in sorted(function_counts.items()):
+        if count != 1:
+            errors.append(f"function disposition occurs {count} times: {function_id}")
+    inventory_tables = {row["table"] for row in sources.table_inventory["tables"]}
+    for table in sorted(inventory_tables | set(table_counts)):
+        if table_counts[table] != 1:
+            errors.append(f"table ownership occurs {table_counts[table]} times: {table}")
+    expected_debts = {
+        _module_debt(row)["id"] for row in sources.dependency_baseline["violations"]
+    } | {"boundary:" + row["fingerprint"] for row in sources.boundary_baseline["violations"]}
+    for debt_id in sorted(expected_debts):
+        if debt_counts[debt_id] != 1:
+            errors.append(f"baseline debt occurs {debt_counts[debt_id]} times: {debt_id}")
+    return sorted(set(errors))
+
+
 def _write(documents: list[dict], views: dict[str, str], sources: AuditSources) -> None:
     REVIEW_ROOT.mkdir(parents=True, exist_ok=True)
     GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
-    MANIFEST_PATH.write_text(_serialize(_manifest(sources)), encoding="utf-8")
+    MANIFEST_PATH.write_text(_serialize(_manifest(sources, documents)), encoding="utf-8")
     for document in documents:
         (REVIEW_ROOT / DOMAIN_FILES[document["domain"]]).write_text(_serialize(document), encoding="utf-8")
     for filename, content in views.items():
@@ -486,7 +583,7 @@ def _write(documents: list[dict], views: dict[str, str], sources: AuditSources) 
 
 
 def _drift(documents: list[dict], views: dict[str, str], sources: AuditSources) -> list[str]:
-    expected = {MANIFEST_PATH: _serialize(_manifest(sources))}
+    expected = {MANIFEST_PATH: _serialize(_manifest(sources, documents))}
     expected.update({REVIEW_ROOT / DOMAIN_FILES[d["domain"]]: _serialize(d) for d in documents})
     expected.update({GENERATED_ROOT / name: content for name, content in views.items()})
     return [str(path.relative_to(REPOSITORY_ROOT)) for path, content in expected.items()
@@ -503,7 +600,9 @@ def main(argv: list[str] | None = None) -> int:
     sources = load_sources()
     documents = initialize_documents(sources, _load_documents())
     views = render_evidence_views(render_views(documents), sources)
-    errors = _validate(documents, args.strict)
+    summary = json.loads(views["summary.json"])
+    errors = _validate(documents, False)
+    errors.extend(audit_consistency_errors(documents, sources))
     if args.write:
         if errors:
             print("Coverage review validation failed:", *errors, sep="\n- ", file=sys.stderr)
@@ -514,7 +613,22 @@ def main(argv: list[str] | None = None) -> int:
         if errors:
             print("Coverage review check failed:", *errors, sep="\n- ", file=sys.stderr)
             return 1
-    summary = json.loads(views["summary.json"])
+        if args.strict:
+            domain_counts = summary["candidate_additions_by_domain"]
+            if (summary["proposed_final_catalog_capabilities"] > 170
+                    or any(count > 40 for count in domain_counts.values())):
+                print(json.dumps({
+                    "status": "architecture_review_required",
+                    "current_catalog_capabilities": summary["current_catalog_capabilities"],
+                    "candidate_capabilities": summary["candidate_capabilities"],
+                    "proposed_final_catalog_capabilities": summary["proposed_final_catalog_capabilities"],
+                    "candidate_additions_by_domain": domain_counts,
+                }, ensure_ascii=False, sort_keys=True))
+                return 3
+            strict_errors = _validate(documents, True)
+            if strict_errors:
+                print("Coverage review strict check failed:", *strict_errors, sep="\n- ", file=sys.stderr)
+                return 1
     print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
     return 0
 

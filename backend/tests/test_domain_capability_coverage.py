@@ -44,8 +44,29 @@ def _stable_targets(domain: str, records: list[dict]) -> set[str]:
         for row in records
         if row["domain"] == domain
         and row["stability"] == "stable"
+        and row.get("classification") != "proposed"
         and row.get("target_capability")
     }
+
+
+def test_proposed_registry_targets_are_defined_by_domain_reviews_not_the_catalog():
+    records, descriptors = _documents()
+    proposed = {
+        row["target_capability"] for row in records
+        if row["stability"] == "stable" and row.get("classification") == "proposed"
+    }
+    reviewed_candidates = set()
+    for path in (ROOT / "docs/governance/capability-coverage-review").glob("*.json"):
+        if path.name == "manifest.json":
+            continue
+        document = json.loads(path.read_text(encoding="utf-8"))
+        reviewed_candidates.update(
+            capability_id for capability_id, group in document["capabilities"].items()
+            if group["kind"] == "candidate"
+        )
+
+    assert proposed == reviewed_candidates
+    assert proposed.isdisjoint(descriptors)
 
 
 @pytest.mark.parametrize("domain", DOMAINS)

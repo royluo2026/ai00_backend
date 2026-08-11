@@ -20,6 +20,8 @@
 | Base Platform | Deliver the governed annotation read business outcome for Base Platform. | `base.annotation.read` |
 | Base Platform | Deliver the governed authorization grant change apply business outcome for Base Platform. | `base.authorization.grant.change.apply` |
 | Base Platform | Deliver the governed authorization grant read business outcome for Base Platform. | `base.authorization.grant.read` |
+| Base Platform | Deliver the governed export template change apply business outcome for Base Platform. | `base.export_template.change.apply` |
+| Base Platform | Deliver the governed export template read business outcome for Base Platform. | `base.export_template.read` |
 | Base Platform | Deliver the governed external datasource change apply business outcome for Base Platform. | `base.external_datasource.change.apply` |
 | Base Platform | Deliver the governed external datasource connection test business outcome for Base Platform. | `base.external_datasource.connection.test` |
 | Base Platform | Deliver the governed external datasource search business outcome for Base Platform. | `base.external_datasource.search` |
@@ -37,11 +39,24 @@
 | Base Platform | Deliver the governed team change apply business outcome for Base Platform. | `base.team.change.apply` |
 | Base Platform | Deliver the governed team membership change apply business outcome for Base Platform. | `base.team.membership.change.apply` |
 | Base Platform | Deliver the governed team read business outcome for Base Platform. | `base.team.read` |
+| Craft | Deliver the governed canvas change apply business outcome for Craft. | `craft.canvas.change.apply` |
+| Craft | Deliver the governed canvas read business outcome for Craft. | `craft.canvas.read` |
+| Craft | Deliver the governed data exchange export business outcome for Craft. | `craft.data_exchange.export` |
+| Craft | Deliver the governed ebom change apply business outcome for Craft. | `craft.ebom.change.apply` |
+| Craft | Deliver the governed ebom read business outcome for Craft. | `craft.ebom.read` |
+| Craft | Deliver the governed gbop change apply business outcome for Craft. | `craft.gbop.change.apply` |
+| Craft | Deliver the governed gbop read business outcome for Craft. | `craft.gbop.read` |
+| Craft | Deliver the governed manufacturing resource change apply business outcome for Craft. | `craft.manufacturing_resource.change.apply` |
+| Craft | Deliver the governed manufacturing resource read business outcome for Craft. | `craft.manufacturing_resource.read` |
+| Craft | Deliver the governed rule change apply business outcome for Craft. | `craft.rule.change.apply` |
+| Craft | Deliver the governed rule read business outcome for Craft. | `craft.rule.read` |
 | Knowledge | Deliver the governed document archive business outcome for Knowledge. | `knowledge.document.archive` |
 | Knowledge | Deliver the governed entry change apply business outcome for Knowledge. | `knowledge.entry.change.apply` |
 | Knowledge | Deliver the governed personalization change apply business outcome for Knowledge. | `knowledge.personalization.change.apply` |
 | Knowledge | Deliver the governed personalization read business outcome for Knowledge. | `knowledge.personalization.read` |
 | Knowledge | Deliver the governed space change apply business outcome for Knowledge. | `knowledge.space.change.apply` |
+| Local Integration | Deliver the governed device change apply business outcome for Local Integration. | `local.device.change.apply` |
+| Local Integration | Deliver the governed device read business outcome for Local Integration. | `local.device.read` |
 | Ontology | Deliver the governed mapping change apply business outcome for Ontology. | `ontology.mapping.change.apply` |
 | Ontology | Deliver the governed schema change apply business outcome for Ontology. | `ontology.schema.change.apply` |
 | Project Management | Deliver the governed activity aggregate business outcome for Project Management. | `project.activity.aggregate` |

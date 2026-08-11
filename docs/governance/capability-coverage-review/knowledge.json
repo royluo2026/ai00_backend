@@ -3,7 +3,7 @@
   "domain": "Knowledge",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:326336f102a0a075e340bcfd1a609393b0912664f92c0a629dd2f28dc886da49",
+    "registry_sha256": "sha256:dc5653a22aba6fbbaf5158d52c7b3bbb4bc2e4864ebd9c4112c06e2ad9ee9a93",
     "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
     "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
   },

@@ -20,6 +20,8 @@
 | Base Platform | `base.annotation.read` | rest |
 | Base Platform | `base.authorization.grant.change.apply` | rest |
 | Base Platform | `base.authorization.grant.read` | rest |
+| Base Platform | `base.export_template.change.apply` | rest |
+| Base Platform | `base.export_template.read` | rest |
 | Base Platform | `base.external_datasource.change.apply` | rest |
 | Base Platform | `base.external_datasource.connection.test` | rest |
 | Base Platform | `base.external_datasource.search` | rest |
@@ -59,24 +61,35 @@
 | Base Platform | `system.lineage.get` | none |
 | Base Platform | `system.search` | agent |
 | Base Platform | `system.worker.outbox.health` | none |
-| Craft | `craft.bop.draft.change.apply` | none |
-| Craft | `craft.bop.draft.change.preview` | none |
-| Craft | `craft.bop.execution_structure.get` | none |
+| Craft | `craft.bop.draft.change.apply` | rest |
+| Craft | `craft.bop.draft.change.preview` | rest, agent |
+| Craft | `craft.bop.execution_structure.get` | rest, agent |
 | Craft | `craft.bop.execution_structure.preview` | none |
-| Craft | `craft.bop.import.preview` | none |
-| Craft | `craft.bop.linked_parts.get` | none |
-| Craft | `craft.bop.version.archive` | none |
+| Craft | `craft.bop.import.preview` | rest |
+| Craft | `craft.bop.linked_parts.get` | rest |
+| Craft | `craft.bop.version.archive` | rest |
 | Craft | `craft.bop.version.compare` | none |
-| Craft | `craft.bop.version.create` | none |
-| Craft | `craft.bop.version.get` | none |
+| Craft | `craft.bop.version.create` | rest |
+| Craft | `craft.bop.version.get` | rest |
 | Craft | `craft.bop.version.list` | none |
-| Craft | `craft.bop.work_package.get` | none |
+| Craft | `craft.bop.work_package.get` | rest |
+| Craft | `craft.canvas.change.apply` | rest, agent |
+| Craft | `craft.canvas.read` | rest, agent |
+| Craft | `craft.data_exchange.export` | rest |
+| Craft | `craft.ebom.change.apply` | rest |
+| Craft | `craft.ebom.read` | rest |
+| Craft | `craft.gbop.change.apply` | rest |
 | Craft | `craft.gbop.item.knowledge.list` | none |
 | Craft | `craft.gbop.item.search` | none |
 | Craft | `craft.gbop.item.usage.get` | none |
-| Craft | `craft.pbom.part.search` | none |
+| Craft | `craft.gbop.read` | rest |
+| Craft | `craft.manufacturing_resource.change.apply` | rest |
+| Craft | `craft.manufacturing_resource.read` | rest |
+| Craft | `craft.pbom.part.search` | rest |
 | Craft | `craft.pbom.snapshot.compare` | none |
-| Craft | `craft.pbom.snapshot.get` | none |
+| Craft | `craft.pbom.snapshot.get` | rest |
+| Craft | `craft.rule.change.apply` | rest |
+| Craft | `craft.rule.read` | rest, agent |
 | Digital Model | `digital_model.component.search` | none |
 | Digital Model | `digital_model.model.create` | none |
 | Digital Model | `digital_model.model.get` | none |
@@ -115,9 +128,11 @@
 | Knowledge | `knowledge.space.list` | rest |
 | Knowledge | `knowledge.space.search` | none |
 | Local Integration | `local.command.get` | none |
+| Local Integration | `local.device.change.apply` | rest |
+| Local Integration | `local.device.read` | rest |
 | Local Integration | `vismockup.capture` | none |
 | Local Integration | `vismockup.highlight` | none |
-| Local Integration | `vismockup.launch` | none |
+| Local Integration | `vismockup.launch` | agent, local_runtime |
 | Local Integration | `vismockup.model.open` | none |
 | Local Integration | `vismockup.status` | none |
 | Local Integration | `vismockup.tree` | none |

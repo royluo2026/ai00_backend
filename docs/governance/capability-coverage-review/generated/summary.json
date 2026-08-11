@@ -3,12 +3,99 @@
   "domains": 9,
   "stable_functions": 753,
   "resolutions": {
-    "existing_capability": 151,
-    "new_capability": 245,
-    "excluded": 92,
-    "unreviewed": 265
+    "existing_capability": 258,
+    "new_capability": 397,
+    "excluded": 98,
+    "unreviewed": 0
   },
-  "candidate_capabilities": 72,
+  "candidate_capabilities": 87,
+  "candidate_additions_by_domain": {
+    "Agent": 13,
+    "Base Platform": 23,
+    "Craft": 11,
+    "Knowledge": 5,
+    "Local Integration": 2,
+    "Ontology": 2,
+    "Project Management": 31
+  },
+  "function_dispositions_by_domain": {
+    "Agent": {
+      "existing_capability": 0,
+      "new_capability": 45,
+      "excluded": 9,
+      "unreviewed": 0
+    },
+    "Base Platform": {
+      "existing_capability": 27,
+      "new_capability": 59,
+      "excluded": 75,
+      "unreviewed": 0
+    },
+    "Craft": {
+      "existing_capability": 126,
+      "new_capability": 145,
+      "excluded": 6,
+      "unreviewed": 0
+    },
+    "Digital Model": {
+      "existing_capability": 7,
+      "new_capability": 0,
+      "excluded": 0,
+      "unreviewed": 0
+    },
+    "Knowledge": {
+      "existing_capability": 40,
+      "new_capability": 10,
+      "excluded": 0,
+      "unreviewed": 0
+    },
+    "Local Integration": {
+      "existing_capability": 16,
+      "new_capability": 3,
+      "excluded": 6,
+      "unreviewed": 0
+    },
+    "Ontology": {
+      "existing_capability": 26,
+      "new_capability": 14,
+      "excluded": 1,
+      "unreviewed": 0
+    },
+    "Project Management": {
+      "existing_capability": 3,
+      "new_capability": 121,
+      "excluded": 1,
+      "unreviewed": 0
+    },
+    "Simulation": {
+      "existing_capability": 13,
+      "new_capability": 0,
+      "excluded": 0,
+      "unreviewed": 0
+    }
+  },
+  "consolidation_ratio": {
+    "new_function_dispositions": 397,
+    "candidate_capabilities": 87,
+    "functions_per_candidate": 4.563
+  },
+  "enabled_exposures": {
+    "web": 2,
+    "rest": 108,
+    "plugin": 0,
+    "agent": 27,
+    "mcp": 0,
+    "local_runtime": 1
+  },
+  "code_extractions": 58,
+  "debt_backlog": {
+    "database": 262,
+    "dependency": 37,
+    "migration": 2
+  },
+  "catalog_descriptors": 103,
+  "current_catalog_capabilities": 87,
+  "proposed_final_catalog_capabilities": 174,
   "evidence": {
     "module_dependencies": 7,
     "boundary_violations": 292,

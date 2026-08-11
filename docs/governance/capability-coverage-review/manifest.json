@@ -1,8 +1,28 @@
 {
   "schema_version": 1,
+  "discussion_status": "architecture_review_required",
+  "thresholds": {
+    "maximum_catalog_capabilities": 170,
+    "maximum_domain_additions": 40
+  },
+  "catalog_descriptors": 103,
+  "current_catalog_capabilities": 87,
+  "candidate_capabilities": 87,
+  "proposed_final_catalog_capabilities": 174,
+  "candidate_additions_by_domain": {
+    "Base Platform": 23,
+    "Agent": 13,
+    "Craft": 11,
+    "Digital Model": 0,
+    "Project Management": 31,
+    "Simulation": 0,
+    "Ontology": 2,
+    "Knowledge": 5,
+    "Local Integration": 2
+  },
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:326336f102a0a075e340bcfd1a609393b0912664f92c0a629dd2f28dc886da49",
+    "registry_sha256": "sha256:dc5653a22aba6fbbaf5158d52c7b3bbb4bc2e4864ebd9c4112c06e2ad9ee9a93",
     "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
     "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
   },
