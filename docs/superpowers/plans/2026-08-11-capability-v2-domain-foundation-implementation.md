@@ -4,7 +4,7 @@
 
 **Goal:** Build the manifest-driven Provider, database, migration, cross-domain invocation and event foundation required to extract every Capability V2 domain without changing business behavior.
 
-**Architecture:** Keep CapabilityGatewayService and Descriptor V2 as the execution kernel, but remove import-time domain registration from the registry. Load trusted official domain Providers from one frozen manifest, give every target domain an explicit database/migration identity, and expose shared contracts for governed cross-domain invocation and outbox events. Existing business implementations remain authoritative during this foundation slice and are wrapped without semantic changes.
+**Architecture:** Keep CapabilityGatewayService and Descriptor V2 as the execution kernel, but remove import-time domain registration from the registry. Load trusted official domain Providers, search exports and event subscriptions from one frozen manifest, give every target domain an explicit database/migration identity, and expose shared contracts for governed cross-domain invocation and outbox events. Existing business implementations remain authoritative during this foundation slice and are wrapped without semantic changes.
 
 **Tech Stack:** Python 3.11+, FastAPI, Pydantic v2, PyMySQL, OceanBase MySQL mode, pytest, JSON Schema-style Capability contracts, PowerShell-compatible test commands.
 
@@ -16,6 +16,8 @@
 - No cross-domain SQL, JOIN, foreign key, Router, Repository, ORM, concrete Service or database-helper import.
 - Each first-class domain owns its code, database, runtime credential, DDL credential, migration ledger, Provider and tests.
 - Cross-domain synchronous work uses CapabilityGatewayService; asynchronous work uses versioned events plus Outbox/Inbox.
+- DomainManifest is the only deployment declaration for search exports and event subscription version ranges.
+- Central governance and frozen artifacts are finalized serially by one designated integrator against the latest integration HEAD.
 - Do not add business capabilities, change business schemas or move business data in this foundation plan.
 - Existing business data is empty; do not implement backfill, dual-write or legacy table views.
 - Do not use subagents.
@@ -32,7 +34,7 @@
 - Create backend/capability_v2/domain_database.py: explicit per-domain database configuration parsing.
 - Create backend/capability_v2/domain_client.py: governed server-side cross-domain invocation.
 - Create backend/capability_v2/domain_events.py: versioned event, Outbox and Inbox contracts.
-- Create backend/capability_v2/official_domains.json: frozen official Provider and database manifest.
+- Create backend/capability_v2/official_domains.json: frozen official Provider, database, search export and event subscription manifest.
 - Delete backend/capability_v2/official_providers.json after all loader callers use official_domains.json.
 - Modify backend/capabilities/registry_next.py: retain registry types only; remove domain imports and registrations.
 - Modify backend/capability_v2/catalog.py: embed DomainArtifact metadata in releases without weakening existing provider hashes.
@@ -79,7 +81,7 @@
 - Test: backend/tests/test_domain_manifest.py
 
 **Interfaces:**
-- Produces: DomainManifest, DomainDatabaseManifest, DomainManifestSet and load_domain_manifests(path: Path) -> DomainManifestSet.
+- Produces: CapabilityExportManifest, EventSubscriptionManifest, DomainManifest, DomainDatabaseManifest, DomainManifestSet and load_domain_manifests(path: Path) -> DomainManifestSet.
 - Consumes: FrozenModel and ProviderArtifact from the Capability V2 kernel.
 
 - [ ] **Step 1: Write the failing manifest validation tests**
@@ -106,6 +108,17 @@ def _document():
             },
             "artifact_path": "plugins/craft/craft_backend",
             "allowed_owners": ["craft"],
+            "search_export": {
+                "capability_id": "craft.object.search",
+                "major_version": 1,
+            },
+            "event_subscriptions": [{
+                "subscription_id": "craft.factory_asset_events",
+                "producer_domain": "factory",
+                "event_type": "factory.asset.scrapped",
+                "min_version": 1,
+                "max_version": 2,
+            }],
             "database": {
                 "database_name": "ai00_craft",
                 "runtime_url_env": "AI00_CRAFT_DB_URL",
@@ -123,6 +136,8 @@ def test_manifest_loads_one_explicit_domain(tmp_path: Path):
     craft = manifests.require("craft")
     assert craft.database.database_name == "ai00_craft"
     assert craft.database.runtime_url_env == "AI00_CRAFT_DB_URL"
+    assert craft.search_export.capability_id == "craft.object.search"
+    assert craft.event_subscriptions[0].max_version == 2
 
 
 def test_manifest_rejects_duplicate_domain_and_database_names(tmp_path: Path):
@@ -140,6 +155,25 @@ def test_manifest_rejects_path_escape(tmp_path: Path):
     path = tmp_path / "domains.json"
     path.write_text(json.dumps(document), encoding="utf-8")
     with pytest.raises(ValueError, match="repository-relative"):
+        load_domain_manifests(path)
+
+
+def test_manifest_rejects_inverted_event_version_range(tmp_path: Path):
+    document = _document()
+    document["domains"][0]["event_subscriptions"][0].update(min_version=3, max_version=2)
+    path = tmp_path / "domains.json"
+    path.write_text(json.dumps(document), encoding="utf-8")
+    with pytest.raises(ValueError, match="min_version"):
+        load_domain_manifests(path)
+
+
+def test_manifest_rejects_duplicate_subscription_ids(tmp_path: Path):
+    document = _document()
+    subscription = document["domains"][0]["event_subscriptions"][0]
+    document["domains"][0]["event_subscriptions"].append(dict(subscription))
+    path = tmp_path / "domains.json"
+    path.write_text(json.dumps(document), encoding="utf-8")
+    with pytest.raises(ValueError, match="duplicate subscription_id"):
         load_domain_manifests(path)
 ~~~
 
@@ -168,12 +202,33 @@ class DomainDatabaseManifest(FrozenModel):
     migration_path: str
 
 
+class CapabilityExportManifest(FrozenModel):
+    capability_id: str = Field(pattern=r"^[a-z][a-z0-9_.]{2,127}$")
+    major_version: int = Field(ge=1)
+
+
+class EventSubscriptionManifest(FrozenModel):
+    subscription_id: str = Field(pattern=r"^[a-z][a-z0-9_.]{2,127}$")
+    producer_domain: str = Field(pattern=r"^[a-z][a-z0-9_]{1,63}$")
+    event_type: str = Field(pattern=r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
+    min_version: int = Field(ge=1)
+    max_version: int = Field(ge=1)
+
+    @model_validator(mode="after")
+    def ordered_versions(self):
+        if self.min_version > self.max_version:
+            raise ValueError("min_version must be <= max_version")
+        return self
+
+
 class DomainManifest(FrozenModel):
     domain_id: str = Field(pattern=r"^[a-z][a-z0-9_]{1,63}$")
     artifact: ProviderArtifact
     artifact_path: str
     allowed_owners: tuple[str, ...]
     database: DomainDatabaseManifest
+    search_export: CapabilityExportManifest | None = None
+    event_subscriptions: tuple[EventSubscriptionManifest, ...] = ()
 
     @model_validator(mode="after")
     def safe_paths(self):
@@ -183,6 +238,9 @@ class DomainManifest(FrozenModel):
                 raise ValueError("paths must be repository-relative POSIX paths")
         if not self.allowed_owners or self.domain_id not in self.allowed_owners:
             raise ValueError("allowed_owners must include domain_id")
+        subscription_ids = [item.subscription_id for item in self.event_subscriptions]
+        if len(subscription_ids) != len(set(subscription_ids)):
+            raise ValueError("duplicate subscription_id")
         return self
 
 
@@ -217,7 +275,7 @@ def load_domain_manifests(path: Path) -> DomainManifestSet:
 
 Run: python -m pytest backend/tests/test_domain_manifest.py -q
 
-Expected: 3 passed.
+Expected: 5 passed.
 
 - [ ] **Step 5: Commit the manifest contract**
 
@@ -308,6 +366,7 @@ git commit -m "refactor: expose official domain provider entrypoints"
 
 **Interfaces:**
 - Produces: hash_domain_artifact(root: Path, relative_path: str) -> str.
+- Produces: current_repository_head(root: Path) -> str, hash_manifest(path: Path) -> str and freeze_official_domains(root: Path, path: Path, expected_head: str | None, expected_manifest_sha256: str | None, check: bool) -> str.
 - Produces: DomainProviderLoader(root: Path, manifests: DomainManifestSet).register_all(registry: CapabilityRegistry) -> tuple[str, ...].
 - PluginLoader continues discovering Web plugin manifests but no longer owns official domain Provider trust logic.
 
@@ -331,6 +390,42 @@ def test_loader_rejects_changed_artifact_hash(tmp_path):
     path.write_text(json.dumps(document), encoding="utf-8")
     with pytest.raises(ProviderTrustError, match="artifact_mismatch"):
         DomainProviderLoader(REPOSITORY_ROOT, load_domain_manifests(path)).register_all(CapabilityRegistry())
+
+
+def test_loader_rejects_search_export_owned_by_another_domain(tmp_path):
+    document = json.loads(OFFICIAL_DOMAINS.read_text(encoding="utf-8"))
+    craft = next(item for item in document["domains"] if item["domain_id"] == "craft")
+    craft["search_export"] = {"capability_id": "system.search", "major_version": 1}
+    path = tmp_path / "domains.json"
+    path.write_text(json.dumps(document), encoding="utf-8")
+    with pytest.raises(ProviderTrustError, match="search_export_owner_mismatch"):
+        DomainProviderLoader(REPOSITORY_ROOT, load_domain_manifests(path)).register_all(CapabilityRegistry())
+
+
+def test_freeze_rejects_stale_manifest_digest(tmp_path):
+    path = tmp_path / "official_domains.json"
+    path.write_bytes(OFFICIAL_DOMAINS.read_bytes())
+    with pytest.raises(ProviderTrustError, match="stale_manifest"):
+        freeze_official_domains(
+            REPOSITORY_ROOT,
+            path,
+            expected_head=current_repository_head(REPOSITORY_ROOT),
+            expected_manifest_sha256="sha256:" + "0" * 64,
+            check=False,
+        )
+
+
+def test_freeze_rejects_stale_integration_head(tmp_path):
+    path = tmp_path / "official_domains.json"
+    path.write_bytes(OFFICIAL_DOMAINS.read_bytes())
+    with pytest.raises(ProviderTrustError, match="stale_head"):
+        freeze_official_domains(
+            REPOSITORY_ROOT,
+            path,
+            expected_head="0" * 40,
+            expected_manifest_sha256=hash_manifest(path),
+            check=False,
+        )
 ~~~
 
 - [ ] **Step 2: Run tests and verify missing loader failure**
@@ -341,7 +436,7 @@ Expected: collection fails for provider_loader.
 
 - [ ] **Step 3: Implement artifact hashing and fail-closed loading**
 
-The hash covers every file below artifact_path with suffix .py or .json, normalizes line endings, includes each repository-relative filename, rejects symlinks/path escapes, and imports only the frozen module. register_all snapshots registry keys before and after each module registration and rejects any newly registered Capability whose owner is outside manifest.allowed_owners. The Base manifest declares allowed_owners as [base, plugin]; every other current manifest declares only its domain_id.
+The hash covers every file below artifact_path with suffix .py or .json, normalizes line endings, includes each repository-relative filename, rejects symlinks/path escapes, and imports only the frozen module. register_all snapshots registry keys before and after each module registration and rejects any newly registered Capability whose owner is outside manifest.allowed_owners. After all Providers load, validate every non-null search_export resolves to a registered read Descriptor whose owner is in that same DomainManifest.allowed_owners. The Base manifest declares allowed_owners as [base, plugin]; every other current manifest declares only its domain_id.
 
 Core loop:
 
@@ -363,11 +458,22 @@ Add keys() -> tuple[tuple[str, int], ...] to CapabilityRegistry rather than read
 
 - [ ] **Step 4: Implement deterministic manifest freezing**
 
-freeze_official_domains.py loads the JSON, recomputes each artifact_hash, sorts domains by domain_id, writes UTF-8 JSON with indent=2 and a final newline, then reloads through DomainManifestSet before replacing the file. It accepts --check to compare without writing. No network access is used.
+freeze_official_domains.py reads the current Git HEAD and exact file-byte sha256 before doing work, and rejects supplied --expected-head or --expected-manifest-sha256 values when either differs. It then recomputes every artifact_hash, sorts domains by domain_id, writes UTF-8 JSON with indent=2 and a final newline, reloads through DomainManifestSet, rechecks HEAD and the original manifest digest immediately before replacement, and prints the new manifest digest. It accepts --check to compare without writing; --check never replaces the file. No network access is used. These optimistic guards are mandatory during every later domain finalization and complement the single-integrator queue defined in the roadmap.
+
+The designated integrator runs the freeze from the latest integration HEAD with:
+
+~~~powershell
+$manifestDigest = "sha256:" + (Get-FileHash backend/capability_v2/official_domains.json -Algorithm SHA256).Hash.ToLowerInvariant()
+$integrationHead = git rev-parse HEAD
+python backend/scripts/freeze_official_domains.py --expected-head $integrationHead --expected-manifest-sha256 $manifestDigest
+python backend/scripts/freeze_official_domains.py --check
+~~~
+
+Expected: the write prints the new digest, the check exits 0, and no second plan enters finalization until the resulting central freeze commit lands.
 
 - [ ] **Step 5: Populate official_domains.json**
 
-Include Base, Knowledge, Ontology and the current Craft, Project Management, Digital Model, Simulation and Local Runtime providers. Use domain_id local_runtime and plugin_id official.local-runtime, and rename plugins/device/manifest.json to that plugin ID. Because the currently published major-1 VisMockup descriptors still declare owner local_integration, the Local Runtime manifest alone temporarily declares allowed_owners [local_runtime, local_integration]. Record that exact alias as transition debt for Plan 13; no other manifest may declare a legacy owner. Point future Factory, Integration and Agent entries at official Provider entry points only after those entry points exist in their own domain plans; do not declare unloadable providers here. Delete official_providers.json once its callers and tests use official_domains.json so there is one trust source.
+Include Base, Knowledge, Ontology and the current Craft, Project Management, Digital Model, Simulation and Local Runtime providers. Use domain_id local_runtime and plugin_id official.local-runtime, and rename plugins/device/manifest.json to that plugin ID. Because the currently published major-1 VisMockup descriptors still declare owner local_integration, the Local Runtime manifest alone temporarily declares allowed_owners [local_runtime, local_integration]. Record that exact alias as transition debt for Plan 13; no other manifest may declare a legacy owner. Point future Factory, Integration and Agent entries at official Provider entry points only after those entry points exist in their own domain plans; do not declare unloadable providers here. Set search_export only where an actual registered read Descriptor already satisfies the owner check; otherwise serialize null until the owning domain plan delivers it. Set event_subscriptions to an empty array until a consumer plan defines a real handler and version range. Delete official_providers.json once its callers and tests use official_domains.json so there is one trust source.
 
 - [ ] **Step 6: Delegate PluginLoader capability registration**
 
@@ -399,6 +505,12 @@ git commit -m "feat: load official capabilities from frozen domain manifests"
 - Modify: backend/plugin_platform/service.py
 - Modify: backend/scripts/build_capability_catalog.py
 - Test: backend/tests/test_capability_bootstrap.py
+- Modify: backend/tests/test_base_capability_contracts.py
+- Modify: backend/tests/test_capability_consumer_e2e.py
+- Modify: backend/tests/test_plugin_authority_boundary.py
+- Modify: backend/tests/test_plugin_mount_sessions_v2.py
+- Modify: backend/tests/test_plugin_platform_next.py
+- Modify: backend/tests/test_plugin_usage_metrics.py
 
 **Interfaces:**
 - Produces: build_capability_registry(root: Path | None = None, manifest_path: Path | None = None) -> CapabilityRegistry.
@@ -448,7 +560,7 @@ def build_capability_registry(root=None, manifest_path=None):
 
 - [ ] **Step 4: Update runtime consumers**
 
-main.py calls get_capability_registry() once, passes that instance to Gateway construction and stops calling PluginLoader.register_capabilities separately. build_capability_catalog.py uses the same builder. gateway.py default construction and plugin_platform/service.py resolve through get_capability_registry(). init_next.py and backend/capabilities/__init__.py expose a lazy proxy only for compatibility; new code imports bootstrap functions directly.
+main.py calls get_capability_registry() once, passes that instance to Gateway construction and stops calling PluginLoader.register_capabilities separately. build_capability_catalog.py uses the same builder. gateway.py default construction and plugin_platform/service.py resolve through get_capability_registry(); delete the current `from backend.capabilities.registry_next import capability_registry` fallback so no runtime path can reactivate import-time registration. init_next.py and backend/capabilities/__init__.py expose a lazy proxy only for compatibility; new code imports bootstrap functions directly.
 
 - [ ] **Step 5: Run bootstrap, catalog and bypass tests**
 
@@ -456,7 +568,15 @@ Run: python -m pytest backend/tests/test_capability_bootstrap.py backend/tests/t
 
 Expected: all pass; Catalog count equals one registry snapshot and contains no duplicate merge of base and plugin registries.
 
-- [ ] **Step 6: Check generated Catalog drift**
+- [ ] **Step 6: Remove system.echo test coupling and regenerate its artifacts**
+
+Remove system.echo from STABLE_CAPABILITIES in test_base_capability_contracts.py. In test_capability_consumer_e2e.py, monkeypatch the router's get_default_gateway with a recording fake and invoke test.web.read so the test proves the REST result envelope without requiring a diagnostic business Capability. In test_plugin_authority_boundary.py use plugin.install as the positive exposure case and missing.capability as the rejection case. In test_plugin_mount_sessions_v2.py replace system.echo@1/system.echo with test.plugin.read@1/test.plugin.read because its Gateway is already fake. In test_plugin_platform_next.py use plugin.storage.get as the example manifest permission. In test_plugin_usage_metrics.py use test.first.read and test.second.read as opaque dedupe inputs. Regenerate acceptance fixtures, Catalog JSON and generated Capability docs so no generated source lists system.echo.
+
+Run: python -m pytest backend/tests/test_base_capability_contracts.py backend/tests/test_capability_consumer_e2e.py backend/tests/test_plugin_authority_boundary.py backend/tests/test_plugin_mount_sessions_v2.py backend/tests/test_plugin_platform_next.py backend/tests/test_plugin_usage_metrics.py -q
+
+Expected: all pass; `rg -n "system\.echo" docs/capabilities backend/tests/acceptance/fixtures` returns no matches, and any remaining backend/tests match is an explicit negative absence assertion rather than an invocation or grant.
+
+- [ ] **Step 7: Check generated Catalog drift**
 
 Run: python backend/scripts/freeze_official_domains.py --check
 
@@ -464,12 +584,12 @@ Expected: exit 0.
 
 Run: python backend/scripts/build_capability_catalog.py --check
 
-Expected: exit 0 after regenerating expected artifacts only if the intentional removal of system.echo changes them. If system.echo is present in generated artifacts, regenerate Catalog/docs in this task and record it as removed diagnostic protocol, not deprecated business behavior.
+Expected: exit 0; system.echo is absent from the registry, acceptance fixture, Catalog and generated docs and is recorded as a removed diagnostic protocol, not deprecated business behavior.
 
-- [ ] **Step 7: Commit explicit bootstrap**
+- [ ] **Step 8: Commit explicit bootstrap**
 
 ~~~powershell
-git add backend/capability_v2/bootstrap.py backend/capabilities/registry_next.py backend/capabilities/init_next.py backend/capabilities/__init__.py backend/main.py backend/capability_v2/gateway.py backend/plugin_platform/service.py backend/scripts/build_capability_catalog.py backend/tests/test_capability_bootstrap.py docs/capabilities docs/governance/capability-catalog-release.json
+git add backend/capability_v2/bootstrap.py backend/capabilities/registry_next.py backend/capabilities/init_next.py backend/capabilities/__init__.py backend/main.py backend/capability_v2/gateway.py backend/plugin_platform/service.py backend/scripts/build_capability_catalog.py backend/tests/test_capability_bootstrap.py backend/tests/test_base_capability_contracts.py backend/tests/test_capability_consumer_e2e.py backend/tests/test_plugin_authority_boundary.py backend/tests/test_plugin_mount_sessions_v2.py backend/tests/test_plugin_platform_next.py backend/tests/test_plugin_usage_metrics.py backend/tests/acceptance/fixtures docs/capabilities docs/governance/capability-catalog-release.json
 git commit -m "refactor: bootstrap one capability registry from domain providers"
 ~~~
 
@@ -677,7 +797,7 @@ git commit -m "feat: add governed cross-domain capability client"
 - Test: backend/tests/test_domain_event_contracts.py
 
 **Interfaces:**
-- Produces: DomainEventEnvelope, OutboxWriter Protocol, InboxDeduplicator Protocol.
+- Produces: DomainEventEnvelope, OutboxWriter Protocol, InboxDeduplicator Protocol, supports_event_version(subscription, event) -> bool and require_event_subscription(manifest, event) -> EventSubscriptionManifest.
 - Does not produce a shared SQL repository; every domain implements these protocols against its own database.
 
 - [ ] **Step 1: Write closed event contract tests**
@@ -705,6 +825,26 @@ def test_event_requires_explicit_tenant_aggregate_version_and_correlation():
 def test_event_rejects_reserved_identity_fields_in_payload():
     with pytest.raises(ValueError, match="reserved event payload field"):
         valid_event(payload={"tenant_id": "forged"})
+
+
+def test_subscription_accepts_only_declared_type_producer_and_version():
+    subscription = EventSubscriptionManifest(
+        subscription_id="base.factory_assets",
+        producer_domain="factory",
+        event_type="factory.asset.scrapped",
+        min_version=1,
+        max_version=2,
+    )
+    assert supports_event_version(subscription, valid_event(event_version=2)) is True
+    assert supports_event_version(subscription, valid_event(event_version=3)) is False
+
+
+def test_unmatched_or_unsupported_event_fails_before_inbox_completion():
+    from types import SimpleNamespace
+
+    manifest = SimpleNamespace(event_subscriptions=())
+    with pytest.raises(UnsupportedEventVersion, match="event_subscription_not_declared"):
+        require_event_subscription(manifest, valid_event())
 ~~~
 
 - [ ] **Step 2: Run tests and verify missing module failure**
@@ -715,7 +855,7 @@ Expected: collection fails for domain_events.
 
 - [ ] **Step 3: Implement immutable event and protocols**
 
-Use FrozenModel. Enforce timezone-aware occurred_at, event_type pattern domain.aggregate.past_tense_event, event_version and aggregate_version >= 1, non-empty request/trace/causation IDs, and reject tenant_id, tenant_gid, producer_domain, aggregate_id and aggregate_version inside payload. Define:
+Use FrozenModel. Enforce timezone-aware occurred_at, event_type pattern domain.aggregate.past_tense_event, event_version and aggregate_version >= 1, non-empty request/trace/causation IDs, and reject tenant_id, tenant_gid, producer_domain, aggregate_id and aggregate_version inside payload. Match subscriptions by producer_domain and exact event_type, then require min_version <= event_version <= max_version before InboxDeduplicator.begin. Unsupported events use stable reasons event_subscription_not_declared or event_version_unsupported and are not marked complete. Define:
 
 ~~~python
 class OutboxWriter(Protocol):
@@ -750,6 +890,20 @@ git commit -m "feat: define versioned domain event contracts"
 - Modify: backend/scripts/check_domain_dependencies.py
 - Modify: backend/tests/test_domain_independence_v2.py
 - Modify: backend/tests/test_capability_kernel_contract.py
+- Modify: backend/governance/boundary_baseline.json
+- Modify: backend/scripts/build_capability_coverage_review.py
+- Modify: docs/governance/capability-coverage-review/craft.json
+- Create: docs/governance/capability-coverage-review/factory.json
+- Create: docs/governance/capability-coverage-review/integration.json
+- Create: docs/governance/capability-coverage-review/local-runtime.json
+- Delete: docs/governance/capability-coverage-review/local-integration.json
+- Modify: docs/governance/capability-coverage-review/manifest.json
+- Modify: docs/governance/capability-coverage-review/generated/capability-candidates.md
+- Modify: docs/governance/capability-coverage-review/generated/code-ownership-extractions.md
+- Modify: docs/governance/capability-coverage-review/generated/consumer-exposure.md
+- Modify: docs/governance/capability-coverage-review/generated/database-ownership-migrations.md
+- Modify: docs/governance/capability-coverage-review/generated/function-dispositions.md
+- Modify: docs/governance/capability-coverage-review/generated/summary.json
 - Create: plugins/factory/README.md
 - Create: plugins/integration/README.md
 - Create: plugins/factory/factory_backend/__init__.py
@@ -774,7 +928,7 @@ Expected: failures identify missing Factory/Integration ownership records, Local
 
 - [ ] **Step 3: Add target domain ownership and minimal roots**
 
-Create only package markers and README files; do not add empty fake Capabilities. Assign existing device code to Local Runtime. Factory and Integration target roots are owned immediately, while existing misplaced implementations remain recorded as reviewed debt until their extraction plans remove them. Do not add new baseline exceptions.
+Create only package markers and README files; do not add empty fake Capabilities. Assign existing device code to Local Runtime. Factory and Integration target roots are owned immediately. Update build_capability_coverage_review.py DOMAINS and RUNTIME_TO_DOMAIN to the eleven approved names, rename local-integration.json to local-runtime.json, and let the merge-preserving initializer create factory.json and integration.json without inventing Capabilities. Update table ownership classification first and capture `audit_domain_boundaries.py --json` before and after. Match reclassified violations by the unchanged tuple (category, path, scope, target); when only owner/detail changes, replace the old `boundary:<fingerprint>` debt ID with the new fingerprint in the same source-domain review document and update its evidence text. Then run `audit_domain_boundaries.py --write-baseline` and `build_capability_coverage_review.py --write`. A changed owner may replace an old reviewed fingerprint, but any violation with no matching old tuple is genuinely new and must be fixed rather than accepted. Existing misplaced implementations remain reviewed debt until their extraction plans remove them.
 
 - [ ] **Step 4: Tighten the import checker**
 
@@ -794,6 +948,14 @@ Run: python backend/scripts/check_domain_dependencies.py --check
 
 Expected: no new cross-domain dependency; existing exact reviewed debt may remain until extraction plans.
 
+Run: python backend/scripts/audit_domain_boundaries.py
+
+Expected: new_violations=0, unowned_tables=[], and Factory/Integration-owned tables are not reported as Craft-owned.
+
+Run: python backend/scripts/build_capability_coverage_review.py --check
+
+Expected: exit 0; every current boundary fingerprint has exactly one reviewed disposition and generated review views have no drift.
+
 Run: python backend/scripts/build_capability_catalog.py --check
 
 Expected: no Catalog drift.
@@ -807,7 +969,7 @@ Expected: status passed, failed=0, skipped=0 for mandatory offline cases. This f
 - [ ] **Step 7: Commit governance alignment**
 
 ~~~powershell
-git add docs/governance/domain-ownership.json backend/governance/domain_boundaries.json .github/CODEOWNERS backend/scripts/check_domain_dependencies.py backend/tests/test_domain_independence_v2.py backend/tests/test_capability_kernel_contract.py plugins/factory plugins/integration
+git add docs/governance/domain-ownership.json docs/governance/capability-coverage-review backend/governance/domain_boundaries.json backend/governance/boundary_baseline.json .github/CODEOWNERS backend/scripts/check_domain_dependencies.py backend/scripts/build_capability_coverage_review.py backend/tests/test_domain_independence_v2.py backend/tests/test_capability_kernel_contract.py plugins/factory plugins/integration
 git commit -m "chore: establish capability v2 domain foundation gates"
 ~~~
 
@@ -816,6 +978,9 @@ git commit -m "chore: establish capability v2 domain foundation gates"
 - CapabilityRegistry has no import-time business-domain registration.
 - Runtime and Catalog builds construct the same registry from the same frozen official domain manifest.
 - Every loaded Provider artifact is hash-pinned and owner-checked.
+- Every search target comes from a validated DomainManifest.search_export; no mutable handwritten search Provider list is a source of truth.
+- Event consumers declare exact producer/type/min/max ranges in DomainManifest.event_subscriptions and unsupported versions fail before Inbox completion.
+- Frozen central manifests reject stale expected HEAD or manifest digests and are finalized by one designated integrator on the latest integration HEAD.
 - system.echo is absent from the business Catalog.
 - Every target domain has an explicit database name, runtime URL env, DDL URL env and migration root.
 - No global database URL fallback exists in the new domain database API.

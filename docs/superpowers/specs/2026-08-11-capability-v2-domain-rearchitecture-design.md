@@ -2,7 +2,7 @@
 
 **日期：** 2026-08-11
 
-**状态：** 已完成业务语义评审，待书面复核
+**状态：** 已完成业务语义评审与两轮独立复核，待最终书面确认
 
 **适用范围：** Base、Project Management、Factory、Craft、Knowledge、Ontology、Agent、Integration、Local Runtime、Digital Model、Simulation、Plugin Platform
 
@@ -319,7 +319,7 @@ Domain Proposal 是领域拥有的内容与状态聚合，不是 Base Approval �
 
 ### 9.4 Domain Event 版本演进
 
-每个 event_type 独立演进 event_version。消费者在部署清单中声明可处理的最小和最大版本；收到不支持的版本时不得确认 Inbox 完成，而是进入 dependency_unavailable/dead-letter 并报警。
+每个 event_type 独立演进 event_version。消费者在本领域 DomainManifest 的 `event_subscriptions` 数组中声明 subscription_id、producer_domain、event_type、min_version 和 max_version；DomainManifest 是该声明的唯一部署清单，不新建第二套事件配置文件。收到未声明或不支持的版本时不得确认 Inbox 完成，而是进入 dependency_unavailable/dead-letter 并报警。
 
 保持同一 event_version 时只允许向后兼容的追加：新增可选字段、扩大文档化枚举且旧消费者具有 unknown 分支、补充不改变既有语义的元数据。删除字段、改变字段类型或含义、改变必填性、改变 Tenant/聚合身份语义均为 breaking change，必须提升 event_version。
 
@@ -393,7 +393,7 @@ Base Revision 引擎遵守 §10.3：只提供不可变 revision graph、共享�
 
 ### 11.4 Search、Lineage 与 Change Impact 数据机制
 
-`system.search` 第一阶段采用有界的 Domain Provider 扇出：Base 并行调用已登记的领域 search Capability，每域有独立 deadline、最大结果数和稳定游标，只接收统一 SearchRef，不接收领域数据库行。Base 负责去重、权限后过滤、稳定的近似排序和部分失败标记；跨域结果不承诺事务快照或精确 total。单域已明确时应直接调用领域 search，不使用 system.search。
+`system.search` 第一阶段采用有界的 Domain Provider 扇出：一个领域只有在其冻结 DomainManifest 中声明 `search_export`（capability_id 和 major_version），且该 Descriptor 真实存在、owner 匹配、risk=read 时才算“已登记”。Base 启动时从同一份 official_domains.json 构建按 domain_id 排序的搜索目标，不维护手写 Provider 列表。Base 并行调用这些领域 search Capability，每域有独立 deadline、最大结果数和稳定游标，只接收统一 SearchRef，不接收领域数据库行。Base 负责去重、权限后过滤、稳定的近似排序和部分失败标记；跨域结果不承诺事务快照或精确 total。单域已明确时应直接调用领域 search，不使用 system.search。
 
 当调用量或排序质量证明有需要时，各领域通过版本化事件向 Base 发布可搜索引用，Base 建立仅含稳定 Ref、标题、摘要、分类、可见性索引键和版本的物化搜索投影。投影不是业务事实源，不能用于领域写入或替代所有者的最终授权检查。本文不要求在第一阶段引入外部搜索引擎。
 
@@ -470,6 +470,8 @@ Craft 只负责“如何制造”，由 PBOM、BOP、GBOP、工艺规则和工�
 
 发布版本不可变。导入文件的通用解析由 Data Exchange 完成，PBOM import.preview 负责领域语义、结构和哈希校验。
 
+CraftPbomRevisionAdapter 在 PBOM Version 发布时将领域版本映射为 Revision Kernel CommitRef；PBOM 数据库仍是版本事实源。Adapter 不直接访问 Revision Repository，并为 BOP、Digital Model 等下游提供可验证的不可变引用。
+
 ### 14.2 BOP
 
 - craft.bop.version.create/get/search/validate/submit/publish/archive/compare。
@@ -481,6 +483,8 @@ Craft 只负责“如何制造”，由 PBOM、BOP、GBOP、工艺规则和工�
 - craft.bop.factory_binding.preview/apply。
 
 节点编辑通过 typed command 和 expected revision 原子执行，不为每种节点生成独立 CRUD Capability。preview 生成短期、绑定调用者和 base revision 的 preview ref；apply 只能消费精确 preview，且检查内容哈希和并发版本。
+
+CraftBopRevisionAdapter 在 BOP Version 发布时记录 CommitRef，并为其固定的 PBOM Version 建立 LineageEdge；后续 GBOP Release 接入时由 Plan 09 补充相应上游边。Factory Binding 指向可变物理资源时通过领域事件进入 Base Lineage/Impact 投影，不伪造 Revision Kernel CommitRef。
 
 层级名称固定为 LineProcess、StationProcess、WorkPosition、Process、Operation。旧 operator、post、step 等含混或错误名称全部移除。
 
@@ -582,6 +586,8 @@ Definition、Flow、Skill 均采用长期身份、不可变 Revision、发布和
 - agent.run.trace.get/search。
 
 Run 取消统一走 system.job.cancel。chat/stream 是 Run 的传输适配。Flow step、checkpoint、budget counter、tool selection、delegation envelope、恢复重试和 ask-clarification 事件属于运行时内部状态。
+
+Agent Run 创建的每个 ApprovalRequest 必须带 `agent_run_id` subject reference，Agent Runtime 同时持久化其 approval_id。Run 在 awaiting_approval 状态被取消时，Agent Runtime 必须在完成 Run 取消前，对保存的每个 pending approval_id 通过 DomainCapabilityClient 幂等调用 `base.approval.request.cancel`；恢复场景可以用 `base.approval.request.search` 按 subject reference 找回遗漏项。Base 将每项置为 cancelled 并向审批界面发布状态变化。已经 decided 的审批不回滚，正在决定与取消竞争时由 Base Approval 的 expected state 原子裁决。Run 取消后到达的批准结果不得执行原 Capability，只记录 approval_stale 审计。
 
 Agent Tool 只能来自冻结 Catalog。手写 craft_tools、knowledge_tools、project_tools 等业务 Handler 删除。Agent Trace 与 System Audit 分开：Trace 解释模型如何运行，Audit 证明 Capability 是否被授权和执行。
 
@@ -812,7 +818,11 @@ Installation install、enable、disable、upgrade、rollback、uninstall 保持�
 5. 观察错误率、延迟、审计完整性和领域指标。
 6. 删除旧业务路径和旧表。
 
-领域计划可以并行开发不相交的领域文件，但中央治理文件、CODEOWNERS、Capability Ledger、official_domains.json、Catalog Release 和 artifact hash 必须通过串行集成队列提交。每个领域合入前从最新集成基线重新生成并校验冻结产物；后一个领域不得基于过期 central manifest 计算 hash。边界 baseline 先按新的表所有权和领域归属自动重算，再人工审查新增、消失或换主的差异；不能通过保留旧 Craft 归属掩盖 Factory 或 Integration 债务。
+领域计划可以在独立 worktree 中并行开发不相交的领域文件，但领域开发提交不得修改中央治理文件、CODEOWNERS、Capability Ledger、official_domains.json、Catalog Release 或 artifact hash。中央冻结产物只允许由一个指定集成者在唯一集成 worktree 的最新 HEAD 上生成和提交；本项目采用 inline execution 时，当前主执行者即指定集成者，所有计划的 finalization 串行进行。
+
+一个领域进入 finalization 时，集成者必须先把该领域代码置于最新集成 HEAD，记录该 HEAD 和当前 official_domains.json 的 sha256，再运行同时带 expected-head 与 expected-manifest-sha256 的冻结命令重新计算当前全量 artifact hash，随后依次运行 Catalog drift、registry、boundary 和领域测试。中央文件作为独立 freeze commit 提交，完成后才允许下一个领域进入 finalization。HEAD 或 manifest digest 不一致、领域分支直接携带中央文件修改都必须失败并重新排队；不能手工合并两个过期 manifest 的 hash。
+
+边界 baseline 先按新的表所有权和领域归属自动重算，再人工审查新增、消失或换主的差异；不能通过保留旧 Craft 归属掩盖 Factory 或 Integration 债务。
 
 回滚只回滚代码路由和未破坏兼容性的领域 Migration。已发布的不可变业务 Version、Release 和 Evidence 不删除。因为没有旧业务数据，首次切换失败时可以清空目标测试 Database 后重新 bootstrap，但不得在生产发布后用清库代替正式回滚。
 
