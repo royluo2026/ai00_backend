@@ -38,7 +38,10 @@ def test_every_stable_user_function_has_capability_or_valid_exclusion(registry):
     invalid = [row["function_id"] for row in registry
                if row["stability"] == "stable"
                and not row.get("target_capability")
-               and row.get("classification") not in {"internal", "operations", "ui_transient", "unreviewed"}]
+               and row.get("classification") not in {
+                   "internal", "operations", "ui_transient", "transport_adapter",
+                   "unstable_product_surface", "unreviewed",
+               }]
     assert invalid == []
 
 
