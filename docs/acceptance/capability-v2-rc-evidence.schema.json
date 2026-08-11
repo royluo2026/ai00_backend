@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Capability V2 RC Runtime Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "generated_at", "catalog_release", "catalog_hash", "git_commit", "migration", "provider_artifacts", "environment_id", "capabilities"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "catalog_release": {"type": "string", "pattern": "^rel_[0-9a-f]{32}$"},
+    "catalog_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "git_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["migration_id", "filename", "sha256"],
+      "properties": {
+        "migration_id": {"type": "string", "minLength": 1},
+        "filename": {"type": "string", "pattern": "^[^/\\\\]+\\.sql$"},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "provider_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["plugin_id", "artifact_hash"],
+        "properties": {
+          "plugin_id": {"type": "string", "minLength": 1},
+          "artifact_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "environment_id": {"type": "string", "minLength": 1},
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["success", "invalid_input", "unauthenticated", "resource_denied", "output_contract", "consumer_contract", "version_pin"],
+        "properties": {
+          "success": {"const": "passed"}, "invalid_input": {"const": "passed"},
+          "unauthenticated": {"const": "passed"}, "resource_denied": {"const": "passed"},
+          "output_contract": {"const": "passed"}, "consumer_contract": {"const": "passed"},
+          "version_pin": {"const": "passed"}
+        }
+      }
+    }
+  }
+}

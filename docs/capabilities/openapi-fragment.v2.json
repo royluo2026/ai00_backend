@@ -5,7 +5,7 @@
   },
   "openapi": "3.1.0",
   "paths": {
-    "/api/v2/capabilities/base.project.search:invoke": {
+    "/api/v1/capabilities/base.project.search:invoke": {
       "post": {
         "description": "Search visible Project Management refs by name or code.",
         "operationId": "invoke_base_project_search_v1",
@@ -283,7 +283,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.draft.change.apply:invoke": {
+    "/api/v1/capabilities/craft.bop.draft.change.apply:invoke": {
       "post": {
         "description": "Apply one exact typed BOP draft preview atomically.",
         "operationId": "invoke_craft_bop_draft_change_apply_v1",
@@ -553,7 +553,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.draft.change.preview:invoke": {
+    "/api/v1/capabilities/craft.bop.draft.change.preview:invoke": {
       "post": {
         "description": "Preview a typed BOP draft change without side effects.",
         "operationId": "invoke_craft_bop_draft_change_preview_v1",
@@ -860,7 +860,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.execution_structure.get:invoke": {
+    "/api/v1/capabilities/craft.bop.execution_structure.get:invoke": {
       "post": {
         "description": "Read the deterministic official execution structure of a published BOP.",
         "operationId": "invoke_craft_bop_execution_structure_get_v1",
@@ -1144,7 +1144,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.execution_structure.preview:invoke": {
+    "/api/v1/capabilities/craft.bop.execution_structure.preview:invoke": {
       "post": {
         "description": "Preview a draft BOP execution structure at an exact revision.",
         "operationId": "invoke_craft_bop_execution_structure_preview_v1",
@@ -1433,7 +1433,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.import.preview:invoke": {
+    "/api/v1/capabilities/craft.bop.import.preview:invoke": {
       "post": {
         "description": "Parse and hash a BOP import document without mutating Craft state.",
         "operationId": "invoke_craft_bop_import_preview_v1",
@@ -1707,7 +1707,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.linked_parts.get:invoke": {
+    "/api/v1/capabilities/craft.bop.linked_parts.get:invoke": {
       "post": {
         "description": "Read PBOM parts explicitly linked to a BOP and their usage locations.",
         "operationId": "invoke_craft_bop_linked_parts_get_v1",
@@ -1955,7 +1955,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.version.archive:invoke": {
+    "/api/v1/capabilities/craft.bop.version.archive:invoke": {
       "post": {
         "description": "Archive a BOP version without deleting its snapshot or references.",
         "operationId": "invoke_craft_bop_version_archive_v1",
@@ -2220,7 +2220,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.version.compare:invoke": {
+    "/api/v1/capabilities/craft.bop.version.compare:invoke": {
       "post": {
         "description": "Compare two BOP versions as semantic structure changes.",
         "operationId": "invoke_craft_bop_version_compare_v1",
@@ -2497,7 +2497,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.version.create:invoke": {
+    "/api/v1/capabilities/craft.bop.version.create:invoke": {
       "post": {
         "description": "Create a BOP draft from an empty, version, template or import preview source.",
         "operationId": "invoke_craft_bop_version_create_v1",
@@ -2783,7 +2783,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.version.get:invoke": {
+    "/api/v1/capabilities/craft.bop.version.get:invoke": {
       "post": {
         "description": "Read one BOP version identity, lifecycle and revision evidence.",
         "operationId": "invoke_craft_bop_version_get_v1",
@@ -3136,7 +3136,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.version.list:invoke": {
+    "/api/v1/capabilities/craft.bop.version.list:invoke": {
       "post": {
         "description": "Discover BOP version summaries with bounded cursor pagination.",
         "operationId": "invoke_craft_bop_version_list_v1",
@@ -3397,7 +3397,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.bop.work_package.get:invoke": {
+    "/api/v1/capabilities/craft.bop.work_package.get:invoke": {
       "post": {
         "description": "Project one BOP structure into a line, station or role work package.",
         "operationId": "invoke_craft_bop_work_package_get_v1",
@@ -3710,7 +3710,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.gbop.item.knowledge.list:invoke": {
+    "/api/v1/capabilities/craft.gbop.item.knowledge.list:invoke": {
       "post": {
         "description": "craft.gbop.item.knowledge.list",
         "operationId": "invoke_craft_gbop_item_knowledge_list_v1",
@@ -3958,7 +3958,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.gbop.item.search:invoke": {
+    "/api/v1/capabilities/craft.gbop.item.search:invoke": {
       "post": {
         "description": "craft.gbop.item.search",
         "operationId": "invoke_craft_gbop_item_search_v1",
@@ -4201,7 +4201,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.gbop.item.usage.get:invoke": {
+    "/api/v1/capabilities/craft.gbop.item.usage.get:invoke": {
       "post": {
         "description": "craft.gbop.item.usage.get",
         "operationId": "invoke_craft_gbop_item_usage_get_v1",
@@ -4449,7 +4449,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.pbom.part.search:invoke": {
+    "/api/v1/capabilities/craft.pbom.part.search:invoke": {
       "post": {
         "description": "craft.pbom.part.search",
         "operationId": "invoke_craft_pbom_part_search_v1",
@@ -4699,7 +4699,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.pbom.snapshot.compare:invoke": {
+    "/api/v1/capabilities/craft.pbom.snapshot.compare:invoke": {
       "post": {
         "description": "craft.pbom.snapshot.compare",
         "operationId": "invoke_craft_pbom_snapshot_compare_v1",
@@ -4970,7 +4970,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/craft.pbom.snapshot.get:invoke": {
+    "/api/v1/capabilities/craft.pbom.snapshot.get:invoke": {
       "post": {
         "description": "craft.pbom.snapshot.get",
         "operationId": "invoke_craft_pbom_snapshot_get_v1",
@@ -5242,7 +5242,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/digital_model.component.search:invoke": {
+    "/api/v1/capabilities/digital_model.component.search:invoke": {
       "post": {
         "description": "Search components in an immutable Digital Model snapshot.",
         "operationId": "invoke_digital_model_component_search_v1",
@@ -5545,7 +5545,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/digital_model.model.create:invoke": {
+    "/api/v1/capabilities/digital_model.model.create:invoke": {
       "post": {
         "description": "Create a governed Digital Model identity.",
         "operationId": "invoke_digital_model_model_create_v1",
@@ -5805,7 +5805,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/digital_model.model.get:invoke": {
+    "/api/v1/capabilities/digital_model.model.get:invoke": {
       "post": {
         "description": "Read a governed Digital Model identity.",
         "operationId": "invoke_digital_model_model_get_v1",
@@ -6061,7 +6061,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/digital_model.model.search:invoke": {
+    "/api/v1/capabilities/digital_model.model.search:invoke": {
       "post": {
         "description": "Search visible Digital Model identities.",
         "operationId": "invoke_digital_model_model_search_v1",
@@ -6340,7 +6340,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/digital_model.snapshot.compare:invoke": {
+    "/api/v1/capabilities/digital_model.snapshot.compare:invoke": {
       "post": {
         "description": "Compare Digital Model snapshots semantically.",
         "operationId": "invoke_digital_model_snapshot_compare_v1",
@@ -6602,7 +6602,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/digital_model.snapshot.get:invoke": {
+    "/api/v1/capabilities/digital_model.snapshot.get:invoke": {
       "post": {
         "description": "Read an immutable Digital Model snapshot.",
         "operationId": "invoke_digital_model_snapshot_get_v1",
@@ -6945,7 +6945,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/digital_model.version.create:invoke": {
+    "/api/v1/capabilities/digital_model.version.create:invoke": {
       "post": {
         "description": "Create an immutable artifact-backed Digital Model snapshot.",
         "operationId": "invoke_digital_model_version_create_v1",
@@ -7327,7 +7327,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/identity.principal.search:invoke": {
+    "/api/v1/capabilities/identity.principal.search:invoke": {
       "post": {
         "description": "Search bounded principal summaries.",
         "operationId": "invoke_identity_principal_search_v1",
@@ -7572,7 +7572,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.context.retrieve:invoke": {
+    "/api/v1/capabilities/knowledge.context.retrieve:invoke": {
       "post": {
         "description": "Retrieve bounded immutable Knowledge revision references for one task.",
         "operationId": "invoke_knowledge_context_retrieve_v1",
@@ -7888,7 +7888,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.acl.grant:invoke": {
+    "/api/v1/capabilities/knowledge.document.acl.grant:invoke": {
       "post": {
         "description": "Grant bounded document access to a same-tenant subject.",
         "operationId": "invoke_knowledge_document_acl_grant_v1",
@@ -8170,7 +8170,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.acl.list:invoke": {
+    "/api/v1/capabilities/knowledge.document.acl.list:invoke": {
       "post": {
         "description": "List governed access grants for a document the caller administers.",
         "operationId": "invoke_knowledge_document_acl_list_v1",
@@ -8466,7 +8466,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.acl.revoke:invoke": {
+    "/api/v1/capabilities/knowledge.document.acl.revoke:invoke": {
       "post": {
         "description": "Revoke one explicit document access grant.",
         "operationId": "invoke_knowledge_document_acl_revoke_v1",
@@ -8739,7 +8739,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.create:invoke": {
+    "/api/v1/capabilities/knowledge.document.create:invoke": {
       "post": {
         "description": "Create a published Markdown document revision in immutable OIS storage.",
         "operationId": "invoke_knowledge_document_create_v1",
@@ -9041,7 +9041,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.diff:invoke": {
+    "/api/v1/capabilities/knowledge.document.diff:invoke": {
       "post": {
         "description": "Diff two immutable Markdown revisions.",
         "operationId": "invoke_knowledge_document_diff_v1",
@@ -9307,7 +9307,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.get:invoke": {
+    "/api/v1/capabilities/knowledge.document.get:invoke": {
       "post": {
         "description": "Read one immutable Markdown revision with evidence.",
         "operationId": "invoke_knowledge_document_get_v1",
@@ -9589,7 +9589,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.history.get:invoke": {
+    "/api/v1/capabilities/knowledge.document.history.get:invoke": {
       "post": {
         "description": "List immutable revision metadata for a document.",
         "operationId": "invoke_knowledge_document_history_get_v1",
@@ -9924,7 +9924,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.restore:invoke": {
+    "/api/v1/capabilities/knowledge.document.restore:invoke": {
       "post": {
         "description": "Restore historical content by publishing a new immutable revision.",
         "operationId": "invoke_knowledge_document_restore_v1",
@@ -10208,7 +10208,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.revise:invoke": {
+    "/api/v1/capabilities/knowledge.document.revise:invoke": {
       "post": {
         "description": "Publish a new immutable revision with optimistic concurrency.",
         "operationId": "invoke_knowledge_document_revise_v1",
@@ -10501,7 +10501,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.revisions:invoke": {
+    "/api/v1/capabilities/knowledge.document.revisions:invoke": {
       "post": {
         "description": "Deprecated compatibility alias for knowledge.document.history.get.",
         "operationId": "invoke_knowledge_document_revisions_v1",
@@ -10836,7 +10836,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.rollback:invoke": {
+    "/api/v1/capabilities/knowledge.document.rollback:invoke": {
       "post": {
         "description": "Deprecated compatibility alias for knowledge.document.restore.",
         "operationId": "invoke_knowledge_document_rollback_v1",
@@ -11120,7 +11120,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.document.search:invoke": {
+    "/api/v1/capabilities/knowledge.document.search:invoke": {
       "post": {
         "description": "Search published immutable Knowledge Workspace documents.",
         "operationId": "invoke_knowledge_document_search_v1",
@@ -11417,7 +11417,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.get:invoke": {
+    "/api/v1/capabilities/knowledge.get:invoke": {
       "post": {
         "description": "读取当前用户有权访问的知识条目及 Markdown 正文.",
         "operationId": "invoke_knowledge_get_v1",
@@ -11769,7 +11769,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.migration.status:invoke": {
+    "/api/v1/capabilities/knowledge.migration.status:invoke": {
       "post": {
         "description": "Inspect tenant-safe legacy Markdown migration readiness and audited runs.",
         "operationId": "invoke_knowledge_migration_status_v1",
@@ -12279,7 +12279,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.proposal.get:invoke": {
+    "/api/v1/capabilities/knowledge.proposal.get:invoke": {
       "post": {
         "description": "获取一份知识提案的完整 Markdown 和审核状态。",
         "operationId": "invoke_knowledge_proposal_get_v1",
@@ -12651,7 +12651,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.proposal.list:invoke": {
+    "/api/v1/capabilities/knowledge.proposal.list:invoke": {
       "post": {
         "description": "列出当前管理员可审核的知识提案。",
         "operationId": "invoke_knowledge_proposal_list_v1",
@@ -13045,7 +13045,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.proposal.outbox.list:invoke": {
+    "/api/v1/capabilities/knowledge.proposal.outbox.list:invoke": {
       "post": {
         "description": "查看当前用户或团队可见的知识发布补偿队列。",
         "operationId": "invoke_knowledge_proposal_outbox_list_v1",
@@ -13389,7 +13389,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.proposal.outbox.retry:invoke": {
+    "/api/v1/capabilities/knowledge.proposal.outbox.retry:invoke": {
       "post": {
         "description": "重试一个 OIS 知识发布补偿任务，幂等创建正式知识条目。",
         "operationId": "invoke_knowledge_proposal_outbox_retry_v1",
@@ -13718,7 +13718,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.proposal.review:invoke": {
+    "/api/v1/capabilities/knowledge.proposal.review:invoke": {
       "post": {
         "description": "审核知识提案；通过后将 Markdown 写入 OIS 并生成正式知识条目。",
         "operationId": "invoke_knowledge_proposal_review_v1",
@@ -14102,7 +14102,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.propose:invoke": {
+    "/api/v1/capabilities/knowledge.propose:invoke": {
       "post": {
         "description": "提交一份待评审的 Markdown 知识提案，不直接修改正式知识库。",
         "operationId": "invoke_knowledge_propose_v1",
@@ -14491,7 +14491,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.search:invoke": {
+    "/api/v1/capabilities/knowledge.search:invoke": {
       "post": {
         "description": "按标题、Markdown 正文和标签搜索知识条目.",
         "operationId": "invoke_knowledge_search_v1",
@@ -14870,7 +14870,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.space.create:invoke": {
+    "/api/v1/capabilities/knowledge.space.create:invoke": {
       "post": {
         "description": "Create a tenant Knowledge Workspace space.",
         "operationId": "invoke_knowledge_space_create_v1",
@@ -15143,7 +15143,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.space.list:invoke": {
+    "/api/v1/capabilities/knowledge.space.list:invoke": {
       "post": {
         "description": "Deprecated compatibility alias for knowledge.space.search.",
         "operationId": "invoke_knowledge_space_list_v1",
@@ -15418,7 +15418,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/knowledge.space.search:invoke": {
+    "/api/v1/capabilities/knowledge.space.search:invoke": {
       "post": {
         "description": "Search spaces available in the current tenant.",
         "operationId": "invoke_knowledge_space_search_v1",
@@ -15693,7 +15693,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/local.command.get:invoke": {
+    "/api/v1/capabilities/local.command.get:invoke": {
       "post": {
         "description": "Read an owned local operation outcome.",
         "operationId": "invoke_local_command_get_v1",
@@ -16161,7 +16161,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.change.proposal.create:invoke": {
+    "/api/v1/capabilities/ontology.change.proposal.create:invoke": {
       "post": {
         "description": "Create an immutable typed proposal against the exact active release.",
         "operationId": "invoke_ontology_change_proposal_create_v1",
@@ -16461,7 +16461,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.change.proposal.get:invoke": {
+    "/api/v1/capabilities/ontology.change.proposal.get:invoke": {
       "post": {
         "description": "Read the current immutable proposal revision.",
         "operationId": "invoke_ontology_change_proposal_get_v1",
@@ -16759,7 +16759,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.change.proposal.review.submit:invoke": {
+    "/api/v1/capabilities/ontology.change.proposal.review.submit:invoke": {
       "post": {
         "description": "Append a human review bound to an immutable proposal revision Hash.",
         "operationId": "invoke_ontology_change_proposal_review_submit_v1",
@@ -17022,7 +17022,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.change.proposal.search:invoke": {
+    "/api/v1/capabilities/ontology.change.proposal.search:invoke": {
       "post": {
         "description": "Search proposal metadata by governed status.",
         "operationId": "invoke_ontology_change_proposal_search_v1",
@@ -17258,7 +17258,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.concept.get:invoke": {
+    "/api/v1/capabilities/ontology.concept.get:invoke": {
       "post": {
         "description": "Read a summary or schema view pinned to an immutable release.",
         "operationId": "invoke_ontology_concept_get_v1",
@@ -17554,7 +17554,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.concept.resolve:invoke": {
+    "/api/v1/capabilities/ontology.concept.resolve:invoke": {
       "post": {
         "description": "Resolve a term without guessing across an immutable release.",
         "operationId": "invoke_ontology_concept_resolve_v1",
@@ -17850,7 +17850,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.mapping.assess:invoke": {
+    "/api/v1/capabilities/ontology.mapping.assess:invoke": {
       "post": {
         "description": "Assess deterministic mapping compatibility without persisting a mapping.",
         "operationId": "invoke_ontology_mapping_assess_v1",
@@ -18145,7 +18145,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.release.activate:invoke": {
+    "/api/v1/capabilities/ontology.release.activate:invoke": {
       "post": {
         "description": "Atomically activate a verified direct forward release.",
         "operationId": "invoke_ontology_release_activate_v1",
@@ -18415,7 +18415,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.release.diff:invoke": {
+    "/api/v1/capabilities/ontology.release.diff:invoke": {
       "post": {
         "description": "Compute a semantic stable-identity release diff.",
         "operationId": "invoke_ontology_release_diff_v1",
@@ -18934,7 +18934,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.release.get:invoke": {
+    "/api/v1/capabilities/ontology.release.get:invoke": {
       "post": {
         "description": "Read one immutable or active release.",
         "operationId": "invoke_ontology_release_get_v1",
@@ -19230,7 +19230,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.release.publish:invoke": {
+    "/api/v1/capabilities/ontology.release.publish:invoke": {
       "post": {
         "description": "Publish an approved proposal as a new immutable inactive release.",
         "operationId": "invoke_ontology_release_publish_v1",
@@ -19535,7 +19535,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/ontology.release.search:invoke": {
+    "/api/v1/capabilities/ontology.release.search:invoke": {
       "post": {
         "description": "Search immutable release metadata.",
         "operationId": "invoke_ontology_release_search_v1",
@@ -19848,7 +19848,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.disable:invoke": {
+    "/api/v1/capabilities/plugin.disable:invoke": {
       "post": {
         "description": "Disable an installed plugin.",
         "operationId": "invoke_plugin_disable_v1",
@@ -20089,7 +20089,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.enable:invoke": {
+    "/api/v1/capabilities/plugin.enable:invoke": {
       "post": {
         "description": "Enable an installed plugin.",
         "operationId": "invoke_plugin_enable_v1",
@@ -20330,7 +20330,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.install:invoke": {
+    "/api/v1/capabilities/plugin.install:invoke": {
       "post": {
         "description": "Install a platform-signed release in disabled state.",
         "operationId": "invoke_plugin_install_v1",
@@ -20582,7 +20582,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.revoke:invoke": {
+    "/api/v1/capabilities/plugin.revoke:invoke": {
       "post": {
         "description": "Revoke an installed plugin immediately.",
         "operationId": "invoke_plugin_revoke_v1",
@@ -20823,7 +20823,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.rollback:invoke": {
+    "/api/v1/capabilities/plugin.rollback:invoke": {
       "post": {
         "description": "Roll back to the previous platform-signed version.",
         "operationId": "invoke_plugin_rollback_v1",
@@ -21064,7 +21064,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.storage.delete:invoke": {
+    "/api/v1/capabilities/plugin.storage.delete:invoke": {
       "post": {
         "description": "Delete a value using optional optimistic versioning.",
         "operationId": "invoke_plugin_storage_delete_v1",
@@ -21304,7 +21304,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.storage.get:invoke": {
+    "/api/v1/capabilities/plugin.storage.get:invoke": {
       "post": {
         "description": "Read a value from the caller plugin namespace.",
         "operationId": "invoke_plugin_storage_get_v1",
@@ -21551,7 +21551,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.storage.list:invoke": {
+    "/api/v1/capabilities/plugin.storage.list:invoke": {
       "post": {
         "description": "List keys in the caller plugin namespace.",
         "operationId": "invoke_plugin_storage_list_v1",
@@ -21808,7 +21808,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.storage.put:invoke": {
+    "/api/v1/capabilities/plugin.storage.put:invoke": {
       "post": {
         "description": "Create or replace a value using optimistic versioning.",
         "operationId": "invoke_plugin_storage_put_v1",
@@ -22054,7 +22054,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.uninstall:invoke": {
+    "/api/v1/capabilities/plugin.uninstall:invoke": {
       "post": {
         "description": "Uninstall a disabled or revoked plugin.",
         "operationId": "invoke_plugin_uninstall_v1",
@@ -22295,7 +22295,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.upgrade.finish:invoke": {
+    "/api/v1/capabilities/plugin.upgrade.finish:invoke": {
       "post": {
         "description": "Complete or fail a staged upgrade after health validation.",
         "operationId": "invoke_plugin_upgrade_finish_v1",
@@ -22540,7 +22540,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/plugin.upgrade:invoke": {
+    "/api/v1/capabilities/plugin.upgrade:invoke": {
       "post": {
         "description": "Stage a signed version upgrade pending health result.",
         "operationId": "invoke_plugin_upgrade_v1",
@@ -22802,7 +22802,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/semantic.context.get:invoke": {
+    "/api/v1/capabilities/semantic.context.get:invoke": {
       "post": {
         "description": "Read an allowlisted bounded semantic named view.",
         "operationId": "invoke_semantic_context_get_v1",
@@ -23054,7 +23054,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.environment.create:invoke": {
+    "/api/v1/capabilities/simulation.environment.create:invoke": {
       "post": {
         "description": "Create a reproducible environment from four immutable references.",
         "operationId": "invoke_simulation_environment_create_v1",
@@ -23631,7 +23631,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.environment.get:invoke": {
+    "/api/v1/capabilities/simulation.environment.get:invoke": {
       "post": {
         "description": "Read a reproducible Simulation environment.",
         "operationId": "invoke_simulation_environment_get_v1",
@@ -24080,7 +24080,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.environment.list:invoke": {
+    "/api/v1/capabilities/simulation.environment.list:invoke": {
       "post": {
         "description": "List visible Simulation environments.",
         "operationId": "invoke_simulation_environment_list_v1",
@@ -24544,7 +24544,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.parameter_set.create:invoke": {
+    "/api/v1/capabilities/simulation.parameter_set.create:invoke": {
       "post": {
         "description": "Create an immutable Simulation parameter set.",
         "operationId": "invoke_simulation_parameter_set_create_v1",
@@ -24857,7 +24857,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.parameter_set.get:invoke": {
+    "/api/v1/capabilities/simulation.parameter_set.get:invoke": {
       "post": {
         "description": "Read an immutable Simulation parameter set.",
         "operationId": "invoke_simulation_parameter_set_get_v1",
@@ -25162,7 +25162,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.profile.create:invoke": {
+    "/api/v1/capabilities/simulation.profile.create:invoke": {
       "post": {
         "description": "Create an immutable solver profile.",
         "operationId": "invoke_simulation_profile_create_v1",
@@ -25485,7 +25485,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.profile.get:invoke": {
+    "/api/v1/capabilities/simulation.profile.get:invoke": {
       "post": {
         "description": "Read an immutable solver profile.",
         "operationId": "invoke_simulation_profile_get_v1",
@@ -25795,7 +25795,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.result.get:invoke": {
+    "/api/v1/capabilities/simulation.result.get:invoke": {
       "post": {
         "description": "Read completed Simulation result ArtifactRefs.",
         "operationId": "invoke_simulation_result_get_v1",
@@ -26074,7 +26074,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.run.get:invoke": {
+    "/api/v1/capabilities/simulation.run.get:invoke": {
       "post": {
         "description": "Read Simulation run state and pinned versions.",
         "operationId": "invoke_simulation_run_get_v1",
@@ -26369,7 +26369,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/simulation.run.start:invoke": {
+    "/api/v1/capabilities/simulation.run.start:invoke": {
       "post": {
         "description": "Queue a Simulation run with exact pinned inputs.",
         "operationId": "invoke_simulation_run_start_v1",
@@ -26664,7 +26664,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/system.activity.search:invoke": {
+    "/api/v1/capabilities/system.activity.search:invoke": {
       "post": {
         "description": "Search immutable activity summaries.",
         "operationId": "invoke_system_activity_search_v1",
@@ -26903,7 +26903,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/system.change_impact.preview:invoke": {
+    "/api/v1/capabilities/system.change_impact.preview:invoke": {
       "post": {
         "description": "Compose impact from a server-issued preview or diff ref.",
         "operationId": "invoke_system_change_impact_preview_v1",
@@ -27154,7 +27154,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/system.echo:invoke": {
+    "/api/v1/capabilities/system.echo:invoke": {
       "post": {
         "description": "Return the supplied JSON payload; used to verify adapters.",
         "operationId": "invoke_system_echo_v1",
@@ -27385,7 +27385,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/system.job.cancel:invoke": {
+    "/api/v1/capabilities/system.job.cancel:invoke": {
       "post": {
         "description": "Request job cancellation without claiming rollback.",
         "operationId": "invoke_system_job_cancel_v1",
@@ -27634,7 +27634,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/system.job.get:invoke": {
+    "/api/v1/capabilities/system.job.get:invoke": {
       "post": {
         "description": "Read one owner-scoped asynchronous job.",
         "operationId": "invoke_system_job_get_v1",
@@ -27883,7 +27883,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/system.lineage.get:invoke": {
+    "/api/v1/capabilities/system.lineage.get:invoke": {
       "post": {
         "description": "Compose immutable provenance events and completeness.",
         "operationId": "invoke_system_lineage_get_v1",
@@ -28138,7 +28138,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/system.search:invoke": {
+    "/api/v1/capabilities/system.search:invoke": {
       "post": {
         "description": "Search stable references across registered domain providers.",
         "operationId": "invoke_system_search_v1",
@@ -28407,7 +28407,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/system.worker.outbox.health:invoke": {
+    "/api/v1/capabilities/system.worker.outbox.health:invoke": {
       "post": {
         "description": "Read the Knowledge publication worker heartbeat, queue totals, and alert total.",
         "operationId": "invoke_system_worker_outbox_health_v1",
@@ -28689,7 +28689,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/vismockup.capture:invoke": {
+    "/api/v1/capabilities/vismockup.capture:invoke": {
       "post": {
         "description": "Capture the active VisMockup view as an ArtifactRef.",
         "operationId": "invoke_vismockup_capture_v1",
@@ -28941,7 +28941,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/vismockup.highlight:invoke": {
+    "/api/v1/capabilities/vismockup.highlight:invoke": {
       "post": {
         "description": "Highlight occurrences by CATIA occurrence name.",
         "operationId": "invoke_vismockup_highlight_v1",
@@ -29203,7 +29203,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/vismockup.launch:invoke": {
+    "/api/v1/capabilities/vismockup.launch:invoke": {
       "post": {
         "description": "Launch or connect to VisMockup.",
         "operationId": "invoke_vismockup_launch_v1",
@@ -29455,7 +29455,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/vismockup.model.open:invoke": {
+    "/api/v1/capabilities/vismockup.model.open:invoke": {
       "post": {
         "description": "Materialize and open an authorized model ArtifactRef.",
         "operationId": "invoke_vismockup_model_open_v1",
@@ -29747,7 +29747,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/vismockup.status:invoke": {
+    "/api/v1/capabilities/vismockup.status:invoke": {
       "post": {
         "description": "Read VisMockup connection state.",
         "operationId": "invoke_vismockup_status_v1",
@@ -29999,7 +29999,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/vismockup.tree:invoke": {
+    "/api/v1/capabilities/vismockup.tree:invoke": {
       "post": {
         "description": "Read the active VisMockup product tree.",
         "operationId": "invoke_vismockup_tree_v1",
@@ -30259,7 +30259,7 @@
         "x-ai00-major-version": 1
       }
     },
-    "/api/v2/capabilities/vismockup.visibility:invoke": {
+    "/api/v1/capabilities/vismockup.visibility:invoke": {
       "post": {
         "description": "Change active-view visibility or selection.",
         "operationId": "invoke_vismockup_visibility_v1",

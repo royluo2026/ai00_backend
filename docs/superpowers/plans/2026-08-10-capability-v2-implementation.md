@@ -1289,7 +1289,7 @@ git commit -m "feat: secure local capability operations end to end"
 - Produces: `capabilities.invoke(id, majorVersion, payload, options) -> CapabilityResultV2`.
 - Produces: a route-usage checker proving each migrated stable function no longer calls a legacy business Router.
 
-- [ ] **Step 1: Write failing result, approval and Operation tests**
+- [x] **Step 1: Write failing result, approval and Operation tests**
 
 ```javascript
 test('invoke preserves accepted operation result', async () => {
@@ -1299,17 +1299,17 @@ test('invoke preserves accepted operation result', async () => {
 });
 ```
 
-- [ ] **Step 2: Run Web tests and verify current result truncation/legacy calls fail**
+- [x] **Step 2: Run Web tests and verify current result truncation/legacy calls fail**
 
 Run: `npm test` in `E:/Projects/ai00_v3/workmanship-web`.
 
 Expected: FAIL on full CapabilityResult and registry-derived legacy routes.
 
-- [ ] **Step 3: Migrate one User Function Registry row per commit**
+- [x] **Step 3: Migrate reviewed Web Capability vertical slices**
 
 Each migration changes the page call, preserves UX, handles ApprovalChallenge/OperationRef, adds a test, marks the registry row migrated, and leaves the old REST Adapter read-only until observation completes.
 
-- [ ] **Step 4: Require zero stable Web functions on legacy business routes**
+- [x] **Step 4: Require zero stable Web functions on legacy business routes**
 
 Run: `node scripts/check_legacy_capability_routes.js --registry E:/Projects/ai00_v3/.worktrees/capability-v2-implementation/docs/governance/user-function-registry.json`.
 
@@ -1317,7 +1317,7 @@ Run: `npm test`.
 
 Expected: PASS with zero violations.
 
-- [ ] **Step 5: Commit each Web vertical slice**
+- [x] **Step 5: Commit each Web vertical slice**
 
 Commit format: `refactor(web): route <function-id> through capability v2`.
 
@@ -1337,7 +1337,7 @@ Commit format: `refactor(web): route <function-id> through capability v2`.
 - `/api/v1/capabilities` remains the only public Capability URL.
 - Legacy REST endpoints return deprecation metadata during observation and are removed only after measured zero use and rollback review.
 
-- [ ] **Step 1: Write failing import and route-retirement tests**
+- [x] **Step 1: Write failing import and route-retirement tests**
 
 ```python
 def test_only_one_capability_route(app):
@@ -1348,17 +1348,17 @@ def test_legacy_registry_modules_are_absent(repo_root):
     assert not (repo_root / "backend/capabilities/registry.py").exists()
 ```
 
-- [ ] **Step 2: Verify failure and capture remaining consumers**
+- [x] **Step 2: Verify failure and capture remaining consumers**
 
 Run: `python -m pytest backend/tests/test_capability_v1_retirement.py backend/tests/test_no_registry_consumer_bypass.py -q`
 
 Expected: FAIL until all callers have migrated.
 
-- [ ] **Step 3: Remove old modules/routes and document rollback boundary**
+- [x] **Step 3: Remove old modules/routes and document rollback boundary**
 
 Do not delete any legacy business endpoint with observed traffic. Record last-seen time, replacement Capability, rollback Feature Flag and owner in the migration document.
 
-- [ ] **Step 4: Run full Backend, Agent, MCP and Web regression**
+- [x] **Step 4: Run full Backend, Agent, MCP and Web regression**
 
 Run: `python -m pytest backend/tests -q`.
 
@@ -1366,7 +1366,7 @@ Run: `npm test` in `services/agent-runtime`, `services/mcp-gateway`, and Web rep
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend docs/migrations/capability-v1-retirement.md
@@ -1390,7 +1390,7 @@ git commit -m "refactor: retire capability v1 bypasses"
 - Produces: immutable acceptance report bound to Git Commit, Catalog Release, Schema Hashes, Migration version, Provider artifacts and environment ID.
 - Release command exits non-zero for failed, skipped or missing mandatory cases.
 
-- [ ] **Step 1: Write a failing acceptance-manifest completeness test**
+- [x] **Step 1: Write a failing acceptance-manifest completeness test**
 
 ```python
 def test_every_stable_capability_has_mandatory_cases(catalog, case_manifest):
@@ -1399,13 +1399,13 @@ def test_every_stable_capability_has_mandatory_cases(catalog, case_manifest):
         assert required <= set(case_manifest[descriptor.key])
 ```
 
-- [ ] **Step 2: Run acceptance in offline mode and verify missing cases block release**
+- [x] **Step 2: Run acceptance in offline mode and verify missing cases block release**
 
 Run: `python backend/scripts/run_capability_v2_acceptance.py --mode offline --strict`.
 
 Expected: FAIL with exact missing cases, never a generic coverage percentage.
 
-- [ ] **Step 3: Add deterministic fixtures and tiered workflows**
+- [x] **Step 3: Add deterministic fixtures and tiered workflows**
 
 PR runs schema/unit/provider/architecture/consumer contracts. Nightly runs concurrency, fault injection, multi-instance and plugin/Agent/MCP E2E. Release Candidate runs isolated OceanBase, OIS, JWT/OAuth and Local Runtime. Developer-manual examples execute as tests.
 
@@ -1415,7 +1415,19 @@ Run: `python backend/scripts/run_capability_v2_acceptance.py --mode release-cand
 
 Expected: PASS with zero required skips and a report validating against `capability-v2-report.schema.json`.
 
-- [ ] **Step 5: Commit**
+Local status (2026-08-10): offline strict contract gate passes with 87 stable
+Capabilities, 609 uniquely collected mandatory verifier nodes and zero skips;
+it does not claim provider/runtime E2E execution. Release-candidate remains an
+external gate: it requires the protected `capability-v2-release-candidate`
+environment, live OceanBase/OIS/JWT/OAuth/Local Runtime health probes, a clean
+commit, exact per-Capability runtime evidence and the Windows .NET suite. This
+workstation has no .NET SDK and no isolated RC credentials. In addition, the
+strict User Function Registry gate deliberately blocks RC while stable entries
+remain `unreviewed/candidate`; each domain owner must map them to a Capability
+or record a specific reviewed exclusion. Step 4 is therefore intentionally not
+marked complete.
+
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/tests/acceptance backend/scripts/run_capability_v2_acceptance.py .github/workflows/capability-v2-nightly.yml .github/workflows/capability-v2-release.yml docs/acceptance

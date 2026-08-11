@@ -175,7 +175,7 @@ def build_documentation(release: CatalogRelease) -> DocumentationBundle:
         for item in capabilities if item["exposure"]["mcp"]
     ]
     openapi_paths = {
-        f"/api/v2/capabilities/{item['id']}:invoke": {
+        f"/api/v1/capabilities/{item['id']}:invoke": {
             "post": {
                 "operationId": f"invoke_{item['id'].replace('.', '_').replace('-', '_')}_v{item['major_version']}",
                 "summary": item["title"],

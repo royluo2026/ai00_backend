@@ -1,0 +1,53 @@
+name: Capability V2 Nightly
+
+on:
+  schedule:
+    - cron: "20 18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrated-nightly:
+    runs-on: windows-latest
+    env:
+      AI00_ACCEPTANCE_ENVIRONMENT_ID: nightly-${{ github.run_id }}-${{ github.run_attempt }}
+      AI00_ACCEPTANCE_AGENT_RESULT: passed
+      AI00_ACCEPTANCE_MCP_RESULT: passed
+      AI00_ACCEPTANCE_LOCAL_RUNTIME_RESULT: passed
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - run: python -m pip install -r backend/requirements.txt
+      - run: python backend/scripts/build_capability_catalog.py --check
+      - run: python backend/scripts/generate_capability_docs.py --check
+      - run: python backend/scripts/build_user_function_registry.py --check
+      - run: python backend/scripts/build_capability_acceptance_manifest.py --check
+      - run: python -m pytest backend/tests -q
+      - run: npm ci
+        working-directory: services/agent-runtime
+      - run: npm test
+        working-directory: services/agent-runtime
+      - run: npm ci
+        working-directory: services/mcp-gateway
+      - run: npm test
+        working-directory: services/mcp-gateway
+      - run: dotnet test local-runtime/Ai00.LocalRuntime.sln -c Release
+      - run: python backend/scripts/run_capability_v2_acceptance.py --mode nightly --strict --report artifacts/capability-v2-nightly.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: capability-v2-nightly-report
+          path: artifacts/capability-v2-nightly.json
+          if-no-files-found: error

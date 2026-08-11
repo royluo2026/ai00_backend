@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai00.local/schemas/capability-v2-report.schema.json",
+  "title": "Capability V2 Acceptance Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "report_id", "generated_at", "mode", "status",
+    "git_commit", "working_tree_clean", "catalog_release", "catalog_hash",
+    "schema_hashes", "migration", "provider_artifacts", "environment_id",
+    "validation_scope", "runtime_evidence_hash", "component_results",
+    "cases", "test_run", "blockers"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "report_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "mode": {"enum": ["offline", "nightly", "release-candidate"]},
+    "status": {"enum": ["passed", "failed"]},
+    "git_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "working_tree_clean": {"type": "boolean"},
+    "catalog_release": {"type": "string", "pattern": "^rel_[0-9a-f]{32}$"},
+    "catalog_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "schema_hashes": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}},
+    "migration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["migration_id", "filename", "sha256"],
+      "properties": {
+        "migration_id": {"type": "string", "pattern": "^[0-9]{12}$"},
+        "filename": {"type": "string", "pattern": "^[0-9]{12}_[a-z0-9_]+\\.sql$"},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "provider_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["plugin_id", "module", "version", "artifact_hash"],
+        "properties": {
+          "plugin_id": {"type": "string"}, "module": {"type": "string"},
+          "version": {"type": "string"},
+          "artifact_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "environment_id": {"type": "string", "minLength": 1},
+    "validation_scope": {"enum": ["contract", "runtime_e2e"]},
+    "runtime_evidence_hash": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+    "component_results": {
+      "type": "object", "additionalProperties": false,
+      "required": ["agent", "mcp", "local_runtime"],
+      "properties": {
+        "agent": {"enum": ["passed", "not_run"]},
+        "mcp": {"enum": ["passed", "not_run"]},
+        "local_runtime": {"enum": ["passed", "not_run"]}
+      }
+    },
+    "cases": {
+      "type": "object", "additionalProperties": false,
+      "required": ["stable_capabilities", "mandatory_case_types", "declared_cases", "validated_cases", "failed", "skipped"],
+      "properties": {
+        "stable_capabilities": {"type": "integer", "minimum": 1},
+        "mandatory_case_types": {"const": 7},
+        "declared_cases": {"type": "integer", "minimum": 1},
+        "validated_cases": {"type": "integer", "minimum": 0},
+        "failed": {"type": "integer", "minimum": 0},
+        "skipped": {"type": "integer", "minimum": 0}
+      }
+    },
+    "test_run": {
+      "type": "object", "additionalProperties": false,
+      "required": ["command", "exit_code", "summary"],
+      "properties": {"command": {"type": "string"}, "exit_code": {"type": "integer"}, "summary": {"type": "string"}}
+    },
+    "blockers": {"type": "array", "items": {"type": "string"}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "passed"}}},
+      "then": {
+        "properties": {
+          "blockers": {"maxItems": 0},
+          "cases": {"properties": {"failed": {"const": 0}, "skipped": {"const": 0}}},
+          "test_run": {"properties": {"exit_code": {"const": 0}}}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["mode", "status"],
+        "properties": {"mode": {"const": "release-candidate"}, "status": {"const": "passed"}}
+      },
+      "then": {
+        "properties": {
+          "working_tree_clean": {"const": true},
+          "validation_scope": {"const": "runtime_e2e"},
+          "runtime_evidence_hash": {"type": "string"},
+          "component_results": {
+            "properties": {
+              "agent": {"const": "passed"}, "mcp": {"const": "passed"},
+              "local_runtime": {"const": "passed"}
+            }
+          }
+        }
+      }
+    }
+  ]
+}
