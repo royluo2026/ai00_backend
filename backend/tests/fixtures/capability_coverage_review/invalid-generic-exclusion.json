@@ -7,18 +7,21 @@
     "catalog_release": "capability-v2-2026-08-11",
     "catalog_sha256": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
   },
-  "function_dispositions": {
+  "unreviewed_functions": {},
+  "excluded_functions": {
     "rest:GET:/api/project-health": {
       "resolution": "excluded",
       "target_capability": null,
-      "source_paths": [],
-      "evidence": "Not a capability.",
-      "reason": "Exclude it.",
-      "classification": "operations"
+      "source_paths": ["backend/routers/project_health.py"],
+      "evidence": "The health route reports deployment liveness only.",
+      "reason": "This is not a capability and needs no review.",
+      "classification": "operations",
+      "owner": "project-management-owner",
+      "reviewer": "project-management-owner",
+      "reviewed_at": "2026-08-11"
     }
   },
-  "capability_candidates": {},
-  "consumer_exposures": {},
+  "capabilities": {},
   "code_extractions": [],
   "database_boundaries": [],
   "debt_dispositions": [],

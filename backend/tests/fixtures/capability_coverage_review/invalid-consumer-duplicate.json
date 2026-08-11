@@ -7,17 +7,39 @@
     "catalog_release": "capability-v2-2026-08-11",
     "catalog_sha256": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
   },
-  "function_dispositions": {},
-  "capability_candidates": {},
-  "consumer_exposures": {
+  "unreviewed_functions": {},
+  "excluded_functions": {},
+  "capabilities": {
     "project.project.create": {
-      "shared_pipeline": "web_specific_implementation",
-      "web": {"enabled": true, "reason": "Project creation is available in the web workspace.", "policy_ref": "project.create"},
-      "rest": {"enabled": true, "reason": "The REST gateway exposes the shared capability.", "policy_ref": "project.create"},
-      "plugin": {"enabled": true, "reason": "Plugins invoke the same governed project operation.", "policy_ref": "project.create"},
-      "agent": {"enabled": true, "reason": "Agents invoke the same governed project operation.", "policy_ref": "project.create"},
-      "mcp": {"enabled": false, "reason": "MCP exposure awaits an approved tool policy decision.", "policy_ref": "project.create"},
-      "local_runtime": {"enabled": false, "reason": "This business operation has no local-runtime transport need.", "policy_ref": "project.create"}
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/projects": {
+          "resolution": "new_capability",
+          "source_paths": ["backend/routers/projects.py"],
+          "owner": "project-management-owner",
+          "evidence": "The route creates the Project aggregate from user input.",
+          "reviewer": "project-management-owner",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "web_specific_implementation",
+        "web": {"enabled": true, "reason": "Project creation is available in the web workspace.", "policy_ref": "project.create"},
+        "rest": {"enabled": true, "reason": "The REST gateway exposes the shared capability.", "policy_ref": "project.create"},
+        "plugin": {"enabled": true, "reason": "Plugins invoke the same governed project operation.", "policy_ref": "project.create"},
+        "agent": {"enabled": true, "reason": "Agents invoke the same governed project operation.", "policy_ref": "project.create"},
+        "mcp": {"enabled": false, "reason": "MCP exposure awaits an approved tool policy decision.", "policy_ref": "project.create"},
+        "local_runtime": {"enabled": false, "reason": "This business operation has no local-runtime transport need.", "policy_ref": "project.create"}
+      },
+      "candidate_definition": {
+        "business_outcome": "Create a Project aggregate from governed planning metadata.",
+        "non_goals": ["Do not expose consumer-specific project creation code."],
+        "owner_domain": "project_management",
+        "application_port": "project_management.create_project",
+        "provider_artifact": "official.project-management",
+        "owned_tables": ["projects"],
+        "migration_stream": "project_management"
+      }
     }
   },
   "code_extractions": [],

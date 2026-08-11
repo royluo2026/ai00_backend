@@ -7,9 +7,9 @@
     "schema_version",
     "domain",
     "reviewed_against",
-    "function_dispositions",
-    "capability_candidates",
-    "consumer_exposures",
+    "unreviewed_functions",
+    "excluded_functions",
+    "capabilities",
     "code_extractions",
     "database_boundaries",
     "debt_dispositions",
@@ -19,39 +19,23 @@
     "schema_version": {"const": 1},
     "domain": {"type": "string", "minLength": 1},
     "reviewed_against": {"$ref": "#/$defs/ReviewedAgainst"},
-    "function_dispositions": {"$ref": "#/$defs/FunctionDispositions"},
-    "capability_candidates": {"$ref": "#/$defs/CapabilityCandidates"},
-    "consumer_exposures": {"$ref": "#/$defs/ConsumerExposures"},
-    "code_extractions": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/CodeExtraction"}
-    },
-    "database_boundaries": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/DatabaseBoundary"}
-    },
-    "debt_dispositions": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/DebtDisposition"}
-    },
+    "unreviewed_functions": {"$ref": "#/$defs/UnreviewedFunctions"},
+    "excluded_functions": {"$ref": "#/$defs/ExcludedFunctions"},
+    "capabilities": {"$ref": "#/$defs/Capabilities"},
+    "code_extractions": {"type": "array", "items": {"$ref": "#/$defs/CodeExtraction"}},
+    "database_boundaries": {"type": "array", "items": {"$ref": "#/$defs/DatabaseBoundary"}},
+    "debt_dispositions": {"type": "array", "items": {"$ref": "#/$defs/DebtDisposition"}},
     "review": {"$ref": "#/$defs/Review"}
   },
   "allOf": [
     {
       "if": {
         "properties": {
-          "review": {
-            "properties": {"status": {"const": "approved"}},
-            "required": ["status"]
-          }
+          "review": {"properties": {"status": {"const": "approved"}}, "required": ["status"]}
         },
         "required": ["review"]
       },
-      "then": {
-        "properties": {
-          "function_dispositions": {"$ref": "#/$defs/ApprovedFunctionDispositions"}
-        }
-      }
+      "then": {"properties": {"unreviewed_functions": {"maxProperties": 0}}}
     }
   ],
   "$defs": {
@@ -66,186 +50,146 @@
         "catalog_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
       }
     },
-    "FunctionDispositions": {
-      "type": "object",
-      "additionalProperties": false,
-      "propertyNames": {"type": "string", "minLength": 1},
-      "patternProperties": {"^.+$": {"$ref": "#/$defs/FunctionDisposition"}}
-    },
-    "ApprovedFunctionDispositions": {
-      "type": "object",
-      "additionalProperties": false,
-      "propertyNames": {"type": "string", "minLength": 1},
-      "patternProperties": {"^.+$": {"$ref": "#/$defs/ApprovedFunctionDisposition"}}
-    },
-    "FunctionDisposition": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "resolution",
-        "target_capability",
-        "source_paths",
-        "evidence",
-        "reason",
-        "classification"
-      ],
-      "properties": {
-        "resolution": {"$ref": "#/$defs/Resolution"},
-        "target_capability": {"type": ["string", "null"]},
-        "source_paths": {
-          "type": "array",
-          "items": {"type": "string", "minLength": 1},
-          "uniqueItems": true
-        },
-        "evidence": {"type": ["string", "null"]},
-        "reason": {"type": ["string", "null"]},
-        "classification": {"type": ["string", "null"]},
-        "owner": {"type": ["string", "null"]}
-      },
-      "allOf": [
-        {
-          "not": {
-            "properties": {"resolution": {"const": "new_capability"}},
-            "required": ["resolution"]
-          }
-        },
-        {
-          "if": {"properties": {"resolution": {"const": "unreviewed"}}},
-          "then": {
-            "properties": {
-              "target_capability": {"const": null}
-            }
-          }
-        },
-        {
-          "if": {"properties": {"resolution": {"const": "existing_capability"}}},
-          "then": {
-            "properties": {
-              "target_capability": {"type": "string", "minLength": 1}
-            }
-          }
-        },
-        {
-          "if": {"properties": {"resolution": {"const": "excluded"}}},
-          "then": {
-            "properties": {
-              "target_capability": {"const": null},
-              "source_paths": {"minItems": 1},
-              "evidence": {"type": "string", "minLength": 20},
-              "reason": {
-                "type": "string",
-                "minLength": 20,
-                "not": {"const": "This is not a capability and needs no review."}
-              },
-              "classification": {
-                "enum": [
-                  "internal",
-                  "operations",
-                  "ui_transient",
-                  "transport_adapter",
-                  "unstable_product_surface"
-                ]
-              },
-              "owner": {"type": "string", "minLength": 1}
-            },
-            "required": ["owner"]
-          }
-        }
-      ]
-    },
-    "ApprovedFunctionDisposition": {
-      "allOf": [
-        {"$ref": "#/$defs/FunctionDisposition"},
-        {
-          "properties": {
-            "resolution": {"enum": ["existing_capability", "excluded"]}
-          }
-        }
-      ]
-    },
-    "CapabilityCandidates": {
-      "type": "object",
-      "additionalProperties": false,
-      "propertyNames": {"type": "string", "minLength": 1},
-      "patternProperties": {"^.+$": {"$ref": "#/$defs/CapabilityCandidate"}}
-    },
-    "CapabilityCandidate": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "business_outcome",
-        "resolution",
-        "non_goals",
-        "source_function_ids",
-        "owner_domain",
-        "application_port",
-        "provider_artifact",
-        "owned_tables",
-        "migration_stream",
-        "consumer_exposure_ref",
-        "delivery_pipeline"
-      ],
-      "properties": {
-        "business_outcome": {"type": "string", "minLength": 1},
-        "resolution": {"const": "new_capability"},
-        "non_goals": {
-          "type": "array",
-          "minItems": 1,
-          "items": {"type": "string", "minLength": 1}
-        },
-        "source_function_ids": {"$ref": "#/$defs/NewCapabilitySourceFunctions"},
-        "owner_domain": {"type": "string", "minLength": 1},
-        "application_port": {"type": "string", "minLength": 1},
-        "provider_artifact": {"type": "string", "minLength": 1},
-        "owned_tables": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
-        "migration_stream": {"type": "string", "minLength": 1},
-        "consumer_exposure_ref": {"$ref": "#/$defs/ConsumerExposure"},
-        "delivery_pipeline": {"const": "capability_provider_gateway"}
-      }
-    },
-    "ConsumerExposures": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "existing_catalog_capabilities": {"$ref": "#/$defs/ExistingCatalogExposures"}
-      }
-    },
-    "ExistingCatalogExposures": {
-      "type": "object",
-      "additionalProperties": false,
-      "propertyNames": {"type": "string", "minLength": 1},
-      "patternProperties": {"^.+$": {"$ref": "#/$defs/ConsumerExposure"}}
-    },
     "Resolution": {
       "enum": ["unreviewed", "existing_capability", "new_capability", "excluded"]
     },
-    "NewCapabilitySourceFunctions": {
+    "UnreviewedFunctions": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/UnreviewedFunction"}}
+    },
+    "UnreviewedFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolution", "source_paths", "owner", "evidence", "reviewer", "reviewed_at"],
+      "properties": {
+        "resolution": {"const": "unreviewed"},
+        "source_paths": {"$ref": "#/$defs/SourcePaths"},
+        "owner": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string", "minLength": 20},
+        "reviewer": {"type": "string", "minLength": 1},
+        "reviewed_at": {"$ref": "#/$defs/ReviewDate"}
+      }
+    },
+    "ExcludedFunctions": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/ExcludedFunction"}}
+    },
+    "ExcludedFunction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolution", "target_capability", "source_paths", "evidence", "reason", "classification", "owner", "reviewer", "reviewed_at"],
+      "properties": {
+        "resolution": {"const": "excluded"},
+        "target_capability": {"const": null},
+        "source_paths": {"$ref": "#/$defs/SourcePaths"},
+        "evidence": {"type": "string", "minLength": 20},
+        "reason": {
+          "type": "string",
+          "minLength": 20,
+          "not": {"const": "This is not a capability and needs no review."}
+        },
+        "classification": {"enum": ["internal", "operations", "ui_transient", "transport_adapter", "unstable_product_surface"]},
+        "owner": {"type": "string", "minLength": 1},
+        "reviewer": {"type": "string", "minLength": 1},
+        "reviewed_at": {"$ref": "#/$defs/ReviewDate"}
+      }
+    },
+    "Capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/CapabilityGroup"}}
+    },
+    "CapabilityGroup": {
+      "oneOf": [
+        {"$ref": "#/$defs/ExistingCapabilityGroup"},
+        {"$ref": "#/$defs/CandidateCapabilityGroup"}
+      ]
+    },
+    "ExistingCapabilityGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "function_dispositions", "consumer_exposure"],
+      "properties": {
+        "kind": {"const": "existing"},
+        "function_dispositions": {"$ref": "#/$defs/ExistingFunctionDispositions"},
+        "consumer_exposure": {"$ref": "#/$defs/ConsumerExposure"}
+      }
+    },
+    "CandidateCapabilityGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "function_dispositions", "consumer_exposure", "candidate_definition"],
+      "properties": {
+        "kind": {"const": "candidate"},
+        "function_dispositions": {"$ref": "#/$defs/CandidateFunctionDispositions"},
+        "consumer_exposure": {"$ref": "#/$defs/ConsumerExposure"},
+        "candidate_definition": {"$ref": "#/$defs/CandidateDefinition"}
+      }
+    },
+    "ExistingFunctionDispositions": {
       "type": "object",
       "additionalProperties": false,
       "minProperties": 1,
       "propertyNames": {"type": "string", "minLength": 1},
-      "patternProperties": {"^.+$": {"$ref": "#/$defs/NewCapabilityFunctionDisposition"}}
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/ExistingFunctionDisposition"}}
     },
-    "NewCapabilityFunctionDisposition": {
+    "CandidateFunctionDispositions": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/CandidateFunctionDisposition"}}
+    },
+    "ExistingFunctionDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolution", "source_paths", "owner", "evidence", "reviewer", "reviewed_at"],
+      "properties": {
+        "resolution": {"const": "existing_capability"},
+        "source_paths": {"$ref": "#/$defs/SourcePaths"},
+        "owner": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string", "minLength": 20},
+        "reviewer": {"type": "string", "minLength": 1},
+        "reviewed_at": {"$ref": "#/$defs/ReviewDate"}
+      }
+    },
+    "CandidateFunctionDisposition": {
       "type": "object",
       "additionalProperties": false,
       "required": ["resolution", "source_paths", "owner", "evidence", "reviewer", "reviewed_at"],
       "properties": {
         "resolution": {"const": "new_capability"},
-        "source_paths": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
+        "source_paths": {"$ref": "#/$defs/SourcePaths"},
         "owner": {"type": "string", "minLength": 1},
         "evidence": {"type": "string", "minLength": 20},
         "reviewer": {"type": "string", "minLength": 1},
-        "reviewed_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+        "reviewed_at": {"$ref": "#/$defs/ReviewDate"}
+      }
+    },
+    "SourcePaths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "ReviewDate": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "CandidateDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["business_outcome", "non_goals", "owner_domain", "application_port", "provider_artifact", "owned_tables", "migration_stream"],
+      "properties": {
+        "business_outcome": {"type": "string", "minLength": 1},
+        "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "owner_domain": {"type": "string", "minLength": 1},
+        "application_port": {"type": "string", "minLength": 1},
+        "provider_artifact": {"type": "string", "minLength": 1},
+        "owned_tables": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "migration_stream": {"type": "string", "minLength": 1}
       }
     },
     "ConsumerExposure": {
@@ -278,12 +222,7 @@
       "required": ["id", "source_paths", "owner_domain", "target_application_port", "shared_pipeline", "disposition"],
       "properties": {
         "id": {"type": "string", "minLength": 1},
-        "source_paths": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
+        "source_paths": {"$ref": "#/$defs/SourcePaths"},
         "owner_domain": {"type": "string", "minLength": 1},
         "target_application_port": {"type": "string", "minLength": 1},
         "shared_pipeline": {"const": "capability_provider_gateway"},
@@ -309,12 +248,7 @@
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "category": {"enum": ["consumer_adapter", "dependency", "database", "migration", "legacy_implementation"]},
-        "source_paths": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
+        "source_paths": {"$ref": "#/$defs/SourcePaths"},
         "owner_domain": {"type": "string", "minLength": 1},
         "disposition": {"enum": ["remove_after_extraction", "retain_with_boundary", "migrate", "accepted"]},
         "reason": {"type": "string", "minLength": 1}
@@ -326,7 +260,7 @@
       "required": ["reviewer", "reviewed_at", "status"],
       "properties": {
         "reviewer": {"type": "string", "minLength": 1},
-        "reviewed_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "reviewed_at": {"$ref": "#/$defs/ReviewDate"},
         "status": {"enum": ["draft", "approved"]}
       }
     }

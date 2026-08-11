@@ -1,4 +1,4 @@
-"""Contract tests for per-domain capability coverage review documents."""
+"""Contract tests for normalized per-domain capability coverage reviews."""
 from __future__ import annotations
 
 import json
@@ -28,95 +28,86 @@ def fixture():
     return load
 
 
+def _validate(schema: dict, document: dict) -> None:
+    jsonschema.Draft202012Validator(schema).validate(document)
+
+
 def test_minimal_domain_review_is_closed_and_valid(review_schema, fixture):
-    """Catches a valid document becoming invalid or accepting unknown root fields."""
+    """Proves one normalized document can contain both existing and candidate groups."""
     document = fixture("minimal-valid.json")
-    jsonschema.Draft202012Validator(review_schema).validate(document)
+    _validate(review_schema, document)
 
     document["unexpected"] = True
     with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(document)
+        _validate(review_schema, document)
 
 
 def test_generic_exclusion_is_rejected(review_schema, fixture):
     """Catches an excluded function without source evidence or a specific reason."""
     with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(
-            fixture("invalid-generic-exclusion.json")
-        )
+        _validate(review_schema, fixture("invalid-generic-exclusion.json"))
 
 
 def test_consumer_specific_duplicate_implementation_is_rejected(review_schema, fixture):
-    """Catches a consumer-specific delivery pipeline instead of the shared pipeline."""
+    """Catches a consumer-specific pipeline in an otherwise valid candidate group."""
     with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(
-            fixture("invalid-consumer-duplicate.json")
-        )
+        _validate(review_schema, fixture("invalid-consumer-duplicate.json"))
 
 
-def test_exclusion_without_a_domain_owner_is_rejected(review_schema, fixture):
-    """Catches an otherwise evidenced exclusion that omits its accountable owner."""
-    with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(
-            fixture("invalid-exclusion-missing-owner.json")
-        )
-
-
-def test_new_capability_cannot_reference_a_dangling_candidate_id(review_schema, fixture):
-    """Catches a new-capability disposition detached from its candidate record."""
-    with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(
-            fixture("invalid-dangling-candidate-id.json")
-        )
-
-
-def test_candidate_requires_an_owned_new_capability_disposition(review_schema, fixture):
-    """Catches a candidate with only free function IDs and no owned new-capability rows."""
-    with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(
-            fixture("invalid-candidate-without-owned-disposition.json")
-        )
-
-
-def test_removing_candidate_owned_new_capability_disposition_is_rejected(review_schema, fixture):
-    """Catches removal of the candidate-owned record that binds its source function."""
+def test_candidate_with_wrong_nested_resolution_is_rejected(review_schema, fixture):
+    """Catches an existing-capability row inside a candidate Capability group."""
     document = fixture("minimal-valid.json")
-    document["capability_candidates"]["project.project.create"]["source_function_ids"].clear()
+    document["capabilities"]["project.project.create"]["function_dispositions"][
+        "rest:POST:/api/projects"
+    ]["resolution"] = "existing_capability"
 
     with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(document)
+        _validate(review_schema, document)
 
 
-def test_candidate_cannot_reference_a_mismatched_exposure_id(review_schema, fixture):
-    """Catches candidate delivery evidence detached from its shared exposure record."""
-    with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(
-            fixture("invalid-mismatched-exposure-id.json")
-        )
-
-
-def test_root_exposure_cannot_duplicate_a_candidate_policy(review_schema, fixture):
-    """Catches a disconnected root exposure alongside a candidate-owned policy."""
-    with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(
-            fixture("invalid-disconnected-root-exposure.json")
-        )
-
-
-def test_adding_a_second_disconnected_candidate_exposure_is_rejected(review_schema, fixture):
-    """Catches adding a candidate-keyed root policy beside the inline candidate policy."""
+def test_existing_group_with_candidate_definition_is_rejected(review_schema, fixture):
+    """Catches a candidate definition attached to an existing Catalog Capability group."""
     document = fixture("minimal-valid.json")
-    document["consumer_exposures"]["project.project.create"] = document[
-        "capability_candidates"
-    ]["project.project.create"]["consumer_exposure_ref"]
+    document["capabilities"]["project.project.list"]["candidate_definition"] = {
+        "business_outcome": "Must not be attached to an existing Capability.",
+        "non_goals": ["No-op"],
+        "owner_domain": "project_management",
+        "application_port": "project_management.list_projects",
+        "provider_artifact": "official.project-management",
+        "owned_tables": ["projects"],
+        "migration_stream": "project_management"
+    }
 
     with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(document)
+        _validate(review_schema, document)
 
 
-def test_generic_exclusion_reason_is_rejected_independently(review_schema, fixture):
-    """Catches a generic exclusion reason even when all other exclusion evidence is valid."""
+def test_candidate_without_definition_is_rejected(review_schema, fixture):
+    """Catches a candidate group that lacks its required inline candidate definition."""
+    document = fixture("minimal-valid.json")
+    del document["capabilities"]["project.project.create"]["candidate_definition"]
+
     with pytest.raises(jsonschema.ValidationError):
-        jsonschema.Draft202012Validator(review_schema).validate(
-            fixture("invalid-generic-exclusion-reason.json")
-        )
+        _validate(review_schema, document)
+
+
+def test_capability_group_requires_function_dispositions(review_schema, fixture):
+    """Catches removal of the non-empty map that binds functions to the sole Capability ID."""
+    document = fixture("minimal-valid.json")
+    document["capabilities"]["project.project.create"]["function_dispositions"].clear()
+
+    with pytest.raises(jsonschema.ValidationError):
+        _validate(review_schema, document)
+
+
+def test_free_candidate_id_and_duplicate_exposure_map_are_rejected(review_schema, fixture):
+    """Catches reintroduced sibling Capability identity or exposure data."""
+    document = fixture("minimal-valid.json")
+    document["capabilities"]["project.project.create"]["candidate_id"] = "project.project.other"
+    with pytest.raises(jsonschema.ValidationError):
+        _validate(review_schema, document)
+
+    document = fixture("minimal-valid.json")
+    document["consumer_exposures"] = {"project.project.create": {}}
+    with pytest.raises(jsonschema.ValidationError):
+        _validate(review_schema, document)

@@ -7,22 +7,34 @@
     "catalog_release": "capability-v2-2026-08-11",
     "catalog_sha256": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
   },
-  "function_dispositions": {
-    "rest:GET:/api/projects": {
-      "resolution": "existing_capability",
-      "target_capability": "project.project.list",
-      "source_paths": ["backend/routers/projects.py"],
-      "evidence": null,
-      "reason": null,
-      "classification": null
-    }
-  },
-  "capability_candidates": {
+  "unreviewed_functions": {},
+  "excluded_functions": {},
+  "capabilities": {
+    "project.project.list": {
+      "kind": "existing",
+      "function_dispositions": {
+        "rest:GET:/api/projects": {
+          "resolution": "existing_capability",
+          "source_paths": ["backend/routers/projects.py"],
+          "owner": "project-management-owner",
+          "evidence": "The route lists Project aggregates using the shared query port.",
+          "reviewer": "project-management-owner",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {"enabled": true, "reason": "Project listing is available in the web workspace.", "policy_ref": "project.list"},
+        "rest": {"enabled": true, "reason": "The REST gateway exposes the shared capability.", "policy_ref": "project.list"},
+        "plugin": {"enabled": true, "reason": "Plugins invoke the same governed list operation.", "policy_ref": "project.list"},
+        "agent": {"enabled": true, "reason": "Agents invoke the same governed list operation.", "policy_ref": "project.list"},
+        "mcp": {"enabled": false, "reason": "MCP exposure awaits an approved tool policy decision.", "policy_ref": "project.list"},
+        "local_runtime": {"enabled": false, "reason": "This read operation has no local-runtime transport need.", "policy_ref": "project.list"}
+      }
+    },
     "project.project.create": {
-      "business_outcome": "Create a project with the caller's supplied planning metadata.",
-      "resolution": "new_capability",
-      "non_goals": ["Do not expose consumer-specific project creation code."],
-      "source_function_ids": {
+      "kind": "candidate",
+      "function_dispositions": {
         "rest:POST:/api/projects": {
           "resolution": "new_capability",
           "source_paths": ["backend/routers/projects.py"],
@@ -32,12 +44,7 @@
           "reviewed_at": "2026-08-11"
         }
       },
-      "owner_domain": "project_management",
-      "application_port": "project_management.create_project",
-      "provider_artifact": "official.project-management",
-      "owned_tables": ["projects"],
-      "migration_stream": "project_management",
-      "consumer_exposure_ref": {
+      "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {"enabled": true, "reason": "Project creation is available in the web workspace.", "policy_ref": "project.create"},
         "rest": {"enabled": true, "reason": "The REST gateway exposes the shared capability.", "policy_ref": "project.create"},
@@ -46,51 +53,20 @@
         "mcp": {"enabled": false, "reason": "MCP exposure awaits an approved tool policy decision.", "policy_ref": "project.create"},
         "local_runtime": {"enabled": false, "reason": "This business operation has no local-runtime transport need.", "policy_ref": "project.create"}
       },
-      "delivery_pipeline": "capability_provider_gateway"
-    }
-  },
-  "consumer_exposures": {
-    "existing_catalog_capabilities": {
-      "project.project.list": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {"enabled": true, "reason": "Project listing is available in the web workspace.", "policy_ref": "project.list"},
-        "rest": {"enabled": true, "reason": "The REST gateway exposes the existing capability.", "policy_ref": "project.list"},
-        "plugin": {"enabled": true, "reason": "Plugins invoke the same governed list operation.", "policy_ref": "project.list"},
-        "agent": {"enabled": true, "reason": "Agents invoke the same governed list operation.", "policy_ref": "project.list"},
-        "mcp": {"enabled": false, "reason": "MCP exposure awaits an approved tool policy decision.", "policy_ref": "project.list"},
-        "local_runtime": {"enabled": false, "reason": "This read operation has no local-runtime transport need.", "policy_ref": "project.list"}
+      "candidate_definition": {
+        "business_outcome": "Create a Project aggregate from governed planning metadata.",
+        "non_goals": ["Do not expose consumer-specific project creation code."],
+        "owner_domain": "project_management",
+        "application_port": "project_management.create_project",
+        "provider_artifact": "official.project-management",
+        "owned_tables": ["projects"],
+        "migration_stream": "project_management"
       }
     }
   },
-  "code_extractions": [
-    {
-      "id": "project-create-shared-provider",
-      "source_paths": ["backend/routers/projects.py"],
-      "owner_domain": "project_management",
-      "target_application_port": "project_management.create_project",
-      "shared_pipeline": "capability_provider_gateway",
-      "disposition": "planned"
-    }
-  ],
-  "database_boundaries": [
-    {
-      "table": "projects",
-      "owner_domain": "project_management",
-      "access_mode": "write",
-      "migration_stream": "project_management",
-      "evidence": "Project creation writes the projects aggregate table."
-    }
-  ],
-  "debt_dispositions": [
-    {
-      "id": "project-create-router-debt",
-      "category": "consumer_adapter",
-      "source_paths": ["backend/routers/projects.py"],
-      "owner_domain": "project_management",
-      "disposition": "remove_after_extraction",
-      "reason": "The route delegates only after the shared provider is extracted."
-    }
-  ],
+  "code_extractions": [],
+  "database_boundaries": [],
+  "debt_dispositions": [],
   "review": {
     "reviewer": "project-management-owner",
     "reviewed_at": "2026-08-11",
