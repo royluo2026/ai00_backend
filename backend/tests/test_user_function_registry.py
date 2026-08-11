@@ -397,4 +397,89 @@ def test_strict_cli_returns_nonzero_when_baseline_contains_unreviewed_stable_can
     )
 
     assert result.returncode == 1
-    assert "stable function lacks capability or valid exclusion" in result.stderr
+    assert "missing reviewed disposition" in result.stderr
+
+
+def test_review_linkage_rejects_registry_row_missing_from_domain_review():
+    builder = _builder_module()
+    row = {
+        "function_id": "rest:GET:/api/example",
+        "domain": "Base Platform",
+        "stability": "stable",
+        "source_paths": ["backend/routers/example.py"],
+    }
+
+    errors = builder.review_disposition_errors(
+        {row["function_id"]: row}, [], {}
+    )
+
+    assert errors == ["missing reviewed disposition: rest:GET:/api/example"]
+
+
+def test_review_linkage_rejects_target_owned_by_another_domain():
+    builder = _builder_module()
+    row = {
+        "function_id": "rest:GET:/api/projects",
+        "domain": "Project Management",
+        "stability": "stable",
+        "source_paths": ["backend/routers/projects.py"],
+    }
+    review = {
+        "domain": "Project Management",
+        "unreviewed_functions": {},
+        "excluded_functions": {},
+        "capabilities": {
+            "craft.project.search": {
+                "kind": "existing",
+                "function_dispositions": {
+                    row["function_id"]: {
+                        "resolution": "existing_capability",
+                        "source_paths": row["source_paths"],
+                    }
+                },
+            }
+        },
+    }
+
+    errors = builder.review_disposition_errors(
+        {row["function_id"]: row}, [review], {"craft.project.search": "craft"}
+    )
+
+    assert errors == ["capability owner mismatch: rest:GET:/api/projects"]
+
+
+def test_registry_projection_ignores_stale_review_source_evidence():
+    builder = _builder_module()
+    function_id = "rest:GET:/api/projects"
+    row = {
+        "function_id": function_id,
+        "domain": "Project Management",
+        "stability": "stable",
+        "source_paths": ["backend/routers/projects_v2.py"],
+        "target_capability": None,
+        "classification": "unreviewed",
+        "migration_status": "candidate",
+        "exclusion_reason": None,
+    }
+    review = {
+        "domain": "Project Management",
+        "excluded_functions": {},
+        "capabilities": {
+            "base.project.search": {
+                "kind": "existing",
+                "function_dispositions": {
+                    function_id: {
+                        "resolution": "existing_capability",
+                        "source_paths": ["backend/routers/projects.py"],
+                    }
+                },
+            }
+        },
+    }
+
+    projected = builder.apply_review_dispositions(
+        {function_id: row}, [review], {"base.project.search": "project_management"}
+    )
+
+    assert projected[function_id]["target_capability"] is None
+    assert projected[function_id]["classification"] == "unreviewed"

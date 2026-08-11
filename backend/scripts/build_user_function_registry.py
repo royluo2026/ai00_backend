@@ -18,6 +18,8 @@ from typing import Iterable
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = REPOSITORY_ROOT / "docs" / "governance" / "user-function-registry.json"
+REVIEW_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-coverage-review"
+CATALOG_PATH = REPOSITORY_ROOT / "docs" / "capabilities" / "catalog.v2.json"
 DOMAINS = (
     "Base Platform",
     "Agent",
@@ -29,7 +31,10 @@ DOMAINS = (
     "Knowledge",
     "Local Integration",
 )
-VALID_EXCLUSIONS = {"internal", "operations", "ui_transient"}
+VALID_EXCLUSIONS = {
+    "internal", "operations", "ui_transient", "transport_adapter",
+    "unstable_product_surface",
+}
 ROUTE_METHODS = {"get", "post", "put", "patch", "delete", "head", "options"}
 CAPABILITY_PATTERN = r"(?:base|craft|digital_model|identity|knowledge|local|ontology|plugin|semantic|simulation|system|vismockup)\.[a-z0-9_.]+"
 CAPABILITY_RE = re.compile(rf"(?<![a-z0-9_.])({CAPABILITY_PATTERN})(?![a-z0-9_.])")
@@ -520,6 +525,129 @@ def registry_errors(
     return sorted(set(errors))
 
 
+def _owner_key(domain: str) -> str:
+    return {
+        "Base Platform": "base",
+        "Local Integration": "local_integration",
+    }.get(domain, domain.lower().replace(" ", "_"))
+
+
+def load_coverage_reviews(path: Path = REVIEW_PATH) -> list[dict]:
+    if not path.exists():
+        return []
+    return [
+        json.loads(review_path.read_text(encoding="utf-8"))
+        for review_path in sorted(path.glob("*.json"))
+        if review_path.name != "manifest.json"
+    ]
+
+
+def load_catalog_owners(path: Path = CATALOG_PATH) -> dict[str, str]:
+    catalog = json.loads(path.read_text(encoding="utf-8"))
+    return {row["id"]: row["owner_domain"] for row in catalog["capabilities"]}
+
+
+def _reviewed_dispositions(reviews: list[dict]) -> tuple[dict[str, dict], set[str]]:
+    dispositions: dict[str, dict] = {}
+    duplicates: set[str] = set()
+    for review in reviews:
+        domain = review["domain"]
+        for function_id, disposition in review.get("excluded_functions", {}).items():
+            item = {**disposition, "review_domain": domain, "capability_id": None}
+            if function_id in dispositions:
+                duplicates.add(function_id)
+            dispositions[function_id] = item
+        for capability_id, group in review.get("capabilities", {}).items():
+            for function_id, disposition in group.get("function_dispositions", {}).items():
+                item = {
+                    **disposition,
+                    "review_domain": domain,
+                    "capability_id": capability_id,
+                    "kind": group["kind"],
+                    "candidate_definition": group.get("candidate_definition"),
+                }
+                if function_id in dispositions:
+                    duplicates.add(function_id)
+                dispositions[function_id] = item
+    return dispositions, duplicates
+
+
+def review_disposition_errors(
+    registry: dict[str, dict], reviews: list[dict], catalog_owners: dict[str, str]
+) -> list[str]:
+    """Validate the one-way link from reviewed domain decisions to Registry evidence."""
+    dispositions, duplicates = _reviewed_dispositions(reviews)
+    errors = [f"duplicate reviewed disposition: {function_id}" for function_id in duplicates]
+    for function_id, row in sorted(registry.items()):
+        if row.get("stability") != "stable":
+            continue
+        disposition = dispositions.get(function_id)
+        if disposition is None:
+            errors.append(f"missing reviewed disposition: {function_id}")
+            continue
+        if disposition["review_domain"] != row.get("domain"):
+            errors.append(f"review domain mismatch: {function_id}")
+        if sorted(disposition.get("source_paths", [])) != sorted(row.get("source_paths", [])):
+            errors.append(f"review source evidence mismatch: {function_id}")
+        resolution = disposition.get("resolution")
+        if resolution == "existing_capability":
+            capability_id = disposition["capability_id"]
+            owner = catalog_owners.get(capability_id)
+            if owner is None:
+                errors.append(f"dangling Catalog capability: {function_id}")
+            elif owner != _owner_key(row["domain"]):
+                errors.append(f"capability owner mismatch: {function_id}")
+        elif resolution == "new_capability":
+            definition = disposition.get("candidate_definition") or {}
+            if definition.get("owner_domain") != _owner_key(row["domain"]):
+                errors.append(f"capability owner mismatch: {function_id}")
+        elif resolution != "excluded":
+            errors.append(f"missing reviewed disposition: {function_id}")
+    return sorted(set(errors))
+
+
+def apply_review_dispositions(
+    records: dict[str, dict], reviews: list[dict], catalog_owners: dict[str, str]
+) -> dict[str, dict]:
+    """Return a Registry projection without mutating authored review documents."""
+    dispositions, _ = _reviewed_dispositions(reviews)
+    projected = {function_id: dict(row) for function_id, row in records.items()}
+    for function_id, row in projected.items():
+        disposition = dispositions.get(function_id)
+        if not disposition:
+            continue
+        if disposition["review_domain"] != row.get("domain"):
+            continue
+        if sorted(disposition.get("source_paths", [])) != sorted(row.get("source_paths", [])):
+            continue
+        resolution = disposition.get("resolution")
+        if resolution == "existing_capability":
+            if catalog_owners.get(disposition["capability_id"]) != _owner_key(row["domain"]):
+                continue
+            row.update(target_capability=disposition["capability_id"], classification="mapped")
+        elif resolution == "new_capability":
+            definition = disposition.get("candidate_definition") or {}
+            if definition.get("owner_domain") != _owner_key(row["domain"]):
+                continue
+            row.update(
+                target_capability=disposition["capability_id"],
+                classification="proposed",
+                migration_status="proposed",
+                exclusion_reason=None,
+            )
+        elif resolution == "excluded":
+            migration_status = row.get("migration_status")
+            if migration_status == "candidate":
+                migration_status = "excluded"
+            row.update(
+                target_capability=None,
+                classification=disposition["classification"],
+                migration_status=migration_status,
+                exclusion_reason=disposition["reason"],
+            )
+    return projected
+
+
 def validate_registry_document(document: object, schema: dict) -> list[str]:
     """Validate this JSON-Schema contract without an optional third-party package."""
     errors: list[str] = []
@@ -602,7 +730,10 @@ def main(argv: list[str] | None = None) -> int:
     existing = load_registry()
     discovered = discover_user_functions()
     if args.check or args.strict:
-        errors = registry_errors(existing, discovered, include_governance=args.strict)
+        errors = registry_errors(existing, discovered, include_governance=False)
+        if args.strict:
+            reviews = load_coverage_reviews()
+            errors.extend(review_disposition_errors(existing, reviews, load_catalog_owners()))
         if errors:
             print("User Function Registry drift:", *errors, sep="\n- ", file=sys.stderr)
             return 1
@@ -610,6 +741,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"User Function Registry {label} passed: {_counts(existing.values())}")
         return 0
     records = merge_discovery(existing, discovered)
+    reviews = load_coverage_reviews()
+    projected = apply_review_dispositions(
+        {row["function_id"]: row for row in records}, reviews, load_catalog_owners()
+    )
+    records = list(projected.values())
     write_registry(records)
     print(f"User Function Registry written: {_counts(records)}")
     return 0
