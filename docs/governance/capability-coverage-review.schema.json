@@ -62,14 +62,12 @@
     "UnreviewedFunction": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["resolution", "source_paths", "owner", "evidence", "reviewer", "reviewed_at"],
+      "required": ["resolution", "source_paths", "owner", "evidence"],
       "properties": {
         "resolution": {"const": "unreviewed"},
         "source_paths": {"$ref": "#/$defs/SourcePaths"},
         "owner": {"type": "string", "minLength": 1},
-        "evidence": {"type": "string", "minLength": 20},
-        "reviewer": {"type": "string", "minLength": 1},
-        "reviewed_at": {"$ref": "#/$defs/ReviewDate"}
+        "evidence": {"type": "string", "minLength": 20}
       }
     },
     "ExcludedFunctions": {

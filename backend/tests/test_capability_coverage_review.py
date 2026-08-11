@@ -43,7 +43,7 @@ def test_minimal_domain_review_is_closed_and_valid(review_schema, fixture):
 
 
 def test_generic_exclusion_is_rejected(review_schema, fixture):
-    """Catches an excluded function without source evidence or a specific reason."""
+    """Catches an otherwise valid exclusion with a generic review reason."""
     with pytest.raises(jsonschema.ValidationError):
         _validate(review_schema, fixture("invalid-generic-exclusion.json"))
 
@@ -109,5 +109,22 @@ def test_free_candidate_id_and_duplicate_exposure_map_are_rejected(review_schema
 
     document = fixture("minimal-valid.json")
     document["consumer_exposures"] = {"project.project.create": {}}
+    with pytest.raises(jsonschema.ValidationError):
+        _validate(review_schema, document)
+
+
+def test_draft_unreviewed_function_does_not_forge_review_approval(review_schema, fixture):
+    """Catches a schema that forces scanner-discovered rows to invent reviewer metadata."""
+    document = fixture("minimal-valid.json")
+    document["unreviewed_functions"]["rest:GET:/api/new-route"] = {
+        "resolution": "unreviewed",
+        "source_paths": ["backend/routers/new_route.py"],
+        "owner": "project-management-owner",
+        "evidence": "Discovered from the stable FastAPI route decorator."
+    }
+
+    _validate(review_schema, document)
+
+    document["review"]["status"] = "approved"
     with pytest.raises(jsonschema.ValidationError):
         _validate(review_schema, document)
