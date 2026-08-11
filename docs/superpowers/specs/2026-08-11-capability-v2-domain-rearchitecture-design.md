@@ -21,7 +21,7 @@
 3. 能力是否存在由业务语义决定，不以总数为设计目标，也不为了减少数量而合并权限、风险或状态机不同的动作。
 4. 每个一级领域独立拥有代码、数据库、数据库用户、迁移流、Provider、测试和发布单元。
 5. 禁止跨域 SQL、跨域 JOIN、跨域外键以及导入其他领域的 Router、Repository、ORM、数据库连接或具体 Service。
-6. 跨域同步调用通过 Capability Gateway 或稳定 Public Port；异步协作通过带 Outbox 的版本化领域事件。
+6. 跨域业务同步调用统一通过 Capability Gateway；Public Port 只定义稳定类型契约、领域内部依赖倒置接口或平台基础设施适配，不得成为绕过 Gateway 的第二条业务执行路径。异步协作通过带 Outbox 的版本化领域事件。
 7. 跨域只保存不透明 ResourceRef、ArtifactRef、OperationRef 和不可变版本引用。
 8. PBOM 是本产品唯一的生产物料结构名称；代码、表、API、Capability 和文档中的 eBOM 全部改为 PBOM。
 9. Factory 的物理线体、物理工位和实物资产，与 BOP 的计划线体、计划工位、岗位、工序和操作严格分离。
@@ -160,6 +160,8 @@ bootstrap → provider + infrastructure
 
 Domain 不依赖 FastAPI、数据库驱动、Gateway 或其他领域。Application 不依赖具体 Repository。Provider 不直接执行 SQL。API 不绕过 Gateway 调用 Application。
 
+Public Port 可以被其他领域导入，但只能暴露稳定 DTO、ResourceRef、错误枚举和协议类型。其他领域不得直接取得该 Port 的领域实现实例来执行业务查询或命令；跨域业务调用必须由 DomainCapabilityClient 构造 InvocationEnvelope 并进入完整 Gateway 管线。OIS、时钟、ID、密钥存储等平台基础设施 Port 不属于领域业务调用，可以由受信任基础设施适配器直接实现。
+
 ## 6. Capability 定义与注册
 
 ### 6.1 唯一事实来源
@@ -264,7 +266,11 @@ Tenant 只能来自经过认证的 ConsumerIdentity 和 DelegationContext。
 
 Gateway Confirmation 是调用安全协议，不是业务审批。Base Approval 是有申请人、审批人、对象快照和正式决定的业务服务。
 
-领域提交审批时保存精确 ResourceRef、revision/hash 和申请原因。Base 不修改领域数据。审批通过后，由原领域验证对象仍与审批快照一致并继续状态转换。
+Domain Proposal 是领域拥有的内容与状态聚合，不是 Base Approval 的复制品。Proposal 负责草稿、不可变 Proposal Revision、领域校验、提交和撤回；Base Approval 负责审批参与者、授权、正式决定、通知触发和不可变审批记录。Gateway Confirmation、Base Approval 和 Domain Proposal 三者不得互相替代。
+
+领域提交审批时必须先冻结一个不可变 Submitted Revision，并保存精确 ResourceRef、revision/hash、申请原因和 Base ApprovalRef。提交后继续编辑必须创建新的 Draft 或 Revision，不能修改待审批内容。Base 不修改领域数据；Base Approval 决定通过事件或受治理的内部 Capability 交还原领域，原领域的 review.decide 验证 ApprovalRef、审批人资格、精确 revision/hash 和当前状态后执行发布或状态转换。
+
+审批比较始终使用精确 revision 和内容 hash，不采用“语义等价”放宽。若引用版本不存在、hash 不一致、审批已过期或状态已前进，领域返回稳定的 approval_stale 或 state_conflict；调用方必须基于新 revision 重新提交。Base Notification 消费 Approval 与领域状态事件发送通知，领域不得各自建立第二套通知投递链。Gateway 与领域审计共同记录同一 request_id、trace_id 和 ApprovalRef。
 
 ## 9. 数据库独立性
 
@@ -311,7 +317,17 @@ Gateway Confirmation 是调用安全协议，不是业务审批。Base Approval 
 
 不实现分布式数据库事务。
 
+### 9.4 Domain Event 版本演进
+
+每个 event_type 独立演进 event_version。消费者在部署清单中声明可处理的最小和最大版本；收到不支持的版本时不得确认 Inbox 完成，而是进入 dependency_unavailable/dead-letter 并报警。
+
+保持同一 event_version 时只允许向后兼容的追加：新增可选字段、扩大文档化枚举且旧消费者具有 unknown 分支、补充不改变既有语义的元数据。删除字段、改变字段类型或含义、改变必填性、改变 Tenant/聚合身份语义均为 breaking change，必须提升 event_version。
+
+Outbox 只保存产生时的单一规范事件，不为不同消费者写多份版本。消费者负责把其声明范围内的旧版本确定性 upcast 到当前内部模型；生产者升级 breaking version 前，必须先完成所有登记消费者的 expand 部署，使其版本范围包含新版本，再切换生产者，最后 contract 删除旧版本支持。Upcast 只能转换结构，不能补造业务事实。旧版本只有在所有已登记消费者停止声明支持且旧 Outbox/重放窗口结束后才能退役。契约测试必须覆盖兼容读取、未知版本拒绝、幂等重放和版本退役清单。
+
 ## 10. 公共引用契约
+
+### 10.1 稳定引用
 
 跨域引用采用带类型和版本的稳定结构：
 
@@ -328,6 +344,20 @@ Gateway Confirmation 是调用安全协议，不是业务审批。Base Approval 
 tenant_gid 不允许由普通调用者填写；它由 Gateway 绑定或由 Provider 输出。不可变资源必须包含 version/hash。可变身份引用只保存 resource_id，使用前通过所有者 Provider 重新校验。
 
 ArtifactRef 只指向 OIS 中的不可变内容并包含 media type、sha256、byte size 和 artifact version。OperationRef 只表达异步执行状态，不代替领域 Run、Job 或 Version ID。
+
+### 10.2 跨域调用决策
+
+任何领域为了完成业务结果而读取、验证或修改另一领域对象，都必须通过 DomainCapabilityClient 调用所有者公开 Capability。该规则同样适用于无副作用的存在性检查和权限前置校验；不能因为调用是 read 而直接取得另一领域 Application Port 实现。DomainCapabilityClient 保留原 ConsumerIdentity、Tenant、Delegation、Catalog Release、request_id、trace_id、deadline 和幂等信息，并完整处理 rejected、failed、accepted 与 outcome_unknown。
+
+Public Port 的直接实现调用只允许两类场景：同一领域内部的 Application/Infrastructure 依赖倒置；以及 OIS、时钟、ID、加密、消息传输等不拥有业务对象的平台基础设施。跨域 DTO 可以定义在 public/domain_ports 包中，但 DTO 可导入不等于业务实现可直调。
+
+### 10.3 Revision Kernel 定位
+
+Base Revision Kernel 继续保留，定位为共享的不可变版本算法与跨域引用图基础设施，不是所有领域的统一业务版本数据库，也不形成 revision.* 万能业务 Capability。它提供规范化内容哈希、CommitRef/SnapshotRef、Diff、可选三方合并、LineageEdge、环检测和引用完整性校验。
+
+每个领域自己的 Version、Revision、Release 仍是该领域业务事实源，保存在该领域数据库并由该领域 Provider 管理。领域只有在需要通用 Diff、Merge 或跨域 Lineage 时才通过领域 Adapter 接入 Revision Kernel；不需要分支或合并语义的聚合不得为了技术统一被强制改造成 Git 模型。Revision Kernel 中保存的 CommitRef 和 LineageEdge 不能替代领域版本状态，也不能赋予 Base 修改领域对象的权限。
+
+Ontology、Craft、Knowledge、Digital Model 和 Simulation 的接入都必须使用各自 Adapter。Adapter 将领域不可变版本映射为 CommitRef，并校验 Tenant、owner_domain、resource identity 和 content hash；禁止领域直接访问 Revision Kernel Repository。跨域 Lineage 只连接稳定不可变引用。领域版本删除或归档不能破坏已经发布的 Lineage 证据。
 
 ## 11. Base 详细设计
 
@@ -359,7 +389,15 @@ ArtifactRef 只指向 OIS 中的不可变内容并包含 media type、sha256、b
 
 原始日志、debug trace、health、ready、worker heartbeat、outbox、幂等表、任务租约、Catalog 生成、Gateway token、mount token、升级健康回调和插件月度统计关闭均为内部或运维机制。
 
-Base Revision 引擎只提供不可变 revision graph 和内部校验，不提供可修改任意领域对象的 revision.apply。
+Base Revision 引擎遵守 §10.3：只提供不可变 revision graph、共享算法和内部校验，不提供可修改任意领域对象的 revision.apply。
+
+### 11.4 Search、Lineage 与 Change Impact 数据机制
+
+`system.search` 第一阶段采用有界的 Domain Provider 扇出：Base 并行调用已登记的领域 search Capability，每域有独立 deadline、最大结果数和稳定游标，只接收统一 SearchRef，不接收领域数据库行。Base 负责去重、权限后过滤、稳定的近似排序和部分失败标记；跨域结果不承诺事务快照或精确 total。单域已明确时应直接调用领域 search，不使用 system.search。
+
+当调用量或排序质量证明有需要时，各领域通过版本化事件向 Base 发布可搜索引用，Base 建立仅含稳定 Ref、标题、摘要、分类、可见性索引键和版本的物化搜索投影。投影不是业务事实源，不能用于领域写入或替代所有者的最终授权检查。本文不要求在第一阶段引入外部搜索引擎。
+
+`system.lineage.get` 和 `system.change_impact.preview` 使用事件驱动的 Base 物化引用图。领域发布版本、建立关联、归档或产生服务器签发 preview/diff 时更新 Outbox；Base Inbox 幂等构建 LineageEdge 和影响索引。查询返回 complete、partial 或 stale 状态以及缺失领域，不能把依赖超时解释为“没有影响”。对必须即时确认的关键引用，Base 可以通过 DomainCapabilityClient 向所有者二次校验，但不得跨域 SQL。
 
 ## 12. Project Management 详细设计
 
@@ -413,7 +451,9 @@ Factory 当前不建立 allocation/reservation 能力，因为产品尚无真实
 
 ### 13.3 与 BOP 的边界
 
-BOP StationProcess 和 LineProcess 只是计划节点。Craft 可以保存 Factory ResourceRef，并在绑定时调用 Factory Provider 校验。Factory 不保存 BOP 节点，不参与 BOP 树事务。
+BOP StationProcess 和 LineProcess 只是计划节点。Craft 可以保存 Factory ResourceRef，并在绑定时通过 DomainCapabilityClient 调用 Factory Provider，校验资源存在、Tenant、类型、发布/有效状态和工艺适用性。Factory 不保存 BOP 节点，不参与 BOP 树事务。
+
+Factory Binding 表达“该工艺计划适用于或引用该物理结构/资源”，不表达时间段占用、独占、排程、产能承诺或预订。同一个 Physical Line、Physical Station 或资源类型可以被多个 BOP Version 合法引用，因此 `craft.bop.factory_binding.preview` 不执行所谓 BOP 间占用冲突检查。若未来需要排产，应建立独立 Scheduling/Reservation 聚合和释放生命周期，不能把该语义偷偷加入 Factory Binding。反向使用索引可以作为 Lineage/Impact 投影存在，但不是 Factory 的软预订记录。
 
 ## 14. Craft 详细设计
 
@@ -470,6 +510,12 @@ Ignore 改为正式 Waiver，记录理由、负责人、作用范围、规则版
 - Canvas 和工作台移入 Base Workspace。
 - Approval 使用 Base Approval。
 - Excel/飞书连接和同步移入 Integration 或内部 Data Exchange。
+
+### 14.6 Preview 生命周期
+
+所有 `*.preview/apply` 使用统一 PreviewRef 契约。默认 TTL 为 15 分钟；具体 Capability 可以在 Descriptor 中声明更短 TTL，但不能由调用者延长。PreviewRef 绑定 tenant_gid、capability_id/major、catalog_release、ConsumerIdentity 的稳定 principal、delegation subject、资源 ID、base revision、输入 hash 和输出 hash。Plugin 额外绑定 installation_id，Agent/MCP 额外绑定 agent_run_id；Web 不绑定短暂 HTTP session，JWT 刷新只要 principal 和 delegation 不变就不使 PreviewRef 失效。
+
+Apply 必须原子检查 PreviewRef 未消费、未过期、身份绑定一致、Catalog major 兼容、资源仍处于 base revision 且内容 hash 一致。成功后 PreviewRef 只能消费一次；并发重复消费按同一 idempotency key 返回稳定结果。过期返回 preview_expired，版本变化返回 revision_conflict，身份变化返回 preview_identity_mismatch，Catalog 不兼容返回 preview_catalog_mismatch。任何失败都不得自动重新 preview；消费者可以显式重新调用 preview 并重新展示结果或确认。
 
 ## 15. Knowledge 详细设计
 
@@ -541,6 +587,8 @@ Agent Tool 只能来自冻结 Catalog。手写 craft_tools、knowledge_tools、p
 
 ## 18. Integration 详细设计
 
+Integration 分为不依赖具体业务域的 Core 和按目标领域独立交付的 Sync Adapter。Core 拥有 Connector、Credential、Connection Test、Schema Discovery、Mapping、Sync Run、游标和调度协议；Adapter 只把受限外部记录转换成某个目标领域 Capability 输入，并通过 DomainCapabilityClient 执行。
+
 ### 18.1 Capability
 
 - integration.connector.create/get/search/update/archive。
@@ -553,6 +601,8 @@ Agent Tool 只能来自冻结 Catalog。手写 craft_tools、knowledge_tools、p
 Connection Test 使用密钥并访问网络，必须有独立 SSRF、网络策略、超时、审计和结果脱敏。Mapping 不接受任意 SQL 或可执行转换脚本，只接受受限表达式。
 
 Sync 可以编排目标领域 Capability，但不能直接写目标领域数据库。飞书目录同步、外部数据库、SaaS、Webhook 都是不同 Connector Adapter，共用同一 Connector 聚合。
+
+Integration Core 只依赖 Foundation 与 Base。每个 Adapter 在 Provider Manifest 中显式声明目标 domain、capability_id/major、最低 Catalog Release 和事件版本范围，并且只有在目标 Provider 稳定后才能启用。首个交付可以只包含 Base + Knowledge 的飞书文档同步；Craft、Project Management 等 Adapter 后续独立增加，不要求 Integration 等待所有业务领域完成。禁用某个 Adapter 不影响 Core 或其他 Adapter 的迁移和发布。
 
 Webhook、cursor、lease、retry、outbox 和定时触发属于内部协议。
 
@@ -650,6 +700,7 @@ Installation install、enable、disable、upgrade、rollback、uninstall 保持�
 - 固化 Descriptor Bundle、Provider Manifest 和 Domain Bootstrap 接口。
 - 建立独立 Database 配置和 Migration Runner。
 - 建立 DomainCapabilityClient、Event Envelope、Outbox/Inbox 公共契约。
+- 固化跨域调用决策、Event 兼容矩阵和 Revision Adapter 契约。
 - 更新边界检查器，使新跨域依赖立即失败。
 
 退出条件：空领域包可以独立迁移、注册 Provider、构建 Catalog 和运行契约测试。
@@ -706,6 +757,8 @@ Installation install、enable、disable、upgrade、rollback、uninstall 保持�
 - Agent Tools 全部改为 Catalog 生成。
 - 删除旧业务 Tool Handler 和旧 App Flow Run。
 
+在本阶段完成前，现有手写 Agent 业务 Tool Handler 冻结功能演进，只允许安全修复和向 Gateway 迁移；不得新增 Router 直连、原始用户 Token 转发或新的业务工具。领域 Capability 稳定后应尽早按域替换，不必等到全部 Agent 聚合重建完成才消除已知绕行路径。
+
 退出条件：Agent 不导入任何业务领域实现，所有工具调用经过 Gateway。
 
 ### 阶段 9：消费者切换与清理
@@ -758,6 +811,8 @@ Installation install、enable、disable、upgrade、rollback、uninstall 保持�
 4. 将 REST 兼容适配器和 Web SDK 切到新 Capability。
 5. 观察错误率、延迟、审计完整性和领域指标。
 6. 删除旧业务路径和旧表。
+
+领域计划可以并行开发不相交的领域文件，但中央治理文件、CODEOWNERS、Capability Ledger、official_domains.json、Catalog Release 和 artifact hash 必须通过串行集成队列提交。每个领域合入前从最新集成基线重新生成并校验冻结产物；后一个领域不得基于过期 central manifest 计算 hash。边界 baseline 先按新的表所有权和领域归属自动重算，再人工审查新增、消失或换主的差异；不能通过保留旧 Craft 归属掩盖 Factory 或 Integration 债务。
 
 回滚只回滚代码路由和未破坏兼容性的领域 Migration。已发布的不可变业务 Version、Release 和 Evidence 不删除。因为没有旧业务数据，首次切换失败时可以清空目标测试 Database 后重新 bootstrap，但不得在生产发布后用清库代替正式回滚。
 
