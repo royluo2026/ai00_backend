@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Capability Coverage Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "domain",
+    "reviewed_against",
+    "function_dispositions",
+    "capability_candidates",
+    "consumer_exposures",
+    "code_extractions",
+    "database_boundaries",
+    "debt_dispositions",
+    "review"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "domain": {"type": "string", "minLength": 1},
+    "reviewed_against": {"$ref": "#/$defs/ReviewedAgainst"},
+    "function_dispositions": {"$ref": "#/$defs/FunctionDispositions"},
+    "capability_candidates": {"$ref": "#/$defs/CapabilityCandidates"},
+    "consumer_exposures": {"$ref": "#/$defs/ConsumerExposures"},
+    "code_extractions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/CodeExtraction"}
+    },
+    "database_boundaries": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/DatabaseBoundary"}
+    },
+    "debt_dispositions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/DebtDisposition"}
+    },
+    "review": {"$ref": "#/$defs/Review"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "review": {
+            "properties": {"status": {"const": "approved"}},
+            "required": ["status"]
+          }
+        },
+        "required": ["review"]
+      },
+      "then": {
+        "properties": {
+          "function_dispositions": {"$ref": "#/$defs/ApprovedFunctionDispositions"}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "ReviewedAgainst": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_commit", "registry_sha256", "catalog_release", "catalog_sha256"],
+      "properties": {
+        "git_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "registry_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "catalog_release": {"type": "string", "minLength": 1},
+        "catalog_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "FunctionDispositions": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/FunctionDisposition"}}
+    },
+    "ApprovedFunctionDispositions": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/ApprovedFunctionDisposition"}}
+    },
+    "FunctionDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resolution",
+        "target_capability",
+        "candidate_id",
+        "source_paths",
+        "evidence",
+        "reason",
+        "classification"
+      ],
+      "properties": {
+        "resolution": {
+          "enum": ["unreviewed", "existing_capability", "new_capability", "excluded"]
+        },
+        "target_capability": {"type": ["string", "null"]},
+        "candidate_id": {"type": ["string", "null"]},
+        "source_paths": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "evidence": {"type": ["string", "null"]},
+        "reason": {"type": ["string", "null"]},
+        "classification": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"resolution": {"const": "unreviewed"}}},
+          "then": {
+            "properties": {
+              "target_capability": {"const": null},
+              "candidate_id": {"const": null}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"resolution": {"const": "existing_capability"}}},
+          "then": {
+            "properties": {
+              "target_capability": {"type": "string", "minLength": 1},
+              "candidate_id": {"const": null}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"resolution": {"const": "new_capability"}}},
+          "then": {
+            "properties": {
+              "target_capability": {"const": null},
+              "candidate_id": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"resolution": {"const": "excluded"}}},
+          "then": {
+            "properties": {
+              "target_capability": {"const": null},
+              "candidate_id": {"const": null},
+              "source_paths": {"minItems": 1},
+              "evidence": {"type": "string", "minLength": 20},
+              "reason": {"type": "string", "minLength": 20},
+              "classification": {
+                "enum": [
+                  "internal",
+                  "operations",
+                  "ui_transient",
+                  "transport_adapter",
+                  "unstable_product_surface"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ApprovedFunctionDisposition": {
+      "allOf": [
+        {"$ref": "#/$defs/FunctionDisposition"},
+        {
+          "properties": {
+            "resolution": {"enum": ["existing_capability", "new_capability", "excluded"]}
+          }
+        }
+      ]
+    },
+    "CapabilityCandidates": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/CapabilityCandidate"}}
+    },
+    "CapabilityCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "business_outcome",
+        "non_goals",
+        "source_function_ids",
+        "owner_domain",
+        "application_port",
+        "provider_artifact",
+        "owned_tables",
+        "migration_stream",
+        "consumer_exposure_ref",
+        "delivery_pipeline"
+      ],
+      "properties": {
+        "business_outcome": {"type": "string", "minLength": 1},
+        "non_goals": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "source_function_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "owner_domain": {"type": "string", "minLength": 1},
+        "application_port": {"type": "string", "minLength": 1},
+        "provider_artifact": {"type": "string", "minLength": 1},
+        "owned_tables": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "migration_stream": {"type": "string", "minLength": 1},
+        "consumer_exposure_ref": {"type": "string", "minLength": 1},
+        "delivery_pipeline": {"const": "capability_provider_gateway"}
+      }
+    },
+    "ConsumerExposures": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/ConsumerExposure"}}
+    },
+    "ConsumerExposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shared_pipeline", "web", "rest", "plugin", "agent", "mcp", "local_runtime"],
+      "properties": {
+        "shared_pipeline": {"const": "capability_provider_gateway"},
+        "web": {"$ref": "#/$defs/Exposure"},
+        "rest": {"$ref": "#/$defs/Exposure"},
+        "plugin": {"$ref": "#/$defs/Exposure"},
+        "agent": {"$ref": "#/$defs/Exposure"},
+        "mcp": {"$ref": "#/$defs/Exposure"},
+        "local_runtime": {"$ref": "#/$defs/Exposure"}
+      }
+    },
+    "Exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "reason", "policy_ref"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "reason": {"type": "string", "minLength": 1},
+        "policy_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "CodeExtraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source_paths", "owner_domain", "target_application_port", "shared_pipeline", "disposition"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "source_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "owner_domain": {"type": "string", "minLength": 1},
+        "target_application_port": {"type": "string", "minLength": 1},
+        "shared_pipeline": {"const": "capability_provider_gateway"},
+        "disposition": {"enum": ["planned", "completed", "not_required"]}
+      }
+    },
+    "DatabaseBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["table", "owner_domain", "access_mode", "migration_stream", "evidence"],
+      "properties": {
+        "table": {"type": "string", "minLength": 1},
+        "owner_domain": {"type": "string", "minLength": 1},
+        "access_mode": {"enum": ["read", "write", "read_write"]},
+        "migration_stream": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string", "minLength": 1}
+      }
+    },
+    "DebtDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "category", "source_paths", "owner_domain", "disposition", "reason"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "category": {"enum": ["consumer_adapter", "dependency", "database", "migration", "legacy_implementation"]},
+        "source_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "owner_domain": {"type": "string", "minLength": 1},
+        "disposition": {"enum": ["remove_after_extraction", "retain_with_boundary", "migrate", "accepted"]},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "Review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer", "reviewed_at", "status"],
+      "properties": {
+        "reviewer": {"type": "string", "minLength": 1},
+        "reviewed_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "status": {"enum": ["draft", "approved"]}
+      }
+    }
+  }
+}

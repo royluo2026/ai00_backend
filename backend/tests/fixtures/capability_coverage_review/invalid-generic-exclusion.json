@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "domain": "Project Management",
+  "reviewed_against": {
+    "git_commit": "0123456789abcdef0123456789abcdef01234567",
+    "registry_sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "catalog_release": "capability-v2-2026-08-11",
+    "catalog_sha256": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+  },
+  "function_dispositions": {
+    "rest:GET:/api/project-health": {
+      "resolution": "excluded",
+      "target_capability": null,
+      "candidate_id": null,
+      "source_paths": [],
+      "evidence": "Not a capability.",
+      "reason": "Exclude it.",
+      "classification": "operations"
+    }
+  },
+  "capability_candidates": {},
+  "consumer_exposures": {},
+  "code_extractions": [],
+  "database_boundaries": [],
+  "debt_dispositions": [],
+  "review": {
+    "reviewer": "project-management-owner",
+    "reviewed_at": "2026-08-11",
+    "status": "draft"
+  }
+}

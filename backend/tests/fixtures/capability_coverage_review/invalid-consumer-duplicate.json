@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "domain": "Project Management",
+  "reviewed_against": {
+    "git_commit": "0123456789abcdef0123456789abcdef01234567",
+    "registry_sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "catalog_release": "capability-v2-2026-08-11",
+    "catalog_sha256": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+  },
+  "function_dispositions": {},
+  "capability_candidates": {},
+  "consumer_exposures": {
+    "project.project.create": {
+      "shared_pipeline": "web_specific_implementation",
+      "web": {"enabled": true, "reason": "Project creation is available in the web workspace.", "policy_ref": "project.create"},
+      "rest": {"enabled": true, "reason": "The REST gateway exposes the shared capability.", "policy_ref": "project.create"},
+      "plugin": {"enabled": true, "reason": "Plugins invoke the same governed project operation.", "policy_ref": "project.create"},
+      "agent": {"enabled": true, "reason": "Agents invoke the same governed project operation.", "policy_ref": "project.create"},
+      "mcp": {"enabled": false, "reason": "MCP exposure awaits an approved tool policy decision.", "policy_ref": "project.create"},
+      "local_runtime": {"enabled": false, "reason": "This business operation has no local-runtime transport need.", "policy_ref": "project.create"}
+    }
+  },
+  "code_extractions": [],
+  "database_boundaries": [],
+  "debt_dispositions": [],
+  "review": {
+    "reviewer": "project-management-owner",
+    "reviewed_at": "2026-08-11",
+    "status": "draft"
+  }
+}
