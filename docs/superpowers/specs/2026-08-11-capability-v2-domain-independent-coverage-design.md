@@ -24,7 +24,7 @@ Completion means all stable records have a reviewed disposition, every mapped Ca
 
 1. A route, screen helper, Agent tool, or runtime endpoint is evidence of a function, not automatically a Capability.
 2. Capabilities model stable business outcomes. Multiple transports and consumers may map to one Capability.
-3. Registry resolution does not imply Plugin or Agent exposure. Exposure is an explicit per-consumer policy.
+3. Web, REST compatibility, Plugin, Agent, MCP, and Local Runtime share one Capability ID, Descriptor, Provider, Gateway pipeline, and version history for the same business outcome. No consumer-specific business implementation is allowed.
 4. Existing Capabilities are reused before proposing new ones.
 5. A new Capability is permitted only when no existing business outcome covers the function without weakening schemas, authorization, resource selection, or audit meaning.
 6. Broad catch-all Capabilities and union-schema command buses are prohibited.
@@ -90,12 +90,13 @@ The inventory must show why each candidate cannot map to an existing Capability.
 
 ### 5.3 Consumer Exposure Inventory
 
-For every mapped Capability, record independent decisions for Web, REST compatibility, Plugin, Agent, MCP, and Local Runtime.
+For every mapped Capability, record independent access decisions for Web, REST compatibility, Plugin, Agent, MCP, and Local Runtime. These decisions select consumers of one shared Capability; they never create parallel Web, Plugin, or Agent implementations.
 
-- Web and REST compatibility may be broader than extension exposure.
+- Web and REST compatibility may be broader than extension exposure, but their adapters contain no business logic and invoke the same Gateway and Provider as every other consumer.
 - Plugin exposure requires a stable extension use case and mount-scoped permissions.
 - Agent and MCP exposure require bounded semantics, safe automation level, deterministic schemas, resource scoping, and data projection.
 - Internal, operational, webhook, transport, and UI-transient functions are not made Agent tools merely to resolve Registry rows.
+- A stable user-visible business outcome used only by Web still belongs to the shared Catalog. A transient UI composition or transport helper is excluded instead of becoming a Web-only Capability.
 
 ### 5.4 Code Ownership and Extraction Inventory
 
@@ -172,6 +173,7 @@ Release requires all of the following:
 - every target owner matches the reviewed function domain;
 - every stable Capability has a loadable Provider and complete mandatory acceptance cases;
 - every consumer uses `CapabilityGatewayService.invoke()` or a compatibility adapter that invokes it;
+- the same business outcome has one Capability and one Provider implementation across Web, REST, Plugin, Agent, MCP, and Local Runtime; consumer-specific duplicate business services are zero;
 - consumer exposure matches the reviewed matrix;
 - every owned table and migration has exactly one domain owner;
 - cross-domain table writes are zero;
@@ -198,4 +200,3 @@ Release requires all of the following:
 3. Exact per-domain implementation plans generated only after candidate review.
 4. Independently owned code, Provider, database migration stream, tests, docs, artifact, and rollback boundary for each domain.
 5. A final acceptance report proving both Capability quality coverage and product-function governance coverage.
-
