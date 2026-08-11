@@ -77,6 +77,7 @@
 **Interfaces:**
 - Produces: Draft 2020-12 schema with `additionalProperties: false` at every object boundary.
 - Produces: resolution enum `unreviewed | existing_capability | new_capability | excluded`; approved documents and audit strict mode forbid `unreviewed`.
+- Produces: one normalized `capabilities` map keyed by the sole Capability ID. Each entry owns its function dispositions and consumer exposure; candidate entries additionally own their candidate definition. The source document never stores sibling maps that repeat Capability IDs.
 - Produces: exposure keys `web`, `rest`, `plugin`, `agent`, `mcp`, and `local_runtime`, each with `enabled`, `reason`, and `policy_ref`.
 - Produces: candidate, code-extraction, database-boundary, and debt-disposition records used by all later tasks.
 
@@ -121,9 +122,9 @@ Every domain document must require these top-level keys:
     "catalog_release": "non-empty release ID",
     "catalog_sha256": "sha256:<64 lowercase hexadecimal characters>"
   },
-  "function_dispositions": {},
-  "capability_candidates": {},
-  "consumer_exposures": {},
+  "unreviewed_functions": {},
+  "excluded_functions": {},
+  "capabilities": {},
   "code_extractions": [],
   "database_boundaries": [],
   "debt_dispositions": [],
@@ -137,9 +138,11 @@ Every domain document must require these top-level keys:
 
 `excluded` records require at least one source path, an evidence string of at least 20 characters, a reason of at least 20 characters, and classification `internal | operations | ui_transient | transport_adapter | unstable_product_surface`. They must have `target_capability: null`.
 
-`existing_capability` records require a non-null Catalog ID and may not define a candidate. `new_capability` records require a matching key in `capability_candidates`.
+`unreviewed_functions` is keyed by `function_id` and each value has `resolution: unreviewed`. `excluded_functions` is keyed by `function_id` and each value has `resolution: excluded` plus the complete exclusion evidence.
 
-Every candidate requires `business_outcome`, `non_goals`, `source_function_ids`, `owner_domain`, `application_port`, `provider_artifact`, `owned_tables`, `migration_stream`, and `consumer_exposure_ref`.
+`capabilities` is keyed by the unique Capability ID. Every value requires `kind: existing | candidate`, a non-empty `function_dispositions` map keyed by `function_id`, and one inline six-consumer exposure object. Existing entries require every nested disposition to have `resolution: existing_capability` and forbid a candidate definition. Candidate entries require every nested disposition to have `resolution: new_capability` and require exactly one inline candidate definition. This normalized shape makes a dangling or divergent candidate/exposure ID structurally unrepresentable.
+
+Every inline candidate definition requires `business_outcome`, `non_goals`, `owner_domain`, `application_port`, `provider_artifact`, `owned_tables`, and `migration_stream`. Source functions and consumer exposure are owned by the enclosing Capability group and are not repeated in the candidate definition.
 
 - [ ] **Step 4: Run schema tests and verify GREEN**
 
@@ -174,8 +177,8 @@ git commit -m "test: define capability coverage review contract"
 ```python
 def test_merge_preserves_reviewed_dispositions_and_adds_new_candidates(builder):
     merged = builder.merge_domain_review(REVIEWED_DOMAIN, DISCOVERED_FUNCTIONS)
-    assert merged["function_dispositions"]["rest:GET:/api/projects"]["resolution"] == "existing_capability"
-    assert merged["function_dispositions"]["rest:GET:/api/new-route"]["resolution"] == "unreviewed"
+    assert merged["capabilities"]["project.project.search"]["function_dispositions"]["rest:GET:/api/projects"]["resolution"] == "existing_capability"
+    assert merged["unreviewed_functions"]["rest:GET:/api/new-route"]["resolution"] == "unreviewed"
 
 
 def test_generated_views_are_order_independent(builder):
