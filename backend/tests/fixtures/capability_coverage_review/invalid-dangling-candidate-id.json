@@ -8,13 +8,14 @@
     "catalog_sha256": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
   },
   "function_dispositions": {
-    "rest:GET:/api/project-health": {
-      "resolution": "excluded",
+    "rest:POST:/api/projects": {
+      "resolution": "new_capability",
       "target_capability": null,
-      "source_paths": [],
-      "evidence": "Not a capability.",
-      "reason": "Exclude it.",
-      "classification": "operations"
+      "candidate_id": "project.project.missing",
+      "source_paths": ["backend/routers/projects.py"],
+      "evidence": null,
+      "reason": null,
+      "classification": null
     }
   },
   "capability_candidates": {},

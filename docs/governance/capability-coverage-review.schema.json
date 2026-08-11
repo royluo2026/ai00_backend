@@ -84,7 +84,6 @@
       "required": [
         "resolution",
         "target_capability",
-        "candidate_id",
         "source_paths",
         "evidence",
         "reason",
@@ -92,10 +91,9 @@
       ],
       "properties": {
         "resolution": {
-          "enum": ["unreviewed", "existing_capability", "new_capability", "excluded"]
+          "enum": ["unreviewed", "existing_capability", "excluded"]
         },
         "target_capability": {"type": ["string", "null"]},
-        "candidate_id": {"type": ["string", "null"]},
         "source_paths": {
           "type": "array",
           "items": {"type": "string", "minLength": 1},
@@ -103,15 +101,15 @@
         },
         "evidence": {"type": ["string", "null"]},
         "reason": {"type": ["string", "null"]},
-        "classification": {"type": ["string", "null"]}
+        "classification": {"type": ["string", "null"]},
+        "owner": {"type": ["string", "null"]}
       },
       "allOf": [
         {
           "if": {"properties": {"resolution": {"const": "unreviewed"}}},
           "then": {
             "properties": {
-              "target_capability": {"const": null},
-              "candidate_id": {"const": null}
+              "target_capability": {"const": null}
             }
           }
         },
@@ -119,17 +117,7 @@
           "if": {"properties": {"resolution": {"const": "existing_capability"}}},
           "then": {
             "properties": {
-              "target_capability": {"type": "string", "minLength": 1},
-              "candidate_id": {"const": null}
-            }
-          }
-        },
-        {
-          "if": {"properties": {"resolution": {"const": "new_capability"}}},
-          "then": {
-            "properties": {
-              "target_capability": {"const": null},
-              "candidate_id": {"type": "string", "minLength": 1}
+              "target_capability": {"type": "string", "minLength": 1}
             }
           }
         },
@@ -138,10 +126,13 @@
           "then": {
             "properties": {
               "target_capability": {"const": null},
-              "candidate_id": {"const": null},
               "source_paths": {"minItems": 1},
               "evidence": {"type": "string", "minLength": 20},
-              "reason": {"type": "string", "minLength": 20},
+              "reason": {
+                "type": "string",
+                "minLength": 20,
+                "not": {"const": "This is not a capability and needs no review."}
+              },
               "classification": {
                 "enum": [
                   "internal",
@@ -150,8 +141,10 @@
                   "transport_adapter",
                   "unstable_product_surface"
                 ]
-              }
-            }
+              },
+              "owner": {"type": "string", "minLength": 1}
+            },
+            "required": ["owner"]
           }
         }
       ]
@@ -161,7 +154,7 @@
         {"$ref": "#/$defs/FunctionDisposition"},
         {
           "properties": {
-            "resolution": {"enum": ["existing_capability", "new_capability", "excluded"]}
+            "resolution": {"enum": ["existing_capability", "excluded"]}
           }
         }
       ]
@@ -177,6 +170,7 @@
       "additionalProperties": false,
       "required": [
         "business_outcome",
+        "resolution",
         "non_goals",
         "source_function_ids",
         "owner_domain",
@@ -189,6 +183,7 @@
       ],
       "properties": {
         "business_outcome": {"type": "string", "minLength": 1},
+        "resolution": {"const": "new_capability"},
         "non_goals": {
           "type": "array",
           "minItems": 1,
@@ -209,7 +204,7 @@
           "items": {"type": "string", "minLength": 1}
         },
         "migration_stream": {"type": "string", "minLength": 1},
-        "consumer_exposure_ref": {"type": "string", "minLength": 1},
+        "consumer_exposure_ref": {"$ref": "#/$defs/ConsumerExposure"},
         "delivery_pipeline": {"const": "capability_provider_gateway"}
       }
     },

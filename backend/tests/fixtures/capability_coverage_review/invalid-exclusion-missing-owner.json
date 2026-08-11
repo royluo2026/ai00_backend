@@ -11,9 +11,9 @@
     "rest:GET:/api/project-health": {
       "resolution": "excluded",
       "target_capability": null,
-      "source_paths": [],
-      "evidence": "Not a capability.",
-      "reason": "Exclude it.",
+      "source_paths": ["backend/routers/project_health.py"],
+      "evidence": "The health route reports deployment liveness only.",
+      "reason": "The operations route reports status without a business outcome.",
       "classification": "operations"
     }
   },

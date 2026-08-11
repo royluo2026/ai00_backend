@@ -11,16 +11,6 @@
     "rest:GET:/api/projects": {
       "resolution": "existing_capability",
       "target_capability": "project.project.list",
-      "candidate_id": null,
-      "source_paths": ["backend/routers/projects.py"],
-      "evidence": null,
-      "reason": null,
-      "classification": null
-    },
-    "rest:POST:/api/projects": {
-      "resolution": "new_capability",
-      "target_capability": null,
-      "candidate_id": "project.project.create",
       "source_paths": ["backend/routers/projects.py"],
       "evidence": null,
       "reason": null,
@@ -30,6 +20,7 @@
   "capability_candidates": {
     "project.project.create": {
       "business_outcome": "Create a project with the caller's supplied planning metadata.",
+      "resolution": "new_capability",
       "non_goals": ["Do not expose consumer-specific project creation code."],
       "source_function_ids": ["rest:POST:/api/projects"],
       "owner_domain": "project_management",
@@ -37,7 +28,15 @@
       "provider_artifact": "official.project-management",
       "owned_tables": ["projects"],
       "migration_stream": "project_management",
-      "consumer_exposure_ref": "project.project.create",
+      "consumer_exposure_ref": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {"enabled": true, "reason": "Project creation is available in the web workspace.", "policy_ref": "project.create"},
+        "rest": {"enabled": true, "reason": "The REST gateway exposes the shared capability.", "policy_ref": "project.create"},
+        "plugin": {"enabled": true, "reason": "Plugins invoke the same governed project operation.", "policy_ref": "project.create"},
+        "agent": {"enabled": true, "reason": "Agents invoke the same governed project operation.", "policy_ref": "project.create"},
+        "mcp": {"enabled": false, "reason": "MCP exposure awaits an approved tool policy decision.", "policy_ref": "project.create"},
+        "local_runtime": {"enabled": false, "reason": "This business operation has no local-runtime transport need.", "policy_ref": "project.create"}
+      },
       "delivery_pipeline": "capability_provider_gateway"
     }
   },

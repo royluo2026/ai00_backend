@@ -50,3 +50,35 @@ def test_consumer_specific_duplicate_implementation_is_rejected(review_schema, f
         jsonschema.Draft202012Validator(review_schema).validate(
             fixture("invalid-consumer-duplicate.json")
         )
+
+
+def test_exclusion_without_a_domain_owner_is_rejected(review_schema, fixture):
+    """Catches an otherwise evidenced exclusion that omits its accountable owner."""
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.Draft202012Validator(review_schema).validate(
+            fixture("invalid-exclusion-missing-owner.json")
+        )
+
+
+def test_new_capability_cannot_reference_a_dangling_candidate_id(review_schema, fixture):
+    """Catches a new-capability disposition detached from its candidate record."""
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.Draft202012Validator(review_schema).validate(
+            fixture("invalid-dangling-candidate-id.json")
+        )
+
+
+def test_candidate_cannot_reference_a_mismatched_exposure_id(review_schema, fixture):
+    """Catches candidate delivery evidence detached from its shared exposure record."""
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.Draft202012Validator(review_schema).validate(
+            fixture("invalid-mismatched-exposure-id.json")
+        )
+
+
+def test_generic_exclusion_reason_is_rejected_independently(review_schema, fixture):
+    """Catches a generic exclusion reason even when all other exclusion evidence is valid."""
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.Draft202012Validator(review_schema).validate(
+            fixture("invalid-generic-exclusion-reason.json")
+        )
