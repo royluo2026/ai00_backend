@@ -79,8 +79,9 @@ def load_sources(root: Path = REPOSITORY_ROOT) -> AuditSources:
     registry = _json(registry_path)
     catalog = _json(catalog_path)
     manifest = _json(manifest_path) if manifest_path.exists() else {}
-    reviewed_against = manifest.get("reviewed_against") or {
-        "git_commit": _head(root),
+    previous_binding = manifest.get("reviewed_against", {})
+    reviewed_against = {
+        "git_commit": previous_binding.get("git_commit", _head(root)),
         "registry_sha256": _sha256(registry_path),
         "catalog_release": catalog["release_id"],
         "catalog_sha256": _sha256(catalog_path),
@@ -143,6 +144,11 @@ def _reviewed_function_ids(document: dict) -> set[str]:
 def merge_domain_review(existing: dict, discovered: list[dict]) -> dict:
     """Preserve authored decisions and append newly discovered functions as unreviewed."""
     merged = copy.deepcopy(existing)
+    discovered_ids = {row["function_id"] for row in discovered}
+    merged["unreviewed_functions"] = {
+        function_id: row for function_id, row in merged["unreviewed_functions"].items()
+        if function_id in discovered_ids
+    }
     known = _reviewed_function_ids(merged)
     for row in sorted(discovered, key=lambda item: item["function_id"]):
         function_id = row["function_id"]
@@ -314,10 +320,13 @@ def _merge_evidence(document: dict, sources: AuditSources) -> dict:
         ) if debt["owner_domain"] == domain
     )
     existing_debts = {row["id"]: row for row in document.get("debt_dispositions", [])}
-    document["debt_dispositions"] = [
+    merged_debts = [
         {**row, **existing_debts.get(row["id"], {})}
         for row in sorted(generated_debts, key=lambda item: item["id"])
     ]
+    generated_ids = {row["id"] for row in generated_debts}
+    merged_debts.extend(row for debt_id, row in sorted(existing_debts.items()) if debt_id not in generated_ids)
+    document["debt_dispositions"] = sorted(merged_debts, key=lambda item: item["id"])
     return document
 
 

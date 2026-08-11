@@ -176,9 +176,11 @@ def test_every_baseline_violation_and_table_has_one_generated_review_row(builder
     sources = builder.load_sources(ROOT)
     documents = builder.initialize_documents(sources)
     debt_ids = [row["id"] for document in documents for row in document["debt_dispositions"]]
+    baseline_debt_ids = [debt_id for debt_id in debt_ids if debt_id.startswith(("module:", "boundary:"))]
     tables = [row["table"] for document in documents for row in document["database_boundaries"]]
 
-    assert len(debt_ids) == len(set(debt_ids)) == 299
+    assert len(debt_ids) == len(set(debt_ids))
+    assert len(baseline_debt_ids) == len(set(baseline_debt_ids)) == 299
     assert len(tables) == len(set(tables)) == 162
     assert {row["category"] for document in documents for row in document["debt_dispositions"]} == {
         "dependency", "database"

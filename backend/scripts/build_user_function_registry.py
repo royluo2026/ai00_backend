@@ -97,10 +97,26 @@ def _domain(value: str, path: str = "") -> str:
         return "Ontology"
     if "knowledge" in subject:
         return "Knowledge"
-    if "craft" in subject or "bop" in subject or "pbom" in subject or "gbop" in subject:
-        return "Craft"
     if value.lower() in {
-        "agent_tool:search", "agent_tool:list_tasks", "agent_tool:get_task",
+        "agent_tool:find_similar_cases", "agent_tool:recommend_practice",
+    }:
+        return "Knowledge"
+    if value.lower() in {
+        "agent_tool:audit_entry_rules", "agent_tool:check_rules", "agent_tool:generate_canvas",
+        "agent_tool:get_canvas_state", "agent_tool:get_entry_relations",
+        "agent_tool:get_selected_elements", "agent_tool:list_rules", "agent_tool:run_skill_canvas",
+    }:
+        return "Craft"
+    if value.lower().startswith("agent_tool:") and any(
+        marker in value.lower() for marker in ("bop", "pbom", "gbop", "craft")
+    ):
+        return "Craft"
+    if value.lower() == "agent_tool:open_in_container":
+        return "Local Integration"
+    if value.lower() in {"agent_tool:global_search", "agent_tool:search"}:
+        return "Base Platform"
+    if value.lower() in {
+        "agent_tool:list_tasks", "agent_tool:get_task",
         "agent_tool:list_task_lists", "agent_tool:list_issues", "agent_tool:get_issue",
         "agent_tool:list_issue_lists", "agent_tool:list_projects",
         "agent_tool:list_approval_orders", "agent_tool:create_task",
@@ -111,7 +127,12 @@ def _domain(value: str, path: str = "") -> str:
     if any(marker in subject for marker in (
         "/api/projects", "/api/project/", "base.project.",
         "/api/tasks", "/api/issues", "/api/milestones", "/api/workbenches",
-        "/api/workspaces", "project_management", "project-management",
+        "/api/workbench/", "/api/workspaces", "/api/task-dependencies",
+        "/api/approval/", "/api/lists", "/api/task-templates", "/api/collab/",
+        "/api/shares", "/api/share-links", "/api/bitable-sync", "/api/item-entries",
+        "/api/change-logs", "/api/follows", "/api/notifications",
+        "/api/permission-requests", "/api/mentions", "/share/issues",
+        "project_management", "project-management",
         "routers/projects.py", "routers/tasks.py", "routers/issues.py",
     )):
         return "Project Management"
@@ -120,6 +141,8 @@ def _domain(value: str, path: str = "") -> str:
         "plugins/agent", "routers/agents.py", "capabilities/agent_",
     )):
         return "Agent"
+    if "craft" in subject or "bop" in subject or "pbom" in subject or "gbop" in subject:
+        return "Craft"
     return "Base Platform"
 
 

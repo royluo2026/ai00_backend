@@ -3,7 +3,28 @@
 | Domain | Capability | Enabled consumers |
 |---|---|---|
 
-| Base Platform | `identity.principal.search` | none |
+| Base Platform | `base.annotation.change.apply` | rest |
+| Base Platform | `base.annotation.read` | rest |
+| Base Platform | `base.authorization.grant.change.apply` | rest |
+| Base Platform | `base.authorization.grant.read` | rest |
+| Base Platform | `base.external_datasource.change.apply` | rest |
+| Base Platform | `base.external_datasource.connection.test` | rest |
+| Base Platform | `base.external_datasource.search` | rest |
+| Base Platform | `base.external_mapping.change.apply` | rest |
+| Base Platform | `base.external_mapping.read` | rest |
+| Base Platform | `base.identity.directory.sync` | rest |
+| Base Platform | `base.identity.role.assign` | rest |
+| Base Platform | `base.identity.session.get` | rest |
+| Base Platform | `base.plugin.marketplace.publisher.register` | rest |
+| Base Platform | `base.plugin.marketplace.release.change.apply` | rest |
+| Base Platform | `base.plugin.marketplace.search` | rest |
+| Base Platform | `base.plugin.marketplace.usage.close` | rest |
+| Base Platform | `base.saved_view.change.apply` | rest |
+| Base Platform | `base.saved_view.read` | rest |
+| Base Platform | `base.team.change.apply` | rest |
+| Base Platform | `base.team.membership.change.apply` | rest |
+| Base Platform | `base.team.read` | rest |
+| Base Platform | `identity.principal.search` | rest |
 | Base Platform | `plugin.disable` | none |
 | Base Platform | `plugin.enable` | none |
 | Base Platform | `plugin.install` | none |
@@ -23,7 +44,7 @@
 | Base Platform | `system.job.cancel` | none |
 | Base Platform | `system.job.get` | none |
 | Base Platform | `system.lineage.get` | none |
-| Base Platform | `system.search` | none |
+| Base Platform | `system.search` | agent |
 | Base Platform | `system.worker.outbox.health` | none |
 | Craft | `craft.bop.draft.change.apply` | none |
 | Craft | `craft.bop.draft.change.preview` | none |
@@ -95,7 +116,37 @@
 | Ontology | `ontology.release.get` | none |
 | Ontology | `ontology.release.publish` | none |
 | Ontology | `ontology.release.search` | none |
-| Project Management | `base.project.search` | none |
+| Project Management | `base.project.search` | rest, agent |
+| Project Management | `project.approval.change.apply` | rest, agent |
+| Project Management | `project.approval.read` | rest, agent |
+| Project Management | `project.bitable_binding.change.apply` | rest |
+| Project Management | `project.bitable_binding.read` | rest |
+| Project Management | `project.change_log.read` | rest |
+| Project Management | `project.collaboration.change.apply` | rest |
+| Project Management | `project.collaboration.read` | rest |
+| Project Management | `project.craft_scope.read` | rest |
+| Project Management | `project.follow.change.apply` | rest |
+| Project Management | `project.follow.read` | rest |
+| Project Management | `project.issue.change.apply` | rest, agent |
+| Project Management | `project.issue.read` | rest, agent |
+| Project Management | `project.list.change.apply` | rest |
+| Project Management | `project.list.read` | rest |
+| Project Management | `project.member.change.apply` | rest |
+| Project Management | `project.member.read` | rest |
+| Project Management | `project.notification.change.apply` | web, rest |
+| Project Management | `project.notification.read` | web, rest |
+| Project Management | `project.permission_request.change.apply` | rest |
+| Project Management | `project.permission_request.read` | rest |
+| Project Management | `project.project.change.apply` | rest |
+| Project Management | `project.project.read` | rest |
+| Project Management | `project.sharing.change.apply` | rest |
+| Project Management | `project.sharing.read` | rest |
+| Project Management | `project.task.change.apply` | rest, agent |
+| Project Management | `project.task.read` | rest, agent |
+| Project Management | `project.task_template.change.apply` | rest |
+| Project Management | `project.task_template.read` | rest |
+| Project Management | `project.workbench.change.apply` | rest |
+| Project Management | `project.workbench.read` | rest |
 | Simulation | `simulation.environment.create` | none |
 | Simulation | `simulation.environment.get` | none |
 | Simulation | `simulation.environment.list` | none |

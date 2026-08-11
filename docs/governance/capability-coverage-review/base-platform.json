@@ -3,1186 +3,2648 @@
   "domain": "Base Platform",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:d20e0541378b3f1a8b6fedc39cf95771bc8140a65672f3335aee5bde26038723",
+    "registry_sha256": "sha256:593205f17618ee8c5c85e5d53fcdc505589577af998e8dbe0bbdf3dee64a4bc6",
     "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
     "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
   },
-  "unreviewed_functions": {
+  "unreviewed_functions": {},
+  "excluded_functions": {
     "rest:DELETE:/admin/config/{key}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:DELETE:/admin/config/{key} is implemented at backend/routers/admin.py.",
+      "reason": "rest:DELETE:/admin/config/{key} is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/ext-datasources/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/ext-mappings/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/follows/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/follows.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/grants/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/grants.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/self_ann/{item_gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/self_annotations.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/views/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/views.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/teams/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/teams.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/teams/{gid}/members/{user_gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/teams.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capabilities.py"
       ],
+      "evidence": "The stable surface rest:GET:/ is implemented at backend/routers/capabilities.py.",
+      "reason": "rest:GET:/ is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/admin/cloud-db-config": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:GET:/admin/cloud-db-config is implemented at backend/routers/admin.py.",
+      "reason": "rest:GET:/admin/cloud-db-config is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/admin/config": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:GET:/admin/config is implemented at backend/routers/admin.py.",
+      "reason": "rest:GET:/admin/config is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/admin/config/{key}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:GET:/admin/config/{key} is implemented at backend/routers/admin.py.",
+      "reason": "rest:GET:/admin/config/{key} is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/admin/debug-logs": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:GET:/admin/debug-logs is implemented at backend/routers/admin.py.",
+      "reason": "rest:GET:/admin/debug-logs is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/admin/plugin-registry": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:GET:/admin/plugin-registry is implemented at backend/routers/admin.py.",
+      "reason": "rest:GET:/admin/plugin-registry is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/annotations/{key}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/annotations.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/deploy": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/deploy.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/deploy is implemented at backend/routers/deploy.py.",
+      "reason": "rest:GET:/api/deploy is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/deploy/current": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/deploy.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/deploy/current is implemented at backend/routers/deploy.py.",
+      "reason": "rest:GET:/api/deploy/current is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/deploy/history": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/deploy.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/deploy/history is implemented at backend/routers/deploy.py.",
+      "reason": "rest:GET:/api/deploy/history is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/deploy/pipeline": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/deploy.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/deploy/pipeline is implemented at backend/routers/deploy.py.",
+      "reason": "rest:GET:/api/deploy/pipeline is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ext-datasources": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ext-datasources/{gid}/tables": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ext-field-mappings": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ext-mappings": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ext-mappings/{gid}/columns": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/ext-mappings/{gid}/preview": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/feishu/im/contact-messages": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_im.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/feishu/im/contact-messages is implemented at backend/routers/feishu_im.py.",
+      "reason": "rest:GET:/api/feishu/im/contact-messages is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/feishu/im/mentions": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_im.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/feishu/im/mentions is implemented at backend/routers/feishu_im.py.",
+      "reason": "rest:GET:/api/feishu/im/mentions is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/file-store/config": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/file_store.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/file-store/config is implemented at backend/routers/file_store.py.",
+      "reason": "rest:GET:/api/file-store/config is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/follows": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/follows.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/follows/check": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/follows.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/grants": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/grants.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/grants/me": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/grants.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/notifications": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/notifications.py",
-        "dist/web/core/notification_manager.js"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/notifications/prefs": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/notifications.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/notifications/unread_count": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/notifications.py",
-        "dist/web/core/notification_manager.js"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/plugin/list": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugins.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/self_ann/batch": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/self_annotations.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/self_ann/list": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/self_annotations.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/self_ann/{item_gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/self_annotations.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/users/": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/users.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/users/me": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/users.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/users/search": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/users.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path} is implemented at backend/routers/plugin_marketplace.py.",
+      "reason": "rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path} is a signed marketplace asset or mounted Capability transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/v1/plugin-marketplace/catalog": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/v1/plugin-marketplace/installations": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/v1/plugin-marketplace/installations/{plugin_id}/events": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/v1/plugin-marketplace/registry": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/v1/plugin-marketplace/releases": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/v1/plugin-marketplace/usage/months/{month}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/v2/agent-capabilities/catalog": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/v2/agent-capabilities/catalog is implemented at backend/routers/agent_capabilities.py.",
+      "reason": "rest:GET:/api/v2/agent-capabilities/catalog is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/v2/agent-capabilities/catalog-preview": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/v2/agent-capabilities/catalog-preview is implemented at backend/routers/agent_capabilities.py.",
+      "reason": "rest:GET:/api/v2/agent-capabilities/catalog-preview is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/v2/capability-artifacts/{artifact_id}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capability_artifacts.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/v2/capability-artifacts/{artifact_id} is implemented at backend/routers/capability_artifacts.py.",
+      "reason": "rest:GET:/api/v2/capability-artifacts/{artifact_id} is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/api/v2/capability-operations/{operation_id}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capability_operations.py"
       ],
+      "evidence": "The stable surface rest:GET:/api/v2/capability-operations/{operation_id} is implemented at backend/routers/capability_operations.py.",
+      "reason": "rest:GET:/api/v2/capability-operations/{operation_id} is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/views": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/views.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/auth/feishu/callback": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/auth.py"
       ],
+      "evidence": "The stable surface rest:GET:/auth/feishu/callback is implemented at backend/routers/auth.py.",
+      "reason": "rest:GET:/auth/feishu/callback is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/auth/feishu/login-url": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/auth.py"
       ],
+      "evidence": "The stable surface rest:GET:/auth/feishu/login-url is implemented at backend/routers/auth.py.",
+      "reason": "rest:GET:/auth/feishu/login-url is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/auth/feishu/poll/{state}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/auth.py"
       ],
+      "evidence": "The stable surface rest:GET:/auth/feishu/poll/{state} is implemented at backend/routers/auth.py.",
+      "reason": "rest:GET:/auth/feishu/poll/{state} is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/auth/me": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/auth.py"
       ],
+      "evidence": "The stable surface rest:GET:/auth/me is implemented at backend/routers/auth.py.",
+      "reason": "rest:GET:/auth/me is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/cache/debug": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/cache/debug is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/cache/debug is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/calendar/events/{event_id}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/calendar/events/{event_id} is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/calendar/events/{event_id} is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/calendar/today": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/calendar/today is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/calendar/today is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/org/dept-search": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/org/dept-search is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/org/dept-search is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/org/users": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/org/users is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/org/users is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/org/users/search": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/org/users/search is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/org/users/search is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/search/chats": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/search/chats is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/search/chats is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/search/docs": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/search/docs is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/search/docs is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/search/events": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/search/events is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/search/events is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/search/meetings": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/search/meetings is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/search/meetings is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/search/users": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/search/users is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/search/users is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/feishu/sync/org/status": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:GET:/feishu/sync/org/status is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:GET:/feishu/sync/org/status is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/health": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/health.py"
       ],
+      "evidence": "The stable surface rest:GET:/health is implemented at backend/routers/health.py.",
+      "reason": "rest:GET:/health is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/ready": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/health.py"
       ],
+      "evidence": "The stable surface rest:GET:/ready is implemented at backend/routers/health.py.",
+      "reason": "rest:GET:/ready is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/share/issues": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/share_page.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/teams": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/org.py",
-        "backend/routers/teams.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/teams/{gid}/members": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/teams.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/users/": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/users_compat.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/users/me": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/users_compat.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:GET:/{capability_id}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capabilities.py"
       ],
+      "evidence": "The stable surface rest:GET:/{capability_id} is implemented at backend/routers/capabilities.py.",
+      "reason": "rest:GET:/{capability_id} is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/ext-datasources/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/ext-mappings/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/follows/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/follows.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/notifications/prefs": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/notifications.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/notifications/read_all": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/notifications.py",
-        "dist/web/core/notification_manager.js"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/notifications/{gid}/read": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/notifications.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/users/{user_gid}/role": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/users.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/views/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/views.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:PATCH:/feishu/calendar/events/{event_id}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:PATCH:/feishu/calendar/events/{event_id} is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:PATCH:/feishu/calendar/events/{event_id} is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:PATCH:/feishu/calendar/events/{event_id}/rsvp": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:PATCH:/feishu/calendar/events/{event_id}/rsvp is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:PATCH:/feishu/calendar/events/{event_id}/rsvp is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/teams/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/teams.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/teams/{gid}/config": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/teams.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/admin/cloud-db-config": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:POST:/admin/cloud-db-config is implemented at backend/routers/admin.py.",
+      "reason": "rest:POST:/admin/cloud-db-config is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/admin/cloud-db-config/test": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:POST:/admin/cloud-db-config/test is implemented at backend/routers/admin.py.",
+      "reason": "rest:POST:/admin/cloud-db-config/test is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/admin/config/reload": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:POST:/admin/config/reload is implemented at backend/routers/admin.py.",
+      "reason": "rest:POST:/admin/config/reload is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/admin/server-restart": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:POST:/admin/server-restart is implemented at backend/routers/admin.py.",
+      "reason": "rest:POST:/admin/server-restart is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/deploy/rollback": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/deploy.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/deploy/rollback is implemented at backend/routers/deploy.py.",
+      "reason": "rest:POST:/api/deploy/rollback is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ext-datasources": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ext-datasources/{gid}/test": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ext-mappings": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/ext-mappings/{gid}/import": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/feishu/doc/read": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_doc.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/feishu/doc/read is implemented at backend/routers/feishu_doc.py.",
+      "reason": "rest:POST:/api/feishu/doc/read is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/feishu/doc/write-cells": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_doc.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/feishu/doc/write-cells is implemented at backend/routers/feishu_doc.py.",
+      "reason": "rest:POST:/api/feishu/doc/write-cells is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/file-store/config": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/file_store.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/file-store/config is implemented at backend/routers/file_store.py.",
+      "reason": "rest:POST:/api/file-store/config is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/file-store/ois-config": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/file_store.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/file-store/ois-config is implemented at backend/routers/file_store.py.",
+      "reason": "rest:POST:/api/file-store/ois-config is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/file-store/ois-test": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/file_store.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/file-store/ois-test is implemented at backend/routers/file_store.py.",
+      "reason": "rest:POST:/api/file-store/ois-test is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/file-store/test": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/file_store.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/file-store/test is implemented at backend/routers/file_store.py.",
+      "reason": "rest:POST:/api/file-store/test is a storage configuration and connectivity diagnostic endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/follows": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/follows.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/grants": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/grants.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/mentions/notify": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/mentions.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/org/sync-from-feishu": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/org.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/uploads": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/uploads.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/uploads is implemented at backend/routers/uploads.py.",
+      "reason": "rest:POST:/api/uploads is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/uploads/ois/resolve": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/uploads.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/uploads/ois/resolve is implemented at backend/routers/uploads.py.",
+      "reason": "rest:POST:/api/uploads/ois/resolve is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:confirm": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:confirm is implemented at backend/routers/plugin_marketplace.py.",
+      "reason": "rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:confirm is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:invoke": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:invoke is implemented at backend/routers/plugin_marketplace.py.",
+      "reason": "rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:invoke is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/v1/plugin-marketplace/publishers": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/v1/plugin-marketplace/releases": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/review": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/revoke": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/plugin_marketplace.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v2/agent-capabilities/delegations": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v2/agent-capabilities/delegations is implemented at backend/routers/agent_capabilities.py.",
+      "reason": "rest:POST:/api/v2/agent-capabilities/delegations is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm is implemented at backend/routers/agent_capabilities.py.",
+      "reason": "rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/agent_capabilities.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke is implemented at backend/routers/agent_capabilities.py.",
+      "reason": "rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v2/capability-artifacts/uploads": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capability_artifacts.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v2/capability-artifacts/uploads is implemented at backend/routers/capability_artifacts.py.",
+      "reason": "rest:POST:/api/v2/capability-artifacts/uploads is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v2/capability-artifacts/uploads/{upload_id}:finalize": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capability_artifacts.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v2/capability-artifacts/uploads/{upload_id}:finalize is implemented at backend/routers/capability_artifacts.py.",
+      "reason": "rest:POST:/api/v2/capability-artifacts/uploads/{upload_id}:finalize is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v2/mcp-capabilities/delegations": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/mcp_capabilities.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v2/mcp-capabilities/delegations is implemented at backend/routers/mcp_capabilities.py.",
+      "reason": "rest:POST:/api/v2/mcp-capabilities/delegations is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/api/v2/mcp-capabilities/{capability_id}:invoke": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/mcp_capabilities.py"
       ],
+      "evidence": "The stable surface rest:POST:/api/v2/mcp-capabilities/{capability_id}:invoke is implemented at backend/routers/mcp_capabilities.py.",
+      "reason": "rest:POST:/api/v2/mcp-capabilities/{capability_id}:invoke is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/views": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/views.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/views/{gid}/copy": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/views.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/auth/logout": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/auth.py"
       ],
+      "evidence": "The stable surface rest:POST:/auth/logout is implemented at backend/routers/auth.py.",
+      "reason": "rest:POST:/auth/logout is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/auth/refresh": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/auth.py"
       ],
+      "evidence": "The stable surface rest:POST:/auth/refresh is implemented at backend/routers/auth.py.",
+      "reason": "rest:POST:/auth/refresh is a authentication handshake or token-session transport endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/feishu/cache/refresh": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:POST:/feishu/cache/refresh is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:POST:/feishu/cache/refresh is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/feishu/chat-message/share-list": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:POST:/feishu/chat-message/share-list is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:POST:/feishu/chat-message/share-list is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/feishu/message/send": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:POST:/feishu/message/send is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:POST:/feishu/message/send is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/feishu/sync/org": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:POST:/feishu/sync/org is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:POST:/feishu/sync/org is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/feishu/sync/org/structure": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:POST:/feishu/sync/org/structure is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:POST:/feishu/sync/org/structure is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/feishu/webhook/bitable": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/feishu_proxy.py"
       ],
+      "evidence": "The stable surface rest:POST:/feishu/webhook/bitable is implemented at backend/routers/feishu_proxy.py.",
+      "reason": "rest:POST:/feishu/webhook/bitable is a raw Feishu protocol adapter endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/teams": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/teams.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/teams/{gid}/members": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/teams.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/{capability_id}:confirm": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capabilities.py"
       ],
+      "evidence": "The stable surface rest:POST:/{capability_id}:confirm is implemented at backend/routers/capabilities.py.",
+      "reason": "rest:POST:/{capability_id}:confirm is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:POST:/{capability_id}:invoke": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capabilities.py"
       ],
+      "evidence": "The stable surface rest:POST:/{capability_id}:invoke is implemented at backend/routers/capabilities.py.",
+      "reason": "rest:POST:/{capability_id}:invoke is a shared Capability Gateway protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:PUT:/admin/config/{key}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/admin.py"
       ],
+      "evidence": "The stable surface rest:PUT:/admin/config/{key} is implemented at backend/routers/admin.py.",
+      "reason": "rest:PUT:/admin/config/{key} is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "classification": "operations",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PUT:/api/annotations/{key}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/annotations.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PUT:/api/ext-field-mappings/batch": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/ext_datasource.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PUT:/api/self_ann/{item_gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/self_annotations.py"
-      ],
-      "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:PUT:/api/uploads/{filename}": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/uploads.py"
       ],
+      "evidence": "The stable surface rest:PUT:/api/uploads/{filename} is implemented at backend/routers/uploads.py.",
+      "reason": "rest:PUT:/api/uploads/{filename} is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     },
     "rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content": {
-      "resolution": "unreviewed",
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
         "backend/routers/capability_artifacts.py"
       ],
+      "evidence": "The stable surface rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content is implemented at backend/routers/capability_artifacts.py.",
+      "reason": "rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content is a ArtifactRef or OperationRef transfer protocol endpoint; it is retained as transport adapter infrastructure and must not become an independently invokable business Capability.",
+      "classification": "transport_adapter",
       "owner": "Base Platform",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     }
   },
-  "excluded_functions": {},
   "capabilities": {
+    "base.annotation.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/self_ann/{item_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/self_annotations.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:DELETE:/api/self_ann/{item_gid} implements the reviewed base.annotation.change.apply business outcome from backend/routers/self_annotations.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/annotations/{key}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/annotations.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PUT:/api/annotations/{key} implements the reviewed base.annotation.change.apply business outcome from backend/routers/annotations.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/self_ann/{item_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/self_annotations.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PUT:/api/self_ann/{item_gid} implements the reviewed base.annotation.change.apply business outcome from backend/routers/self_annotations.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.annotation.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.annotation.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.annotation.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.annotation.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.annotation.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.annotation.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed annotation change apply business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.annotation.change.apply",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_base_self_annotations"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.annotation.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/annotations/{key}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/annotations.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/annotations/{key} implements the reviewed base.annotation.read business outcome from backend/routers/annotations.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/self_ann/batch": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/self_annotations.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/self_ann/batch implements the reviewed base.annotation.read business outcome from backend/routers/self_annotations.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/self_ann/list": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/self_annotations.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/self_ann/list implements the reviewed base.annotation.read business outcome from backend/routers/self_annotations.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/self_ann/{item_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/self_annotations.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/self_ann/{item_gid} implements the reviewed base.annotation.read business outcome from backend/routers/self_annotations.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.annotation.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.annotation.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.annotation.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.annotation.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.annotation.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.annotation.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed annotation read business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.annotation.read",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_base_self_annotations"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.authorization.grant.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/grants/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/grants.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:DELETE:/api/grants/{gid} implements the reviewed base.authorization.grant.change.apply business outcome from backend/routers/grants.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/grants": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/grants.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/grants implements the reviewed base.authorization.grant.change.apply business outcome from backend/routers/grants.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.authorization.grant.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed authorization grant change apply business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.authorization.grant.change.apply",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_auth_permission_grants"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.authorization.grant.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/grants": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/grants.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/grants implements the reviewed base.authorization.grant.read business outcome from backend/routers/grants.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/grants/me": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/grants.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/grants/me implements the reviewed base.authorization.grant.read business outcome from backend/routers/grants.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.authorization.grant.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.authorization.grant.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed authorization grant read business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.authorization.grant.read",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_auth_permission_grants"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.external_datasource.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/ext-datasources/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:DELETE:/api/ext-datasources/{gid} implements the reviewed base.external_datasource.change.apply business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/ext-datasources/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PATCH:/api/ext-datasources/{gid} implements the reviewed base.external_datasource.change.apply business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ext-datasources": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/ext-datasources implements the reviewed base.external_datasource.change.apply business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.external_datasource.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed external datasource change apply business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.external_datasource.change.apply",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.external_datasource.connection.test": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/ext-datasources/{gid}/test": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/ext-datasources/{gid}/test implements the reviewed base.external_datasource.connection.test business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.connection.test"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.external_datasource.connection.test"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.connection.test"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.connection.test"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.connection.test"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.connection.test"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed external datasource connection test business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.external_datasource.connection.test",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.external_datasource.search": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/ext-datasources": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/ext-datasources implements the reviewed base.external_datasource.search business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ext-datasources/{gid}/tables": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/ext-datasources/{gid}/tables implements the reviewed base.external_datasource.schema.get business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.search"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.external_datasource.search"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.search"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.search"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.search"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.external_datasource.search"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed external datasource search business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.external_datasource.search",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.external_mapping.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/ext-mappings/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:DELETE:/api/ext-mappings/{gid} implements the reviewed base.external_mapping.change.apply business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/ext-mappings/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PATCH:/api/ext-mappings/{gid} implements the reviewed base.external_mapping.change.apply business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ext-mappings": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/ext-mappings implements the reviewed base.external_mapping.change.apply business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/ext-mappings/{gid}/import": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/ext-mappings/{gid}/import implements the reviewed base.external_mapping.import business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/ext-field-mappings/batch": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PUT:/api/ext-field-mappings/batch implements the reviewed base.external_mapping.change.apply business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.external_mapping.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed external mapping change apply business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.external_mapping.change.apply",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.external_mapping.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/ext-field-mappings": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/ext-field-mappings implements the reviewed base.external_mapping.search business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ext-mappings": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/ext-mappings implements the reviewed base.external_mapping.search business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ext-mappings/{gid}/columns": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/ext-mappings/{gid}/columns implements the reviewed base.external_mapping.search business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/ext-mappings/{gid}/preview": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/ext-mappings/{gid}/preview implements the reviewed base.external_mapping.preview business outcome from backend/routers/ext_datasource.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.external_mapping.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.external_mapping.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed external mapping read business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.external_mapping.read",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.identity.directory.sync": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/org/sync-from-feishu": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/org.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/org/sync-from-feishu implements the reviewed base.identity.directory.sync business outcome from backend/routers/org.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.identity.directory.sync"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.identity.directory.sync"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.identity.directory.sync"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.identity.directory.sync"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.identity.directory.sync"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.identity.directory.sync"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed identity directory sync business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.identity.directory.sync",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_auth_auth_pending",
+          "workmanship_auth_users"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.identity.role.assign": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:PATCH:/api/users/{user_gid}/role": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/users.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PATCH:/api/users/{user_gid}/role implements the reviewed base.identity.role.assign business outcome from backend/routers/users.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.identity.role.assign"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.identity.role.assign"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.identity.role.assign"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.identity.role.assign"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.identity.role.assign"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.identity.role.assign"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed identity role assign business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.identity.role.assign",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_auth_auth_pending",
+          "workmanship_auth_users"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.identity.session.get": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/users/me": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/users.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/users/me implements the reviewed base.identity.session.get business outcome from backend/routers/users.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/users/me": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/users_compat.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/users/me implements the reviewed base.identity.session.get business outcome from backend/routers/users_compat.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.identity.session.get"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.identity.session.get"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.identity.session.get"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.identity.session.get"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.identity.session.get"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.identity.session.get"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed identity session get business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.identity.session.get",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_auth_auth_pending",
+          "workmanship_auth_users"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.plugin.marketplace.publisher.register": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/v1/plugin-marketplace/publishers": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/v1/plugin-marketplace/publishers implements the reviewed base.plugin.marketplace.publisher.register business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.publisher.register"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.plugin.marketplace.publisher.register"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.publisher.register"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.publisher.register"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.publisher.register"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.publisher.register"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed plugin marketplace publisher register business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.plugin.marketplace.publisher.register",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_plugin_installations",
+          "workmanship_plugin_lifecycle_events",
+          "workmanship_plugin_mount_sessions",
+          "workmanship_plugin_namespace_kv",
+          "workmanship_plugin_publishers",
+          "workmanship_plugin_releases",
+          "workmanship_plugin_usage_events",
+          "workmanship_plugin_usage_month_closures",
+          "workmanship_plugin_usage_monthly"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.plugin.marketplace.release.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/v1/plugin-marketplace/releases": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/v1/plugin-marketplace/releases implements the reviewed base.plugin.marketplace.release.publish business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/review": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/review implements the reviewed base.plugin.marketplace.release.review business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/revoke": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/revoke implements the reviewed base.plugin.marketplace.release.revoke business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.release.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.plugin.marketplace.release.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.release.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.release.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.release.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.release.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed plugin marketplace release change apply business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.plugin.marketplace.release.change.apply",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_plugin_installations",
+          "workmanship_plugin_lifecycle_events",
+          "workmanship_plugin_mount_sessions",
+          "workmanship_plugin_namespace_kv",
+          "workmanship_plugin_publishers",
+          "workmanship_plugin_releases",
+          "workmanship_plugin_usage_events",
+          "workmanship_plugin_usage_month_closures",
+          "workmanship_plugin_usage_monthly"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.plugin.marketplace.search": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/plugin/list": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugins.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/plugin/list implements the reviewed base.plugin.marketplace.search business outcome from backend/routers/plugins.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/v1/plugin-marketplace/catalog": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/v1/plugin-marketplace/catalog implements the reviewed base.plugin.marketplace.search business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/v1/plugin-marketplace/installations": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/v1/plugin-marketplace/installations implements the reviewed base.plugin.marketplace.search business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/v1/plugin-marketplace/installations/{plugin_id}/events": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/v1/plugin-marketplace/installations/{plugin_id}/events implements the reviewed base.plugin.marketplace.audit.search business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/v1/plugin-marketplace/registry": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/v1/plugin-marketplace/registry implements the reviewed base.plugin.marketplace.search business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/v1/plugin-marketplace/releases": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/v1/plugin-marketplace/releases implements the reviewed base.plugin.marketplace.search business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/v1/plugin-marketplace/usage/months/{month}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/v1/plugin-marketplace/usage/months/{month} implements the reviewed base.plugin.marketplace.usage.get business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.search"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.plugin.marketplace.search"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.search"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.search"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.search"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.search"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed plugin marketplace search business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.plugin.marketplace.search",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_plugin_installations",
+          "workmanship_plugin_lifecycle_events",
+          "workmanship_plugin_mount_sessions",
+          "workmanship_plugin_namespace_kv",
+          "workmanship_plugin_publishers",
+          "workmanship_plugin_releases",
+          "workmanship_plugin_usage_events",
+          "workmanship_plugin_usage_month_closures",
+          "workmanship_plugin_usage_monthly"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.plugin.marketplace.usage.close": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/plugin_marketplace.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close implements the reviewed base.plugin.marketplace.usage.close business outcome from backend/routers/plugin_marketplace.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.usage.close"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.plugin.marketplace.usage.close"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.usage.close"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.usage.close"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.usage.close"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.plugin.marketplace.usage.close"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed plugin marketplace usage close business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.plugin.marketplace.usage.close",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_plugin_installations",
+          "workmanship_plugin_lifecycle_events",
+          "workmanship_plugin_mount_sessions",
+          "workmanship_plugin_namespace_kv",
+          "workmanship_plugin_publishers",
+          "workmanship_plugin_releases",
+          "workmanship_plugin_usage_events",
+          "workmanship_plugin_usage_month_closures",
+          "workmanship_plugin_usage_monthly"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.saved_view.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/views/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/views.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:DELETE:/api/views/{gid} implements the reviewed base.saved_view.change.apply business outcome from backend/routers/views.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/views/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/views.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PATCH:/api/views/{gid} implements the reviewed base.saved_view.change.apply business outcome from backend/routers/views.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/views": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/views.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/views implements the reviewed base.saved_view.change.apply business outcome from backend/routers/views.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/views/{gid}/copy": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/views.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/api/views/{gid}/copy implements the reviewed base.saved_view.change.apply business outcome from backend/routers/views.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.saved_view.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed saved view change apply business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.saved_view.change.apply",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_app_view_configs"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.saved_view.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/views": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/views.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/views implements the reviewed base.saved_view.read business outcome from backend/routers/views.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.saved_view.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.saved_view.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed saved view read business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.saved_view.read",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_app_view_configs"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.team.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/teams/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/teams.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:DELETE:/teams/{gid} implements the reviewed base.team.change.apply business outcome from backend/routers/teams.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/teams/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/teams.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PATCH:/teams/{gid} implements the reviewed base.team.change.apply business outcome from backend/routers/teams.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/teams/{gid}/config": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/teams.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:PATCH:/teams/{gid}/config implements the reviewed base.team.change.apply business outcome from backend/routers/teams.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/teams": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/teams.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/teams implements the reviewed base.team.change.apply business outcome from backend/routers/teams.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.team.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.team.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.team.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.team.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.team.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.team.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed team change apply business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.team.change.apply",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_auth_teams"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.team.membership.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/teams/{gid}/members/{user_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/teams.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:DELETE:/teams/{gid}/members/{user_gid} implements the reviewed base.team.membership.change.apply business outcome from backend/routers/teams.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/teams/{gid}/members": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/teams.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:POST:/teams/{gid}/members implements the reviewed base.team.membership.change.apply business outcome from backend/routers/teams.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.team.membership.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.team.membership.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.team.membership.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.team.membership.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.team.membership.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.team.membership.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed team membership change apply business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.team.membership.change.apply",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_auth_teams"
+        ],
+        "migration_stream": "base"
+      }
+    },
+    "base.team.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/teams": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/org.py",
+            "backend/routers/teams.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/teams implements the reviewed base.team.read business outcome from backend/routers/org.py, backend/routers/teams.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/teams/{gid}/members": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/teams.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/teams/{gid}/members implements the reviewed base.team.read business outcome from backend/routers/teams.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.team.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.team.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.team.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "base.team.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.team.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.team.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed team read business outcome for Base Platform.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "base",
+        "application_port": "base.team.read",
+        "provider_artifact": "ai00-base-platform",
+        "owned_tables": [
+          "workmanship_auth_teams"
+        ],
+        "migration_stream": "base"
+      }
+    },
     "identity.principal.search": {
       "kind": "existing",
       "function_dispositions": {
@@ -1196,39 +2658,69 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/users/": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/users.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/users/ implements the reviewed identity.principal.search business outcome from backend/routers/users.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/users/search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/users.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/api/users/search implements the reviewed identity.principal.search business outcome from backend/routers/users.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/users/": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/routers/users_compat.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface rest:GET:/users/ implements the reviewed identity.principal.search business outcome from backend/routers/users_compat.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "identity.principal.search"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "identity.principal.search"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "identity.principal.search"
         },
         "agent": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "identity.principal.search"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "identity.principal.search"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "identity.principal.search"
         }
       }
     },
@@ -2162,6 +3654,26 @@
     "system.search": {
       "kind": "existing",
       "function_dispositions": {
+        "agent_tool:global_search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface agent_tool:global_search implements the reviewed system.search business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "agent_tool:search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Base Platform",
+          "evidence": "The stable surface agent_tool:search implements the reviewed system.search business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
         "capability:system.search": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -2178,33 +3690,33 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "system.search"
         },
         "rest": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed rest consumer requires this business outcome.",
+          "policy_ref": "system.search"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "system.search"
         },
         "agent": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "system.search"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "system.search"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "system.search"
         }
       }
     },

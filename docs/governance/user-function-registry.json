@@ -355,7 +355,7 @@
     },
     "agent_tool:audit_entry_rules": {
       "function_id": "agent_tool:audit_entry_rules",
-      "domain": "Agent",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -369,7 +369,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -399,7 +399,7 @@
     },
     "agent_tool:check_rules": {
       "function_id": "agent_tool:check_rules",
-      "domain": "Agent",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -413,7 +413,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -509,7 +509,7 @@
     },
     "agent_tool:find_similar_cases": {
       "function_id": "agent_tool:find_similar_cases",
-      "domain": "Agent",
+      "domain": "Knowledge",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -523,7 +523,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -553,7 +553,7 @@
     },
     "agent_tool:generate_canvas": {
       "function_id": "agent_tool:generate_canvas",
-      "domain": "Agent",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -567,7 +567,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -575,7 +575,7 @@
     },
     "agent_tool:get_canvas_state": {
       "function_id": "agent_tool:get_canvas_state",
-      "domain": "Agent",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -589,7 +589,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -597,7 +597,7 @@
     },
     "agent_tool:get_entry_relations": {
       "function_id": "agent_tool:get_entry_relations",
-      "domain": "Agent",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -611,7 +611,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -707,7 +707,7 @@
     },
     "agent_tool:get_selected_elements": {
       "function_id": "agent_tool:get_selected_elements",
-      "domain": "Agent",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -721,7 +721,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -751,7 +751,7 @@
     },
     "agent_tool:global_search": {
       "function_id": "agent_tool:global_search",
-      "domain": "Agent",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -765,7 +765,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -905,7 +905,7 @@
     },
     "agent_tool:list_rules": {
       "function_id": "agent_tool:list_rules",
-      "domain": "Agent",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -919,7 +919,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -971,7 +971,7 @@
     },
     "agent_tool:open_in_container": {
       "function_id": "agent_tool:open_in_container",
-      "domain": "Agent",
+      "domain": "Local Integration",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -985,7 +985,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Local Integration",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -1015,7 +1015,7 @@
     },
     "agent_tool:recommend_practice": {
       "function_id": "agent_tool:recommend_practice",
-      "domain": "Agent",
+      "domain": "Knowledge",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -1029,7 +1029,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -1037,7 +1037,7 @@
     },
     "agent_tool:run_skill_canvas": {
       "function_id": "agent_tool:run_skill_canvas",
-      "domain": "Agent",
+      "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -1051,7 +1051,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Agent",
+      "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -1103,7 +1103,7 @@
     },
     "agent_tool:search": {
       "function_id": "agent_tool:search",
-      "domain": "Project Management",
+      "domain": "Base Platform",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -1117,7 +1117,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Project Management",
+      "owner": "Base Platform",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -3827,7 +3827,7 @@
     },
     "rest:DELETE:/api/bitable-sync/bindings/{list_gid}": {
       "function_id": "rest:DELETE:/api/bitable-sync/bindings/{list_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -3841,7 +3841,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -4443,7 +4443,7 @@
     },
     "rest:DELETE:/api/follows/{gid}": {
       "function_id": "rest:DELETE:/api/follows/{gid}",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4457,7 +4457,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -4619,7 +4619,7 @@
     },
     "rest:DELETE:/api/issues/{gid}": {
       "function_id": "rest:DELETE:/api/issues/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4633,7 +4633,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -4641,7 +4641,7 @@
     },
     "rest:DELETE:/api/item-entries/{item_type}/{item_gid}": {
       "function_id": "rest:DELETE:/api/item-entries/{item_type}/{item_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4655,7 +4655,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/item_entries.py"
@@ -4729,7 +4729,7 @@
     },
     "rest:DELETE:/api/lists/{gid}": {
       "function_id": "rest:DELETE:/api/lists/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4743,7 +4743,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/lists.py"
@@ -4839,7 +4839,7 @@
     },
     "rest:DELETE:/api/projects/vehicle_models/{gid}": {
       "function_id": "rest:DELETE:/api/projects/vehicle_models/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4853,7 +4853,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -4861,7 +4861,7 @@
     },
     "rest:DELETE:/api/projects/{gid}": {
       "function_id": "rest:DELETE:/api/projects/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4875,7 +4875,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -4883,7 +4883,7 @@
     },
     "rest:DELETE:/api/projects/{gid}/members/{member_gid}": {
       "function_id": "rest:DELETE:/api/projects/{gid}/members/{member_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4897,7 +4897,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -4949,7 +4949,7 @@
     },
     "rest:DELETE:/api/share-links/{token}": {
       "function_id": "rest:DELETE:/api/share-links/{token}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4963,7 +4963,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/share_links.py"
@@ -4971,7 +4971,7 @@
     },
     "rest:DELETE:/api/shares/items/{gid}": {
       "function_id": "rest:DELETE:/api/shares/items/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -4985,7 +4985,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/shares.py"
@@ -4993,7 +4993,7 @@
     },
     "rest:DELETE:/api/shares/lists/{list_gid}/{gid}": {
       "function_id": "rest:DELETE:/api/shares/lists/{list_gid}/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5007,7 +5007,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/shares.py"
@@ -5059,7 +5059,7 @@
     },
     "rest:DELETE:/api/task-dependencies/{gid}": {
       "function_id": "rest:DELETE:/api/task-dependencies/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5073,7 +5073,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -5081,7 +5081,7 @@
     },
     "rest:DELETE:/api/task-templates/items/{item_gid}": {
       "function_id": "rest:DELETE:/api/task-templates/items/{item_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5095,7 +5095,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -5103,7 +5103,7 @@
     },
     "rest:DELETE:/api/task-templates/{gid}": {
       "function_id": "rest:DELETE:/api/task-templates/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5117,7 +5117,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -5125,7 +5125,7 @@
     },
     "rest:DELETE:/api/tasks/{gid}": {
       "function_id": "rest:DELETE:/api/tasks/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5139,7 +5139,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -5565,7 +5565,7 @@
     },
     "rest:GET:/api/approval/orders": {
       "function_id": "rest:GET:/api/approval/orders",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5579,7 +5579,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/approval.py"
@@ -5587,7 +5587,7 @@
     },
     "rest:GET:/api/approval/orders/{gid}": {
       "function_id": "rest:GET:/api/approval/orders/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5601,7 +5601,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/approval.py"
@@ -5609,7 +5609,7 @@
     },
     "rest:GET:/api/bitable-sync/bindings/{list_gid}": {
       "function_id": "rest:GET:/api/bitable-sync/bindings/{list_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5623,7 +5623,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -5631,7 +5631,7 @@
     },
     "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema": {
       "function_id": "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5645,7 +5645,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -5653,7 +5653,7 @@
     },
     "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token": {
       "function_id": "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5667,7 +5667,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -5675,7 +5675,7 @@
     },
     "rest:GET:/api/bitable-sync/bindings/{list_gid}/status": {
       "function_id": "rest:GET:/api/bitable-sync/bindings/{list_gid}/status",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -5689,7 +5689,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -6709,7 +6709,7 @@
     },
     "rest:GET:/api/change-logs": {
       "function_id": "rest:GET:/api/change-logs",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -6723,7 +6723,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/change_logs.py"
@@ -6731,7 +6731,7 @@
     },
     "rest:GET:/api/collab/sessions": {
       "function_id": "rest:GET:/api/collab/sessions",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -6745,7 +6745,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/collab.py"
@@ -6753,7 +6753,7 @@
     },
     "rest:GET:/api/collab/sessions/{gid}": {
       "function_id": "rest:GET:/api/collab/sessions/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -6767,7 +6767,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/collab.py"
@@ -7501,7 +7501,7 @@
     },
     "rest:GET:/api/follows": {
       "function_id": "rest:GET:/api/follows",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7515,7 +7515,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -7523,7 +7523,7 @@
     },
     "rest:GET:/api/follows/check": {
       "function_id": "rest:GET:/api/follows/check",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7537,7 +7537,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -7809,7 +7809,7 @@
     },
     "rest:GET:/api/issues": {
       "function_id": "rest:GET:/api/issues",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7823,7 +7823,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -7831,7 +7831,7 @@
     },
     "rest:GET:/api/issues/promote": {
       "function_id": "rest:GET:/api/issues/promote",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7845,7 +7845,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -7853,7 +7853,7 @@
     },
     "rest:GET:/api/issues/{gid}": {
       "function_id": "rest:GET:/api/issues/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7867,7 +7867,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -7875,7 +7875,7 @@
     },
     "rest:GET:/api/item-entries/{item_type}/{item_gid}": {
       "function_id": "rest:GET:/api/item-entries/{item_type}/{item_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -7889,7 +7889,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/item_entries.py"
@@ -8073,7 +8073,7 @@
     },
     "rest:GET:/api/lists": {
       "function_id": "rest:GET:/api/lists",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8087,7 +8087,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/lists.py"
@@ -8095,7 +8095,7 @@
     },
     "rest:GET:/api/notifications": {
       "function_id": "rest:GET:/api/notifications",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST",
@@ -8110,7 +8110,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py",
@@ -8119,7 +8119,7 @@
     },
     "rest:GET:/api/notifications/prefs": {
       "function_id": "rest:GET:/api/notifications/prefs",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8133,7 +8133,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py"
@@ -8141,7 +8141,7 @@
     },
     "rest:GET:/api/notifications/unread_count": {
       "function_id": "rest:GET:/api/notifications/unread_count",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST",
@@ -8156,7 +8156,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py",
@@ -8429,7 +8429,7 @@
     },
     "rest:GET:/api/permission-requests": {
       "function_id": "rest:GET:/api/permission-requests",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8443,7 +8443,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/permission_requests.py"
@@ -8473,7 +8473,7 @@
     },
     "rest:GET:/api/projects": {
       "function_id": "rest:GET:/api/projects",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8487,7 +8487,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -8495,7 +8495,7 @@
     },
     "rest:GET:/api/projects/members/matrix": {
       "function_id": "rest:GET:/api/projects/members/matrix",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8509,7 +8509,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -8517,7 +8517,7 @@
     },
     "rest:GET:/api/projects/vehicle_models": {
       "function_id": "rest:GET:/api/projects/vehicle_models",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8531,7 +8531,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -8539,7 +8539,7 @@
     },
     "rest:GET:/api/projects/{gid}": {
       "function_id": "rest:GET:/api/projects/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8553,7 +8553,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -8561,7 +8561,7 @@
     },
     "rest:GET:/api/projects/{gid}/bop-lines": {
       "function_id": "rest:GET:/api/projects/{gid}/bop-lines",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8575,7 +8575,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -8583,7 +8583,7 @@
     },
     "rest:GET:/api/projects/{gid}/members": {
       "function_id": "rest:GET:/api/projects/{gid}/members",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8597,7 +8597,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -8715,7 +8715,7 @@
     },
     "rest:GET:/api/share-links/{token}": {
       "function_id": "rest:GET:/api/share-links/{token}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8729,7 +8729,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/share_links.py"
@@ -8737,7 +8737,7 @@
     },
     "rest:GET:/api/shares/lists/{list_gid}": {
       "function_id": "rest:GET:/api/shares/lists/{list_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8751,7 +8751,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/shares.py"
@@ -8869,7 +8869,7 @@
     },
     "rest:GET:/api/task-dependencies": {
       "function_id": "rest:GET:/api/task-dependencies",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8883,7 +8883,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -8891,7 +8891,7 @@
     },
     "rest:GET:/api/task-templates": {
       "function_id": "rest:GET:/api/task-templates",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8905,7 +8905,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -8913,7 +8913,7 @@
     },
     "rest:GET:/api/task-templates/{gid}": {
       "function_id": "rest:GET:/api/task-templates/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8927,7 +8927,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -8935,7 +8935,7 @@
     },
     "rest:GET:/api/tasks": {
       "function_id": "rest:GET:/api/tasks",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8949,7 +8949,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -8957,7 +8957,7 @@
     },
     "rest:GET:/api/tasks/promote": {
       "function_id": "rest:GET:/api/tasks/promote",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8971,7 +8971,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -8979,7 +8979,7 @@
     },
     "rest:GET:/api/tasks/{gid}": {
       "function_id": "rest:GET:/api/tasks/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8993,7 +8993,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -9419,7 +9419,7 @@
     },
     "rest:GET:/api/workbench/home": {
       "function_id": "rest:GET:/api/workbench/home",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9433,7 +9433,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/workbench_home.py"
@@ -9441,7 +9441,7 @@
     },
     "rest:GET:/api/workbench/panel1": {
       "function_id": "rest:GET:/api/workbench/panel1",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9455,7 +9455,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/workbench_home.py"
@@ -9903,7 +9903,7 @@
     },
     "rest:GET:/share/issues": {
       "function_id": "rest:GET:/share/issues",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -9917,7 +9917,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/share_page.py"
@@ -10784,7 +10784,7 @@
     },
     "rest:PATCH:/api/follows/{gid}": {
       "function_id": "rest:PATCH:/api/follows/{gid}",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10798,7 +10798,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -10916,7 +10916,7 @@
     },
     "rest:PATCH:/api/issues/{gid}": {
       "function_id": "rest:PATCH:/api/issues/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -10930,7 +10930,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -11004,7 +11004,7 @@
     },
     "rest:PATCH:/api/lists/{gid}": {
       "function_id": "rest:PATCH:/api/lists/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11018,7 +11018,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/lists.py"
@@ -11026,7 +11026,7 @@
     },
     "rest:PATCH:/api/notifications/prefs": {
       "function_id": "rest:PATCH:/api/notifications/prefs",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11040,7 +11040,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py"
@@ -11048,7 +11048,7 @@
     },
     "rest:PATCH:/api/notifications/read_all": {
       "function_id": "rest:PATCH:/api/notifications/read_all",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST",
@@ -11063,7 +11063,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py",
@@ -11072,7 +11072,7 @@
     },
     "rest:PATCH:/api/notifications/{gid}/read": {
       "function_id": "rest:PATCH:/api/notifications/{gid}/read",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11086,7 +11086,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/notifications.py"
@@ -11160,7 +11160,7 @@
     },
     "rest:PATCH:/api/projects/vehicle_models/{gid}": {
       "function_id": "rest:PATCH:/api/projects/vehicle_models/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11174,7 +11174,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -11182,7 +11182,7 @@
     },
     "rest:PATCH:/api/projects/{gid}": {
       "function_id": "rest:PATCH:/api/projects/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11196,7 +11196,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -11248,7 +11248,7 @@
     },
     "rest:PATCH:/api/task-templates/items/{item_gid}": {
       "function_id": "rest:PATCH:/api/task-templates/items/{item_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11262,7 +11262,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -11270,7 +11270,7 @@
     },
     "rest:PATCH:/api/task-templates/{gid}": {
       "function_id": "rest:PATCH:/api/task-templates/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11284,7 +11284,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -11292,7 +11292,7 @@
     },
     "rest:PATCH:/api/tasks/{gid}": {
       "function_id": "rest:PATCH:/api/tasks/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11306,7 +11306,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -11754,7 +11754,7 @@
     },
     "rest:POST:/api/approval/orders": {
       "function_id": "rest:POST:/api/approval/orders",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11768,7 +11768,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/approval.py"
@@ -11776,7 +11776,7 @@
     },
     "rest:POST:/api/approval/orders/scope_upgrade": {
       "function_id": "rest:POST:/api/approval/orders/scope_upgrade",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11790,7 +11790,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/approval.py"
@@ -11798,7 +11798,7 @@
     },
     "rest:POST:/api/approval/orders/{gid}/approve": {
       "function_id": "rest:POST:/api/approval/orders/{gid}/approve",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11812,7 +11812,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/approval.py"
@@ -11820,7 +11820,7 @@
     },
     "rest:POST:/api/approval/orders/{gid}/start": {
       "function_id": "rest:POST:/api/approval/orders/{gid}/start",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11834,7 +11834,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/approval.py"
@@ -11842,7 +11842,7 @@
     },
     "rest:POST:/api/approval/orders/{gid}/withdraw": {
       "function_id": "rest:POST:/api/approval/orders/{gid}/withdraw",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11856,7 +11856,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/approval.py"
@@ -11864,7 +11864,7 @@
     },
     "rest:POST:/api/bitable-sync/bindings/{list_gid}": {
       "function_id": "rest:POST:/api/bitable-sync/bindings/{list_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11878,7 +11878,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -11886,7 +11886,7 @@
     },
     "rest:POST:/api/bitable-sync/bindings/{list_gid}/pull": {
       "function_id": "rest:POST:/api/bitable-sync/bindings/{list_gid}/pull",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11900,7 +11900,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -11908,7 +11908,7 @@
     },
     "rest:POST:/api/bitable-sync/bindings/{list_gid}/push": {
       "function_id": "rest:POST:/api/bitable-sync/bindings/{list_gid}/push",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11922,7 +11922,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -11930,7 +11930,7 @@
     },
     "rest:POST:/api/bitable-sync/rows/push": {
       "function_id": "rest:POST:/api/bitable-sync/rows/push",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11944,7 +11944,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -12986,7 +12986,7 @@
     },
     "rest:POST:/api/collab/sessions": {
       "function_id": "rest:POST:/api/collab/sessions",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13000,7 +13000,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/collab.py"
@@ -13008,7 +13008,7 @@
     },
     "rest:POST:/api/collab/sessions/{gid}/end": {
       "function_id": "rest:POST:/api/collab/sessions/{gid}/end",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13022,7 +13022,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/collab.py"
@@ -13030,7 +13030,7 @@
     },
     "rest:POST:/api/collab/sessions/{gid}/join": {
       "function_id": "rest:POST:/api/collab/sessions/{gid}/join",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -13044,7 +13044,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/collab.py"
@@ -13998,7 +13998,7 @@
     },
     "rest:POST:/api/follows": {
       "function_id": "rest:POST:/api/follows",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14012,7 +14012,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/follows.py"
@@ -14570,7 +14570,7 @@
     },
     "rest:POST:/api/issues": {
       "function_id": "rest:POST:/api/issues",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14584,7 +14584,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -14592,7 +14592,7 @@
     },
     "rest:POST:/api/issues/promote": {
       "function_id": "rest:POST:/api/issues/promote",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14606,7 +14606,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -14746,7 +14746,7 @@
     },
     "rest:POST:/api/lists": {
       "function_id": "rest:POST:/api/lists",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14760,7 +14760,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/lists.py"
@@ -14768,7 +14768,7 @@
     },
     "rest:POST:/api/lists/{gid}/retarget": {
       "function_id": "rest:POST:/api/lists/{gid}/retarget",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14782,7 +14782,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/lists.py"
@@ -14790,7 +14790,7 @@
     },
     "rest:POST:/api/mentions/notify": {
       "function_id": "rest:POST:/api/mentions/notify",
-      "domain": "Base Platform",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -14804,7 +14804,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Base Platform",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/mentions.py"
@@ -14988,7 +14988,7 @@
     },
     "rest:POST:/api/permission-requests": {
       "function_id": "rest:POST:/api/permission-requests",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15002,7 +15002,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/permission_requests.py"
@@ -15010,7 +15010,7 @@
     },
     "rest:POST:/api/permission-requests/{gid}/approve": {
       "function_id": "rest:POST:/api/permission-requests/{gid}/approve",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15024,7 +15024,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/permission_requests.py"
@@ -15032,7 +15032,7 @@
     },
     "rest:POST:/api/permission-requests/{gid}/reject": {
       "function_id": "rest:POST:/api/permission-requests/{gid}/reject",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15046,7 +15046,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/permission_requests.py"
@@ -15054,7 +15054,7 @@
     },
     "rest:POST:/api/projects": {
       "function_id": "rest:POST:/api/projects",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15068,7 +15068,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -15076,7 +15076,7 @@
     },
     "rest:POST:/api/projects/vehicle_models": {
       "function_id": "rest:POST:/api/projects/vehicle_models",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15090,7 +15090,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -15098,7 +15098,7 @@
     },
     "rest:POST:/api/projects/{gid}/members": {
       "function_id": "rest:POST:/api/projects/{gid}/members",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15112,7 +15112,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -15186,7 +15186,7 @@
     },
     "rest:POST:/api/share-links": {
       "function_id": "rest:POST:/api/share-links",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15200,7 +15200,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/share_links.py"
@@ -15208,7 +15208,7 @@
     },
     "rest:POST:/api/shares/items": {
       "function_id": "rest:POST:/api/shares/items",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15222,7 +15222,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/shares.py"
@@ -15230,7 +15230,7 @@
     },
     "rest:POST:/api/shares/lists/{list_gid}": {
       "function_id": "rest:POST:/api/shares/lists/{list_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15244,7 +15244,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/shares.py"
@@ -15406,7 +15406,7 @@
     },
     "rest:POST:/api/task-dependencies": {
       "function_id": "rest:POST:/api/task-dependencies",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15420,7 +15420,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -15428,7 +15428,7 @@
     },
     "rest:POST:/api/task-templates": {
       "function_id": "rest:POST:/api/task-templates",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15442,7 +15442,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -15450,7 +15450,7 @@
     },
     "rest:POST:/api/task-templates/{gid}/instantiate": {
       "function_id": "rest:POST:/api/task-templates/{gid}/instantiate",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15464,7 +15464,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -15472,7 +15472,7 @@
     },
     "rest:POST:/api/task-templates/{template_gid}/items": {
       "function_id": "rest:POST:/api/task-templates/{template_gid}/items",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15486,7 +15486,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/task_templates.py"
@@ -15494,7 +15494,7 @@
     },
     "rest:POST:/api/tasks": {
       "function_id": "rest:POST:/api/tasks",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15508,7 +15508,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -15516,7 +15516,7 @@
     },
     "rest:POST:/api/tasks/promote": {
       "function_id": "rest:POST:/api/tasks/promote",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -15530,7 +15530,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -16418,7 +16418,7 @@
     },
     "rest:PUT:/api/bitable-sync/bindings/{list_gid}": {
       "function_id": "rest:PUT:/api/bitable-sync/bindings/{list_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16432,7 +16432,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/bitable_sync.py"
@@ -16506,7 +16506,7 @@
     },
     "rest:PUT:/api/issues/{gid}": {
       "function_id": "rest:PUT:/api/issues/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16520,7 +16520,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -16528,7 +16528,7 @@
     },
     "rest:PUT:/api/item-entries/{item_type}/{item_gid}": {
       "function_id": "rest:PUT:/api/item-entries/{item_type}/{item_gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16542,7 +16542,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/item_entries.py"
@@ -16550,7 +16550,7 @@
     },
     "rest:PUT:/api/projects/{gid}/line-assignment": {
       "function_id": "rest:PUT:/api/projects/{gid}/line-assignment",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16564,7 +16564,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/projects.py"
@@ -16616,7 +16616,7 @@
     },
     "rest:PUT:/api/task-dependencies/{gid}": {
       "function_id": "rest:PUT:/api/task-dependencies/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16630,7 +16630,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"
@@ -16638,7 +16638,7 @@
     },
     "rest:PUT:/api/tasks/{gid}": {
       "function_id": "rest:PUT:/api/tasks/{gid}",
-      "domain": "Craft",
+      "domain": "Project Management",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -16652,7 +16652,7 @@
       "data_classification": "internal",
       "classification": "unreviewed",
       "migration_status": "candidate",
-      "owner": "Craft",
+      "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/craft/craft_backend/routers/promotion.py"

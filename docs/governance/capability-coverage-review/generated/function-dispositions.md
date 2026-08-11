@@ -18,24 +18,12 @@
 | Agent | `agent_runtime:POST:/v1/sessions` | unreviewed | — |
 | Agent | `agent_tool:aggregate_history` | unreviewed | — |
 | Agent | `agent_tool:ask_for_clarification` | unreviewed | — |
-| Agent | `agent_tool:audit_entry_rules` | unreviewed | — |
 | Agent | `agent_tool:calculate` | unreviewed | — |
-| Agent | `agent_tool:check_rules` | unreviewed | — |
 | Agent | `agent_tool:create_discussion_topic` | unreviewed | — |
-| Agent | `agent_tool:find_similar_cases` | unreviewed | — |
 | Agent | `agent_tool:flag_for_review` | unreviewed | — |
-| Agent | `agent_tool:generate_canvas` | unreviewed | — |
-| Agent | `agent_tool:get_canvas_state` | unreviewed | — |
-| Agent | `agent_tool:get_entry_relations` | unreviewed | — |
-| Agent | `agent_tool:get_selected_elements` | unreviewed | — |
-| Agent | `agent_tool:global_search` | unreviewed | — |
 | Agent | `agent_tool:list_memories` | unreviewed | — |
 | Agent | `agent_tool:list_preferences` | unreviewed | — |
-| Agent | `agent_tool:list_rules` | unreviewed | — |
-| Agent | `agent_tool:open_in_container` | unreviewed | — |
 | Agent | `agent_tool:recall_memory` | unreviewed | — |
-| Agent | `agent_tool:recommend_practice` | unreviewed | — |
-| Agent | `agent_tool:run_skill_canvas` | unreviewed | — |
 | Agent | `agent_tool:save_memory` | unreviewed | — |
 | Agent | `agent_tool:save_preference` | unreviewed | — |
 | Agent | `rest:DELETE:/api/ai/sessions/{gid}` | unreviewed | — |
@@ -70,153 +58,140 @@
 | Agent | `rest:POST:/api/skills/seed-system` | unreviewed | — |
 | Agent | `rest:PUT:/api/flows/{gid}` | unreviewed | — |
 | Agent | `rest:PUT:/api/skills/{gid}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/admin/config/{key}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/api/ext-datasources/{gid}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/api/ext-mappings/{gid}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/api/follows/{gid}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/api/grants/{gid}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/api/self_ann/{item_gid}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/api/views/{gid}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/teams/{gid}` | unreviewed | — |
-| Base Platform | `rest:DELETE:/teams/{gid}/members/{user_gid}` | unreviewed | — |
-| Base Platform | `rest:GET:/` | unreviewed | — |
-| Base Platform | `rest:GET:/admin/cloud-db-config` | unreviewed | — |
-| Base Platform | `rest:GET:/admin/config` | unreviewed | — |
-| Base Platform | `rest:GET:/admin/config/{key}` | unreviewed | — |
-| Base Platform | `rest:GET:/admin/debug-logs` | unreviewed | — |
-| Base Platform | `rest:GET:/admin/plugin-registry` | unreviewed | — |
-| Base Platform | `rest:GET:/api/annotations/{key}` | unreviewed | — |
-| Base Platform | `rest:GET:/api/deploy` | unreviewed | — |
-| Base Platform | `rest:GET:/api/deploy/current` | unreviewed | — |
-| Base Platform | `rest:GET:/api/deploy/history` | unreviewed | — |
-| Base Platform | `rest:GET:/api/deploy/pipeline` | unreviewed | — |
-| Base Platform | `rest:GET:/api/ext-datasources` | unreviewed | — |
-| Base Platform | `rest:GET:/api/ext-datasources/{gid}/tables` | unreviewed | — |
-| Base Platform | `rest:GET:/api/ext-field-mappings` | unreviewed | — |
-| Base Platform | `rest:GET:/api/ext-mappings` | unreviewed | — |
-| Base Platform | `rest:GET:/api/ext-mappings/{gid}/columns` | unreviewed | — |
-| Base Platform | `rest:GET:/api/ext-mappings/{gid}/preview` | unreviewed | — |
-| Base Platform | `rest:GET:/api/feishu/im/contact-messages` | unreviewed | — |
-| Base Platform | `rest:GET:/api/feishu/im/mentions` | unreviewed | — |
-| Base Platform | `rest:GET:/api/file-store/config` | unreviewed | — |
-| Base Platform | `rest:GET:/api/follows` | unreviewed | — |
-| Base Platform | `rest:GET:/api/follows/check` | unreviewed | — |
-| Base Platform | `rest:GET:/api/grants` | unreviewed | — |
-| Base Platform | `rest:GET:/api/grants/me` | unreviewed | — |
-| Base Platform | `rest:GET:/api/notifications` | unreviewed | — |
-| Base Platform | `rest:GET:/api/notifications/prefs` | unreviewed | — |
-| Base Platform | `rest:GET:/api/notifications/unread_count` | unreviewed | — |
-| Base Platform | `rest:GET:/api/plugin/list` | unreviewed | — |
-| Base Platform | `rest:GET:/api/self_ann/batch` | unreviewed | — |
-| Base Platform | `rest:GET:/api/self_ann/list` | unreviewed | — |
-| Base Platform | `rest:GET:/api/self_ann/{item_gid}` | unreviewed | — |
-| Base Platform | `rest:GET:/api/users/` | unreviewed | — |
-| Base Platform | `rest:GET:/api/users/me` | unreviewed | — |
-| Base Platform | `rest:GET:/api/users/search` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path}` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v1/plugin-marketplace/catalog` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v1/plugin-marketplace/installations` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v1/plugin-marketplace/installations/{plugin_id}/events` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v1/plugin-marketplace/registry` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v1/plugin-marketplace/releases` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v1/plugin-marketplace/usage/months/{month}` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v2/agent-capabilities/catalog` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v2/agent-capabilities/catalog-preview` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v2/capability-artifacts/{artifact_id}` | unreviewed | — |
-| Base Platform | `rest:GET:/api/v2/capability-operations/{operation_id}` | unreviewed | — |
-| Base Platform | `rest:GET:/api/views` | unreviewed | — |
-| Base Platform | `rest:GET:/auth/feishu/callback` | unreviewed | — |
-| Base Platform | `rest:GET:/auth/feishu/login-url` | unreviewed | — |
-| Base Platform | `rest:GET:/auth/feishu/poll/{state}` | unreviewed | — |
-| Base Platform | `rest:GET:/auth/me` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/cache/debug` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/calendar/events/{event_id}` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/calendar/today` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/org/dept-search` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/org/users` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/org/users/search` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/search/chats` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/search/docs` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/search/events` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/search/meetings` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/search/users` | unreviewed | — |
-| Base Platform | `rest:GET:/feishu/sync/org/status` | unreviewed | — |
-| Base Platform | `rest:GET:/health` | unreviewed | — |
-| Base Platform | `rest:GET:/ready` | unreviewed | — |
-| Base Platform | `rest:GET:/share/issues` | unreviewed | — |
-| Base Platform | `rest:GET:/teams` | unreviewed | — |
-| Base Platform | `rest:GET:/teams/{gid}/members` | unreviewed | — |
-| Base Platform | `rest:GET:/users/` | unreviewed | — |
-| Base Platform | `rest:GET:/users/me` | unreviewed | — |
-| Base Platform | `rest:GET:/{capability_id}` | unreviewed | — |
-| Base Platform | `rest:PATCH:/api/ext-datasources/{gid}` | unreviewed | — |
-| Base Platform | `rest:PATCH:/api/ext-mappings/{gid}` | unreviewed | — |
-| Base Platform | `rest:PATCH:/api/follows/{gid}` | unreviewed | — |
-| Base Platform | `rest:PATCH:/api/notifications/prefs` | unreviewed | — |
-| Base Platform | `rest:PATCH:/api/notifications/read_all` | unreviewed | — |
-| Base Platform | `rest:PATCH:/api/notifications/{gid}/read` | unreviewed | — |
-| Base Platform | `rest:PATCH:/api/users/{user_gid}/role` | unreviewed | — |
-| Base Platform | `rest:PATCH:/api/views/{gid}` | unreviewed | — |
-| Base Platform | `rest:PATCH:/feishu/calendar/events/{event_id}` | unreviewed | — |
-| Base Platform | `rest:PATCH:/feishu/calendar/events/{event_id}/rsvp` | unreviewed | — |
-| Base Platform | `rest:PATCH:/teams/{gid}` | unreviewed | — |
-| Base Platform | `rest:PATCH:/teams/{gid}/config` | unreviewed | — |
-| Base Platform | `rest:POST:/admin/cloud-db-config` | unreviewed | — |
-| Base Platform | `rest:POST:/admin/cloud-db-config/test` | unreviewed | — |
-| Base Platform | `rest:POST:/admin/config/reload` | unreviewed | — |
-| Base Platform | `rest:POST:/admin/server-restart` | unreviewed | — |
-| Base Platform | `rest:POST:/api/deploy/rollback` | unreviewed | — |
-| Base Platform | `rest:POST:/api/ext-datasources` | unreviewed | — |
-| Base Platform | `rest:POST:/api/ext-datasources/{gid}/test` | unreviewed | — |
-| Base Platform | `rest:POST:/api/ext-mappings` | unreviewed | — |
-| Base Platform | `rest:POST:/api/ext-mappings/{gid}/import` | unreviewed | — |
-| Base Platform | `rest:POST:/api/feishu/doc/read` | unreviewed | — |
-| Base Platform | `rest:POST:/api/feishu/doc/write-cells` | unreviewed | — |
-| Base Platform | `rest:POST:/api/file-store/config` | unreviewed | — |
-| Base Platform | `rest:POST:/api/file-store/ois-config` | unreviewed | — |
-| Base Platform | `rest:POST:/api/file-store/ois-test` | unreviewed | — |
-| Base Platform | `rest:POST:/api/file-store/test` | unreviewed | — |
-| Base Platform | `rest:POST:/api/follows` | unreviewed | — |
-| Base Platform | `rest:POST:/api/grants` | unreviewed | — |
-| Base Platform | `rest:POST:/api/mentions/notify` | unreviewed | — |
-| Base Platform | `rest:POST:/api/org/sync-from-feishu` | unreviewed | — |
-| Base Platform | `rest:POST:/api/uploads` | unreviewed | — |
-| Base Platform | `rest:POST:/api/uploads/ois/resolve` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:confirm` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:invoke` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v1/plugin-marketplace/publishers` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v1/plugin-marketplace/releases` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/review` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/revoke` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v2/agent-capabilities/delegations` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v2/capability-artifacts/uploads` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v2/capability-artifacts/uploads/{upload_id}:finalize` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v2/mcp-capabilities/delegations` | unreviewed | — |
-| Base Platform | `rest:POST:/api/v2/mcp-capabilities/{capability_id}:invoke` | unreviewed | — |
-| Base Platform | `rest:POST:/api/views` | unreviewed | — |
-| Base Platform | `rest:POST:/api/views/{gid}/copy` | unreviewed | — |
-| Base Platform | `rest:POST:/auth/logout` | unreviewed | — |
-| Base Platform | `rest:POST:/auth/refresh` | unreviewed | — |
-| Base Platform | `rest:POST:/feishu/cache/refresh` | unreviewed | — |
-| Base Platform | `rest:POST:/feishu/chat-message/share-list` | unreviewed | — |
-| Base Platform | `rest:POST:/feishu/message/send` | unreviewed | — |
-| Base Platform | `rest:POST:/feishu/sync/org` | unreviewed | — |
-| Base Platform | `rest:POST:/feishu/sync/org/structure` | unreviewed | — |
-| Base Platform | `rest:POST:/feishu/webhook/bitable` | unreviewed | — |
-| Base Platform | `rest:POST:/teams` | unreviewed | — |
-| Base Platform | `rest:POST:/teams/{gid}/members` | unreviewed | — |
-| Base Platform | `rest:POST:/{capability_id}:confirm` | unreviewed | — |
-| Base Platform | `rest:POST:/{capability_id}:invoke` | unreviewed | — |
-| Base Platform | `rest:PUT:/admin/config/{key}` | unreviewed | — |
-| Base Platform | `rest:PUT:/api/annotations/{key}` | unreviewed | — |
-| Base Platform | `rest:PUT:/api/ext-field-mappings/batch` | unreviewed | — |
-| Base Platform | `rest:PUT:/api/self_ann/{item_gid}` | unreviewed | — |
-| Base Platform | `rest:PUT:/api/uploads/{filename}` | unreviewed | — |
-| Base Platform | `rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content` | unreviewed | — |
+| Base Platform | `rest:DELETE:/admin/config/{key}` | excluded | — |
+| Base Platform | `rest:GET:/` | excluded | — |
+| Base Platform | `rest:GET:/admin/cloud-db-config` | excluded | — |
+| Base Platform | `rest:GET:/admin/config` | excluded | — |
+| Base Platform | `rest:GET:/admin/config/{key}` | excluded | — |
+| Base Platform | `rest:GET:/admin/debug-logs` | excluded | — |
+| Base Platform | `rest:GET:/admin/plugin-registry` | excluded | — |
+| Base Platform | `rest:GET:/api/deploy` | excluded | — |
+| Base Platform | `rest:GET:/api/deploy/current` | excluded | — |
+| Base Platform | `rest:GET:/api/deploy/history` | excluded | — |
+| Base Platform | `rest:GET:/api/deploy/pipeline` | excluded | — |
+| Base Platform | `rest:GET:/api/feishu/im/contact-messages` | excluded | — |
+| Base Platform | `rest:GET:/api/feishu/im/mentions` | excluded | — |
+| Base Platform | `rest:GET:/api/file-store/config` | excluded | — |
+| Base Platform | `rest:GET:/api/v1/plugin-marketplace/assets/{token}/{plugin_id}/{version}/{asset_path:path}` | excluded | — |
+| Base Platform | `rest:GET:/api/v2/agent-capabilities/catalog` | excluded | — |
+| Base Platform | `rest:GET:/api/v2/agent-capabilities/catalog-preview` | excluded | — |
+| Base Platform | `rest:GET:/api/v2/capability-artifacts/{artifact_id}` | excluded | — |
+| Base Platform | `rest:GET:/api/v2/capability-operations/{operation_id}` | excluded | — |
+| Base Platform | `rest:GET:/auth/feishu/callback` | excluded | — |
+| Base Platform | `rest:GET:/auth/feishu/login-url` | excluded | — |
+| Base Platform | `rest:GET:/auth/feishu/poll/{state}` | excluded | — |
+| Base Platform | `rest:GET:/auth/me` | excluded | — |
+| Base Platform | `rest:GET:/feishu/cache/debug` | excluded | — |
+| Base Platform | `rest:GET:/feishu/calendar/events/{event_id}` | excluded | — |
+| Base Platform | `rest:GET:/feishu/calendar/today` | excluded | — |
+| Base Platform | `rest:GET:/feishu/org/dept-search` | excluded | — |
+| Base Platform | `rest:GET:/feishu/org/users` | excluded | — |
+| Base Platform | `rest:GET:/feishu/org/users/search` | excluded | — |
+| Base Platform | `rest:GET:/feishu/search/chats` | excluded | — |
+| Base Platform | `rest:GET:/feishu/search/docs` | excluded | — |
+| Base Platform | `rest:GET:/feishu/search/events` | excluded | — |
+| Base Platform | `rest:GET:/feishu/search/meetings` | excluded | — |
+| Base Platform | `rest:GET:/feishu/search/users` | excluded | — |
+| Base Platform | `rest:GET:/feishu/sync/org/status` | excluded | — |
+| Base Platform | `rest:GET:/health` | excluded | — |
+| Base Platform | `rest:GET:/ready` | excluded | — |
+| Base Platform | `rest:GET:/{capability_id}` | excluded | — |
+| Base Platform | `rest:PATCH:/feishu/calendar/events/{event_id}` | excluded | — |
+| Base Platform | `rest:PATCH:/feishu/calendar/events/{event_id}/rsvp` | excluded | — |
+| Base Platform | `rest:POST:/admin/cloud-db-config` | excluded | — |
+| Base Platform | `rest:POST:/admin/cloud-db-config/test` | excluded | — |
+| Base Platform | `rest:POST:/admin/config/reload` | excluded | — |
+| Base Platform | `rest:POST:/admin/server-restart` | excluded | — |
+| Base Platform | `rest:POST:/api/deploy/rollback` | excluded | — |
+| Base Platform | `rest:POST:/api/feishu/doc/read` | excluded | — |
+| Base Platform | `rest:POST:/api/feishu/doc/write-cells` | excluded | — |
+| Base Platform | `rest:POST:/api/file-store/config` | excluded | — |
+| Base Platform | `rest:POST:/api/file-store/ois-config` | excluded | — |
+| Base Platform | `rest:POST:/api/file-store/ois-test` | excluded | — |
+| Base Platform | `rest:POST:/api/file-store/test` | excluded | — |
+| Base Platform | `rest:POST:/api/uploads` | excluded | — |
+| Base Platform | `rest:POST:/api/uploads/ois/resolve` | excluded | — |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:confirm` | excluded | — |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:invoke` | excluded | — |
+| Base Platform | `rest:POST:/api/v2/agent-capabilities/delegations` | excluded | — |
+| Base Platform | `rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm` | excluded | — |
+| Base Platform | `rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke` | excluded | — |
+| Base Platform | `rest:POST:/api/v2/capability-artifacts/uploads` | excluded | — |
+| Base Platform | `rest:POST:/api/v2/capability-artifacts/uploads/{upload_id}:finalize` | excluded | — |
+| Base Platform | `rest:POST:/api/v2/mcp-capabilities/delegations` | excluded | — |
+| Base Platform | `rest:POST:/api/v2/mcp-capabilities/{capability_id}:invoke` | excluded | — |
+| Base Platform | `rest:POST:/auth/logout` | excluded | — |
+| Base Platform | `rest:POST:/auth/refresh` | excluded | — |
+| Base Platform | `rest:POST:/feishu/cache/refresh` | excluded | — |
+| Base Platform | `rest:POST:/feishu/chat-message/share-list` | excluded | — |
+| Base Platform | `rest:POST:/feishu/message/send` | excluded | — |
+| Base Platform | `rest:POST:/feishu/sync/org` | excluded | — |
+| Base Platform | `rest:POST:/feishu/sync/org/structure` | excluded | — |
+| Base Platform | `rest:POST:/feishu/webhook/bitable` | excluded | — |
+| Base Platform | `rest:POST:/{capability_id}:confirm` | excluded | — |
+| Base Platform | `rest:POST:/{capability_id}:invoke` | excluded | — |
+| Base Platform | `rest:PUT:/admin/config/{key}` | excluded | — |
+| Base Platform | `rest:PUT:/api/uploads/{filename}` | excluded | — |
+| Base Platform | `rest:PUT:/api/v2/capability-artifacts/uploads/{upload_id}/content` | excluded | — |
+| Base Platform | `rest:DELETE:/api/self_ann/{item_gid}` | new_capability | `base.annotation.change.apply` |
+| Base Platform | `rest:PUT:/api/annotations/{key}` | new_capability | `base.annotation.change.apply` |
+| Base Platform | `rest:PUT:/api/self_ann/{item_gid}` | new_capability | `base.annotation.change.apply` |
+| Base Platform | `rest:GET:/api/annotations/{key}` | new_capability | `base.annotation.read` |
+| Base Platform | `rest:GET:/api/self_ann/batch` | new_capability | `base.annotation.read` |
+| Base Platform | `rest:GET:/api/self_ann/list` | new_capability | `base.annotation.read` |
+| Base Platform | `rest:GET:/api/self_ann/{item_gid}` | new_capability | `base.annotation.read` |
+| Base Platform | `rest:DELETE:/api/grants/{gid}` | new_capability | `base.authorization.grant.change.apply` |
+| Base Platform | `rest:POST:/api/grants` | new_capability | `base.authorization.grant.change.apply` |
+| Base Platform | `rest:GET:/api/grants` | new_capability | `base.authorization.grant.read` |
+| Base Platform | `rest:GET:/api/grants/me` | new_capability | `base.authorization.grant.read` |
+| Base Platform | `rest:DELETE:/api/ext-datasources/{gid}` | new_capability | `base.external_datasource.change.apply` |
+| Base Platform | `rest:PATCH:/api/ext-datasources/{gid}` | new_capability | `base.external_datasource.change.apply` |
+| Base Platform | `rest:POST:/api/ext-datasources` | new_capability | `base.external_datasource.change.apply` |
+| Base Platform | `rest:POST:/api/ext-datasources/{gid}/test` | new_capability | `base.external_datasource.connection.test` |
+| Base Platform | `rest:GET:/api/ext-datasources` | new_capability | `base.external_datasource.search` |
+| Base Platform | `rest:GET:/api/ext-datasources/{gid}/tables` | new_capability | `base.external_datasource.search` |
+| Base Platform | `rest:DELETE:/api/ext-mappings/{gid}` | new_capability | `base.external_mapping.change.apply` |
+| Base Platform | `rest:PATCH:/api/ext-mappings/{gid}` | new_capability | `base.external_mapping.change.apply` |
+| Base Platform | `rest:POST:/api/ext-mappings` | new_capability | `base.external_mapping.change.apply` |
+| Base Platform | `rest:POST:/api/ext-mappings/{gid}/import` | new_capability | `base.external_mapping.change.apply` |
+| Base Platform | `rest:PUT:/api/ext-field-mappings/batch` | new_capability | `base.external_mapping.change.apply` |
+| Base Platform | `rest:GET:/api/ext-field-mappings` | new_capability | `base.external_mapping.read` |
+| Base Platform | `rest:GET:/api/ext-mappings` | new_capability | `base.external_mapping.read` |
+| Base Platform | `rest:GET:/api/ext-mappings/{gid}/columns` | new_capability | `base.external_mapping.read` |
+| Base Platform | `rest:GET:/api/ext-mappings/{gid}/preview` | new_capability | `base.external_mapping.read` |
+| Base Platform | `rest:POST:/api/org/sync-from-feishu` | new_capability | `base.identity.directory.sync` |
+| Base Platform | `rest:PATCH:/api/users/{user_gid}/role` | new_capability | `base.identity.role.assign` |
+| Base Platform | `rest:GET:/api/users/me` | new_capability | `base.identity.session.get` |
+| Base Platform | `rest:GET:/users/me` | new_capability | `base.identity.session.get` |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/publishers` | new_capability | `base.plugin.marketplace.publisher.register` |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/releases` | new_capability | `base.plugin.marketplace.release.change.apply` |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/review` | new_capability | `base.plugin.marketplace.release.change.apply` |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/releases/{plugin_id}/{version}/revoke` | new_capability | `base.plugin.marketplace.release.change.apply` |
+| Base Platform | `rest:GET:/api/plugin/list` | new_capability | `base.plugin.marketplace.search` |
+| Base Platform | `rest:GET:/api/v1/plugin-marketplace/catalog` | new_capability | `base.plugin.marketplace.search` |
+| Base Platform | `rest:GET:/api/v1/plugin-marketplace/installations` | new_capability | `base.plugin.marketplace.search` |
+| Base Platform | `rest:GET:/api/v1/plugin-marketplace/installations/{plugin_id}/events` | new_capability | `base.plugin.marketplace.search` |
+| Base Platform | `rest:GET:/api/v1/plugin-marketplace/registry` | new_capability | `base.plugin.marketplace.search` |
+| Base Platform | `rest:GET:/api/v1/plugin-marketplace/releases` | new_capability | `base.plugin.marketplace.search` |
+| Base Platform | `rest:GET:/api/v1/plugin-marketplace/usage/months/{month}` | new_capability | `base.plugin.marketplace.search` |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close` | new_capability | `base.plugin.marketplace.usage.close` |
+| Base Platform | `rest:DELETE:/api/views/{gid}` | new_capability | `base.saved_view.change.apply` |
+| Base Platform | `rest:PATCH:/api/views/{gid}` | new_capability | `base.saved_view.change.apply` |
+| Base Platform | `rest:POST:/api/views` | new_capability | `base.saved_view.change.apply` |
+| Base Platform | `rest:POST:/api/views/{gid}/copy` | new_capability | `base.saved_view.change.apply` |
+| Base Platform | `rest:GET:/api/views` | new_capability | `base.saved_view.read` |
+| Base Platform | `rest:DELETE:/teams/{gid}` | new_capability | `base.team.change.apply` |
+| Base Platform | `rest:PATCH:/teams/{gid}` | new_capability | `base.team.change.apply` |
+| Base Platform | `rest:PATCH:/teams/{gid}/config` | new_capability | `base.team.change.apply` |
+| Base Platform | `rest:POST:/teams` | new_capability | `base.team.change.apply` |
+| Base Platform | `rest:DELETE:/teams/{gid}/members/{user_gid}` | new_capability | `base.team.membership.change.apply` |
+| Base Platform | `rest:POST:/teams/{gid}/members` | new_capability | `base.team.membership.change.apply` |
+| Base Platform | `rest:GET:/teams` | new_capability | `base.team.read` |
+| Base Platform | `rest:GET:/teams/{gid}/members` | new_capability | `base.team.read` |
 | Base Platform | `capability:identity.principal.search` | existing_capability | `identity.principal.search` |
+| Base Platform | `rest:GET:/api/users/` | existing_capability | `identity.principal.search` |
+| Base Platform | `rest:GET:/api/users/search` | existing_capability | `identity.principal.search` |
+| Base Platform | `rest:GET:/users/` | existing_capability | `identity.principal.search` |
 | Base Platform | `capability:plugin.disable` | existing_capability | `plugin.disable` |
 | Base Platform | `capability:plugin.enable` | existing_capability | `plugin.enable` |
 | Base Platform | `capability:plugin.install` | existing_capability | `plugin.install` |
@@ -236,9 +211,18 @@
 | Base Platform | `capability:system.job.cancel` | existing_capability | `system.job.cancel` |
 | Base Platform | `capability:system.job.get` | existing_capability | `system.job.get` |
 | Base Platform | `capability:system.lineage.get` | existing_capability | `system.lineage.get` |
+| Base Platform | `agent_tool:global_search` | existing_capability | `system.search` |
+| Base Platform | `agent_tool:search` | existing_capability | `system.search` |
 | Base Platform | `capability:system.search` | existing_capability | `system.search` |
 | Base Platform | `capability:system.worker.outbox.health` | existing_capability | `system.worker.outbox.health` |
-| Craft | `rest:DELETE:/api/bitable-sync/bindings/{list_gid}` | unreviewed | — |
+| Craft | `agent_tool:audit_entry_rules` | unreviewed | — |
+| Craft | `agent_tool:check_rules` | unreviewed | — |
+| Craft | `agent_tool:generate_canvas` | unreviewed | — |
+| Craft | `agent_tool:get_canvas_state` | unreviewed | — |
+| Craft | `agent_tool:get_entry_relations` | unreviewed | — |
+| Craft | `agent_tool:get_selected_elements` | unreviewed | — |
+| Craft | `agent_tool:list_rules` | unreviewed | — |
+| Craft | `agent_tool:run_skill_canvas` | unreviewed | — |
 | Craft | `rest:DELETE:/api/bop/entries/{gid}` | unreviewed | — |
 | Craft | `rest:DELETE:/api/bop/entry-links/{gid}` | unreviewed | — |
 | Craft | `rest:DELETE:/api/bop/factories/{gid}` | unreviewed | — |
@@ -269,27 +253,8 @@
 | Craft | `rest:DELETE:/api/gbop/processes/{gid}` | unreviewed | — |
 | Craft | `rest:DELETE:/api/gbop/version-families/{family_gid}/archive` | unreviewed | — |
 | Craft | `rest:DELETE:/api/import-export/templates/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/issues/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/item-entries/{item_type}/{item_gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/lists/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/projects/vehicle_models/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/projects/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/projects/{gid}/members/{member_gid}` | unreviewed | — |
 | Craft | `rest:DELETE:/api/rules/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/share-links/{token}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/shares/items/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/shares/lists/{list_gid}/{gid}` | unreviewed | — |
 | Craft | `rest:DELETE:/api/std_op/operations/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/task-dependencies/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/task-templates/items/{item_gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/task-templates/{gid}` | unreviewed | — |
-| Craft | `rest:DELETE:/api/tasks/{gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/approval/orders` | unreviewed | — |
-| Craft | `rest:GET:/api/approval/orders/{gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/bitable-sync/bindings/{list_gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/bitable-sync/bindings/{list_gid}/schema` | unreviewed | — |
-| Craft | `rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token` | unreviewed | — |
-| Craft | `rest:GET:/api/bitable-sync/bindings/{list_gid}/status` | unreviewed | — |
 | Craft | `rest:GET:/api/bop/entity-detail` | unreviewed | — |
 | Craft | `rest:GET:/api/bop/entries/search` | unreviewed | — |
 | Craft | `rest:GET:/api/bop/entries/{gid}` | unreviewed | — |
@@ -333,9 +298,6 @@
 | Craft | `rest:GET:/api/bop/versions/{version_gid}/station-part-map` | unreviewed | — |
 | Craft | `rest:GET:/api/canvases` | unreviewed | — |
 | Craft | `rest:GET:/api/canvases/{gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/change-logs` | unreviewed | — |
-| Craft | `rest:GET:/api/collab/sessions` | unreviewed | — |
-| Craft | `rest:GET:/api/collab/sessions/{gid}` | unreviewed | — |
 | Craft | `rest:GET:/api/craft_lib/equipments` | unreviewed | — |
 | Craft | `rest:GET:/api/craft_lib/fasteners` | unreviewed | — |
 | Craft | `rest:GET:/api/craft_lib/fixtures` | unreviewed | — |
@@ -361,34 +323,12 @@
 | Craft | `rest:GET:/api/gbop/versions/{version_gid}/operations` | unreviewed | — |
 | Craft | `rest:GET:/api/gbop/versions/{version_gid}/processes` | unreviewed | — |
 | Craft | `rest:GET:/api/import-export/templates` | unreviewed | — |
-| Craft | `rest:GET:/api/issues` | unreviewed | — |
-| Craft | `rest:GET:/api/issues/promote` | unreviewed | — |
-| Craft | `rest:GET:/api/issues/{gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/item-entries/{item_type}/{item_gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/lists` | unreviewed | — |
-| Craft | `rest:GET:/api/permission-requests` | unreviewed | — |
-| Craft | `rest:GET:/api/projects` | unreviewed | — |
-| Craft | `rest:GET:/api/projects/members/matrix` | unreviewed | — |
-| Craft | `rest:GET:/api/projects/vehicle_models` | unreviewed | — |
-| Craft | `rest:GET:/api/projects/{gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/projects/{gid}/bop-lines` | unreviewed | — |
-| Craft | `rest:GET:/api/projects/{gid}/members` | unreviewed | — |
 | Craft | `rest:GET:/api/rules` | unreviewed | — |
 | Craft | `rest:GET:/api/rules/{gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/share-links/{token}` | unreviewed | — |
-| Craft | `rest:GET:/api/shares/lists/{list_gid}` | unreviewed | — |
 | Craft | `rest:GET:/api/std_op/operations` | unreviewed | — |
 | Craft | `rest:GET:/api/std_op/operations/{gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/task-dependencies` | unreviewed | — |
-| Craft | `rest:GET:/api/task-templates` | unreviewed | — |
-| Craft | `rest:GET:/api/task-templates/{gid}` | unreviewed | — |
-| Craft | `rest:GET:/api/tasks` | unreviewed | — |
-| Craft | `rest:GET:/api/tasks/promote` | unreviewed | — |
-| Craft | `rest:GET:/api/tasks/{gid}` | unreviewed | — |
 | Craft | `rest:GET:/api/vpps-operations` | unreviewed | — |
 | Craft | `rest:GET:/api/vpps-operations/rule4-ignores` | unreviewed | — |
-| Craft | `rest:GET:/api/workbench/home` | unreviewed | — |
-| Craft | `rest:GET:/api/workbench/panel1` | unreviewed | — |
 | Craft | `rest:PATCH:/api/bop/entity-detail` | unreviewed | — |
 | Craft | `rest:PATCH:/api/bop/entries/{gid}` | unreviewed | — |
 | Craft | `rest:PATCH:/api/bop/factories/{gid}` | unreviewed | — |
@@ -425,24 +365,8 @@
 | Craft | `rest:PATCH:/api/gbop/processes/{gid}` | unreviewed | — |
 | Craft | `rest:PATCH:/api/gbop/versions/{gid}` | unreviewed | — |
 | Craft | `rest:PATCH:/api/import-export/templates/{gid}` | unreviewed | — |
-| Craft | `rest:PATCH:/api/issues/{gid}` | unreviewed | — |
-| Craft | `rest:PATCH:/api/lists/{gid}` | unreviewed | — |
-| Craft | `rest:PATCH:/api/projects/vehicle_models/{gid}` | unreviewed | — |
-| Craft | `rest:PATCH:/api/projects/{gid}` | unreviewed | — |
 | Craft | `rest:PATCH:/api/rules/{gid}` | unreviewed | — |
 | Craft | `rest:PATCH:/api/std_op/operations/{gid}` | unreviewed | — |
-| Craft | `rest:PATCH:/api/task-templates/items/{item_gid}` | unreviewed | — |
-| Craft | `rest:PATCH:/api/task-templates/{gid}` | unreviewed | — |
-| Craft | `rest:PATCH:/api/tasks/{gid}` | unreviewed | — |
-| Craft | `rest:POST:/api/approval/orders` | unreviewed | — |
-| Craft | `rest:POST:/api/approval/orders/scope_upgrade` | unreviewed | — |
-| Craft | `rest:POST:/api/approval/orders/{gid}/approve` | unreviewed | — |
-| Craft | `rest:POST:/api/approval/orders/{gid}/start` | unreviewed | — |
-| Craft | `rest:POST:/api/approval/orders/{gid}/withdraw` | unreviewed | — |
-| Craft | `rest:POST:/api/bitable-sync/bindings/{list_gid}` | unreviewed | — |
-| Craft | `rest:POST:/api/bitable-sync/bindings/{list_gid}/pull` | unreviewed | — |
-| Craft | `rest:POST:/api/bitable-sync/bindings/{list_gid}/push` | unreviewed | — |
-| Craft | `rest:POST:/api/bitable-sync/rows/push` | unreviewed | — |
 | Craft | `rest:POST:/api/bop/entries` | unreviewed | — |
 | Craft | `rest:POST:/api/bop/entries/{gid}/demote` | unreviewed | — |
 | Craft | `rest:POST:/api/bop/entries/{gid}/history/{log_gid}/rollback` | unreviewed | — |
@@ -490,9 +414,6 @@
 | Craft | `rest:POST:/api/bop/versions/{version_gid}/purge-entries` | unreviewed | — |
 | Craft | `rest:POST:/api/bop/versions/{version_gid}/staging` | unreviewed | — |
 | Craft | `rest:POST:/api/canvases` | unreviewed | — |
-| Craft | `rest:POST:/api/collab/sessions` | unreviewed | — |
-| Craft | `rest:POST:/api/collab/sessions/{gid}/end` | unreviewed | — |
-| Craft | `rest:POST:/api/collab/sessions/{gid}/join` | unreviewed | — |
 | Craft | `rest:POST:/api/craft_lib/equipments` | unreviewed | — |
 | Craft | `rest:POST:/api/craft_lib/equipments/{gid}/obsolete` | unreviewed | — |
 | Craft | `rest:POST:/api/craft_lib/fasteners` | unreviewed | — |
@@ -545,41 +466,16 @@
 | Craft | `rest:POST:/api/import-export/lark-sheets/read` | unreviewed | — |
 | Craft | `rest:POST:/api/import-export/lark-sheets/write` | unreviewed | — |
 | Craft | `rest:POST:/api/import-export/templates` | unreviewed | — |
-| Craft | `rest:POST:/api/issues` | unreviewed | — |
-| Craft | `rest:POST:/api/issues/promote` | unreviewed | — |
-| Craft | `rest:POST:/api/lists` | unreviewed | — |
-| Craft | `rest:POST:/api/lists/{gid}/retarget` | unreviewed | — |
-| Craft | `rest:POST:/api/permission-requests` | unreviewed | — |
-| Craft | `rest:POST:/api/permission-requests/{gid}/approve` | unreviewed | — |
-| Craft | `rest:POST:/api/permission-requests/{gid}/reject` | unreviewed | — |
-| Craft | `rest:POST:/api/projects` | unreviewed | — |
-| Craft | `rest:POST:/api/projects/vehicle_models` | unreviewed | — |
-| Craft | `rest:POST:/api/projects/{gid}/members` | unreviewed | — |
 | Craft | `rest:POST:/api/rule-engine/audit/bop-version/{version_gid}` | unreviewed | — |
 | Craft | `rest:POST:/api/rule-engine/check` | unreviewed | — |
 | Craft | `rest:POST:/api/rules` | unreviewed | — |
-| Craft | `rest:POST:/api/share-links` | unreviewed | — |
-| Craft | `rest:POST:/api/shares/items` | unreviewed | — |
-| Craft | `rest:POST:/api/shares/lists/{list_gid}` | unreviewed | — |
 | Craft | `rest:POST:/api/std_op/operations` | unreviewed | — |
 | Craft | `rest:POST:/api/std_op/operations/{gid}/clone-to-post` | unreviewed | — |
 | Craft | `rest:POST:/api/std_op/operations/{gid}/deprecate` | unreviewed | — |
 | Craft | `rest:POST:/api/std_op/operations/{gid}/publish` | unreviewed | — |
-| Craft | `rest:POST:/api/task-dependencies` | unreviewed | — |
-| Craft | `rest:POST:/api/task-templates` | unreviewed | — |
-| Craft | `rest:POST:/api/task-templates/{gid}/instantiate` | unreviewed | — |
-| Craft | `rest:POST:/api/task-templates/{template_gid}/items` | unreviewed | — |
-| Craft | `rest:POST:/api/tasks` | unreviewed | — |
-| Craft | `rest:POST:/api/tasks/promote` | unreviewed | — |
 | Craft | `rest:POST:/api/vpps-operations/rule4-bulk-ignore` | unreviewed | — |
 | Craft | `rest:POST:/api/vpps-operations/{gid}/revert` | unreviewed | — |
-| Craft | `rest:PUT:/api/bitable-sync/bindings/{list_gid}` | unreviewed | — |
 | Craft | `rest:PUT:/api/bop/versions/{gid}/layout-config` | unreviewed | — |
-| Craft | `rest:PUT:/api/issues/{gid}` | unreviewed | — |
-| Craft | `rest:PUT:/api/item-entries/{item_type}/{item_gid}` | unreviewed | — |
-| Craft | `rest:PUT:/api/projects/{gid}/line-assignment` | unreviewed | — |
-| Craft | `rest:PUT:/api/task-dependencies/{gid}` | unreviewed | — |
-| Craft | `rest:PUT:/api/tasks/{gid}` | unreviewed | — |
 | Craft | `capability:craft.bop.draft.change.apply` | existing_capability | `craft.bop.draft.change.apply` |
 | Craft | `capability:craft.bop.draft.change.preview` | existing_capability | `craft.bop.draft.change.preview` |
 | Craft | `capability:craft.bop.execution_structure.get` | existing_capability | `craft.bop.execution_structure.get` |
@@ -607,8 +503,10 @@
 | Digital Model | `capability:digital_model.snapshot.compare` | existing_capability | `digital_model.snapshot.compare` |
 | Digital Model | `capability:digital_model.snapshot.get` | existing_capability | `digital_model.snapshot.get` |
 | Digital Model | `capability:digital_model.version.create` | existing_capability | `digital_model.version.create` |
+| Knowledge | `agent_tool:find_similar_cases` | unreviewed | — |
 | Knowledge | `agent_tool:get_knowledge_document` | unreviewed | — |
 | Knowledge | `agent_tool:get_knowledge_entry` | unreviewed | — |
+| Knowledge | `agent_tool:recommend_practice` | unreviewed | — |
 | Knowledge | `rest:DELETE:/api/knowledge_entries/{gid}` | unreviewed | — |
 | Knowledge | `rest:DELETE:/api/knowledge_hub/folders/{gid}` | unreviewed | — |
 | Knowledge | `rest:DELETE:/api/knowledge_hub/items/{gid}` | unreviewed | — |
@@ -655,6 +553,7 @@
 | Knowledge | `capability:knowledge.space.create` | existing_capability | `knowledge.space.create` |
 | Knowledge | `capability:knowledge.space.list` | existing_capability | `knowledge.space.list` |
 | Knowledge | `capability:knowledge.space.search` | existing_capability | `knowledge.space.search` |
+| Local Integration | `agent_tool:open_in_container` | unreviewed | — |
 | Local Integration | `rest:DELETE:/api/v1/devices/{device_gid}` | unreviewed | — |
 | Local Integration | `rest:GET:/api/v1/devices` | unreviewed | — |
 | Local Integration | `rest:POST:/api/v1/devices/enrollments` | unreviewed | — |
@@ -720,29 +619,130 @@
 | Ontology | `capability:ontology.release.get` | existing_capability | `ontology.release.get` |
 | Ontology | `capability:ontology.release.publish` | existing_capability | `ontology.release.publish` |
 | Ontology | `capability:ontology.release.search` | existing_capability | `ontology.release.search` |
-| Project Management | `agent_tool:add_task_progress_log` | unreviewed | — |
-| Project Management | `agent_tool:create_approval_order` | unreviewed | — |
-| Project Management | `agent_tool:create_issue` | unreviewed | — |
-| Project Management | `agent_tool:create_task` | unreviewed | — |
-| Project Management | `agent_tool:get_issue` | unreviewed | — |
-| Project Management | `agent_tool:get_task` | unreviewed | — |
-| Project Management | `agent_tool:list_approval_orders` | unreviewed | — |
-| Project Management | `agent_tool:list_issue_lists` | unreviewed | — |
-| Project Management | `agent_tool:list_issues` | unreviewed | — |
-| Project Management | `agent_tool:list_projects` | unreviewed | — |
-| Project Management | `agent_tool:list_task_lists` | unreviewed | — |
-| Project Management | `agent_tool:list_tasks` | unreviewed | — |
-| Project Management | `agent_tool:search` | unreviewed | — |
-| Project Management | `agent_tool:update_issue` | unreviewed | — |
-| Project Management | `agent_tool:update_task` | unreviewed | — |
-| Project Management | `rest:DELETE:/api/workbenches/{gid}` | unreviewed | — |
-| Project Management | `rest:DELETE:/api/workbenches/{gid}/override` | unreviewed | — |
-| Project Management | `rest:GET:/api/workbenches` | unreviewed | — |
-| Project Management | `rest:GET:/api/workbenches/{gid}/override` | unreviewed | — |
-| Project Management | `rest:PATCH:/api/workbenches/{gid}` | unreviewed | — |
-| Project Management | `rest:POST:/api/workbenches` | unreviewed | — |
-| Project Management | `rest:PUT:/api/workbenches/{gid}/override` | unreviewed | — |
+| Project Management | `rest:GET:/share/issues` | excluded | — |
+| Project Management | `agent_tool:list_projects` | existing_capability | `base.project.search` |
 | Project Management | `capability:base.project.search` | existing_capability | `base.project.search` |
+| Project Management | `rest:GET:/api/projects` | existing_capability | `base.project.search` |
+| Project Management | `agent_tool:create_approval_order` | new_capability | `project.approval.change.apply` |
+| Project Management | `rest:POST:/api/approval/orders` | new_capability | `project.approval.change.apply` |
+| Project Management | `rest:POST:/api/approval/orders/scope_upgrade` | new_capability | `project.approval.change.apply` |
+| Project Management | `rest:POST:/api/approval/orders/{gid}/approve` | new_capability | `project.approval.change.apply` |
+| Project Management | `rest:POST:/api/approval/orders/{gid}/start` | new_capability | `project.approval.change.apply` |
+| Project Management | `rest:POST:/api/approval/orders/{gid}/withdraw` | new_capability | `project.approval.change.apply` |
+| Project Management | `agent_tool:list_approval_orders` | new_capability | `project.approval.read` |
+| Project Management | `rest:GET:/api/approval/orders` | new_capability | `project.approval.read` |
+| Project Management | `rest:GET:/api/approval/orders/{gid}` | new_capability | `project.approval.read` |
+| Project Management | `rest:DELETE:/api/bitable-sync/bindings/{list_gid}` | new_capability | `project.bitable_binding.change.apply` |
+| Project Management | `rest:POST:/api/bitable-sync/bindings/{list_gid}` | new_capability | `project.bitable_binding.change.apply` |
+| Project Management | `rest:POST:/api/bitable-sync/bindings/{list_gid}/pull` | new_capability | `project.bitable_binding.change.apply` |
+| Project Management | `rest:POST:/api/bitable-sync/bindings/{list_gid}/push` | new_capability | `project.bitable_binding.change.apply` |
+| Project Management | `rest:POST:/api/bitable-sync/rows/push` | new_capability | `project.bitable_binding.change.apply` |
+| Project Management | `rest:PUT:/api/bitable-sync/bindings/{list_gid}` | new_capability | `project.bitable_binding.change.apply` |
+| Project Management | `rest:GET:/api/bitable-sync/bindings/{list_gid}` | new_capability | `project.bitable_binding.read` |
+| Project Management | `rest:GET:/api/bitable-sync/bindings/{list_gid}/schema` | new_capability | `project.bitable_binding.read` |
+| Project Management | `rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token` | new_capability | `project.bitable_binding.read` |
+| Project Management | `rest:GET:/api/bitable-sync/bindings/{list_gid}/status` | new_capability | `project.bitable_binding.read` |
+| Project Management | `rest:GET:/api/change-logs` | new_capability | `project.change_log.read` |
+| Project Management | `rest:POST:/api/collab/sessions` | new_capability | `project.collaboration.change.apply` |
+| Project Management | `rest:POST:/api/collab/sessions/{gid}/end` | new_capability | `project.collaboration.change.apply` |
+| Project Management | `rest:POST:/api/collab/sessions/{gid}/join` | new_capability | `project.collaboration.change.apply` |
+| Project Management | `rest:GET:/api/collab/sessions` | new_capability | `project.collaboration.read` |
+| Project Management | `rest:GET:/api/collab/sessions/{gid}` | new_capability | `project.collaboration.read` |
+| Project Management | `rest:GET:/api/projects/{gid}/bop-lines` | new_capability | `project.craft_scope.read` |
+| Project Management | `rest:DELETE:/api/follows/{gid}` | new_capability | `project.follow.change.apply` |
+| Project Management | `rest:PATCH:/api/follows/{gid}` | new_capability | `project.follow.change.apply` |
+| Project Management | `rest:POST:/api/follows` | new_capability | `project.follow.change.apply` |
+| Project Management | `rest:GET:/api/follows` | new_capability | `project.follow.read` |
+| Project Management | `rest:GET:/api/follows/check` | new_capability | `project.follow.read` |
+| Project Management | `agent_tool:create_issue` | new_capability | `project.issue.change.apply` |
+| Project Management | `agent_tool:update_issue` | new_capability | `project.issue.change.apply` |
+| Project Management | `rest:DELETE:/api/issues/{gid}` | new_capability | `project.issue.change.apply` |
+| Project Management | `rest:GET:/api/issues/promote` | new_capability | `project.issue.change.apply` |
+| Project Management | `rest:PATCH:/api/issues/{gid}` | new_capability | `project.issue.change.apply` |
+| Project Management | `rest:POST:/api/issues` | new_capability | `project.issue.change.apply` |
+| Project Management | `rest:POST:/api/issues/promote` | new_capability | `project.issue.change.apply` |
+| Project Management | `rest:PUT:/api/issues/{gid}` | new_capability | `project.issue.change.apply` |
+| Project Management | `agent_tool:get_issue` | new_capability | `project.issue.read` |
+| Project Management | `agent_tool:list_issue_lists` | new_capability | `project.issue.read` |
+| Project Management | `agent_tool:list_issues` | new_capability | `project.issue.read` |
+| Project Management | `rest:GET:/api/issues` | new_capability | `project.issue.read` |
+| Project Management | `rest:GET:/api/issues/{gid}` | new_capability | `project.issue.read` |
+| Project Management | `rest:DELETE:/api/item-entries/{item_type}/{item_gid}` | new_capability | `project.list.change.apply` |
+| Project Management | `rest:DELETE:/api/lists/{gid}` | new_capability | `project.list.change.apply` |
+| Project Management | `rest:PATCH:/api/lists/{gid}` | new_capability | `project.list.change.apply` |
+| Project Management | `rest:POST:/api/lists` | new_capability | `project.list.change.apply` |
+| Project Management | `rest:POST:/api/lists/{gid}/retarget` | new_capability | `project.list.change.apply` |
+| Project Management | `rest:PUT:/api/item-entries/{item_type}/{item_gid}` | new_capability | `project.list.change.apply` |
+| Project Management | `rest:GET:/api/item-entries/{item_type}/{item_gid}` | new_capability | `project.list.read` |
+| Project Management | `rest:GET:/api/lists` | new_capability | `project.list.read` |
+| Project Management | `rest:DELETE:/api/projects/{gid}/members/{member_gid}` | new_capability | `project.member.change.apply` |
+| Project Management | `rest:POST:/api/projects/{gid}/members` | new_capability | `project.member.change.apply` |
+| Project Management | `rest:GET:/api/projects/members/matrix` | new_capability | `project.member.read` |
+| Project Management | `rest:GET:/api/projects/{gid}/members` | new_capability | `project.member.read` |
+| Project Management | `rest:PATCH:/api/notifications/prefs` | new_capability | `project.notification.change.apply` |
+| Project Management | `rest:PATCH:/api/notifications/read_all` | new_capability | `project.notification.change.apply` |
+| Project Management | `rest:PATCH:/api/notifications/{gid}/read` | new_capability | `project.notification.change.apply` |
+| Project Management | `rest:POST:/api/mentions/notify` | new_capability | `project.notification.change.apply` |
+| Project Management | `rest:GET:/api/notifications` | new_capability | `project.notification.read` |
+| Project Management | `rest:GET:/api/notifications/prefs` | new_capability | `project.notification.read` |
+| Project Management | `rest:GET:/api/notifications/unread_count` | new_capability | `project.notification.read` |
+| Project Management | `rest:POST:/api/permission-requests` | new_capability | `project.permission_request.change.apply` |
+| Project Management | `rest:POST:/api/permission-requests/{gid}/approve` | new_capability | `project.permission_request.change.apply` |
+| Project Management | `rest:POST:/api/permission-requests/{gid}/reject` | new_capability | `project.permission_request.change.apply` |
+| Project Management | `rest:GET:/api/permission-requests` | new_capability | `project.permission_request.read` |
+| Project Management | `rest:DELETE:/api/projects/vehicle_models/{gid}` | new_capability | `project.project.change.apply` |
+| Project Management | `rest:DELETE:/api/projects/{gid}` | new_capability | `project.project.change.apply` |
+| Project Management | `rest:PATCH:/api/projects/vehicle_models/{gid}` | new_capability | `project.project.change.apply` |
+| Project Management | `rest:PATCH:/api/projects/{gid}` | new_capability | `project.project.change.apply` |
+| Project Management | `rest:POST:/api/projects` | new_capability | `project.project.change.apply` |
+| Project Management | `rest:POST:/api/projects/vehicle_models` | new_capability | `project.project.change.apply` |
+| Project Management | `rest:PUT:/api/projects/{gid}/line-assignment` | new_capability | `project.project.change.apply` |
+| Project Management | `rest:GET:/api/projects/vehicle_models` | new_capability | `project.project.read` |
+| Project Management | `rest:GET:/api/projects/{gid}` | new_capability | `project.project.read` |
+| Project Management | `rest:DELETE:/api/share-links/{token}` | new_capability | `project.sharing.change.apply` |
+| Project Management | `rest:DELETE:/api/shares/items/{gid}` | new_capability | `project.sharing.change.apply` |
+| Project Management | `rest:DELETE:/api/shares/lists/{list_gid}/{gid}` | new_capability | `project.sharing.change.apply` |
+| Project Management | `rest:POST:/api/share-links` | new_capability | `project.sharing.change.apply` |
+| Project Management | `rest:POST:/api/shares/items` | new_capability | `project.sharing.change.apply` |
+| Project Management | `rest:POST:/api/shares/lists/{list_gid}` | new_capability | `project.sharing.change.apply` |
+| Project Management | `rest:GET:/api/share-links/{token}` | new_capability | `project.sharing.read` |
+| Project Management | `rest:GET:/api/shares/lists/{list_gid}` | new_capability | `project.sharing.read` |
+| Project Management | `agent_tool:add_task_progress_log` | new_capability | `project.task.change.apply` |
+| Project Management | `agent_tool:create_task` | new_capability | `project.task.change.apply` |
+| Project Management | `agent_tool:update_task` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:DELETE:/api/task-dependencies/{gid}` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:DELETE:/api/tasks/{gid}` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:GET:/api/tasks/promote` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:PATCH:/api/tasks/{gid}` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:POST:/api/task-dependencies` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:POST:/api/tasks` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:POST:/api/tasks/promote` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:PUT:/api/task-dependencies/{gid}` | new_capability | `project.task.change.apply` |
+| Project Management | `rest:PUT:/api/tasks/{gid}` | new_capability | `project.task.change.apply` |
+| Project Management | `agent_tool:get_task` | new_capability | `project.task.read` |
+| Project Management | `agent_tool:list_task_lists` | new_capability | `project.task.read` |
+| Project Management | `agent_tool:list_tasks` | new_capability | `project.task.read` |
+| Project Management | `rest:GET:/api/task-dependencies` | new_capability | `project.task.read` |
+| Project Management | `rest:GET:/api/tasks` | new_capability | `project.task.read` |
+| Project Management | `rest:GET:/api/tasks/{gid}` | new_capability | `project.task.read` |
+| Project Management | `rest:DELETE:/api/task-templates/items/{item_gid}` | new_capability | `project.task_template.change.apply` |
+| Project Management | `rest:DELETE:/api/task-templates/{gid}` | new_capability | `project.task_template.change.apply` |
+| Project Management | `rest:PATCH:/api/task-templates/items/{item_gid}` | new_capability | `project.task_template.change.apply` |
+| Project Management | `rest:PATCH:/api/task-templates/{gid}` | new_capability | `project.task_template.change.apply` |
+| Project Management | `rest:POST:/api/task-templates` | new_capability | `project.task_template.change.apply` |
+| Project Management | `rest:POST:/api/task-templates/{gid}/instantiate` | new_capability | `project.task_template.change.apply` |
+| Project Management | `rest:POST:/api/task-templates/{template_gid}/items` | new_capability | `project.task_template.change.apply` |
+| Project Management | `rest:GET:/api/task-templates` | new_capability | `project.task_template.read` |
+| Project Management | `rest:GET:/api/task-templates/{gid}` | new_capability | `project.task_template.read` |
+| Project Management | `rest:DELETE:/api/workbenches/{gid}` | new_capability | `project.workbench.change.apply` |
+| Project Management | `rest:DELETE:/api/workbenches/{gid}/override` | new_capability | `project.workbench.change.apply` |
+| Project Management | `rest:PATCH:/api/workbenches/{gid}` | new_capability | `project.workbench.change.apply` |
+| Project Management | `rest:POST:/api/workbenches` | new_capability | `project.workbench.change.apply` |
+| Project Management | `rest:PUT:/api/workbenches/{gid}/override` | new_capability | `project.workbench.change.apply` |
+| Project Management | `rest:GET:/api/workbench/home` | new_capability | `project.workbench.read` |
+| Project Management | `rest:GET:/api/workbench/panel1` | new_capability | `project.workbench.read` |
+| Project Management | `rest:GET:/api/workbenches` | new_capability | `project.workbench.read` |
+| Project Management | `rest:GET:/api/workbenches/{gid}/override` | new_capability | `project.workbench.read` |
 | Simulation | `capability:simulation.environment.create` | existing_capability | `simulation.environment.create` |
 | Simulation | `rest:POST:/api/simulation/environments` | existing_capability | `simulation.environment.create` |
 | Simulation | `capability:simulation.environment.get` | existing_capability | `simulation.environment.get` |

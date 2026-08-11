@@ -3,193 +3,40 @@
   "domain": "Project Management",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:d20e0541378b3f1a8b6fedc39cf95771bc8140a65672f3335aee5bde26038723",
+    "registry_sha256": "sha256:593205f17618ee8c5c85e5d53fcdc505589577af998e8dbe0bbdf3dee64a4bc6",
     "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
     "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
   },
-  "unreviewed_functions": {
-    "agent_tool:add_task_progress_log": {
-      "resolution": "unreviewed",
+  "unreviewed_functions": {},
+  "excluded_functions": {
+    "rest:GET:/share/issues": {
+      "resolution": "excluded",
+      "target_capability": null,
       "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+        "backend/routers/share_page.py"
       ],
+      "evidence": "The stable surface rest:GET:/share/issues is implemented at backend/routers/share_page.py.",
+      "reason": "rest:GET:/share/issues is a transient public share page composed from governed Issue data; it is retained as ui transient infrastructure and must not become an independently invokable business Capability.",
+      "classification": "ui_transient",
       "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:create_approval_order": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:create_issue": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:create_task": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:get_issue": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:get_task": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:list_approval_orders": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:list_issue_lists": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:list_issues": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:list_projects": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:list_task_lists": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:list_tasks": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:search": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:update_issue": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "agent_tool:update_task": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/workbenches/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/workbenches.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:DELETE:/api/workbenches/{gid}/override": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/workbenches.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/workbenches": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/workbenches.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:GET:/api/workbenches/{gid}/override": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/workbenches.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PATCH:/api/workbenches/{gid}": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/workbenches.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:POST:/api/workbenches": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/workbenches.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
-    },
-    "rest:PUT:/api/workbenches/{gid}/override": {
-      "resolution": "unreviewed",
-      "source_paths": [
-        "backend/routers/workbenches.py"
-      ],
-      "owner": "Project Management",
-      "evidence": "Discovered as a stable user function in the bound Registry source evidence."
+      "reviewer": "capability-v2-architecture-review",
+      "reviewed_at": "2026-08-11"
     }
   },
-  "excluded_functions": {},
   "capabilities": {
     "base.project.search": {
       "kind": "existing",
       "function_dispositions": {
+        "agent_tool:list_projects": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:list_projects implements the reviewed base.project.search business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
         "capability:base.project.search": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -200,44 +47,2822 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/projects": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/projects implements the reviewed base.project.search business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "base.project.search"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.project.search"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "base.project.search"
         },
         "agent": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "base.project.search"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "base.project.search"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "base.project.search"
         }
+      }
+    },
+    "project.approval.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "agent_tool:create_approval_order": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:create_approval_order implements the reviewed project.approval.change.apply business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/approval/orders": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/approval.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/approval/orders implements the reviewed project.approval.change.apply business outcome from plugins/craft/craft_backend/routers/approval.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/approval/orders/scope_upgrade": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/approval.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/approval/orders/scope_upgrade implements the reviewed project.approval.change.apply business outcome from plugins/craft/craft_backend/routers/approval.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/approval/orders/{gid}/approve": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/approval.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/approval/orders/{gid}/approve implements the reviewed project.approval.change.apply business outcome from plugins/craft/craft_backend/routers/approval.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/approval/orders/{gid}/start": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/approval.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/approval/orders/{gid}/start implements the reviewed project.approval.change.apply business outcome from plugins/craft/craft_backend/routers/approval.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/approval/orders/{gid}/withdraw": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/approval.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/approval/orders/{gid}/withdraw implements the reviewed project.approval.change.apply business outcome from plugins/craft/craft_backend/routers/approval.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.approval.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.approval.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.approval.change.apply"
+        },
+        "agent": {
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.approval.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.approval.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.approval.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed approval change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.approval.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_approval_orders"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.approval.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "agent_tool:list_approval_orders": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:list_approval_orders implements the reviewed project.approval.read business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/approval/orders": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/approval.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/approval/orders implements the reviewed project.approval.read business outcome from plugins/craft/craft_backend/routers/approval.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/approval/orders/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/approval.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/approval/orders/{gid} implements the reviewed project.approval.read business outcome from plugins/craft/craft_backend/routers/approval.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.approval.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.approval.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.approval.read"
+        },
+        "agent": {
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.approval.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.approval.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.approval.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed approval read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.approval.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_approval_orders"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.bitable_binding.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/bitable-sync/bindings/{list_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/bitable-sync/bindings/{list_gid} implements the reviewed project.bitable_binding.change.apply business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/bitable-sync/bindings/{list_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/bitable-sync/bindings/{list_gid} implements the reviewed project.bitable_binding.change.apply business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/bitable-sync/bindings/{list_gid}/pull": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/bitable-sync/bindings/{list_gid}/pull implements the reviewed project.bitable_binding.synchronize business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/bitable-sync/bindings/{list_gid}/push": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/bitable-sync/bindings/{list_gid}/push implements the reviewed project.bitable_binding.synchronize business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/bitable-sync/rows/push": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/bitable-sync/rows/push implements the reviewed project.bitable_binding.synchronize business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/bitable-sync/bindings/{list_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PUT:/api/bitable-sync/bindings/{list_gid} implements the reviewed project.bitable_binding.change.apply business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.bitable_binding.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed bitable binding change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.bitable_binding.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_list_bitable_bindings",
+          "workmanship_work_list_bitable_record_map"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.bitable_binding.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/bitable-sync/bindings/{list_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/bitable-sync/bindings/{list_gid} implements the reviewed project.bitable_binding.read business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/bitable-sync/bindings/{list_gid}/schema implements the reviewed project.bitable_binding.read business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token implements the reviewed project.bitable_binding.read business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/bitable-sync/bindings/{list_gid}/status": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/bitable_sync.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/bitable-sync/bindings/{list_gid}/status implements the reviewed project.bitable_binding.read business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.bitable_binding.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.bitable_binding.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed bitable binding read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.bitable_binding.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_list_bitable_bindings",
+          "workmanship_work_list_bitable_record_map"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.change_log.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/change-logs": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/change_logs.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/change-logs implements the reviewed project.change_log.read business outcome from plugins/craft/craft_backend/routers/change_logs.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.change_log.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.change_log.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.change_log.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.change_log.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.change_log.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.change_log.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed change log read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.change_log.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_item_change_logs"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.collaboration.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/collab/sessions": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/collab.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/collab/sessions implements the reviewed project.collaboration.change.apply business outcome from plugins/craft/craft_backend/routers/collab.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/collab/sessions/{gid}/end": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/collab.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/collab/sessions/{gid}/end implements the reviewed project.collaboration.change.apply business outcome from plugins/craft/craft_backend/routers/collab.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/collab/sessions/{gid}/join": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/collab.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/collab/sessions/{gid}/join implements the reviewed project.collaboration.change.apply business outcome from plugins/craft/craft_backend/routers/collab.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.collaboration.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed collaboration change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.collaboration.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_collab_sessions"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.collaboration.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/collab/sessions": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/collab.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/collab/sessions implements the reviewed project.collaboration.read business outcome from plugins/craft/craft_backend/routers/collab.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/collab/sessions/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/collab.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/collab/sessions/{gid} implements the reviewed project.collaboration.read business outcome from plugins/craft/craft_backend/routers/collab.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.collaboration.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.collaboration.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed collaboration read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.collaboration.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_collab_sessions"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.craft_scope.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/projects/{gid}/bop-lines": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/projects/{gid}/bop-lines implements the reviewed project.craft_scope.read business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.craft_scope.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.craft_scope.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.craft_scope.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.craft_scope.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.craft_scope.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.craft_scope.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed craft scope read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.craft_scope.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.follow.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/follows/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/follows.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/follows/{gid} implements the reviewed project.follow.change.apply business outcome from backend/routers/follows.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/follows/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/follows.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/follows/{gid} implements the reviewed project.follow.change.apply business outcome from backend/routers/follows.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/follows": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/follows.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/follows implements the reviewed project.follow.change.apply business outcome from backend/routers/follows.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.follow.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.follow.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.follow.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.follow.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.follow.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.follow.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed follow change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.follow.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_follows"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.follow.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/follows": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/follows.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/follows implements the reviewed project.follow.read business outcome from backend/routers/follows.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/follows/check": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/follows.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/follows/check implements the reviewed project.follow.read business outcome from backend/routers/follows.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.follow.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.follow.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.follow.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.follow.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.follow.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.follow.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed follow read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.follow.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_follows"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.issue.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "agent_tool:create_issue": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:create_issue implements the reviewed project.issue.change.apply business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "agent_tool:update_issue": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:update_issue implements the reviewed project.issue.change.apply business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/issues/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/issues/{gid} implements the reviewed project.issue.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/issues/promote": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/issues/promote implements the reviewed project.issue.promote business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/issues/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/issues/{gid} implements the reviewed project.issue.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/issues": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/issues implements the reviewed project.issue.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/issues/promote": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/issues/promote implements the reviewed project.issue.promote business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/issues/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PUT:/api/issues/{gid} implements the reviewed project.issue.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.issue.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.issue.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.issue.change.apply"
+        },
+        "agent": {
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.issue.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.issue.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.issue.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed issue change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.issue.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_issues",
+          "workmanship_work_issues"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.issue.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "agent_tool:get_issue": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:get_issue implements the reviewed project.issue.read business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "agent_tool:list_issue_lists": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:list_issue_lists implements the reviewed project.issue.read business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "agent_tool:list_issues": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:list_issues implements the reviewed project.issue.read business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/issues": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/issues implements the reviewed project.issue.read business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/issues/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/issues/{gid} implements the reviewed project.issue.read business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.issue.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.issue.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.issue.read"
+        },
+        "agent": {
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.issue.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.issue.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.issue.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed issue read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.issue.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_issues",
+          "workmanship_work_issues"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.list.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/item-entries/{item_type}/{item_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/item_entries.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/item-entries/{item_type}/{item_gid} implements the reviewed project.item_entry.change.apply business outcome from plugins/craft/craft_backend/routers/item_entries.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/lists/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/lists.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/lists/{gid} implements the reviewed project.list.change.apply business outcome from plugins/craft/craft_backend/routers/lists.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/lists/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/lists.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/lists/{gid} implements the reviewed project.list.change.apply business outcome from plugins/craft/craft_backend/routers/lists.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/lists": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/lists.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/lists implements the reviewed project.list.change.apply business outcome from plugins/craft/craft_backend/routers/lists.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/lists/{gid}/retarget": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/lists.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/lists/{gid}/retarget implements the reviewed project.list.change.apply business outcome from plugins/craft/craft_backend/routers/lists.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/item-entries/{item_type}/{item_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/item_entries.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PUT:/api/item-entries/{item_type}/{item_gid} implements the reviewed project.item_entry.change.apply business outcome from plugins/craft/craft_backend/routers/item_entries.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.list.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.list.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.list.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.list.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.list.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.list.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed list change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.list.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_item_entries",
+          "workmanship_work_lists"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.list.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/item-entries/{item_type}/{item_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/item_entries.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/item-entries/{item_type}/{item_gid} implements the reviewed project.item_entry.read business outcome from plugins/craft/craft_backend/routers/item_entries.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/lists": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/lists.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/lists implements the reviewed project.list.read business outcome from plugins/craft/craft_backend/routers/lists.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.list.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.list.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.list.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.list.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.list.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.list.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed list read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.list.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_item_entries",
+          "workmanship_work_lists"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.member.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/projects/{gid}/members/{member_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/projects/{gid}/members/{member_gid} implements the reviewed project.member.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/projects/{gid}/members": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/projects/{gid}/members implements the reviewed project.member.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.member.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.member.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.member.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.member.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.member.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.member.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed member change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.member.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.member.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/projects/members/matrix": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/projects/members/matrix implements the reviewed project.member.read business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/projects/{gid}/members": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/projects/{gid}/members implements the reviewed project.member.read business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.member.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.member.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.member.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.member.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.member.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.member.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed member read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.member.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.notification.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:PATCH:/api/notifications/prefs": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/notifications.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/notifications/prefs implements the reviewed project.notification.preference.change.apply business outcome from backend/routers/notifications.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/notifications/read_all": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/notifications.py",
+            "dist/web/core/notification_manager.js"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/notifications/read_all implements the reviewed project.notification.read.mark business outcome from backend/routers/notifications.py, dist/web/core/notification_manager.js.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/notifications/{gid}/read": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/notifications.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/notifications/{gid}/read implements the reviewed project.notification.read.mark business outcome from backend/routers/notifications.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/mentions/notify": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/mentions.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/mentions/notify implements the reviewed project.notification.send business outcome from backend/routers/mentions.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Reviewed web exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.notification.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.notification.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.notification.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.notification.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.notification.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.notification.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed notification change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.notification.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_notifications"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.notification.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/notifications": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/notifications.py",
+            "dist/web/core/notification_manager.js"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/notifications implements the reviewed project.notification.read business outcome from backend/routers/notifications.py, dist/web/core/notification_manager.js.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/notifications/prefs": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/notifications.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/notifications/prefs implements the reviewed project.notification.preference.read business outcome from backend/routers/notifications.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/notifications/unread_count": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/notifications.py",
+            "dist/web/core/notification_manager.js"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/notifications/unread_count implements the reviewed project.notification.read business outcome from backend/routers/notifications.py, dist/web/core/notification_manager.js.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": true,
+          "reason": "Reviewed web exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.notification.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.notification.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.notification.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.notification.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.notification.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.notification.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed notification read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.notification.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_notifications"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.permission_request.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/permission-requests": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/permission_requests.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/permission-requests implements the reviewed project.permission_request.create business outcome from plugins/craft/craft_backend/routers/permission_requests.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/permission-requests/{gid}/approve": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/permission_requests.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/permission-requests/{gid}/approve implements the reviewed project.permission_request.decide business outcome from plugins/craft/craft_backend/routers/permission_requests.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/permission-requests/{gid}/reject": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/permission_requests.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/permission-requests/{gid}/reject implements the reviewed project.permission_request.decide business outcome from plugins/craft/craft_backend/routers/permission_requests.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.permission_request.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed permission request change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.permission_request.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_permission_requests"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.permission_request.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/permission-requests": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/permission_requests.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/permission-requests implements the reviewed project.permission_request.read business outcome from plugins/craft/craft_backend/routers/permission_requests.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.permission_request.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.permission_request.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed permission request read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.permission_request.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_permission_requests"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.project.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/projects/vehicle_models/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/projects/vehicle_models/{gid} implements the reviewed project.vehicle_model.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/projects/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/projects/{gid} implements the reviewed project.project.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/projects/vehicle_models/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/projects/vehicle_models/{gid} implements the reviewed project.vehicle_model.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/projects/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/projects/{gid} implements the reviewed project.project.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/projects": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/projects implements the reviewed project.project.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/projects/vehicle_models": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/projects/vehicle_models implements the reviewed project.vehicle_model.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/projects/{gid}/line-assignment": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PUT:/api/projects/{gid}/line-assignment implements the reviewed project.line_assignment.set business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.project.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.project.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.project.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.project.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.project.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.project.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed project change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.project.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_projects",
+          "workmanship_proj_vehicle_models"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.project.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/projects/vehicle_models": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/projects/vehicle_models implements the reviewed project.vehicle_model.read business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/projects/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/projects.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/projects/{gid} implements the reviewed project.project.read business outcome from plugins/craft/craft_backend/routers/projects.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.project.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.project.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.project.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.project.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.project.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.project.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed project read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.project.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_projects",
+          "workmanship_proj_vehicle_models"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.sharing.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/share-links/{token}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/share_links.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/share-links/{token} implements the reviewed project.share_link.change.apply business outcome from plugins/craft/craft_backend/routers/share_links.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/shares/items/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/shares.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/shares/items/{gid} implements the reviewed project.share.change.apply business outcome from plugins/craft/craft_backend/routers/shares.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/shares/lists/{list_gid}/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/shares.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/shares/lists/{list_gid}/{gid} implements the reviewed project.share.change.apply business outcome from plugins/craft/craft_backend/routers/shares.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/share-links": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/share_links.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/share-links implements the reviewed project.share_link.change.apply business outcome from plugins/craft/craft_backend/routers/share_links.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/shares/items": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/shares.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/shares/items implements the reviewed project.share.change.apply business outcome from plugins/craft/craft_backend/routers/shares.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/shares/lists/{list_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/shares.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/shares/lists/{list_gid} implements the reviewed project.share.change.apply business outcome from plugins/craft/craft_backend/routers/shares.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.sharing.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.sharing.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.sharing.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.sharing.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.sharing.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.sharing.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed sharing change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.sharing.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_share_links"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.sharing.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/share-links/{token}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/share_links.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/share-links/{token} implements the reviewed project.share_link.read business outcome from plugins/craft/craft_backend/routers/share_links.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/shares/lists/{list_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/shares.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/shares/lists/{list_gid} implements the reviewed project.share.read business outcome from plugins/craft/craft_backend/routers/shares.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.sharing.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.sharing.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.sharing.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.sharing.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.sharing.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.sharing.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed sharing read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.sharing.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_work_share_links"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.task.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "agent_tool:add_task_progress_log": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:add_task_progress_log implements the reviewed project.task.change.apply business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "agent_tool:create_task": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:create_task implements the reviewed project.task.change.apply business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "agent_tool:update_task": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:update_task implements the reviewed project.task.change.apply business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/task-dependencies/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/task-dependencies/{gid} implements the reviewed project.task_dependency.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/tasks/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/tasks/{gid} implements the reviewed project.task.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/tasks/promote": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/tasks/promote implements the reviewed project.task.promote business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/tasks/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/tasks/{gid} implements the reviewed project.task.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/task-dependencies": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/task-dependencies implements the reviewed project.task_dependency.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/tasks": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/tasks implements the reviewed project.task.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/tasks/promote": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/tasks/promote implements the reviewed project.task.promote business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/task-dependencies/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PUT:/api/task-dependencies/{gid} implements the reviewed project.task_dependency.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/tasks/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PUT:/api/tasks/{gid} implements the reviewed project.task.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.task.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.task.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.task.change.apply"
+        },
+        "agent": {
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.task.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.task.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.task.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed task change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.task.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_task_dependencies",
+          "workmanship_proj_tasks",
+          "workmanship_work_task_dependencies",
+          "workmanship_work_tasks"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.task.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "agent_tool:get_task": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:get_task implements the reviewed project.task.read business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "agent_tool:list_task_lists": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:list_task_lists implements the reviewed project.task.read business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "agent_tool:list_tasks": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface agent_tool:list_tasks implements the reviewed project.task.read business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/task-dependencies": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/task-dependencies implements the reviewed project.task_dependency.read business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/tasks": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/tasks implements the reviewed project.task.read business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/tasks/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/promotion.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/tasks/{gid} implements the reviewed project.task.read business outcome from plugins/craft/craft_backend/routers/promotion.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.task.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.task.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.task.read"
+        },
+        "agent": {
+          "enabled": true,
+          "reason": "Reviewed agent exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.task.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.task.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.task.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed task read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.task.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_task_dependencies",
+          "workmanship_proj_tasks",
+          "workmanship_work_task_dependencies",
+          "workmanship_work_tasks"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.task_template.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/task-templates/items/{item_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/task-templates/items/{item_gid} implements the reviewed project.task_template.change.apply business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/task-templates/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/task-templates/{gid} implements the reviewed project.task_template.change.apply business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/task-templates/items/{item_gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/task-templates/items/{item_gid} implements the reviewed project.task_template.change.apply business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/task-templates/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/task-templates/{gid} implements the reviewed project.task_template.change.apply business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/task-templates": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/task-templates implements the reviewed project.task_template.change.apply business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/task-templates/{gid}/instantiate": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/task-templates/{gid}/instantiate implements the reviewed project.task_template.instantiate business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/task-templates/{template_gid}/items": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/task-templates/{template_gid}/items implements the reviewed project.task_template.change.apply business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.task_template.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.task_template.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.task_template.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.task_template.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.task_template.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.task_template.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed task template change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.task_template.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_tasks",
+          "workmanship_work_tasks"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.task_template.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/task-templates": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/task-templates implements the reviewed project.task_template.read business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/task-templates/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/task_templates.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/task-templates/{gid} implements the reviewed project.task_template.read business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.task_template.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.task_template.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.task_template.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.task_template.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.task_template.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.task_template.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed task template read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.task_template.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_proj_tasks",
+          "workmanship_work_tasks"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.workbench.change.apply": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/workbenches/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/workbenches.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/workbenches/{gid} implements the reviewed project.workbench.change.apply business outcome from backend/routers/workbenches.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:DELETE:/api/workbenches/{gid}/override": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/workbenches.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:DELETE:/api/workbenches/{gid}/override implements the reviewed project.workbench.change.apply business outcome from backend/routers/workbenches.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PATCH:/api/workbenches/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/workbenches.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PATCH:/api/workbenches/{gid} implements the reviewed project.workbench.change.apply business outcome from backend/routers/workbenches.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:POST:/api/workbenches": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/workbenches.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:POST:/api/workbenches implements the reviewed project.workbench.change.apply business outcome from backend/routers/workbenches.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:PUT:/api/workbenches/{gid}/override": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/workbenches.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:PUT:/api/workbenches/{gid}/override implements the reviewed project.workbench.change.apply business outcome from backend/routers/workbenches.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.workbench.change.apply"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.workbench.change.apply"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.workbench.change.apply"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.workbench.change.apply"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.workbench.change.apply"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.workbench.change.apply"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed workbench change apply business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.workbench.change.apply",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_app_wb_annotations",
+          "workmanship_app_workbench_configs",
+          "workmanship_app_workbench_member_overrides"
+        ],
+        "migration_stream": "project_management"
+      }
+    },
+    "project.workbench.read": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/workbench/home": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/workbench_home.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/workbench/home implements the reviewed project.workbench.dashboard.read business outcome from plugins/craft/craft_backend/routers/workbench_home.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/workbench/panel1": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/routers/workbench_home.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/workbench/panel1 implements the reviewed project.workbench.dashboard.read business outcome from plugins/craft/craft_backend/routers/workbench_home.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/workbenches": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/workbenches.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/workbenches implements the reviewed project.workbench.read business outcome from backend/routers/workbenches.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "rest:GET:/api/workbenches/{gid}/override": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/workbenches.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The stable surface rest:GET:/api/workbenches/{gid}/override implements the reviewed project.workbench.read business outcome from backend/routers/workbenches.py.",
+          "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed web consumer requires this business outcome.",
+          "policy_ref": "project.workbench.read"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
+          "policy_ref": "project.workbench.read"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed plugin consumer requires this business outcome.",
+          "policy_ref": "project.workbench.read"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed agent consumer requires this business outcome.",
+          "policy_ref": "project.workbench.read"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed mcp consumer requires this business outcome.",
+          "policy_ref": "project.workbench.read"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed local_runtime consumer requires this business outcome.",
+          "policy_ref": "project.workbench.read"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed workbench read business outcome for Project Management.",
+        "non_goals": [
+          "Does not create consumer-specific business logic or bypass the shared Gateway."
+        ],
+        "owner_domain": "project_management",
+        "application_port": "project.workbench.read",
+        "provider_artifact": "ai00-project-management-plugin",
+        "owned_tables": [
+          "workmanship_app_wb_annotations",
+          "workmanship_app_workbench_configs",
+          "workmanship_app_workbench_member_overrides"
+        ],
+        "migration_stream": "project_management"
       }
     }
   },
-  "code_extractions": [],
+  "code_extractions": [
+    {
+      "id": "extract:project-management:projects-router",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "target_application_port": "project_management.projects",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    },
+    {
+      "id": "extract:project-management:workbench-home-router",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/workbench_home.py"
+      ],
+      "owner_domain": "Project Management",
+      "target_application_port": "project_management.workbench_home",
+      "shared_pipeline": "capability_provider_gateway",
+      "disposition": "planned"
+    }
+  ],
   "database_boundaries": [
     {
       "table": "workmanship_app_wb_annotations",
@@ -576,6 +3201,34 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
+    },
+    {
+      "id": "migration:202608050002_craft_work_collaboration_tables",
+      "category": "migration",
+      "source_paths": [
+        "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Craft legacy migration stream",
+      "target_owner": "Project Management",
+      "replacement_boundary": "project_management versioned migration stream",
+      "resolution_plan": "Keep the applied migration immutable and add future corrective ownership changes in the Project Management stream.",
+      "disposition": "migrate",
+      "reason": "The immutable filename carries a Craft prefix while the tables and release responsibility belong to Project Management."
+    },
+    {
+      "id": "migration:202608050003_craft_list_team_visibility",
+      "category": "migration",
+      "source_paths": [
+        "backend/db/migrations/202608050003_craft_list_team_visibility.sql"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Craft legacy migration stream",
+      "target_owner": "Project Management",
+      "replacement_boundary": "project_management versioned migration stream",
+      "resolution_plan": "Keep the applied migration immutable and add future corrective ownership changes in the Project Management stream.",
+      "disposition": "migrate",
+      "reason": "The immutable filename carries a Craft prefix while the tables and release responsibility belong to Project Management."
     },
     {
       "id": "module:0b580b8beb013377912678020e0c35a743a76a64942801f457d947032d3c0d78",
