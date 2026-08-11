@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import jsonschema
@@ -15,7 +16,8 @@ FIXTURE_DIR = ROOT / "backend" / "tests" / "fixtures" / "capability_coverage_rev
 
 @pytest.fixture
 def review_schema() -> dict:
-    return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    schema_path = Path(os.environ.get("CAPABILITY_COVERAGE_SCHEMA_PATH", SCHEMA_PATH))
+    return json.loads(schema_path.read_text(encoding="utf-8"))
 
 
 @pytest.fixture
@@ -68,12 +70,48 @@ def test_new_capability_cannot_reference_a_dangling_candidate_id(review_schema, 
         )
 
 
+def test_candidate_requires_an_owned_new_capability_disposition(review_schema, fixture):
+    """Catches a candidate with only free function IDs and no owned new-capability rows."""
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.Draft202012Validator(review_schema).validate(
+            fixture("invalid-candidate-without-owned-disposition.json")
+        )
+
+
+def test_removing_candidate_owned_new_capability_disposition_is_rejected(review_schema, fixture):
+    """Catches removal of the candidate-owned record that binds its source function."""
+    document = fixture("minimal-valid.json")
+    document["capability_candidates"]["project.project.create"]["source_function_ids"].clear()
+
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.Draft202012Validator(review_schema).validate(document)
+
+
 def test_candidate_cannot_reference_a_mismatched_exposure_id(review_schema, fixture):
     """Catches candidate delivery evidence detached from its shared exposure record."""
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.Draft202012Validator(review_schema).validate(
             fixture("invalid-mismatched-exposure-id.json")
         )
+
+
+def test_root_exposure_cannot_duplicate_a_candidate_policy(review_schema, fixture):
+    """Catches a disconnected root exposure alongside a candidate-owned policy."""
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.Draft202012Validator(review_schema).validate(
+            fixture("invalid-disconnected-root-exposure.json")
+        )
+
+
+def test_adding_a_second_disconnected_candidate_exposure_is_rejected(review_schema, fixture):
+    """Catches adding a candidate-keyed root policy beside the inline candidate policy."""
+    document = fixture("minimal-valid.json")
+    document["consumer_exposures"]["project.project.create"] = document[
+        "capability_candidates"
+    ]["project.project.create"]["consumer_exposure_ref"]
+
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.Draft202012Validator(review_schema).validate(document)
 
 
 def test_generic_exclusion_reason_is_rejected_independently(review_schema, fixture):

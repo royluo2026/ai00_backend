@@ -90,9 +90,7 @@
         "classification"
       ],
       "properties": {
-        "resolution": {
-          "enum": ["unreviewed", "existing_capability", "excluded"]
-        },
+        "resolution": {"$ref": "#/$defs/Resolution"},
         "target_capability": {"type": ["string", "null"]},
         "source_paths": {
           "type": "array",
@@ -105,6 +103,12 @@
         "owner": {"type": ["string", "null"]}
       },
       "allOf": [
+        {
+          "not": {
+            "properties": {"resolution": {"const": "new_capability"}},
+            "required": ["resolution"]
+          }
+        },
         {
           "if": {"properties": {"resolution": {"const": "unreviewed"}}},
           "then": {
@@ -189,12 +193,7 @@
           "minItems": 1,
           "items": {"type": "string", "minLength": 1}
         },
-        "source_function_ids": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
+        "source_function_ids": {"$ref": "#/$defs/NewCapabilitySourceFunctions"},
         "owner_domain": {"type": "string", "minLength": 1},
         "application_port": {"type": "string", "minLength": 1},
         "provider_artifact": {"type": "string", "minLength": 1},
@@ -211,8 +210,43 @@
     "ConsumerExposures": {
       "type": "object",
       "additionalProperties": false,
+      "properties": {
+        "existing_catalog_capabilities": {"$ref": "#/$defs/ExistingCatalogExposures"}
+      }
+    },
+    "ExistingCatalogExposures": {
+      "type": "object",
+      "additionalProperties": false,
       "propertyNames": {"type": "string", "minLength": 1},
       "patternProperties": {"^.+$": {"$ref": "#/$defs/ConsumerExposure"}}
+    },
+    "Resolution": {
+      "enum": ["unreviewed", "existing_capability", "new_capability", "excluded"]
+    },
+    "NewCapabilitySourceFunctions": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "patternProperties": {"^.+$": {"$ref": "#/$defs/NewCapabilityFunctionDisposition"}}
+    },
+    "NewCapabilityFunctionDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolution", "source_paths", "owner", "evidence", "reviewer", "reviewed_at"],
+      "properties": {
+        "resolution": {"const": "new_capability"},
+        "source_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "owner": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string", "minLength": 20},
+        "reviewer": {"type": "string", "minLength": 1},
+        "reviewed_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+      }
     },
     "ConsumerExposure": {
       "type": "object",

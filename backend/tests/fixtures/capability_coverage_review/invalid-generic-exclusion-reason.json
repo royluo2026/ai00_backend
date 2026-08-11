@@ -14,7 +14,8 @@
       "source_paths": ["backend/routers/project_health.py"],
       "evidence": "The health route reports deployment liveness only.",
       "reason": "This is not a capability and needs no review.",
-      "classification": "operations"
+      "classification": "operations",
+      "owner": "project-management-owner"
     }
   },
   "capability_candidates": {},
