@@ -8,5 +8,13 @@
     "excluded": 6,
     "unreviewed": 628
   },
-  "candidate_capabilities": 0
+  "candidate_capabilities": 0,
+  "evidence": {
+    "module_dependencies": 7,
+    "boundary_violations": 292,
+    "cross_domain_sql": 262,
+    "internal_import": 30,
+    "tables": 162,
+    "migrations": 35
+  }
 }

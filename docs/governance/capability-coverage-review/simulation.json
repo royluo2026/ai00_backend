@@ -549,7 +549,15 @@
     }
   },
   "code_extractions": [],
-  "database_boundaries": [],
+  "database_boundaries": [
+    {
+      "table": "workmanship_sim_environments",
+      "owner_domain": "Simulation",
+      "access_mode": "read_write",
+      "migration_stream": "simulation",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    }
+  ],
   "debt_dispositions": [],
   "review": {
     "reviewer": "pending-domain-review",

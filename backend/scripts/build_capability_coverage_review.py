@@ -8,6 +8,7 @@ import json
 import subprocess
 import sys
 from collections import Counter
+from fnmatch import fnmatch
 from pathlib import Path
 from typing import NamedTuple
 
@@ -22,6 +23,11 @@ SCHEMA_PATH = GOVERNANCE_ROOT / "capability-coverage-review.schema.json"
 REGISTRY_PATH = GOVERNANCE_ROOT / "user-function-registry.json"
 CATALOG_PATH = REPOSITORY_ROOT / "docs" / "capabilities" / "catalog.v2.json"
 MANIFEST_PATH = REVIEW_ROOT / "manifest.json"
+OWNERSHIP_PATH = GOVERNANCE_ROOT / "domain-ownership.json"
+DEPENDENCY_BASELINE_PATH = GOVERNANCE_ROOT / "domain-dependency-baseline.json"
+BOUNDARY_BASELINE_PATH = REPOSITORY_ROOT / "backend" / "governance" / "boundary_baseline.json"
+TABLE_INVENTORY_PATH = REPOSITORY_ROOT / "backend" / "governance" / "table_inventory.json"
+RUNTIME_OWNERSHIP_PATH = REPOSITORY_ROOT / "backend" / "governance" / "domain_boundaries.json"
 DOMAINS = (
     "Base Platform", "Agent", "Craft", "Digital Model", "Project Management",
     "Simulation", "Ontology", "Knowledge", "Local Integration",
@@ -30,6 +36,12 @@ DOMAIN_FILES = {domain: domain.lower().replace(" ", "-") + ".json" for domain in
 CONSUMERS = ("web", "rest", "plugin", "agent", "mcp", "local_runtime")
 BOOTSTRAP_REVIEWER = "existing-user-function-registry"
 BOOTSTRAP_DATE = "2026-08-11"
+RUNTIME_TO_DOMAIN = {
+    "base": "Base Platform", "agent": "Agent", "craft": "Craft",
+    "digital_model": "Digital Model", "project_management": "Project Management",
+    "simulation": "Simulation", "ontology": "Ontology", "knowledge": "Knowledge",
+    "device": "Local Integration", "local_integration": "Local Integration",
+}
 
 
 class AuditSources(NamedTuple):
@@ -37,6 +49,11 @@ class AuditSources(NamedTuple):
     catalog: dict
     manifest: dict
     reviewed_against: dict
+    ownership: dict
+    dependency_baseline: dict
+    boundary_baseline: dict
+    table_inventory: dict
+    runtime_ownership: dict
 
 
 def _json(path: Path) -> dict:
@@ -68,7 +85,14 @@ def load_sources(root: Path = REPOSITORY_ROOT) -> AuditSources:
         "catalog_release": catalog["release_id"],
         "catalog_sha256": _sha256(catalog_path),
     }
-    return AuditSources(registry, catalog, manifest, reviewed_against)
+    return AuditSources(
+        registry, catalog, manifest, reviewed_against,
+        _json(root / "docs" / "governance" / "domain-ownership.json"),
+        _json(root / "docs" / "governance" / "domain-dependency-baseline.json"),
+        _json(root / "backend" / "governance" / "boundary_baseline.json"),
+        _json(root / "backend" / "governance" / "table_inventory.json"),
+        _json(root / "backend" / "governance" / "domain_boundaries.json"),
+    )
 
 
 def _discovered(row: dict) -> dict:
@@ -186,6 +210,117 @@ def _bootstrap_existing(document: dict, rows: list[dict]) -> dict:
     return document
 
 
+def _canonical_hash(value: dict) -> str:
+    raw = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _runtime_source_domain(path: str, runtime_ownership: dict) -> str | None:
+    normalized = Path(path).as_posix().lstrip("./")
+    for rule in runtime_ownership.get("source_overrides", []):
+        if normalized == rule["path"]:
+            return rule["domain"]
+    matches = []
+    for rule in runtime_ownership.get("source_roots", []):
+        prefix = rule["path"].rstrip("/")
+        if normalized == prefix or normalized.startswith(prefix + "/"):
+            matches.append((len(prefix), rule["domain"]))
+    return max(matches)[1] if matches else None
+
+
+def _domain_name(runtime_domain: str | None) -> str:
+    return RUNTIME_TO_DOMAIN.get(runtime_domain or "", "Unowned Internal")
+
+
+def _module_debt(row: dict) -> dict:
+    identity = {key: row[key] for key in ("source", "imported_module", "source_domain", "target_domain")}
+    return {
+        "id": "module:" + _canonical_hash(identity),
+        "category": "dependency",
+        "source_paths": [row["source"]],
+        "owner_domain": row["source_domain"],
+        "current_owner": row["source_domain"],
+        "target_owner": row["target_domain"],
+        "replacement_boundary": "versioned_public_port:" + _owner_slug(row["target_domain"]),
+        "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
+        "disposition": "remove_after_extraction",
+        "reason": row["reason"],
+    }
+
+
+def _owner_slug(domain: str) -> str:
+    if domain == "Base Platform":
+        return "base"
+    if domain == "Local Integration":
+        return "local_integration"
+    return domain.lower().replace(" ", "_")
+
+
+def _boundary_debt(row: dict, sources: AuditSources, table_owners: dict[str, str]) -> dict:
+    current_runtime = _runtime_source_domain(row["path"], sources.runtime_ownership)
+    current_owner = _domain_name(current_runtime)
+    if row["category"] == "cross_domain_sql":
+        target_owner = _domain_name(table_owners.get(row["target"]))
+        category = "database"
+        boundary = "application_port:" + _owner_slug(target_owner)
+        plan = "Remove direct SQL and route the operation through the target domain Application Port."
+    else:
+        module_path = row["target"].replace(".", "/") + ".py"
+        target_owner = _domain_name(_runtime_source_domain(module_path, sources.runtime_ownership))
+        category = "dependency"
+        boundary = "versioned_public_port:" + _owner_slug(target_owner)
+        plan = "Replace the internal module import with a versioned public contract or Application Port."
+    return {
+        "id": "boundary:" + row["fingerprint"],
+        "category": category,
+        "source_paths": [row["path"]],
+        "owner_domain": current_owner,
+        "current_owner": current_owner,
+        "target_owner": target_owner,
+        "replacement_boundary": boundary,
+        "resolution_plan": plan,
+        "disposition": "remove_after_extraction",
+        "reason": row["detail"],
+    }
+
+
+def _merge_evidence(document: dict, sources: AuditSources) -> dict:
+    domain = document["domain"]
+    runtime_names = {runtime for runtime, name in RUNTIME_TO_DOMAIN.items() if name == domain}
+    existing_tables = {row["table"]: row for row in document.get("database_boundaries", [])}
+    generated_tables = []
+    for item in sorted(sources.table_inventory["tables"], key=lambda row: row["table"]):
+        if item["runtime_domain"] not in runtime_names:
+            continue
+        generated = {
+            "table": item["table"],
+            "owner_domain": domain,
+            "access_mode": "read_write",
+            "migration_stream": _owner_slug(domain),
+            "evidence": "Owned by the exact runtime table inventory bound to this coverage review.",
+        }
+        generated_tables.append({**generated, **existing_tables.get(item["table"], {})})
+    document["database_boundaries"] = generated_tables
+
+    table_owners = {row["table"]: row["runtime_domain"] for row in sources.table_inventory["tables"]}
+    generated_debts = [
+        _module_debt(row) for row in sources.dependency_baseline["violations"]
+        if row["source_domain"] == domain
+    ]
+    generated_debts.extend(
+        debt for debt in (
+            _boundary_debt(row, sources, table_owners)
+            for row in sources.boundary_baseline["violations"]
+        ) if debt["owner_domain"] == domain
+    )
+    existing_debts = {row["id"]: row for row in document.get("debt_dispositions", [])}
+    document["debt_dispositions"] = [
+        {**row, **existing_debts.get(row["id"], {})}
+        for row in sorted(generated_debts, key=lambda item: item["id"])
+    ]
+    return document
+
+
 def initialize_documents(sources: AuditSources, existing: dict[str, dict] | None = None) -> list[dict]:
     existing = existing or {}
     rows = stable_functions(sources)
@@ -196,7 +331,8 @@ def initialize_documents(sources: AuditSources, existing: dict[str, dict] | None
         if domain not in existing:
             document = _bootstrap_existing(document, domain_rows)
         document["reviewed_against"] = copy.deepcopy(sources.reviewed_against)
-        result.append(merge_domain_review(document, domain_rows))
+        document = merge_domain_review(document, domain_rows)
+        result.append(_merge_evidence(document, sources))
     return result
 
 
@@ -248,6 +384,49 @@ def render_views(documents: list[dict]) -> dict[str, str]:
     }
 
 
+def migration_owner_rows(sources: AuditSources, root: Path = REPOSITORY_ROOT) -> list[dict]:
+    rows = []
+    for path in sorted((root / "backend" / "db" / "migrations").glob("*.sql")):
+        relative = path.relative_to(root).as_posix()
+        matches = []
+        for domain, descriptor in sources.ownership["domains"].items():
+            for pattern in descriptor["migration_paths"]:
+                if fnmatch(relative, pattern):
+                    specificity = len(pattern.replace("*", "").replace("?", ""))
+                    matches.append((specificity, domain))
+        if not matches:
+            raise ValueError(f"unowned migration: {relative}")
+        best = max(score for score, _ in matches)
+        owners = sorted({domain for score, domain in matches if score == best})
+        if len(owners) != 1:
+            raise ValueError(f"ambiguous migration owner: {relative}: {owners}")
+        rows.append({"path": relative, "owner_domain": owners[0], "migration_stream": _owner_slug(owners[0])})
+    return rows
+
+
+def render_evidence_views(views: dict[str, str], sources: AuditSources) -> dict[str, str]:
+    views = dict(views)
+    migration_lines = [
+        f"| {row['owner_domain']} | `{row['path']}` | migration | {row['migration_stream']} |"
+        for row in migration_owner_rows(sources)
+    ]
+    views["database-ownership-migrations.md"] = (
+        views["database-ownership-migrations.md"].rstrip() + "\n" + "\n".join(migration_lines) + "\n"
+    )
+    summary = json.loads(views["summary.json"])
+    categories = Counter(row["category"] for row in sources.boundary_baseline["violations"])
+    summary["evidence"] = {
+        "module_dependencies": len(sources.dependency_baseline["violations"]),
+        "boundary_violations": len(sources.boundary_baseline["violations"]),
+        "cross_domain_sql": categories["cross_domain_sql"],
+        "internal_import": categories["internal_import"],
+        "tables": sources.table_inventory["table_count"],
+        "migrations": len(migration_owner_rows(sources)),
+    }
+    views["summary.json"] = json.dumps(summary, ensure_ascii=False, indent=2) + "\n"
+    return views
+
+
 def _load_documents() -> dict[str, dict]:
     result = {}
     for domain, filename in DOMAIN_FILES.items():
@@ -257,8 +436,17 @@ def _load_documents() -> dict[str, dict]:
     return result
 
 
-def _manifest(reviewed_against: dict) -> dict:
-    return {"schema_version": 1, "reviewed_against": reviewed_against, "domains": list(DOMAINS)}
+def _manifest(sources: AuditSources) -> dict:
+    return {
+        "schema_version": 1,
+        "reviewed_against": sources.reviewed_against,
+        "ownership_sha256": _sha256(OWNERSHIP_PATH),
+        "table_inventory_sha256": _sha256(TABLE_INVENTORY_PATH),
+        "dependency_baseline_sha256": _sha256(DEPENDENCY_BASELINE_PATH),
+        "boundary_baseline_sha256": _sha256(BOUNDARY_BASELINE_PATH),
+        "runtime_ownership_sha256": _sha256(RUNTIME_OWNERSHIP_PATH),
+        "domains": list(DOMAINS),
+    }
 
 
 def _serialize(document: dict) -> str:
@@ -278,18 +466,18 @@ def _validate(documents: list[dict], strict: bool) -> list[str]:
     return sorted(errors)
 
 
-def _write(documents: list[dict], views: dict[str, str], reviewed_against: dict) -> None:
+def _write(documents: list[dict], views: dict[str, str], sources: AuditSources) -> None:
     REVIEW_ROOT.mkdir(parents=True, exist_ok=True)
     GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
-    MANIFEST_PATH.write_text(_serialize(_manifest(reviewed_against)), encoding="utf-8")
+    MANIFEST_PATH.write_text(_serialize(_manifest(sources)), encoding="utf-8")
     for document in documents:
         (REVIEW_ROOT / DOMAIN_FILES[document["domain"]]).write_text(_serialize(document), encoding="utf-8")
     for filename, content in views.items():
         (GENERATED_ROOT / filename).write_text(content, encoding="utf-8")
 
 
-def _drift(documents: list[dict], views: dict[str, str], reviewed_against: dict) -> list[str]:
-    expected = {MANIFEST_PATH: _serialize(_manifest(reviewed_against))}
+def _drift(documents: list[dict], views: dict[str, str], sources: AuditSources) -> list[str]:
+    expected = {MANIFEST_PATH: _serialize(_manifest(sources))}
     expected.update({REVIEW_ROOT / DOMAIN_FILES[d["domain"]]: _serialize(d) for d in documents})
     expected.update({GENERATED_ROOT / name: content for name, content in views.items()})
     return [str(path.relative_to(REPOSITORY_ROOT)) for path, content in expected.items()
@@ -305,15 +493,15 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     sources = load_sources()
     documents = initialize_documents(sources, _load_documents())
-    views = render_views(documents)
+    views = render_evidence_views(render_views(documents), sources)
     errors = _validate(documents, args.strict)
     if args.write:
         if errors:
             print("Coverage review validation failed:", *errors, sep="\n- ", file=sys.stderr)
             return 1
-        _write(documents, views, sources.reviewed_against)
+        _write(documents, views, sources)
     else:
-        errors.extend(f"generated drift: {path}" for path in _drift(documents, views, sources.reviewed_against))
+        errors.extend(f"generated drift: {path}" for path in _drift(documents, views, sources))
         if errors:
             print("Coverage review check failed:", *errors, sep="\n- ", file=sys.stderr)
             return 1

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import hashlib
 import json
 from fnmatch import fnmatch
 from pathlib import Path
@@ -11,6 +12,7 @@ from pathlib import Path
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 OWNERSHIP_PATH = REPOSITORY_ROOT / "docs" / "governance" / "domain-ownership.json"
 BASELINE_PATH = REPOSITORY_ROOT / "docs" / "governance" / "domain-dependency-baseline.json"
+REVIEW_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-coverage-review"
 
 
 def _load(path: Path) -> dict:
@@ -112,6 +114,22 @@ def _key(row: dict) -> tuple[str, str, str, str]:
     return row["source"], row["imported_module"], row["source_domain"], row["target_domain"]
 
 
+def dependency_review_id(row: dict) -> str:
+    value = {key: row[key] for key in ("source", "imported_module", "source_domain", "target_domain")}
+    raw = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return "module:" + hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def reviewed_debt_ids(path: Path = REVIEW_PATH) -> list[str]:
+    ids = []
+    for review_path in sorted(path.glob("*.json")):
+        if review_path.name == "manifest.json":
+            continue
+        document = _load(review_path)
+        ids.extend(row["id"] for row in document.get("debt_dispositions", []))
+    return ids
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="compare discovered violations with the exact reviewed baseline")
@@ -125,6 +143,13 @@ def main(argv: list[str] | None = None) -> int:
         errors.append(f"new cross-domain dependency: {actual_by_key[key]}")
     for key in sorted(expected_by_key.keys() - actual_by_key.keys()):
         errors.append(f"stale dependency baseline (remove it): {expected_by_key[key]}")
+    expected_review_ids = {dependency_review_id(row) for row in actual}
+    review_ids = reviewed_debt_ids()
+    for debt_id in sorted(expected_review_ids - set(review_ids)):
+        errors.append(f"missing dependency review disposition: {debt_id}")
+    for debt_id in sorted(expected_review_ids):
+        if review_ids.count(debt_id) > 1:
+            errors.append(f"duplicate dependency review disposition: {debt_id}")
     if errors:
         print("Domain dependency check failed:")
         for error in errors:

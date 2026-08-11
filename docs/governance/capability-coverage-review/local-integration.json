@@ -589,7 +589,29 @@
     }
   },
   "code_extractions": [],
-  "database_boundaries": [],
+  "database_boundaries": [
+    {
+      "table": "workmanship_runtime_commands",
+      "owner_domain": "Local Integration",
+      "access_mode": "read_write",
+      "migration_stream": "local_integration",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_runtime_devices",
+      "owner_domain": "Local Integration",
+      "access_mode": "read_write",
+      "migration_stream": "local_integration",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_runtime_enrollments",
+      "owner_domain": "Local Integration",
+      "access_mode": "read_write",
+      "migration_stream": "local_integration",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    }
+  ],
   "debt_dispositions": [],
   "review": {
     "reviewer": "pending-domain-review",

@@ -837,8 +837,220 @@
     }
   },
   "code_extractions": [],
-  "database_boundaries": [],
-  "debt_dispositions": [],
+  "database_boundaries": [
+    {
+      "table": "workmanship_base_ontology_active_refs",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_ontology_change_proposals",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_ontology_proposal_reviews",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_ontology_proposal_revisions",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_ontology_release_objects",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_ontology_releases",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_onto_axioms",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_onto_classes",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_onto_properties",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_onto_relations",
+      "owner_domain": "Ontology",
+      "access_mode": "read_write",
+      "migration_stream": "ontology",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    }
+  ],
+  "debt_dispositions": [
+    {
+      "id": "boundary:3b73b160652cc67cc497",
+      "category": "dependency",
+      "source_paths": [
+        "backend/ontology/repository.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "ontology imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:47779647717353062c4e",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/ontology_proposals_next.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "ontology imports base internal module backend.utils.gid"
+    },
+    {
+      "id": "boundary:52e8ee63be0e9c722bfd",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/ontology_releases_next.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "ontology imports base internal module backend.core.ois_storage"
+    },
+    {
+      "id": "boundary:6bfeff1829c7e06a1162",
+      "category": "dependency",
+      "source_paths": [
+        "backend/ontology/proposals.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "ontology imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:9d8d21880690619eef47",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/ontology_releases_next.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "ontology imports base internal module backend.utils.gid"
+    },
+    {
+      "id": "module:0e654045c9e3ba313245702a3404a3d2545e1a8772310be8ca2cac63157058b5",
+      "category": "dependency",
+      "source_paths": [
+        "backend/ontology/repository.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "Legacy direct infrastructure dependency; replace with an Ontology-owned repository adapter."
+    },
+    {
+      "id": "module:0f7c0eb6deb08afd59d72120de8316a4fc71b0c78470eb47ce91fb7b285b65f8",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/ontology_releases_next.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "Legacy object-storage implementation dependency; consume ArtifactPort."
+    },
+    {
+      "id": "module:73bda76f2e1cb9ab6c1c0914242bb3ae2a9bd728025c5778143d4965de387dbc",
+      "category": "dependency",
+      "source_paths": [
+        "backend/ontology/proposals.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "Legacy direct infrastructure dependency; replace with an Ontology-owned repository adapter."
+    },
+    {
+      "id": "module:9596d53724e9533498a105200fc3e03b97be18f57a53cfa1cfb05286083aac93",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/ontology_releases_next.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "Legacy ID implementation dependency; consume the stable platform ID port."
+    },
+    {
+      "id": "module:feac12edc0039e22e3f2c587fcca17d762257a22723e3e3710aa67a378f263fb",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/ontology_proposals_next.py"
+      ],
+      "owner_domain": "Ontology",
+      "current_owner": "Ontology",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "Legacy ID implementation dependency; consume the stable platform ID port."
+    }
+  ],
   "review": {
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",

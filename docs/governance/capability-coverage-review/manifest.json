@@ -6,6 +6,11 @@
     "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
     "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
   },
+  "ownership_sha256": "sha256:4c824bcb29bf3bc79dae8ea51fe40de804325538da5d5722047b8bce65d97531",
+  "table_inventory_sha256": "sha256:36b9d8cdfbe05c2a1ae98a3c1e3839dd87484190f3d38c49f23fac7625f0384f",
+  "dependency_baseline_sha256": "sha256:b589c35c7a98a9d832d0d0b566fc7f6ce0e98495812bc1755e3666cca7fa01df",
+  "boundary_baseline_sha256": "sha256:13f47bc573701eb69fdf18bc599ad82effd3b363ac2f4f3e13b31eed92748a2a",
+  "runtime_ownership_sha256": "sha256:3640de09f36ca179cfeb4ea6bfb0835367f9889337c80ebc416045c37e53bfeb",
   "domains": [
     "Base Platform",
     "Agent",

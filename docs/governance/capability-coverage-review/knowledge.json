@@ -1427,8 +1427,507 @@
     }
   },
   "code_extractions": [],
-  "database_boundaries": [],
-  "debt_dispositions": [],
+  "database_boundaries": [
+    {
+      "table": "workmanship_know_document_acl",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_documents",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_entries",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_favorites",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_folders",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_items",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_migration_items",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_migration_runs",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_proposals",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_publish_outbox",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_recent",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_revisions",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_spaces",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    }
+  ],
+  "debt_dispositions": [
+    {
+      "id": "boundary:0f990e26058cbfd0cdcb",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
+    },
+    {
+      "id": "boundary:12eff717e881ee6d8fc9",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/proposal_query_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
+    },
+    {
+      "id": "boundary:1381972d12d0aa6e07b2",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_migration_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:1bd603fd24b57d5b9e54",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:3a99fe185bfe52de0c23",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:3cf20cd1621747d72ad9",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_context_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:3d2fe3f8684e267c5672",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:4cc294b466b6ef610b4e",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_retry_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
+    },
+    {
+      "id": "boundary:55e937e24d78d64c60ae",
+      "category": "dependency",
+      "source_paths": [
+        "backend/knowledge/revision_store.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.core.ois_storage"
+    },
+    {
+      "id": "boundary:57e6cdd201303b99bc53",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:5d656b1200df6eca3b0b",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
+    },
+    {
+      "id": "boundary:629729e63135be71f9cd",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:642cb274f1ab6ed097eb",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_retry_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
+    },
+    {
+      "id": "boundary:67685a98b3ec11b13bf7",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:7fd742275ddcad04a564",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
+    },
+    {
+      "id": "boundary:82daf6811ce172daa0a5",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/review_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
+    },
+    {
+      "id": "boundary:8d69dd1321b25a756b84",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/proposals_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
+    },
+    {
+      "id": "boundary:92e8d088b2ae76f87694",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_retry_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:983c709c86b0b1955f77",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:9adfa3c98b9fa5d8deda",
+      "category": "dependency",
+      "source_paths": [
+        "backend/knowledge/revision_store.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.core.ois_storage"
+    },
+    {
+      "id": "boundary:9f763c056dfffb1833e8",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.utils.gid"
+    },
+    {
+      "id": "boundary:b24870bd09b8a1aad413",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/proposal_query_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
+    },
+    {
+      "id": "boundary:b49c8e71e2b9aec007ff",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:bfa94125faebb019ba02",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.utils.gid"
+    },
+    {
+      "id": "boundary:c3ad64e3ba87a3b0c92e",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:c8e8226c6db8f21d2d4a",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/review_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:e9536a55b88b9fca51bd",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:f482035bd26430240f57",
+      "category": "dependency",
+      "source_paths": [
+        "backend/capabilities/knowledge_documents_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Base Platform",
+      "replacement_boundary": "versioned_public_port:base",
+      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "knowledge imports base internal module backend.db.connection"
+    },
+    {
+      "id": "boundary:f4ac41fdee05dfee22b0",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_next.py"
+      ],
+      "owner_domain": "Knowledge",
+      "current_owner": "Knowledge",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
+    }
+  ],
   "review": {
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",

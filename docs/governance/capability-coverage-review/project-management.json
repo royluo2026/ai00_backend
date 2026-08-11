@@ -238,8 +238,360 @@
     }
   },
   "code_extractions": [],
-  "database_boundaries": [],
-  "debt_dispositions": [],
+  "database_boundaries": [
+    {
+      "table": "workmanship_app_wb_annotations",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_app_workbench_configs",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_app_workbench_member_overrides",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_proj_approval_orders",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_proj_collab_sessions",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_proj_issues",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_proj_projects",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_proj_task_dependencies",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_proj_tasks",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_proj_vehicle_models",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_follows",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_issues",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_item_change_logs",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_item_entries",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_item_shares",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_list_bitable_bindings",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_list_bitable_record_map",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_list_shares",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_lists",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_notifications",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_permission_requests",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_share_links",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_task_dependencies",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_task_template_items",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_task_templates",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_work_tasks",
+      "owner_domain": "Project Management",
+      "access_mode": "read_write",
+      "migration_stream": "project_management",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    }
+  ],
+  "debt_dispositions": [
+    {
+      "id": "boundary:0b4134b3014d3ed288fd",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
+    },
+    {
+      "id": "boundary:0bd527f63d794c1fdf85",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/workbench_home.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
+    },
+    {
+      "id": "boundary:3650a50f1c5a2945a932",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
+    },
+    {
+      "id": "boundary:39ff62e8d261e8a1a477",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
+    },
+    {
+      "id": "boundary:52accfaa3da9ed8a8510",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
+    },
+    {
+      "id": "boundary:5bc13929696524e0369e",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
+    },
+    {
+      "id": "boundary:5ce0bac82ba8d37d9fe0",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/workbench_home.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_pbom_versions"
+    },
+    {
+      "id": "boundary:5dfcb7aa8f27b022a5fc",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/workbench_home.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
+    },
+    {
+      "id": "boundary:60b036a3d9bc12da60b3",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
+    },
+    {
+      "id": "boundary:89f433b49e3f2d4f7370",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
+    },
+    {
+      "id": "boundary:a7d9e9ee0bd8f3e91542",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/projects.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "application_port:craft",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
+    },
+    {
+      "id": "module:0b580b8beb013377912678020e0c35a743a76a64942801f457d947032d3c0d78",
+      "category": "dependency",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/workbench_home.py"
+      ],
+      "owner_domain": "Project Management",
+      "current_owner": "Project Management",
+      "target_owner": "Craft",
+      "replacement_boundary": "versioned_public_port:craft",
+      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "Project Management code is still physically hosted in Craft; extract it and replace this import with a port."
+    }
+  ],
   "review": {
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",

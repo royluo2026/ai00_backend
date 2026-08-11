@@ -14,13 +14,16 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 IDENTIFIER = re.compile(r"^[A-Za-z0-9_$]+$")
 URLS = {
     "base": "USERS_DB_URL",
-    "craft": "AI00_CRAFT_DB_URL",
-    "simulation": "AI00_SIMULATION_DB_URL",
     "agent": "AI00_AGENT_DB_URL",
-    "device": "AI00_DEVICE_DB_URL",
+    "craft": "AI00_CRAFT_DB_URL",
+    "digital_model": "AI00_DIGITAL_MODEL_DB_URL",
     "project_management": "AI00_PROJECT_MANAGEMENT_DB_URL",
+    "simulation": "AI00_SIMULATION_DB_URL",
+    "ontology": "AI00_ONTOLOGY_DB_URL",
     "knowledge": "AI00_KNOWLEDGE_DB_URL",
+    "local_integration": "AI00_LOCAL_INTEGRATION_DB_URL",
 }
+COMPATIBILITY_URLS = {"local_integration": "AI00_DEVICE_DB_URL"}
 DENIED_CODES = {1044, 1045, 1142, 1143, 1227}
 
 
@@ -52,11 +55,14 @@ def verify(inventory_path: Path, *, verify_ddl_denied: bool = False, env: dict[s
     if not tables or any(not IDENTIFIER.fullmatch(str(item.get("table", ""))) for item in tables):
         raise ValueError("inventory is empty or contains unsafe table names")
     results: list[Result] = []
-    if not any(env.get(variable, "").strip() for variable in URLS.values()):
+    configured_variables = list(URLS.values()) + list(COMPATIBILITY_URLS.values())
+    if not any(env.get(variable, "").strip() for variable in configured_variables):
         return [Result(domain, "connection", variable, False, "missing database URL") for domain, variable in URLS.items()]
     import pymysql
     for domain, variable in URLS.items():
         raw = env.get(variable, "").strip()
+        if not raw and domain in COMPATIBILITY_URLS:
+            raw = env.get(COMPATIBILITY_URLS[domain], "").strip()
         if not raw:
             results.append(Result(domain, "connection", variable, False, "missing database URL")); continue
         try:
@@ -74,7 +80,7 @@ def verify(inventory_path: Path, *, verify_ddl_denied: bool = False, env: dict[s
                         allowed = True; code = None
                     except Exception as exc:
                         allowed = False; code = _code(exc)
-                    expected = owner == domain
+                    expected = ("local_integration" if owner == "device" else owner) == domain
                     ok = allowed if expected else (not allowed and code in DENIED_CODES)
                     detail = "allowed" if allowed else f"denied/error code {code}"
                     results.append(Result(domain, "owned-allow" if expected else "foreign-deny", table, ok, detail))

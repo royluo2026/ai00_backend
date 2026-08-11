@@ -242,12 +242,16 @@
     "DebtDisposition": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "category", "source_paths", "owner_domain", "disposition", "reason"],
+      "required": ["id", "category", "source_paths", "owner_domain", "current_owner", "target_owner", "replacement_boundary", "resolution_plan", "disposition", "reason"],
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "category": {"enum": ["consumer_adapter", "dependency", "database", "migration", "legacy_implementation"]},
         "source_paths": {"$ref": "#/$defs/SourcePaths"},
         "owner_domain": {"type": "string", "minLength": 1},
+        "current_owner": {"type": "string", "minLength": 1},
+        "target_owner": {"type": "string", "minLength": 1},
+        "replacement_boundary": {"type": "string", "minLength": 1},
+        "resolution_plan": {"type": "string", "minLength": 20},
         "disposition": {"enum": ["remove_after_extraction", "retain_with_boundary", "migrate", "accepted"]},
         "reason": {"type": "string", "minLength": 1}
       }

@@ -172,6 +172,21 @@ def load_baseline(path: Path) -> set[str]:
     return {item["fingerprint"] if isinstance(item, dict) else item for item in data.get("violations", [])}
 
 
+def reviewed_boundary_ids(path: Path = REPO_ROOT / "docs/governance/capability-coverage-review") -> list[str]:
+    ids: list[str] = []
+    if not path.exists():
+        return ids
+    for review_path in sorted(path.glob("*.json")):
+        if review_path.name == "manifest.json":
+            continue
+        document = json.loads(review_path.read_text(encoding="utf-8"))
+        ids.extend(
+            row["id"] for row in document.get("debt_dispositions", [])
+            if row["id"].startswith("boundary:")
+        )
+    return ids
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
@@ -211,12 +226,18 @@ def main() -> int:
     current = {item.fingerprint for item in violations}
     new = sorted(current - baseline)
     resolved = sorted(baseline - current)
+    review_ids = reviewed_boundary_ids()
+    expected_review_ids = {"boundary:" + fingerprint for fingerprint in current}
+    missing_reviews = sorted(expected_review_ids - set(review_ids))
+    duplicate_reviews = sorted(debt_id for debt_id in expected_review_ids if review_ids.count(debt_id) > 1)
     summary = {
         "tables": len(tables),
         "unowned_tables": unowned,
         "violations": len(violations),
         "new_violations": len(new),
         "resolved_baseline_items": len(resolved),
+        "missing_review_dispositions": missing_reviews,
+        "duplicate_review_dispositions": duplicate_reviews,
     }
     if args.json:
         print(json.dumps({"summary": summary, **payload}, ensure_ascii=False, indent=2))
@@ -225,7 +246,7 @@ def main() -> int:
         for item in violations:
             if item.fingerprint in new:
                 print(f"NEW {item.category} {item.path}:{item.scope} -> {item.target}: {item.detail}")
-    return 1 if unowned or new else 0
+    return 1 if unowned or new or missing_reviews or duplicate_reviews else 0
 
 
 if __name__ == "__main__":

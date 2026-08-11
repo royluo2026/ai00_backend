@@ -2258,8 +2258,1263 @@
     }
   },
   "code_extractions": [],
-  "database_boundaries": [],
-  "debt_dispositions": [],
+  "database_boundaries": [
+    {
+      "table": "workmanship_app_capability_audit",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_app_export_templates",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_app_feishu_search_cache",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_app_operational_alerts",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_app_system_config",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_app_view_configs",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_app_worker_heartbeats",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_auth_auth_pending",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_auth_bid_sections",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_auth_permission_grants",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_auth_project_members",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_auth_section_owners",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_auth_teams",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_auth_users",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_artifact_upload_sessions",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_artifacts",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_approvals",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_audit_ledger",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_audit_outbox",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_catalog_releases",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_operations",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_outcomes",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_rate_windows",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_consumer_delegations",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_schema_migrations",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_self_annotations",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_display_id_counters",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_int_ext_datasources",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_int_ext_field_mappings",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_int_ext_mappings",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_installations",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_lifecycle_events",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_mount_sessions",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_namespace_kv",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_publishers",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_releases",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_usage_events",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_usage_month_closures",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_plugin_usage_monthly",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    }
+  ],
+  "debt_dispositions": [
+    {
+      "id": "boundary:15ce567ee01921ed8d9a",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_favorites"
+    },
+    {
+      "id": "boundary:16964b172fb47eac45ce",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:1b82f1c12c71d6fb12af",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/notifications.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_notifications"
+    },
+    {
+      "id": "boundary:1beb809800fb0c064ae8",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_folders"
+    },
+    {
+      "id": "boundary:1c1b9befcfc41bee2ec0",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_configs"
+    },
+    {
+      "id": "boundary:1e00c1f72708b969726e",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:1fe328e8f126d3cc2dc3",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_migration_runs"
+    },
+    {
+      "id": "boundary:229cb6f7c1a79b3284cd",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/follows.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_follows"
+    },
+    {
+      "id": "boundary:22a4a822538cbb691c25",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:270583f51b32ba0c5fd2",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/follows.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_follows"
+    },
+    {
+      "id": "boundary:28209e880bbd1e20dc15",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_folders"
+    },
+    {
+      "id": "boundary:3355fcf95f432c7970ef",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_revisions"
+    },
+    {
+      "id": "boundary:38c79da7d2b3ec10cbce",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/notifications.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_notifications"
+    },
+    {
+      "id": "boundary:3a1066637fb982f4003d",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_recent"
+    },
+    {
+      "id": "boundary:3c11d98c6ddf3df5b1f9",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_member_overrides"
+    },
+    {
+      "id": "boundary:462dbc2b4bdc81b1cf43",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_folders"
+    },
+    {
+      "id": "boundary:48400323bc78c45f7d9a",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:49f0b5dd15b4710e7be8",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/bootstrap_ontology_release.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Ontology",
+      "replacement_boundary": "application_port:ontology",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses ontology-owned table workmanship_onto_classes"
+    },
+    {
+      "id": "boundary:4ba63a0f0261b4e71b85",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_member_overrides"
+    },
+    {
+      "id": "boundary:4d25b4e8354ea5c5bc0b",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:4dd8d9636470c8a9340f",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:515ee1de9ad31bce1681",
+      "category": "database",
+      "source_paths": [
+        "backend/utils/notif.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_notifications"
+    },
+    {
+      "id": "boundary:52982ef6cfc49d22d19e",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_spaces"
+    },
+    {
+      "id": "boundary:52f6d98251efa5410865",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_worker_next.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
+    },
+    {
+      "id": "boundary:5aca4c2e5562b49c3325",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_folders"
+    },
+    {
+      "id": "boundary:64c048c7e9a5f8cc7704",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/notifications.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_notifications"
+    },
+    {
+      "id": "boundary:66f711850c2ca2da59a1",
+      "category": "database",
+      "source_paths": [
+        "backend/platform_sdk/knowledge.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:6800494e3d6e8f3ae8a9",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_migration_items"
+    },
+    {
+      "id": "boundary:6d96b377193bb9898490",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:6f2800cd4f96e2460cbe",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/bootstrap_ontology_release.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Ontology",
+      "replacement_boundary": "application_port:ontology",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses ontology-owned table workmanship_onto_axioms"
+    },
+    {
+      "id": "boundary:74c2e528e98cf17314bb",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:75868a912df2634f8332",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_configs"
+    },
+    {
+      "id": "boundary:79015650b59f870f8c6a",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/follows.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_follows"
+    },
+    {
+      "id": "boundary:7aa70bbb1c311435e49c",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_favorites"
+    },
+    {
+      "id": "boundary:7f7e38d56d63b1e1e977",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:865b037c8fe1a8543510",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_documents"
+    },
+    {
+      "id": "boundary:91045df4b62df0fd266e",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_migration_runs"
+    },
+    {
+      "id": "boundary:91e2fb841d61196d855d",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/notifications.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_notifications"
+    },
+    {
+      "id": "boundary:9564983a5bf29040d275",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:a5ece08dd35d662380ae",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:ad97d3abe97b09bbc195",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_folders"
+    },
+    {
+      "id": "boundary:af25516f318f63625e0f",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:bc6576cce706d91993ef",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_recent"
+    },
+    {
+      "id": "boundary:bd2b784711470f73a2e7",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_recent"
+    },
+    {
+      "id": "boundary:bde36c995cb87bf3c583",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_configs"
+    },
+    {
+      "id": "boundary:bfa675e004a9ae89c187",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/annotations.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_wb_annotations"
+    },
+    {
+      "id": "boundary:c7121c55b61283924e05",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_migration_items"
+    },
+    {
+      "id": "boundary:ca7635e36a392961e528",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_favorites"
+    },
+    {
+      "id": "boundary:cd56dec3d9e7a6be551d",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_folders"
+    },
+    {
+      "id": "boundary:cdb73f2ada97996234e3",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_member_overrides"
+    },
+    {
+      "id": "boundary:d4ecbe74b89fd4e91f84",
+      "category": "database",
+      "source_paths": [
+        "backend/platform_sdk/follows.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_follows"
+    },
+    {
+      "id": "boundary:d5117ba7b7502a06b5ef",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_configs"
+    },
+    {
+      "id": "boundary:d6e0c8a834a96e872dc6",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/annotations.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_wb_annotations"
+    },
+    {
+      "id": "boundary:d8b105f0238de6d31e9b",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/follows.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_follows"
+    },
+    {
+      "id": "boundary:d9f53a2bf1ff68047477",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:db418bf1777bae3040ec",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:dc311b41371ba745dd79",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/bootstrap_ontology_release.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Ontology",
+      "replacement_boundary": "application_port:ontology",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses ontology-owned table workmanship_onto_properties"
+    },
+    {
+      "id": "boundary:df1abe013f029a9d2d54",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/bootstrap_ontology_release.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Ontology",
+      "replacement_boundary": "application_port:ontology",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses ontology-owned table workmanship_onto_relations"
+    },
+    {
+      "id": "boundary:e02497a651158f84b182",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_document_acl"
+    },
+    {
+      "id": "boundary:eae972e5308a5a8ea946",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_migration_items"
+    },
+    {
+      "id": "boundary:eb116aa6c73299209114",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_migration_runs"
+    },
+    {
+      "id": "boundary:ed84d3574596509d25b6",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_configs"
+    },
+    {
+      "id": "boundary:eeb44de7eb7c39ecd9a1",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/follows.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_follows"
+    },
+    {
+      "id": "boundary:f544664c91567294560c",
+      "category": "database",
+      "source_paths": [
+        "backend/capabilities/outbox_worker_next.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
+    },
+    {
+      "id": "boundary:f65da28f47554f50baed",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:f8d67740f20fdef9c61a",
+      "category": "database",
+      "source_paths": [
+        "backend/scripts/migrate_knowledge_markdown_revisions.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_migration_runs"
+    },
+    {
+      "id": "boundary:f98e4553eb76dc183211",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/workbenches.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_member_overrides"
+    },
+    {
+      "id": "boundary:fddd0c825033b6a71f25",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge_hub.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:ff8b034c87fe14d4f683",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/knowledge.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Knowledge",
+      "replacement_boundary": "application_port:knowledge",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
+    },
+    {
+      "id": "boundary:ffb4a9b502c22494195d",
+      "category": "database",
+      "source_paths": [
+        "backend/utils/follow_trigger.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Project Management",
+      "replacement_boundary": "application_port:project_management",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses project_management-owned table workmanship_work_follows"
+    }
+  ],
   "review": {
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",
