@@ -8,7 +8,7 @@
     "schema_version", "report_id", "generated_at", "mode", "status",
     "git_commit", "working_tree_clean", "catalog_release", "catalog_hash",
     "schema_hashes", "migration", "provider_artifacts", "environment_id",
-    "validation_scope", "runtime_evidence_hash", "component_results",
+    "validation_scope", "runtime_evidence_hash", "component_results", "completion",
     "cases", "test_run", "blockers"
   ],
   "properties": {
@@ -55,6 +55,32 @@
         "local_runtime": {"enum": ["passed", "not_run"]}
       }
     },
+    "completion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete", "domains", "plugin_agent_gateway_only",
+        "independent_domains", "sync_production_paths",
+        "async_production_paths", "cross_domain_sql", "internal_imports",
+        "consumer_bypasses", "catalog_capabilities", "failed"
+      ],
+      "properties": {
+        "complete": {"type": "boolean"},
+        "domains": {
+          "type": "array", "minItems": 11, "maxItems": 11,
+          "uniqueItems": true, "items": {"type": "string"}
+        },
+        "plugin_agent_gateway_only": {"type": "boolean"},
+        "independent_domains": {"type": "integer", "minimum": 0, "maximum": 11},
+        "sync_production_paths": {"type": "integer", "minimum": 0},
+        "async_production_paths": {"type": "integer", "minimum": 0},
+        "cross_domain_sql": {"type": "integer", "minimum": 0},
+        "internal_imports": {"type": "integer", "minimum": 0},
+        "consumer_bypasses": {"type": "integer", "minimum": 0},
+        "catalog_capabilities": {"type": "integer", "minimum": 0},
+        "failed": {"type": "array", "items": {"type": "string"}}
+      }
+    },
     "cases": {
       "type": "object", "additionalProperties": false,
       "required": ["stable_capabilities", "mandatory_case_types", "declared_cases", "validated_cases", "failed", "skipped"],
@@ -95,6 +121,20 @@
           "working_tree_clean": {"const": true},
           "validation_scope": {"const": "runtime_e2e"},
           "runtime_evidence_hash": {"type": "string"},
+          "completion": {
+            "properties": {
+              "complete": {"const": true},
+              "plugin_agent_gateway_only": {"const": true},
+              "independent_domains": {"const": 11},
+              "sync_production_paths": {"minimum": 1},
+              "async_production_paths": {"minimum": 1},
+              "cross_domain_sql": {"const": 0},
+              "internal_imports": {"const": 0},
+              "consumer_bypasses": {"const": 0},
+              "catalog_capabilities": {"const": 173},
+              "failed": {"maxItems": 0}
+            }
+          },
           "component_results": {
             "properties": {
               "agent": {"const": "passed"}, "mcp": {"const": "passed"},

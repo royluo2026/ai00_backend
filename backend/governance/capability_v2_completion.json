@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "required_domains": [
+    "agent",
+    "base",
+    "craft",
+    "digital_model",
+    "factory",
+    "integration",
+    "knowledge",
+    "local_runtime",
+    "ontology",
+    "project_management",
+    "simulation"
+  ],
+  "consumer_adapter_roots": [
+    "backend/routers/plugin_marketplace.py",
+    "backend/routers/agent_capabilities.py",
+    "backend/ai_assistant",
+    "plugins/agent/agent_backend"
+  ],
+  "forbidden_consumer_paths": [
+    "backend/ai_assistant/tool_registry.py",
+    "backend/ai_assistant/tool_handlers",
+    "plugins/agent/agent_backend/ai_assistant/tool_handlers",
+    "backend/capability_v2/v1_adapter.py"
+  ],
+  "forbidden_consumer_import_fragments": [
+    ".application.",
+    ".infrastructure.repositories."
+  ],
+  "forbidden_consumer_call_fragments": [
+    "get_conn("
+  ],
+  "frozen_coverage": {
+    "domains": 11,
+    "stable_functions": 752,
+    "resolutions.unreviewed": 0,
+    "candidate_capabilities": 87,
+    "catalog_descriptors": 102,
+    "proposed_final_catalog_capabilities": 173
+  },
+  "required_catalog_capabilities": 173
+}

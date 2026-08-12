@@ -1,10 +1,15 @@
 import json
+import hashlib
 import sys
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from types import SimpleNamespace
 
+from backend.capability_v2.completion import evaluate_completion
 from backend.scripts.run_capability_v2_acceptance import (
     MANDATORY_CASES,
+    acceptance_temp_root,
+    contract_test_command,
     _http_json_probe,
     _migration_binding,
     _oceanbase_probe,
@@ -12,6 +17,7 @@ from backend.scripts.run_capability_v2_acceptance import (
     evaluate_case_outcomes,
     build_report,
     catalog_integrity_errors,
+    completion_blockers,
     load_documents,
     validate_runtime_evidence,
     validate_report_schema,
@@ -40,6 +46,24 @@ def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
 def test_current_manifest_is_release_complete():
     catalog, manifest = load_documents()
     assert validate_manifest(catalog, manifest) == []
+
+
+def test_acceptance_temp_root_is_repository_local_and_writable(tmp_path):
+    temp_root = acceptance_temp_root(tmp_path)
+
+    probe = temp_root / "probe.json"
+    probe.write_text("{}", encoding="utf-8")
+
+    assert temp_root.parent == tmp_path
+    assert probe.read_text(encoding="utf-8") == "{}"
+
+
+def test_contract_pytest_uses_run_local_basetemp(tmp_path):
+    command = contract_test_command(tmp_path)
+
+    basetemp_index = command.index("--basetemp")
+    assert Path(command[basetemp_index + 1]).parent == tmp_path
+    assert command[command.index("-p") + 1] == "no:cacheprovider"
 
 
 def test_one_missing_case_blocks_with_exact_capability_and_case():
@@ -74,6 +98,18 @@ def test_generated_report_validates_against_checked_in_schema():
     })
 
     assert validate_report_schema(report) == []
+    assert report["completion"]["complete"] is False
+    assert report["completion"]["cross_domain_sql"] == 332
+
+
+def test_only_release_candidate_is_blocked_by_incomplete_program():
+    root = Path(__file__).resolve().parents[3]
+    completion = evaluate_completion(root, mode="progress")
+
+    assert completion_blockers("offline", completion) == []
+    blockers = completion_blockers("release-candidate", completion)
+    assert "capability completion: cross_domain_sql:332" in blockers
+    assert "capability completion: missing_domain:agent" in blockers
 
 
 def test_skipped_or_missing_mandatory_node_is_release_blocking():
@@ -112,6 +148,57 @@ def test_failed_release_candidate_report_remains_schema_valid_for_diagnostics():
 
     assert report["status"] == "failed"
     assert validate_report_schema(report) == []
+
+
+def test_passed_release_candidate_requires_both_production_sharing_paths():
+    catalog, manifest = load_documents()
+    declared = sum(len(cases) for cases in manifest["capabilities"].values())
+    report = build_report(
+        "release-candidate",
+        catalog,
+        manifest,
+        [],
+        {
+            "exit_code": 0,
+            "summary": "acceptance passed",
+            "command": "pytest acceptance",
+            "outcome_counts": {
+                "passed": declared,
+                "failed": 0,
+                "skipped": 0,
+                "missing": 0,
+            },
+        },
+        runtime_evidence_hash="sha256:" + "a" * 64,
+    )
+    report["status"] = "passed"
+    report["working_tree_clean"] = True
+    report["component_results"] = {
+        "agent": "passed",
+        "mcp": "passed",
+        "local_runtime": "passed",
+    }
+    report["completion"].update(
+        {
+            "complete": True,
+            "plugin_agent_gateway_only": True,
+            "independent_domains": 11,
+            "cross_domain_sql": 0,
+            "internal_imports": 0,
+            "consumer_bypasses": 0,
+            "failed": [],
+        }
+    )
+    report.pop("report_id")
+    canonical = json.dumps(
+        report, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode()
+    report["report_id"] = "sha256:" + hashlib.sha256(canonical).hexdigest()
+
+    errors = validate_report_schema(report)
+
+    assert any("sync_production_paths" in error for error in errors)
+    assert any("async_production_paths" in error for error in errors)
 
 
 def test_runtime_evidence_is_bound_to_commit_run_catalog_migrations_and_providers(tmp_path, monkeypatch):

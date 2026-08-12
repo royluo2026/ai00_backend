@@ -20,6 +20,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+from backend.capability_v2.completion import CompletionReport, evaluate_completion
 CATALOG_PATH = ROOT / "docs/capabilities/catalog.v2.json"
 MANIFEST_PATH = ROOT / "backend/tests/acceptance/fixtures/case-manifest.json"
 REPORT_SCHEMA_PATH = ROOT / "docs/acceptance/capability-v2-report.schema.json"
@@ -292,13 +293,53 @@ def evaluate_case_outcomes(manifest: dict, outcomes: dict[str, str]) -> tuple[di
     return counts, blockers
 
 
+def acceptance_temp_root(root: Path = ROOT) -> Path:
+    """Return a project-scoped writable root for acceptance subprocess data."""
+
+    shared_runtime = (
+        root.parent.parent / ".runtime"
+        if root.parent.name == ".worktrees"
+        else root.parent / ".runtime"
+    )
+    path = (
+        shared_runtime / "capability-v2-acceptance"
+        if shared_runtime.is_dir()
+        else root / ".capability-acceptance.tmp"
+    )
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def completion_blockers(mode: str, completion: CompletionReport) -> list[str]:
+    if mode != "release-candidate":
+        return []
+    return [f"capability completion: {failure}" for failure in completion.failed]
+
+
+def contract_test_command(run_directory: Path) -> list[str]:
+    return [
+        sys.executable,
+        "-m",
+        "pytest",
+        "backend/tests/acceptance",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        str(run_directory / "pytest"),
+        "-p",
+        "backend.tests.acceptance.outcome_plugin",
+    ]
+
+
 def _run_contract_tests(manifest: dict) -> tuple[dict, list[str]]:
-    with tempfile.TemporaryDirectory(prefix="ai00-capability-acceptance-") as directory:
-        result_path = Path(directory) / "outcomes.json"
-        command = [
-            sys.executable, "-m", "pytest", "backend/tests/acceptance", "-q",
-            "-p", "backend.tests.acceptance.outcome_plugin",
-        ]
+    with tempfile.TemporaryDirectory(
+        prefix="run-",
+        dir=acceptance_temp_root(ROOT),
+    ) as directory:
+        run_directory = Path(directory)
+        result_path = run_directory / "outcomes.json"
+        command = contract_test_command(run_directory)
         process_env = dict(os.environ)
         process_env["AI00_ACCEPTANCE_RESULT_PATH"] = str(result_path)
         completed = subprocess.run(command, cwd=ROOT, env=process_env, text=True, capture_output=True, check=False)
@@ -320,12 +361,22 @@ def _run_contract_tests(manifest: dict) -> tuple[dict, list[str]]:
     }, blockers
 
 
-def build_report(mode: str, catalog: dict, manifest: dict, blockers: list[str], test_result: dict, *, runtime_evidence_hash: str | None = None) -> dict:
+def build_report(
+    mode: str,
+    catalog: dict,
+    manifest: dict,
+    blockers: list[str],
+    test_result: dict,
+    *,
+    runtime_evidence_hash: str | None = None,
+    completion: CompletionReport | None = None,
+) -> dict:
     commit = _git("rev-parse", "HEAD")
     clean = not bool(_git("status", "--porcelain", "--untracked-files=no"))
     stable_count = len(manifest.get("capabilities", {}))
     declared_cases = sum(len(value) for value in manifest.get("capabilities", {}).values())
     counts = test_result["outcome_counts"]
+    completion = completion or evaluate_completion(ROOT, mode="progress")
     status = "passed" if not blockers and test_result["exit_code"] == 0 and counts["passed"] == declared_cases else "failed"
     report = {
         "schema_version": 1,
@@ -350,6 +401,7 @@ def build_report(mode: str, catalog: dict, manifest: dict, blockers: list[str], 
             "mcp": os.environ.get("AI00_ACCEPTANCE_MCP_RESULT", "not_run"),
             "local_runtime": os.environ.get("AI00_ACCEPTANCE_LOCAL_RUNTIME_RESULT", "not_run"),
         },
+        "completion": completion.serialized(),
         "cases": {
             "stable_capabilities": stable_count,
             "mandatory_case_types": len(MANDATORY_CASES),
@@ -398,6 +450,11 @@ def main() -> int:
     current_env = dict(os.environ)
     blockers.extend(environment_errors(args.mode, current_env))
     runtime_evidence_hash = None
+    completion = evaluate_completion(
+        ROOT,
+        mode="strict" if args.mode == "release-candidate" else "progress",
+    )
+    blockers.extend(completion_blockers(args.mode, completion))
     if args.mode == "release-candidate":
         evidence_errors, runtime_evidence_hash = validate_runtime_evidence(catalog, manifest, current_env)
         blockers.extend(evidence_errors)
@@ -411,6 +468,7 @@ def main() -> int:
     report = build_report(
         args.mode, catalog, manifest, blockers, test_result,
         runtime_evidence_hash=runtime_evidence_hash,
+        completion=completion,
     )
     schema_errors = validate_report_schema(report)
     if schema_errors:
@@ -418,6 +476,7 @@ def main() -> int:
         report = build_report(
             args.mode, catalog, manifest, blockers, test_result,
             runtime_evidence_hash=runtime_evidence_hash,
+            completion=completion,
         )
         remaining = validate_report_schema(report)
         if remaining:

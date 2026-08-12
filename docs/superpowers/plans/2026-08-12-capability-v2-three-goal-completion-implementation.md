@@ -70,7 +70,7 @@ python backend/scripts/freeze_official_domains.py --check
 python backend/scripts/build_capability_catalog.py --check
 python backend/scripts/generate_capability_docs.py --check
 python backend/scripts/build_capability_acceptance_manifest.py --check
-python backend/scripts/build_user_function_registry.py --strict
+python backend/scripts/build_user_function_registry.py --check
 python backend/scripts/check_domain_dependencies.py
 python backend/scripts/audit_domain_boundaries.py
 git add -- backend/capability_v2/official_domains.json docs/governance/capability-catalog-release.json docs/capabilities backend/tests/acceptance/fixtures/case-manifest.json
@@ -91,16 +91,17 @@ If any command fails, do not commit central artifacts and do not begin the depen
 - Create: `backend/tests/test_capability_v2_completion.py`
 - Create: `backend/tests/capability_completion_support.py`
 - Modify: `backend/scripts/run_capability_v2_acceptance.py`
+- Modify: `docs/acceptance/capability-v2-report.schema.json`
 
 **Interfaces:**
 - Consumes: `DomainManifestSet`, frozen coverage `summary.json`, `boundary_baseline.json`, Catalog release and consumer exposure records.
 - Produces: `FrozenCoverageReview`, `CompletionReport`, `evaluate_completion(root: Path, mode: Literal["progress", "strict"]) -> CompletionReport`, `registered_descriptor_ids(module_name: str) -> set[str]`, `assert_database_denied(connection: Any, sql: str) -> None`, a validated production-path registry and a CLI that returns nonzero when strict completion is false.
 
-- [ ] **Step 1: Write failing contract tests**
+- [x] **Step 1: Write failing contract tests**
 
 ```python
-def test_strict_completion_requires_all_three_goals(repo_copy):
-    report = evaluate_completion(repo_copy, mode="strict")
+def test_complete_repository_satisfies_all_three_goals(complete_repo):
+    report = evaluate_completion(complete_repo, mode="strict")
     assert set(report.domains) == {
         "base", "project_management", "factory", "craft", "knowledge",
         "ontology", "agent", "integration", "local_runtime",
@@ -115,13 +116,13 @@ def test_strict_completion_requires_all_three_goals(repo_copy):
     assert report.consumer_bypasses == 0
 ```
 
-- [ ] **Step 2: Verify the test fails against the current repository**
+- [x] **Step 2: Verify the test fails before implementation**
 
 Run: `python -m pytest backend/tests/test_capability_v2_completion.py -q`
 
-Expected: FAIL because Factory, Integration and Agent are absent from `official_domains.json`, production sharing evidence is absent, and the boundary baseline is nonzero.
+Expected: collection FAIL because `backend.capability_v2.completion` does not exist. A separate progress assertion records the current missing domains, production paths and boundary debt without requiring them to pass during Task 1.
 
-- [ ] **Step 3: Implement the report and immutable contract**
+- [x] **Step 3: Implement the report and immutable contract**
 
 ```python
 @dataclass(frozen=True)
@@ -134,6 +135,7 @@ class CompletionReport:
     cross_domain_sql: int
     internal_imports: int
     consumer_bypasses: int
+    catalog_capabilities: int
     failed: tuple[str, ...]
 
     @property
@@ -141,26 +143,26 @@ class CompletionReport:
         return not self.failed
 ```
 
-Store the eleven domain IDs, three goal predicates, frozen input paths and required RC evidence keys in `capability_v2_completion.json`. `progress` reports unmet predicates without weakening them; `strict` exits 1 unless every predicate passes. Do not store waivers in this file.
+Store the eleven domain IDs, three goal predicates, frozen 752/87/102/173 input counts and required RC evidence keys in `capability_v2_completion.json`. `progress` reports unmet predicates without weakening them; `strict` exits 1 unless every predicate passes. Do not store waivers in this file.
 
 Create `capability_v2_production_paths.json` with schema version 1 and initially empty `sync` and `async` arrays. Each later entry requires a stable path ID, caller/producer, callee/consumer, Capability or event contract, production source module and exact E2E pytest node ID. `evaluate_completion` rejects missing modules, missing test nodes, duplicate IDs and test-only source modules.
 
 `FrozenCoverageReview` loads the generated coverage documents read-only and exposes `capability_ids(owner: str) -> frozenset[str]`. `registered_descriptor_ids` imports the official module into an isolated registry and returns the registered IDs. `assert_database_denied` executes the supplied SQL and passes only for the database driver's access-denied error code; connection or syntax errors must fail the test.
 
-- [ ] **Step 4: Integrate the strict report into acceptance**
+- [x] **Step 4: Integrate the strict report into acceptance**
 
 Add the completion report to release-candidate output. Offline mode reports progress but does not claim RC completion. Release-candidate mode fails if `complete` is false or any required evidence is missing/skipped.
 
-- [ ] **Step 5: Run the gate tests**
+- [x] **Step 5: Run the gate tests**
 
 Run: `python -m pytest backend/tests/test_capability_v2_completion.py backend/tests/acceptance/test_acceptance_runner.py -q`
 
 Expected: PASS for report behavior; an explicit strict invocation against the current repository returns nonzero and lists exact unmet predicates.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
-git add -- backend/capability_v2/completion.py backend/scripts/check_capability_v2_completion.py backend/governance/capability_v2_completion.json backend/governance/capability_v2_production_paths.json backend/tests/test_capability_v2_completion.py backend/tests/capability_completion_support.py backend/scripts/run_capability_v2_acceptance.py
+git add -- backend/capability_v2/completion.py backend/scripts/check_capability_v2_completion.py backend/governance/capability_v2_completion.json backend/governance/capability_v2_production_paths.json backend/tests/test_capability_v2_completion.py backend/tests/capability_completion_support.py backend/tests/acceptance/test_acceptance_runner.py backend/scripts/run_capability_v2_acceptance.py docs/acceptance/capability-v2-report.schema.json docs/superpowers/plans/2026-08-12-capability-v2-three-goal-completion-implementation.md
 git commit -m "feat: enforce capability v2 three-goal completion"
 ```
 
