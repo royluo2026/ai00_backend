@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_cda2b607e3024d034ad9797aa6b45c30",
-  "catalog_hash": "sha256:cda2b607e3024d034ad9797aa6b45c301eda04deca2b4bf317f09809b211e5e5",
+  "release_id": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
+  "catalog_hash": "sha256:5d0b0d121ec3f4a3756abf9fcff0a93817a3e54869b62db6a092a94dd638cb4b",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -13894,6 +13894,126 @@
       "domain_errors_complete": true
     },
     {
+      "id": "knowledge.document.archive",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.document.archive",
+      "description": "Execute knowledge.document.archive.",
+      "use_when": "A governed consumer needs this Knowledge outcome.",
+      "do_not_use_when": "The resource belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "knowledge.v2:knowledge.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:2527d43f2b772624fd40f750b4fe92e554ecbce489b0e01c44dc1ffd42ad7b71",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
       "id": "knowledge.document.create",
       "major_version": 1,
       "owner_domain": "knowledge",
@@ -16000,6 +16120,126 @@
       "domain_errors_complete": true
     },
     {
+      "id": "knowledge.entry.change.apply",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.entry.change.apply",
+      "description": "Execute knowledge.entry.change.apply.",
+      "use_when": "A governed consumer needs this Knowledge outcome.",
+      "do_not_use_when": "The resource belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "knowledge.v2:knowledge.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:2527d43f2b772624fd40f750b4fe92e554ecbce489b0e01c44dc1ffd42ad7b71",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
       "id": "knowledge.get",
       "major_version": 1,
       "owner_domain": "knowledge",
@@ -16969,6 +17209,246 @@
         "additionalProperties": false
       },
       "schema_hash": "sha256:abd6019e55a9e5abdd4cda186c57fc2d2be0171396c3ce641433341a2193292b",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "knowledge.personalization.change.apply",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.personalization.change.apply",
+      "description": "Execute knowledge.personalization.change.apply.",
+      "use_when": "A governed consumer needs this Knowledge outcome.",
+      "do_not_use_when": "The resource belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "knowledge.v2:knowledge.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:2527d43f2b772624fd40f750b4fe92e554ecbce489b0e01c44dc1ffd42ad7b71",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "knowledge.personalization.read",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.personalization.read",
+      "description": "Execute knowledge.personalization.read.",
+      "use_when": "A governed consumer needs this Knowledge outcome.",
+      "do_not_use_when": "The resource belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "knowledge.v2:knowledge.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:2527d43f2b772624fd40f750b4fe92e554ecbce489b0e01c44dc1ffd42ad7b71",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -19296,6 +19776,220 @@
       "domain_errors_complete": true
     },
     {
+      "id": "knowledge.reference_data.change.apply",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.reference_data.change.apply",
+      "description": "Read or publish immutable versioned reference datasets.",
+      "use_when": "Other domains need low-frequency maintained tabular data for reproducible calculations.",
+      "do_not_use_when": "The caller needs mutable operational transactions or cross-domain SQL.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "knowledge.v2:knowledge.reference_data.publish",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "knowledge.reference_data.read",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.reference_data.read",
+      "description": "Read or publish immutable versioned reference datasets.",
+      "use_when": "Other domains need low-frequency maintained tabular data for reproducible calculations.",
+      "do_not_use_when": "The caller needs mutable operational transactions or cross-domain SQL.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "knowledge.v2:knowledge.reference_data.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
       "id": "knowledge.search",
       "major_version": 1,
       "owner_domain": "knowledge",
@@ -19655,6 +20349,126 @@
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The scoped Knowledge resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The document head differs from the supplied base revision.",
+          "retryable": false
+        },
+        {
+          "code": "proposal_state_conflict",
+          "meaning": "The proposal is no longer in a state that accepts this transition.",
+          "retryable": false
+        },
+        {
+          "code": "knowledge_storage_unavailable",
+          "meaning": "The immutable Knowledge object store is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "publication_in_progress",
+          "meaning": "Another worker owns the current publication lease.",
+          "retryable": true
+        },
+        {
+          "code": "self_review_forbidden",
+          "meaning": "Proposal creators cannot approve or reject their own proposal.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "knowledge.space.change.apply",
+      "major_version": 1,
+      "owner_domain": "knowledge",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "knowledge.space.change.apply",
+      "description": "Execute knowledge.space.change.apply.",
+      "use_when": "A governed consumer needs this Knowledge outcome.",
+      "do_not_use_when": "The resource belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "knowledge.v2:knowledge.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:2527d43f2b772624fd40f750b4fe92e554ecbce489b0e01c44dc1ffd42ad7b71",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -34391,9 +35205,9 @@
     },
     {
       "plugin_id": "official.knowledge",
-      "module": "backend.knowledge.official_provider",
-      "version": "1.0.0",
-      "artifact_hash": "sha256:ee4bf4f10505bc0a5c60b9ff0024a9b6ee3bbe56fe7d6c8a93362e3d98b397a7"
+      "module": "knowledge_backend.capabilities",
+      "version": "2.0.0",
+      "artifact_hash": "sha256:5d238ff6574322ee2534cc021f5055e3da61e33d67b2063df1eda0fb4bc4de32"
     },
     {
       "plugin_id": "official.local-runtime",
@@ -34420,5 +35234,5 @@
       "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
     }
   ],
-  "created_at": "2026-08-12T07:56:32.858732Z"
+  "created_at": "2026-08-12T08:08:34.169993Z"
 }

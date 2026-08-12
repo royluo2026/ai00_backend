@@ -8,7 +8,7 @@ Execute base.approval.request.decide in the Base Approval service.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_cda2b607e3024d034ad9797aa6b45c30`
+- Catalog Release：`rel_5d0b0d121ec3f4a3756abf9fcff0a938`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Execute base.approval.request.decide in the Base Approval service.
 ```json
 {
   "capability_id": "base.approval.request.decide",
-  "catalog_release": "rel_cda2b607e3024d034ad9797aa6b45c30",
+  "catalog_release": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
   "major_version": 1,
   "payload": {
     "approval_id": "example",

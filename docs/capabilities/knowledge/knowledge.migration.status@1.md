@@ -8,7 +8,7 @@ Inspect tenant-safe legacy Markdown migration readiness and audited runs.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_cda2b607e3024d034ad9797aa6b45c30`
+- Catalog Release：`rel_5d0b0d121ec3f4a3756abf9fcff0a938`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -77,7 +77,7 @@ Inspect tenant-safe legacy Markdown migration readiness and audited runs.
 ```json
 {
   "capability_id": "knowledge.migration.status",
-  "catalog_release": "rel_cda2b607e3024d034ad9797aa6b45c30",
+  "catalog_release": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
   "major_version": 1,
   "payload": {}
 }

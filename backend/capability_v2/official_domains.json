@@ -95,11 +95,11 @@
       "domain_id": "knowledge",
       "artifact": {
         "plugin_id": "official.knowledge",
-        "module": "backend.knowledge.official_provider",
-        "version": "1.0.0",
-        "artifact_hash": "sha256:ee4bf4f10505bc0a5c60b9ff0024a9b6ee3bbe56fe7d6c8a93362e3d98b397a7"
+        "module": "knowledge_backend.capabilities",
+        "version": "2.0.0",
+        "artifact_hash": "sha256:5d238ff6574322ee2534cc021f5055e3da61e33d67b2063df1eda0fb4bc4de32"
       },
-      "artifact_path": "backend/knowledge",
+      "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
         "knowledge"
       ],

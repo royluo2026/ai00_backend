@@ -693,6 +693,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.document.acl.revoke@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.document.acl.revoke@1]"
     },
+    "knowledge.document.archive@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.document.archive@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.document.archive@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[knowledge.document.archive@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[knowledge.document.archive@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.document.archive@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.document.archive@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.document.archive@1]"
+    },
     "knowledge.document.create@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.document.create@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.document.create@1]",
@@ -756,6 +765,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.document.search@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.document.search@1]"
     },
+    "knowledge.entry.change.apply@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.entry.change.apply@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.entry.change.apply@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[knowledge.entry.change.apply@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[knowledge.entry.change.apply@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.entry.change.apply@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.entry.change.apply@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.entry.change.apply@1]"
+    },
     "knowledge.get@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.get@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.get@1]",
@@ -773,6 +791,24 @@
       "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.migration.status@1]",
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.migration.status@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.migration.status@1]"
+    },
+    "knowledge.personalization.change.apply@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.personalization.change.apply@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.personalization.change.apply@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[knowledge.personalization.change.apply@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[knowledge.personalization.change.apply@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.personalization.change.apply@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.personalization.change.apply@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.personalization.change.apply@1]"
+    },
+    "knowledge.personalization.read@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.personalization.read@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.personalization.read@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[knowledge.personalization.read@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[knowledge.personalization.read@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.personalization.read@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.personalization.read@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.personalization.read@1]"
     },
     "knowledge.proposal.get@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.proposal.get@1]",
@@ -828,6 +864,24 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.propose@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.propose@1]"
     },
+    "knowledge.reference_data.change.apply@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.reference_data.change.apply@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.reference_data.change.apply@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[knowledge.reference_data.change.apply@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[knowledge.reference_data.change.apply@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.reference_data.change.apply@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.reference_data.change.apply@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.reference_data.change.apply@1]"
+    },
+    "knowledge.reference_data.read@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.reference_data.read@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.reference_data.read@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[knowledge.reference_data.read@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[knowledge.reference_data.read@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.reference_data.read@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.reference_data.read@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.reference_data.read@1]"
+    },
     "knowledge.search@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.search@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.search@1]",
@@ -836,6 +890,15 @@
       "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.search@1]",
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.search@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.search@1]"
+    },
+    "knowledge.space.change.apply@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.space.change.apply@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[knowledge.space.change.apply@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[knowledge.space.change.apply@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[knowledge.space.change.apply@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[knowledge.space.change.apply@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[knowledge.space.change.apply@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[knowledge.space.change.apply@1]"
     },
     "knowledge.space.create@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[knowledge.space.create@1]",
@@ -1459,7 +1522,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_cda2b607e3024d034ad9797aa6b45c30",
+  "catalog_release": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
   "mandatory_cases": [
     "success",
     "invalid_input",
