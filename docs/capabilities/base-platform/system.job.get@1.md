@@ -8,7 +8,7 @@ Read one owner-scoped asynchronous job.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_cc58105fccf916e2b43d744d898e593c`
+- Catalog Release：`rel_cda2b607e3024d034ad9797aa6b45c30`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Read one owner-scoped asynchronous job.
 ```json
 {
   "capability_id": "system.job.get",
-  "catalog_release": "rel_cc58105fccf916e2b43d744d898e593c",
+  "catalog_release": "rel_cda2b607e3024d034ad9797aa6b45c30",
   "major_version": 1,
   "payload": {
     "job_gid": "example",

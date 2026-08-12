@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_cc58105fccf916e2b43d744d898e593c",
-  "catalog_hash": "sha256:cc58105fccf916e2b43d744d898e593cfe7a209fc253be10793578150808bc6d",
+  "release_id": "rel_cda2b607e3024d034ad9797aa6b45c30",
+  "catalog_hash": "sha256:cda2b607e3024d034ad9797aa6b45c301eda04deca2b4bf317f09809b211e5e5",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -10746,6 +10746,2148 @@
           "code": "idempotency_conflict",
           "meaning": "The idempotency key is already bound to another Digital Model request.",
           "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.asset.get",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.asset.get",
+      "description": "Execute the governed factory.asset.get Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "factory.v2:factory.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.asset.maintenance.complete",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.asset.maintenance.complete",
+      "description": "Execute the governed factory.asset.maintenance.complete Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.asset.maintenance.start",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.asset.maintenance.start",
+      "description": "Execute the governed factory.asset.maintenance.start Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.asset.register",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.asset.register",
+      "description": "Execute the governed factory.asset.register Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.asset.scrap",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.asset.scrap",
+      "description": "Execute the governed factory.asset.scrap Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A0",
+      "authorization_policy": "factory.v2:factory.asset.scrap",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "high_risk",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.asset.search",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.asset.search",
+      "description": "Execute the governed factory.asset.search Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "factory.v2:factory.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.asset.update",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.asset.update",
+      "description": "Execute the governed factory.asset.update Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.resource_catalog.create",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.resource_catalog.create",
+      "description": "Execute the governed factory.resource_catalog.create Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.resource_catalog.deprecate",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.resource_catalog.deprecate",
+      "description": "Execute the governed factory.resource_catalog.deprecate Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.resource_catalog.get",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.resource_catalog.get",
+      "description": "Execute the governed factory.resource_catalog.get Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "factory.v2:factory.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.resource_catalog.publish",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.resource_catalog.publish",
+      "description": "Execute the governed factory.resource_catalog.publish Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.resource_catalog.revise",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.resource_catalog.revise",
+      "description": "Execute the governed factory.resource_catalog.revise Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.resource_catalog.search",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.resource_catalog.search",
+      "description": "Execute the governed factory.resource_catalog.search Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "factory.v2:factory.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.structure.archive",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.structure.archive",
+      "description": "Execute the governed factory.structure.archive Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.structure.create",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.structure.create",
+      "description": "Execute the governed factory.structure.create Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.structure.get",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.structure.get",
+      "description": "Execute the governed factory.structure.get Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "factory.v2:factory.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.structure.search",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.structure.search",
+      "description": "Execute the governed factory.structure.search Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "factory.v2:factory.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.structure.update",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.structure.update",
+      "description": "Execute the governed factory.structure.update Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
         }
       ],
       "domain_errors_complete": true
@@ -32233,13 +34375,19 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:d3eb493060b345795b1ea60a3d9f54c920b8f9b019a880b6146f363bea061a88"
+      "artifact_hash": "sha256:523476b6d6c216e6aacc5aa74560e257718b1d042413dfc783fb62e80ddb1eab"
     },
     {
       "plugin_id": "official.digital-model",
       "module": "digital_model_backend.capabilities",
       "version": "1.1.0",
       "artifact_hash": "sha256:db0b213ef84ff65ed50cc8a1e29c9aafbe3f3c6ff46cdde5c206b8ea88333931"
+    },
+    {
+      "plugin_id": "official.factory",
+      "module": "factory_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:2a571a88403a7ab8649210b7bad41fb4319e2d01fe3cc6cc9a584b4a00e8e7a9"
     },
     {
       "plugin_id": "official.knowledge",
@@ -32272,5 +34420,5 @@
       "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
     }
   ],
-  "created_at": "2026-08-12T07:42:18.871074Z"
+  "created_at": "2026-08-12T07:56:32.858732Z"
 }

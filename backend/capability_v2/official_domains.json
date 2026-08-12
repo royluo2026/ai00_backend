@@ -31,7 +31,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:d3eb493060b345795b1ea60a3d9f54c920b8f9b019a880b6146f363bea061a88"
+        "artifact_hash": "sha256:523476b6d6c216e6aacc5aa74560e257718b1d042413dfc783fb62e80ddb1eab"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -65,6 +65,30 @@
         "migration_path": "backend/db/migrations/domains/digital_model"
       },
       "search_export": null,
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "factory",
+      "artifact": {
+        "plugin_id": "official.factory",
+        "module": "factory_backend.capabilities",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:2a571a88403a7ab8649210b7bad41fb4319e2d01fe3cc6cc9a584b4a00e8e7a9"
+      },
+      "artifact_path": "plugins/factory/factory_backend",
+      "allowed_owners": [
+        "factory"
+      ],
+      "database": {
+        "database_name": "ai00_factory",
+        "runtime_url_env": "AI00_FACTORY_DB_URL",
+        "ddl_url_env": "AI00_FACTORY_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/factory"
+      },
+      "search_export": {
+        "capability_id": "factory.structure.search",
+        "major_version": 1
+      },
       "event_subscriptions": []
     },
     {
