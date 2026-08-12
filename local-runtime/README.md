@@ -25,9 +25,10 @@
 
 ```powershell
 dotnet build .\Ai00.LocalRuntime.sln -c Release
+dotnet test .\Ai00.LocalRuntime.sln -c Release --no-build
 ```
 
-当前工作环境没有 .NET SDK，因此本批次只进行了源码/XML 静态检查；必须在 Windows CI 编译并在安装 VisMockup 的试点机跑 COM 契约测试后才能发布 MSI。
+仓库级验收必须在 Windows 与 .NET 8 SDK 上完成 Release 全解决方案构建和测试。发布 MSI 前仍必须在 Windows CI 重跑，并在安装 VisMockup 的试点机执行 COM 行为对照测试。
 
 ## 升级
 
