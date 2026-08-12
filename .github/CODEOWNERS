@@ -82,6 +82,8 @@
 /backend/db/migrations/202608100008_ontology_revision_refs.sql @ai00/ontology-maintainers
 
 # Knowledge
+/plugins/knowledge/** @ai00/knowledge-maintainers
+/backend/db/migrations/domains/knowledge/** @ai00/knowledge-maintainers
 /backend/knowledge/** @ai00/knowledge-maintainers
 /backend/capabilities/knowledge_* @ai00/knowledge-maintainers
 /backend/capabilities/proposals_next.py @ai00/knowledge-maintainers
@@ -113,10 +115,14 @@
 # Domain-specific shared-kernel adapters remain owned by their domain teams.
 /backend/domain_ports/ontology.py @ai00/ontology-maintainers
 /backend/capability_v2/revision/ontology_adapter.py @ai00/ontology-maintainers
+/plugins/ontology/** @ai00/ontology-maintainers
+/backend/db/migrations/domains/ontology/** @ai00/ontology-maintainers
+/backend/scripts/bootstrap_ontology_release.py @ai00/ontology-maintainers
 /backend/domain_ports/project_management.py @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/change_logs.py @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/collab.py @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/item_entries.py @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/permission_requests.py @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/share_links.py @ai00/project-management-maintainers
+/plugins/craft/craft_backend/routers/shares.py @ai00/project-management-maintainers
 /backend/domain_ports/knowledge.py @ai00/knowledge-maintainers

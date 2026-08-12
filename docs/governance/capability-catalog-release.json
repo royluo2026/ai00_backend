@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
-  "catalog_hash": "sha256:5d0b0d121ec3f4a3756abf9fcff0a93817a3e54869b62db6a092a94dd638cb4b",
+  "release_id": "rel_129248ab04fdb72549a2f50f9e5316d9",
+  "catalog_hash": "sha256:129248ab04fdb72549a2f50f9e5316d9eb481a5ea6e759e11dfa5471e442b393",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -21674,7 +21674,7 @@
       "id": "ontology.change.proposal.create",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.change.proposal.create",
       "description": "Create an immutable typed proposal against the exact active release.",
@@ -21684,19 +21684,19 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -21788,28 +21788,127 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "proposal_gid",
+          "proposal_revision_gid",
+          "revision_no",
+          "base_release_gid",
+          "content_sha256",
+          "changes",
+          "status",
+          "author_gid",
+          "base_ontology_version_ref"
+        ],
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          },
+          "proposal_revision_gid": {
+            "type": "string"
+          },
+          "revision_no": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "base_release_gid": {
+            "type": "string"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "author_gid": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "base_ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:636ab3d454724d0dd0ee13dd59e643b5c386dcdd7c21fa30a76868222d0893cf",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.change.proposal.get",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.change.proposal.get",
       "description": "Read the current immutable proposal revision.",
@@ -21827,11 +21926,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -22013,14 +22112,35 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.change.proposal.review.submit",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.change.proposal.review.submit",
       "description": "Append a human review bound to an immutable proposal revision Hash.",
@@ -22030,19 +22150,19 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:ontology.review",
+      "authorization_policy": "ontology.v2:ontology.review",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -22097,28 +22217,86 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "review_gid",
+          "proposal_gid",
+          "proposal_revision_gid",
+          "content_sha256",
+          "decision",
+          "reviewer_gid"
+        ],
+        "properties": {
+          "review_gid": {
+            "type": "string"
+          },
+          "proposal_gid": {
+            "type": "string"
+          },
+          "proposal_revision_gid": {
+            "type": "string"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject",
+              "request_changes"
+            ]
+          },
+          "reviewer_gid": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:39cb7133ea7c58415800c12773f4f01bf9c5ff20447074f3f777a1e2fbe1984c",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.change.proposal.search",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.change.proposal.search",
       "description": "Search proposal metadata by governed status.",
@@ -22136,11 +22314,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "properties": {},
@@ -22203,14 +22381,35 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.concept.get",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.concept.get",
       "description": "Read a summary or schema view pinned to an immutable release.",
@@ -22228,11 +22427,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -22388,14 +22587,35 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.concept.resolve",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.concept.resolve",
       "description": "Resolve a term without guessing across an immutable release.",
@@ -22413,11 +22633,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -22590,14 +22810,35 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.mapping.assess",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.mapping.assess",
       "description": "Assess deterministic mapping compatibility without persisting a mapping.",
@@ -22615,11 +22856,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -22749,14 +22990,148 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "ontology.mapping.change.apply",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "ontology.mapping.change.apply",
+      "description": "Convert a requested schema or mapping change into a governed Ontology proposal.",
+      "use_when": "A consumer needs to propose an Ontology change.",
+      "do_not_use_when": "The caller expects direct mutable schema CRUD.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "ontology.v2:ontology.propose",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "base_release_gid",
+          "changes"
+        ],
+        "properties": {
+          "base_release_gid": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7e1fbd1e8f0012e8d49537a42b49239fc835b63501b315bccd0c435cbbe1f9d4",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.release.activate",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.release.activate",
       "description": "Atomically activate a verified direct forward release.",
@@ -22766,19 +23141,19 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "legacy:ontology.activate",
+      "automation_level": "A0",
+      "authorization_policy": "ontology.v2:ontology.activate",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -22840,28 +23215,93 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "ref_name",
+          "release_gid",
+          "release_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "ref_name": {
+            "type": "string"
+          },
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:e35c1da4b4567aee8caf5f28f14d9110d1bfd6b49f9f2f41d020fca600f25f77",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "required",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
+      "evidence_policy": "required",
+      "audit_policy": "high_risk",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.release.diff",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.release.diff",
       "description": "Compute a semantic stable-identity release diff.",
@@ -22879,11 +23319,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -23505,14 +23945,35 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.release.get",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.release.get",
       "description": "Read one immutable or active release.",
@@ -23530,11 +23991,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "properties": {},
@@ -23717,14 +24178,35 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.release.publish",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.release.publish",
       "description": "Publish an approved proposal as a new immutable inactive release.",
@@ -23734,19 +24216,19 @@
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
-        "plugin": false,
-        "agent": false,
+        "plugin": true,
+        "agent": true,
         "api": true,
-        "mcp": false,
+        "mcp": true,
         "worker": false,
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "legacy:ontology.publish",
+      "authorization_policy": "ontology.v2:ontology.publish",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -23843,28 +24325,130 @@
         },
         "additionalProperties": false
       },
-      "agent_output_schema": null,
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "release_gid",
+          "content_sha256",
+          "ontology_version_ref"
+        ],
+        "properties": {
+          "release_gid": {
+            "type": "string"
+          },
+          "parent_release_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "object_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ois_object_key": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_gid": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "revision_commit_id": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "compatibility": {
+            "type": "string",
+            "enum": [
+              "backward_compatible",
+              "migration_required",
+              "breaking"
+            ]
+          },
+          "ontology_version_ref": {
+            "type": "object",
+            "required": [
+              "release_gid",
+              "content_hash",
+              "revision_ref"
+            ],
+            "properties": {
+              "release_gid": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision_ref": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
       "schema_hash": "sha256:04fb98466a2e32fe27f5d37570eedc395e5b403bafe563effb334ecdbc699860",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "admin",
-      "evidence_policy": "optional",
+      "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "ontology.release.search",
       "major_version": 1,
       "owner_domain": "ontology",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "ontology.release.search",
       "description": "Search immutable release metadata.",
@@ -23882,11 +24466,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "ontology.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "properties": {},
@@ -24103,8 +24687,142 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "ontology.schema.change.apply",
+      "major_version": 1,
+      "owner_domain": "ontology",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "ontology.schema.change.apply",
+      "description": "Convert a requested schema or mapping change into a governed Ontology proposal.",
+      "use_when": "A consumer needs to propose an Ontology change.",
+      "do_not_use_when": "The caller expects direct mutable schema CRUD.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "ontology.v2:ontology.propose",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "base_release_gid",
+          "changes"
+        ],
+        "properties": {
+          "base_release_gid": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7e1fbd1e8f0012e8d49537a42b49239fc835b63501b315bccd0c435cbbe1f9d4",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "Ontology release or object was not found.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "Activation requires an approved release.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "Ontology active release changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "Ontology provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "plugin.disable",
@@ -35189,7 +35907,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:523476b6d6c216e6aacc5aa74560e257718b1d042413dfc783fb62e80ddb1eab"
+      "artifact_hash": "sha256:0f1f5d884ae45714c94c76266cbced54ce9fd69e3aedd38c4012fdf0b9c71df2"
     },
     {
       "plugin_id": "official.digital-model",
@@ -35217,9 +35935,9 @@
     },
     {
       "plugin_id": "official.ontology",
-      "module": "backend.ontology.official_provider",
-      "version": "1.0.0",
-      "artifact_hash": "sha256:3f4b1818a435021936fb275b95e5f655d0325d65942e4653a8a73de162359c1d"
+      "module": "ontology_backend.capabilities",
+      "version": "2.0.0",
+      "artifact_hash": "sha256:ba13af6547a54fe86b992636e2ea7cd8c046d80bbc30f3311dbe167b605b6b58"
     },
     {
       "plugin_id": "official.project-management",
@@ -35234,5 +35952,5 @@
       "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
     }
   ],
-  "created_at": "2026-08-12T08:08:34.169993Z"
+  "created_at": "2026-08-12T08:29:11.457002Z"
 }

@@ -8,7 +8,7 @@ Compose impact from a server-issued preview or diff ref.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_5d0b0d121ec3f4a3756abf9fcff0a938`
+- Catalog Release：`rel_129248ab04fdb72549a2f50f9e5316d9`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -75,7 +75,7 @@ Compose impact from a server-issued preview or diff ref.
 ```json
 {
   "capability_id": "system.change_impact.preview",
-  "catalog_release": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
+  "catalog_release": "rel_129248ab04fdb72549a2f50f9e5316d9",
   "major_version": 1,
   "payload": {
     "change_ref": "example"

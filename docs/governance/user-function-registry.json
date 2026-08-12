@@ -2655,7 +2655,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_proposals_next.py"
+        "backend/capabilities/ontology_proposals_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_proposals_next.py"
       ]
     },
     "capability:ontology.change.proposal.get": {
@@ -2678,7 +2679,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_proposals_next.py"
+        "backend/capabilities/ontology_proposals_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_proposals_next.py"
       ]
     },
     "capability:ontology.change.proposal.review.submit": {
@@ -2701,7 +2703,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_proposals_next.py"
+        "backend/capabilities/ontology_proposals_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_proposals_next.py"
       ]
     },
     "capability:ontology.change.proposal.search": {
@@ -2724,7 +2727,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_proposals_next.py"
+        "backend/capabilities/ontology_proposals_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_proposals_next.py"
       ]
     },
     "capability:ontology.concept.get": {
@@ -2747,7 +2751,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_concepts_next.py"
+        "backend/capabilities/ontology_concepts_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py"
       ]
     },
     "capability:ontology.concept.resolve": {
@@ -2770,7 +2775,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_concepts_next.py"
+        "backend/capabilities/ontology_concepts_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py"
       ]
     },
     "capability:ontology.mapping.assess": {
@@ -2793,7 +2799,30 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_concepts_next.py"
+        "backend/capabilities/ontology_concepts_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_concepts_next.py"
+      ]
+    },
+    "capability:ontology.mapping.change.apply": {
+      "function_id": "capability:ontology.mapping.change.apply",
+      "domain": "Ontology",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "ontology.mapping.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "ontology"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Ontology",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/ontology/ontology_backend/capabilities/reviewed.py"
       ]
     },
     "capability:ontology.release.activate": {
@@ -2816,7 +2845,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_releases_next.py"
+        "backend/capabilities/ontology_releases_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_releases_next.py"
       ]
     },
     "capability:ontology.release.diff": {
@@ -2839,7 +2869,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_releases_next.py"
+        "backend/capabilities/ontology_releases_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_releases_next.py"
       ]
     },
     "capability:ontology.release.get": {
@@ -2862,7 +2893,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_releases_next.py"
+        "backend/capabilities/ontology_releases_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_releases_next.py"
       ]
     },
     "capability:ontology.release.publish": {
@@ -2885,7 +2917,8 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_releases_next.py"
+        "backend/capabilities/ontology_releases_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_releases_next.py"
       ]
     },
     "capability:ontology.release.search": {
@@ -2908,7 +2941,30 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/ontology_releases_next.py"
+        "backend/capabilities/ontology_releases_next.py",
+        "plugins/ontology/ontology_backend/capabilities/ontology_releases_next.py"
+      ]
+    },
+    "capability:ontology.schema.change.apply": {
+      "function_id": "capability:ontology.schema.change.apply",
+      "domain": "Ontology",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "ontology.schema.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "ontology"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Ontology",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/ontology/ontology_backend/capabilities/reviewed.py"
       ]
     },
     "capability:plugin.disable": {
@@ -4919,8 +4975,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -4941,8 +4997,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -4963,8 +5019,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -4985,8 +5041,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -10226,8 +10282,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -11262,8 +11318,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -11284,8 +11340,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -11306,8 +11362,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -14980,8 +15036,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -15002,8 +15058,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -15024,8 +15080,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -15046,8 +15102,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -15068,8 +15124,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
@@ -15090,8 +15146,8 @@
         "ontology"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [

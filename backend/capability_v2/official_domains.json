@@ -31,7 +31,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:523476b6d6c216e6aacc5aa74560e257718b1d042413dfc783fb62e80ddb1eab"
+        "artifact_hash": "sha256:0f1f5d884ae45714c94c76266cbced54ce9fd69e3aedd38c4012fdf0b9c71df2"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -138,11 +138,11 @@
       "domain_id": "ontology",
       "artifact": {
         "plugin_id": "official.ontology",
-        "module": "backend.ontology.official_provider",
-        "version": "1.0.0",
-        "artifact_hash": "sha256:3f4b1818a435021936fb275b95e5f655d0325d65942e4653a8a73de162359c1d"
+        "module": "ontology_backend.capabilities",
+        "version": "2.0.0",
+        "artifact_hash": "sha256:ba13af6547a54fe86b992636e2ea7cd8c046d80bbc30f3311dbe167b605b6b58"
       },
-      "artifact_path": "backend/ontology",
+      "artifact_path": "plugins/ontology/ontology_backend",
       "allowed_owners": [
         "ontology"
       ],

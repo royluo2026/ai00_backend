@@ -6,11 +6,11 @@ Read one immutable or active release.
 
 - 适用：A release identity or current active release is needed.
 - 不适用：Comparing two releases.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_5d0b0d121ec3f4a3756abf9fcff0a938`
+- Catalog Release：`rel_129248ab04fdb72549a2f50f9e5316d9`
 - Schema 精度：`typed`
-- 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
@@ -28,10 +28,10 @@ Read one immutable or active release.
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:authenticated`
+- 授权策略：`ontology.v2:authenticated`
 - 自动化等级：`A2`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
@@ -68,7 +68,7 @@ Read one immutable or active release.
 ```json
 {
   "capability_id": "ontology.release.get",
-  "catalog_release": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
+  "catalog_release": "rel_129248ab04fdb72549a2f50f9e5316d9",
   "major_version": 1,
   "payload": {}
 }
@@ -195,9 +195,12 @@ Read one immutable or active release.
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `resource_not_found`：Ontology release or object was not found.（retryable=false）
+- `approval_required`：Activation requires an approved release.（retryable=false）
+- `version_conflict`：Ontology active release changed concurrently.（retryable=false）
+- `provider_unavailable`：Ontology provider is unavailable.（retryable=true）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

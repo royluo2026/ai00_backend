@@ -6,21 +6,21 @@ Append a human review bound to an immutable proposal revision Hash.
 
 - 适用：A human reviewer makes a formal decision.
 - 不适用：An Agent is attempting to approve.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_5d0b0d121ec3f4a3756abf9fcff0a938`
+- Catalog Release：`rel_129248ab04fdb72549a2f50f9e5316d9`
 - Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`, `domain_errors_not_declared`, `experimental_lifecycle`
+- 暂未开放原因：`legacy_partial_schema`
 
 ## 消费者可用性
 
 | 消费者 | 状态 |
 |---|---|
 | web | 可用 |
-| plugin | 不可用 |
-| agent | 不可用 |
+| plugin | 可用 |
+| agent | 可用 |
 | api | 可用 |
-| mcp | 不可用 |
+| mcp | 可用 |
 | worker | 不可用 |
 | local_runtime | 不可用 |
 
@@ -28,10 +28,10 @@ Append a human review bound to an immutable proposal revision Hash.
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:ontology.review`
+- 授权策略：`ontology.v2:ontology.review`
 - 自动化等级：`A1`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
@@ -43,14 +43,14 @@ Append a human review bound to an immutable proposal revision Hash.
 - 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`user`
-- 幂等：`none`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
-- Operation：`none`
+- 一致性：`external`
+- Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
-- Evidence：`optional`
+- Evidence：`required`
 - 配额成本：1
 
 ## 输入 Schema
@@ -79,7 +79,7 @@ Append a human review bound to an immutable proposal revision Hash.
 ```json
 {
   "capability_id": "ontology.change.proposal.review.submit",
-  "catalog_release": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
+  "catalog_release": "rel_129248ab04fdb72549a2f50f9e5316d9",
   "major_version": 1,
   "payload": {
     "content_sha256": "example",
@@ -167,9 +167,12 @@ Append a human review bound to an immutable proposal revision Hash.
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `resource_not_found`：Ontology release or object was not found.（retryable=false）
+- `approval_required`：Activation requires an approved release.（retryable=false）
+- `version_conflict`：Ontology active release changed concurrently.（retryable=false）
+- `provider_unavailable`：Ontology provider is unavailable.（retryable=true）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

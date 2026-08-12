@@ -1,13 +1,13 @@
-# project.member.change.apply@1
+# ontology.schema.change.apply@1
 
-Execute the reviewed project.member.change.apply project outcome.
+Convert a requested schema or mapping change into a governed Ontology proposal.
 
 ## 使用判断
 
-- 适用：A governed consumer needs this Project Management outcome.
-- 不适用：The operation belongs to another domain.
+- 适用：A consumer needs to propose an Ontology change.
+- 不适用：The caller expects direct mutable schema CRUD.
 - 生命周期：`stable`
-- 所属领域：`project_management`
+- 所属领域：`ontology`
 - Catalog Release：`rel_129248ab04fdb72549a2f50f9e5316d9`
 - Schema 精度：`typed`
 - 暂未开放原因：无
@@ -28,7 +28,7 @@ Execute the reviewed project.member.change.apply project outcome.
 
 ## 授权与数据边界
 
-- 授权策略：`project_management.v2:project.write`
+- 授权策略：`ontology.v2:ontology.propose`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -46,11 +46,11 @@ Execute the reviewed project.member.change.apply project outcome.
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
+- 一致性：`external`
 - Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
-- Evidence：`optional`
+- Evidence：`required`
 - 配额成本：1
 
 ## 输入 Schema
@@ -59,20 +59,21 @@ Execute the reviewed project.member.change.apply project outcome.
 {
   "additionalProperties": false,
   "properties": {
-    "arguments": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "operation": {
-      "maxLength": 128,
-      "minLength": 1,
+    "base_release_gid": {
       "type": "string"
+    },
+    "changes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "type": "array"
     }
   },
   "required": [
-    "operation",
-    "arguments"
+    "base_release_gid",
+    "changes"
   ],
   "type": "object"
 }
@@ -82,12 +83,12 @@ Execute the reviewed project.member.change.apply project outcome.
 
 ```json
 {
-  "capability_id": "project.member.change.apply",
+  "capability_id": "ontology.schema.change.apply",
   "catalog_release": "rel_129248ab04fdb72549a2f50f9e5316d9",
   "major_version": 1,
   "payload": {
-    "arguments": {},
-    "operation": "example"
+    "base_release_gid": "example",
+    "changes": []
   }
 }
 ```
@@ -145,11 +146,10 @@ Execute the reviewed project.member.change.apply project outcome.
 
 领域错误：
 
-- `resource_not_found`：The requested project resource is unavailable.（retryable=false）
-- `permission_denied`：The caller cannot access the project resource.（retryable=false）
-- `approval_required`：The project change requires Base approval.（retryable=false）
-- `version_conflict`：The project resource changed concurrently.（retryable=false）
-- `provider_unavailable`：The Project Management provider is unavailable.（retryable=true）
+- `resource_not_found`：Ontology release or object was not found.（retryable=false）
+- `approval_required`：Activation requires an approved release.（retryable=false）
+- `version_conflict`：Ontology active release changed concurrently.（retryable=false）
+- `provider_unavailable`：Ontology provider is unavailable.（retryable=true）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

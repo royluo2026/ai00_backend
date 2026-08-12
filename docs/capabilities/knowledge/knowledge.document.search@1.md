@@ -8,7 +8,7 @@ Search published immutable Knowledge Workspace documents.
 - 不适用：The document gid is already known.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_5d0b0d121ec3f4a3756abf9fcff0a938`
+- Catalog Release：`rel_129248ab04fdb72549a2f50f9e5316d9`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -77,7 +77,7 @@ Search published immutable Knowledge Workspace documents.
 ```json
 {
   "capability_id": "knowledge.document.search",
-  "catalog_release": "rel_5d0b0d121ec3f4a3756abf9fcff0a938",
+  "catalog_release": "rel_129248ab04fdb72549a2f50f9e5316d9",
   "major_version": 1,
   "payload": {}
 }
