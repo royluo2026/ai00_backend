@@ -2988,17 +2988,17 @@
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "plugin.upgrade.finish",
+      "target_capability": null,
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
+      "classification": "operations",
       "migration_status": "registered",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "Plugin upgrade finish is a trusted deployment-health callback owned by the control plane, not a business Capability.",
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/plugin_marketplace_next.py"
@@ -3419,17 +3419,17 @@
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "system.worker.outbox.health",
+      "target_capability": null,
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "mapped",
+      "classification": "operations",
       "migration_status": "registered",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "Worker heartbeat and outbox health are authenticated operations telemetry, not an independently invokable business outcome.",
       "source_paths": [
         "backend/capabilities/agreed_catalog.py"
       ]
@@ -4244,12 +4244,12 @@
     },
     "rest:DELETE:/api/ext-datasources/{gid}": {
       "function_id": "rest:DELETE:/api/ext-datasources/{gid}",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_datasource.change.apply",
+      "target_capability": "integration.connector.archive",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -4258,7 +4258,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -4266,12 +4266,12 @@
     },
     "rest:DELETE:/api/ext-mappings/{gid}": {
       "function_id": "rest:DELETE:/api/ext-mappings/{gid}",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.change.apply",
+      "target_capability": "integration.mapping.archive",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -4280,7 +4280,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7060,12 +7060,12 @@
     },
     "rest:GET:/api/ext-datasources": {
       "function_id": "rest:GET:/api/ext-datasources",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_datasource.search",
+      "target_capability": "integration.connector.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7074,7 +7074,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7082,12 +7082,12 @@
     },
     "rest:GET:/api/ext-datasources/{gid}/tables": {
       "function_id": "rest:GET:/api/ext-datasources/{gid}/tables",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_datasource.search",
+      "target_capability": "integration.connector.schema.discover",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7096,7 +7096,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7104,12 +7104,12 @@
     },
     "rest:GET:/api/ext-field-mappings": {
       "function_id": "rest:GET:/api/ext-field-mappings",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.read",
+      "target_capability": "integration.mapping.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7118,7 +7118,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7126,12 +7126,12 @@
     },
     "rest:GET:/api/ext-mappings": {
       "function_id": "rest:GET:/api/ext-mappings",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.read",
+      "target_capability": "integration.mapping.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7140,7 +7140,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7148,12 +7148,12 @@
     },
     "rest:GET:/api/ext-mappings/{gid}/columns": {
       "function_id": "rest:GET:/api/ext-mappings/{gid}/columns",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.read",
+      "target_capability": "integration.connector.schema.discover",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7162,7 +7162,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -7170,12 +7170,12 @@
     },
     "rest:GET:/api/ext-mappings/{gid}/preview": {
       "function_id": "rest:GET:/api/ext-mappings/{gid}/preview",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.read",
+      "target_capability": "integration.mapping.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7184,7 +7184,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -10607,12 +10607,12 @@
     },
     "rest:PATCH:/api/ext-datasources/{gid}": {
       "function_id": "rest:PATCH:/api/ext-datasources/{gid}",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_datasource.change.apply",
+      "target_capability": "integration.connector.update",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -10621,7 +10621,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -10629,12 +10629,12 @@
     },
     "rest:PATCH:/api/ext-mappings/{gid}": {
       "function_id": "rest:PATCH:/api/ext-mappings/{gid}",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.change.apply",
+      "target_capability": "integration.mapping.update",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -10643,7 +10643,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -13359,12 +13359,12 @@
     },
     "rest:POST:/api/ext-datasources": {
       "function_id": "rest:POST:/api/ext-datasources",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_datasource.change.apply",
+      "target_capability": "integration.connector.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -13373,7 +13373,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -13381,12 +13381,12 @@
     },
     "rest:POST:/api/ext-datasources/{gid}/test": {
       "function_id": "rest:POST:/api/ext-datasources/{gid}/test",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_datasource.connection.test",
+      "target_capability": "integration.connector.connection.test",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -13395,7 +13395,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -13403,12 +13403,12 @@
     },
     "rest:POST:/api/ext-mappings": {
       "function_id": "rest:POST:/api/ext-mappings",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.change.apply",
+      "target_capability": "integration.mapping.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -13417,7 +13417,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -13425,12 +13425,12 @@
     },
     "rest:POST:/api/ext-mappings/{gid}/import": {
       "function_id": "rest:POST:/api/ext-mappings/{gid}/import",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.change.apply",
+      "target_capability": "integration.sync.start",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -13439,7 +13439,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"
@@ -15806,17 +15806,17 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.plugin.marketplace.usage.close",
+      "target_capability": null,
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "operations",
       "migration_status": "proposed",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "Plugin usage month close is a scheduled accounting operation, not an independently invokable business outcome.",
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
       ]
@@ -16439,12 +16439,12 @@
     },
     "rest:PUT:/api/ext-field-mappings/batch": {
       "function_id": "rest:PUT:/api/ext-field-mappings/batch",
-      "domain": "Base Platform",
+      "domain": "Integration",
       "stability": "stable",
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "base.external_mapping.change.apply",
+      "target_capability": "integration.mapping.update",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -16453,7 +16453,7 @@
       "data_classification": "internal",
       "classification": "proposed",
       "migration_status": "proposed",
-      "owner": "Base Platform",
+      "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/ext_datasource.py"

@@ -55,10 +55,12 @@ def _complete_repository(tmp_path: Path) -> Path:
                 ".infrastructure.repositories.",
             ],
             "forbidden_consumer_call_fragments": ["get_conn("],
-            "frozen_coverage": {
+            "coverage_invariants": {
                 "domains": 11,
                 "stable_functions": 752,
                 "resolutions.unreviewed": 0,
+            },
+            "starting_snapshot": {
                 "candidate_capabilities": 87,
                 "catalog_descriptors": 102,
                 "proposed_final_catalog_capabilities": 173,
@@ -304,7 +306,29 @@ def test_frozen_coverage_drift_fails_closed(tmp_path: Path) -> None:
     report = evaluate_completion(root, mode="strict")
 
     assert report.complete is False
-    assert "frozen_coverage:stable_functions:751!=752" in report.failed
+    assert "coverage_invariant:stable_functions:751!=752" in report.failed
+
+
+def test_approved_candidate_count_correction_does_not_fail_completion(
+    tmp_path: Path,
+) -> None:
+    root = _complete_repository(tmp_path)
+    summary_path = (
+        root
+        / "docs/governance/capability-coverage-review/generated/summary.json"
+    )
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary["candidate_capabilities"] = 94
+    summary["proposed_final_catalog_capabilities"] = 178
+    _write_json(
+        root,
+        "docs/governance/capability-coverage-review/generated/summary.json",
+        summary,
+    )
+
+    report = evaluate_completion(root, mode="strict")
+
+    assert report.complete is True
 
 
 def test_catalog_count_is_evidence_not_a_completion_quota(tmp_path: Path) -> None:
@@ -356,7 +380,15 @@ def test_frozen_review_exposes_exact_capability_ids() -> None:
     base_ids = review.capability_ids("base")
     assert "base.annotation.read" in base_ids
     assert "base.annotation.change.apply" in base_ids
-    assert len(base_ids) == 44
+    assert "system.worker.outbox.health" not in base_ids
+    assert "plugin.upgrade.finish" not in base_ids
+    assert len(base_ids) == 36
+
+    integration_ids = review.capability_ids("integration")
+    assert "integration.connector.create" in integration_ids
+    assert "integration.mapping.preview" in integration_ids
+    assert "integration.sync.start" in integration_ids
+    assert len(integration_ids) == 13
 
 
 def test_completion_cli_reports_progress_and_fails_strict() -> None:

@@ -22,18 +22,12 @@
 | Base Platform | `base.authorization.grant.read` | rest |
 | Base Platform | `base.export_template.change.apply` | rest |
 | Base Platform | `base.export_template.read` | rest |
-| Base Platform | `base.external_datasource.change.apply` | rest |
-| Base Platform | `base.external_datasource.connection.test` | rest |
-| Base Platform | `base.external_datasource.search` | rest |
-| Base Platform | `base.external_mapping.change.apply` | rest |
-| Base Platform | `base.external_mapping.read` | rest |
 | Base Platform | `base.identity.directory.sync` | rest |
 | Base Platform | `base.identity.role.assign` | rest |
 | Base Platform | `base.identity.session.get` | rest |
 | Base Platform | `base.plugin.marketplace.publisher.register` | rest |
 | Base Platform | `base.plugin.marketplace.release.change.apply` | rest |
 | Base Platform | `base.plugin.marketplace.search` | rest |
-| Base Platform | `base.plugin.marketplace.usage.close` | rest |
 | Base Platform | `base.saved_view.change.apply` | rest |
 | Base Platform | `base.saved_view.read` | rest |
 | Base Platform | `base.team.change.apply` | rest |
@@ -51,7 +45,6 @@
 | Base Platform | `plugin.storage.put` | none |
 | Base Platform | `plugin.uninstall` | none |
 | Base Platform | `plugin.upgrade` | none |
-| Base Platform | `plugin.upgrade.finish` | none |
 | Base Platform | `semantic.context.get` | none |
 | Base Platform | `system.activity.search` | none |
 | Base Platform | `system.change_impact.preview` | none |
@@ -59,7 +52,6 @@
 | Base Platform | `system.job.get` | none |
 | Base Platform | `system.lineage.get` | none |
 | Base Platform | `system.search` | agent |
-| Base Platform | `system.worker.outbox.health` | none |
 | Craft | `craft.bop.draft.change.apply` | rest |
 | Craft | `craft.bop.draft.change.preview` | rest, agent |
 | Craft | `craft.bop.execution_structure.get` | rest, agent |
@@ -96,6 +88,19 @@
 | Digital Model | `digital_model.snapshot.compare` | none |
 | Digital Model | `digital_model.snapshot.get` | none |
 | Digital Model | `digital_model.version.create` | none |
+| Integration | `integration.connector.archive` | rest |
+| Integration | `integration.connector.connection.test` | rest |
+| Integration | `integration.connector.create` | rest |
+| Integration | `integration.connector.schema.discover` | rest |
+| Integration | `integration.connector.search` | rest |
+| Integration | `integration.connector.update` | rest |
+| Integration | `integration.mapping.archive` | rest |
+| Integration | `integration.mapping.create` | rest |
+| Integration | `integration.mapping.get` | rest |
+| Integration | `integration.mapping.preview` | rest |
+| Integration | `integration.mapping.search` | rest |
+| Integration | `integration.mapping.update` | rest |
+| Integration | `integration.sync.start` | rest |
 | Knowledge | `knowledge.context.retrieve` | rest, agent |
 | Knowledge | `knowledge.document.acl.grant` | none |
 | Knowledge | `knowledge.document.acl.list` | none |

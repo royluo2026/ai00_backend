@@ -3,12 +3,39 @@
   "domain": "Base Platform",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:4029e423d8d266d783ef7ddd7fa4c60084b304d62b8a620c3e5496f42ff7a9d6",
+    "registry_sha256": "sha256:6f670dd4a58955825a24c1f26b66ab5dfd6f3083c161837517e4440a73865041",
     "catalog_release": "rel_4227f82570395820b4085ce8ceefd893",
     "catalog_sha256": "sha256:71f59b251723a1b48cf925fba0995354de738f8e3c90dc12faca5b7b4300d62d"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
+    "capability:plugin.upgrade.finish": {
+      "resolution": "excluded",
+      "target_capability": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "backend/capabilities/plugin_marketplace_next.py"
+      ],
+      "evidence": "Approved correction removes plugin.upgrade.finish from the business Catalog.",
+      "reason": "Plugin upgrade finish is a trusted deployment-health callback owned by the control plane, not a business Capability.",
+      "classification": "operations",
+      "owner": "Base Platform",
+      "reviewer": "capability-v2-base-integration-correction",
+      "reviewed_at": "2026-08-12"
+    },
+    "capability:system.worker.outbox.health": {
+      "resolution": "excluded",
+      "target_capability": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py"
+      ],
+      "evidence": "Approved correction removes system.worker.outbox.health from the business Catalog.",
+      "reason": "Worker heartbeat and outbox health are authenticated operations telemetry, not an independently invokable business outcome.",
+      "classification": "operations",
+      "owner": "Base Platform",
+      "reviewer": "capability-v2-base-integration-correction",
+      "reviewed_at": "2026-08-12"
+    },
     "rest:DELETE:/admin/config/{key}": {
       "resolution": "excluded",
       "target_capability": null,
@@ -723,6 +750,19 @@
       "owner": "Base Platform",
       "reviewer": "capability-v2-architecture-review",
       "reviewed_at": "2026-08-11"
+    },
+    "rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close": {
+      "resolution": "excluded",
+      "target_capability": null,
+      "source_paths": [
+        "backend/routers/plugin_marketplace.py"
+      ],
+      "evidence": "Approved correction removes base.plugin.marketplace.usage.close from the business Catalog.",
+      "reason": "Plugin usage month close is a scheduled accounting operation, not an independently invokable business outcome.",
+      "classification": "operations",
+      "owner": "Base Platform",
+      "reviewer": "capability-v2-base-integration-correction",
+      "reviewed_at": "2026-08-12"
     },
     "rest:POST:/api/v2/agent-capabilities/delegations": {
       "resolution": "excluded",
@@ -1442,413 +1482,6 @@
         "migration_stream": "base"
       }
     },
-    "base.external_datasource.change.apply": {
-      "kind": "candidate",
-      "function_dispositions": {
-        "rest:DELETE:/api/ext-datasources/{gid}": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:DELETE:/api/ext-datasources/{gid} implements the reviewed base.external_datasource.change.apply business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PATCH:/api/ext-datasources/{gid}": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:PATCH:/api/ext-datasources/{gid} implements the reviewed base.external_datasource.change.apply business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/ext-datasources": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:POST:/api/ext-datasources implements the reviewed base.external_datasource.change.apply business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.change.apply"
-        },
-        "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "base.external_datasource.change.apply"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.change.apply"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.change.apply"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.change.apply"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.change.apply"
-        }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed external datasource change apply business outcome for Base Platform.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "base",
-        "application_port": "base.external_datasource.change.apply",
-        "provider_artifact": "ai00-base-platform",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "base"
-      }
-    },
-    "base.external_datasource.connection.test": {
-      "kind": "candidate",
-      "function_dispositions": {
-        "rest:POST:/api/ext-datasources/{gid}/test": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:POST:/api/ext-datasources/{gid}/test implements the reviewed base.external_datasource.connection.test business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.connection.test"
-        },
-        "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "base.external_datasource.connection.test"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.connection.test"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.connection.test"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.connection.test"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.connection.test"
-        }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed external datasource connection test business outcome for Base Platform.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "base",
-        "application_port": "base.external_datasource.connection.test",
-        "provider_artifact": "ai00-base-platform",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "base"
-      }
-    },
-    "base.external_datasource.search": {
-      "kind": "candidate",
-      "function_dispositions": {
-        "rest:GET:/api/ext-datasources": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:GET:/api/ext-datasources implements the reviewed base.external_datasource.search business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/ext-datasources/{gid}/tables": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:GET:/api/ext-datasources/{gid}/tables implements the reviewed base.external_datasource.schema.get business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.search"
-        },
-        "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "base.external_datasource.search"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.search"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.search"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.search"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "base.external_datasource.search"
-        }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed external datasource search business outcome for Base Platform.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "base",
-        "application_port": "base.external_datasource.search",
-        "provider_artifact": "ai00-base-platform",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "base"
-      }
-    },
-    "base.external_mapping.change.apply": {
-      "kind": "candidate",
-      "function_dispositions": {
-        "rest:DELETE:/api/ext-mappings/{gid}": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:DELETE:/api/ext-mappings/{gid} implements the reviewed base.external_mapping.change.apply business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PATCH:/api/ext-mappings/{gid}": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:PATCH:/api/ext-mappings/{gid} implements the reviewed base.external_mapping.change.apply business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/ext-mappings": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:POST:/api/ext-mappings implements the reviewed base.external_mapping.change.apply business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/ext-mappings/{gid}/import": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:POST:/api/ext-mappings/{gid}/import implements the reviewed base.external_mapping.import business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PUT:/api/ext-field-mappings/batch": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:PUT:/api/ext-field-mappings/batch implements the reviewed base.external_mapping.change.apply business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.change.apply"
-        },
-        "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "base.external_mapping.change.apply"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.change.apply"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.change.apply"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.change.apply"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.change.apply"
-        }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed external mapping change apply business outcome for Base Platform.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "base",
-        "application_port": "base.external_mapping.change.apply",
-        "provider_artifact": "ai00-base-platform",
-        "owned_tables": [
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "base"
-      }
-    },
-    "base.external_mapping.read": {
-      "kind": "candidate",
-      "function_dispositions": {
-        "rest:GET:/api/ext-field-mappings": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:GET:/api/ext-field-mappings implements the reviewed base.external_mapping.search business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/ext-mappings": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:GET:/api/ext-mappings implements the reviewed base.external_mapping.search business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/ext-mappings/{gid}/columns": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:GET:/api/ext-mappings/{gid}/columns implements the reviewed base.external_mapping.search business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/ext-mappings/{gid}/preview": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:GET:/api/ext-mappings/{gid}/preview implements the reviewed base.external_mapping.preview business outcome from backend/routers/ext_datasource.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.read"
-        },
-        "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "base.external_mapping.read"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.read"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.read"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.read"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "base.external_mapping.read"
-        }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed external mapping read business outcome for Base Platform.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "base",
-        "application_port": "base.external_mapping.read",
-        "provider_artifact": "ai00-base-platform",
-        "owned_tables": [
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "base"
-      }
-    },
     "base.identity.directory.sync": {
       "kind": "candidate",
       "function_dispositions": {
@@ -2317,75 +1950,6 @@
         ],
         "owner_domain": "base",
         "application_port": "base.plugin.marketplace.search",
-        "provider_artifact": "ai00-base-platform",
-        "owned_tables": [
-          "workmanship_plugin_installations",
-          "workmanship_plugin_lifecycle_events",
-          "workmanship_plugin_mount_sessions",
-          "workmanship_plugin_namespace_kv",
-          "workmanship_plugin_publishers",
-          "workmanship_plugin_releases",
-          "workmanship_plugin_usage_events",
-          "workmanship_plugin_usage_month_closures",
-          "workmanship_plugin_usage_monthly"
-        ],
-        "migration_stream": "base"
-      }
-    },
-    "base.plugin.marketplace.usage.close": {
-      "kind": "candidate",
-      "function_dispositions": {
-        "rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/plugin_marketplace.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "The stable surface rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close implements the reviewed base.plugin.marketplace.usage.close business outcome from backend/routers/plugin_marketplace.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "base.plugin.marketplace.usage.close"
-        },
-        "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "base.plugin.marketplace.usage.close"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "base.plugin.marketplace.usage.close"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "base.plugin.marketplace.usage.close"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "base.plugin.marketplace.usage.close"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "base.plugin.marketplace.usage.close"
-        }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed plugin marketplace usage close business outcome for Base Platform.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "base",
-        "application_port": "base.plugin.marketplace.usage.close",
         "provider_artifact": "ai00-base-platform",
         "owned_tables": [
           "workmanship_plugin_installations",
@@ -3401,55 +2965,6 @@
         }
       }
     },
-    "plugin.upgrade.finish": {
-      "kind": "existing",
-      "function_dispositions": {
-        "capability:plugin.upgrade.finish": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/capabilities/agreed_catalog.py",
-            "backend/capabilities/plugin_marketplace_next.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
-          "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        }
-      }
-    },
     "semantic.context.get": {
       "kind": "existing",
       "function_dispositions": {
@@ -3810,54 +3325,6 @@
           "enabled": false,
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "system.search"
-        }
-      }
-    },
-    "system.worker.outbox.health": {
-      "kind": "existing",
-      "function_dispositions": {
-        "capability:system.worker.outbox.health": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/capabilities/agreed_catalog.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
-          "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
         }
       }
     }

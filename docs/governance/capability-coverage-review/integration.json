@@ -3,13 +3,835 @@
   "domain": "Integration",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:4029e423d8d266d783ef7ddd7fa4c60084b304d62b8a620c3e5496f42ff7a9d6",
+    "registry_sha256": "sha256:6f670dd4a58955825a24c1f26b66ab5dfd6f3083c161837517e4440a73865041",
     "catalog_release": "rel_4227f82570395820b4085ce8ceefd893",
     "catalog_sha256": "sha256:71f59b251723a1b48cf925fba0995354de738f8e3c90dc12faca5b7b4300d62d"
   },
   "unreviewed_functions": {},
   "excluded_functions": {},
-  "capabilities": {},
+  "capabilities": {
+    "integration.connector.archive": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/ext-datasources/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:DELETE:/api/ext-datasources/{gid} to integration.connector.archive.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.archive"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.connector.archive"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.archive"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.archive"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.archive"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.archive"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.connector.archive business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.connector.archive",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.connector.connection.test": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/ext-datasources/{gid}/test": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:POST:/api/ext-datasources/{gid}/test to integration.connector.connection.test.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.connection.test"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.connector.connection.test"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.connection.test"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.connection.test"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.connection.test"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.connection.test"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.connector.connection.test business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.connector.connection.test",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.connector.create": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/ext-datasources": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:POST:/api/ext-datasources to integration.connector.create.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.create"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.connector.create"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.create"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.create"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.create"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.create"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.connector.create business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.connector.create",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.connector.schema.discover": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/ext-datasources/{gid}/tables": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:GET:/api/ext-datasources/{gid}/tables to integration.connector.schema.discover.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        },
+        "rest:GET:/api/ext-mappings/{gid}/columns": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:GET:/api/ext-mappings/{gid}/columns to integration.connector.schema.discover.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.schema.discover"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.connector.schema.discover"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.schema.discover"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.schema.discover"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.schema.discover"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.schema.discover"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.connector.schema.discover business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.connector.schema.discover",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.connector.search": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/ext-datasources": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:GET:/api/ext-datasources to integration.connector.search.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.search"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.connector.search"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.search"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.search"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.search"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.search"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.connector.search business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.connector.search",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.connector.update": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:PATCH:/api/ext-datasources/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:PATCH:/api/ext-datasources/{gid} to integration.connector.update.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.update"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.connector.update"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.update"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.update"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.update"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.connector.update"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.connector.update business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.connector.update",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_datasources"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.mapping.archive": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:DELETE:/api/ext-mappings/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:DELETE:/api/ext-mappings/{gid} to integration.mapping.archive.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.archive"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.mapping.archive"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.archive"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.archive"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.archive"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.archive"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.mapping.archive business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.mapping.archive",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.mapping.create": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/ext-mappings": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:POST:/api/ext-mappings to integration.mapping.create.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.create"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.mapping.create"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.create"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.create"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.create"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.create"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.mapping.create business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.mapping.create",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.mapping.get": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/ext-field-mappings": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:GET:/api/ext-field-mappings to integration.mapping.get.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.get"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.mapping.get"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.get"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.get"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.get"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.get"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.mapping.get business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.mapping.get",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.mapping.preview": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/ext-mappings/{gid}/preview": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:GET:/api/ext-mappings/{gid}/preview to integration.mapping.preview.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.preview"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.mapping.preview"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.preview"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.preview"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.preview"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.preview"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.mapping.preview business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.mapping.preview",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.mapping.search": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:GET:/api/ext-mappings": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:GET:/api/ext-mappings to integration.mapping.search.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.search"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.mapping.search"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.search"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.search"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.search"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.search"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.mapping.search business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.mapping.search",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.mapping.update": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:PATCH:/api/ext-mappings/{gid}": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:PATCH:/api/ext-mappings/{gid} to integration.mapping.update.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        },
+        "rest:PUT:/api/ext-field-mappings/batch": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:PUT:/api/ext-field-mappings/batch to integration.mapping.update.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.update"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.mapping.update"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.update"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.update"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.update"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.mapping.update"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.mapping.update business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.mapping.update",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "integration"
+      }
+    },
+    "integration.sync.start": {
+      "kind": "candidate",
+      "function_dispositions": {
+        "rest:POST:/api/ext-mappings/{gid}/import": {
+          "resolution": "new_capability",
+          "source_paths": [
+            "backend/routers/ext_datasource.py"
+          ],
+          "owner": "Integration",
+          "evidence": "Approved ownership correction maps rest:POST:/api/ext-mappings/{gid}/import to integration.sync.start.",
+          "reviewer": "capability-v2-base-integration-correction",
+          "reviewed_at": "2026-08-12"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.sync.start"
+        },
+        "rest": {
+          "enabled": true,
+          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
+          "policy_ref": "integration.sync.start"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.sync.start"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.sync.start"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.sync.start"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No reviewed consumer requires this corrected business outcome.",
+          "policy_ref": "integration.sync.start"
+        }
+      },
+      "candidate_definition": {
+        "business_outcome": "Deliver the governed integration.sync.start business outcome for Integration.",
+        "non_goals": [
+          "Does not bypass Catalog and Gateway or write another domain database."
+        ],
+        "owner_domain": "integration",
+        "application_port": "integration.sync.start",
+        "provider_artifact": "ai00-integration",
+        "owned_tables": [
+          "workmanship_int_ext_datasources",
+          "workmanship_int_ext_field_mappings",
+          "workmanship_int_ext_mappings"
+        ],
+        "migration_stream": "integration"
+      }
+    }
+  },
   "code_extractions": [],
   "database_boundaries": [
     {

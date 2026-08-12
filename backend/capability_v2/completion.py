@@ -202,10 +202,12 @@ def _nested_value(document: dict, dotted_path: str):
     return value
 
 
-def _frozen_coverage_failures(root: Path, configuration: dict) -> list[str]:
-    expected = configuration.get("frozen_coverage")
+def _coverage_invariant_failures(root: Path, configuration: dict) -> list[str]:
+    expected = configuration.get("coverage_invariants")
     if not isinstance(expected, dict) or not expected:
-        raise CompletionConfigurationError("frozen_coverage must be a non-empty object")
+        raise CompletionConfigurationError(
+            "coverage_invariants must be a non-empty object"
+        )
     summary = _load_json(
         root
         / "docs/governance/capability-coverage-review/generated/summary.json"
@@ -214,12 +216,12 @@ def _frozen_coverage_failures(root: Path, configuration: dict) -> list[str]:
     for field, expected_value in sorted(expected.items()):
         if not isinstance(field, str) or not isinstance(expected_value, int):
             raise CompletionConfigurationError(
-                "frozen_coverage values must be integer predicates"
+                "coverage_invariants values must be integer predicates"
             )
         actual = _nested_value(summary, field)
         if actual != expected_value:
             failures.append(
-                f"frozen_coverage:{field}:{actual}!={expected_value}"
+                f"coverage_invariant:{field}:{actual}!={expected_value}"
             )
     return failures
 
@@ -310,7 +312,7 @@ def evaluate_completion(
     independent, failures = _independent_domains(
         root, manifests, required_domains
     )
-    failures.extend(_frozen_coverage_failures(root, configuration))
+    failures.extend(_coverage_invariant_failures(root, configuration))
     boundary = _load_json(root / "backend/governance/boundary_baseline.json")
     cross_domain_sql, internal_imports = _boundary_counts(boundary)
     consumer_bypasses = _consumer_bypasses(root, configuration)

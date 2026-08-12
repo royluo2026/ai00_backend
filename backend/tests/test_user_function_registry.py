@@ -57,6 +57,7 @@ def test_first_class_domains_include_independent_maintainer_boundaries():
         "Simulation",
         "Ontology",
         "Knowledge",
+        "Integration",
         "Local Integration",
     }
 
@@ -85,6 +86,9 @@ def test_domain_classification_uses_business_owner_not_consumer_surface():
     assert builder._domain(
         "rest:GET:/api/health", "backend/routers/health.py"
     ) == "Base Platform"
+    assert builder._domain(
+        "rest:POST:/api/ext-datasources", "backend/routers/ext_datasource.py"
+    ) == "Integration"
     assert builder._domain(
         "capability:craft.gbop.item.knowledge.list",
         "plugins/craft/craft_backend/capabilities/gbop_read.py",

@@ -37,6 +37,39 @@ DOMAIN_FILES = {domain: domain.lower().replace(" ", "-") + ".json" for domain in
 CONSUMERS = ("web", "rest", "plugin", "agent", "mcp", "local_runtime")
 BOOTSTRAP_REVIEWER = "existing-user-function-registry"
 BOOTSTRAP_DATE = "2026-08-11"
+CORRECTION_REVIEWER = "capability-v2-base-integration-correction"
+CORRECTION_DATE = "2026-08-12"
+BASE_INTEGRATION_CORRECTIONS = {
+    "rest:POST:/api/ext-datasources": "integration.connector.create",
+    "rest:PATCH:/api/ext-datasources/{gid}": "integration.connector.update",
+    "rest:DELETE:/api/ext-datasources/{gid}": "integration.connector.archive",
+    "rest:POST:/api/ext-datasources/{gid}/test": "integration.connector.connection.test",
+    "rest:GET:/api/ext-datasources": "integration.connector.search",
+    "rest:GET:/api/ext-datasources/{gid}/tables": "integration.connector.schema.discover",
+    "rest:POST:/api/ext-mappings": "integration.mapping.create",
+    "rest:PATCH:/api/ext-mappings/{gid}": "integration.mapping.update",
+    "rest:DELETE:/api/ext-mappings/{gid}": "integration.mapping.archive",
+    "rest:POST:/api/ext-mappings/{gid}/import": "integration.sync.start",
+    "rest:PUT:/api/ext-field-mappings/batch": "integration.mapping.update",
+    "rest:GET:/api/ext-mappings": "integration.mapping.search",
+    "rest:GET:/api/ext-field-mappings": "integration.mapping.get",
+    "rest:GET:/api/ext-mappings/{gid}/columns": "integration.connector.schema.discover",
+    "rest:GET:/api/ext-mappings/{gid}/preview": "integration.mapping.preview",
+}
+BASE_OPERATIONS_EXCLUSIONS = {
+    "capability:system.worker.outbox.health": (
+        "system.worker.outbox.health",
+        "Worker heartbeat and outbox health are authenticated operations telemetry, not an independently invokable business outcome.",
+    ),
+    "capability:plugin.upgrade.finish": (
+        "plugin.upgrade.finish",
+        "Plugin upgrade finish is a trusted deployment-health callback owned by the control plane, not a business Capability.",
+    ),
+    "rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close": (
+        "base.plugin.marketplace.usage.close",
+        "Plugin usage month close is a scheduled accounting operation, not an independently invokable business outcome.",
+    ),
+}
 RUNTIME_TO_DOMAIN = {
     "base": "Base Platform", "agent": "Agent", "craft": "Craft",
     "factory": "Factory", "integration": "Integration",
@@ -167,6 +200,116 @@ def merge_domain_review(existing: dict, discovered: list[dict]) -> dict:
         }
     merged["unreviewed_functions"] = dict(sorted(merged["unreviewed_functions"].items()))
     return merged
+
+
+def _pop_function_disposition(documents: list[dict], function_id: str) -> dict:
+    found = None
+    for document in documents:
+        for bucket in ("unreviewed_functions", "excluded_functions"):
+            row = document[bucket].pop(function_id, None)
+            if row is not None:
+                found = row
+        for capability_id in list(document["capabilities"]):
+            group = document["capabilities"][capability_id]
+            row = group["function_dispositions"].pop(function_id, None)
+            if row is not None:
+                found = row
+            if not group["function_dispositions"]:
+                del document["capabilities"][capability_id]
+    if found is None:
+        raise ValueError(f"approved correction function is missing: {function_id}")
+    return found
+
+
+def _corrected_exposure(capability_id: str) -> dict:
+    exposure = {"shared_pipeline": "capability_provider_gateway"}
+    for consumer in CONSUMERS:
+        enabled = consumer == "rest"
+        exposure[consumer] = {
+            "enabled": enabled,
+            "reason": (
+                "The approved REST compatibility adapter uses Catalog and Gateway."
+                if enabled
+                else "No reviewed consumer requires this corrected business outcome."
+            ),
+            "policy_ref": capability_id,
+        }
+    return exposure
+
+
+def _integration_tables(capability_id: str) -> list[str]:
+    if capability_id.startswith("integration.connector."):
+        return ["workmanship_int_ext_datasources"]
+    if capability_id.startswith("integration.mapping."):
+        return [
+            "workmanship_int_ext_field_mappings",
+            "workmanship_int_ext_mappings",
+        ]
+    return [
+        "workmanship_int_ext_datasources",
+        "workmanship_int_ext_field_mappings",
+        "workmanship_int_ext_mappings",
+    ]
+
+
+def _apply_approved_corrections(documents: list[dict]) -> list[dict]:
+    by_domain = {document["domain"]: document for document in documents}
+    integration = by_domain["Integration"]
+    base = by_domain["Base Platform"]
+    for function_id, capability_id in BASE_INTEGRATION_CORRECTIONS.items():
+        source = _pop_function_disposition(documents, function_id)
+        group = integration["capabilities"].setdefault(
+            capability_id,
+            {
+                "kind": "candidate",
+                "function_dispositions": {},
+                "consumer_exposure": _corrected_exposure(capability_id),
+                "candidate_definition": {
+                    "business_outcome": (
+                        f"Deliver the governed {capability_id} business outcome for Integration."
+                    ),
+                    "non_goals": [
+                        "Does not bypass Catalog and Gateway or write another domain database."
+                    ],
+                    "owner_domain": "integration",
+                    "application_port": capability_id,
+                    "provider_artifact": "ai00-integration",
+                    "owned_tables": _integration_tables(capability_id),
+                    "migration_stream": "integration",
+                },
+            },
+        )
+        group["function_dispositions"][function_id] = {
+            "resolution": "new_capability",
+            "source_paths": sorted(source["source_paths"]),
+            "owner": "Integration",
+            "evidence": (
+                f"Approved ownership correction maps {function_id} to {capability_id}."
+            ),
+            "reviewer": CORRECTION_REVIEWER,
+            "reviewed_at": CORRECTION_DATE,
+        }
+    for function_id, (removed_id, reason) in BASE_OPERATIONS_EXCLUSIONS.items():
+        source = _pop_function_disposition(documents, function_id)
+        base["excluded_functions"][function_id] = {
+            "resolution": "excluded",
+            "target_capability": None,
+            "source_paths": sorted(source["source_paths"]),
+            "evidence": (
+                f"Approved correction removes {removed_id} from the business Catalog."
+            ),
+            "reason": reason,
+            "classification": "operations",
+            "owner": "Base Platform",
+            "reviewer": CORRECTION_REVIEWER,
+            "reviewed_at": CORRECTION_DATE,
+        }
+    for document in documents:
+        document["capabilities"] = dict(sorted(document["capabilities"].items()))
+        document["excluded_functions"] = dict(
+            sorted(document["excluded_functions"].items())
+        )
+    return documents
 
 
 def _exposure(row: dict) -> dict:
@@ -362,7 +505,7 @@ def initialize_documents(sources: AuditSources, existing: dict[str, dict] | None
         document["reviewed_against"] = copy.deepcopy(sources.reviewed_against)
         document = merge_domain_review(document, domain_rows)
         result.append(_merge_evidence(document, sources))
-    return result
+    return _apply_approved_corrections(result)
 
 
 def _lines(title: str, header: str, rows: list[str]) -> str:

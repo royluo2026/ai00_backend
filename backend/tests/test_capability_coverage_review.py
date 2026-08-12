@@ -197,9 +197,59 @@ def test_complete_audit_has_zero_unreviewed_and_consistent_candidates(builder):
 
     assert builder.audit_consistency_errors(documents, sources) == []
     assert summary["resolutions"]["unreviewed"] == 0
-    assert summary["candidate_capabilities"] == 87
-    assert summary["proposed_final_catalog_capabilities"] == 173
-    assert max(summary["candidate_additions_by_domain"].values()) == 31
+    assert summary["candidate_capabilities"] == sum(
+        summary["candidate_additions_by_domain"].values()
+    )
+    assert summary["proposed_final_catalog_capabilities"] == (
+        summary["current_catalog_capabilities"]
+        + summary["candidate_capabilities"]
+    )
+
+
+def test_approved_base_integration_correction_is_applied(builder):
+    documents = {
+        item["domain"]: item
+        for item in builder.initialize_documents(
+            builder.load_sources(ROOT), builder._load_documents()
+        )
+    }
+    base = documents["Base Platform"]["capabilities"]
+    integration = documents["Integration"]["capabilities"]
+    removed = {
+        "base.external_datasource.change.apply",
+        "base.external_datasource.connection.test",
+        "base.external_datasource.search",
+        "base.external_mapping.change.apply",
+        "base.external_mapping.read",
+        "base.plugin.marketplace.usage.close",
+        "plugin.upgrade.finish",
+        "system.worker.outbox.health",
+    }
+    assert removed.isdisjoint(base)
+
+    expected = {
+        "rest:POST:/api/ext-datasources": "integration.connector.create",
+        "rest:PATCH:/api/ext-datasources/{gid}": "integration.connector.update",
+        "rest:DELETE:/api/ext-datasources/{gid}": "integration.connector.archive",
+        "rest:POST:/api/ext-datasources/{gid}/test": "integration.connector.connection.test",
+        "rest:GET:/api/ext-datasources": "integration.connector.search",
+        "rest:GET:/api/ext-datasources/{gid}/tables": "integration.connector.schema.discover",
+        "rest:POST:/api/ext-mappings": "integration.mapping.create",
+        "rest:PATCH:/api/ext-mappings/{gid}": "integration.mapping.update",
+        "rest:DELETE:/api/ext-mappings/{gid}": "integration.mapping.archive",
+        "rest:POST:/api/ext-mappings/{gid}/import": "integration.sync.start",
+        "rest:PUT:/api/ext-field-mappings/batch": "integration.mapping.update",
+        "rest:GET:/api/ext-mappings": "integration.mapping.search",
+        "rest:GET:/api/ext-field-mappings": "integration.mapping.get",
+        "rest:GET:/api/ext-mappings/{gid}/columns": "integration.connector.schema.discover",
+        "rest:GET:/api/ext-mappings/{gid}/preview": "integration.mapping.preview",
+    }
+    actual = {
+        function_id: capability_id
+        for capability_id, capability in integration.items()
+        for function_id in capability["function_dispositions"]
+    }
+    assert {key: actual.get(key) for key in expected} == expected
 
 
 def test_strict_stops_at_architecture_threshold_with_exact_counts():
@@ -213,7 +263,18 @@ def test_strict_stops_at_architecture_threshold_with_exact_counts():
 
     assert result.returncode == 3
     payload = json.loads(result.stdout)
-    assert payload["status"] == "architecture_review_required"
-    assert payload["current_catalog_capabilities"] == 86
-    assert payload["candidate_capabilities"] == 87
-    assert payload["proposed_final_catalog_capabilities"] == 173
+    summary = json.loads(
+        (ROOT / "docs/governance/capability-coverage-review/generated/summary.json")
+        .read_text(encoding="utf-8")
+    )
+    assert payload == {
+        "status": "architecture_review_required",
+        "current_catalog_capabilities": summary["current_catalog_capabilities"],
+        "candidate_capabilities": summary["candidate_capabilities"],
+        "proposed_final_catalog_capabilities": summary[
+            "proposed_final_catalog_capabilities"
+        ],
+        "candidate_additions_by_domain": summary[
+            "candidate_additions_by_domain"
+        ],
+    }

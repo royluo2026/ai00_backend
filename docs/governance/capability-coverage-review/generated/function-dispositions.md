@@ -57,6 +57,8 @@
 | Agent | `rest:POST:/api/skills` | new_capability | `agent.skill.change.apply` |
 | Agent | `rest:PUT:/api/skills/{gid}` | new_capability | `agent.skill.change.apply` |
 | Agent | `rest:GET:/api/skills` | new_capability | `agent.skill.read` |
+| Base Platform | `capability:plugin.upgrade.finish` | excluded | — |
+| Base Platform | `capability:system.worker.outbox.health` | excluded | — |
 | Base Platform | `rest:DELETE:/admin/config/{key}` | excluded | — |
 | Base Platform | `rest:GET:/` | excluded | — |
 | Base Platform | `rest:GET:/admin/cloud-db-config` | excluded | — |
@@ -112,6 +114,7 @@
 | Base Platform | `rest:POST:/api/uploads/ois/resolve` | excluded | — |
 | Base Platform | `rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:confirm` | excluded | — |
 | Base Platform | `rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:invoke` | excluded | — |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close` | excluded | — |
 | Base Platform | `rest:POST:/api/v2/agent-capabilities/delegations` | excluded | — |
 | Base Platform | `rest:POST:/api/v2/agent-capabilities/{capability_id}:confirm` | excluded | — |
 | Base Platform | `rest:POST:/api/v2/agent-capabilities/{capability_id}:invoke` | excluded | — |
@@ -147,21 +150,6 @@
 | Base Platform | `rest:PATCH:/api/import-export/templates/{gid}` | new_capability | `base.export_template.change.apply` |
 | Base Platform | `rest:POST:/api/import-export/templates` | new_capability | `base.export_template.change.apply` |
 | Base Platform | `rest:GET:/api/import-export/templates` | new_capability | `base.export_template.read` |
-| Base Platform | `rest:DELETE:/api/ext-datasources/{gid}` | new_capability | `base.external_datasource.change.apply` |
-| Base Platform | `rest:PATCH:/api/ext-datasources/{gid}` | new_capability | `base.external_datasource.change.apply` |
-| Base Platform | `rest:POST:/api/ext-datasources` | new_capability | `base.external_datasource.change.apply` |
-| Base Platform | `rest:POST:/api/ext-datasources/{gid}/test` | new_capability | `base.external_datasource.connection.test` |
-| Base Platform | `rest:GET:/api/ext-datasources` | new_capability | `base.external_datasource.search` |
-| Base Platform | `rest:GET:/api/ext-datasources/{gid}/tables` | new_capability | `base.external_datasource.search` |
-| Base Platform | `rest:DELETE:/api/ext-mappings/{gid}` | new_capability | `base.external_mapping.change.apply` |
-| Base Platform | `rest:PATCH:/api/ext-mappings/{gid}` | new_capability | `base.external_mapping.change.apply` |
-| Base Platform | `rest:POST:/api/ext-mappings` | new_capability | `base.external_mapping.change.apply` |
-| Base Platform | `rest:POST:/api/ext-mappings/{gid}/import` | new_capability | `base.external_mapping.change.apply` |
-| Base Platform | `rest:PUT:/api/ext-field-mappings/batch` | new_capability | `base.external_mapping.change.apply` |
-| Base Platform | `rest:GET:/api/ext-field-mappings` | new_capability | `base.external_mapping.read` |
-| Base Platform | `rest:GET:/api/ext-mappings` | new_capability | `base.external_mapping.read` |
-| Base Platform | `rest:GET:/api/ext-mappings/{gid}/columns` | new_capability | `base.external_mapping.read` |
-| Base Platform | `rest:GET:/api/ext-mappings/{gid}/preview` | new_capability | `base.external_mapping.read` |
 | Base Platform | `rest:POST:/api/org/sync-from-feishu` | new_capability | `base.identity.directory.sync` |
 | Base Platform | `rest:PATCH:/api/users/{user_gid}/role` | new_capability | `base.identity.role.assign` |
 | Base Platform | `rest:GET:/api/users/me` | new_capability | `base.identity.session.get` |
@@ -177,7 +165,6 @@
 | Base Platform | `rest:GET:/api/v1/plugin-marketplace/registry` | new_capability | `base.plugin.marketplace.search` |
 | Base Platform | `rest:GET:/api/v1/plugin-marketplace/releases` | new_capability | `base.plugin.marketplace.search` |
 | Base Platform | `rest:GET:/api/v1/plugin-marketplace/usage/months/{month}` | new_capability | `base.plugin.marketplace.search` |
-| Base Platform | `rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close` | new_capability | `base.plugin.marketplace.usage.close` |
 | Base Platform | `rest:DELETE:/api/views/{gid}` | new_capability | `base.saved_view.change.apply` |
 | Base Platform | `rest:PATCH:/api/views/{gid}` | new_capability | `base.saved_view.change.apply` |
 | Base Platform | `rest:POST:/api/views` | new_capability | `base.saved_view.change.apply` |
@@ -206,7 +193,6 @@
 | Base Platform | `capability:plugin.storage.put` | existing_capability | `plugin.storage.put` |
 | Base Platform | `capability:plugin.uninstall` | existing_capability | `plugin.uninstall` |
 | Base Platform | `capability:plugin.upgrade` | existing_capability | `plugin.upgrade` |
-| Base Platform | `capability:plugin.upgrade.finish` | existing_capability | `plugin.upgrade.finish` |
 | Base Platform | `capability:semantic.context.get` | existing_capability | `semantic.context.get` |
 | Base Platform | `capability:system.activity.search` | existing_capability | `system.activity.search` |
 | Base Platform | `capability:system.change_impact.preview` | existing_capability | `system.change_impact.preview` |
@@ -216,7 +202,6 @@
 | Base Platform | `agent_tool:global_search` | existing_capability | `system.search` |
 | Base Platform | `agent_tool:search` | existing_capability | `system.search` |
 | Base Platform | `capability:system.search` | existing_capability | `system.search` |
-| Base Platform | `capability:system.worker.outbox.health` | existing_capability | `system.worker.outbox.health` |
 | Craft | `rest:POST:/api/bop/pics/upload` | excluded | — |
 | Craft | `rest:POST:/api/bop/resolve-gids` | excluded | — |
 | Craft | `rest:POST:/api/import-export/lark-bitable/read` | excluded | — |
@@ -501,6 +486,21 @@
 | Digital Model | `capability:digital_model.snapshot.compare` | existing_capability | `digital_model.snapshot.compare` |
 | Digital Model | `capability:digital_model.snapshot.get` | existing_capability | `digital_model.snapshot.get` |
 | Digital Model | `capability:digital_model.version.create` | existing_capability | `digital_model.version.create` |
+| Integration | `rest:DELETE:/api/ext-datasources/{gid}` | new_capability | `integration.connector.archive` |
+| Integration | `rest:POST:/api/ext-datasources/{gid}/test` | new_capability | `integration.connector.connection.test` |
+| Integration | `rest:POST:/api/ext-datasources` | new_capability | `integration.connector.create` |
+| Integration | `rest:GET:/api/ext-datasources/{gid}/tables` | new_capability | `integration.connector.schema.discover` |
+| Integration | `rest:GET:/api/ext-mappings/{gid}/columns` | new_capability | `integration.connector.schema.discover` |
+| Integration | `rest:GET:/api/ext-datasources` | new_capability | `integration.connector.search` |
+| Integration | `rest:PATCH:/api/ext-datasources/{gid}` | new_capability | `integration.connector.update` |
+| Integration | `rest:DELETE:/api/ext-mappings/{gid}` | new_capability | `integration.mapping.archive` |
+| Integration | `rest:POST:/api/ext-mappings` | new_capability | `integration.mapping.create` |
+| Integration | `rest:GET:/api/ext-field-mappings` | new_capability | `integration.mapping.get` |
+| Integration | `rest:GET:/api/ext-mappings/{gid}/preview` | new_capability | `integration.mapping.preview` |
+| Integration | `rest:GET:/api/ext-mappings` | new_capability | `integration.mapping.search` |
+| Integration | `rest:PATCH:/api/ext-mappings/{gid}` | new_capability | `integration.mapping.update` |
+| Integration | `rest:PUT:/api/ext-field-mappings/batch` | new_capability | `integration.mapping.update` |
+| Integration | `rest:POST:/api/ext-mappings/{gid}/import` | new_capability | `integration.sync.start` |
 | Knowledge | `agent_tool:recommend_practice` | existing_capability | `knowledge.context.retrieve` |
 | Knowledge | `agent_tool:search_knowledge` | existing_capability | `knowledge.context.retrieve` |
 | Knowledge | `capability:knowledge.context.retrieve` | existing_capability | `knowledge.context.retrieve` |

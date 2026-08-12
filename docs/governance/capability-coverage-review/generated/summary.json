@@ -3,16 +3,17 @@
   "domains": 11,
   "stable_functions": 752,
   "resolutions": {
-    "existing_capability": 257,
-    "new_capability": 397,
-    "excluded": 98,
+    "existing_capability": 255,
+    "new_capability": 396,
+    "excluded": 101,
     "unreviewed": 0
   },
-  "candidate_capabilities": 87,
+  "candidate_capabilities": 94,
   "candidate_additions_by_domain": {
     "Agent": 13,
-    "Base Platform": 23,
+    "Base Platform": 17,
     "Craft": 11,
+    "Integration": 13,
     "Knowledge": 5,
     "Local Runtime": 2,
     "Ontology": 2,
@@ -26,9 +27,9 @@
       "unreviewed": 0
     },
     "Base Platform": {
-      "existing_capability": 26,
-      "new_capability": 59,
-      "excluded": 75,
+      "existing_capability": 24,
+      "new_capability": 43,
+      "excluded": 78,
       "unreviewed": 0
     },
     "Craft": {
@@ -40,6 +41,12 @@
     "Digital Model": {
       "existing_capability": 7,
       "new_capability": 0,
+      "excluded": 0,
+      "unreviewed": 0
+    },
+    "Integration": {
+      "existing_capability": 0,
+      "new_capability": 15,
       "excluded": 0,
       "unreviewed": 0
     },
@@ -75,13 +82,13 @@
     }
   },
   "consolidation_ratio": {
-    "new_function_dispositions": 397,
-    "candidate_capabilities": 87,
-    "functions_per_candidate": 4.563
+    "new_function_dispositions": 396,
+    "candidate_capabilities": 94,
+    "functions_per_candidate": 4.213
   },
   "enabled_exposures": {
     "web": 2,
-    "rest": 108,
+    "rest": 115,
     "plugin": 0,
     "agent": 27,
     "mcp": 0,
@@ -95,7 +102,7 @@
   },
   "catalog_descriptors": 102,
   "current_catalog_capabilities": 86,
-  "proposed_final_catalog_capabilities": 173,
+  "proposed_final_catalog_capabilities": 180,
   "evidence": {
     "module_dependencies": 7,
     "boundary_violations": 338,

@@ -29,6 +29,7 @@ DOMAINS = (
     "Simulation",
     "Ontology",
     "Knowledge",
+    "Integration",
     "Local Integration",
 )
 VALID_EXCLUSIONS = {
@@ -36,7 +37,7 @@ VALID_EXCLUSIONS = {
     "unstable_product_surface",
 }
 ROUTE_METHODS = {"get", "post", "put", "patch", "delete", "head", "options"}
-CAPABILITY_PATTERN = r"(?:base|craft|digital_model|identity|knowledge|local|ontology|plugin|semantic|simulation|system|vismockup)\.[a-z0-9_.]+"
+CAPABILITY_PATTERN = r"(?:base|craft|digital_model|identity|integration|knowledge|local|ontology|plugin|semantic|simulation|system|vismockup)\.[a-z0-9_.]+"
 CAPABILITY_RE = re.compile(rf"(?<![a-z0-9_.])({CAPABILITY_PATTERN})(?![a-z0-9_.])")
 FETCH_CALL_RE = re.compile(
     r"\b(?:fetch|_cloudFetch)\s*\(\s*(?P<quote>[\"'])(?P<endpoint>[^\"'\x60${]+)(?P=quote)(?P<options>\s*,\s*\{[^{}]*\})?\s*\)"
@@ -74,6 +75,11 @@ def _relative(path: Path) -> str:
 def _domain(value: str, path: str = "") -> str:
     subject = f"{value} {path}".lower()
     capability_id = value.lower().removeprefix("capability:")
+    if any(marker in subject for marker in (
+        "/api/ext-datasources", "/api/ext-mappings", "/api/ext-field-mappings",
+        "integration.", "plugins/integration", "integration_backend",
+    )):
+        return "Integration"
     if value.lower().startswith("capability:"):
         if capability_id.startswith("base.project."):
             return "Project Management"
