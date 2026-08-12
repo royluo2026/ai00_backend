@@ -44,8 +44,8 @@ RC also requires:
 - TLS-authenticated OceanBase plus a complete, checksum-matching migration ledger;
 - all manifest-declared runtime and DDL database URLs (`AI00_<DOMAIN>_DB_URL`
   and `AI00_<DOMAIN>_DDL_DB_URL`) for the eleven domains;
-- Provider CRUD evidence for every domain plus live owner-table read/zero-impact
-  write probes and all 110 cross-domain database grant denials;
+- Provider CRUD evidence for every domain, exact live domain-migration ledgers,
+  owner-table read/zero-impact write probes and all 110 cross-domain database grant denials;
 - OIS health JSON with `service: ois` and the exact `environment_id`;
 - JWT and OAuth discovery JSON with configured exact issuers and HTTPS JWKS URIs;
 - Local Runtime health JSON with `service: ai00-local-runtime`, protocol
@@ -69,5 +69,7 @@ python backend/scripts/verify_domain_database_isolation.py `
 The Provider document contains `schema_version: 1` and a `domains` object whose
 keys are exactly the eleven domain IDs and whose values are all `passed`. Merge
 the generated document's `database_isolation` member into the final
-`AI00_ACCEPTANCE_RC_EVIDENCE` JSON. The verifier uses TLS, never prints database
-secrets, rolls back owner probes and performs writes with `WHERE 1=0`.
+`AI00_ACCEPTANCE_RC_EVIDENCE` JSON. The verifier uses TLS and each domain's DDL
+credential to compare the live `ai00_schema_migrations` ledger with every frozen
+migration. It never prints database secrets, rolls back owner probes and performs
+writes with `WHERE 1=0`.

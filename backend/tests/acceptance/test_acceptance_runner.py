@@ -55,6 +55,7 @@ def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
             "owner_operations": {
                 domain_id: {
                     "provider_crud": "passed",
+                    "migration_ledger": "passed",
                     "database_read": "passed",
                     "database_write": "passed",
                 }

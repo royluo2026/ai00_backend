@@ -71,9 +71,10 @@
           "additionalProperties": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["provider_crud", "database_read", "database_write"],
+            "required": ["provider_crud", "migration_ledger", "database_read", "database_write"],
             "properties": {
               "provider_crud": {"const": "passed"},
+              "migration_ledger": {"const": "passed"},
               "database_read": {"const": "passed"},
               "database_write": {"const": "passed"}
             }

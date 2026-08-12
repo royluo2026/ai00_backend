@@ -9,6 +9,7 @@ from typing import Callable, Mapping
 
 from .domain_database import DomainDatabaseUrl, load_domain_database_url
 from .domain_manifest import load_domain_manifests
+from .domain_migrations import discover_domain_migrations
 
 
 _IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
@@ -20,11 +21,21 @@ class DatabaseIsolationError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class ExpectedDomainMigration:
+    migration_id: str
+    filename: str
+    checksum: str
+    artifact_version: str
+
+
+@dataclass(frozen=True)
 class DatabaseProbeTarget:
     domain_id: str
     database_name: str
     runtime_url_env: str
+    ddl_url_env: str
     table_name: str
+    migrations: tuple[ExpectedDomainMigration, ...]
 
 
 def _quoted(value: str) -> str:
@@ -62,7 +73,17 @@ def load_probe_targets(root: Path) -> tuple[DatabaseProbeTarget, ...]:
                 domain_id=manifest.domain_id,
                 database_name=manifest.database.database_name,
                 runtime_url_env=manifest.database.runtime_url_env,
+                ddl_url_env=manifest.database.ddl_url_env,
                 table_name=table_name,
+                migrations=tuple(
+                    ExpectedDomainMigration(
+                        migration_id=migration.migration_id,
+                        filename=migration.path.name,
+                        checksum=migration.checksum,
+                        artifact_version=migration.artifact_version,
+                    )
+                    for migration in discover_domain_migrations(root, manifest)
+                ),
             )
         )
     if len(targets) != 11:
@@ -125,6 +146,42 @@ def _owner_probe(connection: object, target: DatabaseProbeTarget) -> str:
     return field
 
 
+def _migration_ledger_probe(connection: object, target: DatabaseProbeTarget) -> None:
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT migration_id, name, checksum, artifact_version "
+            "FROM ai00_schema_migrations ORDER BY migration_id"
+        )
+        rows = cursor.fetchall()
+    actual = []
+    for row in rows:
+        if isinstance(row, Mapping):
+            values = (
+                row.get("migration_id"),
+                row.get("name"),
+                row.get("checksum"),
+                row.get("artifact_version"),
+            )
+        else:
+            values = tuple(row[:4])
+        actual.append(tuple(str(value or "") for value in values))
+    expected = [
+        (
+            migration.migration_id,
+            migration.filename.removeprefix(
+                f"{migration.migration_id}_"
+            ).removesuffix(".sql"),
+            migration.checksum,
+            migration.artifact_version,
+        )
+        for migration in target.migrations
+    ]
+    if len(actual) != len(set(actual)) or set(actual) != set(expected):
+        raise DatabaseIsolationError(
+            f"migration_ledger_mismatch:{target.domain_id}"
+        )
+
+
 def _query_is_denied(connection: object, sql: str) -> bool:
     try:
         with connection.cursor() as cursor:
@@ -161,9 +218,29 @@ def verify_database_grants(
         )
         for target in targets
     }
+    ddl_urls = {
+        target.domain_id: load_domain_database_url(
+            manifests[target.domain_id], environ, role="ddl"
+        )
+        for target in targets
+    }
     owner_operations: dict[str, dict[str, str]] = {}
     owner_columns: dict[str, str] = {}
     for target in targets:
+        ddl_connection = None
+        try:
+            ddl_connection = connect(ddl_urls[target.domain_id], ca_path)
+            _migration_ledger_probe(ddl_connection, target)
+        except Exception as exc:
+            if isinstance(exc, DatabaseIsolationError):
+                raise
+            raise DatabaseIsolationError(
+                f"migration_ledger_probe_failed:{target.domain_id}:"
+                f"{type(exc).__name__}"
+            ) from exc
+        finally:
+            if ddl_connection is not None:
+                ddl_connection.close()
         connection = None
         try:
             connection = connect(urls[target.domain_id], ca_path)
@@ -178,6 +255,7 @@ def verify_database_grants(
             if connection is not None:
                 connection.close()
         owner_operations[target.domain_id] = {
+            "migration_ledger": "passed",
             "database_read": "passed",
             "database_write": "passed",
         }
@@ -253,6 +331,7 @@ def verify_database_grants(
 __all__ = [
     "DatabaseIsolationError",
     "DatabaseProbeTarget",
+    "ExpectedDomainMigration",
     "load_probe_targets",
     "verify_database_grants",
 ]

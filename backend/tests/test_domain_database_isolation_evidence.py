@@ -60,10 +60,14 @@ class Cursor:
     def fetchone(self):
         return self._row
 
+    def fetchall(self):
+        return self.connection.ledger_rows
+
 
 class Connection:
-    def __init__(self, *, deny=False):
+    def __init__(self, *, deny=False, ledger_rows=()):
         self.deny = deny
+        self.ledger_rows = tuple(ledger_rows)
         self.queries = []
         self.closed = False
         self.rolled_back = False
@@ -79,13 +83,35 @@ class Connection:
 
 
 def _environment(targets):
-    return {
+    environment = {
         target.runtime_url_env: (
             f"mysql://{target.domain_id}_runtime:secret@db.example:2881/"
             f"{target.database_name}"
         )
         for target in targets
     }
+    environment.update(
+        {
+            target.ddl_url_env: (
+                f"mysql://{target.domain_id}_ddl:secret@db.example:2881/"
+                f"{target.database_name}"
+            )
+            for target in targets
+        }
+    )
+    return environment
+
+
+def _ledger_rows(target):
+    return tuple(
+        {
+            "migration_id": migration.migration_id,
+            "name": migration.filename.removeprefix(f"{migration.migration_id}_").removesuffix(".sql"),
+            "checksum": migration.checksum,
+            "artifact_version": migration.artifact_version,
+        }
+        for migration in target.migrations
+    )
 
 
 def test_probe_targets_cover_exactly_eleven_manifest_domains_with_owned_tables():
@@ -96,15 +122,38 @@ def test_probe_targets_cover_exactly_eleven_manifest_domains_with_owned_tables()
     assert all(target.table_name.startswith("workmanship_") for target in targets)
 
 
+def test_probe_targets_bind_each_ddl_credential_and_all_frozen_migrations():
+    targets = load_probe_targets(ROOT)
+
+    assert all(target.ddl_url_env.startswith("AI00_") for target in targets)
+    assert sum(len(target.migrations) for target in targets) == 14
+    assert {
+        (target.domain_id, migration.migration_id, migration.filename)
+        for target in targets
+        for migration in target.migrations
+    } >= {
+        ("base", "0002", "0002_domain_inbox.sql"),
+        ("knowledge", "0003", "0003_display_counters.sql"),
+    }
+
+
 def test_grant_probe_proves_owner_access_and_all_110_cross_domain_denials():
     targets = load_probe_targets(ROOT)
+    targets_by_domain = {target.domain_id: target for target in targets}
     connections = []
 
     def connect(url, _ca_path):
-        connection = Connection(
-            deny=url.username.removesuffix("_runtime")
-            != url.database.removeprefix("ai00_")
-        )
+        principal = url.username
+        if principal.endswith("_ddl"):
+            domain_id = principal.removesuffix("_ddl")
+            connection = Connection(
+                ledger_rows=_ledger_rows(targets_by_domain[domain_id])
+            )
+        else:
+            connection = Connection(
+                deny=principal.removesuffix("_runtime")
+                != url.database.removeprefix("ai00_")
+            )
         connections.append(connection)
         return connection
 
@@ -123,25 +172,86 @@ def test_grant_probe_proves_owner_access_and_all_110_cross_domain_denials():
     assert all(connection.closed for connection in connections)
 
 
+def test_grant_probe_requires_exact_live_migration_ledgers():
+    targets = load_probe_targets(ROOT)
+    targets_by_domain = {target.domain_id: target for target in targets}
+
+    def connect(url, _ca_path):
+        principal = url.username
+        if principal.endswith("_ddl"):
+            domain_id = principal.removesuffix("_ddl")
+            return Connection(ledger_rows=_ledger_rows(targets_by_domain[domain_id]))
+        return Connection(
+            deny=principal.removesuffix("_runtime")
+            != url.database.removeprefix("ai00_")
+        )
+
+    result = verify_database_grants(
+        targets,
+        _environment(targets),
+        ca_path="ca.pem",
+        connect=connect,
+    )
+
+    assert all(
+        row["migration_ledger"] == "passed"
+        for row in result["owner_operations"].values()
+    )
+
+
 def test_grant_probe_fails_if_any_cross_domain_query_is_allowed():
     targets = load_probe_targets(ROOT)
+    targets_by_domain = {target.domain_id: target for target in targets}
+
+    def connect(url, _ca_path):
+        if url.username.endswith("_ddl"):
+            domain_id = url.username.removesuffix("_ddl")
+            return Connection(ledger_rows=_ledger_rows(targets_by_domain[domain_id]))
+        return Connection(deny=False)
 
     with pytest.raises(DatabaseIsolationError, match="cross_domain_read_allowed"):
         verify_database_grants(
             targets,
             _environment(targets),
             ca_path="ca.pem",
-            connect=lambda _url, _ca_path: Connection(deny=False),
+            connect=connect,
         )
 
 
 def test_grant_probe_does_not_misreport_unexpected_database_errors_as_denial():
     targets = load_probe_targets(ROOT)
+    targets_by_domain = {target.domain_id: target for target in targets}
 
-    def connect(_url, _ca_path):
+    def connect(url, _ca_path):
+        if url.username.endswith("_ddl"):
+            domain_id = url.username.removesuffix("_ddl")
+            return Connection(ledger_rows=_ledger_rows(targets_by_domain[domain_id]))
         raise RuntimeError("network unavailable")
 
     with pytest.raises(DatabaseIsolationError, match="owner_probe_failed"):
+        verify_database_grants(
+            targets,
+            _environment(targets),
+            ca_path="ca.pem",
+            connect=connect,
+        )
+
+
+def test_grant_probe_rejects_missing_or_changed_live_migration_rows():
+    targets = load_probe_targets(ROOT)
+    targets_by_domain = {target.domain_id: target for target in targets}
+
+    def connect(url, _ca_path):
+        principal = url.username
+        if principal.endswith("_ddl"):
+            domain_id = principal.removesuffix("_ddl")
+            rows = _ledger_rows(targets_by_domain[domain_id])
+            if domain_id == "agent":
+                rows = ()
+            return Connection(ledger_rows=rows)
+        return Connection(deny=False)
+
+    with pytest.raises(DatabaseIsolationError, match="migration_ledger_mismatch:agent"):
         verify_database_grants(
             targets,
             _environment(targets),
@@ -169,6 +279,10 @@ def test_cli_binds_provider_crud_and_writes_complete_rc_fragment(tmp_path):
     output_path = tmp_path / "database-isolation.json"
 
     def connect(url, _ca_path):
+        if url.username.endswith("_ddl"):
+            domain_id = url.username.removesuffix("_ddl")
+            target = next(item for item in targets if item.domain_id == domain_id)
+            return Connection(ledger_rows=_ledger_rows(target))
         return Connection(
             deny=url.username.removesuffix("_runtime")
             != url.database.removeprefix("ai00_")
@@ -191,6 +305,7 @@ def test_cli_binds_provider_crud_and_writes_complete_rc_fragment(tmp_path):
     assert result == 0
     assert document["database_isolation"]["owner_operations"]["agent"] == {
         "provider_crud": "passed",
+        "migration_ledger": "passed",
         "database_read": "passed",
         "database_write": "passed",
     }
