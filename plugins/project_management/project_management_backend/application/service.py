@@ -101,6 +101,15 @@ class ItemEntryRepository(Protocol):
     def count_unread_notifications(self, user_gid: str) -> int: ...
     def mark_notification_read(self, gid: str, user_gid: str) -> bool: ...
     def mark_all_notifications_read(self, user_gid: str) -> None: ...
+    def search_work_items(self, item_type: str, filters: dict[str, Any], scope: dict[str, Any]) -> list[dict[str, Any]]: ...
+    def create_work_item(self, item_type: str, gid: str, values: dict[str, Any]) -> dict[str, Any]: ...
+    def get_work_item(self, item_type: str, gid: str) -> dict[str, Any] | None: ...
+    def update_work_item(self, item_type: str, gid: str, updates: dict[str, Any], actor_gid: str, events: list[str]) -> bool: ...
+    def delete_work_item(self, item_type: str, gid: str, user_gid: str) -> bool: ...
+    def list_task_dependencies(self, list_gid: str) -> list[dict[str, Any]]: ...
+    def create_task_dependency(self, gid: str, values: dict[str, Any]) -> dict[str, Any]: ...
+    def update_task_dependency(self, gid: str, updates: dict[str, Any]) -> bool: ...
+    def delete_task_dependency(self, gid: str) -> bool: ...
 
 
 _OPERATIONS = {
@@ -139,6 +148,10 @@ _OPERATIONS = {
     "project.follow.change.apply": frozenset({"follows.create", "follows.update", "follows.delete"}),
     "project.notification.read": frozenset({"notifications.list", "notifications.unread_count"}),
     "project.notification.change.apply": frozenset({"notifications.create", "notifications.mark_read", "notifications.mark_all_read"}),
+    "project.task.read": frozenset({"tasks.search", "tasks.get", "task_dependencies.list"}),
+    "project.task.change.apply": frozenset({"tasks.create", "tasks.promote", "tasks.update", "tasks.delete", "task_dependencies.create", "task_dependencies.update", "task_dependencies.delete"}),
+    "project.issue.read": frozenset({"issues.search", "issues.get"}),
+    "project.issue.change.apply": frozenset({"issues.create", "issues.promote", "issues.update", "issues.delete"}),
 }
 
 
@@ -269,6 +282,29 @@ def _notify_conditions(raw: Any, valid: set[str]) -> list[str]:
     return []
 
 
+_TASK_UPDATE_FIELDS = {"title", "description", "status", "priority", "review_date", "meeting_level", "meeting_doc_link", "due_date", "plan_start", "plan_end", "actual_start", "actual_end", "share_scope", "assignee_team_gid", "project_gid", "attachments", "list_gid", "scheduled_date", "scheduled_start_time", "time_estimate", "is_deleted", "parent_task_gid", "canvas_x", "canvas_y", "completion", "node_type", "canvas_icon", "feishu_assignee_open_id", "feishu_assignee_name", "feishu_group_chat_id", "feishu_group_name", "feishu_groups", "feishu_docs"}
+_ISSUE_UPDATE_FIELDS = {"title", "description", "severity", "status", "assignee_team_gid", "project_gid", "occurrence_root_cause", "escape_root_cause", "interim_action", "permanent_action", "related_task_gid", "related_knowledge_gid", "approval_order_gid", "bop_entry_gid", "share_scope", "attachments", "list_gid", "scheduled_date", "feishu_assignee_open_id", "feishu_assignee_name", "feishu_group_chat_id", "feishu_group_name", "feishu_groups", "feishu_docs"}
+
+
+def _work_item_values(item_type: str, args: Mapping[str, Any], user_gid: str, display_id: str) -> dict[str, Any]:
+    common = {"display_id": display_id, "title": _required_text(args, "title"), "description": str(args.get("description") or ""), "owner_gid": str(args.get("owner_gid") or ""), "owner_user_gid": user_gid, "assignee_team_gid": args.get("assignee_team_gid"), "project_gid": args.get("project_gid"), "status": str(args.get("status") or ("pending" if item_type == "task" else "open")), "share_scope": str(args.get("share_scope") or "project"), "list_gid": args.get("list_gid"), "attachments": list(args.get("attachments") or [])}
+    if item_type == "task":
+        common.update({key: args.get(key, default) for key, default in {"priority": "normal", "source_ref": {}, "review_date": None, "meeting_level": "none", "meeting_doc_link": None, "progress_logs": [], "due_date": None, "plan_start": None, "plan_end": None, "actual_start": None, "actual_end": None, "canvas_x": None, "canvas_y": None, "node_type": "normal", "canvas_icon": "star"}.items()})
+    else:
+        common.update({key: args.get(key, default) for key, default in {"severity": "low", "tracking_refs": [], "occurrence_root_cause": None, "escape_root_cause": None, "interim_action": None, "permanent_action": None, "source_ref": {}, "related_task_gid": None, "related_knowledge_gid": None, "approval_order_gid": None, "bop_entry_gid": None}.items()})
+    return common
+
+
+def _work_item_output(item_type: str, row: Mapping[str, Any]) -> dict[str, Any]:
+    result = dict(row)
+    for key in ("source_ref",): result[key] = result.get(key) or {}
+    for key in ("progress_logs", "tracking_refs", "attachments", "feishu_groups", "feishu_docs"): result[key] = result.get(key) or []
+    result["created_at"] = str(result.get("created_at") or ""); result["updated_at"] = str(result.get("updated_at") or "")
+    if item_type == "task":
+        result.setdefault("owner_name", ""); result["is_deleted"] = bool(result.get("is_deleted", False)); result["completion"] = result.get("completion") or 0; result["node_type"] = result.get("node_type") or "normal"; result["canvas_icon"] = result.get("canvas_icon") or "star"
+    return result
+
+
 class ProjectManagementApplication:
     def __init__(
         self,
@@ -276,10 +312,15 @@ class ProjectManagementApplication:
         *,
         next_id: Callable[[], str] | None = None,
         next_token: Callable[[], str] | None = None,
+        next_display_id: Callable[[str], int] | None = None,
     ) -> None:
         self._repository = repository
         self._next_id = next_id or (lambda: str(uuid4()))
         self._next_token = next_token or (lambda: secrets.token_urlsafe(16))
+        if next_display_id is None:
+            from backend.platform_sdk.ids import next_display_id as allocate_display_id
+            next_display_id = allocate_display_id
+        self._next_display_id = next_display_id
 
     def invoke(
         self,
@@ -322,6 +363,8 @@ class ProjectManagementApplication:
             return self._follow(operation, arguments, _context)
         if operation.startswith("notifications."):
             return self._notification(operation, arguments, _context)
+        if operation.startswith(("tasks.", "issues.", "task_dependencies.")):
+            return self._work_item(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -509,6 +552,55 @@ class ProjectManagementApplication:
             return {"success": True, "data": {"gid": gid}}
         if operation == "notifications.mark_all_read": self._repository.mark_all_notifications_read(user_gid); return {"success": True}
         self._repository.mark_notification_read(_required_text(arguments, "gid"), user_gid); return {"success": True}
+
+    def _work_item(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if operation.startswith("task_dependencies."):
+            if operation == "task_dependencies.list": return {"success": True, "data": self._repository.list_task_dependencies(_required_text(arguments, "list_gid"))}
+            if operation == "task_dependencies.create":
+                gid = self._next_id(); row = self._repository.create_task_dependency(gid, {"source_gid": _required_text(arguments, "source_gid"), "target_gid": _required_text(arguments, "target_gid"), "edge_type": str(arguments.get("edge_type") or "prerequisite"), "dep_condition": str(arguments.get("dep_condition") or "done"), "dep_group": arguments.get("dep_group"), "label": str(arguments.get("label") or "")})
+                return {"success": True, "data": row}
+            gid = _required_text(arguments, "gid")
+            if operation == "task_dependencies.delete": self._repository.delete_task_dependency(gid); return {"success": True}
+            source = arguments.get("updates") if isinstance(arguments.get("updates"), Mapping) else arguments
+            updates = {key: value for key, value in source.items() if key in {"edge_type", "dep_condition", "dep_group", "label"}}
+            if not updates: raise CapabilityBusinessError("invalid_input", "no update fields")
+            if not self._repository.update_task_dependency(gid, updates): raise CapabilityBusinessError("not_found", "dependency not found")
+            return {"success": True}
+        item_type = "task" if operation.startswith("tasks.") else "issue"
+        if operation.endswith("search"):
+            scope = arguments.get("scope")
+            if not isinstance(scope, Mapping) or str(scope.get("user_gid") or "") != user_gid: raise CapabilityBusinessError("invalid_input", "server-derived scope is required")
+            filters = {key: arguments.get(key) for key in ("project_gid", "status", "list_gid", "scheduled_date_from", "q", "page_size")}
+            return {"success": True, "data": [_work_item_output(item_type, row) for row in self._repository.search_work_items(item_type, filters, dict(scope))]}
+        if operation.endswith("get"):
+            row = self._repository.get_work_item(item_type, _required_text(arguments, "gid"))
+            if row is None: raise CapabilityBusinessError("not_found", f"{item_type} not found")
+            return {"success": True, "data": _work_item_output(item_type, row)}
+        if operation.endswith(("create", "promote")):
+            gid = self._next_id(); prefix, sequence = (("T-C", "proj_tasks_display_seq") if item_type == "task" else ("I-C", "proj_issues_display_seq"))
+            values = _work_item_values(item_type, arguments, user_gid, f"{prefix}{self._next_display_id(sequence):08d}")
+            row = self._repository.create_work_item(item_type, gid, values)
+            if operation.endswith("promote"): return {"success": True, "data": {"cloud_gid": gid, "local_gid": arguments.get("local_gid")}}
+            return {"success": True, "data": _work_item_output(item_type, row)}
+        gid = _required_text(arguments, "gid")
+        if operation.endswith("delete"):
+            if not self._repository.delete_work_item(item_type, gid, user_gid): raise CapabilityBusinessError("not_found", f"{item_type} not found or access denied")
+            return {"success": True}
+        source = arguments.get("updates") if isinstance(arguments.get("updates"), Mapping) else arguments
+        allowed = _TASK_UPDATE_FIELDS if item_type == "task" else _ISSUE_UPDATE_FIELDS
+        updates = {key: value for key, value in source.items() if key in allowed}
+        if not updates: raise CapabilityBusinessError("invalid_input", "no update fields")
+        row = self._repository.get_work_item(item_type, gid)
+        roles = frozenset(getattr(context, "active_roles", ()) or ())
+        if "attachments" in updates and row and str(row.get("owner_user_gid") or "") != user_gid and not roles & {"super_admin", "team_admin"}: raise CapabilityBusinessError("forbidden", "only owner or administrator can edit attachments")
+        events = ["any_change"]
+        if "status" in updates:
+            events.append("status_change")
+            if str(updates["status"]).lower() in {"done", "resolved", "closed", "completed"}: events.append("resolved")
+        if "assignee_team_gid" in updates: events.append("assigned_to_me")
+        if not self._repository.update_work_item(item_type, gid, updates, user_gid, events): raise CapabilityBusinessError("not_found", f"{item_type} not found")
+        return {"success": True}
 
     def _project(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
         user_gid = str(getattr(context, "user_gid", "") or "")

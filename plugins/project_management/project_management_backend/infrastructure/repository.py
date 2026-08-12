@@ -557,3 +557,75 @@ class ProjectManagementRepository:
 
     def mark_all_notifications_read(self, user_gid: str) -> None:
         self.execute("UPDATE workmanship_work_notifications SET is_read=TRUE WHERE user_gid=%s AND is_read=FALSE", (user_gid,))
+
+    def search_work_items(self, item_type: str, filters: dict[str, Any], scope: dict[str, Any]) -> list[dict[str, Any]]:
+        table, alias = (("workmanship_proj_tasks", "t") if item_type == "task" else ("workmanship_proj_issues", "i"))
+        visible = [f"{alias}.owner_user_gid=%s", f"{alias}.share_scope='global'"]; params: list[Any] = [scope["user_gid"]]
+        members = list(scope.get("team_member_gids") or [])
+        if members:
+            placeholders = ",".join(["%s"] * len(members)); visible.append(f"({alias}.share_scope='team' AND {alias}.owner_user_gid IN ({placeholders}))"); params.extend(members)
+        projects = list(scope.get("project_gids") or [])
+        if projects:
+            placeholders = ",".join(["%s"] * len(projects)); visible.append(f"({alias}.share_scope='project' AND {alias}.project_gid IN ({placeholders}))"); params.extend(projects)
+        clauses = ["(" + " OR ".join(visible) + ")"]
+        if item_type == "task": clauses.append(f"{alias}.deleted_at IS NULL")
+        for key in ("project_gid", "status", "list_gid"):
+            if filters.get(key): clauses.append(f"{alias}.{key}=%s"); params.append(filters[key])
+        if item_type == "task" and filters.get("scheduled_date_from"): clauses.extend([f"{alias}.scheduled_date>=%s", f"{alias}.is_deleted=FALSE"]); params.append(filters["scheduled_date_from"])
+        if filters.get("q"): clauses.append(f"{alias}.title LIKE %s"); params.append(f"%{filters['q']}%")
+        page_size = filters.get("page_size"); limit = f" LIMIT {max(1, min(int(page_size), 500))}" if page_size else ""
+        return self.fetch_all(f"SELECT {alias}.* FROM {table} {alias} WHERE {' AND '.join(clauses)} ORDER BY {alias}.created_at DESC{limit}", tuple(params))
+
+    def create_work_item(self, item_type: str, gid: str, values: dict[str, Any]) -> dict[str, Any]:
+        table = "workmanship_proj_tasks" if item_type == "task" else "workmanship_proj_issues"
+        columns = list(values); encoded = [json.dumps(value, ensure_ascii=False) if isinstance(value, (dict, list)) else value for value in values.values()]
+        self.execute(f"INSERT INTO {table} (gid,{','.join(columns)}) VALUES (%s,{','.join(['%s'] * len(columns))})", tuple([gid] + encoded))
+        return self.get_work_item(item_type, gid) or {"gid": gid, **values}
+
+    def get_work_item(self, item_type: str, gid: str) -> dict[str, Any] | None:
+        table = "workmanship_proj_tasks" if item_type == "task" else "workmanship_proj_issues"
+        return self.fetch_one(f"SELECT * FROM {table} WHERE gid=%s", (gid,))
+
+    def update_work_item(self, item_type: str, gid: str, updates: dict[str, Any], actor_gid: str, events: list[str]) -> bool:
+        table = "workmanship_proj_tasks" if item_type == "task" else "workmanship_proj_issues"
+        old = self.get_work_item(item_type, gid)
+        if old is None: return False
+        encoded = {key: json.dumps(value, ensure_ascii=False) if isinstance(value, (dict, list)) else value for key, value in updates.items()}
+        affected = self.execute(f"UPDATE {table} SET {','.join(f'{key}=%s' for key in encoded)},updated_at=NOW() WHERE gid=%s", tuple(encoded.values()) + (gid,))
+        list_gid = old.get("list_gid") or updates.get("list_gid")
+        for field, value in updates.items():
+            if field != "attachments":
+                self.execute("INSERT INTO workmanship_work_item_change_logs (gid,item_type,item_gid,list_gid,changed_by,field_name,old_value,new_value) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (str(__import__('uuid').uuid4()), item_type, gid, list_gid, actor_gid, field, json.dumps(old.get(field), ensure_ascii=False, default=str), json.dumps(value, ensure_ascii=False, default=str)))
+        followers = self.fetch_all("SELECT user_gid,notify_on FROM workmanship_work_follows WHERE item_type=%s AND item_gid=%s AND user_gid<>%s", (item_type, gid, actor_gid))
+        title = str(updates.get("title") or old.get("title") or gid)
+        for follower in followers:
+            raw = follower.get("notify_on") or []
+            if isinstance(raw, str):
+                try: raw = json.loads(raw)
+                except ValueError: raw = [raw]
+            if "any_change" in raw or set(events) & set(raw):
+                self.create_notification(str(__import__('uuid').uuid4()), {"user_gid": follower["user_gid"], "type": "item_status", "item_type": item_type, "item_gid": gid, "title": title, "body": "、".join(events)})
+        return bool(affected)
+
+    def delete_work_item(self, item_type: str, gid: str, user_gid: str) -> bool:
+        if item_type == "task": return bool(self.execute("UPDATE workmanship_proj_tasks SET deleted_at=NOW() WHERE gid=%s AND owner_user_gid=%s AND deleted_at IS NULL", (gid, user_gid)))
+        with get_project_management_conn() as connection:
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("DELETE FROM workmanship_work_item_entries WHERE item_type='issue' AND item_gid=%s", (gid,))
+                    affected = cursor.execute("DELETE FROM workmanship_proj_issues WHERE gid=%s AND owner_user_gid=%s", (gid, user_gid))
+                connection.commit(); return bool(affected)
+            except Exception: connection.rollback(); raise
+
+    def list_task_dependencies(self, list_gid: str) -> list[dict[str, Any]]:
+        return self.fetch_all("SELECT DISTINCT td.* FROM workmanship_proj_task_dependencies td WHERE td.source_gid IN (SELECT gid FROM workmanship_proj_tasks WHERE list_gid=%s) OR td.target_gid IN (SELECT gid FROM workmanship_proj_tasks WHERE list_gid=%s) ORDER BY td.created_at", (list_gid, list_gid))
+
+    def create_task_dependency(self, gid: str, values: dict[str, Any]) -> dict[str, Any]:
+        self.execute("INSERT INTO workmanship_proj_task_dependencies (gid,source_gid,target_gid,edge_type,dep_condition,dep_group,label) VALUES (%s,%s,%s,%s,%s,%s,%s)", (gid, values["source_gid"], values["target_gid"], values["edge_type"], values["dep_condition"], values["dep_group"], values["label"]))
+        return self.fetch_one("SELECT gid,source_gid,target_gid,edge_type,dep_condition,dep_group,label FROM workmanship_proj_task_dependencies WHERE gid=%s", (gid,)) or {"gid": gid, **values}
+
+    def update_task_dependency(self, gid: str, updates: dict[str, Any]) -> bool:
+        return bool(self.execute(f"UPDATE workmanship_proj_task_dependencies SET {','.join(f'{key}=%s' for key in updates)} WHERE gid=%s", tuple(updates.values()) + (gid,)))
+
+    def delete_task_dependency(self, gid: str) -> bool:
+        return bool(self.execute("DELETE FROM workmanship_proj_task_dependencies WHERE gid=%s", (gid,)))

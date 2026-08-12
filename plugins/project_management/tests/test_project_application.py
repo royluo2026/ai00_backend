@@ -90,6 +90,10 @@ class InMemoryItemEntryRepository:
         self.workbench_overrides = {}
         self.follows = {}
         self.notifications = {}
+        self.tasks = {}
+        self.issues = {}
+        self.task_dependencies = {}
+        self.last_update_events = []
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -320,6 +324,26 @@ class InMemoryItemEntryRepository:
     def mark_all_notifications_read(self, user_gid):
         for row in self.notifications.values():
             if row["user_gid"] == user_gid: row["is_read"] = True
+    def search_work_items(self, item_type, filters, scope): return list((self.tasks if item_type == "task" else self.issues).values())
+    def create_work_item(self, item_type, gid, values):
+        target = self.tasks if item_type == "task" else self.issues
+        target[gid] = {"gid": gid, "created_at": "2026-08-12", "updated_at": "2026-08-12", "deleted_at": None, **values}
+        return target[gid]
+    def get_work_item(self, item_type, gid): return (self.tasks if item_type == "task" else self.issues).get(gid)
+    def update_work_item(self, item_type, gid, updates, actor_gid, events):
+        row = self.get_work_item(item_type, gid)
+        if not row: return False
+        self.last_update_events = events
+        row.update(updates); return True
+    def delete_work_item(self, item_type, gid, user_gid):
+        target = self.tasks if item_type == "task" else self.issues
+        return target.pop(gid, None) is not None
+    def list_task_dependencies(self, list_gid): return list(self.task_dependencies.values())
+    def create_task_dependency(self, gid, values): self.task_dependencies[gid] = {"gid": gid, **values}; return self.task_dependencies[gid]
+    def update_task_dependency(self, gid, updates):
+        if gid not in self.task_dependencies: return False
+        self.task_dependencies[gid].update(updates); return True
+    def delete_task_dependency(self, gid): return self.task_dependencies.pop(gid, None) is not None
 
 
 def _application():
@@ -690,3 +714,17 @@ def test_notification_create_read_and_mark_are_project_owned():
     listed = application.invoke("project.notification.read", {"operation": "notifications.list", "arguments": {"unread_only": True}}, CONTEXT)
     assert listed["data"][0]["title"] == "Changed"
     assert application.invoke("project.notification.change.apply", {"operation": "notifications.mark_read", "arguments": {"gid": "notification-1"}}, CONTEXT) == {"success": True}
+
+
+def test_task_issue_and_dependency_lifecycle_are_project_owned():
+    ids = iter(["task-1", "issue-1", "dep-1"])
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: next(ids), next_display_id=lambda kind: 7)
+    task = application.invoke("project.task.change.apply", {"operation": "tasks.create", "arguments": {"title": "Build", "list_gid": "list-1"}}, CONTEXT)
+    assert task["data"]["display_id"] == "T-C00000007"
+    issue = application.invoke("project.issue.change.apply", {"operation": "issues.create", "arguments": {"title": "Defect"}}, CONTEXT)
+    assert issue["data"]["display_id"] == "I-C00000007"
+    dep = application.invoke("project.task.change.apply", {"operation": "task_dependencies.create", "arguments": {"source_gid": "task-1", "target_gid": "task-2"}}, CONTEXT)
+    assert dep["data"]["gid"] == "dep-1"
+    assert application.invoke("project.task.read", {"operation": "tasks.get", "arguments": {"gid": "task-1"}}, CONTEXT)["data"]["title"] == "Build"
+    application.invoke("project.task.change.apply", {"operation": "tasks.update", "arguments": {"gid": "task-1", "updates": {"status": "done"}}}, CONTEXT)
+    assert application._repository.last_update_events == ["any_change", "status_change", "resolved"]
