@@ -47,13 +47,14 @@ def test_provider_publishes_thirteen_native_governed_capabilities():
     register_capabilities(registry)
     registrations = {spec.id: (spec, handler, descriptor) for spec, handler, descriptor in registry.items}
     assert set(registrations) == CAPABILITY_IDS
-    for capability_id, (_, _, descriptor) in registrations.items():
+    for capability_id, (spec, _, descriptor) in registrations.items():
         assert descriptor.owner_domain == "integration", capability_id
         assert descriptor.lifecycle_status == "stable"
         assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
         assert descriptor.input_schema["additionalProperties"] is False
         assert descriptor.output_schema["additionalProperties"] is False
         assert descriptor.domain_errors_complete is True
+        assert spec.confirmation == ("none" if spec.risk.value == "read" else "user")
 
 
 @pytest.mark.parametrize("host", ["127.0.0.1", "localhost", "10.1.2.3", "169.254.169.254", "::1"])

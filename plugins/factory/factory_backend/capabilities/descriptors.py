@@ -22,7 +22,7 @@ FACTORY_CAPABILITY_IDS = (
 def specs() -> tuple[CapabilitySpec, ...]:
     result = []
     for capability_id in FACTORY_CAPABILITY_IDS:
-        read = capability_id.endswith((".get", ".search"))
+        read = capability_id.endswith((".get", ".search", ".read"))
         high_risk = capability_id == "factory.asset.scrap"
         result.append(CapabilitySpec(
             id=capability_id,
@@ -31,7 +31,7 @@ def specs() -> tuple[CapabilitySpec, ...]:
             use_when="A consumer needs physical factory topology, catalog, or asset data.",
             do_not_use_when="The resource is a BOP plan node or production schedule.",
             risk=CapabilityRisk.READ if read else CapabilityRisk.WRITE,
-            confirmation="user" if high_risk else "none",
+            confirmation="none" if read else "user",
             permissions=("factory.read",) if read else (("factory.asset.scrap",) if high_risk else ("factory.write",)),
             input_schema=INPUT_SCHEMA,
             output_schema=OUTPUT_SCHEMA,

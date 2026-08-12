@@ -26,7 +26,7 @@ def specs() -> tuple[CapabilitySpec, ...]:
             use_when="A consumer needs governed external connector, mapping, or sync orchestration.",
             do_not_use_when="The caller can use an owning domain Capability directly without external integration.",
             risk=CapabilityRisk.READ if read else CapabilityRisk.WRITE,
-            confirmation="none",
+            confirmation="none" if read else "user",
             permissions=("integration.read",) if read else ("integration.write",),
             input_schema=INPUT_SCHEMAS[capability_id], output_schema=OUTPUT_SCHEMAS[capability_id],
             tags=("integration", "read" if read else "write"),

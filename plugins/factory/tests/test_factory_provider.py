@@ -40,4 +40,4 @@ def test_factory_provider_registers_only_factory_owned_stable_descriptors():
     assert registry.items
     assert {descriptor.owner_domain for _, _, descriptor in registry.items} == {"factory"}
     assert all(descriptor.lifecycle_status == "stable" for _, _, descriptor in registry.items)
-
+    assert all(spec.confirmation == ("none" if spec.risk.value == "read" else "user") for spec, _, _ in registry.items)
