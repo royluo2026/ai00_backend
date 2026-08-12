@@ -71,8 +71,10 @@
     "runtime_evidence_hash": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
     "component_results": {
       "type": "object", "additionalProperties": false,
-      "required": ["agent", "mcp", "local_runtime"],
+      "required": ["backend_gateway", "plugin", "agent", "mcp", "local_runtime"],
       "properties": {
+        "backend_gateway": {"enum": ["passed", "not_run"]},
+        "plugin": {"enum": ["passed", "not_run"]},
         "agent": {"enum": ["passed", "not_run"]},
         "mcp": {"enum": ["passed", "not_run"]},
         "local_runtime": {"enum": ["passed", "not_run"]}
@@ -160,6 +162,7 @@
           },
           "component_results": {
             "properties": {
+              "backend_gateway": {"const": "passed"}, "plugin": {"const": "passed"},
               "agent": {"const": "passed"}, "mcp": {"const": "passed"},
               "local_runtime": {"const": "passed"}
             }

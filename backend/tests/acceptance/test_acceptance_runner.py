@@ -51,6 +51,31 @@ def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
         "domain_migrations": _domain_migration_bindings(),
         "provider_artifacts": catalog["provider_artifacts"],
         "environment_id": "rc-isolated-42",
+        "component_results": {
+            "backend_gateway": "passed",
+            "plugin": "passed",
+            "agent": "passed",
+            "mcp": "passed",
+            "local_runtime": "passed",
+        },
+        "probe_provenance": {
+            "outcome_sha256": "sha256:" + "e" * 64,
+            "components": {
+                component: {
+                    "endpoint": (
+                        "outbound://backend-device-gateway"
+                        if component == "local_runtime"
+                        else f"https://{component}.example.test"
+                    ),
+                    "checks": ["current-run"],
+                    "duration_ms": 1,
+                    "correlation_ids": [f"{component}-request-1"],
+                }
+                for component in (
+                    "backend_gateway", "plugin", "agent", "mcp", "local_runtime"
+                )
+            },
+        },
         "database_isolation": {
             "owner_operations": {
                 domain_id: {
@@ -178,15 +203,17 @@ def test_release_candidate_never_passes_on_missing_external_environment():
     assert "missing AI00_ACCEPTANCE_RUN_ID" in errors
     for variable in (
         "AI00_ACCEPTANCE_OIS_HEALTH_URL", "AI00_ACCEPTANCE_JWT_DISCOVERY_URL",
-        "AI00_ACCEPTANCE_OAUTH_DISCOVERY_URL", "AI00_ACCEPTANCE_LOCAL_RUNTIME_HEALTH_URL",
+        "AI00_ACCEPTANCE_OAUTH_DISCOVERY_URL",
     ):
         assert f"missing {variable}" in errors
+    assert "missing AI00_ACCEPTANCE_LOCAL_RUNTIME_HEALTH_URL" not in errors
     manifests = load_domain_manifests(
         Path(__file__).resolve().parents[3] / "backend/capability_v2/official_domains.json"
     )
     for domain in manifests.domains:
         assert f"missing {domain.database.runtime_url_env}" in errors
         assert f"missing {domain.database.ddl_url_env}" in errors
+    assert not any("_RESULT must be passed" in error for error in errors)
 
 
 def test_generated_report_validates_against_checked_in_schema():
@@ -202,6 +229,43 @@ def test_generated_report_validates_against_checked_in_schema():
     assert report["completion"]["cross_domain_sql"] == 0
     assert report["domain_manifest"] == _domain_manifest_binding()
     assert report["domain_migrations"] == _domain_migration_bindings()
+
+
+def test_release_report_uses_bound_runtime_component_results_not_env_constants(
+    monkeypatch,
+):
+    catalog, manifest = load_documents()
+    declared = sum(len(cases) for cases in manifest["capabilities"].values())
+    monkeypatch.setenv("AI00_ACCEPTANCE_AGENT_RESULT", "passed")
+    components = {
+        "backend_gateway": "passed",
+        "plugin": "passed",
+        "agent": "passed",
+        "mcp": "passed",
+        "local_runtime": "passed",
+    }
+
+    report = build_report(
+        "release-candidate",
+        catalog,
+        manifest,
+        [],
+        {
+            "exit_code": 0,
+            "summary": "acceptance passed",
+            "command": "pytest acceptance",
+            "outcome_counts": {
+                "passed": declared,
+                "failed": 0,
+                "skipped": 0,
+                "missing": 0,
+            },
+        },
+        runtime_evidence_hash="sha256:" + "a" * 64,
+        component_results=components,
+    )
+
+    assert report["component_results"] == components
 
 
 def test_only_release_candidate_is_blocked_by_incomplete_program():
@@ -282,6 +346,8 @@ def test_passed_release_candidate_requires_both_production_sharing_paths():
     report["status"] = "passed"
     report["working_tree_clean"] = True
     report["component_results"] = {
+        "backend_gateway": "passed",
+        "plugin": "passed",
         "agent": "passed",
         "mcp": "passed",
         "local_runtime": "passed",
@@ -411,6 +477,35 @@ def test_runtime_evidence_requires_runtime_ddl_denial_for_every_domain(
     )
 
     assert any("runtime_ddl" in error for error in errors)
+
+
+def test_runtime_evidence_requires_all_current_component_probe_results(
+    tmp_path, monkeypatch
+):
+    catalog, manifest = load_documents()
+    commit = "a" * 40
+    monkeypatch.setattr(
+        "backend.scripts.run_capability_v2_acceptance._git",
+        lambda *args: commit,
+    )
+    evidence = _runtime_evidence(catalog, manifest, commit=commit)
+    evidence.pop("component_results")
+    evidence.pop("probe_provenance")
+    path = tmp_path / "missing-component-results.json"
+    path.write_text(json.dumps(evidence), encoding="utf-8")
+
+    errors, _ = validate_runtime_evidence(
+        catalog,
+        manifest,
+        {
+            "AI00_ACCEPTANCE_RC_EVIDENCE": str(path),
+            "AI00_ACCEPTANCE_ENVIRONMENT_ID": "rc-isolated-42",
+            "AI00_ACCEPTANCE_RUN_ID": "rc-run-42",
+        },
+    )
+
+    assert any("component_results" in error for error in errors)
+    assert any("probe_provenance" in error for error in errors)
 
 
 def test_schema_invalid_runtime_evidence_fails_without_structural_exception(tmp_path):

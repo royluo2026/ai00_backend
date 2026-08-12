@@ -13,6 +13,7 @@ import sys
 import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Mapping
 from urllib.parse import unquote, urlparse
 from urllib.request import Request, urlopen
 
@@ -33,7 +34,6 @@ RC_URLS = {
     "ois": "AI00_ACCEPTANCE_OIS_HEALTH_URL",
     "jwt": "AI00_ACCEPTANCE_JWT_DISCOVERY_URL",
     "oauth": "AI00_ACCEPTANCE_OAUTH_DISCOVERY_URL",
-    "local_runtime": "AI00_ACCEPTANCE_LOCAL_RUNTIME_HEALTH_URL",
 }
 
 
@@ -142,9 +142,6 @@ def environment_errors(mode: str, env: dict[str, str], *, probe: bool = True) ->
     errors: list[str] = []
     if not env.get("AI00_ACCEPTANCE_ENVIRONMENT_ID", "").strip():
         errors.append("missing AI00_ACCEPTANCE_ENVIRONMENT_ID")
-    for component in ("AGENT", "MCP", "LOCAL_RUNTIME"):
-        if env.get(f"AI00_ACCEPTANCE_{component}_RESULT") != "passed":
-            errors.append(f"AI00_ACCEPTANCE_{component}_RESULT must be passed")
     if mode == "nightly":
         return errors
     if not env.get("AI00_ACCEPTANCE_RUN_ID", "").strip():
@@ -317,6 +314,21 @@ def validate_runtime_evidence(catalog: dict, manifest: dict, env: dict[str, str]
     return errors, evidence_hash
 
 
+def runtime_component_results(env: Mapping[str, str]) -> dict[str, str]:
+    value = str(env.get("AI00_ACCEPTANCE_RC_EVIDENCE", "")).strip()
+    if not value:
+        raise ValueError("runtime component evidence path missing")
+    try:
+        evidence = json.loads(Path(value).read_text(encoding="utf-8"))
+        components = evidence["component_results"]
+    except Exception as exc:
+        raise ValueError("runtime component evidence unreadable") from exc
+    required = {"backend_gateway", "plugin", "agent", "mcp", "local_runtime"}
+    if set(components) != required or any(components[name] != "passed" for name in required):
+        raise ValueError("runtime component evidence incomplete")
+    return {name: str(components[name]) for name in sorted(required)}
+
+
 def _database_isolation_evidence_errors(evidence: dict) -> list[str]:
     from backend.capability_v2.domain_manifest import load_domain_manifests
 
@@ -453,6 +465,7 @@ def build_report(
     *,
     runtime_evidence_hash: str | None = None,
     completion: CompletionReport | None = None,
+    component_results: Mapping[str, str] | None = None,
 ) -> dict:
     commit = _git("rev-parse", "HEAD")
     clean = _tracked_worktree_clean()
@@ -481,11 +494,13 @@ def build_report(
         "environment_id": os.environ.get("AI00_ACCEPTANCE_ENVIRONMENT_ID", f"offline:{socket.gethostname()}"),
         "validation_scope": "runtime_e2e" if mode == "release-candidate" else "contract",
         "runtime_evidence_hash": runtime_evidence_hash,
-        "component_results": {
-            "agent": os.environ.get("AI00_ACCEPTANCE_AGENT_RESULT", "not_run"),
-            "mcp": os.environ.get("AI00_ACCEPTANCE_MCP_RESULT", "not_run"),
-            "local_runtime": os.environ.get("AI00_ACCEPTANCE_LOCAL_RUNTIME_RESULT", "not_run"),
-        },
+        "component_results": dict(component_results or {
+            "backend_gateway": "not_run",
+            "plugin": "not_run",
+            "agent": "not_run",
+            "mcp": "not_run",
+            "local_runtime": "not_run",
+        }),
         "completion": completion.serialized(),
         "cases": {
             "stable_capabilities": stable_count,
@@ -535,6 +550,7 @@ def main() -> int:
     current_env = dict(os.environ)
     blockers.extend(environment_errors(args.mode, current_env))
     runtime_evidence_hash = None
+    component_results = None
     completion = evaluate_completion(
         ROOT,
         mode="strict" if args.mode == "release-candidate" else "progress",
@@ -543,6 +559,11 @@ def main() -> int:
     if args.mode == "release-candidate":
         evidence_errors, runtime_evidence_hash = validate_runtime_evidence(catalog, manifest, current_env)
         blockers.extend(evidence_errors)
+        if not evidence_errors:
+            try:
+                component_results = runtime_component_results(current_env)
+            except ValueError as exc:
+                blockers.append(str(exc))
         try:
             if not _tracked_worktree_clean():
                 blockers.append("release-candidate requires a clean working tree")
@@ -554,6 +575,7 @@ def main() -> int:
         args.mode, catalog, manifest, blockers, test_result,
         runtime_evidence_hash=runtime_evidence_hash,
         completion=completion,
+        component_results=component_results,
     )
     schema_errors = validate_report_schema(report)
     if schema_errors:
@@ -562,6 +584,7 @@ def main() -> int:
             args.mode, catalog, manifest, blockers, test_result,
             runtime_evidence_hash=runtime_evidence_hash,
             completion=completion,
+            component_results=component_results,
         )
         remaining = validate_report_schema(report)
         if remaining:

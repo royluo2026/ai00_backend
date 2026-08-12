@@ -3,7 +3,7 @@
   "title": "Capability V2 RC Runtime Evidence",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "run_id", "generated_at", "catalog_release", "catalog_hash", "git_commit", "migration", "domain_manifest", "domain_migrations", "provider_artifacts", "environment_id", "database_isolation", "capabilities"],
+  "required": ["schema_version", "run_id", "generated_at", "catalog_release", "catalog_hash", "git_commit", "migration", "domain_manifest", "domain_migrations", "provider_artifacts", "environment_id", "component_results", "probe_provenance", "database_isolation", "capabilities"],
   "properties": {
     "schema_version": {"const": 1},
     "run_id": {"type": "string", "minLength": 1},
@@ -59,6 +59,38 @@
       }
     },
     "environment_id": {"type": "string", "minLength": 1},
+    "component_results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["backend_gateway", "plugin", "agent", "mcp", "local_runtime"],
+      "properties": {
+        "backend_gateway": {"const": "passed"},
+        "plugin": {"const": "passed"},
+        "agent": {"const": "passed"},
+        "mcp": {"const": "passed"},
+        "local_runtime": {"const": "passed"}
+      }
+    },
+    "probe_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome_sha256", "components"],
+      "properties": {
+        "outcome_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "components": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["backend_gateway", "plugin", "agent", "mcp", "local_runtime"],
+          "properties": {
+            "backend_gateway": {"$ref": "#/$defs/componentProbe"},
+            "plugin": {"$ref": "#/$defs/componentProbe"},
+            "agent": {"$ref": "#/$defs/componentProbe"},
+            "mcp": {"$ref": "#/$defs/componentProbe"},
+            "local_runtime": {"$ref": "#/$defs/componentProbe"}
+          }
+        }
+      }
+    },
     "database_isolation": {
       "type": "object",
       "additionalProperties": false,
@@ -110,6 +142,25 @@
           "unauthenticated": {"const": "passed"}, "resource_denied": {"const": "passed"},
           "output_contract": {"const": "passed"}, "consumer_contract": {"const": "passed"},
           "version_pin": {"const": "passed"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "componentProbe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["endpoint", "checks", "duration_ms", "correlation_ids"],
+      "properties": {
+        "endpoint": {"type": "string", "minLength": 1},
+        "checks": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "correlation_ids": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
         }
       }
     }
