@@ -110,6 +110,8 @@ class ItemEntryRepository(Protocol):
     def create_task_dependency(self, gid: str, values: dict[str, Any]) -> dict[str, Any]: ...
     def update_task_dependency(self, gid: str, updates: dict[str, Any]) -> bool: ...
     def delete_task_dependency(self, gid: str) -> bool: ...
+    def get_annotation(self, key: str) -> Any: ...
+    def put_annotation(self, key: str, data: Any) -> None: ...
 
 
 _OPERATIONS = {
@@ -142,8 +144,8 @@ _OPERATIONS = {
     "project.task_template.change.apply": frozenset({"task_templates.create", "task_templates.update", "task_templates.delete", "task_templates.items.create", "task_templates.items.update", "task_templates.items.delete", "task_templates.instantiate"}),
     "project.approval.read": frozenset({"approval.orders.search", "approval.orders.get"}),
     "project.approval.change.apply": frozenset({"approval.orders.create", "approval.orders.start", "approval.orders.approve", "approval.orders.reject", "approval.orders.withdraw", "approval.scope_upgrade.create"}),
-    "project.workbench.read": frozenset({"workbenches.list", "workbenches.overrides.get"}),
-    "project.workbench.change.apply": frozenset({"workbenches.create", "workbenches.update", "workbenches.delete", "workbenches.overrides.upsert", "workbenches.overrides.delete"}),
+    "project.workbench.read": frozenset({"workbenches.list", "workbenches.overrides.get", "annotations.get"}),
+    "project.workbench.change.apply": frozenset({"workbenches.create", "workbenches.update", "workbenches.delete", "workbenches.overrides.upsert", "workbenches.overrides.delete", "annotations.put"}),
     "project.follow.read": frozenset({"follows.list", "follows.check"}),
     "project.follow.change.apply": frozenset({"follows.create", "follows.update", "follows.delete"}),
     "project.notification.read": frozenset({"notifications.list", "notifications.unread_count"}),
@@ -359,6 +361,10 @@ class ProjectManagementApplication:
             return self._approval(operation, arguments, _context)
         if operation.startswith("workbenches."):
             return self._workbench(operation, arguments, _context)
+        if operation.startswith("annotations."):
+            key = _required_text(arguments, "key")
+            if operation == "annotations.get": return {"data": self._repository.get_annotation(key)}
+            self._repository.put_annotation(key, arguments.get("data")); return {"success": True}
         if operation.startswith("follows."):
             return self._follow(operation, arguments, _context)
         if operation.startswith("notifications."):

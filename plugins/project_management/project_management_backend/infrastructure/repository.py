@@ -629,3 +629,14 @@ class ProjectManagementRepository:
 
     def delete_task_dependency(self, gid: str) -> bool:
         return bool(self.execute("DELETE FROM workmanship_proj_task_dependencies WHERE gid=%s", (gid,)))
+
+    def get_annotation(self, key: str) -> Any:
+        row = self.fetch_one("SELECT data FROM workmanship_app_wb_annotations WHERE `key`=%s", (key,))
+        raw = (row or {}).get("data")
+        if isinstance(raw, str):
+            try: return json.loads(raw)
+            except ValueError: return raw
+        return raw
+
+    def put_annotation(self, key: str, data: Any) -> None:
+        self.execute("INSERT INTO workmanship_app_wb_annotations (`key`,data,updated_at) VALUES (%s,%s,NOW()) ON DUPLICATE KEY UPDATE data=VALUES(data),updated_at=NOW()", (key, json.dumps(data if data is not None else {})))

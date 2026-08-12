@@ -93,6 +93,7 @@ class InMemoryItemEntryRepository:
         self.tasks = {}
         self.issues = {}
         self.task_dependencies = {}
+        self.annotations = {}
         self.last_update_events = []
 
     def list_item_entries(self, item_type, item_gid):
@@ -344,6 +345,8 @@ class InMemoryItemEntryRepository:
         if gid not in self.task_dependencies: return False
         self.task_dependencies[gid].update(updates); return True
     def delete_task_dependency(self, gid): return self.task_dependencies.pop(gid, None) is not None
+    def get_annotation(self, key): return self.annotations.get(key)
+    def put_annotation(self, key, data): self.annotations[key] = data
 
 
 def _application():
@@ -728,3 +731,9 @@ def test_task_issue_and_dependency_lifecycle_are_project_owned():
     assert application.invoke("project.task.read", {"operation": "tasks.get", "arguments": {"gid": "task-1"}}, CONTEXT)["data"]["title"] == "Build"
     application.invoke("project.task.change.apply", {"operation": "tasks.update", "arguments": {"gid": "task-1", "updates": {"status": "done"}}}, CONTEXT)
     assert application._repository.last_update_events == ["any_change", "status_change", "resolved"]
+
+
+def test_workbench_annotations_round_trip_through_project_capability():
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository())
+    application.invoke("project.workbench.change.apply", {"operation": "annotations.put", "arguments": {"key": "canvas", "data": {"x": 1}}}, CONTEXT)
+    assert application.invoke("project.workbench.read", {"operation": "annotations.get", "arguments": {"key": "canvas"}}, CONTEXT) == {"data": {"x": 1}}
