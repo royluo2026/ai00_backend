@@ -264,3 +264,27 @@ class ProjectManagementRepository:
                 connection.commit(); row["status"] = decision; return "updated", row
             except Exception:
                 connection.rollback(); raise
+
+    def is_list_owner(self, list_gid: str, user_gid: str) -> bool:
+        row = self.fetch_one("SELECT owner_gid,creator_gid FROM workmanship_work_lists WHERE gid=%s AND deleted_at IS NULL", (list_gid,))
+        return bool(row and user_gid in {str(row.get("owner_gid") or ""), str(row.get("creator_gid") or "")})
+
+    def list_list_shares(self, list_gid: str) -> list[dict[str, Any]]:
+        return self.fetch_all("SELECT * FROM workmanship_work_list_shares WHERE list_gid=%s ORDER BY created_at", (list_gid,))
+
+    def upsert_list_share(self, gid: str, values: dict[str, Any]) -> dict[str, Any]:
+        self.execute("INSERT INTO workmanship_work_list_shares (gid,list_gid,shared_to,permission,shared_by) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE permission=VALUES(permission),shared_by=VALUES(shared_by)", (gid, values["list_gid"], values["shared_to"], values["permission"], values["shared_by"]))
+        return self.fetch_one("SELECT * FROM workmanship_work_list_shares WHERE gid=%s", (gid,)) or {"gid": gid, **values}
+
+    def delete_list_share(self, list_gid: str, gid: str) -> None:
+        self.execute("DELETE FROM workmanship_work_list_shares WHERE gid=%s AND list_gid=%s", (gid, list_gid))
+
+    def upsert_item_share(self, gid: str, values: dict[str, Any]) -> dict[str, Any]:
+        self.execute("INSERT INTO workmanship_work_item_shares (gid,item_type,item_gid,shared_to,permission,shared_by) VALUES (%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE permission=VALUES(permission),shared_by=VALUES(shared_by)", (gid, values["item_type"], values["item_gid"], values["shared_to"], values["permission"], values["shared_by"]))
+        return self.fetch_one("SELECT * FROM workmanship_work_item_shares WHERE gid=%s", (gid,)) or {"gid": gid, **values}
+
+    def delete_item_share(self, gid: str, user_gid: str) -> str:
+        row = self.fetch_one("SELECT shared_by FROM workmanship_work_item_shares WHERE gid=%s", (gid,))
+        if not row: return "not_found"
+        if str(row["shared_by"]) != user_gid: return "forbidden"
+        self.execute("DELETE FROM workmanship_work_item_shares WHERE gid=%s", (gid,)); return "deleted"

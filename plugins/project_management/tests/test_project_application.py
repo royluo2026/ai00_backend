@@ -77,6 +77,8 @@ class InMemoryItemEntryRepository:
         self.share_links = {}
         self.list_access = {("list-1", "user-1", "team-1"): "write"}
         self.permission_requests = {}
+        self.list_shares = {}
+        self.item_shares = {}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -186,6 +188,27 @@ class InMemoryItemEntryRepository:
         row["status"] = decision
         row["responded_by"] = responder_gid
         return "updated", row
+
+    def is_list_owner(self, list_gid, user_gid):
+        return self.list_owners.get(list_gid) == user_gid
+
+    def list_list_shares(self, list_gid):
+        return [row for row in self.list_shares.values() if row["list_gid"] == list_gid]
+
+    def upsert_list_share(self, gid, values):
+        row = {"gid": gid, **values}; self.list_shares[gid] = row; return row
+
+    def delete_list_share(self, list_gid, gid):
+        if gid in self.list_shares and self.list_shares[gid]["list_gid"] == list_gid: del self.list_shares[gid]
+
+    def upsert_item_share(self, gid, values):
+        row = {"gid": gid, **values}; self.item_shares[gid] = row; return row
+
+    def delete_item_share(self, gid, user_gid):
+        row = self.item_shares.get(gid)
+        if not row: return "not_found"
+        if row["shared_by"] != user_gid: return "forbidden"
+        del self.item_shares[gid]; return "deleted"
 
 
 def _application():
@@ -470,3 +493,12 @@ def test_permission_request_create_list_and_decide_return_notification_intent():
     with pytest.raises(CapabilityBusinessError) as error:
         application.invoke("project.permission_request.change.apply", {"operation": "permission_requests.reject", "arguments": {"gid": "request-1"}}, CONTEXT)
     assert error.value.code == "already_decided"
+
+
+def test_direct_shares_enforce_list_owner_and_item_share_creator():
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: "share-1")
+    created = application.invoke("project.sharing.change.apply", {"operation": "shares.list.create", "arguments": {"list_gid": "list-1", "shared_to": "user-2", "permission": "read"}}, CONTEXT)
+    assert application.invoke("project.sharing.read", {"operation": "shares.list.list", "arguments": {"list_gid": "list-1"}}, CONTEXT) == {"shares": [created["share"]]}
+    with pytest.raises(CapabilityBusinessError) as error:
+        application.invoke("project.sharing.read", {"operation": "shares.list.list", "arguments": {"list_gid": "list-1"}}, CapabilityContext(user_gid="user-2", team_gid="team-1"))
+    assert error.value.code == "forbidden"

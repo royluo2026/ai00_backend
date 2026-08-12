@@ -44,6 +44,12 @@ class ItemEntryRepository(Protocol):
     def create_permission_request(self, gid: str, values: dict[str, Any]) -> dict[str, Any]: ...
     def list_permission_requests(self, target_gid: str | None, status_filter: str | None) -> list[dict[str, Any]]: ...
     def decide_permission_request(self, gid: str, responder_gid: str, decision: str) -> tuple[str, dict[str, Any] | None]: ...
+    def is_list_owner(self, list_gid: str, user_gid: str) -> bool: ...
+    def list_list_shares(self, list_gid: str) -> list[dict[str, Any]]: ...
+    def upsert_list_share(self, gid: str, values: dict[str, Any]) -> dict[str, Any]: ...
+    def delete_list_share(self, list_gid: str, gid: str) -> None: ...
+    def upsert_item_share(self, gid: str, values: dict[str, Any]) -> dict[str, Any]: ...
+    def delete_item_share(self, gid: str, user_gid: str) -> str: ...
 
 
 _OPERATIONS = {
@@ -62,9 +68,9 @@ _OPERATIONS = {
     "project.list.change.apply": frozenset(
         {"item_entries.replace", "item_entries.delete"}
     ),
-    "project.sharing.read": frozenset({"share_links.resolve"}),
+    "project.sharing.read": frozenset({"share_links.resolve", "shares.list.list"}),
     "project.sharing.change.apply": frozenset(
-        {"share_links.create", "share_links.delete"}
+        {"share_links.create", "share_links.delete", "shares.list.create", "shares.list.delete", "shares.item.create", "shares.item.delete"}
     ),
     "project.permission_request.read": frozenset({"permission_requests.list"}),
     "project.permission_request.change.apply": frozenset(
@@ -163,6 +169,8 @@ class ProjectManagementApplication:
             return self._share_link(operation, arguments, _context)
         if operation.startswith("permission_requests."):
             return self._permission_request(operation, arguments, _context)
+        if operation.startswith("shares."):
+            return self._direct_share(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -303,6 +311,26 @@ class ProjectManagementApplication:
             raise CapabilityBusinessError("not_found", "share link not found")
         if result == "forbidden":
             raise CapabilityBusinessError("forbidden", "only the creator can revoke this link")
+        return {"ok": True}
+
+    def _direct_share(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if operation.startswith("shares.list."):
+            list_gid = _required_text(arguments, "list_gid")
+            if not self._repository.is_list_owner(list_gid, user_gid):
+                raise CapabilityBusinessError("forbidden", "only the list owner can manage shares")
+            if operation == "shares.list.list":
+                return {"shares": self._repository.list_list_shares(list_gid)}
+            if operation == "shares.list.delete":
+                self._repository.delete_list_share(list_gid, _required_text(arguments, "gid")); return {"ok": True}
+            row = self._repository.upsert_list_share(self._next_id(), {"list_gid": list_gid, "shared_to": _required_text(arguments, "shared_to"), "permission": str(arguments.get("permission") or "read"), "shared_by": user_gid})
+            return {"share": row}
+        if operation == "shares.item.create":
+            row = self._repository.upsert_item_share(self._next_id(), {"item_type": _required_text(arguments, "item_type"), "item_gid": _required_text(arguments, "item_gid"), "shared_to": _required_text(arguments, "shared_to"), "permission": str(arguments.get("permission") or "read"), "shared_by": user_gid})
+            return {"share": row}
+        result = self._repository.delete_item_share(_required_text(arguments, "gid"), user_gid)
+        if result != "deleted":
+            raise CapabilityBusinessError(result, "share not found" if result == "not_found" else "only the share creator can revoke it")
         return {"ok": True}
 
     def _permission_request(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
