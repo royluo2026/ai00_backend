@@ -409,7 +409,7 @@ def register_collaboration_capabilities(registry) -> None:
             owner="base", id=capability_id, version=1,
             description=f"Execute {capability_id} in the Base collaboration service.",
             risk=CapabilityRisk.READ if is_read else CapabilityRisk.WRITE,
-            confirmation="none", idempotent=True,
+            confirmation="none" if is_read else "user", idempotent=True,
             permissions=("base.collaboration.read",) if is_read else ("base.collaboration.write",),
             input_schema={"type": "object"}, output_schema={"type": "object"},
             tags=("base", "collaboration", "read" if is_read else "write"),

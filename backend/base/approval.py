@@ -555,7 +555,7 @@ def register_approval_capabilities(registry) -> None:
                 version=1,
                 description=f"Execute {capability_id} in the Base Approval service.",
                 risk=CapabilityRisk.READ if is_read else CapabilityRisk.WRITE,
-                confirmation="none",
+                confirmation="none" if is_read else "user",
                 idempotent=True,
                 permissions=("base.approval.read",) if is_read else ("base.approval.write",),
                 input_schema={"type": "object"},
