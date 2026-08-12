@@ -62,6 +62,18 @@ class InMemoryItemEntryRepository:
                 "new_value": "done",
             },
         ]
+        self.sessions = {
+            "session-1": {
+                "gid": "session-1",
+                "section_gid": "section-1",
+                "owner_gid": "user-1",
+                "status": "active",
+                "participants": ["user-1"],
+                "meta": {"cursor": 3},
+                "created_at": "2026-08-12T02:00:00",
+                "ended_at": None,
+            }
+        }
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -99,6 +111,41 @@ class InMemoryItemEntryRepository:
             and (changed_by is None or row["changed_by"] == changed_by)
         ]
         return rows[offset : offset + limit]
+
+    def list_collaboration_sessions(self, section_gid):
+        return [
+            row
+            for row in self.sessions.values()
+            if (row["section_gid"] == section_gid if section_gid else row["status"] == "active")
+        ]
+
+    def get_collaboration_session(self, gid):
+        return self.sessions.get(gid)
+
+    def create_collaboration_session(self, gid, section_gid, owner_gid):
+        self.sessions[gid] = {
+            "gid": gid,
+            "section_gid": section_gid,
+            "owner_gid": owner_gid,
+            "status": "active",
+            "participants": [owner_gid],
+            "meta": {},
+            "created_at": "2026-08-12T03:00:00",
+            "ended_at": None,
+        }
+
+    def join_collaboration_session(self, gid, participant_gid):
+        session = self.sessions.get(gid)
+        if session and session["status"] == "active" and participant_gid not in session["participants"]:
+            session["participants"].append(participant_gid)
+
+    def end_collaboration_session(self, gid, owner_gid):
+        session = self.sessions.get(gid)
+        if not session or session["owner_gid"] != owner_gid:
+            return False
+        session["status"] = "ended"
+        session["ended_at"] = "2026-08-12T04:00:00"
+        return True
 
 
 def _application():
@@ -254,3 +301,69 @@ def test_change_log_list_read_rejects_non_owner_but_trusted_super_admin_can_read
         ),
     )
     assert len(result) == 2
+
+
+def test_collaboration_read_returns_legacy_list_and_detail_shapes():
+    application = _application()
+    listed = application.invoke(
+        "project.collaboration.read",
+        {"operation": "collaboration.sessions.list", "arguments": {"section_gid": None}},
+        CONTEXT,
+    )
+    detailed = application.invoke(
+        "project.collaboration.read",
+        {"operation": "collaboration.sessions.get", "arguments": {"gid": "session-1"}},
+        CONTEXT,
+    )
+
+    assert listed == {
+        "success": True,
+        "data": [{
+            "gid": "session-1",
+            "section_gid": "section-1",
+            "owner_gid": "user-1",
+            "status": "active",
+            "participants": ["user-1"],
+            "created_at": "2026-08-12T02:00:00",
+            "ended_at": None,
+        }],
+    }
+    assert detailed["data"]["meta"] == {"cursor": 3}
+
+
+def test_collaboration_create_join_and_end_preserve_members_and_owner_rule():
+    application = ProjectManagementApplication(
+        repository=InMemoryItemEntryRepository(), next_id=lambda: "session-2"
+    )
+    assert application.invoke(
+        "project.collaboration.change.apply",
+        {
+            "operation": "collaboration.sessions.create",
+            "arguments": {"section_gid": "section-2"},
+        },
+        CONTEXT,
+    ) == {"success": True, "data": {"gid": "session-2"}}
+    member = CapabilityContext(user_gid="user-2", team_gid="team-1")
+    application.invoke(
+        "project.collaboration.change.apply",
+        {"operation": "collaboration.sessions.join", "arguments": {"gid": "session-2"}},
+        member,
+    )
+    application.invoke(
+        "project.collaboration.change.apply",
+        {"operation": "collaboration.sessions.join", "arguments": {"gid": "session-2"}},
+        member,
+    )
+    assert application.invoke(
+        "project.collaboration.read",
+        {"operation": "collaboration.sessions.get", "arguments": {"gid": "session-2"}},
+        CONTEXT,
+    )["data"]["participants"] == ["user-1", "user-2"]
+
+    with pytest.raises(CapabilityBusinessError, match="owner") as error:
+        application.invoke(
+            "project.collaboration.change.apply",
+            {"operation": "collaboration.sessions.end", "arguments": {"gid": "session-2"}},
+            member,
+        )
+    assert error.value.code == "forbidden"

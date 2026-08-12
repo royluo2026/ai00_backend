@@ -27,10 +27,29 @@ class ItemEntryRepository(Protocol):
         limit: int,
         offset: int,
     ) -> list[dict[str, Any]]: ...
+    def list_collaboration_sessions(
+        self, section_gid: str | None
+    ) -> list[dict[str, Any]]: ...
+    def get_collaboration_session(self, gid: str) -> dict[str, Any] | None: ...
+    def create_collaboration_session(
+        self, gid: str, section_gid: str, owner_gid: str
+    ) -> None: ...
+    def join_collaboration_session(self, gid: str, participant_gid: str) -> None: ...
+    def end_collaboration_session(self, gid: str, owner_gid: str) -> bool: ...
 
 
 _OPERATIONS = {
     "project.change_log.read": frozenset({"change_logs.search"}),
+    "project.collaboration.read": frozenset(
+        {"collaboration.sessions.list", "collaboration.sessions.get"}
+    ),
+    "project.collaboration.change.apply": frozenset(
+        {
+            "collaboration.sessions.create",
+            "collaboration.sessions.join",
+            "collaboration.sessions.end",
+        }
+    ),
     "project.list.read": frozenset({"item_entries.get"}),
     "project.list.change.apply": frozenset(
         {"item_entries.replace", "item_entries.delete"}
@@ -76,6 +95,23 @@ def _entry(row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _collaboration_session(
+    row: Mapping[str, Any], *, include_meta: bool = False
+) -> dict[str, Any]:
+    result = {
+        "gid": row["gid"],
+        "section_gid": row["section_gid"],
+        "owner_gid": row["owner_gid"],
+        "status": row["status"],
+        "participants": row["participants"],
+        "created_at": str(row["created_at"]),
+        "ended_at": str(row["ended_at"]) if row.get("ended_at") else None,
+    }
+    if include_meta:
+        result["meta"] = row.get("meta")
+    return result
+
+
 class ProjectManagementApplication:
     def __init__(
         self,
@@ -103,6 +139,8 @@ class ProjectManagementApplication:
             raise CapabilityBusinessError("invalid_input", "arguments must be an object")
         if operation == "change_logs.search":
             return self._search_change_logs(arguments, _context)
+        if operation.startswith("collaboration.sessions."):
+            return self._collaboration(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -157,6 +195,43 @@ class ProjectManagementApplication:
         return self._repository.list_change_logs_by_item(
             item_type, item_gid, changed_by, limit, offset
         )
+
+    def _collaboration(
+        self, operation: str, arguments: Mapping[str, Any], context: object
+    ) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if not user_gid:
+            raise CapabilityBusinessError("unauthenticated", "user identity is required")
+        if operation == "collaboration.sessions.list":
+            section_gid = str(arguments.get("section_gid") or "").strip() or None
+            rows = self._repository.list_collaboration_sessions(section_gid)
+            return {
+                "success": True,
+                "data": [_collaboration_session(row) for row in rows],
+            }
+        if operation == "collaboration.sessions.create":
+            section_gid = _required_text(arguments, "section_gid")
+            gid = self._next_id()
+            self._repository.create_collaboration_session(gid, section_gid, user_gid)
+            return {"success": True, "data": {"gid": gid}}
+
+        gid = _required_text(arguments, "gid")
+        if operation == "collaboration.sessions.get":
+            row = self._repository.get_collaboration_session(gid)
+            if row is None:
+                raise CapabilityBusinessError("not_found", "collaboration session not found")
+            return {
+                "success": True,
+                "data": _collaboration_session(row, include_meta=True),
+            }
+        if operation == "collaboration.sessions.join":
+            self._repository.join_collaboration_session(gid, user_gid)
+            return {"success": True}
+        if not self._repository.end_collaboration_session(gid, user_gid):
+            raise CapabilityBusinessError(
+                "forbidden", "only the session owner can end this session"
+            )
+        return {"success": True}
 
 
 __all__ = ["ItemEntryRepository", "ProjectManagementApplication"]

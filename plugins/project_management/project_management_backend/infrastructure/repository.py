@@ -1,6 +1,7 @@
 """Domain-owned SQL repository boundary."""
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from ..data.connection import get_project_management_conn
@@ -128,3 +129,53 @@ class ProjectManagementRepository:
             params += (changed_by,)
         sql += " ORDER BY changed_at DESC LIMIT %s OFFSET %s"
         return self.fetch_all(sql, params + (limit, offset))
+
+    def list_collaboration_sessions(
+        self, section_gid: str | None
+    ) -> list[dict[str, Any]]:
+        if section_gid:
+            return self.fetch_all(
+                "SELECT gid,section_gid,owner_gid,status,participants,created_at,ended_at "
+                "FROM workmanship_proj_collab_sessions WHERE section_gid=%s "
+                "ORDER BY created_at DESC",
+                (section_gid,),
+            )
+        return self.fetch_all(
+            "SELECT gid,section_gid,owner_gid,status,participants,created_at,ended_at "
+            "FROM workmanship_proj_collab_sessions WHERE status='active' "
+            "ORDER BY created_at DESC"
+        )
+
+    def get_collaboration_session(self, gid: str) -> dict[str, Any] | None:
+        return self.fetch_one(
+            "SELECT gid,section_gid,owner_gid,status,participants,meta,created_at,ended_at "
+            "FROM workmanship_proj_collab_sessions WHERE gid=%s",
+            (gid,),
+        )
+
+    def create_collaboration_session(
+        self, gid: str, section_gid: str, owner_gid: str
+    ) -> None:
+        self.execute(
+            "INSERT INTO workmanship_proj_collab_sessions "
+            "(gid,section_gid,owner_gid,participants,meta) VALUES (%s,%s,%s,%s,%s)",
+            (gid, section_gid, owner_gid, json.dumps([owner_gid]), json.dumps({})),
+        )
+
+    def join_collaboration_session(self, gid: str, participant_gid: str) -> None:
+        participant = json.dumps([participant_gid])
+        self.execute(
+            "UPDATE workmanship_proj_collab_sessions "
+            "SET participants=JSON_MERGE_PRESERVE(participants,%s) "
+            "WHERE gid=%s AND status='active' AND NOT JSON_CONTAINS(participants,%s)",
+            (participant, gid, participant),
+        )
+
+    def end_collaboration_session(self, gid: str, owner_gid: str) -> bool:
+        return bool(
+            self.execute(
+                "UPDATE workmanship_proj_collab_sessions "
+                "SET status='ended',ended_at=NOW() WHERE gid=%s AND owner_gid=%s",
+                (gid, owner_gid),
+            )
+        )

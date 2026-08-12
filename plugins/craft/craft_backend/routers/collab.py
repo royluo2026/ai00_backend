@@ -1,21 +1,22 @@
-"""Craft-owned project collaboration sessions."""
+"""Temporary Gateway adapters for Project Management collaboration sessions."""
 from __future__ import annotations
 
-import json
 from typing import Optional
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from ..data.connection import get_conn
-from backend.platform_sdk.auth import require_role
-from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal, require_role
+from plugins.project_management.project_management_backend.api.compatibility import (
+    build_web_compatibility_envelope,
+    invoke_compatibility,
+)
 
 router = APIRouter(prefix="/api/collab", tags=["collab"])
-
 _MEMBER = require_role(
-    "super_admin", "team_admin", "project_admin",
-    "rule_admin", "knowledge_admin", "member",
+    "super_admin", "team_admin", "project_admin", "rule_admin", "knowledge_admin", "member"
 )
 
 
@@ -23,99 +24,49 @@ class CreateSessionBody(BaseModel):
     section_gid: str
 
 
-def _serialize(row: dict, *, include_meta: bool = False) -> dict:
-    result = {
-        "gid": row["gid"],
-        "section_gid": row["section_gid"],
-        "owner_gid": row["owner_gid"],
-        "status": row["status"],
-        "participants": row["participants"],
-        "created_at": str(row["created_at"]),
-        "ended_at": str(row["ended_at"]) if row.get("ended_at") else None,
-    }
-    if include_meta:
-        result["meta"] = row.get("meta")
-    return result
+async def _invoke_project(request, current_user, principal, gateway, *, capability_id, operation, arguments):
+    request_id = request.headers.get("X-Request-ID") or f"project_{uuid4().hex}"
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id=capability_id,
+            payload={"operation": operation, "arguments": arguments},
+            current_user=current_user,
+            principal=principal,
+            request_id=request_id,
+            trace_id=request.headers.get("X-Trace-ID") or request_id,
+            idempotency_key=request.headers.get("X-Idempotency-Key") if capability_id.endswith("change.apply") else None,
+            approval_reference=request.headers.get("X-Capability-Approval") if capability_id.endswith("change.apply") else None,
+        ),
+    )
+    if not result.ok:
+        code = result.error.code if result.error else "provider_failed"
+        status = 404 if code == "not_found" else 403 if code == "forbidden" else 422
+        raise HTTPException(status, result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
 
 
 @router.get("/sessions")
-def list_sessions(
-    section_gid: Optional[str] = Query(None),
-    current_user: dict = Depends(_MEMBER),
-):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            if section_gid:
-                cur.execute(
-                    "SELECT gid,section_gid,owner_gid,status,participants,created_at,ended_at "
-                    "FROM workmanship_proj_collab_sessions WHERE section_gid=%s "
-                    "ORDER BY created_at DESC",
-                    (section_gid,),
-                )
-            else:
-                cur.execute(
-                    "SELECT gid,section_gid,owner_gid,status,participants,created_at,ended_at "
-                    "FROM workmanship_proj_collab_sessions WHERE status='active' "
-                    "ORDER BY created_at DESC"
-                )
-            rows = [dict(row) for row in cur.fetchall()]
-    return {"success": True, "data": [_serialize(row) for row in rows]}
+async def list_sessions(request: Request, section_gid: Optional[str] = Query(None), current_user: dict = Depends(_MEMBER), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, capability_id="project.collaboration.read", operation="collaboration.sessions.list", arguments={"section_gid": section_gid})
 
 
 @router.post("/sessions", status_code=201)
-def create_session(body: CreateSessionBody, current_user: dict = Depends(_MEMBER)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_proj_collab_sessions "
-                "(gid,section_gid,owner_gid,participants) VALUES (%s,%s,%s,%s)",
-                (gid, body.section_gid, current_user["gid"], json.dumps([current_user["gid"]])),
-            )
-        conn.commit()
-    return {"success": True, "data": {"gid": gid}}
+async def create_session(body: CreateSessionBody, request: Request, current_user: dict = Depends(_MEMBER), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, capability_id="project.collaboration.change.apply", operation="collaboration.sessions.create", arguments={"section_gid": body.section_gid})
 
 
 @router.get("/sessions/{gid}")
-def get_session(gid: str, current_user: dict = Depends(_MEMBER)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid,section_gid,owner_gid,status,participants,meta,created_at,ended_at "
-                "FROM workmanship_proj_collab_sessions WHERE gid=%s",
-                (gid,),
-            )
-            row = cur.fetchone()
-    if not row:
-        raise HTTPException(status_code=404, detail="协同会话不存在")
-    return {"success": True, "data": _serialize(dict(row), include_meta=True)}
+async def get_session(gid: str, request: Request, current_user: dict = Depends(_MEMBER), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, capability_id="project.collaboration.read", operation="collaboration.sessions.get", arguments={"gid": gid})
 
 
 @router.post("/sessions/{gid}/join")
-def join_session(gid: str, current_user: dict = Depends(_MEMBER)):
-    participant = json.dumps([current_user["gid"]])
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE workmanship_proj_collab_sessions "
-                "SET participants=JSON_MERGE_PATCH(participants,%s) "
-                "WHERE gid=%s AND status='active' AND NOT JSON_CONTAINS(participants,%s)",
-                (participant, gid, participant),
-            )
-        conn.commit()
-    return {"success": True}
+async def join_session(gid: str, request: Request, current_user: dict = Depends(_MEMBER), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, capability_id="project.collaboration.change.apply", operation="collaboration.sessions.join", arguments={"gid": gid})
 
 
 @router.post("/sessions/{gid}/end")
-def end_session(gid: str, current_user: dict = Depends(_MEMBER)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE workmanship_proj_collab_sessions SET status='ended',ended_at=NOW() "
-                "WHERE gid=%s AND owner_gid=%s",
-                (gid, current_user["gid"]),
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=403, detail="无权结束此会话或会话不存在")
-        conn.commit()
-    return {"success": True}
+async def end_session(gid: str, request: Request, current_user: dict = Depends(_MEMBER), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, capability_id="project.collaboration.change.apply", operation="collaboration.sessions.end", arguments={"gid": gid})

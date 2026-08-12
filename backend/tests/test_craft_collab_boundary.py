@@ -11,12 +11,5 @@ class CraftCollabBoundaryTests(unittest.TestCase):
         self.assertNotIn("workmanship_", source)
         self.assertIn("plugins.craft.craft_backend.routers.collab", source)
 
-    def test_craft_collab_uses_craft_connection(self):
-        source = (ROOT / "plugins/craft/craft_backend/routers/collab.py").read_text(encoding="utf-8")
-        self.assertIn("from ..data.connection import get_conn", source)
-        self.assertNotIn("backend.db.connection", source)
-        self.assertNotIn("backend.routers.deps", source)
-
-
 if __name__ == "__main__":
     unittest.main()
