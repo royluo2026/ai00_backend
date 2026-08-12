@@ -6,6 +6,7 @@ from typing import Any
 from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityOutput, CapabilitySpec
 
 from ..data.connection import get_project_management_conn
+from .provider import register_capability
 
 
 PROJECT_REF_SCHEMA = {
@@ -71,7 +72,8 @@ def search_projects(payload: dict[str, Any], context: CapabilityContext) -> Capa
 
 
 def register_project_capabilities(registry: Any) -> None:
-    registry.register(
+    register_capability(
+        registry,
         CapabilitySpec(
             id="base.project.search",
             owner="project_management",
