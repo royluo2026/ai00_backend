@@ -156,6 +156,7 @@
     "backend/db/pg_to_mysql_migrate.py",
     "backend/db/check_schema_diff.py",
     "backend/db/run_diff.py",
+    "backend/capability_v2/database_isolation.py",
     "backend/scripts/verify_domain_db_isolation.py"
   ],
   "ignored_identifiers": [
