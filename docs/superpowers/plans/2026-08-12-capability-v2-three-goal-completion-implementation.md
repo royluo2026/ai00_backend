@@ -168,6 +168,8 @@ git commit -m "feat: enforce capability v2 three-goal completion"
 
 ### Task 2: Plan 02 — Complete Base Platform and Plugin Platform
 
+**Approved correction:** Apply `docs/superpowers/specs/2026-08-12-capability-v2-base-integration-correction-decision.md`. Base must not implement or own the five obsolete `base.external_*` candidates. Remove `system.worker.outbox.health`, `plugin.upgrade.finish`, and `base.plugin.marketplace.usage.close` from the business Catalog while retaining their authenticated internal operations paths.
+
 **Files:**
 - Modify: `backend/base/contracts.py`
 - Modify: `backend/base/operations.py`
@@ -181,7 +183,7 @@ git commit -m "feat: enforce capability v2 three-goal completion"
 
 **Interfaces:**
 - Consumes: frozen Base candidate/exposure rows and Foundation Provider/Database contracts.
-- Produces: Base Descriptors and Provider for Tenant, Approval, Notification, Workspace, Plugin Platform and System search/lineage/impact; Base-owned event projections used by later domains.
+- Produces: Base Descriptors and Provider for Tenant, Approval, Notification, Workspace, Plugin Platform and System search/lineage/impact; Base-owned event projections used by later domains. It produces no external-datasource or mapping business implementation.
 
 - [ ] **Step 1: Write failing Base completeness and isolation tests**
 
@@ -205,7 +207,7 @@ Expected: FAIL on missing frozen Base outcomes and direct access to non-Base tab
 
 - [ ] **Step 3: Implement Base vertical slices**
 
-Keep domain state in `ai00_base`; use the Base runtime connection only. Implement pending Approval lookup by `subject_ref`, idempotent per-approval cancellation with expected pending state, Notification, Workspace, Plugin installation/grant/revoke and manifest-driven `system.search`. Remove health, echo, retry and transport pseudo-capabilities from business Descriptors.
+Keep domain state in `ai00_base`; use the Base runtime connection only. Implement pending Approval lookup by `subject_ref`, idempotent per-approval cancellation with expected pending state, Notification, Workspace, Plugin installation/grant/revoke and manifest-driven `system.search`. Remove health, echo, retry, deployment callbacks, monthly-close operations and transport pseudo-capabilities from business Descriptors.
 
 ```python
 def register_capabilities(registry: CapabilityRegistry) -> None:
@@ -661,6 +663,8 @@ Run: `python -m pytest plugins/simulation/tests backend/tests/test_simulation_do
 Expected: PASS. Commit `feat: complete simulation domain`, then freeze central artifacts separately.
 
 ### Task 12: Plan 12 — Build Integration Core and Target Adapters
+
+**Approved correction:** Apply `docs/superpowers/specs/2026-08-12-capability-v2-base-integration-correction-decision.md`. Move the affected REST function dispositions from the five obsolete `base.external_*` candidates to the exact Integration connector, mapping and sync contracts listed in the decision. Do not publish aliases for the obsolete candidate IDs.
 
 **Files:**
 - Create: `plugins/integration/integration_backend/domain/`
