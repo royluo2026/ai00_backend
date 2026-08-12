@@ -8,7 +8,7 @@ Diff two immutable Markdown revisions.
 - 不适用：Only revision metadata is required.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_e44a13a141a97888051f06fbeeacd409`
+- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Diff two immutable Markdown revisions.
 ```json
 {
   "capability_id": "knowledge.document.diff",
-  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
+  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
   "major_version": 1,
   "payload": {
     "document_gid": "example",

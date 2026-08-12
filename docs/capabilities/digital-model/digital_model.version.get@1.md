@@ -1,14 +1,14 @@
-# digital_model.snapshot.get@1
+# digital_model.version.get@1
 
-Read an immutable Digital Model snapshot.
+Read an immutable Digital Model Version.
 
 ## 使用判断
 
-- 适用：Read an immutable Digital Model snapshot.
+- 适用：Read an immutable Digital Model Version.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`digital_model`
-- Catalog Release：`rel_e44a13a141a97888051f06fbeeacd409`
+- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,8 +79,8 @@ Read an immutable Digital Model snapshot.
 
 ```json
 {
-  "capability_id": "digital_model.snapshot.get",
-  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
+  "capability_id": "digital_model.version.get",
+  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
   "major_version": 1,
   "payload": {
     "model_id": "example",

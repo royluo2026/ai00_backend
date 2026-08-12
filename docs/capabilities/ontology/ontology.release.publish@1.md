@@ -8,7 +8,7 @@ Publish an approved proposal as a new immutable inactive release.
 - 不适用：Changing the active release.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_e44a13a141a97888051f06fbeeacd409`
+- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`
 
@@ -77,7 +77,7 @@ Publish an approved proposal as a new immutable inactive release.
 ```json
 {
   "capability_id": "ontology.release.publish",
-  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
+  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
   "major_version": 1,
   "payload": {
     "content_sha256": "example",

@@ -774,23 +774,14 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[digital_model.model.search@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[digital_model.model.search@1]"
     },
-    "digital_model.snapshot.compare@1": {
-      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[digital_model.snapshot.compare@1]",
-      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[digital_model.snapshot.compare@1]",
-      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[digital_model.snapshot.compare@1]",
-      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[digital_model.snapshot.compare@1]",
-      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[digital_model.snapshot.compare@1]",
-      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[digital_model.snapshot.compare@1]",
-      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[digital_model.snapshot.compare@1]"
-    },
-    "digital_model.snapshot.get@1": {
-      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[digital_model.snapshot.get@1]",
-      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[digital_model.snapshot.get@1]",
-      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[digital_model.snapshot.get@1]",
-      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[digital_model.snapshot.get@1]",
-      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[digital_model.snapshot.get@1]",
-      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[digital_model.snapshot.get@1]",
-      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[digital_model.snapshot.get@1]"
+    "digital_model.version.compare@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[digital_model.version.compare@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[digital_model.version.compare@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[digital_model.version.compare@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[digital_model.version.compare@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[digital_model.version.compare@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[digital_model.version.compare@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[digital_model.version.compare@1]"
     },
     "digital_model.version.create@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[digital_model.version.create@1]",
@@ -800,6 +791,24 @@
       "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[digital_model.version.create@1]",
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[digital_model.version.create@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[digital_model.version.create@1]"
+    },
+    "digital_model.version.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[digital_model.version.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[digital_model.version.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[digital_model.version.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[digital_model.version.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[digital_model.version.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[digital_model.version.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[digital_model.version.get@1]"
+    },
+    "digital_model.version.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[digital_model.version.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[digital_model.version.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[digital_model.version.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[digital_model.version.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[digital_model.version.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[digital_model.version.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[digital_model.version.search@1]"
     },
     "factory.asset.get@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[factory.asset.get@1]",
@@ -1972,7 +1981,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
+  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
   "mandatory_cases": [
     "success",
     "invalid_input",

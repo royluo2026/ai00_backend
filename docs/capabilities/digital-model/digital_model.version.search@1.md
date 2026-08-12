@@ -1,14 +1,14 @@
-# digital_model.snapshot.compare@1
+# digital_model.version.search@1
 
-Compare Digital Model snapshots semantically.
+Search immutable Digital Model Versions.
 
 ## 使用判断
 
-- 适用：Compare Digital Model snapshots semantically.
+- 适用：Search immutable Digital Model Versions.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`digital_model`
-- Catalog Release：`rel_e44a13a141a97888051f06fbeeacd409`
+- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -36,8 +36,6 @@ Compare Digital Model snapshots semantically.
 
 资源选择器：
 - `digital-model` ← `model_id`（必填）
-- `digital-model-version` ← `from_version_id`（必填）
-- `digital-model-version` ← `to_version_id`（必填）
 
 ## 执行与可靠性
 
@@ -61,20 +59,12 @@ Compare Digital Model snapshots semantically.
 {
   "additionalProperties": false,
   "properties": {
-    "from_version_id": {
-      "type": "string"
-    },
     "model_id": {
-      "type": "string"
-    },
-    "to_version_id": {
       "type": "string"
     }
   },
   "required": [
-    "model_id",
-    "from_version_id",
-    "to_version_id"
+    "model_id"
   ],
   "type": "object"
 }
@@ -84,13 +74,11 @@ Compare Digital Model snapshots semantically.
 
 ```json
 {
-  "capability_id": "digital_model.snapshot.compare",
-  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
+  "capability_id": "digital_model.version.search",
+  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
   "major_version": 1,
   "payload": {
-    "from_version_id": "example",
-    "model_id": "example",
-    "to_version_id": "example"
+    "model_id": "example"
   }
 }
 ```
@@ -103,33 +91,17 @@ Compare Digital Model snapshots semantically.
 {
   "additionalProperties": false,
   "properties": {
-    "breaking": {
-      "type": "boolean"
-    },
-    "changes": {
+    "items": {
       "items": {
         "additionalProperties": false,
         "properties": {},
         "type": "object"
       },
       "type": "array"
-    },
-    "from_version_id": {
-      "type": "string"
-    },
-    "model_id": {
-      "type": "string"
-    },
-    "to_version_id": {
-      "type": "string"
     }
   },
   "required": [
-    "model_id",
-    "from_version_id",
-    "to_version_id",
-    "changes",
-    "breaking"
+    "items"
   ],
   "type": "object"
 }

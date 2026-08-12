@@ -52,7 +52,7 @@
         "plugin_id": "official.digital-model",
         "module": "digital_model_backend.capabilities",
         "version": "1.1.0",
-        "artifact_hash": "sha256:db0b213ef84ff65ed50cc8a1e29c9aafbe3f3c6ff46cdde5c206b8ea88333931"
+        "artifact_hash": "sha256:8621c4ae44ed33d203114a49e278c9c6c2e79771f0d968d36729fd7587c0fe0e"
       },
       "artifact_path": "plugins/digital_model/digital_model_backend",
       "allowed_owners": [
@@ -182,7 +182,7 @@
         "plugin_id": "official.simulation",
         "module": "simulation_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
+        "artifact_hash": "sha256:fdc5eacfeb974842279a70d00798f64f63d08073cde3e7ee4be28cae737646d1"
       },
       "artifact_path": "plugins/simulation/simulation_backend",
       "allowed_owners": [

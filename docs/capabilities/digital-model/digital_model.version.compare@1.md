@@ -1,13 +1,13 @@
-# craft.bop.execution_structure.get@1
+# digital_model.version.compare@1
 
-Read the deterministic official execution structure of a published BOP.
+Compare Digital Model Versions semantically.
 
 ## 使用判断
 
-- 适用：A downstream system needs the official published execution source.
-- 不适用：The BOP is a draft or the caller is editing it.
+- 适用：Compare Digital Model Versions semantically.
+- 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
-- 所属领域：`craft`
+- 所属领域：`digital_model`
 - Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
 - Schema 精度：`typed`
 - 暂未开放原因：无
@@ -28,14 +28,16 @@ Read the deterministic official execution structure of a published BOP.
 
 ## 授权与数据边界
 
-- 授权策略：`craft.v2:authenticated`
+- 授权策略：`digital_model.v2:digital_model.use`
 - 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `craft-bop-version` ← `version_gid`（必填）
+- `digital-model` ← `model_id`（必填）
+- `digital-model-version` ← `from_version_id`（必填）
+- `digital-model-version` ← `to_version_id`（必填）
 
 ## 执行与可靠性
 
@@ -59,13 +61,20 @@ Read the deterministic official execution structure of a published BOP.
 {
   "additionalProperties": false,
   "properties": {
-    "version_gid": {
-      "minLength": 1,
+    "from_version_id": {
+      "type": "string"
+    },
+    "model_id": {
+      "type": "string"
+    },
+    "to_version_id": {
       "type": "string"
     }
   },
   "required": [
-    "version_gid"
+    "model_id",
+    "from_version_id",
+    "to_version_id"
   ],
   "type": "object"
 }
@@ -75,11 +84,13 @@ Read the deterministic official execution structure of a published BOP.
 
 ```json
 {
-  "capability_id": "craft.bop.execution_structure.get",
+  "capability_id": "digital_model.version.compare",
   "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
   "major_version": 1,
   "payload": {
-    "version_gid": "example"
+    "from_version_id": "example",
+    "model_id": "example",
+    "to_version_id": "example"
   }
 }
 ```
@@ -92,62 +103,33 @@ Read the deterministic official execution structure of a published BOP.
 {
   "additionalProperties": false,
   "properties": {
-    "conditions": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+    "breaking": {
+      "type": "boolean"
     },
-    "content_hash": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+    "changes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "type": "array"
     },
-    "contract_id": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+    "from_version_id": {
+      "type": "string"
     },
-    "contract_version": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+    "model_id": {
+      "type": "string"
     },
-    "dependencies": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "nodes": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "official": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "operations": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "source": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+    "to_version_id": {
+      "type": "string"
     }
   },
   "required": [
-    "contract_id",
-    "contract_version",
-    "official",
-    "source",
-    "nodes",
-    "operations",
-    "dependencies",
-    "conditions",
-    "content_hash"
+    "model_id",
+    "from_version_id",
+    "to_version_id",
+    "changes",
+    "breaking"
   ],
   "type": "object"
 }
@@ -185,23 +167,12 @@ Read the deterministic official execution structure of a published BOP.
 
 领域错误：
 
-- `bop_version_not_found`：The scoped BOP version does not exist.（retryable=false）
-- `bop_revision_unavailable`：The BOP has no authoritative revision.（retryable=false）
-- `revision_conflict`：The current BOP revision differs from the expected revision.（retryable=false）
-- `bop_entry_not_found`：A referenced BOP entry does not exist.（retryable=false）
-- `bop_link_not_found`：A referenced BOP link does not exist.（retryable=false）
-- `bop_project_unassigned`：The BOP is not assigned to a project.（retryable=false）
-- `version_not_published`：An official execution structure requires a published BOP.（retryable=false）
-- `preview_not_found`：The requested BOP change preview does not exist.（retryable=false）
-- `preview_expired`：The requested BOP change preview has expired.（retryable=false）
-- `preview_already_applied`：The requested BOP change preview was already committed.（retryable=false）
-- `idempotency_conflict`：The idempotency key is already bound to another Craft payload.（retryable=false）
-- `source_not_found`：The requested version creation source does not exist.（retryable=false）
-- `archive_forbidden`：The BOP lifecycle forbids archiving this version.（retryable=false）
-- `pbom_snapshot_not_found`：The scoped PBOM snapshot does not exist.（retryable=false）
-- `active_gbop_not_found`：No active GBOP release exists.（retryable=false）
-- `multiple_active_gbop_releases`：More than one active GBOP release exists.（retryable=false）
-- `active_gbop_item_not_found`：The GBOP item is not in the active release.（retryable=false）
+- `model_not_found`：The Digital Model identity does not exist or is not visible.（retryable=false）
+- `snapshot_not_found`：The immutable Digital Model snapshot does not exist or is not visible.（retryable=false）
+- `version_conflict`：The Digital Model head differs from the expected version.（retryable=false）
+- `artifact_not_found`：The geometry artifact is unavailable or does not match its digest.（retryable=false）
+- `component_not_found`：A referenced component does not exist in the selected snapshot.（retryable=false）
+- `idempotency_conflict`：The idempotency key is already bound to another Digital Model request.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

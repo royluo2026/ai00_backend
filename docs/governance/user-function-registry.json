@@ -2542,39 +2542,14 @@
         "plugins/digital_model/digital_model_backend/capabilities/models.py"
       ]
     },
-    "capability:digital_model.snapshot.compare": {
-      "function_id": "capability:digital_model.snapshot.compare",
+    "capability:digital_model.version.compare": {
+      "function_id": "capability:digital_model.version.compare",
       "domain": "Digital Model",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "digital_model.snapshot.compare",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Digital Model",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py",
-        "plugins/digital_model/digital_model_backend/capabilities/contracts.py",
-        "plugins/digital_model/digital_model_backend/capabilities/models.py",
-        "plugins/digital_model/digital_model_backend/capabilities/provider.py"
-      ]
-    },
-    "capability:digital_model.snapshot.get": {
-      "function_id": "capability:digital_model.snapshot.get",
-      "domain": "Digital Model",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "digital_model.snapshot.get",
+      "target_capability": "digital_model.version.compare",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
@@ -2600,6 +2575,56 @@
         "Capability Registry"
       ],
       "target_capability": "digital_model.version.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Digital Model",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/digital_model/digital_model_backend/capabilities/contracts.py",
+        "plugins/digital_model/digital_model_backend/capabilities/models.py",
+        "plugins/digital_model/digital_model_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:digital_model.version.get": {
+      "function_id": "capability:digital_model.version.get",
+      "domain": "Digital Model",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "digital_model.version.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Digital Model",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/digital_model/digital_model_backend/capabilities/contracts.py",
+        "plugins/digital_model/digital_model_backend/capabilities/models.py",
+        "plugins/digital_model/digital_model_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:digital_model.version.search": {
+      "function_id": "capability:digital_model.version.search",
+      "domain": "Digital Model",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "digital_model.version.search",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
