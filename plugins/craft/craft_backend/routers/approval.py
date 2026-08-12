@@ -89,7 +89,6 @@ async def approve_order(gid: str, body: OpinionBody, request: Request, current_u
     return await _transition(gid, "approval.orders.approve", body.comment, request, current_user, principal, gateway)
 
 
-@router.post("/orders/{gid}/reject")
 async def reject_order(gid: str, body: OpinionBody, request: Request, current_user=Depends(_APPROVE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     return await _transition(gid, "approval.orders.reject", body.comment, request, current_user, principal, gateway)
 
