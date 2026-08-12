@@ -8,7 +8,7 @@ Read the active VisMockup product tree.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`local_runtime`
-- Catalog Release：`rel_5e26bcbacb0f06d12462a7ecb7df592a`
+- Catalog Release：`rel_70e0d61b9506f03f680f6e607e23de3d`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -84,7 +84,7 @@ Read the active VisMockup product tree.
 ```json
 {
   "capability_id": "vismockup.tree",
-  "catalog_release": "rel_5e26bcbacb0f06d12462a7ecb7df592a",
+  "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
   "major_version": 1,
   "payload": {
     "device_id": "example"
