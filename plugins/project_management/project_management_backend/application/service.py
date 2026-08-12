@@ -6,6 +6,7 @@ from typing import Any, Protocol
 from uuid import uuid4
 import secrets
 import re
+import json
 from datetime import date, timedelta
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
@@ -90,6 +91,11 @@ class ItemEntryRepository(Protocol):
     def get_workbench_override(self, gid: str, user_gid: str) -> dict[str, Any] | None: ...
     def upsert_workbench_override(self, gid: str, user_gid: str, widgets: list[Any]) -> None: ...
     def delete_workbench_override(self, gid: str, user_gid: str) -> None: ...
+    def list_follows(self, user_gid: str, item_type: str | None) -> list[dict[str, Any]]: ...
+    def get_follow(self, user_gid: str, item_type: str, item_gid: str) -> dict[str, Any] | None: ...
+    def create_follow(self, gid: str, values: dict[str, Any]) -> bool: ...
+    def update_follow(self, gid: str, user_gid: str, notify_on: list[str]) -> bool: ...
+    def delete_follow(self, gid: str, user_gid: str) -> bool: ...
 
 
 _OPERATIONS = {
@@ -124,6 +130,8 @@ _OPERATIONS = {
     "project.approval.change.apply": frozenset({"approval.orders.create", "approval.orders.start", "approval.orders.approve", "approval.orders.reject", "approval.orders.withdraw", "approval.scope_upgrade.create"}),
     "project.workbench.read": frozenset({"workbenches.list", "workbenches.overrides.get"}),
     "project.workbench.change.apply": frozenset({"workbenches.create", "workbenches.update", "workbenches.delete", "workbenches.overrides.upsert", "workbenches.overrides.delete"}),
+    "project.follow.read": frozenset({"follows.list", "follows.check"}),
+    "project.follow.change.apply": frozenset({"follows.create", "follows.update", "follows.delete"}),
 }
 
 
@@ -242,6 +250,18 @@ def _workbench(row: Mapping[str, Any], override: Mapping[str, Any] | list[Any] |
     return result
 
 
+def _notify_conditions(raw: Any, valid: set[str]) -> list[str]:
+    if isinstance(raw, list): return [str(value) for value in raw if str(value) in valid]
+    if isinstance(raw, str):
+        try:
+            decoded = json.loads(raw) if raw.strip().startswith("[") else None
+            if isinstance(decoded, list): return [str(value) for value in decoded if str(value) in valid]
+        except ValueError: pass
+        aliases = {"all": ["any_change"], "any_change": ["any_change"], "key_changes": ["status_change", "resolved", "assigned_to_me"], "none": []}
+        return aliases.get(raw, [raw] if raw in valid else [])
+    return []
+
+
 class ProjectManagementApplication:
     def __init__(
         self,
@@ -291,6 +311,8 @@ class ProjectManagementApplication:
             return self._approval(operation, arguments, _context)
         if operation.startswith("workbenches."):
             return self._workbench(operation, arguments, _context)
+        if operation.startswith("follows."):
+            return self._follow(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -440,6 +462,32 @@ class ProjectManagementApplication:
         updates = {key: value for key, value in source.items() if key in {"name", "widgets", "sort_order"} and value is not None}
         if not updates: raise CapabilityBusinessError("invalid_input", "no update fields")
         self._repository.update_workbench(gid, updates); return {"success": True}
+
+    def _follow(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        valid = {"any_change", "status_change", "comment_added", "resolved", "assigned_to_me", "mentioned"}
+        if operation == "follows.list":
+            rows = self._repository.list_follows(user_gid, str(arguments.get("item_type") or "") or None)
+            return {"success": True, "data": [{**row, "notify_on": _notify_conditions(row.get("notify_on"), valid), "created_at": str(row["created_at"])} for row in rows]}
+        if operation == "follows.check":
+            row = self._repository.get_follow(user_gid, _required_text(arguments, "item_type"), _required_text(arguments, "item_gid"))
+            return {"success": True, "data": ({"followed": True, "gid": row["gid"], "notify_on": _notify_conditions(row.get("notify_on"), valid)} if row else {"followed": False})}
+        if operation == "follows.create":
+            conditions = [str(value) for value in arguments.get("notify_on", ["status_change", "resolved"]) if str(value) in valid]
+            gid = self._next_id()
+            if not self._repository.create_follow(gid, {"user_gid": user_gid, "item_type": _required_text(arguments, "item_type"), "item_gid": _required_text(arguments, "item_gid"), "item_title": str(arguments.get("item_title") or ""), "notify_on": conditions}):
+                raise CapabilityBusinessError("already_exists", "item is already followed")
+            result = {"success": True, "data": {"gid": gid}}
+            owner_gid = str(arguments.get("owner_gid") or "")
+            if owner_gid and owner_gid != user_gid: result["notification"] = {"recipient_gid": owner_gid, "event": "new_follower", "item_type": arguments["item_type"], "item_gid": arguments["item_gid"]}
+            return result
+        gid = _required_text(arguments, "gid")
+        if operation == "follows.delete":
+            if not self._repository.delete_follow(gid, user_gid): raise CapabilityBusinessError("not_found", "follow not found")
+            return {"success": True}
+        conditions = [str(value) for value in arguments.get("notify_on", []) if str(value) in valid]
+        if not self._repository.update_follow(gid, user_gid, conditions): raise CapabilityBusinessError("not_found", "follow not found")
+        return {"success": True, "data": {"notify_on": conditions}}
 
     def _project(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
         user_gid = str(getattr(context, "user_gid", "") or "")

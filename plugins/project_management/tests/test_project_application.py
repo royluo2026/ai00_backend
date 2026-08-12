@@ -88,6 +88,7 @@ class InMemoryItemEntryRepository:
         self.approval_orders = {}
         self.workbenches = {}
         self.workbench_overrides = {}
+        self.follows = {}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -300,6 +301,15 @@ class InMemoryItemEntryRepository:
     def get_workbench_override(self, gid, user_gid): return self.workbench_overrides.get((gid, user_gid))
     def upsert_workbench_override(self, gid, user_gid, widgets): self.workbench_overrides[(gid, user_gid)] = {"widgets": widgets, "updated_at": "2026-08-12"}
     def delete_workbench_override(self, gid, user_gid): self.workbench_overrides.pop((gid, user_gid), None)
+    def list_follows(self, user_gid, item_type): return [row for row in self.follows.values() if row["user_gid"] == user_gid and (not item_type or row["item_type"] == item_type)]
+    def get_follow(self, user_gid, item_type, item_gid): return next((row for row in self.follows.values() if row["user_gid"] == user_gid and row["item_type"] == item_type and row["item_gid"] == item_gid), None)
+    def create_follow(self, gid, values):
+        if self.get_follow(values["user_gid"], values["item_type"], values["item_gid"]): return False
+        self.follows[gid] = {"gid": gid, "created_at": "2026-08-12", **values}; return True
+    def update_follow(self, gid, user_gid, notify_on):
+        if gid not in self.follows or self.follows[gid]["user_gid"] != user_gid: return False
+        self.follows[gid]["notify_on"] = notify_on; return True
+    def delete_follow(self, gid, user_gid): return bool(self.follows.get(gid) and self.follows[gid]["user_gid"] == user_gid and not self.follows.pop(gid, None) is None)
 
 
 def _application():
@@ -651,3 +661,13 @@ def test_workbench_lifecycle_and_member_override_are_project_owned():
     with pytest.raises(CapabilityBusinessError) as error:
         application.invoke("project.workbench.change.apply", {"operation": "workbenches.overrides.upsert", "arguments": {"gid": "workbench-1", "widgets": []}}, CONTEXT)
     assert error.value.code == "invalid_input"
+
+
+def test_follow_create_check_patch_and_delete_are_project_owned():
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: "follow-1")
+    created = application.invoke("project.follow.change.apply", {"operation": "follows.create", "arguments": {"item_type": "task", "item_gid": "task-1", "item_title": "Task", "notify_on": ["status_change", "invalid"]}}, CONTEXT)
+    assert created["data"]["gid"] == "follow-1"
+    checked = application.invoke("project.follow.read", {"operation": "follows.check", "arguments": {"item_type": "task", "item_gid": "task-1"}}, CONTEXT)
+    assert checked["data"] == {"followed": True, "gid": "follow-1", "notify_on": ["status_change"]}
+    assert application.invoke("project.follow.change.apply", {"operation": "follows.update", "arguments": {"gid": "follow-1", "notify_on": ["resolved"]}}, CONTEXT)["data"]["notify_on"] == ["resolved"]
+    assert application.invoke("project.follow.change.apply", {"operation": "follows.delete", "arguments": {"gid": "follow-1"}}, CONTEXT) == {"success": True}

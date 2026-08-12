@@ -519,3 +519,25 @@ class ProjectManagementRepository:
 
     def delete_workbench_override(self, gid: str, user_gid: str) -> None:
         self.execute("DELETE FROM workmanship_app_workbench_member_overrides WHERE workbench_gid=%s AND user_gid=%s", (gid, user_gid))
+
+    def list_follows(self, user_gid: str, item_type: str | None) -> list[dict[str, Any]]:
+        sql = "SELECT gid,user_gid,item_type,item_gid,item_title,notify_on,created_at FROM workmanship_work_follows WHERE user_gid=%s"
+        params: tuple[Any, ...] = (user_gid,)
+        if item_type: sql += " AND item_type=%s"; params += (item_type,)
+        return self.fetch_all(sql + " ORDER BY created_at DESC", params)
+
+    def get_follow(self, user_gid: str, item_type: str, item_gid: str) -> dict[str, Any] | None:
+        return self.fetch_one("SELECT gid,user_gid,item_type,item_gid,item_title,notify_on,created_at FROM workmanship_work_follows WHERE user_gid=%s AND item_type=%s AND item_gid=%s", (user_gid, item_type, item_gid))
+
+    def create_follow(self, gid: str, values: dict[str, Any]) -> bool:
+        try:
+            return bool(self.execute("INSERT INTO workmanship_work_follows (gid,user_gid,item_type,item_gid,item_title,notify_on) VALUES (%s,%s,%s,%s,%s,%s)", (gid, values["user_gid"], values["item_type"], values["item_gid"], values["item_title"], json.dumps(values["notify_on"]))))
+        except Exception as exc:
+            if "duplicate" in str(exc).lower(): return False
+            raise
+
+    def update_follow(self, gid: str, user_gid: str, notify_on: list[str]) -> bool:
+        return bool(self.execute("UPDATE workmanship_work_follows SET notify_on=%s WHERE gid=%s AND user_gid=%s", (json.dumps(notify_on), gid, user_gid)))
+
+    def delete_follow(self, gid: str, user_gid: str) -> bool:
+        return bool(self.execute("DELETE FROM workmanship_work_follows WHERE gid=%s AND user_gid=%s", (gid, user_gid)))
