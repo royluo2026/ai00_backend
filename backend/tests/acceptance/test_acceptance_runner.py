@@ -109,7 +109,8 @@ def test_only_release_candidate_is_blocked_by_incomplete_program():
     assert completion_blockers("offline", completion) == []
     blockers = completion_blockers("release-candidate", completion)
     assert "capability completion: cross_domain_sql:312" in blockers
-    assert "capability completion: missing_domain:agent" in blockers
+    assert "capability completion: consumer_bypasses:11" in blockers
+    assert not any("missing_domain:" in blocker for blocker in blockers)
 
 
 def test_skipped_or_missing_mandatory_node_is_release_blocking():
