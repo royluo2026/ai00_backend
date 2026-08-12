@@ -68,11 +68,14 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - run: python -m pip install -r backend/requirements.txt
+      - run: python backend/scripts/freeze_official_domains.py --check
       - run: python backend/scripts/build_capability_catalog.py --check
       - run: python backend/scripts/generate_capability_docs.py --check
       - run: python backend/scripts/build_user_function_registry.py --strict
       - run: python backend/scripts/build_capability_acceptance_manifest.py --check
-      - run: python -m pytest backend/tests -q
+      - run: python backend/scripts/check_domain_dependencies.py
+      - run: python backend/scripts/audit_domain_boundaries.py --json
+      - run: python -m pytest backend/tests plugins -q
       - run: npm ci
         working-directory: services/agent-runtime
       - run: npm test
@@ -87,6 +90,7 @@ jobs:
       - name: Assemble current-run RC evidence
         run: python backend/scripts/assemble_capability_v2_rc_evidence.py --runtime-evidence "$env:AI00_ACCEPTANCE_RUNTIME_EVIDENCE_SOURCE" --database-evidence artifacts/database-isolation.json --output "$env:AI00_ACCEPTANCE_RC_EVIDENCE"
       - run: python backend/scripts/run_capability_v2_acceptance.py --mode release-candidate --strict --report artifacts/capability-v2-release-candidate.json
+      - run: python backend/scripts/check_capability_v2_completion.py --mode strict --report artifacts/capability-v2-release-candidate.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import yaml
+
 from backend.capability_v2.domain_manifest import load_domain_manifests
 
 
@@ -51,3 +53,37 @@ def test_release_workflow_builds_current_run_evidence_before_acceptance():
     assert workflow.index(assembly_command) < workflow.index(acceptance_command)
     assert "artifacts/capability-v2-rc-evidence.json" in workflow
     assert "artifacts/database-isolation.json" in workflow
+
+
+def test_release_workflow_runs_backend_and_plugin_python_suites():
+    workflow = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    steps = workflow["jobs"]["integrated-release-candidate"]["steps"]
+    commands = [step.get("run") for step in steps if isinstance(step, dict)]
+
+    assert "python -m pytest backend/tests plugins -q" in commands
+
+
+def test_release_workflow_runs_release_gates_and_revalidates_rc_report():
+    workflow = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    steps = workflow["jobs"]["integrated-release-candidate"]["steps"]
+    commands = [step.get("run") for step in steps if isinstance(step, dict)]
+
+    freeze = "python backend/scripts/freeze_official_domains.py --check"
+    dependencies = "python backend/scripts/check_domain_dependencies.py"
+    boundaries = "python backend/scripts/audit_domain_boundaries.py --json"
+    acceptance = (
+        "python backend/scripts/run_capability_v2_acceptance.py "
+        "--mode release-candidate --strict "
+        "--report artifacts/capability-v2-release-candidate.json"
+    )
+    report_check = (
+        "python backend/scripts/check_capability_v2_completion.py "
+        "--mode strict --report artifacts/capability-v2-release-candidate.json"
+    )
+
+    for command in (freeze, dependencies, boundaries, acceptance, report_check):
+        assert command in commands
+    assert commands.index(freeze) < commands.index(acceptance)
+    assert commands.index(dependencies) < commands.index(acceptance)
+    assert commands.index(boundaries) < commands.index(acceptance)
+    assert commands.index(acceptance) < commands.index(report_check)
