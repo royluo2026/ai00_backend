@@ -16,7 +16,7 @@ from ..infrastructure.ids import next_gid
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from .ontology_concepts_next import ONTOLOGY_VERSION_REF_SCHEMA
 
-JSON_VALUE_SCHEMA = {"type": ["object", "array", "string", "number", "boolean", "null"]}
+JSON_VALUE_SCHEMA = {"anyOf": [{"type": "string"}, {"type": "number"}, {"type": "boolean"}, {"type": "null"}]}
 CHANGE_SCHEMA = {
     "type": "object",
     "required": ["operation", "stable_gid", "value", "source_evidence"],
@@ -195,4 +195,4 @@ def register_ontology_proposal_capabilities(registry: Any) -> None:
         use_when="A human reviewer makes a formal decision.", do_not_use_when="An Agent is attempting to approve.",
         effects=("create:ontology.proposal_review",), risk="write", confirmation="user", idempotent=False,
         permissions=("ontology.review",), output_schema=REVIEW_SCHEMA,
-        input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}, "proposal_revision_gid": {"type": "string"}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "decision": {"type": "string", "enum": ["approve", "reject", "request_changes"]}, "comment": {"type": "string", "maxLength": 4000}}, "required": ["proposal_gid", "proposal_revision_gid", "content_sha256", "decision"]}), submit_review)
+        input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}, "proposal_revision_gid": {"type": "string"}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "example": "0" * 64}, "decision": {"type": "string", "enum": ["approve", "reject", "request_changes"]}, "comment": {"type": "string", "maxLength": 4000}}, "required": ["proposal_gid", "proposal_revision_gid", "content_sha256", "decision"]}), submit_review)
