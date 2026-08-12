@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   integrated-release-candidate:
-    runs-on: [self-hosted, windows, capability-v2-rc]
+    runs-on: [self-hosted, test-server, capability-v2-rc]
     environment: capability-v2-release-candidate
     env:
       AI00_ACCEPTANCE_ENVIRONMENT_ID: ${{ inputs.environment_id }}
