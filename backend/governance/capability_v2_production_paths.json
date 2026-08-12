@@ -10,5 +10,18 @@
       "test_node": "plugins/craft/tests/test_bop_domain_sharing.py::test_bop_binding_uses_gateway"
     }
   ],
-  "async": []
+  "async": [
+    {
+      "path_id": "knowledge-publication-base-projection",
+      "producer": "knowledge",
+      "consumer": "base",
+      "contract": "knowledge.document.published.v1",
+      "source_modules": [
+        "backend/capability_v2/event_transport.py",
+        "backend/base/inbox.py",
+        "plugins/knowledge/knowledge_backend/infrastructure/domain_outbox.py"
+      ],
+      "test_node": "backend/tests/test_production_domain_event_path.py::test_knowledge_publication_reaches_base_once"
+    }
+  ]
 }
