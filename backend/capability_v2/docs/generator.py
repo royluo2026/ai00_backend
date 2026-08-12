@@ -41,7 +41,7 @@ STANDARD_ERRORS = (
 
 CANONICAL_DOMAINS = (
     "base", "agent", "craft", "digital_model", "factory", "project_management",
-    "simulation", "ontology", "knowledge", "local_integration",
+    "simulation", "ontology", "knowledge", "integration", "local_integration",
 )
 
 DOMAIN_DOC_PATHS = {
@@ -54,6 +54,7 @@ DOMAIN_DOC_PATHS = {
     "simulation": "simulation",
     "ontology": "ontology",
     "knowledge": "knowledge",
+    "integration": "integration",
     "local_integration": "local-integration",
 }
 

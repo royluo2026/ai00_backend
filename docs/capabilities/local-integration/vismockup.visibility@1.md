@@ -8,7 +8,7 @@ Change active-view visibility or selection.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`local_integration`
-- Catalog Release：`rel_386d62dabf4e43e02ee660709e6398a1`
+- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -85,7 +85,7 @@ Change active-view visibility or selection.
 ```json
 {
   "capability_id": "vismockup.visibility",
-  "catalog_release": "rel_386d62dabf4e43e02ee660709e6398a1",
+  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
   "major_version": 1,
   "payload": {
     "action": "all_on",

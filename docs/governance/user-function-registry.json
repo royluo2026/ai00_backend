@@ -2665,6 +2665,319 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
+    "capability:integration.connector.archive": {
+      "function_id": "capability:integration.connector.archive",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.connector.archive",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.connector.connection.test": {
+      "function_id": "capability:integration.connector.connection.test",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.connector.connection.test",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.connector.create": {
+      "function_id": "capability:integration.connector.create",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.connector.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.connector.schema.discover": {
+      "function_id": "capability:integration.connector.schema.discover",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.connector.schema.discover",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.connector.search": {
+      "function_id": "capability:integration.connector.search",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.connector.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.connector.update": {
+      "function_id": "capability:integration.connector.update",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.connector.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.mapping.archive": {
+      "function_id": "capability:integration.mapping.archive",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping.archive",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.mapping.create": {
+      "function_id": "capability:integration.mapping.create",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.mapping.get": {
+      "function_id": "capability:integration.mapping.get",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.mapping.preview": {
+      "function_id": "capability:integration.mapping.preview",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping.preview",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.mapping.search": {
+      "function_id": "capability:integration.mapping.search",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.mapping.update": {
+      "function_id": "capability:integration.mapping.update",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.mapping.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:integration.sync.start": {
+      "function_id": "capability:integration.sync.start",
+      "domain": "Integration",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "integration.sync.start",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Integration",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/integration/integration_backend/capabilities/contracts.py",
+        "plugins/integration/integration_backend/capabilities/descriptors.py",
+        "plugins/integration/integration_backend/capabilities/provider.py"
+      ]
+    },
     "capability:knowledge.context.retrieve": {
       "function_id": "capability:knowledge.context.retrieve",
       "domain": "Knowledge",
@@ -5423,8 +5736,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -5445,8 +5758,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -8239,8 +8552,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -8261,8 +8574,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -8283,8 +8596,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -8305,8 +8618,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -8327,8 +8640,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -8349,8 +8662,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -11786,8 +12099,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -11808,8 +12121,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -14538,8 +14851,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -14560,8 +14873,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -14582,8 +14895,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -14604,8 +14917,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [
@@ -17618,8 +17931,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Integration",
       "exclusion_reason": null,
       "source_paths": [

@@ -92,27 +92,6 @@
       "event_subscriptions": []
     },
     {
-      "domain_id": "knowledge",
-      "artifact": {
-        "plugin_id": "official.knowledge",
-        "module": "knowledge_backend.capabilities",
-        "version": "2.0.0",
-        "artifact_hash": "sha256:5d238ff6574322ee2534cc021f5055e3da61e33d67b2063df1eda0fb4bc4de32"
-      },
-      "artifact_path": "plugins/knowledge/knowledge_backend",
-      "allowed_owners": [
-        "knowledge"
-      ],
-      "database": {
-        "database_name": "ai00_knowledge",
-        "runtime_url_env": "AI00_KNOWLEDGE_DB_URL",
-        "ddl_url_env": "AI00_KNOWLEDGE_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/knowledge"
-      },
-      "search_export": null,
-      "event_subscriptions": []
-    },
-    {
       "domain_id": "integration",
       "artifact": {
         "plugin_id": "official.integration",
@@ -129,6 +108,27 @@
         "runtime_url_env": "AI00_INTEGRATION_DB_URL",
         "ddl_url_env": "AI00_INTEGRATION_DDL_DB_URL",
         "migration_path": "backend/db/migrations/domains/integration"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "knowledge",
+      "artifact": {
+        "plugin_id": "official.knowledge",
+        "module": "knowledge_backend.capabilities",
+        "version": "2.0.0",
+        "artifact_hash": "sha256:5d238ff6574322ee2534cc021f5055e3da61e33d67b2063df1eda0fb4bc4de32"
+      },
+      "artifact_path": "plugins/knowledge/knowledge_backend",
+      "allowed_owners": [
+        "knowledge"
+      ],
+      "database": {
+        "database_name": "ai00_knowledge",
+        "runtime_url_env": "AI00_KNOWLEDGE_DB_URL",
+        "ddl_url_env": "AI00_KNOWLEDGE_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/knowledge"
       },
       "search_export": null,
       "event_subscriptions": []

@@ -8,7 +8,7 @@ Read an immutable Simulation parameter set.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_386d62dabf4e43e02ee660709e6398a1`
+- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Read an immutable Simulation parameter set.
 ```json
 {
   "capability_id": "simulation.parameter_set.get",
-  "catalog_release": "rel_386d62dabf4e43e02ee660709e6398a1",
+  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
   "major_version": 1,
   "payload": {
     "parameter_set_ref": {

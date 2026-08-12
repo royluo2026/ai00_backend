@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_386d62dabf4e43e02ee660709e6398a1"
+    "version": "rel_d588aa2dfa48c41548960d6e92ff3252"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -244,7 +244,7 @@
           }
         },
         "summary": "base.annotation.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -487,7 +487,7 @@
           }
         },
         "summary": "base.annotation.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -789,7 +789,7 @@
           }
         },
         "summary": "base.approval.request.cancel",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -1110,7 +1110,7 @@
           }
         },
         "summary": "base.approval.request.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -1420,7 +1420,7 @@
           }
         },
         "summary": "base.approval.request.decide",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -1718,7 +1718,7 @@
           }
         },
         "summary": "base.approval.request.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -2028,7 +2028,7 @@
           }
         },
         "summary": "base.approval.request.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -2271,7 +2271,7 @@
           }
         },
         "summary": "base.authorization.grant.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -2514,7 +2514,7 @@
           }
         },
         "summary": "base.authorization.grant.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -2757,7 +2757,7 @@
           }
         },
         "summary": "base.export_template.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -3000,7 +3000,7 @@
           }
         },
         "summary": "base.export_template.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -3243,7 +3243,7 @@
           }
         },
         "summary": "base.identity.directory.sync",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -3486,7 +3486,7 @@
           }
         },
         "summary": "base.identity.role.assign",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -3729,7 +3729,7 @@
           }
         },
         "summary": "base.identity.session.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -3961,7 +3961,7 @@
           }
         },
         "summary": "base.notification.preference.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -4206,7 +4206,7 @@
           }
         },
         "summary": "base.notification.preference.update",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -4468,7 +4468,7 @@
           }
         },
         "summary": "base.notification.read_state.set",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -4731,7 +4731,7 @@
           }
         },
         "summary": "base.notification.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -4974,7 +4974,7 @@
           }
         },
         "summary": "base.plugin.marketplace.publisher.register",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -5217,7 +5217,7 @@
           }
         },
         "summary": "base.plugin.marketplace.release.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -5460,7 +5460,7 @@
           }
         },
         "summary": "base.plugin.marketplace.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -5738,7 +5738,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -5981,7 +5981,7 @@
           }
         },
         "summary": "base.saved_view.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -6224,7 +6224,7 @@
           }
         },
         "summary": "base.saved_view.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -6467,7 +6467,7 @@
           }
         },
         "summary": "base.team.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -6710,7 +6710,7 @@
           }
         },
         "summary": "base.team.membership.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -6953,7 +6953,7 @@
           }
         },
         "summary": "base.team.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -7214,7 +7214,7 @@
           }
         },
         "summary": "base.workspace.template.publish",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -7468,7 +7468,7 @@
           }
         },
         "summary": "base.workspace.template.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -7738,7 +7738,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -8045,7 +8045,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -8329,7 +8329,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -8618,7 +8618,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -8892,7 +8892,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -9140,7 +9140,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -9444,7 +9444,7 @@
           }
         },
         "summary": "craft.bop.validation.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -9748,7 +9748,7 @@
           }
         },
         "summary": "craft.bop.validation.run",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -10013,7 +10013,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -10290,7 +10290,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -10576,7 +10576,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -10929,7 +10929,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -11190,7 +11190,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -11503,7 +11503,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -11807,7 +11807,7 @@
           }
         },
         "summary": "craft.gbop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -12111,7 +12111,7 @@
           }
         },
         "summary": "craft.gbop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -12415,7 +12415,7 @@
           }
         },
         "summary": "craft.gbop.draft.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -12719,7 +12719,7 @@
           }
         },
         "summary": "craft.gbop.draft.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -13023,7 +13023,7 @@
           }
         },
         "summary": "craft.gbop.draft.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -13327,7 +13327,7 @@
           }
         },
         "summary": "craft.gbop.draft.submit",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -13575,7 +13575,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -13818,7 +13818,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -14066,7 +14066,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -14370,7 +14370,7 @@
           }
         },
         "summary": "craft.gbop.release.activate",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -14674,7 +14674,7 @@
           }
         },
         "summary": "craft.gbop.release.archive",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -14978,7 +14978,7 @@
           }
         },
         "summary": "craft.gbop.release.compare",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -15282,7 +15282,7 @@
           }
         },
         "summary": "craft.gbop.release.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -15586,7 +15586,7 @@
           }
         },
         "summary": "craft.gbop.release.publish",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -15890,7 +15890,7 @@
           }
         },
         "summary": "craft.gbop.release.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -16151,7 +16151,7 @@
           }
         },
         "summary": "craft.pbom.draft.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -16406,7 +16406,7 @@
           }
         },
         "summary": "craft.pbom.draft.change.preview",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -16655,7 +16655,7 @@
           }
         },
         "summary": "craft.pbom.import.preview",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -16908,7 +16908,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -17156,7 +17156,7 @@
           }
         },
         "summary": "craft.pbom.version.archive",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -17409,7 +17409,7 @@
           }
         },
         "summary": "craft.pbom.version.compare",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -17689,7 +17689,7 @@
           }
         },
         "summary": "craft.pbom.version.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -17947,7 +17947,7 @@
           }
         },
         "summary": "craft.pbom.version.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -18195,7 +18195,7 @@
           }
         },
         "summary": "craft.pbom.version.publish",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -18437,7 +18437,7 @@
           }
         },
         "summary": "craft.pbom.version.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -18685,7 +18685,7 @@
           }
         },
         "summary": "craft.pbom.version.submit",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -18989,7 +18989,7 @@
           }
         },
         "summary": "craft.rule.draft.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -19293,7 +19293,7 @@
           }
         },
         "summary": "craft.rule.draft.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -19597,7 +19597,7 @@
           }
         },
         "summary": "craft.rule.draft.revise",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -19901,7 +19901,7 @@
           }
         },
         "summary": "craft.rule.draft.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -20205,7 +20205,7 @@
           }
         },
         "summary": "craft.rule.draft.submit",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -20509,7 +20509,7 @@
           }
         },
         "summary": "craft.rule.evaluate",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -20813,7 +20813,7 @@
           }
         },
         "summary": "craft.rule.release.activate",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -21117,7 +21117,7 @@
           }
         },
         "summary": "craft.rule.release.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -21421,7 +21421,7 @@
           }
         },
         "summary": "craft.rule.release.publish",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -21725,7 +21725,7 @@
           }
         },
         "summary": "craft.rule.release.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -22029,7 +22029,7 @@
           }
         },
         "summary": "craft.rule.waiver.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -22333,7 +22333,7 @@
           }
         },
         "summary": "craft.rule.waiver.revoke",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -22637,7 +22637,7 @@
           }
         },
         "summary": "craft.rule.waiver.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -22940,7 +22940,7 @@
           }
         },
         "summary": "digital_model.component.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -23200,7 +23200,7 @@
           }
         },
         "summary": "digital_model.model.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -23456,7 +23456,7 @@
           }
         },
         "summary": "digital_model.model.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -23735,7 +23735,7 @@
           }
         },
         "summary": "digital_model.model.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -23997,7 +23997,7 @@
           }
         },
         "summary": "digital_model.version.compare",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -24379,7 +24379,7 @@
           }
         },
         "summary": "digital_model.version.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -24722,7 +24722,7 @@
           }
         },
         "summary": "digital_model.version.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -24960,7 +24960,7 @@
           }
         },
         "summary": "digital_model.version.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -25203,7 +25203,7 @@
           }
         },
         "summary": "factory.asset.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -25446,7 +25446,7 @@
           }
         },
         "summary": "factory.asset.maintenance.complete",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -25689,7 +25689,7 @@
           }
         },
         "summary": "factory.asset.maintenance.start",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -25932,7 +25932,7 @@
           }
         },
         "summary": "factory.asset.register",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -26175,7 +26175,7 @@
           }
         },
         "summary": "factory.asset.scrap",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -26418,7 +26418,7 @@
           }
         },
         "summary": "factory.asset.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -26661,7 +26661,7 @@
           }
         },
         "summary": "factory.asset.update",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -26904,7 +26904,7 @@
           }
         },
         "summary": "factory.resource.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -27147,7 +27147,7 @@
           }
         },
         "summary": "factory.resource_catalog.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -27390,7 +27390,7 @@
           }
         },
         "summary": "factory.resource_catalog.deprecate",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -27633,7 +27633,7 @@
           }
         },
         "summary": "factory.resource_catalog.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -27876,7 +27876,7 @@
           }
         },
         "summary": "factory.resource_catalog.publish",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -28119,7 +28119,7 @@
           }
         },
         "summary": "factory.resource_catalog.revise",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -28362,7 +28362,7 @@
           }
         },
         "summary": "factory.resource_catalog.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -28605,7 +28605,7 @@
           }
         },
         "summary": "factory.structure.archive",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -28848,7 +28848,7 @@
           }
         },
         "summary": "factory.structure.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -29091,7 +29091,7 @@
           }
         },
         "summary": "factory.structure.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -29334,7 +29334,7 @@
           }
         },
         "summary": "factory.structure.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -29577,7 +29577,7 @@
           }
         },
         "summary": "factory.structure.update",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -29822,7 +29822,3340 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.connector.archive:invoke": {
+      "post": {
+        "description": "Execute the governed integration.connector.archive Integration outcome.",
+        "operationId": "invoke_integration_connector_archive_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expected_revision": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "gid",
+                  "expected_revision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.connector.archive"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "archived": {
+                              "type": "boolean"
+                            },
+                            "gid": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "gid",
+                            "archived"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.connector.archive",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.connector.connection.test:invoke": {
+      "post": {
+        "description": "Execute the governed integration.connector.connection.test Integration outcome.",
+        "operationId": "invoke_integration_connector_connection_test_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "gid"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.connector.connection.test"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "latency_ms": {
+                              "type": "integer"
+                            },
+                            "reachable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "reachable"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.connector.connection.test",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.connector.create:invoke": {
+      "post": {
+        "description": "Execute the governed integration.connector.create Integration outcome.",
+        "operationId": "invoke_integration_connector_create_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "connector_type": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "credential_ref": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "database_name": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "host": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "port": {
+                    "maximum": 65535,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "username": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "connector_type",
+                  "host",
+                  "port",
+                  "database_name",
+                  "username",
+                  "credential_ref"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.connector.create"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "gid": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "revision": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "gid",
+                            "revision",
+                            "status"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.connector.create",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.connector.schema.discover:invoke": {
+      "post": {
+        "description": "Execute the governed integration.connector.schema.discover Integration outcome.",
+        "operationId": "invoke_integration_connector_schema_discover_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "gid"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.connector.schema.discover"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "objects": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "objects"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.connector.schema.discover",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.connector.search:invoke": {
+      "post": {
+        "description": "Execute the governed integration.connector.search Integration outcome.",
+        "operationId": "invoke_integration_connector_search_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "query": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.connector.search"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "items"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.connector.search",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.connector.update:invoke": {
+      "post": {
+        "description": "Execute the governed integration.connector.update Integration outcome.",
+        "operationId": "invoke_integration_connector_update_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "credential_ref": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "expected_revision": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "gid",
+                  "expected_revision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.connector.update"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "changed": {
+                              "type": "boolean"
+                            },
+                            "gid": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "revision": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "gid",
+                            "revision",
+                            "changed"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.connector.update",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.mapping.archive:invoke": {
+      "post": {
+        "description": "Execute the governed integration.mapping.archive Integration outcome.",
+        "operationId": "invoke_integration_mapping_archive_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expected_revision": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "gid",
+                  "expected_revision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.mapping.archive"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "archived": {
+                              "type": "boolean"
+                            },
+                            "gid": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "gid",
+                            "archived"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.mapping.archive",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.mapping.create:invoke": {
+      "post": {
+        "description": "Execute the governed integration.mapping.create Integration outcome.",
+        "operationId": "invoke_integration_mapping_create_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "datasource_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "field_mappings": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "source_field": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "target_field": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "transform_expression": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "source_field",
+                        "target_field"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "minimum_catalog_release": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "name": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "source_object": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "target_capability_id": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "target_domain": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "target_major_version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "datasource_gid",
+                  "name",
+                  "source_object",
+                  "target_domain",
+                  "target_capability_id",
+                  "target_major_version",
+                  "minimum_catalog_release"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.mapping.create"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "gid": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "revision": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "gid",
+                            "revision",
+                            "status"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.mapping.create",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.mapping.get:invoke": {
+      "post": {
+        "description": "Execute the governed integration.mapping.get Integration outcome.",
+        "operationId": "invoke_integration_mapping_get_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "gid"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.mapping.get"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "field_mappings": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "source_field": {
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  "target_field": {
+                                    "minLength": 1,
+                                    "type": "string"
+                                  },
+                                  "transform_expression": {
+                                    "minLength": 1,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "source_field",
+                                  "target_field"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "gid": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "revision": {
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "target_capability_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "gid",
+                            "revision",
+                            "target_capability_id",
+                            "field_mappings"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.mapping.get",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.mapping.preview:invoke": {
+      "post": {
+        "description": "Execute the governed integration.mapping.preview Integration outcome.",
+        "operationId": "invoke_integration_mapping_preview_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "gid"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.mapping.preview"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "rows": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "truncated": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "rows",
+                            "truncated"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.mapping.preview",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.mapping.search:invoke": {
+      "post": {
+        "description": "Execute the governed integration.mapping.search Integration outcome.",
+        "operationId": "invoke_integration_mapping_search_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "query": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.mapping.search"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {},
+                                "type": "object"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "items"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.mapping.search",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.mapping.update:invoke": {
+      "post": {
+        "description": "Execute the governed integration.mapping.update Integration outcome.",
+        "operationId": "invoke_integration_mapping_update_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "expected_revision": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "field_mappings": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "source_field": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "target_field": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "transform_expression": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "source_field",
+                        "target_field"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "gid",
+                  "expected_revision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.mapping.update"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "changed": {
+                              "type": "boolean"
+                            },
+                            "gid": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "revision": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "gid",
+                            "revision",
+                            "changed"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.mapping.update",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/integration.sync.start:invoke": {
+      "post": {
+        "description": "Execute the governed integration.sync.start Integration outcome.",
+        "operationId": "invoke_integration_sync_start_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "mapping_gid": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mapping_gid"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "integration.sync.start"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "operation_id": {
+                                  "minLength": 1,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "accepted"
+                                  ],
+                                  "type": "string"
+                                },
+                                "version": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "operation_id",
+                                "status",
+                                "version"
+                              ],
+                              "type": "object"
+                            },
+                            "run_id": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "run_id",
+                            "operation_ref"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "integration.sync.start",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -30138,7 +33471,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -30420,7 +33753,7 @@
           }
         },
         "summary": "knowledge.document.acl.grant",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -30716,7 +34049,7 @@
           }
         },
         "summary": "knowledge.document.acl.list",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -30989,7 +34322,7 @@
           }
         },
         "summary": "knowledge.document.acl.revoke",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -31230,7 +34563,7 @@
           }
         },
         "summary": "knowledge.document.archive",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -31532,7 +34865,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -31798,7 +35131,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -32080,7 +35413,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -32415,7 +35748,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -32699,7 +36032,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -32992,7 +36325,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -33327,7 +36660,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -33611,7 +36944,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -33908,7 +37241,7 @@
           }
         },
         "summary": "knowledge.document.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -34149,7 +37482,7 @@
           }
         },
         "summary": "knowledge.entry.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -34501,7 +37834,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -35011,7 +38344,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -35252,7 +38585,7 @@
           }
         },
         "summary": "knowledge.personalization.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -35493,7 +38826,7 @@
           }
         },
         "summary": "knowledge.personalization.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -35865,7 +39198,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -36259,7 +39592,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -36603,7 +39936,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -36932,7 +40265,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -37316,7 +40649,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -37705,7 +41038,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -37933,7 +41266,7 @@
           }
         },
         "summary": "knowledge.reference_data.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -38161,7 +41494,7 @@
           }
         },
         "summary": "knowledge.reference_data.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -38540,7 +41873,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -38781,7 +42114,7 @@
           }
         },
         "summary": "knowledge.space.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -39054,7 +42387,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -39329,7 +42662,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -39604,7 +42937,7 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -40072,7 +43405,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -40372,7 +43705,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -40670,7 +44003,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -40933,7 +44266,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -41169,7 +44502,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -41465,7 +44798,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -41761,7 +45094,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -42056,7 +45389,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -42300,7 +45633,7 @@
           }
         },
         "summary": "ontology.mapping.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -42570,7 +45903,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -43089,7 +46422,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -43385,7 +46718,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -43690,7 +47023,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -44003,7 +47336,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -44247,7 +47580,7 @@
           }
         },
         "summary": "ontology.schema.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -44488,7 +47821,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -44729,7 +48062,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -44981,7 +48314,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -45222,7 +48555,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -45463,7 +48796,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -45703,7 +49036,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -45950,7 +49283,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -46207,7 +49540,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -46453,7 +49786,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -46694,7 +50027,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -46956,7 +50289,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -47199,7 +50532,7 @@
           }
         },
         "summary": "project.activity.aggregate",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -47442,7 +50775,7 @@
           }
         },
         "summary": "project.approval.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -47685,7 +51018,7 @@
           }
         },
         "summary": "project.approval.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -47928,7 +51261,7 @@
           }
         },
         "summary": "project.bitable_binding.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -48171,7 +51504,7 @@
           }
         },
         "summary": "project.bitable_binding.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -48414,7 +51747,7 @@
           }
         },
         "summary": "project.change_log.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -48657,7 +51990,7 @@
           }
         },
         "summary": "project.collaboration.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -48900,7 +52233,7 @@
           }
         },
         "summary": "project.collaboration.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -49143,7 +52476,7 @@
           }
         },
         "summary": "project.craft_scope.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -49386,7 +52719,7 @@
           }
         },
         "summary": "project.follow.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -49629,7 +52962,7 @@
           }
         },
         "summary": "project.follow.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -49872,7 +53205,7 @@
           }
         },
         "summary": "project.issue.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -50115,7 +53448,7 @@
           }
         },
         "summary": "project.issue.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -50358,7 +53691,7 @@
           }
         },
         "summary": "project.list.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -50601,7 +53934,7 @@
           }
         },
         "summary": "project.list.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -50844,7 +54177,7 @@
           }
         },
         "summary": "project.member.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -51087,7 +54420,7 @@
           }
         },
         "summary": "project.member.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -51330,7 +54663,7 @@
           }
         },
         "summary": "project.notification.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -51573,7 +54906,7 @@
           }
         },
         "summary": "project.notification.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -51816,7 +55149,7 @@
           }
         },
         "summary": "project.permission_request.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -52059,7 +55392,7 @@
           }
         },
         "summary": "project.permission_request.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -52302,7 +55635,7 @@
           }
         },
         "summary": "project.project.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -52545,7 +55878,7 @@
           }
         },
         "summary": "project.project.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -52788,7 +56121,7 @@
           }
         },
         "summary": "project.sharing.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -53031,7 +56364,7 @@
           }
         },
         "summary": "project.sharing.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -53274,7 +56607,7 @@
           }
         },
         "summary": "project.task.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -53517,7 +56850,7 @@
           }
         },
         "summary": "project.task.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -53760,7 +57093,7 @@
           }
         },
         "summary": "project.task_template.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -54003,7 +57336,7 @@
           }
         },
         "summary": "project.task_template.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -54246,7 +57579,7 @@
           }
         },
         "summary": "project.workbench.change.apply",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -54489,7 +57822,7 @@
           }
         },
         "summary": "project.workbench.read",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -54741,7 +58074,7 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -55190,7 +58523,7 @@
           }
         },
         "summary": "simulation.environment.archive",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -55767,7 +59100,7 @@
           }
         },
         "summary": "simulation.environment.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -56216,7 +59549,7 @@
           }
         },
         "summary": "simulation.environment.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -56680,7 +60013,7 @@
           }
         },
         "summary": "simulation.environment.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -56993,7 +60326,7 @@
           }
         },
         "summary": "simulation.parameter_set.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -57298,7 +60631,7 @@
           }
         },
         "summary": "simulation.parameter_set.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -57605,7 +60938,7 @@
           }
         },
         "summary": "simulation.parameter_set.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -57981,7 +61314,7 @@
           }
         },
         "summary": "simulation.result.compare",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -58285,7 +61618,7 @@
           }
         },
         "summary": "simulation.result.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -58580,7 +61913,7 @@
           }
         },
         "summary": "simulation.run.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -58893,7 +62226,7 @@
           }
         },
         "summary": "simulation.run.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -59188,7 +62521,7 @@
           }
         },
         "summary": "simulation.run.start",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -59511,7 +62844,7 @@
           }
         },
         "summary": "simulation.solver_profile.create",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -59821,7 +63154,7 @@
           }
         },
         "summary": "simulation.solver_profile.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -60133,7 +63466,7 @@
           }
         },
         "summary": "simulation.solver_profile.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -60372,7 +63705,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -60623,7 +63956,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -60872,7 +64205,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -61121,7 +64454,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -61376,7 +64709,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -61645,7 +64978,7 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -61897,7 +65230,7 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -62159,7 +65492,7 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -62411,7 +65744,7 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -62703,7 +66036,7 @@
           }
         },
         "summary": "vismockup.model.open",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -62955,7 +66288,7 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -63215,7 +66548,7 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     },
@@ -63476,7 +66809,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-catalog-release": "rel_d588aa2dfa48c41548960d6e92ff3252",
         "x-ai00-major-version": 1
       }
     }

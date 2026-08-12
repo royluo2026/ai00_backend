@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_386d62dabf4e43e02ee660709e6398a1",
-  "catalog_hash": "sha256:386d62dabf4e43e02ee660709e6398a1aa2a26db8b4f8d6006cffce59c837155",
+  "release_id": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "catalog_hash": "sha256:d588aa2dfa48c41548960d6e92ff3252ecd8c4401b27ba3e35a505bec8f32a05",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -22405,6 +22405,2013 @@
         {
           "code": "plugin_state_conflict",
           "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.connector.archive",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.connector.archive",
+      "description": "Execute the governed integration.connector.archive Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "expected_revision"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "archived": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "archived"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "archived": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "archived"
+        ]
+      },
+      "schema_hash": "sha256:a20139b4ba84039547c99f4800361400a09da64a7a680a4db66cf403c086dca1",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.connector.connection.test",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.connector.connection.test",
+      "description": "Execute the governed integration.connector.connection.test Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "reachable": {
+            "type": "boolean"
+          },
+          "latency_ms": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "reachable"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "reachable": {
+            "type": "boolean"
+          },
+          "latency_ms": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "reachable"
+        ]
+      },
+      "schema_hash": "sha256:fbdcb248bd1b6fab3d616386ad607d69fe618f362e18c049573a1eb65e8224bd",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.connector.create",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.connector.create",
+      "description": "Execute the governed integration.connector.create Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "connector_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "host": {
+            "type": "string",
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "database_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "username": {
+            "type": "string",
+            "minLength": 1
+          },
+          "credential_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "connector_type",
+          "host",
+          "port",
+          "database_name",
+          "username",
+          "credential_ref"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "status"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "status"
+        ]
+      },
+      "schema_hash": "sha256:13e0cced1ea2792d50776ab38b5a94690c4d42f8d5a1058b3164e15f9e727659",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.connector.schema.discover",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.connector.schema.discover",
+      "description": "Execute the governed integration.connector.schema.discover Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "integration.v2:integration.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "objects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "objects"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "objects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "objects"
+        ]
+      },
+      "schema_hash": "sha256:d45bcb595d652799f72fe0d542301ebe7f547c02dccc90e03b9ce90bd2b2f1cc",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.connector.search",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.connector.search",
+      "description": "Execute the governed integration.connector.search Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "integration.v2:integration.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "schema_hash": "sha256:0606824cfbbfaf872b5d45a89ab732c7d6680d30bcddaca2bd39b8afbec3b367",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.connector.update",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.connector.update",
+      "description": "Execute the governed integration.connector.update Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "credential_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "expected_revision"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "changed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "changed"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "changed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "changed"
+        ]
+      },
+      "schema_hash": "sha256:bd3ba61f26c0fca117a6cab1311ea0f3c94fcbbb6d619b51e5bda8c0961333eb",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.mapping.archive",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping.archive",
+      "description": "Execute the governed integration.mapping.archive Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "expected_revision"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "archived": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "archived"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "archived": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "archived"
+        ]
+      },
+      "schema_hash": "sha256:a20139b4ba84039547c99f4800361400a09da64a7a680a4db66cf403c086dca1",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.mapping.create",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping.create",
+      "description": "Execute the governed integration.mapping.create Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "datasource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_object": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_major_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minimum_catalog_release": {
+            "type": "string",
+            "minLength": 1
+          },
+          "field_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "source_field",
+                "target_field"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "datasource_gid",
+          "name",
+          "source_object",
+          "target_domain",
+          "target_capability_id",
+          "target_major_version",
+          "minimum_catalog_release"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "status"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "status"
+        ]
+      },
+      "schema_hash": "sha256:69baf268fff75097453cc8d043270e4eda0f7f9b89c461f63563e539f3d916b4",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.mapping.get",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping.get",
+      "description": "Execute the governed integration.mapping.get Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "integration.v2:integration.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "field_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "source_field",
+                "target_field"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "target_capability_id",
+          "field_mappings"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "target_capability_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "field_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "source_field",
+                "target_field"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "target_capability_id",
+          "field_mappings"
+        ]
+      },
+      "schema_hash": "sha256:5a97c9b83a136b95a855fb0a4d2d2da6c45036ca332a7423e24ac54fadd56045",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.mapping.preview",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping.preview",
+      "description": "Execute the governed integration.mapping.preview Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "integration.v2:integration.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "rows",
+          "truncated"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "rows",
+          "truncated"
+        ]
+      },
+      "schema_hash": "sha256:1cf9f8cd9817cb25390dbb3b4e97e3dd68fe6de9c360db2e22c5557b001a3130",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.mapping.search",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping.search",
+      "description": "Execute the governed integration.mapping.search Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "integration.v2:integration.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {}
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "schema_hash": "sha256:0606824cfbbfaf872b5d45a89ab732c7d6680d30bcddaca2bd39b8afbec3b367",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.mapping.update",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.mapping.update",
+      "description": "Execute the governed integration.mapping.update Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "field_mappings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "target_field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "transform_expression": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "source_field",
+                "target_field"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "expected_revision"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "changed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "changed"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "changed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gid",
+          "revision",
+          "changed"
+        ]
+      },
+      "schema_hash": "sha256:fcbadc3f4e695127acc831c1cb401ca44cac1adb1d24ecb4694f5268f5e4958c",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "integration.sync.start",
+      "major_version": 1,
+      "owner_domain": "integration",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "integration.sync.start",
+      "description": "Execute the governed integration.sync.start Integration outcome.",
+      "use_when": "A consumer needs governed external connector, mapping, or sync orchestration.",
+      "do_not_use_when": "The caller can use an owning domain Capability directly without external integration.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_async",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "integration.v2:integration.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "mapping_gid": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "mapping_gid"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "operation_ref"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operation_ref": {
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "accepted"
+                ]
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "operation_id",
+              "status",
+              "version"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "operation_ref"
+        ]
+      },
+      "schema_hash": "sha256:65fcb6be65e308d0631acc178581d67fb5f3d5eb9bb166f3f6b9fce1c7ef8fee",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Integration request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Integration resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The connector or mapping does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The connector or mapping revision changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "network_policy_rejected",
+          "meaning": "The connector target violates outbound network policy.",
+          "retryable": false
+        },
+        {
+          "code": "connector_runtime_unavailable",
+          "meaning": "The bounded external connector runtime is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "target_capability_unavailable",
+          "meaning": "The owning target-domain Capability is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The sync idempotency key is already bound to another request.",
           "retryable": false
         }
       ],
@@ -47173,6 +49180,12 @@
       "artifact_hash": "sha256:da8d7a93dd8e5a98f1a8c09ee7f8ca689cbd6b120cae2dd12ae4c66766d8c510"
     },
     {
+      "plugin_id": "official.integration",
+      "module": "integration_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:a904539b8312b2e0de73bef0f25b1b65e80afb6a8f1049a577f1f981415794ff"
+    },
+    {
       "plugin_id": "official.knowledge",
       "module": "knowledge_backend.capabilities",
       "version": "2.0.0",
@@ -47203,5 +49216,5 @@
       "artifact_hash": "sha256:01d13e92934650fac586c365529e53e3775b39d171b5a78b069b662dc67d8100"
     }
   ],
-  "created_at": "2026-08-12T09:08:00.957410Z"
+  "created_at": "2026-08-12T09:19:45.293735Z"
 }
