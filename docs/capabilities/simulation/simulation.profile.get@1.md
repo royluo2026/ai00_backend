@@ -8,7 +8,7 @@ Read an immutable solver profile.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_6e6085cb234487b057ef4946e65d85a8`
+- Catalog Release：`rel_9b6efb77d4635f59c96c5081b82936fb`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Read an immutable solver profile.
 ```json
 {
   "capability_id": "simulation.profile.get",
-  "catalog_release": "rel_6e6085cb234487b057ef4946e65d85a8",
+  "catalog_release": "rel_9b6efb77d4635f59c96c5081b82936fb",
   "major_version": 1,
   "payload": {
     "simulation_profile_ref": {

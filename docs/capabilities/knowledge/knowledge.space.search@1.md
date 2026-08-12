@@ -8,7 +8,7 @@ Search spaces available in the current tenant.
 - 不适用：The space gid is already known.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_6e6085cb234487b057ef4946e65d85a8`
+- Catalog Release：`rel_9b6efb77d4635f59c96c5081b82936fb`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -68,7 +68,7 @@ Search spaces available in the current tenant.
 ```json
 {
   "capability_id": "knowledge.space.search",
-  "catalog_release": "rel_6e6085cb234487b057ef4946e65d85a8",
+  "catalog_release": "rel_9b6efb77d4635f59c96c5081b82936fb",
   "major_version": 1,
   "payload": {}
 }

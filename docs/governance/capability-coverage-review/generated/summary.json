@@ -3,20 +3,19 @@
   "domains": 11,
   "stable_functions": 752,
   "resolutions": {
-    "existing_capability": 298,
-    "new_capability": 353,
+    "existing_capability": 419,
+    "new_capability": 232,
     "excluded": 101,
     "unreviewed": 0
   },
-  "candidate_capabilities": 77,
+  "candidate_capabilities": 46,
   "candidate_additions_by_domain": {
     "Agent": 13,
     "Craft": 11,
     "Integration": 13,
     "Knowledge": 5,
     "Local Runtime": 2,
-    "Ontology": 2,
-    "Project Management": 31
+    "Ontology": 2
   },
   "function_dispositions_by_domain": {
     "Agent": {
@@ -68,8 +67,8 @@
       "unreviewed": 0
     },
     "Project Management": {
-      "existing_capability": 3,
-      "new_capability": 121,
+      "existing_capability": 124,
+      "new_capability": 0,
       "excluded": 1,
       "unreviewed": 0
     },
@@ -81,9 +80,9 @@
     }
   },
   "consolidation_ratio": {
-    "new_function_dispositions": 353,
-    "candidate_capabilities": 77,
-    "functions_per_candidate": 4.584
+    "new_function_dispositions": 232,
+    "candidate_capabilities": 46,
+    "functions_per_candidate": 5.043
   },
   "enabled_exposures": {
     "web": 2,
@@ -99,9 +98,9 @@
     "dependency": 37,
     "migration": 2
   },
-  "catalog_descriptors": 128,
-  "current_catalog_capabilities": 112,
-  "proposed_final_catalog_capabilities": 189,
+  "catalog_descriptors": 159,
+  "current_catalog_capabilities": 144,
+  "proposed_final_catalog_capabilities": 190,
   "evidence": {
     "module_dependencies": 7,
     "boundary_violations": 338,

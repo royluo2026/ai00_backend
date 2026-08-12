@@ -24,6 +24,7 @@ class CapabilityKernelContractTests(unittest.TestCase):
             "semantic": "base",
             "base": "base",
             "plugin": "base",
+            "project": "project_management",
             "local": "local_integration",
             "simulation": "simulation",
             "vismockup": "local_integration",

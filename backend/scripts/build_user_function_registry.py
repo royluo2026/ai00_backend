@@ -651,8 +651,10 @@ def review_disposition_errors(
             definition = disposition.get("candidate_definition") or {}
             if definition.get("owner_domain") != _owner_key(row["domain"]):
                 errors.append(f"capability owner mismatch: {function_id}")
-            else:
+            elif disposition["capability_id"] not in catalog_owners:
                 proposed_capabilities.add(disposition["capability_id"])
+            elif catalog_owners[disposition["capability_id"]] != _owner_key(row["domain"]):
+                errors.append(f"capability owner mismatch: {function_id}")
         elif resolution != "excluded":
             errors.append(f"missing reviewed disposition: {function_id}")
     errors.extend(
@@ -685,12 +687,21 @@ def apply_review_dispositions(
             definition = disposition.get("candidate_definition") or {}
             if definition.get("owner_domain") != _owner_key(row["domain"]):
                 continue
-            row.update(
-                target_capability=disposition["capability_id"],
-                classification="proposed",
-                migration_status="proposed",
-                exclusion_reason=None,
-            )
+            capability_id = disposition["capability_id"]
+            if catalog_owners.get(capability_id) == _owner_key(row["domain"]):
+                row.update(
+                    target_capability=capability_id,
+                    classification="mapped",
+                    migration_status="registered",
+                    exclusion_reason=None,
+                )
+            else:
+                row.update(
+                    target_capability=capability_id,
+                    classification="proposed",
+                    migration_status="proposed",
+                    exclusion_reason=None,
+                )
         elif resolution == "excluded":
             migration_status = row.get("migration_status")
             if migration_status == "candidate":

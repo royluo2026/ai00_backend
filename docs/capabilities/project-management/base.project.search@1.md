@@ -6,11 +6,11 @@ Search visible Project Management refs by name or code.
 
 - 适用：A caller needs a stable project reference before invoking another domain.
 - 不适用：A project reference is already known or project rows are requested.
-- 生命周期：`experimental`
+- 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_6e6085cb234487b057ef4946e65d85a8`
+- Catalog Release：`rel_9b6efb77d4635f59c96c5081b82936fb`
 - Schema 精度：`typed`
-- 暂未开放原因：`domain_errors_not_declared`, `experimental_lifecycle`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
@@ -28,10 +28,10 @@ Search visible Project Management refs by name or code.
 
 ## 授权与数据边界
 
-- 授权策略：`legacy:authenticated`
+- 授权策略：`project_management.v2:authenticated`
 - 自动化等级：`A2`
-- 数据分类：`internal`
-- Delegation：`none`
+- 数据分类：`confidential`
+- Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
@@ -82,7 +82,7 @@ Search visible Project Management refs by name or code.
 ```json
 {
   "capability_id": "base.project.search",
-  "catalog_release": "rel_6e6085cb234487b057ef4946e65d85a8",
+  "catalog_release": "rel_9b6efb77d4635f59c96c5081b82936fb",
   "major_version": 1,
   "payload": {
     "query": "example"
@@ -179,9 +179,13 @@ Search visible Project Management refs by name or code.
 
 领域错误：
 
-- 尚未声明完整领域错误；该能力不得扩大插件或 Agent 暴露。
+- `resource_not_found`：The requested project resource is unavailable.（retryable=false）
+- `permission_denied`：The caller cannot access the project resource.（retryable=false）
+- `approval_required`：The project change requires Base approval.（retryable=false）
+- `version_conflict`：The project resource changed concurrently.（retryable=false）
+- `provider_unavailable`：The Project Management provider is unavailable.（retryable=true）
 
-`domain_errors_complete=false`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
+`domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
 ## 版本与迁移
 

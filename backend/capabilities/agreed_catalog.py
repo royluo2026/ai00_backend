@@ -26,6 +26,22 @@ _BASE_V2_APPROVED = frozenset(
     }
 )
 
+_PROJECT_V2_APPROVED = frozenset(
+    "project." + suffix
+    for suffix in {
+        "activity.aggregate", "approval.change.apply", "approval.read",
+        "bitable_binding.change.apply", "bitable_binding.read", "change_log.read",
+        "collaboration.change.apply", "collaboration.read", "craft_scope.read",
+        "follow.change.apply", "follow.read", "issue.change.apply", "issue.read",
+        "list.change.apply", "list.read", "member.change.apply", "member.read",
+        "notification.change.apply", "notification.read",
+        "permission_request.change.apply", "permission_request.read",
+        "project.change.apply", "project.read", "sharing.change.apply", "sharing.read",
+        "task.change.apply", "task.read", "task_template.change.apply",
+        "task_template.read", "workbench.change.apply", "workbench.read",
+    }
+)
+
 APPROVED_CAPABILITY_IDS = frozenset({
     "base.project.search", "identity.principal.search", "knowledge.context.retrieve",
     "knowledge.document.create", "knowledge.document.diff", "knowledge.document.get",
@@ -59,4 +75,4 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "simulation.profile.create", "simulation.profile.get",
     "simulation.environment.create", "simulation.environment.get", "simulation.environment.list",
     "simulation.run.start", "simulation.run.get", "simulation.result.get",
-}) | _BASE_V2_APPROVED
+}) | _BASE_V2_APPROVED | _PROJECT_V2_APPROVED

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_6e6085cb234487b057ef4946e65d85a8",
-  "catalog_hash": "sha256:6e6085cb234487b057ef4946e65d85a8eeffd09fc225aac8ae50d73828e15e84",
+  "release_id": "rel_9b6efb77d4635f59c96c5081b82936fb",
+  "catalog_hash": "sha256:9b6efb77d4635f59c96c5081b82936fbee99106170a015120c5119a89ac9dcb4",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -3527,7 +3527,7 @@
       "id": "base.project.search",
       "major_version": 1,
       "owner_domain": "project_management",
-      "lifecycle_status": "experimental",
+      "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "base.project.search",
       "description": "Search visible Project Management refs by name or code.",
@@ -3545,11 +3545,11 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "legacy:authenticated",
+      "authorization_policy": "project_management.v2:authenticated",
       "resource_selectors": [],
-      "data_classification": "internal",
+      "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
-      "delegation_policy": "none",
+      "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "required": [
@@ -3682,8 +3682,34 @@
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
-      "domain_errors": [],
-      "domain_errors_complete": false
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
     },
     {
       "id": "base.saved_view.change.apply",
@@ -22763,6 +22789,3168 @@
       "domain_errors_complete": true
     },
     {
+      "id": "project.activity.aggregate",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.activity.aggregate",
+      "description": "Execute the reviewed project.activity.aggregate project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.approval.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.approval.change.apply",
+      "description": "Execute the reviewed project.approval.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.approval.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.approval.read",
+      "description": "Execute the reviewed project.approval.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.bitable_binding.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.bitable_binding.change.apply",
+      "description": "Execute the reviewed project.bitable_binding.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.bitable_binding.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.bitable_binding.read",
+      "description": "Execute the reviewed project.bitable_binding.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.change_log.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.change_log.read",
+      "description": "Execute the reviewed project.change_log.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.collaboration.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.collaboration.change.apply",
+      "description": "Execute the reviewed project.collaboration.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.collaboration.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.collaboration.read",
+      "description": "Execute the reviewed project.collaboration.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.craft_scope.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.craft_scope.read",
+      "description": "Execute the reviewed project.craft_scope.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.follow.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.follow.change.apply",
+      "description": "Execute the reviewed project.follow.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.follow.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.follow.read",
+      "description": "Execute the reviewed project.follow.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.issue.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.issue.change.apply",
+      "description": "Execute the reviewed project.issue.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.issue.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.issue.read",
+      "description": "Execute the reviewed project.issue.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.list.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.list.change.apply",
+      "description": "Execute the reviewed project.list.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.list.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.list.read",
+      "description": "Execute the reviewed project.list.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.member.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.member.change.apply",
+      "description": "Execute the reviewed project.member.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.member.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.member.read",
+      "description": "Execute the reviewed project.member.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.notification.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.notification.change.apply",
+      "description": "Execute the reviewed project.notification.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.notification.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.notification.read",
+      "description": "Execute the reviewed project.notification.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.permission_request.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.permission_request.change.apply",
+      "description": "Execute the reviewed project.permission_request.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.permission_request.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.permission_request.read",
+      "description": "Execute the reviewed project.permission_request.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.project.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.project.change.apply",
+      "description": "Execute the reviewed project.project.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.project.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.project.read",
+      "description": "Execute the reviewed project.project.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.sharing.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.sharing.change.apply",
+      "description": "Execute the reviewed project.sharing.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.sharing.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.sharing.read",
+      "description": "Execute the reviewed project.sharing.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.task.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.task.change.apply",
+      "description": "Execute the reviewed project.task.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.task.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.task.read",
+      "description": "Execute the reviewed project.task.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.task_template.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.task_template.change.apply",
+      "description": "Execute the reviewed project.task_template.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.task_template.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.task_template.read",
+      "description": "Execute the reviewed project.task_template.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.workbench.change.apply",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.workbench.change.apply",
+      "description": "Execute the reviewed project.workbench.change.apply project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "project_management.v2:project.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "project.workbench.read",
+      "major_version": 1,
+      "owner_domain": "project_management",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "project.workbench.read",
+      "description": "Execute the reviewed project.workbench.read project outcome.",
+      "use_when": "A governed consumer needs this Project Management outcome.",
+      "do_not_use_when": "The operation belongs to another domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "project_management.v2:project.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested project resource is unavailable.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the project resource.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The project change requires Base approval.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The project resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Project Management provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
       "id": "semantic.context.get",
       "major_version": 1,
       "owner_domain": "base",
@@ -28610,7 +31798,7 @@
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:36abeebd3709cd022156a523027ea3224c70a0be86929f2d808c0e00d15d6474"
+      "artifact_hash": "sha256:39edf13d83e44155add2afd7b0c36b43ccb37d6560f1e85ac28d2acbf5ae710b"
     },
     {
       "plugin_id": "official.simulation",
@@ -28619,5 +31807,5 @@
       "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
     }
   ],
-  "created_at": "2026-08-12T05:41:27.517305Z"
+  "created_at": "2026-08-12T05:55:39.119273Z"
 }
