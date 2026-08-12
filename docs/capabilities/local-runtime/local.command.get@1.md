@@ -7,8 +7,8 @@ Read an owned local operation outcome.
 - 适用：Read an owned local operation outcome.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
-- 所属领域：`local_integration`
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
+- 所属领域：`local_runtime`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,7 +28,7 @@ Read an owned local operation outcome.
 
 ## 授权与数据边界
 
-- 授权策略：`local-integration.v2:agent.run`
+- 授权策略：`local-runtime.v2:agent.run`
 - 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -76,7 +76,7 @@ Read an owned local operation outcome.
 ```json
 {
   "capability_id": "local.command.get",
-  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
   "major_version": 1,
   "payload": {
     "command_id": "example"

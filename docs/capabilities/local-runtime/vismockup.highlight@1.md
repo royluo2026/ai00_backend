@@ -1,14 +1,14 @@
-# vismockup.status@1
+# vismockup.highlight@1
 
-Read VisMockup connection state.
+Highlight occurrences by CATIA occurrence name.
 
 ## 使用判断
 
-- 适用：Read VisMockup connection state.
+- 适用：Highlight occurrences by CATIA occurrence name.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
-- 所属领域：`local_integration`
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
+- 所属领域：`local_runtime`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,8 +28,8 @@ Read VisMockup connection state.
 
 ## 授权与数据边界
 
-- 授权策略：`local-integration.v2:agent.run`
-- 自动化等级：`A2`
+- 授权策略：`local-runtime.v2:agent.run`
+- 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
@@ -39,11 +39,11 @@ Read VisMockup connection state.
 
 ## 执行与可靠性
 
-- 副作用：`read`
+- 副作用：`write`
 - 执行模式：`local`
 - 超时：30 秒
-- 审批：`none`
-- 幂等：`optional`
+- 审批：`user`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`external`
@@ -59,13 +59,23 @@ Read VisMockup connection state.
 {
   "additionalProperties": false,
   "properties": {
+    "catia_names": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 1000,
+      "minItems": 1,
+      "type": "array"
+    },
     "device_id": {
       "minLength": 1,
       "type": "string"
     }
   },
   "required": [
-    "device_id"
+    "device_id",
+    "catia_names"
   ],
   "type": "object"
 }
@@ -75,10 +85,13 @@ Read VisMockup connection state.
 
 ```json
 {
-  "capability_id": "vismockup.status",
-  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "capability_id": "vismockup.highlight",
+  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
   "major_version": 1,
   "payload": {
+    "catia_names": [
+      "example"
+    ],
     "device_id": "example"
   }
 }

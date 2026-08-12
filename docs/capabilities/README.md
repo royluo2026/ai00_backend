@@ -2,8 +2,8 @@
 
 本目录由不可变 Catalog Release 自动生成，不接受手工修改。
 
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
-- Catalog Hash：`sha256:d588aa2dfa48c41548960d6e92ff3252ecd8c4401b27ba3e35a505bec8f32a05`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
+- Catalog Hash：`sha256:51d142e49671e1a08cc117b946a782ba330ae77c6218154c56998a3364aa41c2`
 - 描述符数量：241
 
 ## 重要边界
@@ -23,7 +23,7 @@
 | `factory` | 19 |
 | `integration` | 13 |
 | `knowledge` | 32 |
-| `local_integration` | 8 |
+| `local_runtime` | 8 |
 | `ontology` | 14 |
 | `project_management` | 32 |
 | `simulation` | 15 |

@@ -1,14 +1,14 @@
-# vismockup.capture@1
+# vismockup.visibility@1
 
-Capture the active VisMockup view as an ArtifactRef.
+Change active-view visibility or selection.
 
 ## 使用判断
 
-- 适用：Capture the active VisMockup view as an ArtifactRef.
+- 适用：Change active-view visibility or selection.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
-- 所属领域：`local_integration`
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
+- 所属领域：`local_runtime`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,7 +28,7 @@ Capture the active VisMockup view as an ArtifactRef.
 
 ## 授权与数据边界
 
-- 授权策略：`local-integration.v2:agent.run`
+- 授权策略：`local-runtime.v2:agent.run`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -48,7 +48,7 @@ Capture the active VisMockup view as an ArtifactRef.
 - 无预期版本信封要求。
 - 一致性：`external`
 - Operation：`required`
-- Artifact：`output`
+- Artifact：`none`
 - 审计：`standard`
 - Evidence：`required`
 - 配额成本：1
@@ -59,13 +59,22 @@ Capture the active VisMockup view as an ArtifactRef.
 {
   "additionalProperties": false,
   "properties": {
+    "action": {
+      "enum": [
+        "all_on",
+        "all_off",
+        "deselect"
+      ],
+      "type": "string"
+    },
     "device_id": {
       "minLength": 1,
       "type": "string"
     }
   },
   "required": [
-    "device_id"
+    "device_id",
+    "action"
   ],
   "type": "object"
 }
@@ -75,10 +84,11 @@ Capture the active VisMockup view as an ArtifactRef.
 
 ```json
 {
-  "capability_id": "vismockup.capture",
-  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "capability_id": "vismockup.visibility",
+  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
   "major_version": 1,
   "payload": {
+    "action": "all_on",
     "device_id": "example"
   }
 }

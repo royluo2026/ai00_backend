@@ -8,7 +8,7 @@ Execute the governed factory.structure.update Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Execute the governed factory.structure.update Factory outcome.
 ```json
 {
   "capability_id": "factory.structure.update",
-  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
   "major_version": 1,
   "payload": {}
 }

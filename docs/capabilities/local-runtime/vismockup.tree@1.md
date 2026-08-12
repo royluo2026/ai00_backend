@@ -1,14 +1,14 @@
-# vismockup.highlight@1
+# vismockup.tree@1
 
-Highlight occurrences by CATIA occurrence name.
+Read the active VisMockup product tree.
 
 ## 使用判断
 
-- 适用：Highlight occurrences by CATIA occurrence name.
+- 适用：Read the active VisMockup product tree.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
-- 所属领域：`local_integration`
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
+- 所属领域：`local_runtime`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,8 +28,8 @@ Highlight occurrences by CATIA occurrence name.
 
 ## 授权与数据边界
 
-- 授权策略：`local-integration.v2:agent.run`
-- 自动化等级：`A1`
+- 授权策略：`local-runtime.v2:agent.run`
+- 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
@@ -39,11 +39,11 @@ Highlight occurrences by CATIA occurrence name.
 
 ## 执行与可靠性
 
-- 副作用：`write`
+- 副作用：`read`
 - 执行模式：`local`
 - 超时：30 秒
-- 审批：`user`
-- 幂等：`required`
+- 审批：`none`
+- 幂等：`optional`
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`external`
@@ -59,23 +59,21 @@ Highlight occurrences by CATIA occurrence name.
 {
   "additionalProperties": false,
   "properties": {
-    "catia_names": {
-      "items": {
-        "minLength": 1,
-        "type": "string"
-      },
-      "maxItems": 1000,
-      "minItems": 1,
-      "type": "array"
-    },
     "device_id": {
       "minLength": 1,
       "type": "string"
+    },
+    "force": {
+      "type": "boolean"
+    },
+    "max_depth": {
+      "maximum": 100,
+      "minimum": 1,
+      "type": "integer"
     }
   },
   "required": [
-    "device_id",
-    "catia_names"
+    "device_id"
   ],
   "type": "object"
 }
@@ -85,13 +83,10 @@ Highlight occurrences by CATIA occurrence name.
 
 ```json
 {
-  "capability_id": "vismockup.highlight",
-  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "capability_id": "vismockup.tree",
+  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
   "major_version": 1,
   "payload": {
-    "catia_names": [
-      "example"
-    ],
     "device_id": "example"
   }
 }

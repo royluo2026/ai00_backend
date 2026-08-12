@@ -1,14 +1,14 @@
-# vismockup.tree@1
+# vismockup.model.open@1
 
-Read the active VisMockup product tree.
+Materialize and open an authorized model ArtifactRef.
 
 ## 使用判断
 
-- 适用：Read the active VisMockup product tree.
+- 适用：Materialize and open an authorized model ArtifactRef.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
-- 所属领域：`local_integration`
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
+- 所属领域：`local_runtime`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,27 +28,28 @@ Read the active VisMockup product tree.
 
 ## 授权与数据边界
 
-- 授权策略：`local-integration.v2:agent.run`
-- 自动化等级：`A2`
+- 授权策略：`local-runtime.v2:agent.run`
+- 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
 - `device` ← `device_id`（必填）
+- `artifact` ← `artifact_ref.artifact_id`（必填）
 
 ## 执行与可靠性
 
-- 副作用：`read`
+- 副作用：`write`
 - 执行模式：`local`
 - 超时：30 秒
-- 审批：`none`
-- 幂等：`optional`
+- 审批：`user`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`external`
 - Operation：`required`
-- Artifact：`none`
+- Artifact：`input`
 - 审计：`standard`
 - Evidence：`required`
 - 配额成本：1
@@ -59,21 +60,53 @@ Read the active VisMockup product tree.
 {
   "additionalProperties": false,
   "properties": {
+    "artifact_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "byte_size": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "media_type": {
+          "enum": [
+            "model/jt",
+            "model/plmxml",
+            "application/vnd.siemens.plmxml+xml",
+            "model/step"
+          ],
+          "type": "string"
+        },
+        "sha256": {
+          "example": "0000000000000000000000000000000000000000000000000000000000000000",
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "media_type",
+        "sha256",
+        "byte_size",
+        "version"
+      ],
+      "type": "object"
+    },
     "device_id": {
       "minLength": 1,
       "type": "string"
-    },
-    "force": {
-      "type": "boolean"
-    },
-    "max_depth": {
-      "maximum": 100,
-      "minimum": 1,
-      "type": "integer"
     }
   },
   "required": [
-    "device_id"
+    "device_id",
+    "artifact_ref"
   ],
   "type": "object"
 }
@@ -83,10 +116,17 @@ Read the active VisMockup product tree.
 
 ```json
 {
-  "capability_id": "vismockup.tree",
-  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "capability_id": "vismockup.model.open",
+  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
   "major_version": 1,
   "payload": {
+    "artifact_ref": {
+      "artifact_id": "example",
+      "byte_size": 0,
+      "media_type": "model/jt",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "version": 1
+    },
     "device_id": "example"
   }
 }

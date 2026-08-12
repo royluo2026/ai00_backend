@@ -8,7 +8,7 @@ craft.bop.validation.get
 - 不适用：Rules are unreviewed or inputs are mutable.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -104,7 +104,7 @@ craft.bop.validation.get
 ```json
 {
   "capability_id": "craft.bop.validation.get",
-  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
   "major_version": 1,
   "payload": {}
 }

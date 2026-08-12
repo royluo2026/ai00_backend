@@ -8,7 +8,7 @@ craft.gbop.release.archive
 - 不适用：The subject is a project BOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_d588aa2dfa48c41548960d6e92ff3252`
+- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -104,7 +104,7 @@ craft.gbop.release.archive
 ```json
 {
   "capability_id": "craft.gbop.release.archive",
-  "catalog_release": "rel_d588aa2dfa48c41548960d6e92ff3252",
+  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
   "major_version": 1,
   "payload": {}
 }
