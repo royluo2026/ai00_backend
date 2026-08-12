@@ -8,7 +8,7 @@ Compare Digital Model snapshots semantically.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`digital_model`
-- Catalog Release：`rel_8040279f7935726fd96d793f13704af6`
+- Catalog Release：`rel_cc58105fccf916e2b43d744d898e593c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -85,7 +85,7 @@ Compare Digital Model snapshots semantically.
 ```json
 {
   "capability_id": "digital_model.snapshot.compare",
-  "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
+  "catalog_release": "rel_cc58105fccf916e2b43d744d898e593c",
   "major_version": 1,
   "payload": {
     "from_version_id": "example",

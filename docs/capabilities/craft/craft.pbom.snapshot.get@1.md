@@ -8,7 +8,7 @@ craft.pbom.snapshot.get
 - 不适用：No exact PBOM snapshot is known.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_8040279f7935726fd96d793f13704af6`
+- Catalog Release：`rel_cc58105fccf916e2b43d744d898e593c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -76,7 +76,7 @@ craft.pbom.snapshot.get
 ```json
 {
   "capability_id": "craft.pbom.snapshot.get",
-  "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
+  "catalog_release": "rel_cc58105fccf916e2b43d744d898e593c",
   "major_version": 1,
   "payload": {
     "snapshot_gid": "example"

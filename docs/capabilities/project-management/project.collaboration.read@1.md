@@ -8,7 +8,7 @@ Execute the reviewed project.collaboration.read project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_8040279f7935726fd96d793f13704af6`
+- Catalog Release：`rel_cc58105fccf916e2b43d744d898e593c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Execute the reviewed project.collaboration.read project outcome.
 ```json
 {
   "capability_id": "project.collaboration.read",
-  "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
+  "catalog_release": "rel_cc58105fccf916e2b43d744d898e593c",
   "major_version": 1,
   "payload": {
     "arguments": {},

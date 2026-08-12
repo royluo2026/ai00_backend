@@ -8,7 +8,7 @@ Preview a draft BOP execution structure at an exact revision.
 - 不适用：The caller needs an official execution source.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_8040279f7935726fd96d793f13704af6`
+- Catalog Release：`rel_cc58105fccf916e2b43d744d898e593c`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -81,7 +81,7 @@ Preview a draft BOP execution structure at an exact revision.
 ```json
 {
   "capability_id": "craft.bop.execution_structure.preview",
-  "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
+  "catalog_release": "rel_cc58105fccf916e2b43d744d898e593c",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,
