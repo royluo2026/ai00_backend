@@ -8,7 +8,7 @@ Highlight occurrences by CATIA occurrence name.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`local_runtime`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -86,7 +86,7 @@ Highlight occurrences by CATIA occurrence name.
 ```json
 {
   "capability_id": "vismockup.highlight",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {
     "catia_names": [

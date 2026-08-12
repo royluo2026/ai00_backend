@@ -8,9 +8,9 @@ Publish an approved proposal as a new immutable inactive release.
 - 不适用：Changing the active release.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
@@ -59,9 +59,17 @@ Publish an approved proposal as a new immutable inactive release.
 {
   "additionalProperties": false,
   "properties": {
-    "content_sha256": {},
-    "proposal_gid": {},
-    "proposal_revision_gid": {}
+    "content_sha256": {
+      "example": "0000000000000000000000000000000000000000000000000000000000000000",
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "proposal_gid": {
+      "type": "string"
+    },
+    "proposal_revision_gid": {
+      "type": "string"
+    }
   },
   "required": [
     "proposal_gid",
@@ -77,10 +85,10 @@ Publish an approved proposal as a new immutable inactive release.
 ```json
 {
   "capability_id": "ontology.release.publish",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {
-    "content_sha256": "example",
+    "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
     "proposal_gid": "example",
     "proposal_revision_gid": "example"
   }
@@ -108,9 +116,7 @@ Publish an approved proposal as a new immutable inactive release.
       "type": "string"
     },
     "created_at": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": "string"
     },
     "created_by": {
       "type": "string"
@@ -133,9 +139,54 @@ Publish an approved proposal as a new immutable inactive release.
           "type": "string"
         },
         "revision_ref": {
-          "additionalProperties": false,
-          "properties": {},
-          "type": "object"
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "commit_id": {
+                  "pattern": "^cmt_[0-9a-f]{40}$",
+                  "type": "string"
+                },
+                "content_hash": {
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "repository": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "owner_domain": {
+                      "type": "string"
+                    },
+                    "repository_id": {
+                      "type": "string"
+                    },
+                    "resource_id": {
+                      "type": "string"
+                    },
+                    "tenant_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "repository_id",
+                    "owner_domain",
+                    "resource_id"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "repository",
+                "commit_id",
+                "content_hash"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -146,25 +197,40 @@ Publish an approved proposal as a new immutable inactive release.
       "type": "object"
     },
     "parent_release_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "release_gid": {
       "type": "string"
     },
     "revision_commit_id": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "source": {
       "type": "string"
     },
     "source_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "required": [

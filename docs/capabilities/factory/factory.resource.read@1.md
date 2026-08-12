@@ -8,7 +8,7 @@ Execute the governed factory.resource.read Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,8 +28,8 @@ Execute the governed factory.resource.read Factory outcome.
 
 ## 授权与数据边界
 
-- 授权策略：`factory.v2:factory.write`
-- 自动化等级：`A1`
+- 授权策略：`factory.v2:factory.read`
+- 自动化等级：`A2`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
@@ -39,15 +39,15 @@ Execute the governed factory.resource.read Factory outcome.
 
 ## 执行与可靠性
 
-- 副作用：`write`
+- 副作用：`read`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
 - 审批：`none`
-- 幂等：`required`
+- 幂等：`none`
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`strong`
-- Operation：`optional`
+- Operation：`none`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`optional`
@@ -83,7 +83,7 @@ Execute the governed factory.resource.read Factory outcome.
 ```json
 {
   "capability_id": "factory.resource.read",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {}
 }

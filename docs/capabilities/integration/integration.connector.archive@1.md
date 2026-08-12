@@ -8,7 +8,7 @@ Execute the governed integration.connector.archive Integration outcome.
 - 不适用：The caller can use an owning domain Capability directly without external integration.
 - 生命周期：`stable`
 - 所属领域：`integration`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -42,7 +42,7 @@ Execute the governed integration.connector.archive Integration outcome.
 - 副作用：`write`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
-- 审批：`none`
+- 审批：`user`
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
@@ -81,7 +81,7 @@ Execute the governed integration.connector.archive Integration outcome.
 ```json
 {
   "capability_id": "integration.connector.archive",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,

@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_ba4496adc4b8a9598b657dda5c86fd23"
+    "version": "rel_27b7fa19d775a064b313534af05a2d3a"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -315,7 +315,7 @@
           }
         },
         "summary": "agent.audit.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -629,7 +629,7 @@
           }
         },
         "summary": "agent.audit.record",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -943,7 +943,7 @@
           }
         },
         "summary": "agent.flow.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -1257,7 +1257,7 @@
           }
         },
         "summary": "agent.flow.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -1571,7 +1571,7 @@
           }
         },
         "summary": "agent.interaction.request",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -1885,7 +1885,7 @@
           }
         },
         "summary": "agent.memory.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -2199,7 +2199,7 @@
           }
         },
         "summary": "agent.memory.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -2513,7 +2513,7 @@
           }
         },
         "summary": "agent.run.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -2827,7 +2827,7 @@
           }
         },
         "summary": "agent.run.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -3141,7 +3141,7 @@
           }
         },
         "summary": "agent.session.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -3455,7 +3455,7 @@
           }
         },
         "summary": "agent.session.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -3769,7 +3769,7 @@
           }
         },
         "summary": "agent.skill.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -4083,7 +4083,7 @@
           }
         },
         "summary": "agent.skill.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -4326,7 +4326,7 @@
           }
         },
         "summary": "base.annotation.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -4569,7 +4569,7 @@
           }
         },
         "summary": "base.annotation.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -4871,7 +4871,7 @@
           }
         },
         "summary": "base.approval.request.cancel",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -5192,7 +5192,7 @@
           }
         },
         "summary": "base.approval.request.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -5502,7 +5502,7 @@
           }
         },
         "summary": "base.approval.request.decide",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -5800,7 +5800,7 @@
           }
         },
         "summary": "base.approval.request.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -6110,7 +6110,7 @@
           }
         },
         "summary": "base.approval.request.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -6353,7 +6353,7 @@
           }
         },
         "summary": "base.authorization.grant.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -6596,7 +6596,7 @@
           }
         },
         "summary": "base.authorization.grant.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -6839,7 +6839,7 @@
           }
         },
         "summary": "base.export_template.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -7082,7 +7082,7 @@
           }
         },
         "summary": "base.export_template.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -7325,7 +7325,7 @@
           }
         },
         "summary": "base.identity.directory.sync",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -7568,7 +7568,7 @@
           }
         },
         "summary": "base.identity.role.assign",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -7811,7 +7811,7 @@
           }
         },
         "summary": "base.identity.session.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -8043,7 +8043,7 @@
           }
         },
         "summary": "base.notification.preference.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -8288,7 +8288,7 @@
           }
         },
         "summary": "base.notification.preference.update",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -8550,7 +8550,7 @@
           }
         },
         "summary": "base.notification.read_state.set",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -8813,7 +8813,7 @@
           }
         },
         "summary": "base.notification.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -9056,7 +9056,7 @@
           }
         },
         "summary": "base.plugin.marketplace.publisher.register",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -9299,7 +9299,7 @@
           }
         },
         "summary": "base.plugin.marketplace.release.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -9542,7 +9542,7 @@
           }
         },
         "summary": "base.plugin.marketplace.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -9820,7 +9820,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -10063,7 +10063,7 @@
           }
         },
         "summary": "base.saved_view.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -10306,7 +10306,7 @@
           }
         },
         "summary": "base.saved_view.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -10549,7 +10549,7 @@
           }
         },
         "summary": "base.team.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -10792,7 +10792,7 @@
           }
         },
         "summary": "base.team.membership.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -11035,7 +11035,7 @@
           }
         },
         "summary": "base.team.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -11296,7 +11296,7 @@
           }
         },
         "summary": "base.workspace.template.publish",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -11550,7 +11550,7 @@
           }
         },
         "summary": "base.workspace.template.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -11820,7 +11820,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -12127,7 +12127,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -12411,7 +12411,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -12700,7 +12700,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -12974,7 +12974,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -13222,7 +13222,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -13526,7 +13526,7 @@
           }
         },
         "summary": "craft.bop.validation.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -13830,7 +13830,7 @@
           }
         },
         "summary": "craft.bop.validation.run",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -14095,7 +14095,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -14372,7 +14372,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -14658,7 +14658,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -15011,7 +15011,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -15272,7 +15272,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -15585,7 +15585,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -15889,7 +15889,7 @@
           }
         },
         "summary": "craft.gbop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -16193,7 +16193,7 @@
           }
         },
         "summary": "craft.gbop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -16497,7 +16497,7 @@
           }
         },
         "summary": "craft.gbop.draft.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -16801,7 +16801,7 @@
           }
         },
         "summary": "craft.gbop.draft.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -17105,7 +17105,7 @@
           }
         },
         "summary": "craft.gbop.draft.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -17409,7 +17409,7 @@
           }
         },
         "summary": "craft.gbop.draft.submit",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -17657,7 +17657,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -17900,7 +17900,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -18148,7 +18148,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -18452,7 +18452,7 @@
           }
         },
         "summary": "craft.gbop.release.activate",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -18756,7 +18756,7 @@
           }
         },
         "summary": "craft.gbop.release.archive",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -19060,7 +19060,7 @@
           }
         },
         "summary": "craft.gbop.release.compare",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -19364,7 +19364,7 @@
           }
         },
         "summary": "craft.gbop.release.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -19668,7 +19668,7 @@
           }
         },
         "summary": "craft.gbop.release.publish",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -19972,7 +19972,7 @@
           }
         },
         "summary": "craft.gbop.release.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -20233,7 +20233,7 @@
           }
         },
         "summary": "craft.pbom.draft.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -20488,7 +20488,7 @@
           }
         },
         "summary": "craft.pbom.draft.change.preview",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -20737,7 +20737,7 @@
           }
         },
         "summary": "craft.pbom.import.preview",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -20990,7 +20990,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -21238,7 +21238,7 @@
           }
         },
         "summary": "craft.pbom.version.archive",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -21491,7 +21491,7 @@
           }
         },
         "summary": "craft.pbom.version.compare",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -21771,7 +21771,7 @@
           }
         },
         "summary": "craft.pbom.version.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -22029,7 +22029,7 @@
           }
         },
         "summary": "craft.pbom.version.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -22277,7 +22277,7 @@
           }
         },
         "summary": "craft.pbom.version.publish",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -22519,7 +22519,7 @@
           }
         },
         "summary": "craft.pbom.version.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -22767,7 +22767,7 @@
           }
         },
         "summary": "craft.pbom.version.submit",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -23071,7 +23071,7 @@
           }
         },
         "summary": "craft.rule.draft.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -23375,7 +23375,7 @@
           }
         },
         "summary": "craft.rule.draft.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -23679,7 +23679,7 @@
           }
         },
         "summary": "craft.rule.draft.revise",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -23983,7 +23983,7 @@
           }
         },
         "summary": "craft.rule.draft.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -24287,7 +24287,7 @@
           }
         },
         "summary": "craft.rule.draft.submit",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -24591,7 +24591,7 @@
           }
         },
         "summary": "craft.rule.evaluate",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -24895,7 +24895,7 @@
           }
         },
         "summary": "craft.rule.release.activate",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -25199,7 +25199,7 @@
           }
         },
         "summary": "craft.rule.release.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -25503,7 +25503,7 @@
           }
         },
         "summary": "craft.rule.release.publish",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -25807,7 +25807,7 @@
           }
         },
         "summary": "craft.rule.release.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -26111,7 +26111,7 @@
           }
         },
         "summary": "craft.rule.waiver.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -26415,7 +26415,7 @@
           }
         },
         "summary": "craft.rule.waiver.revoke",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -26719,7 +26719,7 @@
           }
         },
         "summary": "craft.rule.waiver.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -27022,7 +27022,7 @@
           }
         },
         "summary": "digital_model.component.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -27282,7 +27282,7 @@
           }
         },
         "summary": "digital_model.model.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -27538,7 +27538,7 @@
           }
         },
         "summary": "digital_model.model.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -27817,7 +27817,7 @@
           }
         },
         "summary": "digital_model.model.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -28079,7 +28079,7 @@
           }
         },
         "summary": "digital_model.version.compare",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -28461,7 +28461,7 @@
           }
         },
         "summary": "digital_model.version.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -28804,7 +28804,7 @@
           }
         },
         "summary": "digital_model.version.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -29042,7 +29042,7 @@
           }
         },
         "summary": "digital_model.version.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -29285,7 +29285,7 @@
           }
         },
         "summary": "factory.asset.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -29528,7 +29528,7 @@
           }
         },
         "summary": "factory.asset.maintenance.complete",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -29771,7 +29771,7 @@
           }
         },
         "summary": "factory.asset.maintenance.start",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -30014,7 +30014,7 @@
           }
         },
         "summary": "factory.asset.register",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -30257,7 +30257,7 @@
           }
         },
         "summary": "factory.asset.scrap",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -30500,7 +30500,7 @@
           }
         },
         "summary": "factory.asset.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -30743,7 +30743,7 @@
           }
         },
         "summary": "factory.asset.update",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -30986,7 +30986,7 @@
           }
         },
         "summary": "factory.resource.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -31229,7 +31229,7 @@
           }
         },
         "summary": "factory.resource_catalog.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -31472,7 +31472,7 @@
           }
         },
         "summary": "factory.resource_catalog.deprecate",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -31715,7 +31715,7 @@
           }
         },
         "summary": "factory.resource_catalog.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -31958,7 +31958,7 @@
           }
         },
         "summary": "factory.resource_catalog.publish",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -32201,7 +32201,7 @@
           }
         },
         "summary": "factory.resource_catalog.revise",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -32444,7 +32444,7 @@
           }
         },
         "summary": "factory.resource_catalog.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -32687,7 +32687,7 @@
           }
         },
         "summary": "factory.structure.archive",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -32930,7 +32930,7 @@
           }
         },
         "summary": "factory.structure.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -33173,7 +33173,7 @@
           }
         },
         "summary": "factory.structure.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -33416,7 +33416,7 @@
           }
         },
         "summary": "factory.structure.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -33659,7 +33659,7 @@
           }
         },
         "summary": "factory.structure.update",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -33904,7 +33904,7 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -34148,7 +34148,7 @@
           }
         },
         "summary": "integration.connector.archive",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -34385,7 +34385,7 @@
           }
         },
         "summary": "integration.connector.connection.test",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -34661,7 +34661,7 @@
           }
         },
         "summary": "integration.connector.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -34900,7 +34900,7 @@
           }
         },
         "summary": "integration.connector.schema.discover",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -35141,7 +35141,7 @@
           }
         },
         "summary": "integration.connector.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -35398,7 +35398,7 @@
           }
         },
         "summary": "integration.connector.update",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -35642,7 +35642,7 @@
           }
         },
         "summary": "integration.mapping.archive",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -35942,7 +35942,7 @@
           }
         },
         "summary": "integration.mapping.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -36213,7 +36213,7 @@
           }
         },
         "summary": "integration.mapping.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -36461,7 +36461,7 @@
           }
         },
         "summary": "integration.mapping.preview",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -36702,7 +36702,7 @@
           }
         },
         "summary": "integration.mapping.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -36976,7 +36976,7 @@
           }
         },
         "summary": "integration.mapping.update",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -37237,7 +37237,7 @@
           }
         },
         "summary": "integration.sync.start",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -37553,7 +37553,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -37835,7 +37835,7 @@
           }
         },
         "summary": "knowledge.document.acl.grant",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -38131,7 +38131,7 @@
           }
         },
         "summary": "knowledge.document.acl.list",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -38404,7 +38404,7 @@
           }
         },
         "summary": "knowledge.document.acl.revoke",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -38645,7 +38645,7 @@
           }
         },
         "summary": "knowledge.document.archive",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -38947,7 +38947,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -39213,7 +39213,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -39495,7 +39495,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -39830,7 +39830,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -40114,7 +40114,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -40407,7 +40407,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -40742,7 +40742,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -41026,7 +41026,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -41323,7 +41323,7 @@
           }
         },
         "summary": "knowledge.document.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -41564,7 +41564,7 @@
           }
         },
         "summary": "knowledge.entry.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -41916,7 +41916,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -42426,7 +42426,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -42667,7 +42667,7 @@
           }
         },
         "summary": "knowledge.personalization.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -42908,7 +42908,7 @@
           }
         },
         "summary": "knowledge.personalization.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -43280,7 +43280,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -43674,7 +43674,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -44018,7 +44018,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -44347,7 +44347,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -44731,7 +44731,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -45120,7 +45120,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -45348,7 +45348,7 @@
           }
         },
         "summary": "knowledge.reference_data.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -45576,7 +45576,7 @@
           }
         },
         "summary": "knowledge.reference_data.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -45955,7 +45955,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -46196,7 +46196,7 @@
           }
         },
         "summary": "knowledge.space.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -46469,7 +46469,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -46744,7 +46744,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -47019,7 +47019,7 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -47487,7 +47487,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -47501,8 +47501,66 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "base_release_gid": {},
-                  "changes": {}
+                  "base_release_gid": {
+                    "type": "string"
+                  },
+                  "changes": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "operation": {
+                          "type": "string"
+                        },
+                        "source_evidence": {
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "type": "array"
+                        },
+                        "stable_gid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "operation",
+                        "stable_gid",
+                        "value",
+                        "source_evidence"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
                 },
                 "required": [
                   "base_release_gid",
@@ -47600,9 +47658,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -47618,7 +47721,55 @@
                             "changes": {
                               "items": {
                                 "additionalProperties": false,
-                                "properties": {},
+                                "properties": {
+                                  "operation": {
+                                    "type": "string"
+                                  },
+                                  "source_evidence": {
+                                    "items": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "boolean"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "type": "array"
+                                  },
+                                  "stable_gid": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "operation",
+                                  "stable_gid",
+                                  "value",
+                                  "source_evidence"
+                                ],
                                 "type": "object"
                               },
                               "type": "array"
@@ -47631,9 +47782,7 @@
                               "type": "string"
                             },
                             "created_at": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "type": "string"
                             },
                             "proposal_gid": {
                               "type": "string"
@@ -47787,7 +47936,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -47801,7 +47950,9 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "proposal_gid": {}
+                  "proposal_gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "proposal_gid"
@@ -47898,9 +48049,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -47916,7 +48112,55 @@
                             "changes": {
                               "items": {
                                 "additionalProperties": false,
-                                "properties": {},
+                                "properties": {
+                                  "operation": {
+                                    "type": "string"
+                                  },
+                                  "source_evidence": {
+                                    "items": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "boolean"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "type": "array"
+                                  },
+                                  "stable_gid": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "operation",
+                                  "stable_gid",
+                                  "value",
+                                  "source_evidence"
+                                ],
                                 "type": "object"
                               },
                               "type": "array"
@@ -47929,9 +48173,7 @@
                               "type": "string"
                             },
                             "created_at": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "type": "string"
                             },
                             "proposal_gid": {
                               "type": "string"
@@ -48085,7 +48327,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -48099,10 +48341,29 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "content_sha256": {},
-                  "decision": {},
-                  "proposal_gid": {},
-                  "proposal_revision_gid": {}
+                  "comment": {
+                    "maxLength": 4000,
+                    "type": "string"
+                  },
+                  "content_sha256": {
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "decision": {
+                    "enum": [
+                      "approve",
+                      "reject",
+                      "request_changes"
+                    ],
+                    "type": "string"
+                  },
+                  "proposal_gid": {
+                    "type": "string"
+                  },
+                  "proposal_revision_gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "proposal_gid",
@@ -48348,7 +48609,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -48584,7 +48845,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -48719,9 +48980,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -48880,7 +49186,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -49011,9 +49317,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -49176,7 +49527,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -49471,7 +49822,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -49715,7 +50066,7 @@
           }
         },
         "summary": "ontology.mapping.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -49729,10 +50080,48 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "attestations": {},
-                  "expected_active_release_gid": {},
-                  "release_gid": {},
-                  "release_sha256": {}
+                  "attestations": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "blocking_count": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "provider",
+                        "status",
+                        "blocking_count"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "expected_active_release_gid": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "release_gid": {
+                    "type": "string"
+                  },
+                  "release_sha256": {
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "release_gid",
@@ -49829,9 +50218,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -49985,7 +50419,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -49999,8 +50433,12 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "from_release_gid": {},
-                  "to_release_gid": {}
+                  "from_release_gid": {
+                    "type": "string"
+                  },
+                  "to_release_gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "from_release_gid",
@@ -50097,33 +50535,77 @@
                               "properties": {
                                 "added": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "changed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "deprecated": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "removed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 }
@@ -50141,33 +50623,77 @@
                               "properties": {
                                 "added": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "changed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "deprecated": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "removed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 }
@@ -50191,9 +50717,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -50211,33 +50782,77 @@
                               "properties": {
                                 "added": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "changed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "deprecated": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "removed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 }
@@ -50255,33 +50870,77 @@
                               "properties": {
                                 "added": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "changed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "deprecated": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "removed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 }
@@ -50299,33 +50958,77 @@
                               "properties": {
                                 "added": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "changed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "deprecated": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 },
                                 "removed": {
                                   "items": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "type": "array"
                                 }
@@ -50349,9 +51052,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -50504,7 +51252,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -50609,9 +51357,7 @@
                               "type": "string"
                             },
                             "created_at": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "type": "string"
                             },
                             "created_by": {
                               "type": "string"
@@ -50634,9 +51380,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -50647,25 +51438,40 @@
                               "type": "object"
                             },
                             "parent_release_gid": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             },
                             "release_gid": {
                               "type": "string"
                             },
                             "revision_commit_id": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             },
                             "source": {
                               "type": "string"
                             },
                             "source_gid": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             }
                           },
                           "required": [
@@ -50800,7 +51606,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -50814,9 +51620,17 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "content_sha256": {},
-                  "proposal_gid": {},
-                  "proposal_revision_gid": {}
+                  "content_sha256": {
+                    "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                    "pattern": "^[0-9a-f]{64}$",
+                    "type": "string"
+                  },
+                  "proposal_gid": {
+                    "type": "string"
+                  },
+                  "proposal_revision_gid": {
+                    "type": "string"
+                  }
                 },
                 "required": [
                   "proposal_gid",
@@ -50914,9 +51728,7 @@
                               "type": "string"
                             },
                             "created_at": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "type": "string"
                             },
                             "created_by": {
                               "type": "string"
@@ -50939,9 +51751,54 @@
                                   "type": "string"
                                 },
                                 "revision_ref": {
-                                  "additionalProperties": false,
-                                  "properties": {},
-                                  "type": "object"
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "commit_id": {
+                                          "pattern": "^cmt_[0-9a-f]{40}$",
+                                          "type": "string"
+                                        },
+                                        "content_hash": {
+                                          "pattern": "^sha256:[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "repository": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "owner_domain": {
+                                              "type": "string"
+                                            },
+                                            "repository_id": {
+                                              "type": "string"
+                                            },
+                                            "resource_id": {
+                                              "type": "string"
+                                            },
+                                            "tenant_id": {
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "tenant_id",
+                                            "repository_id",
+                                            "owner_domain",
+                                            "resource_id"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "repository",
+                                        "commit_id",
+                                        "content_hash"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
                                 }
                               },
                               "required": [
@@ -50952,25 +51809,40 @@
                               "type": "object"
                             },
                             "parent_release_gid": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             },
                             "release_gid": {
                               "type": "string"
                             },
                             "revision_commit_id": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             },
                             "source": {
                               "type": "string"
                             },
                             "source_gid": {
-                              "additionalProperties": false,
-                              "properties": {},
-                              "type": "object"
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             }
                           },
                           "required": [
@@ -51105,7 +51977,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -51214,9 +52086,7 @@
                                     "type": "string"
                                   },
                                   "created_at": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "type": "string"
                                   },
                                   "created_by": {
                                     "type": "string"
@@ -51239,9 +52109,54 @@
                                         "type": "string"
                                       },
                                       "revision_ref": {
-                                        "additionalProperties": false,
-                                        "properties": {},
-                                        "type": "object"
+                                        "anyOf": [
+                                          {
+                                            "additionalProperties": false,
+                                            "properties": {
+                                              "commit_id": {
+                                                "pattern": "^cmt_[0-9a-f]{40}$",
+                                                "type": "string"
+                                              },
+                                              "content_hash": {
+                                                "pattern": "^sha256:[0-9a-f]{64}$",
+                                                "type": "string"
+                                              },
+                                              "repository": {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "owner_domain": {
+                                                    "type": "string"
+                                                  },
+                                                  "repository_id": {
+                                                    "type": "string"
+                                                  },
+                                                  "resource_id": {
+                                                    "type": "string"
+                                                  },
+                                                  "tenant_id": {
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": [
+                                                  "tenant_id",
+                                                  "repository_id",
+                                                  "owner_domain",
+                                                  "resource_id"
+                                                ],
+                                                "type": "object"
+                                              }
+                                            },
+                                            "required": [
+                                              "repository",
+                                              "commit_id",
+                                              "content_hash"
+                                            ],
+                                            "type": "object"
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
                                       }
                                     },
                                     "required": [
@@ -51252,25 +52167,40 @@
                                     "type": "object"
                                   },
                                   "parent_release_gid": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "release_gid": {
                                     "type": "string"
                                   },
                                   "revision_commit_id": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   },
                                   "source": {
                                     "type": "string"
                                   },
                                   "source_gid": {
-                                    "additionalProperties": false,
-                                    "properties": {},
-                                    "type": "object"
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   }
                                 },
                                 "required": [
@@ -51418,7 +52348,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -51662,7 +52592,7 @@
           }
         },
         "summary": "ontology.schema.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -51903,7 +52833,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -52144,7 +53074,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -52396,7 +53326,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -52637,7 +53567,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -52878,7 +53808,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -53118,7 +54048,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -53365,7 +54295,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -53622,7 +54552,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -53868,7 +54798,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -54109,7 +55039,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -54371,7 +55301,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -54614,7 +55544,7 @@
           }
         },
         "summary": "project.activity.aggregate",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -54857,7 +55787,7 @@
           }
         },
         "summary": "project.approval.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -55100,7 +56030,7 @@
           }
         },
         "summary": "project.approval.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -55343,7 +56273,7 @@
           }
         },
         "summary": "project.bitable_binding.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -55586,7 +56516,7 @@
           }
         },
         "summary": "project.bitable_binding.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -55829,7 +56759,7 @@
           }
         },
         "summary": "project.change_log.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -56072,7 +57002,7 @@
           }
         },
         "summary": "project.collaboration.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -56315,7 +57245,7 @@
           }
         },
         "summary": "project.collaboration.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -56558,7 +57488,7 @@
           }
         },
         "summary": "project.craft_scope.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -56801,7 +57731,7 @@
           }
         },
         "summary": "project.follow.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -57044,7 +57974,7 @@
           }
         },
         "summary": "project.follow.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -57287,7 +58217,7 @@
           }
         },
         "summary": "project.issue.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -57530,7 +58460,7 @@
           }
         },
         "summary": "project.issue.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -57773,7 +58703,7 @@
           }
         },
         "summary": "project.list.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -58016,7 +58946,7 @@
           }
         },
         "summary": "project.list.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -58259,7 +59189,7 @@
           }
         },
         "summary": "project.member.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -58502,7 +59432,7 @@
           }
         },
         "summary": "project.member.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -58745,7 +59675,7 @@
           }
         },
         "summary": "project.notification.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -58988,7 +59918,7 @@
           }
         },
         "summary": "project.notification.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -59231,7 +60161,7 @@
           }
         },
         "summary": "project.permission_request.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -59474,7 +60404,7 @@
           }
         },
         "summary": "project.permission_request.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -59717,7 +60647,7 @@
           }
         },
         "summary": "project.project.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -59960,7 +60890,7 @@
           }
         },
         "summary": "project.project.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -60203,7 +61133,7 @@
           }
         },
         "summary": "project.sharing.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -60446,7 +61376,7 @@
           }
         },
         "summary": "project.sharing.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -60689,7 +61619,7 @@
           }
         },
         "summary": "project.task.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -60932,7 +61862,7 @@
           }
         },
         "summary": "project.task.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -61175,7 +62105,7 @@
           }
         },
         "summary": "project.task_template.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -61418,7 +62348,7 @@
           }
         },
         "summary": "project.task_template.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -61661,7 +62591,7 @@
           }
         },
         "summary": "project.workbench.change.apply",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -61904,7 +62834,7 @@
           }
         },
         "summary": "project.workbench.read",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -62156,7 +63086,7 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -62605,7 +63535,7 @@
           }
         },
         "summary": "simulation.environment.archive",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -63182,7 +64112,7 @@
           }
         },
         "summary": "simulation.environment.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -63631,7 +64561,7 @@
           }
         },
         "summary": "simulation.environment.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -64095,7 +65025,7 @@
           }
         },
         "summary": "simulation.environment.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -64408,7 +65338,7 @@
           }
         },
         "summary": "simulation.parameter_set.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -64713,7 +65643,7 @@
           }
         },
         "summary": "simulation.parameter_set.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -65020,7 +65950,7 @@
           }
         },
         "summary": "simulation.parameter_set.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -65396,7 +66326,7 @@
           }
         },
         "summary": "simulation.result.compare",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -65700,7 +66630,7 @@
           }
         },
         "summary": "simulation.result.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -65995,7 +66925,7 @@
           }
         },
         "summary": "simulation.run.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -66308,7 +67238,7 @@
           }
         },
         "summary": "simulation.run.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -66603,7 +67533,7 @@
           }
         },
         "summary": "simulation.run.start",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -66926,7 +67856,7 @@
           }
         },
         "summary": "simulation.solver_profile.create",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -67236,7 +68166,7 @@
           }
         },
         "summary": "simulation.solver_profile.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -67548,7 +68478,7 @@
           }
         },
         "summary": "simulation.solver_profile.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -67787,7 +68717,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -68038,7 +68968,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -68287,7 +69217,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -68536,7 +69466,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -68791,7 +69721,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -69060,7 +69990,7 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -69312,7 +70242,7 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -69574,7 +70504,7 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -69826,7 +70756,7 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -70118,7 +71048,7 @@
           }
         },
         "summary": "vismockup.model.open",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -70370,7 +71300,7 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -70630,7 +71560,7 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     },
@@ -70891,7 +71821,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+        "x-ai00-catalog-release": "rel_27b7fa19d775a064b313534af05a2d3a",
         "x-ai00-major-version": 1
       }
     }

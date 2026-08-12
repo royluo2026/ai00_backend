@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_ba4496adc4b8a9598b657dda5c86fd23",
-  "catalog_hash": "sha256:ba4496adc4b8a9598b657dda5c86fd23fcd5a87505b66778f446cb5e3e08bec1",
+  "release_id": "rel_27b7fa19d775a064b313534af05a2d3a",
+  "catalog_hash": "sha256:27b7fa19d775a064b313534af05a2d3a04139271355383b6c0b84c8af241a1e4",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -473,7 +473,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -730,7 +730,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -1244,7 +1244,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -1501,7 +1501,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -2015,7 +2015,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -2529,7 +2529,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -3043,7 +3043,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -23498,7 +23498,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -23620,7 +23620,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -23742,7 +23742,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -24108,7 +24108,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -24156,7 +24156,7 @@
       "description": "Execute the governed factory.resource.read Factory outcome.",
       "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
       "do_not_use_when": "The resource is a BOP plan node or production schedule.",
-      "side_effect_level": "write",
+      "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -24167,8 +24167,8 @@
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A1",
-      "authorization_policy": "factory.v2:factory.write",
+      "automation_level": "A2",
+      "authorization_policy": "factory.v2:factory.read",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -24223,10 +24223,10 @@
       },
       "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
-      "operation_policy": "optional",
+      "operation_policy": "none",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "required",
+      "idempotency_policy": "none",
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
@@ -24352,7 +24352,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -24474,7 +24474,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -24718,7 +24718,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -24840,7 +24840,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -25084,7 +25084,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -25206,7 +25206,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -25572,7 +25572,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -25839,7 +25839,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -25966,7 +25966,7 @@
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -26140,7 +26140,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -26558,7 +26558,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -26694,7 +26694,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -26892,7 +26892,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -27535,7 +27535,7 @@
       "consistency_policy": "strong",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -27710,7 +27710,7 @@
       "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
-      "confirmation_policy": "none",
+      "confirmation_policy": "user",
       "evidence_policy": "required",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -36424,14 +36424,72 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "base_release_gid": {
+            "type": "string"
+          },
+          "changes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "operation",
+                "stable_gid",
+                "value",
+                "source_evidence"
+              ],
+              "properties": {
+                "operation": {
+                  "type": "string"
+                },
+                "stable_gid": {
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "source_evidence": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
         "required": [
           "base_release_gid",
           "changes"
         ],
-        "properties": {
-          "base_release_gid": {},
-          "changes": {}
-        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -36469,7 +36527,55 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {},
+              "required": [
+                "operation",
+                "stable_gid",
+                "value",
+                "source_evidence"
+              ],
+              "properties": {
+                "operation": {
+                  "type": "string"
+                },
+                "stable_gid": {
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "source_evidence": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
               "additionalProperties": false
             }
           },
@@ -36483,9 +36589,7 @@
             "type": "string"
           },
           "created_at": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": "string"
           },
           "base_ontology_version_ref": {
             "type": "object",
@@ -36503,9 +36607,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -36548,7 +36697,55 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {},
+              "required": [
+                "operation",
+                "stable_gid",
+                "value",
+                "source_evidence"
+              ],
+              "properties": {
+                "operation": {
+                  "type": "string"
+                },
+                "stable_gid": {
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "source_evidence": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
               "additionalProperties": false
             }
           },
@@ -36562,9 +36759,7 @@
             "type": "string"
           },
           "created_at": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": "string"
           },
           "base_ontology_version_ref": {
             "type": "object",
@@ -36582,9 +36777,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -36592,7 +36832,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:636ab3d454724d0dd0ee13dd59e643b5c386dcdd7c21fa30a76868222d0893cf",
+      "schema_hash": "sha256:7fc40720a315223f8ad89b6cc7d0139a00246dcd42a15ca415daa055ebed1e7b",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -36658,12 +36898,14 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          }
+        },
         "required": [
           "proposal_gid"
         ],
-        "properties": {
-          "proposal_gid": {}
-        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -36701,7 +36943,55 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {},
+              "required": [
+                "operation",
+                "stable_gid",
+                "value",
+                "source_evidence"
+              ],
+              "properties": {
+                "operation": {
+                  "type": "string"
+                },
+                "stable_gid": {
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "source_evidence": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
               "additionalProperties": false
             }
           },
@@ -36715,9 +37005,7 @@
             "type": "string"
           },
           "created_at": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": "string"
           },
           "base_ontology_version_ref": {
             "type": "object",
@@ -36735,9 +37023,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -36780,7 +37113,55 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {},
+              "required": [
+                "operation",
+                "stable_gid",
+                "value",
+                "source_evidence"
+              ],
+              "properties": {
+                "operation": {
+                  "type": "string"
+                },
+                "stable_gid": {
+                  "type": "string"
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "source_evidence": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                }
+              },
               "additionalProperties": false
             }
           },
@@ -36794,9 +37175,7 @@
             "type": "string"
           },
           "created_at": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": "string"
           },
           "base_ontology_version_ref": {
             "type": "object",
@@ -36814,9 +37193,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -36824,7 +37248,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:cbba1c07ff27e7d9c93893020d4ff8ebfcd7c12b62c65f08218919dd745e8678",
+      "schema_hash": "sha256:94bdf598affb054b38d5a599f7fb0c4ba2035bfdb1a3d9639dbf3c1b220d131a",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -36890,18 +37314,37 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          },
+          "proposal_revision_gid": {
+            "type": "string"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "example": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject",
+              "request_changes"
+            ]
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        },
         "required": [
           "proposal_gid",
           "proposal_revision_gid",
           "content_sha256",
           "decision"
         ],
-        "properties": {
-          "proposal_gid": {},
-          "proposal_revision_gid": {},
-          "content_sha256": {},
-          "decision": {}
-        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -36980,7 +37423,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:39cb7133ea7c58415800c12773f4f01bf9c5ff20447074f3f777a1e2fbe1984c",
+      "schema_hash": "sha256:c7f7769af61a199d240f0e2f1367376ba928f69beff986b4f5f551e6aca56351",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -37234,9 +37677,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -37289,9 +37777,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -37299,7 +37832,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a829d4dece8ffc35254ef33ebcaf087e267823a0585de53706f86d0570c27c3f",
+      "schema_hash": "sha256:44fde9f0556c1ddabb5643640eb92fea203222f656b47c2e6ac64fd94e93b4aa",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -37440,9 +37973,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -37512,9 +38090,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -37522,7 +38145,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:8d2522ec67dd808a246c76afa0d3e37a003fb6e671a0000672a4ad98e9a3f846",
+      "schema_hash": "sha256:41712052fa26952463d3945803445e788bbdd13942c1eb47d7ec77f23964ff22",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -37881,18 +38504,56 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "release_gid": {
+            "type": "string"
+          },
+          "release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "example": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "expected_active_release_gid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "attestations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "blocking_count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "provider",
+                "status",
+                "blocking_count"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
         "required": [
           "release_gid",
           "release_sha256",
           "expected_active_release_gid",
           "attestations"
         ],
-        "properties": {
-          "release_gid": {},
-          "release_sha256": {},
-          "expected_active_release_gid": {},
-          "attestations": {}
-        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -37930,9 +38591,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -37975,9 +38681,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -37985,7 +38736,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:e35c1da4b4567aee8caf5f28f14d9110d1bfd6b49f9f2f41d020fca600f25f77",
+      "schema_hash": "sha256:4e9bf175b7de1f83e3b7ef9fc50f39d6d82edc1c03c93037e3fda648caa8d3e2",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
@@ -38051,14 +38802,18 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "from_release_gid": {
+            "type": "string"
+          },
+          "to_release_gid": {
+            "type": "string"
+          }
+        },
         "required": [
           "from_release_gid",
           "to_release_gid"
         ],
-        "properties": {
-          "from_release_gid": {},
-          "to_release_gid": {}
-        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -38088,33 +38843,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38132,33 +38931,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38176,33 +39019,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38220,33 +39107,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38264,33 +39195,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38326,9 +39301,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -38349,9 +39369,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -38386,33 +39451,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38430,33 +39539,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38474,33 +39627,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38518,33 +39715,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38562,33 +39803,77 @@
               "added": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "changed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "deprecated": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "removed": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             },
@@ -38624,9 +39909,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -38647,9 +39977,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -38657,7 +40032,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:831b04545091f6b6f42c144c35b2f19ba94637125682cda580445bcad6c9bae1",
+      "schema_hash": "sha256:9f4336c28a27adb3ba557dc24ee53ea5f620b2e84087c6b3d4a3fa194f8ac0c8",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -38738,9 +40113,14 @@
             "type": "string"
           },
           "parent_release_gid": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "content_sha256": {
             "type": "string",
@@ -38757,22 +40137,30 @@
             "type": "string"
           },
           "source_gid": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "revision_commit_id": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "created_by": {
             "type": "string"
           },
           "created_at": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": "string"
           },
           "compatibility": {
             "type": "string",
@@ -38798,9 +40186,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -38820,9 +40253,14 @@
             "type": "string"
           },
           "parent_release_gid": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "content_sha256": {
             "type": "string",
@@ -38839,22 +40277,30 @@
             "type": "string"
           },
           "source_gid": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "revision_commit_id": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "created_by": {
             "type": "string"
           },
           "created_at": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": "string"
           },
           "compatibility": {
             "type": "string",
@@ -38880,9 +40326,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -38890,7 +40381,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:1305002f5615aca9915e5615c16a7ece1233124f5bf68557d8e51658bcf6743e",
+      "schema_hash": "sha256:0625558a15885795833deb731c43b0037ce410bf3711b8f8ab19f333bd00d9ac",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -38956,16 +40447,24 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
+        "properties": {
+          "proposal_gid": {
+            "type": "string"
+          },
+          "proposal_revision_gid": {
+            "type": "string"
+          },
+          "content_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "example": "0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        },
         "required": [
           "proposal_gid",
           "proposal_revision_gid",
           "content_sha256"
         ],
-        "properties": {
-          "proposal_gid": {},
-          "proposal_revision_gid": {},
-          "content_sha256": {}
-        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -38980,9 +40479,14 @@
             "type": "string"
           },
           "parent_release_gid": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "content_sha256": {
             "type": "string",
@@ -38999,22 +40503,30 @@
             "type": "string"
           },
           "source_gid": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "revision_commit_id": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "created_by": {
             "type": "string"
           },
           "created_at": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": "string"
           },
           "compatibility": {
             "type": "string",
@@ -39040,9 +40552,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -39062,9 +40619,14 @@
             "type": "string"
           },
           "parent_release_gid": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "content_sha256": {
             "type": "string",
@@ -39081,22 +40643,30 @@
             "type": "string"
           },
           "source_gid": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "revision_commit_id": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "created_by": {
             "type": "string"
           },
           "created_at": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": "string"
           },
           "compatibility": {
             "type": "string",
@@ -39122,9 +40692,54 @@
                 "pattern": "^sha256:[0-9a-f]{64}$"
               },
               "revision_ref": {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "repository",
+                      "commit_id",
+                      "content_hash"
+                    ],
+                    "properties": {
+                      "repository": {
+                        "type": "object",
+                        "required": [
+                          "tenant_id",
+                          "repository_id",
+                          "owner_domain",
+                          "resource_id"
+                        ],
+                        "properties": {
+                          "tenant_id": {
+                            "type": "string"
+                          },
+                          "repository_id": {
+                            "type": "string"
+                          },
+                          "owner_domain": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "commit_id": {
+                        "type": "string",
+                        "pattern": "^cmt_[0-9a-f]{40}$"
+                      },
+                      "content_hash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               }
             },
             "additionalProperties": false
@@ -39132,7 +40747,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:04fb98466a2e32fe27f5d37570eedc395e5b403bafe563effb334ecdbc699860",
+      "schema_hash": "sha256:d82c515ba4016c9d8f744e312d2311cbbdc5b05e2c5130a557a40be147fbe16e",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -39222,9 +40837,14 @@
                   "type": "string"
                 },
                 "parent_release_gid": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "content_sha256": {
                   "type": "string",
@@ -39241,22 +40861,30 @@
                   "type": "string"
                 },
                 "source_gid": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "revision_commit_id": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "created_by": {
                   "type": "string"
                 },
                 "created_at": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "type": "string"
                 },
                 "compatibility": {
                   "type": "string",
@@ -39282,9 +40910,54 @@
                       "pattern": "^sha256:[0-9a-f]{64}$"
                     },
                     "revision_ref": {
-                      "type": "object",
-                      "properties": {},
-                      "additionalProperties": false
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "repository",
+                            "commit_id",
+                            "content_hash"
+                          ],
+                          "properties": {
+                            "repository": {
+                              "type": "object",
+                              "required": [
+                                "tenant_id",
+                                "repository_id",
+                                "owner_domain",
+                                "resource_id"
+                              ],
+                              "properties": {
+                                "tenant_id": {
+                                  "type": "string"
+                                },
+                                "repository_id": {
+                                  "type": "string"
+                                },
+                                "owner_domain": {
+                                  "type": "string"
+                                },
+                                "resource_id": {
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "commit_id": {
+                              "type": "string",
+                              "pattern": "^cmt_[0-9a-f]{40}$"
+                            },
+                            "content_hash": {
+                              "type": "string",
+                              "pattern": "^sha256:[0-9a-f]{64}$"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "additionalProperties": false
@@ -39321,9 +40994,14 @@
                   "type": "string"
                 },
                 "parent_release_gid": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "content_sha256": {
                   "type": "string",
@@ -39340,22 +41018,30 @@
                   "type": "string"
                 },
                 "source_gid": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "revision_commit_id": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "created_by": {
                   "type": "string"
                 },
                 "created_at": {
-                  "type": "object",
-                  "properties": {},
-                  "additionalProperties": false
+                  "type": "string"
                 },
                 "compatibility": {
                   "type": "string",
@@ -39381,9 +41067,54 @@
                       "pattern": "^sha256:[0-9a-f]{64}$"
                     },
                     "revision_ref": {
-                      "type": "object",
-                      "properties": {},
-                      "additionalProperties": false
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "repository",
+                            "commit_id",
+                            "content_hash"
+                          ],
+                          "properties": {
+                            "repository": {
+                              "type": "object",
+                              "required": [
+                                "tenant_id",
+                                "repository_id",
+                                "owner_domain",
+                                "resource_id"
+                              ],
+                              "properties": {
+                                "tenant_id": {
+                                  "type": "string"
+                                },
+                                "repository_id": {
+                                  "type": "string"
+                                },
+                                "owner_domain": {
+                                  "type": "string"
+                                },
+                                "resource_id": {
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            "commit_id": {
+                              "type": "string",
+                              "pattern": "^cmt_[0-9a-f]{40}$"
+                            },
+                            "content_hash": {
+                              "type": "string",
+                              "pattern": "^sha256:[0-9a-f]{64}$"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "additionalProperties": false
@@ -39399,7 +41130,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1f4a15cc0686f33ff40dc25982baea2fdb7ea7a01001f122dc3139cb59ad36",
+      "schema_hash": "sha256:88f57d458455f4a5c6e4f8077c39bbf541ae4f3cb9cf906bb70c831ed210fff7",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -52500,7 +54231,7 @@
       "plugin_id": "official.agent",
       "module": "agent_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:05f5619445e18a99ee98b8b7dde3a99090d6eac2e9a770996cf9e2a9e9788249"
+      "artifact_hash": "sha256:d191c1f15fad32c53978be65d675a2725dd23be8bc3614af9dbabc4517e0ea37"
     },
     {
       "plugin_id": "official.base",
@@ -52524,13 +54255,13 @@
       "plugin_id": "official.factory",
       "module": "factory_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:da8d7a93dd8e5a98f1a8c09ee7f8ca689cbd6b120cae2dd12ae4c66766d8c510"
+      "artifact_hash": "sha256:0239a9ea27f7624d3dbec6d89a29ec79bdfbc3ca0d8f133488d30956202e586a"
     },
     {
       "plugin_id": "official.integration",
       "module": "integration_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:a904539b8312b2e0de73bef0f25b1b65e80afb6a8f1049a577f1f981415794ff"
+      "artifact_hash": "sha256:7b7e56cb3180ac2def3ff432e9d898365ff1b6e82988b2b552196374c758ba09"
     },
     {
       "plugin_id": "official.knowledge",
@@ -52548,7 +54279,7 @@
       "plugin_id": "official.ontology",
       "module": "ontology_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:ba13af6547a54fe86b992636e2ea7cd8c046d80bbc30f3311dbe167b605b6b58"
+      "artifact_hash": "sha256:fde918fd00311419d00df007266f925b163a8cd64fa17a9326ba1d8d7ed84c74"
     },
     {
       "plugin_id": "official.project-management",
@@ -52563,5 +54294,5 @@
       "artifact_hash": "sha256:01d13e92934650fac586c365529e53e3775b39d171b5a78b069b662dc67d8100"
     }
   ],
-  "created_at": "2026-08-12T09:33:32.601661Z"
+  "created_at": "2026-08-12T09:45:37.213258Z"
 }

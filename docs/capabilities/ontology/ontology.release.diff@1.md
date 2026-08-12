@@ -8,9 +8,9 @@ Compute a semantic stable-identity release diff.
 - 不适用：Raw JSON text differences are expected.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
@@ -59,8 +59,12 @@ Compute a semantic stable-identity release diff.
 {
   "additionalProperties": false,
   "properties": {
-    "from_release_gid": {},
-    "to_release_gid": {}
+    "from_release_gid": {
+      "type": "string"
+    },
+    "to_release_gid": {
+      "type": "string"
+    }
   },
   "required": [
     "from_release_gid",
@@ -75,7 +79,7 @@ Compute a semantic stable-identity release diff.
 ```json
 {
   "capability_id": "ontology.release.diff",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {
     "from_release_gid": "example",
@@ -105,33 +109,77 @@ Compute a semantic stable-identity release diff.
       "properties": {
         "added": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "changed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "deprecated": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "removed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         }
@@ -149,33 +197,77 @@ Compute a semantic stable-identity release diff.
       "properties": {
         "added": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "changed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "deprecated": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "removed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         }
@@ -199,9 +291,54 @@ Compute a semantic stable-identity release diff.
           "type": "string"
         },
         "revision_ref": {
-          "additionalProperties": false,
-          "properties": {},
-          "type": "object"
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "commit_id": {
+                  "pattern": "^cmt_[0-9a-f]{40}$",
+                  "type": "string"
+                },
+                "content_hash": {
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "repository": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "owner_domain": {
+                      "type": "string"
+                    },
+                    "repository_id": {
+                      "type": "string"
+                    },
+                    "resource_id": {
+                      "type": "string"
+                    },
+                    "tenant_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "repository_id",
+                    "owner_domain",
+                    "resource_id"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "repository",
+                "commit_id",
+                "content_hash"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -219,33 +356,77 @@ Compute a semantic stable-identity release diff.
       "properties": {
         "added": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "changed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "deprecated": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "removed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         }
@@ -263,33 +444,77 @@ Compute a semantic stable-identity release diff.
       "properties": {
         "added": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "changed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "deprecated": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "removed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         }
@@ -307,33 +532,77 @@ Compute a semantic stable-identity release diff.
       "properties": {
         "added": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "changed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "deprecated": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         },
         "removed": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "type": "array"
         }
@@ -357,9 +626,54 @@ Compute a semantic stable-identity release diff.
           "type": "string"
         },
         "revision_ref": {
-          "additionalProperties": false,
-          "properties": {},
-          "type": "object"
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "commit_id": {
+                  "pattern": "^cmt_[0-9a-f]{40}$",
+                  "type": "string"
+                },
+                "content_hash": {
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "repository": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "owner_domain": {
+                      "type": "string"
+                    },
+                    "repository_id": {
+                      "type": "string"
+                    },
+                    "resource_id": {
+                      "type": "string"
+                    },
+                    "tenant_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "repository_id",
+                    "owner_domain",
+                    "resource_id"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "repository",
+                "commit_id",
+                "content_hash"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [

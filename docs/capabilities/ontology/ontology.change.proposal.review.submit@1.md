@@ -8,9 +8,9 @@ Append a human review bound to an immutable proposal revision Hash.
 - 不适用：An Agent is attempting to approve.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
@@ -59,10 +59,29 @@ Append a human review bound to an immutable proposal revision Hash.
 {
   "additionalProperties": false,
   "properties": {
-    "content_sha256": {},
-    "decision": {},
-    "proposal_gid": {},
-    "proposal_revision_gid": {}
+    "comment": {
+      "maxLength": 4000,
+      "type": "string"
+    },
+    "content_sha256": {
+      "example": "0000000000000000000000000000000000000000000000000000000000000000",
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "approve",
+        "reject",
+        "request_changes"
+      ],
+      "type": "string"
+    },
+    "proposal_gid": {
+      "type": "string"
+    },
+    "proposal_revision_gid": {
+      "type": "string"
+    }
   },
   "required": [
     "proposal_gid",
@@ -79,11 +98,11 @@ Append a human review bound to an immutable proposal revision Hash.
 ```json
 {
   "capability_id": "ontology.change.proposal.review.submit",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {
-    "content_sha256": "example",
-    "decision": "example",
+    "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "decision": "approve",
     "proposal_gid": "example",
     "proposal_revision_gid": "example"
   }

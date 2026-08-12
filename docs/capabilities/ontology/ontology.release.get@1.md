@@ -8,7 +8,7 @@ Read one immutable or active release.
 - 不适用：Comparing two releases.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -68,7 +68,7 @@ Read one immutable or active release.
 ```json
 {
   "capability_id": "ontology.release.get",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {}
 }
@@ -95,9 +95,7 @@ Read one immutable or active release.
       "type": "string"
     },
     "created_at": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": "string"
     },
     "created_by": {
       "type": "string"
@@ -120,9 +118,54 @@ Read one immutable or active release.
           "type": "string"
         },
         "revision_ref": {
-          "additionalProperties": false,
-          "properties": {},
-          "type": "object"
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "commit_id": {
+                  "pattern": "^cmt_[0-9a-f]{40}$",
+                  "type": "string"
+                },
+                "content_hash": {
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "repository": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "owner_domain": {
+                      "type": "string"
+                    },
+                    "repository_id": {
+                      "type": "string"
+                    },
+                    "resource_id": {
+                      "type": "string"
+                    },
+                    "tenant_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "repository_id",
+                    "owner_domain",
+                    "resource_id"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "repository",
+                "commit_id",
+                "content_hash"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -133,25 +176,40 @@ Read one immutable or active release.
       "type": "object"
     },
     "parent_release_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "release_gid": {
       "type": "string"
     },
     "revision_commit_id": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "source": {
       "type": "string"
     },
     "source_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "required": [

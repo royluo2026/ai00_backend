@@ -7,7 +7,7 @@
         "plugin_id": "official.agent",
         "module": "agent_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:05f5619445e18a99ee98b8b7dde3a99090d6eac2e9a770996cf9e2a9e9788249"
+        "artifact_hash": "sha256:d191c1f15fad32c53978be65d675a2725dd23be8bc3614af9dbabc4517e0ea37"
       },
       "artifact_path": "plugins/agent/agent_backend",
       "allowed_owners": [
@@ -94,7 +94,7 @@
         "plugin_id": "official.factory",
         "module": "factory_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:da8d7a93dd8e5a98f1a8c09ee7f8ca689cbd6b120cae2dd12ae4c66766d8c510"
+        "artifact_hash": "sha256:0239a9ea27f7624d3dbec6d89a29ec79bdfbc3ca0d8f133488d30956202e586a"
       },
       "artifact_path": "plugins/factory/factory_backend",
       "allowed_owners": [
@@ -118,7 +118,7 @@
         "plugin_id": "official.integration",
         "module": "integration_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:a904539b8312b2e0de73bef0f25b1b65e80afb6a8f1049a577f1f981415794ff"
+        "artifact_hash": "sha256:7b7e56cb3180ac2def3ff432e9d898365ff1b6e82988b2b552196374c758ba09"
       },
       "artifact_path": "plugins/integration/integration_backend",
       "allowed_owners": [
@@ -181,7 +181,7 @@
         "plugin_id": "official.ontology",
         "module": "ontology_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:d29ce8f2f43821ef3e17cedb71af0f1df275e5cd454ac43425581bb9b98d5c49"
+        "artifact_hash": "sha256:fde918fd00311419d00df007266f925b163a8cd64fa17a9326ba1d8d7ed84c74"
       },
       "artifact_path": "plugins/ontology/ontology_backend",
       "allowed_owners": [

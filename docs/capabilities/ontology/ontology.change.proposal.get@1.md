@@ -8,9 +8,9 @@ Read the current immutable proposal revision.
 - 不适用：Searching proposals.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
@@ -59,7 +59,9 @@ Read the current immutable proposal revision.
 {
   "additionalProperties": false,
   "properties": {
-    "proposal_gid": {}
+    "proposal_gid": {
+      "type": "string"
+    }
   },
   "required": [
     "proposal_gid"
@@ -73,7 +75,7 @@ Read the current immutable proposal revision.
 ```json
 {
   "capability_id": "ontology.change.proposal.get",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {
     "proposal_gid": "example"
@@ -103,9 +105,54 @@ Read the current immutable proposal revision.
           "type": "string"
         },
         "revision_ref": {
-          "additionalProperties": false,
-          "properties": {},
-          "type": "object"
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "commit_id": {
+                  "pattern": "^cmt_[0-9a-f]{40}$",
+                  "type": "string"
+                },
+                "content_hash": {
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "repository": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "owner_domain": {
+                      "type": "string"
+                    },
+                    "repository_id": {
+                      "type": "string"
+                    },
+                    "resource_id": {
+                      "type": "string"
+                    },
+                    "tenant_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "repository_id",
+                    "owner_domain",
+                    "resource_id"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "repository",
+                "commit_id",
+                "content_hash"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -121,7 +168,55 @@ Read the current immutable proposal revision.
     "changes": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "operation": {
+            "type": "string"
+          },
+          "source_evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "stable_gid": {
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "operation",
+          "stable_gid",
+          "value",
+          "source_evidence"
+        ],
         "type": "object"
       },
       "type": "array"
@@ -134,9 +229,7 @@ Read the current immutable proposal revision.
       "type": "string"
     },
     "created_at": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": "string"
     },
     "proposal_gid": {
       "type": "string"

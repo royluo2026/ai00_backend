@@ -8,7 +8,7 @@ Execute the reviewed project.follow.read project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Execute the reviewed project.follow.read project outcome.
 ```json
 {
   "capability_id": "project.follow.read",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {
     "arguments": {},

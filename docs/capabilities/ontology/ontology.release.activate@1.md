@@ -8,9 +8,9 @@ Atomically activate a verified direct forward release.
 - 不适用：Publishing or rolling back directly.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
-- Schema 精度：`legacy_partial`
-- 暂未开放原因：`legacy_partial_schema`
+- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
+- Schema 精度：`typed`
+- 暂未开放原因：无
 
 ## 消费者可用性
 
@@ -59,10 +59,48 @@ Atomically activate a verified direct forward release.
 {
   "additionalProperties": false,
   "properties": {
-    "attestations": {},
-    "expected_active_release_gid": {},
-    "release_gid": {},
-    "release_sha256": {}
+    "attestations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "blocking_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "status",
+          "blocking_count"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "expected_active_release_gid": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "release_gid": {
+      "type": "string"
+    },
+    "release_sha256": {
+      "example": "0000000000000000000000000000000000000000000000000000000000000000",
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
   },
   "required": [
     "release_gid",
@@ -79,13 +117,13 @@ Atomically activate a verified direct forward release.
 ```json
 {
   "capability_id": "ontology.release.activate",
-  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
   "major_version": 1,
   "payload": {
-    "attestations": "example",
+    "attestations": [],
     "expected_active_release_gid": "example",
     "release_gid": "example",
-    "release_sha256": "example"
+    "release_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
   }
 }
 ```
@@ -109,9 +147,54 @@ Atomically activate a verified direct forward release.
           "type": "string"
         },
         "revision_ref": {
-          "additionalProperties": false,
-          "properties": {},
-          "type": "object"
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "commit_id": {
+                  "pattern": "^cmt_[0-9a-f]{40}$",
+                  "type": "string"
+                },
+                "content_hash": {
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "repository": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "owner_domain": {
+                      "type": "string"
+                    },
+                    "repository_id": {
+                      "type": "string"
+                    },
+                    "resource_id": {
+                      "type": "string"
+                    },
+                    "tenant_id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "tenant_id",
+                    "repository_id",
+                    "owner_domain",
+                    "resource_id"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "repository",
+                "commit_id",
+                "content_hash"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
