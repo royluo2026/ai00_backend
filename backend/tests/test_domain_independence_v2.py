@@ -85,7 +85,7 @@ def test_factory_and_integration_reserve_unique_foundation_paths():
         },
         "Integration": {
             "code_paths": "plugins/integration/**",
-            "migration_paths": "plugins/integration/migrations/**",
+            "migration_paths": "backend/db/migrations/domains/integration/**",
             "provider_paths": "plugins/integration/integration_backend/capabilities/**",
             "test_paths": "plugins/integration/tests/**",
             "documentation_paths": "docs/capabilities/integration/**",

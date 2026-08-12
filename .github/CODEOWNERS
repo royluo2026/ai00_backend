@@ -59,7 +59,7 @@
 
 # Integration
 /plugins/integration/** @ai00/integration-maintainers
-/plugins/integration/migrations/** @ai00/integration-maintainers
+/backend/db/migrations/domains/integration/** @ai00/integration-maintainers
 /backend/domain_ports/integration.py @ai00/integration-maintainers
 
 # Project Management (specific legacy rules must follow the broad Craft rule)

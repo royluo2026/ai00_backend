@@ -106,7 +106,7 @@
       "module_prefixes": ["plugins.integration"],
       "code_paths": ["plugins/integration/**", "backend/domain_ports/integration.py"],
       "provider_paths": ["plugins/integration/integration_backend/capabilities/**"],
-      "migration_paths": ["plugins/integration/migrations/**"],
+      "migration_paths": ["backend/db/migrations/domains/integration/**"],
       "test_paths": ["plugins/integration/tests/**"],
       "documentation_paths": ["docs/capabilities/integration/**"]
     },

@@ -76,4 +76,10 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "simulation.environment.create", "simulation.environment.get", "simulation.environment.search", "simulation.environment.archive",
     "simulation.run.start", "simulation.run.get", "simulation.run.search",
     "simulation.result.get", "simulation.result.compare",
+    "integration.connector.archive", "integration.connector.connection.test",
+    "integration.connector.create", "integration.connector.schema.discover",
+    "integration.connector.search", "integration.connector.update",
+    "integration.mapping.archive", "integration.mapping.create", "integration.mapping.get",
+    "integration.mapping.preview", "integration.mapping.search", "integration.mapping.update",
+    "integration.sync.start",
 }) | _BASE_V2_APPROVED | _PROJECT_V2_APPROVED
