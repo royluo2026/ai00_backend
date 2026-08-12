@@ -207,6 +207,7 @@ def registry(
             item["capability_versions"] = {
                 value.rsplit("@", 1)[0]: int(value.rsplit("@", 1)[1]) for value in grants
             }
+            item["capability_catalog"] = _mount_catalog(issued.session, release)
             item["mount_url"] = mount_url(
                 issued.asset_token, item["plugin_id"], item["version"], item["web"]["entry"]
             )
@@ -255,26 +256,6 @@ async def invoke_from_mount(
         error=result.error.code if result.error else None,
     )
     return result.model_dump(mode="json")
-
-
-@router.get("/mounts/{mount_session_id}/capabilities")
-def mount_capabilities(
-    mount_session_id: str,
-    user: dict = Depends(get_current_user),
-):
-    try:
-        session = _resolve_mount_for_user(mount_session_id, user)
-        release = _catalog_release()
-        if session.catalog_release != release.release_id:
-            raise MountSessionError("mount and gateway catalog releases differ")
-    except MountSessionError as exc:
-        raise HTTPException(
-            403, detail={"code": "plugin_mount_denied", "message": str(exc)}
-        ) from exc
-    return {
-        "catalog_release": release.release_id,
-        "capabilities": _mount_catalog(session, release),
-    }
 
 
 @router.post("/mounts/{mount_session_id}/capabilities/{capability_id}:confirm")

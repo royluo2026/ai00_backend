@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import copy
 import json
 import re
 import sys
@@ -517,7 +518,17 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
                 generated["current_consumers"] = discovered_by_id[function_id]["current_consumers"]
                 generated["source_paths"] = discovered_by_id[function_id]["source_paths"]
         merged.append(generated)
-    return merged
+    discovered_ids = set(discovered_by_id)
+    merged.extend(
+        copy.deepcopy(row)
+        for function_id, row in sorted(existing.items())
+        if function_id not in discovered_ids
+        and row.get("stability") == "stable"
+        and row.get("target_capability") is None
+        and row.get("classification") in VALID_EXCLUSIONS
+        and row.get("migration_status") == "excluded"
+    )
+    return sorted(merged, key=lambda row: row["function_id"])
 
 
 def registry_errors(
@@ -533,7 +544,13 @@ def registry_errors(
         if row["stability"] == "stable" and row["function_id"] not in existing:
             errors.append(f"missing stable function: {row['function_id']}")
     for function_id, row in existing.items():
-        if row.get("stability") == "stable" and function_id not in discovered_ids:
+        retained_reviewed_operation = (
+            row.get("target_capability") is None
+            and row.get("classification") == "operations"
+            and row.get("migration_status") == "excluded"
+        )
+        if (row.get("stability") == "stable" and function_id not in discovered_ids
+                and not retained_reviewed_operation):
             errors.append(f"stale stable function: {function_id}")
         if function_id in discovered_by_id:
             for field in ("domain", "stability", "current_consumers", "source_paths"):

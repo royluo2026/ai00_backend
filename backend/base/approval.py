@@ -11,8 +11,11 @@ from typing import Protocol
 from uuid import uuid4
 from pathlib import Path
 
-from backend.capabilities.models_next import CapabilityBusinessError
-from backend.capabilities.models_next import CapabilityRisk, CapabilitySpec
+from backend.capability_v2.provider_contracts import (
+    CapabilityBusinessError,
+    CapabilityRisk,
+    CapabilitySpec,
+)
 
 from .provider import register_capability
 from backend.capability_v2.domain_database import (

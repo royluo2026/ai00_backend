@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from backend.capabilities.models_next import (
+from backend.capability_v2.provider_contracts import (
     CapabilityBusinessError,
     CapabilityRisk,
     CapabilitySpec,

@@ -192,6 +192,19 @@ def merge_domain_review(existing: dict, discovered: list[dict]) -> dict:
         function_id = row["function_id"]
         if function_id in known:
             continue
+        if row.get("classification") != "unreviewed" and row.get("exclusion_reason"):
+            merged["excluded_functions"][function_id] = {
+                "resolution": "excluded",
+                "target_capability": None,
+                "source_paths": sorted(row["source_paths"]),
+                "evidence": "Reviewed classification from the bound User Function Registry.",
+                "reason": row["exclusion_reason"],
+                "classification": row["classification"],
+                "owner": row["domain"],
+                "reviewer": BOOTSTRAP_REVIEWER,
+                "reviewed_at": BOOTSTRAP_DATE,
+            }
+            continue
         merged["unreviewed_functions"][function_id] = {
             "resolution": "unreviewed",
             "source_paths": sorted(row["source_paths"]),
@@ -216,8 +229,6 @@ def _pop_function_disposition(documents: list[dict], function_id: str) -> dict:
                 found = row
             if not group["function_dispositions"]:
                 del document["capabilities"][capability_id]
-    if found is None:
-        raise ValueError(f"approved correction function is missing: {function_id}")
     return found
 
 
@@ -258,6 +269,8 @@ def _apply_approved_corrections(documents: list[dict]) -> list[dict]:
     base = by_domain["Base Platform"]
     for function_id, capability_id in BASE_INTEGRATION_CORRECTIONS.items():
         source = _pop_function_disposition(documents, function_id)
+        if source is None:
+            raise ValueError(f"approved correction function is missing: {function_id}")
         group = integration["capabilities"].setdefault(
             capability_id,
             {
@@ -291,6 +304,8 @@ def _apply_approved_corrections(documents: list[dict]) -> list[dict]:
         }
     for function_id, (removed_id, reason) in BASE_OPERATIONS_EXCLUSIONS.items():
         source = _pop_function_disposition(documents, function_id)
+        if source is None:
+            continue
         base["excluded_functions"][function_id] = {
             "resolution": "excluded",
             "target_capability": None,
@@ -481,10 +496,22 @@ def _merge_evidence(document: dict, sources: AuditSources) -> dict:
 def initialize_documents(sources: AuditSources, existing: dict[str, dict] | None = None) -> list[dict]:
     existing = existing or {}
     rows = stable_functions(sources)
+    stable_ids = {row["function_id"] for row in rows}
+    catalog_ids = {row["id"] for row in sources.catalog["capabilities"]}
     result = []
     for domain in DOMAINS:
         domain_rows = [row for row in rows if row["domain"] == domain]
         document = copy.deepcopy(existing.get(domain)) if domain in existing else _empty_review(domain, sources.reviewed_against)
+        # Serial domain finalization promotes reviewed candidates once the
+        # immutable Catalog contains them and drops dispositions for retired
+        # stable surfaces. Human review metadata on live functions is retained.
+        for capability_id, group in document.get("capabilities", {}).items():
+            if group.get("kind") == "candidate" and capability_id in catalog_ids:
+                group["kind"] = "existing"
+                group.pop("candidate_definition", None)
+                for disposition in group["function_dispositions"].values():
+                    if disposition.get("resolution") == "new_capability":
+                        disposition["resolution"] = "existing_capability"
         if domain not in existing:
             document = _bootstrap_existing(document, domain_rows)
         document["excluded_functions"].pop("capability:system.echo", None)
@@ -505,7 +532,25 @@ def initialize_documents(sources: AuditSources, existing: dict[str, dict] | None
         document["reviewed_against"] = copy.deepcopy(sources.reviewed_against)
         document = merge_domain_review(document, domain_rows)
         result.append(_merge_evidence(document, sources))
-    return _apply_approved_corrections(result)
+    corrected = _apply_approved_corrections(result)
+    for document in corrected:
+        document["unreviewed_functions"] = {
+            key: value for key, value in document["unreviewed_functions"].items()
+            if key in stable_ids
+        }
+        document["excluded_functions"] = {
+            key: value for key, value in document["excluded_functions"].items()
+            if key in stable_ids
+        }
+        for capability_id in list(document["capabilities"]):
+            group = document["capabilities"][capability_id]
+            group["function_dispositions"] = {
+                key: value for key, value in group["function_dispositions"].items()
+                if key in stable_ids
+            }
+            if not group["function_dispositions"]:
+                del document["capabilities"][capability_id]
+    return corrected
 
 
 def _lines(title: str, header: str, rows: list[str]) -> str:

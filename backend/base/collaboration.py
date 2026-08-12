@@ -8,7 +8,7 @@ import json
 from threading import RLock
 from uuid import uuid4
 
-from backend.capabilities.models_next import (
+from backend.capability_v2.provider_contracts import (
     CapabilityBusinessError,
     CapabilityRisk,
     CapabilitySpec,
