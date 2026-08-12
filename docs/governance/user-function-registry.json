@@ -1361,6 +1361,50 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.bop.validation.get": {
+      "function_id": "capability:craft.bop.validation.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.validation.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.bop.validation.run": {
+      "function_id": "capability:craft.bop.validation.run",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.validation.run",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
     "capability:craft.bop.version.archive": {
       "function_id": "capability:craft.bop.version.archive",
       "domain": "Craft",
@@ -1509,6 +1553,138 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.gbop.draft.change.apply": {
+      "function_id": "capability:craft.gbop.draft.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.draft.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.draft.change.preview": {
+      "function_id": "capability:craft.gbop.draft.change.preview",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.draft.change.preview",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.draft.create": {
+      "function_id": "capability:craft.gbop.draft.create",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.draft.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.draft.get": {
+      "function_id": "capability:craft.gbop.draft.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.draft.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.draft.search": {
+      "function_id": "capability:craft.gbop.draft.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.draft.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.draft.submit": {
+      "function_id": "capability:craft.gbop.draft.submit",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.draft.submit",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
     "capability:craft.gbop.item.knowledge.list": {
       "function_id": "capability:craft.gbop.item.knowledge.list",
       "domain": "Craft",
@@ -1530,6 +1706,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py",
         "plugins/craft/craft_backend/capabilities/gbop_read.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
@@ -1555,6 +1732,7 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py",
         "plugins/craft/craft_backend/capabilities/gbop_read.py"
       ]
     },
@@ -1579,8 +1757,141 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py",
         "plugins/craft/craft_backend/capabilities/gbop_read.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.gbop.release.activate": {
+      "function_id": "capability:craft.gbop.release.activate",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.release.activate",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.release.archive": {
+      "function_id": "capability:craft.gbop.release.archive",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.release.archive",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.release.compare": {
+      "function_id": "capability:craft.gbop.release.compare",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.release.compare",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.release.get": {
+      "function_id": "capability:craft.gbop.release.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.release.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.release.publish": {
+      "function_id": "capability:craft.gbop.release.publish",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.release.publish",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.gbop.release.search": {
+      "function_id": "capability:craft.gbop.release.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.release.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
     "capability:craft.pbom.draft.change.apply": {
@@ -1844,6 +2155,292 @@
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.rule.draft.create": {
+      "function_id": "capability:craft.rule.draft.create",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.draft.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.draft.get": {
+      "function_id": "capability:craft.rule.draft.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.draft.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.draft.revise": {
+      "function_id": "capability:craft.rule.draft.revise",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.draft.revise",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.draft.search": {
+      "function_id": "capability:craft.rule.draft.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.draft.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.draft.submit": {
+      "function_id": "capability:craft.rule.draft.submit",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.draft.submit",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.evaluate": {
+      "function_id": "capability:craft.rule.evaluate",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.evaluate",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.release.activate": {
+      "function_id": "capability:craft.rule.release.activate",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.release.activate",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.release.get": {
+      "function_id": "capability:craft.rule.release.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.release.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.release.publish": {
+      "function_id": "capability:craft.rule.release.publish",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.release.publish",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.release.search": {
+      "function_id": "capability:craft.rule.release.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.release.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.waiver.create": {
+      "function_id": "capability:craft.rule.waiver.create",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.waiver.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.waiver.revoke": {
+      "function_id": "capability:craft.rule.waiver.revoke",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.waiver.revoke",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.waiver.search": {
+      "function_id": "capability:craft.rule.waiver.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.waiver.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
     "capability:digital_model.component.search": {

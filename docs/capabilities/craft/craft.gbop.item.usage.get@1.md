@@ -4,11 +4,11 @@ craft.gbop.item.usage.get
 
 ## 使用判断
 
-- 适用：The current active GBOP release is the required source.
-- 不适用：A historical or draft GBOP release is required.
+- 适用：GBOP draft, immutable release, or item is the subject.
+- 不适用：The subject is a project BOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_43f5e74624f8b2dbf07dd372796dc3f8`
+- Catalog Release：`rel_e44a13a141a97888051f06fbeeacd409`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -76,7 +76,7 @@ craft.gbop.item.usage.get
 ```json
 {
   "capability_id": "craft.gbop.item.usage.get",
-  "catalog_release": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
+  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
   "major_version": 1,
   "payload": {
     "item_gid": "example"

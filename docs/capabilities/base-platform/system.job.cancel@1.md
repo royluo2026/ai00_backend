@@ -8,7 +8,7 @@ Request job cancellation without claiming rollback.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_43f5e74624f8b2dbf07dd372796dc3f8`
+- Catalog Release：`rel_e44a13a141a97888051f06fbeeacd409`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Request job cancellation without claiming rollback.
 ```json
 {
   "capability_id": "system.job.cancel",
-  "catalog_release": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
+  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
   "major_version": 1,
   "payload": {
     "job_gid": "example",

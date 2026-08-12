@@ -8,7 +8,7 @@ Execute the governed factory.structure.get Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_43f5e74624f8b2dbf07dd372796dc3f8`
+- Catalog Release：`rel_e44a13a141a97888051f06fbeeacd409`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Execute the governed factory.structure.get Factory outcome.
 ```json
 {
   "capability_id": "factory.structure.get",
-  "catalog_release": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
+  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
   "major_version": 1,
   "payload": {}
 }

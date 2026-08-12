@@ -315,6 +315,24 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.bop.linked_parts.get@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.bop.linked_parts.get@1]"
     },
+    "craft.bop.validation.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.bop.validation.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.bop.validation.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.bop.validation.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.bop.validation.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.bop.validation.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.bop.validation.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.bop.validation.get@1]"
+    },
+    "craft.bop.validation.run@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.bop.validation.run@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.bop.validation.run@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.bop.validation.run@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.bop.validation.run@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.bop.validation.run@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.bop.validation.run@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.bop.validation.run@1]"
+    },
     "craft.bop.version.archive@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.bop.version.archive@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.bop.version.archive@1]",
@@ -369,6 +387,60 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.bop.work_package.get@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.bop.work_package.get@1]"
     },
+    "craft.gbop.draft.change.apply@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.draft.change.apply@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.draft.change.apply@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.draft.change.apply@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.draft.change.apply@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.draft.change.apply@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.draft.change.apply@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.draft.change.apply@1]"
+    },
+    "craft.gbop.draft.change.preview@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.draft.change.preview@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.draft.change.preview@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.draft.change.preview@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.draft.change.preview@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.draft.change.preview@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.draft.change.preview@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.draft.change.preview@1]"
+    },
+    "craft.gbop.draft.create@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.draft.create@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.draft.create@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.draft.create@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.draft.create@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.draft.create@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.draft.create@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.draft.create@1]"
+    },
+    "craft.gbop.draft.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.draft.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.draft.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.draft.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.draft.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.draft.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.draft.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.draft.get@1]"
+    },
+    "craft.gbop.draft.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.draft.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.draft.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.draft.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.draft.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.draft.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.draft.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.draft.search@1]"
+    },
+    "craft.gbop.draft.submit@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.draft.submit@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.draft.submit@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.draft.submit@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.draft.submit@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.draft.submit@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.draft.submit@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.draft.submit@1]"
+    },
     "craft.gbop.item.knowledge.list@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.item.knowledge.list@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.item.knowledge.list@1]",
@@ -395,6 +467,60 @@
       "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.item.usage.get@1]",
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.item.usage.get@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.item.usage.get@1]"
+    },
+    "craft.gbop.release.activate@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.release.activate@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.release.activate@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.release.activate@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.release.activate@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.release.activate@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.release.activate@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.release.activate@1]"
+    },
+    "craft.gbop.release.archive@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.release.archive@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.release.archive@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.release.archive@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.release.archive@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.release.archive@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.release.archive@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.release.archive@1]"
+    },
+    "craft.gbop.release.compare@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.release.compare@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.release.compare@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.release.compare@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.release.compare@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.release.compare@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.release.compare@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.release.compare@1]"
+    },
+    "craft.gbop.release.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.release.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.release.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.release.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.release.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.release.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.release.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.release.get@1]"
+    },
+    "craft.gbop.release.publish@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.release.publish@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.release.publish@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.release.publish@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.release.publish@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.release.publish@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.release.publish@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.release.publish@1]"
+    },
+    "craft.gbop.release.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.gbop.release.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.gbop.release.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.gbop.release.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.gbop.release.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.gbop.release.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.gbop.release.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.gbop.release.search@1]"
     },
     "craft.pbom.draft.change.apply@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.pbom.draft.change.apply@1]",
@@ -494,6 +620,123 @@
       "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.pbom.version.submit@1]",
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.pbom.version.submit@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.pbom.version.submit@1]"
+    },
+    "craft.rule.draft.create@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.draft.create@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.draft.create@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.draft.create@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.draft.create@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.draft.create@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.draft.create@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.draft.create@1]"
+    },
+    "craft.rule.draft.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.draft.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.draft.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.draft.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.draft.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.draft.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.draft.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.draft.get@1]"
+    },
+    "craft.rule.draft.revise@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.draft.revise@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.draft.revise@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.draft.revise@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.draft.revise@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.draft.revise@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.draft.revise@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.draft.revise@1]"
+    },
+    "craft.rule.draft.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.draft.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.draft.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.draft.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.draft.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.draft.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.draft.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.draft.search@1]"
+    },
+    "craft.rule.draft.submit@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.draft.submit@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.draft.submit@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.draft.submit@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.draft.submit@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.draft.submit@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.draft.submit@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.draft.submit@1]"
+    },
+    "craft.rule.evaluate@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.evaluate@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.evaluate@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.evaluate@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.evaluate@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.evaluate@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.evaluate@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.evaluate@1]"
+    },
+    "craft.rule.release.activate@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.release.activate@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.release.activate@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.release.activate@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.release.activate@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.release.activate@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.release.activate@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.release.activate@1]"
+    },
+    "craft.rule.release.get@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.release.get@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.release.get@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.release.get@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.release.get@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.release.get@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.release.get@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.release.get@1]"
+    },
+    "craft.rule.release.publish@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.release.publish@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.release.publish@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.release.publish@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.release.publish@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.release.publish@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.release.publish@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.release.publish@1]"
+    },
+    "craft.rule.release.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.release.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.release.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.release.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.release.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.release.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.release.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.release.search@1]"
+    },
+    "craft.rule.waiver.create@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.waiver.create@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.waiver.create@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.waiver.create@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.waiver.create@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.waiver.create@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.waiver.create@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.waiver.create@1]"
+    },
+    "craft.rule.waiver.revoke@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.waiver.revoke@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.waiver.revoke@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.waiver.revoke@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.waiver.revoke@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.waiver.revoke@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.waiver.revoke@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.waiver.revoke@1]"
+    },
+    "craft.rule.waiver.search@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[craft.rule.waiver.search@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[craft.rule.waiver.search@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[craft.rule.waiver.search@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[craft.rule.waiver.search@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[craft.rule.waiver.search@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[craft.rule.waiver.search@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[craft.rule.waiver.search@1]"
     },
     "digital_model.component.search@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[digital_model.component.search@1]",
@@ -1729,7 +1972,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
+  "catalog_release": "rel_e44a13a141a97888051f06fbeeacd409",
   "mandatory_cases": [
     "success",
     "invalid_input",
