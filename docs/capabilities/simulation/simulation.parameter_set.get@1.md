@@ -8,7 +8,7 @@ Read an immutable Simulation parameter set.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
+- Catalog Release：`rel_386d62dabf4e43e02ee660709e6398a1`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Read an immutable Simulation parameter set.
 ```json
 {
   "capability_id": "simulation.parameter_set.get",
-  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
+  "catalog_release": "rel_386d62dabf4e43e02ee660709e6398a1",
   "major_version": 1,
   "payload": {
     "parameter_set_ref": {
@@ -214,6 +214,7 @@ Read an immutable Simulation parameter set.
 - `source_version_mismatch`：A referenced source no longer matches its immutable hash or version.（retryable=false）
 - `parameter_set_not_found`：The immutable parameter set is unavailable or not visible.（retryable=false）
 - `simulation_profile_not_found`：The immutable Simulation profile is unavailable or not visible.（retryable=false）
+- `solver_not_allowed`：The requested solver coordinate is not in the governed allowlist.（retryable=false）
 - `simulation_environment_not_found`：The Simulation environment is unavailable or not visible.（retryable=false）
 - `simulation_run_not_found`：The Simulation run is unavailable or not visible.（retryable=false）
 - `simulation_result_not_ready`：The Simulation run has no completed result artifacts.（retryable=true）

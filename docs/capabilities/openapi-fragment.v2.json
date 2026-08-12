@@ -1,7 +1,7 @@
 {
   "info": {
     "title": "AI00 Capability V2",
-    "version": "rel_91d463504f565162861a144daa9db0fd"
+    "version": "rel_386d62dabf4e43e02ee660709e6398a1"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -244,7 +244,7 @@
           }
         },
         "summary": "base.annotation.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -487,7 +487,7 @@
           }
         },
         "summary": "base.annotation.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -789,7 +789,7 @@
           }
         },
         "summary": "base.approval.request.cancel",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -1110,7 +1110,7 @@
           }
         },
         "summary": "base.approval.request.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -1420,7 +1420,7 @@
           }
         },
         "summary": "base.approval.request.decide",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -1718,7 +1718,7 @@
           }
         },
         "summary": "base.approval.request.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -2028,7 +2028,7 @@
           }
         },
         "summary": "base.approval.request.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -2271,7 +2271,7 @@
           }
         },
         "summary": "base.authorization.grant.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -2514,7 +2514,7 @@
           }
         },
         "summary": "base.authorization.grant.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -2757,7 +2757,7 @@
           }
         },
         "summary": "base.export_template.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -3000,7 +3000,7 @@
           }
         },
         "summary": "base.export_template.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -3243,7 +3243,7 @@
           }
         },
         "summary": "base.identity.directory.sync",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -3486,7 +3486,7 @@
           }
         },
         "summary": "base.identity.role.assign",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -3729,7 +3729,7 @@
           }
         },
         "summary": "base.identity.session.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -3961,7 +3961,7 @@
           }
         },
         "summary": "base.notification.preference.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -4206,7 +4206,7 @@
           }
         },
         "summary": "base.notification.preference.update",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -4468,7 +4468,7 @@
           }
         },
         "summary": "base.notification.read_state.set",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -4731,7 +4731,7 @@
           }
         },
         "summary": "base.notification.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -4974,7 +4974,7 @@
           }
         },
         "summary": "base.plugin.marketplace.publisher.register",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -5217,7 +5217,7 @@
           }
         },
         "summary": "base.plugin.marketplace.release.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -5460,7 +5460,7 @@
           }
         },
         "summary": "base.plugin.marketplace.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -5738,7 +5738,7 @@
           }
         },
         "summary": "base.project.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -5981,7 +5981,7 @@
           }
         },
         "summary": "base.saved_view.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -6224,7 +6224,7 @@
           }
         },
         "summary": "base.saved_view.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -6467,7 +6467,7 @@
           }
         },
         "summary": "base.team.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -6710,7 +6710,7 @@
           }
         },
         "summary": "base.team.membership.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -6953,7 +6953,7 @@
           }
         },
         "summary": "base.team.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -7214,7 +7214,7 @@
           }
         },
         "summary": "base.workspace.template.publish",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -7468,7 +7468,7 @@
           }
         },
         "summary": "base.workspace.template.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -7738,7 +7738,7 @@
           }
         },
         "summary": "craft.bop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -8045,7 +8045,7 @@
           }
         },
         "summary": "craft.bop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -8329,7 +8329,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -8618,7 +8618,7 @@
           }
         },
         "summary": "craft.bop.execution_structure.preview",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -8892,7 +8892,7 @@
           }
         },
         "summary": "craft.bop.import.preview",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -9140,7 +9140,7 @@
           }
         },
         "summary": "craft.bop.linked_parts.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -9444,7 +9444,7 @@
           }
         },
         "summary": "craft.bop.validation.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -9748,7 +9748,7 @@
           }
         },
         "summary": "craft.bop.validation.run",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -10013,7 +10013,7 @@
           }
         },
         "summary": "craft.bop.version.archive",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -10290,7 +10290,7 @@
           }
         },
         "summary": "craft.bop.version.compare",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -10576,7 +10576,7 @@
           }
         },
         "summary": "craft.bop.version.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -10929,7 +10929,7 @@
           }
         },
         "summary": "craft.bop.version.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -11190,7 +11190,7 @@
           }
         },
         "summary": "craft.bop.version.list",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -11503,7 +11503,7 @@
           }
         },
         "summary": "craft.bop.work_package.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -11807,7 +11807,7 @@
           }
         },
         "summary": "craft.gbop.draft.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -12111,7 +12111,7 @@
           }
         },
         "summary": "craft.gbop.draft.change.preview",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -12415,7 +12415,7 @@
           }
         },
         "summary": "craft.gbop.draft.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -12719,7 +12719,7 @@
           }
         },
         "summary": "craft.gbop.draft.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -13023,7 +13023,7 @@
           }
         },
         "summary": "craft.gbop.draft.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -13327,7 +13327,7 @@
           }
         },
         "summary": "craft.gbop.draft.submit",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -13575,7 +13575,7 @@
           }
         },
         "summary": "craft.gbop.item.knowledge.list",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -13818,7 +13818,7 @@
           }
         },
         "summary": "craft.gbop.item.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -14066,7 +14066,7 @@
           }
         },
         "summary": "craft.gbop.item.usage.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -14370,7 +14370,7 @@
           }
         },
         "summary": "craft.gbop.release.activate",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -14674,7 +14674,7 @@
           }
         },
         "summary": "craft.gbop.release.archive",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -14978,7 +14978,7 @@
           }
         },
         "summary": "craft.gbop.release.compare",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -15282,7 +15282,7 @@
           }
         },
         "summary": "craft.gbop.release.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -15586,7 +15586,7 @@
           }
         },
         "summary": "craft.gbop.release.publish",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -15890,7 +15890,7 @@
           }
         },
         "summary": "craft.gbop.release.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -16151,7 +16151,7 @@
           }
         },
         "summary": "craft.pbom.draft.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -16406,7 +16406,7 @@
           }
         },
         "summary": "craft.pbom.draft.change.preview",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -16655,7 +16655,7 @@
           }
         },
         "summary": "craft.pbom.import.preview",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -16908,7 +16908,7 @@
           }
         },
         "summary": "craft.pbom.part.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -17156,7 +17156,7 @@
           }
         },
         "summary": "craft.pbom.version.archive",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -17409,7 +17409,7 @@
           }
         },
         "summary": "craft.pbom.version.compare",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -17689,7 +17689,7 @@
           }
         },
         "summary": "craft.pbom.version.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -17947,7 +17947,7 @@
           }
         },
         "summary": "craft.pbom.version.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -18195,7 +18195,7 @@
           }
         },
         "summary": "craft.pbom.version.publish",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -18437,7 +18437,7 @@
           }
         },
         "summary": "craft.pbom.version.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -18685,7 +18685,7 @@
           }
         },
         "summary": "craft.pbom.version.submit",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -18989,7 +18989,7 @@
           }
         },
         "summary": "craft.rule.draft.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -19293,7 +19293,7 @@
           }
         },
         "summary": "craft.rule.draft.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -19597,7 +19597,7 @@
           }
         },
         "summary": "craft.rule.draft.revise",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -19901,7 +19901,7 @@
           }
         },
         "summary": "craft.rule.draft.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -20205,7 +20205,7 @@
           }
         },
         "summary": "craft.rule.draft.submit",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -20509,7 +20509,7 @@
           }
         },
         "summary": "craft.rule.evaluate",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -20813,7 +20813,7 @@
           }
         },
         "summary": "craft.rule.release.activate",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -21117,7 +21117,7 @@
           }
         },
         "summary": "craft.rule.release.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -21421,7 +21421,7 @@
           }
         },
         "summary": "craft.rule.release.publish",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -21725,7 +21725,7 @@
           }
         },
         "summary": "craft.rule.release.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -22029,7 +22029,7 @@
           }
         },
         "summary": "craft.rule.waiver.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -22333,7 +22333,7 @@
           }
         },
         "summary": "craft.rule.waiver.revoke",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -22637,7 +22637,7 @@
           }
         },
         "summary": "craft.rule.waiver.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -22940,7 +22940,7 @@
           }
         },
         "summary": "digital_model.component.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -23200,7 +23200,7 @@
           }
         },
         "summary": "digital_model.model.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -23456,7 +23456,7 @@
           }
         },
         "summary": "digital_model.model.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -23735,7 +23735,7 @@
           }
         },
         "summary": "digital_model.model.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -23997,7 +23997,7 @@
           }
         },
         "summary": "digital_model.version.compare",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -24379,7 +24379,7 @@
           }
         },
         "summary": "digital_model.version.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -24722,7 +24722,7 @@
           }
         },
         "summary": "digital_model.version.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -24960,7 +24960,7 @@
           }
         },
         "summary": "digital_model.version.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -25203,7 +25203,7 @@
           }
         },
         "summary": "factory.asset.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -25446,7 +25446,7 @@
           }
         },
         "summary": "factory.asset.maintenance.complete",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -25689,7 +25689,7 @@
           }
         },
         "summary": "factory.asset.maintenance.start",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -25932,7 +25932,7 @@
           }
         },
         "summary": "factory.asset.register",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -26175,7 +26175,7 @@
           }
         },
         "summary": "factory.asset.scrap",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -26418,7 +26418,7 @@
           }
         },
         "summary": "factory.asset.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -26661,7 +26661,7 @@
           }
         },
         "summary": "factory.asset.update",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -26904,7 +26904,7 @@
           }
         },
         "summary": "factory.resource.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -27147,7 +27147,7 @@
           }
         },
         "summary": "factory.resource_catalog.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -27390,7 +27390,7 @@
           }
         },
         "summary": "factory.resource_catalog.deprecate",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -27633,7 +27633,7 @@
           }
         },
         "summary": "factory.resource_catalog.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -27876,7 +27876,7 @@
           }
         },
         "summary": "factory.resource_catalog.publish",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -28119,7 +28119,7 @@
           }
         },
         "summary": "factory.resource_catalog.revise",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -28362,7 +28362,7 @@
           }
         },
         "summary": "factory.resource_catalog.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -28605,7 +28605,7 @@
           }
         },
         "summary": "factory.structure.archive",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -28848,7 +28848,7 @@
           }
         },
         "summary": "factory.structure.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -29091,7 +29091,7 @@
           }
         },
         "summary": "factory.structure.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -29334,7 +29334,7 @@
           }
         },
         "summary": "factory.structure.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -29577,7 +29577,7 @@
           }
         },
         "summary": "factory.structure.update",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -29822,7 +29822,7 @@
           }
         },
         "summary": "identity.principal.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -30138,7 +30138,7 @@
           }
         },
         "summary": "knowledge.context.retrieve",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -30420,7 +30420,7 @@
           }
         },
         "summary": "knowledge.document.acl.grant",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -30716,7 +30716,7 @@
           }
         },
         "summary": "knowledge.document.acl.list",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -30989,7 +30989,7 @@
           }
         },
         "summary": "knowledge.document.acl.revoke",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -31230,7 +31230,7 @@
           }
         },
         "summary": "knowledge.document.archive",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -31532,7 +31532,7 @@
           }
         },
         "summary": "knowledge.document.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -31798,7 +31798,7 @@
           }
         },
         "summary": "knowledge.document.diff",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -32080,7 +32080,7 @@
           }
         },
         "summary": "knowledge.document.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -32415,7 +32415,7 @@
           }
         },
         "summary": "knowledge.document.history.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -32699,7 +32699,7 @@
           }
         },
         "summary": "knowledge.document.restore",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -32992,7 +32992,7 @@
           }
         },
         "summary": "knowledge.document.revise",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -33327,7 +33327,7 @@
           }
         },
         "summary": "knowledge.document.revisions",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -33611,7 +33611,7 @@
           }
         },
         "summary": "knowledge.document.rollback",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -33908,7 +33908,7 @@
           }
         },
         "summary": "knowledge.document.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -34149,7 +34149,7 @@
           }
         },
         "summary": "knowledge.entry.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -34501,7 +34501,7 @@
           }
         },
         "summary": "knowledge.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -35011,7 +35011,7 @@
           }
         },
         "summary": "knowledge.migration.status",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -35252,7 +35252,7 @@
           }
         },
         "summary": "knowledge.personalization.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -35493,7 +35493,7 @@
           }
         },
         "summary": "knowledge.personalization.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -35865,7 +35865,7 @@
           }
         },
         "summary": "knowledge.proposal.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -36259,7 +36259,7 @@
           }
         },
         "summary": "knowledge.proposal.list",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -36603,7 +36603,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.list",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -36932,7 +36932,7 @@
           }
         },
         "summary": "knowledge.proposal.outbox.retry",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -37316,7 +37316,7 @@
           }
         },
         "summary": "knowledge.proposal.review",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -37705,7 +37705,7 @@
           }
         },
         "summary": "knowledge.propose",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -37933,7 +37933,7 @@
           }
         },
         "summary": "knowledge.reference_data.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -38161,7 +38161,7 @@
           }
         },
         "summary": "knowledge.reference_data.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -38540,7 +38540,7 @@
           }
         },
         "summary": "knowledge.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -38781,7 +38781,7 @@
           }
         },
         "summary": "knowledge.space.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -39054,7 +39054,7 @@
           }
         },
         "summary": "knowledge.space.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -39329,7 +39329,7 @@
           }
         },
         "summary": "knowledge.space.list",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -39604,7 +39604,7 @@
           }
         },
         "summary": "knowledge.space.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -40072,7 +40072,7 @@
           }
         },
         "summary": "local.command.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -40372,7 +40372,7 @@
           }
         },
         "summary": "ontology.change.proposal.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -40670,7 +40670,7 @@
           }
         },
         "summary": "ontology.change.proposal.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -40933,7 +40933,7 @@
           }
         },
         "summary": "ontology.change.proposal.review.submit",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -41169,7 +41169,7 @@
           }
         },
         "summary": "ontology.change.proposal.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -41465,7 +41465,7 @@
           }
         },
         "summary": "ontology.concept.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -41761,7 +41761,7 @@
           }
         },
         "summary": "ontology.concept.resolve",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -42056,7 +42056,7 @@
           }
         },
         "summary": "ontology.mapping.assess",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -42300,7 +42300,7 @@
           }
         },
         "summary": "ontology.mapping.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -42570,7 +42570,7 @@
           }
         },
         "summary": "ontology.release.activate",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -43089,7 +43089,7 @@
           }
         },
         "summary": "ontology.release.diff",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -43385,7 +43385,7 @@
           }
         },
         "summary": "ontology.release.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -43690,7 +43690,7 @@
           }
         },
         "summary": "ontology.release.publish",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -44003,7 +44003,7 @@
           }
         },
         "summary": "ontology.release.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -44247,7 +44247,7 @@
           }
         },
         "summary": "ontology.schema.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -44488,7 +44488,7 @@
           }
         },
         "summary": "plugin.disable",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -44729,7 +44729,7 @@
           }
         },
         "summary": "plugin.enable",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -44981,7 +44981,7 @@
           }
         },
         "summary": "plugin.install",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -45222,7 +45222,7 @@
           }
         },
         "summary": "plugin.revoke",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -45463,7 +45463,7 @@
           }
         },
         "summary": "plugin.rollback",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -45703,7 +45703,7 @@
           }
         },
         "summary": "plugin.storage.delete",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -45950,7 +45950,7 @@
           }
         },
         "summary": "plugin.storage.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -46207,7 +46207,7 @@
           }
         },
         "summary": "plugin.storage.list",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -46453,7 +46453,7 @@
           }
         },
         "summary": "plugin.storage.put",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -46694,7 +46694,7 @@
           }
         },
         "summary": "plugin.uninstall",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -46956,7 +46956,7 @@
           }
         },
         "summary": "plugin.upgrade",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -47199,7 +47199,7 @@
           }
         },
         "summary": "project.activity.aggregate",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -47442,7 +47442,7 @@
           }
         },
         "summary": "project.approval.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -47685,7 +47685,7 @@
           }
         },
         "summary": "project.approval.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -47928,7 +47928,7 @@
           }
         },
         "summary": "project.bitable_binding.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -48171,7 +48171,7 @@
           }
         },
         "summary": "project.bitable_binding.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -48414,7 +48414,7 @@
           }
         },
         "summary": "project.change_log.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -48657,7 +48657,7 @@
           }
         },
         "summary": "project.collaboration.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -48900,7 +48900,7 @@
           }
         },
         "summary": "project.collaboration.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -49143,7 +49143,7 @@
           }
         },
         "summary": "project.craft_scope.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -49386,7 +49386,7 @@
           }
         },
         "summary": "project.follow.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -49629,7 +49629,7 @@
           }
         },
         "summary": "project.follow.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -49872,7 +49872,7 @@
           }
         },
         "summary": "project.issue.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -50115,7 +50115,7 @@
           }
         },
         "summary": "project.issue.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -50358,7 +50358,7 @@
           }
         },
         "summary": "project.list.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -50601,7 +50601,7 @@
           }
         },
         "summary": "project.list.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -50844,7 +50844,7 @@
           }
         },
         "summary": "project.member.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -51087,7 +51087,7 @@
           }
         },
         "summary": "project.member.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -51330,7 +51330,7 @@
           }
         },
         "summary": "project.notification.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -51573,7 +51573,7 @@
           }
         },
         "summary": "project.notification.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -51816,7 +51816,7 @@
           }
         },
         "summary": "project.permission_request.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -52059,7 +52059,7 @@
           }
         },
         "summary": "project.permission_request.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -52302,7 +52302,7 @@
           }
         },
         "summary": "project.project.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -52545,7 +52545,7 @@
           }
         },
         "summary": "project.project.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -52788,7 +52788,7 @@
           }
         },
         "summary": "project.sharing.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -53031,7 +53031,7 @@
           }
         },
         "summary": "project.sharing.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -53274,7 +53274,7 @@
           }
         },
         "summary": "project.task.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -53517,7 +53517,7 @@
           }
         },
         "summary": "project.task.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -53760,7 +53760,7 @@
           }
         },
         "summary": "project.task_template.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -54003,7 +54003,7 @@
           }
         },
         "summary": "project.task_template.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -54246,7 +54246,7 @@
           }
         },
         "summary": "project.workbench.change.apply",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -54489,7 +54489,7 @@
           }
         },
         "summary": "project.workbench.read",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -54741,7 +54741,456 @@
           }
         },
         "summary": "semantic.context.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/simulation.environment.archive:invoke": {
+      "post": {
+        "description": "Archive a Simulation environment.",
+        "operationId": "invoke_simulation_environment_archive_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "environment_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "environment_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "simulation.environment.archive"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "environment_id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "source": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "execution_plan": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "content_hash": {
+                                      "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                      "pattern": "^sha256:[0-9a-f]{64}$",
+                                      "type": "string"
+                                    },
+                                    "craft_commit_ref": {
+                                      "type": "string"
+                                    },
+                                    "node_count": {
+                                      "type": "integer"
+                                    },
+                                    "revision": {
+                                      "type": "integer"
+                                    },
+                                    "version_gid": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "version_gid",
+                                    "revision",
+                                    "content_hash",
+                                    "craft_commit_ref"
+                                  ],
+                                  "type": "object"
+                                },
+                                "model_snapshot": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "artifact_ref": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "artifact_id": {
+                                          "type": "string"
+                                        },
+                                        "byte_size": {
+                                          "minimum": 0,
+                                          "type": "integer"
+                                        },
+                                        "media_type": {
+                                          "type": "string"
+                                        },
+                                        "sha256": {
+                                          "example": "0000000000000000000000000000000000000000000000000000000000000000",
+                                          "pattern": "^[0-9a-f]{64}$",
+                                          "type": "string"
+                                        },
+                                        "version": {
+                                          "minimum": 1,
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "artifact_id",
+                                        "media_type",
+                                        "sha256",
+                                        "byte_size",
+                                        "version"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "model_id": {
+                                      "type": "string"
+                                    },
+                                    "snapshot_hash": {
+                                      "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                      "pattern": "^sha256:[0-9a-f]{64}$",
+                                      "type": "string"
+                                    },
+                                    "version_id": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "model_id",
+                                    "version_id",
+                                    "snapshot_hash",
+                                    "artifact_ref"
+                                  ],
+                                  "type": "object"
+                                },
+                                "parameter_set": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "content_hash": {
+                                      "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                      "pattern": "^sha256:[0-9a-f]{64}$",
+                                      "type": "string"
+                                    },
+                                    "parameter_set_id": {
+                                      "type": "string"
+                                    },
+                                    "parameters": {
+                                      "items": {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "unit": {
+                                            "type": "string"
+                                          },
+                                          "value": {
+                                            "type": [
+                                              "number",
+                                              "integer",
+                                              "string",
+                                              "boolean"
+                                            ]
+                                          }
+                                        },
+                                        "required": [
+                                          "name",
+                                          "value"
+                                        ],
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    },
+                                    "version": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "parameter_set_id",
+                                    "version",
+                                    "content_hash",
+                                    "parameters"
+                                  ],
+                                  "type": "object"
+                                },
+                                "simulation_profile": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "content_hash": {
+                                      "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                      "pattern": "^sha256:[0-9a-f]{64}$",
+                                      "type": "string"
+                                    },
+                                    "profile_id": {
+                                      "type": "string"
+                                    },
+                                    "settings": {
+                                      "items": {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "value": {
+                                            "type": [
+                                              "number",
+                                              "integer",
+                                              "string",
+                                              "boolean"
+                                            ]
+                                          }
+                                        },
+                                        "required": [
+                                          "name",
+                                          "value"
+                                        ],
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    },
+                                    "solver": {
+                                      "type": "string"
+                                    },
+                                    "solver_version": {
+                                      "type": "string"
+                                    },
+                                    "version": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "profile_id",
+                                    "version",
+                                    "content_hash",
+                                    "solver",
+                                    "solver_version",
+                                    "settings"
+                                  ],
+                                  "type": "object"
+                                },
+                                "source_fingerprint": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "execution_plan",
+                                "model_snapshot",
+                                "parameter_set",
+                                "simulation_profile",
+                                "source_fingerprint"
+                              ],
+                              "type": "object"
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "environment_id",
+                            "name",
+                            "status",
+                            "source"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "simulation.environment.archive",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -55318,7 +55767,7 @@
           }
         },
         "summary": "simulation.environment.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -55767,14 +56216,14 @@
           }
         },
         "summary": "simulation.environment.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
-    "/api/v1/capabilities/simulation.environment.list:invoke": {
+    "/api/v1/capabilities/simulation.environment.search:invoke": {
       "post": {
-        "description": "List visible Simulation environments.",
-        "operationId": "invoke_simulation_environment_list_v1",
+        "description": "Search visible Simulation environments.",
+        "operationId": "invoke_simulation_environment_search_v1",
         "requestBody": {
           "content": {
             "application/json": {
@@ -55835,7 +56284,7 @@
                       "type": "array"
                     },
                     "capability_id": {
-                      "const": "simulation.environment.list"
+                      "const": "simulation.environment.search"
                     },
                     "correlation": {
                       "additionalProperties": false,
@@ -56230,8 +56679,8 @@
             "description": "CapabilityResultV2"
           }
         },
-        "summary": "simulation.environment.list",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "summary": "simulation.environment.search",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -56544,7 +56993,7 @@
           }
         },
         "summary": "simulation.parameter_set.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -56849,60 +57298,29 @@
           }
         },
         "summary": "simulation.parameter_set.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
-    "/api/v1/capabilities/simulation.profile.create:invoke": {
+    "/api/v1/capabilities/simulation.parameter_set.search:invoke": {
       "post": {
-        "description": "Create an immutable solver profile.",
-        "operationId": "invoke_simulation_profile_create_v1",
+        "description": "Search immutable Simulation parameter sets.",
+        "operationId": "invoke_simulation_parameter_set_search_v1",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "name": {
-                    "type": "string"
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
                   },
-                  "settings": {
-                    "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        },
-                        "value": {
-                          "type": [
-                            "number",
-                            "integer",
-                            "string",
-                            "boolean"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "name",
-                        "value"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
-                  "solver": {
-                    "type": "string"
-                  },
-                  "solver_version": {
+                  "query": {
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name",
-                  "solver",
-                  "solver_version",
-                  "settings"
-                ],
                 "type": "object"
               }
             }
@@ -56951,7 +57369,7 @@
                       "type": "array"
                     },
                     "capability_id": {
-                      "const": "simulation.profile.create"
+                      "const": "simulation.parameter_set.search"
                     },
                     "correlation": {
                       "additionalProperties": false,
@@ -56981,69 +57399,84 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "name": {
-                              "type": "string"
-                            },
-                            "settings": {
+                            "items": {
                               "items": {
                                 "additionalProperties": false,
                                 "properties": {
                                   "name": {
                                     "type": "string"
                                   },
-                                  "value": {
-                                    "type": [
-                                      "number",
-                                      "integer",
-                                      "string",
-                                      "boolean"
-                                    ]
+                                  "parameter_set_ref": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "content_hash": {
+                                        "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                        "pattern": "^sha256:[0-9a-f]{64}$",
+                                        "type": "string"
+                                      },
+                                      "parameter_set_id": {
+                                        "type": "string"
+                                      },
+                                      "version": {
+                                        "minimum": 1,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "parameter_set_id",
+                                      "version",
+                                      "content_hash"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "parameters": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "unit": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": [
+                                            "number",
+                                            "integer",
+                                            "string",
+                                            "boolean"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "name",
+                                        "value"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
                                   }
                                 },
                                 "required": [
+                                  "parameter_set_ref",
                                   "name",
-                                  "value"
+                                  "parameters"
                                 ],
                                 "type": "object"
                               },
                               "type": "array"
                             },
-                            "simulation_profile_ref": {
-                              "additionalProperties": false,
-                              "properties": {
-                                "content_hash": {
-                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-                                  "pattern": "^sha256:[0-9a-f]{64}$",
-                                  "type": "string"
-                                },
-                                "profile_id": {
-                                  "type": "string"
-                                },
-                                "version": {
-                                  "minimum": 1,
-                                  "type": "integer"
-                                }
-                              },
-                              "required": [
-                                "profile_id",
-                                "version",
-                                "content_hash"
-                              ],
-                              "type": "object"
-                            },
-                            "solver": {
+                            "query": {
                               "type": "string"
                             },
-                            "solver_version": {
-                              "type": "string"
+                            "total": {
+                              "type": "integer"
                             }
                           },
                           "required": [
-                            "simulation_profile_ref",
-                            "name",
-                            "solver",
-                            "solver_version",
-                            "settings"
+                            "items",
+                            "total",
+                            "query"
                           ],
                           "type": "object"
                         },
@@ -57171,47 +57604,73 @@
             "description": "CapabilityResultV2"
           }
         },
-        "summary": "simulation.profile.create",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "summary": "simulation.parameter_set.search",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
-    "/api/v1/capabilities/simulation.profile.get:invoke": {
+    "/api/v1/capabilities/simulation.result.compare:invoke": {
       "post": {
-        "description": "Read an immutable solver profile.",
-        "operationId": "invoke_simulation_profile_get_v1",
+        "description": "Compare immutable Simulation result references.",
+        "operationId": "invoke_simulation_result_compare_v1",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "simulation_profile_ref": {
+                  "left_result_ref": {
                     "additionalProperties": false,
                     "properties": {
-                      "content_hash": {
+                      "result_hash": {
                         "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
                         "pattern": "^sha256:[0-9a-f]{64}$",
                         "type": "string"
                       },
-                      "profile_id": {
+                      "run_id": {
                         "type": "string"
                       },
-                      "version": {
-                        "minimum": 1,
-                        "type": "integer"
+                      "source_fingerprint": {
+                        "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                        "pattern": "^sha256:[0-9a-f]{64}$",
+                        "type": "string"
                       }
                     },
                     "required": [
-                      "profile_id",
-                      "version",
-                      "content_hash"
+                      "run_id",
+                      "source_fingerprint",
+                      "result_hash"
+                    ],
+                    "type": "object"
+                  },
+                  "right_result_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "result_hash": {
+                        "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                        "pattern": "^sha256:[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "run_id": {
+                        "type": "string"
+                      },
+                      "source_fingerprint": {
+                        "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                        "pattern": "^sha256:[0-9a-f]{64}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "run_id",
+                      "source_fingerprint",
+                      "result_hash"
                     ],
                     "type": "object"
                   }
                 },
                 "required": [
-                  "simulation_profile_ref"
+                  "left_result_ref",
+                  "right_result_ref"
                 ],
                 "type": "object"
               }
@@ -57261,7 +57720,7 @@
                       "type": "array"
                     },
                     "capability_id": {
-                      "const": "simulation.profile.get"
+                      "const": "simulation.result.compare"
                     },
                     "correlation": {
                       "additionalProperties": false,
@@ -57291,69 +57750,109 @@
                         {
                           "additionalProperties": false,
                           "properties": {
-                            "name": {
-                              "type": "string"
-                            },
-                            "settings": {
+                            "changes": {
                               "items": {
                                 "additionalProperties": false,
                                 "properties": {
-                                  "name": {
+                                  "after_sha256": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "artifact_id": {
                                     "type": "string"
                                   },
-                                  "value": {
-                                    "type": [
-                                      "number",
-                                      "integer",
-                                      "string",
-                                      "boolean"
+                                  "before_sha256": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
                                     ]
+                                  },
+                                  "change_type": {
+                                    "enum": [
+                                      "artifact_added",
+                                      "artifact_removed",
+                                      "artifact_changed"
+                                    ],
+                                    "type": "string"
                                   }
                                 },
                                 "required": [
-                                  "name",
-                                  "value"
+                                  "artifact_id",
+                                  "change_type",
+                                  "before_sha256",
+                                  "after_sha256"
                                 ],
                                 "type": "object"
                               },
                               "type": "array"
                             },
-                            "simulation_profile_ref": {
+                            "left_result_ref": {
                               "additionalProperties": false,
                               "properties": {
-                                "content_hash": {
+                                "result_hash": {
                                   "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
                                   "pattern": "^sha256:[0-9a-f]{64}$",
                                   "type": "string"
                                 },
-                                "profile_id": {
+                                "run_id": {
                                   "type": "string"
                                 },
-                                "version": {
-                                  "minimum": 1,
-                                  "type": "integer"
+                                "source_fingerprint": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
                                 }
                               },
                               "required": [
-                                "profile_id",
-                                "version",
-                                "content_hash"
+                                "run_id",
+                                "source_fingerprint",
+                                "result_hash"
                               ],
                               "type": "object"
                             },
-                            "solver": {
-                              "type": "string"
+                            "right_result_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "result_hash": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "run_id": {
+                                  "type": "string"
+                                },
+                                "source_fingerprint": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "run_id",
+                                "source_fingerprint",
+                                "result_hash"
+                              ],
+                              "type": "object"
                             },
-                            "solver_version": {
-                              "type": "string"
+                            "same_inputs": {
+                              "type": "boolean"
                             }
                           },
                           "required": [
-                            "simulation_profile_ref",
-                            "name",
-                            "solver",
-                            "solver_version",
-                            "settings"
+                            "left_result_ref",
+                            "right_result_ref",
+                            "same_inputs",
+                            "changes"
                           ],
                           "type": "object"
                         },
@@ -57481,8 +57980,8 @@
             "description": "CapabilityResultV2"
           }
         },
-        "summary": "simulation.profile.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "summary": "simulation.result.compare",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -57616,6 +58115,30 @@
                               },
                               "type": "array"
                             },
+                            "result_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "result_hash": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "run_id": {
+                                  "type": "string"
+                                },
+                                "source_fingerprint": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "run_id",
+                                "source_fingerprint",
+                                "result_hash"
+                              ],
+                              "type": "object"
+                            },
                             "run_id": {
                               "type": "string"
                             },
@@ -57629,6 +58152,7 @@
                             }
                           },
                           "required": [
+                            "result_ref",
                             "run_id",
                             "status",
                             "source_fingerprint",
@@ -57761,7 +58285,7 @@
           }
         },
         "summary": "simulation.result.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -58056,7 +58580,320 @@
           }
         },
         "summary": "simulation.run.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/simulation.run.search:invoke": {
+      "post": {
+        "description": "Search Simulation runs.",
+        "operationId": "invoke_simulation_run_search_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "environment_id": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "simulation.run.search"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "craft_commit_ref": {
+                                    "type": "string"
+                                  },
+                                  "environment_id": {
+                                    "type": "string"
+                                  },
+                                  "model_snapshot_hash": {
+                                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                    "pattern": "^sha256:[0-9a-f]{64}$",
+                                    "type": "string"
+                                  },
+                                  "operation_ref": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "operation_id": {
+                                        "type": "string"
+                                      },
+                                      "status": {
+                                        "enum": [
+                                          "accepted",
+                                          "running",
+                                          "completed",
+                                          "failed",
+                                          "cancelled",
+                                          "outcome_unknown"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "version": {
+                                        "minimum": 1,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "operation_id",
+                                      "status",
+                                      "version"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "parameter_version": {
+                                    "type": "integer"
+                                  },
+                                  "run_id": {
+                                    "type": "string"
+                                  },
+                                  "solver_version": {
+                                    "type": "string"
+                                  },
+                                  "source_fingerprint": {
+                                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                    "pattern": "^sha256:[0-9a-f]{64}$",
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "run_id",
+                                  "environment_id",
+                                  "status",
+                                  "source_fingerprint",
+                                  "craft_commit_ref",
+                                  "model_snapshot_hash",
+                                  "parameter_version",
+                                  "solver_version",
+                                  "operation_ref"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "total": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "simulation.run.search",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -58351,7 +59188,952 @@
           }
         },
         "summary": "simulation.run.start",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/simulation.solver_profile.create:invoke": {
+      "post": {
+        "description": "Create an immutable solver profile.",
+        "operationId": "invoke_simulation_solver_profile_create_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "settings": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": [
+                            "number",
+                            "integer",
+                            "string",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "solver": {
+                    "type": "string"
+                  },
+                  "solver_version": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "solver",
+                  "solver_version",
+                  "settings"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "simulation.solver_profile.create"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "settings": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "type": [
+                                      "number",
+                                      "integer",
+                                      "string",
+                                      "boolean"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "name",
+                                  "value"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "simulation_profile_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "profile_id": {
+                                  "type": "string"
+                                },
+                                "version": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "profile_id",
+                                "version",
+                                "content_hash"
+                              ],
+                              "type": "object"
+                            },
+                            "solver": {
+                              "type": "string"
+                            },
+                            "solver_version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "simulation_profile_ref",
+                            "name",
+                            "solver",
+                            "solver_version",
+                            "settings"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "simulation.solver_profile.create",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/simulation.solver_profile.get:invoke": {
+      "post": {
+        "description": "Read an immutable solver profile.",
+        "operationId": "invoke_simulation_solver_profile_get_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "simulation_profile_ref": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "content_hash": {
+                        "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                        "pattern": "^sha256:[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "profile_id": {
+                        "type": "string"
+                      },
+                      "version": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "profile_id",
+                      "version",
+                      "content_hash"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "simulation_profile_ref"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "simulation.solver_profile.get"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "settings": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "type": [
+                                      "number",
+                                      "integer",
+                                      "string",
+                                      "boolean"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "name",
+                                  "value"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "simulation_profile_ref": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "content_hash": {
+                                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                  "pattern": "^sha256:[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "profile_id": {
+                                  "type": "string"
+                                },
+                                "version": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "profile_id",
+                                "version",
+                                "content_hash"
+                              ],
+                              "type": "object"
+                            },
+                            "solver": {
+                              "type": "string"
+                            },
+                            "solver_version": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "simulation_profile_ref",
+                            "name",
+                            "solver",
+                            "solver_version",
+                            "settings"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "simulation.solver_profile.get",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
+        "x-ai00-major-version": 1
+      }
+    },
+    "/api/v1/capabilities/simulation.solver_profile.search:invoke": {
+      "post": {
+        "description": "Search immutable solver profiles.",
+        "operationId": "invoke_simulation_solver_profile_search_v1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "limit": {
+                    "maximum": 200,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifact_refs": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "artifact_id": {
+                            "type": "string"
+                          },
+                          "byte_size": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "media_type": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "version": {
+                            "minimum": 1,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "artifact_id",
+                          "media_type",
+                          "sha256",
+                          "byte_size",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "capability_id": {
+                      "const": "simulation.solver_profile.search"
+                    },
+                    "correlation": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "request_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "request_id",
+                        "trace_id"
+                      ],
+                      "type": "object"
+                    },
+                    "data": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "settings": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": [
+                                            "number",
+                                            "integer",
+                                            "string",
+                                            "boolean"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "name",
+                                        "value"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "simulation_profile_ref": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "content_hash": {
+                                        "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                                        "pattern": "^sha256:[0-9a-f]{64}$",
+                                        "type": "string"
+                                      },
+                                      "profile_id": {
+                                        "type": "string"
+                                      },
+                                      "version": {
+                                        "minimum": 1,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "profile_id",
+                                      "version",
+                                      "content_hash"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "solver": {
+                                    "type": "string"
+                                  },
+                                  "solver_version": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "simulation_profile_ref",
+                                  "name",
+                                  "solver",
+                                  "solver_version",
+                                  "settings"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "query": {
+                              "type": "string"
+                            },
+                            "total": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "items",
+                            "total",
+                            "query"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "code": {
+                              "type": "string"
+                            },
+                            "details": {
+                              "type": "object"
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "retryable": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "message",
+                            "retryable",
+                            "details"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "items": {
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "major_version": {
+                      "const": 1
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "operation_ref": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "operation_id": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "accepted",
+                                "claimed",
+                                "preparing",
+                                "running",
+                                "post_processing",
+                                "completed",
+                                "failed",
+                                "cancelled",
+                                "outcome_unknown"
+                              ],
+                              "type": "string"
+                            },
+                            "version": {
+                              "minimum": 1,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "operation_id",
+                            "status",
+                            "version"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "accepted",
+                        "rejected",
+                        "failed",
+                        "outcome_unknown"
+                      ],
+                      "type": "string"
+                    },
+                    "warnings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "status",
+                    "capability_id",
+                    "major_version",
+                    "data",
+                    "operation_ref",
+                    "artifact_refs",
+                    "error",
+                    "evidence",
+                    "warnings",
+                    "correlation"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "CapabilityResultV2"
+          }
+        },
+        "summary": "simulation.solver_profile.search",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -58590,7 +60372,7 @@
           }
         },
         "summary": "system.activity.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -58841,7 +60623,7 @@
           }
         },
         "summary": "system.change_impact.preview",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -59090,7 +60872,7 @@
           }
         },
         "summary": "system.job.cancel",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -59339,7 +61121,7 @@
           }
         },
         "summary": "system.job.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -59594,7 +61376,7 @@
           }
         },
         "summary": "system.lineage.get",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -59863,7 +61645,7 @@
           }
         },
         "summary": "system.search",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -60115,7 +61897,7 @@
           }
         },
         "summary": "vismockup.capture",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -60377,7 +62159,7 @@
           }
         },
         "summary": "vismockup.highlight",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -60629,7 +62411,7 @@
           }
         },
         "summary": "vismockup.launch",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -60921,7 +62703,7 @@
           }
         },
         "summary": "vismockup.model.open",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -61173,7 +62955,7 @@
           }
         },
         "summary": "vismockup.status",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -61433,7 +63215,7 @@
           }
         },
         "summary": "vismockup.tree",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     },
@@ -61694,7 +63476,7 @@
           }
         },
         "summary": "vismockup.visibility",
-        "x-ai00-catalog-release": "rel_91d463504f565162861a144daa9db0fd",
+        "x-ai00-catalog-release": "rel_386d62dabf4e43e02ee660709e6398a1",
         "x-ai00-major-version": 1
       }
     }

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_91d463504f565162861a144daa9db0fd",
-  "catalog_hash": "sha256:91d463504f565162861a144daa9db0fd7e101518a96ef02530f8f712f8e0c086",
+  "release_id": "rel_386d62dabf4e43e02ee660709e6398a1",
+  "catalog_hash": "sha256:386d62dabf4e43e02ee660709e6398a1aa2a26db8b4f8d6006cffce59c837155",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -39619,6 +39619,569 @@
       "domain_errors_complete": true
     },
     {
+      "id": "simulation.environment.archive",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "simulation.environment.archive",
+      "description": "Archive a Simulation environment.",
+      "use_when": "Archive a Simulation environment.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-environment",
+          "payload_path": "environment_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "environment_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "environment_id"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "environment_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "execution_plan": {
+                "type": "object",
+                "properties": {
+                  "version_gid": {
+                    "type": "string"
+                  },
+                  "revision": {
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "craft_commit_ref": {
+                    "type": "string"
+                  },
+                  "node_count": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "version_gid",
+                  "revision",
+                  "content_hash",
+                  "craft_commit_ref"
+                ]
+              },
+              "model_snapshot": {
+                "type": "object",
+                "properties": {
+                  "model_id": {
+                    "type": "string"
+                  },
+                  "version_id": {
+                    "type": "string"
+                  },
+                  "snapshot_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "artifact_ref": {
+                    "type": "object",
+                    "properties": {
+                      "artifact_id": {
+                        "type": "string"
+                      },
+                      "media_type": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      "byte_size": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "version": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "artifact_id",
+                      "media_type",
+                      "sha256",
+                      "byte_size",
+                      "version"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "model_id",
+                  "version_id",
+                  "snapshot_hash",
+                  "artifact_ref"
+                ]
+              },
+              "parameter_set": {
+                "type": "object",
+                "properties": {
+                  "parameter_set_id": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "parameters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": [
+                            "number",
+                            "integer",
+                            "string",
+                            "boolean"
+                          ]
+                        },
+                        "unit": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ]
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "parameter_set_id",
+                  "version",
+                  "content_hash",
+                  "parameters"
+                ]
+              },
+              "simulation_profile": {
+                "type": "object",
+                "properties": {
+                  "profile_id": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "solver": {
+                    "type": "string"
+                  },
+                  "solver_version": {
+                    "type": "string"
+                  },
+                  "settings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": [
+                            "number",
+                            "integer",
+                            "string",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ]
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "profile_id",
+                  "version",
+                  "content_hash",
+                  "solver",
+                  "solver_version",
+                  "settings"
+                ]
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "execution_plan",
+              "model_snapshot",
+              "parameter_set",
+              "simulation_profile",
+              "source_fingerprint"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "environment_id",
+          "name",
+          "status",
+          "source"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "environment_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "execution_plan": {
+                "type": "object",
+                "properties": {
+                  "version_gid": {
+                    "type": "string"
+                  },
+                  "revision": {
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "craft_commit_ref": {
+                    "type": "string"
+                  },
+                  "node_count": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "version_gid",
+                  "revision",
+                  "content_hash",
+                  "craft_commit_ref"
+                ]
+              },
+              "model_snapshot": {
+                "type": "object",
+                "properties": {
+                  "model_id": {
+                    "type": "string"
+                  },
+                  "version_id": {
+                    "type": "string"
+                  },
+                  "snapshot_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "artifact_ref": {
+                    "type": "object",
+                    "properties": {
+                      "artifact_id": {
+                        "type": "string"
+                      },
+                      "media_type": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "example": "0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      "byte_size": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "version": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "artifact_id",
+                      "media_type",
+                      "sha256",
+                      "byte_size",
+                      "version"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "model_id",
+                  "version_id",
+                  "snapshot_hash",
+                  "artifact_ref"
+                ]
+              },
+              "parameter_set": {
+                "type": "object",
+                "properties": {
+                  "parameter_set_id": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "parameters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": [
+                            "number",
+                            "integer",
+                            "string",
+                            "boolean"
+                          ]
+                        },
+                        "unit": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ]
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "parameter_set_id",
+                  "version",
+                  "content_hash",
+                  "parameters"
+                ]
+              },
+              "simulation_profile": {
+                "type": "object",
+                "properties": {
+                  "profile_id": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "integer"
+                  },
+                  "content_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$",
+                    "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                  },
+                  "solver": {
+                    "type": "string"
+                  },
+                  "solver_version": {
+                    "type": "string"
+                  },
+                  "settings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": [
+                            "number",
+                            "integer",
+                            "string",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ]
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "profile_id",
+                  "version",
+                  "content_hash",
+                  "solver",
+                  "solver_version",
+                  "settings"
+                ]
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "execution_plan",
+              "model_snapshot",
+              "parameter_set",
+              "simulation_profile",
+              "source_fingerprint"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "environment_id",
+          "name",
+          "status",
+          "source"
+        ]
+      },
+      "schema_hash": "sha256:f74042900772fdefab5932c4ab82cf9ecf1dcc499ef35109d484af6842034305",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
       "id": "simulation.environment.create",
       "major_version": 1,
       "owner_domain": "simulation",
@@ -40302,6 +40865,11 @@
           "retryable": false
         },
         {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
           "code": "simulation_environment_not_found",
           "meaning": "The Simulation environment is unavailable or not visible.",
           "retryable": false
@@ -40860,6 +41428,11 @@
           "retryable": false
         },
         {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
           "code": "simulation_environment_not_found",
           "meaning": "The Simulation environment is unavailable or not visible.",
           "retryable": false
@@ -40883,14 +41456,14 @@
       "domain_errors_complete": true
     },
     {
-      "id": "simulation.environment.list",
+      "id": "simulation.environment.search",
       "major_version": 1,
       "owner_domain": "simulation",
       "lifecycle_status": "stable",
       "catalog_release": null,
-      "title": "simulation.environment.list",
-      "description": "List visible Simulation environments.",
-      "use_when": "List visible Simulation environments.",
+      "title": "simulation.environment.search",
+      "description": "Search visible Simulation environments.",
+      "use_when": "Search visible Simulation environments.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
@@ -41443,6 +42016,11 @@
           "retryable": false
         },
         {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
           "code": "simulation_environment_not_found",
           "meaning": "The Simulation environment is unavailable or not visible.",
           "retryable": false
@@ -41692,6 +42270,11 @@
         {
           "code": "simulation_profile_not_found",
           "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
           "retryable": false
         },
         {
@@ -41945,270 +42528,8 @@
           "retryable": false
         },
         {
-          "code": "simulation_environment_not_found",
-          "meaning": "The Simulation environment is unavailable or not visible.",
-          "retryable": false
-        },
-        {
-          "code": "simulation_run_not_found",
-          "meaning": "The Simulation run is unavailable or not visible.",
-          "retryable": false
-        },
-        {
-          "code": "simulation_result_not_ready",
-          "meaning": "The Simulation run has no completed result artifacts.",
-          "retryable": true
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different Simulation request.",
-          "retryable": false
-        }
-      ],
-      "domain_errors_complete": true
-    },
-    {
-      "id": "simulation.profile.create",
-      "major_version": 1,
-      "owner_domain": "simulation",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "simulation.profile.create",
-      "description": "Create an immutable solver profile.",
-      "use_when": "Create an immutable solver profile.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
-      "side_effect_level": "write",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "automation_level": "A1",
-      "authorization_policy": "simulation.v2:simulation.use",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "solver": {
-            "type": "string"
-          },
-          "solver_version": {
-            "type": "string"
-          },
-          "settings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "value": {
-                  "type": [
-                    "number",
-                    "integer",
-                    "string",
-                    "boolean"
-                  ]
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "name",
-                "value"
-              ]
-            }
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "name",
-          "solver",
-          "solver_version",
-          "settings"
-        ]
-      },
-      "output_schema": {
-        "type": "object",
-        "properties": {
-          "simulation_profile_ref": {
-            "type": "object",
-            "properties": {
-              "profile_id": {
-                "type": "string"
-              },
-              "version": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "content_hash": {
-                "type": "string",
-                "pattern": "^sha256:[0-9a-f]{64}$",
-                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "profile_id",
-              "version",
-              "content_hash"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "solver": {
-            "type": "string"
-          },
-          "solver_version": {
-            "type": "string"
-          },
-          "settings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "value": {
-                  "type": [
-                    "number",
-                    "integer",
-                    "string",
-                    "boolean"
-                  ]
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "name",
-                "value"
-              ]
-            }
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "simulation_profile_ref",
-          "name",
-          "solver",
-          "solver_version",
-          "settings"
-        ]
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "properties": {
-          "simulation_profile_ref": {
-            "type": "object",
-            "properties": {
-              "profile_id": {
-                "type": "string"
-              },
-              "version": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "content_hash": {
-                "type": "string",
-                "pattern": "^sha256:[0-9a-f]{64}$",
-                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "profile_id",
-              "version",
-              "content_hash"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "solver": {
-            "type": "string"
-          },
-          "solver_version": {
-            "type": "string"
-          },
-          "settings": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "value": {
-                  "type": [
-                    "number",
-                    "integer",
-                    "string",
-                    "boolean"
-                  ]
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "name",
-                "value"
-              ]
-            }
-          }
-        },
-        "additionalProperties": false,
-        "required": [
-          "simulation_profile_ref",
-          "name",
-          "solver",
-          "solver_version",
-          "settings"
-        ]
-      },
-      "schema_hash": "sha256:097b3f62cfee1d5c68016b05e846ccfeda9170986f6a16abfacc9aff207d0306",
-      "artifact_policy": "none",
-      "operation_policy": "optional",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "required",
-      "consistency_policy": "external",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "confirmation_policy": "user",
-      "evidence_policy": "required",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "source_resolver_unavailable",
-          "meaning": "A required owning-domain resolver is unavailable.",
-          "retryable": true
-        },
-        {
-          "code": "source_version_mismatch",
-          "meaning": "A referenced source no longer matches its immutable hash or version.",
-          "retryable": false
-        },
-        {
-          "code": "parameter_set_not_found",
-          "meaning": "The immutable parameter set is unavailable or not visible.",
-          "retryable": false
-        },
-        {
-          "code": "simulation_profile_not_found",
-          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
           "retryable": false
         },
         {
@@ -42235,14 +42556,14 @@
       "domain_errors_complete": true
     },
     {
-      "id": "simulation.profile.get",
+      "id": "simulation.parameter_set.search",
       "major_version": 1,
       "owner_domain": "simulation",
       "lifecycle_status": "stable",
       "catalog_release": null,
-      "title": "simulation.profile.get",
-      "description": "Read an immutable solver profile.",
-      "use_when": "Read an immutable solver profile.",
+      "title": "simulation.parameter_set.search",
+      "description": "Search immutable Simulation parameter sets.",
+      "use_when": "Search immutable Simulation parameter sets.",
       "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
@@ -42257,187 +42578,193 @@
       },
       "automation_level": "A2",
       "authorization_policy": "simulation.v2:simulation.use",
-      "resource_selectors": [
-        {
-          "resource_type": "simulation-profile",
-          "payload_path": "simulation_profile_ref.profile_id",
-          "required": true
-        }
-      ],
+      "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
         "properties": {
-          "simulation_profile_ref": {
-            "type": "object",
-            "properties": {
-              "profile_id": {
-                "type": "string"
-              },
-              "version": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "content_hash": {
-                "type": "string",
-                "pattern": "^sha256:[0-9a-f]{64}$",
-                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "profile_id",
-              "version",
-              "content_hash"
-            ]
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
           }
         },
-        "additionalProperties": false,
-        "required": [
-          "simulation_profile_ref"
-        ]
+        "additionalProperties": false
       },
       "output_schema": {
         "type": "object",
         "properties": {
-          "simulation_profile_ref": {
-            "type": "object",
-            "properties": {
-              "profile_id": {
-                "type": "string"
-              },
-              "version": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "content_hash": {
-                "type": "string",
-                "pattern": "^sha256:[0-9a-f]{64}$",
-                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "profile_id",
-              "version",
-              "content_hash"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "solver": {
-            "type": "string"
-          },
-          "solver_version": {
-            "type": "string"
-          },
-          "settings": {
+          "items": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
+                "parameter_set_ref": {
+                  "type": "object",
+                  "properties": {
+                    "parameter_set_id": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "content_hash": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "parameter_set_id",
+                    "version",
+                    "content_hash"
+                  ]
+                },
                 "name": {
                   "type": "string"
                 },
-                "value": {
-                  "type": [
-                    "number",
-                    "integer",
-                    "string",
-                    "boolean"
-                  ]
+                "parameters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": [
+                          "number",
+                          "integer",
+                          "string",
+                          "boolean"
+                        ]
+                      },
+                      "unit": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "value"
+                    ]
+                  }
                 }
               },
               "additionalProperties": false,
               "required": [
+                "parameter_set_ref",
                 "name",
-                "value"
+                "parameters"
               ]
             }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
           }
         },
         "additionalProperties": false,
         "required": [
-          "simulation_profile_ref",
-          "name",
-          "solver",
-          "solver_version",
-          "settings"
+          "items",
+          "total",
+          "query"
         ]
       },
       "agent_output_schema": {
         "type": "object",
         "properties": {
-          "simulation_profile_ref": {
-            "type": "object",
-            "properties": {
-              "profile_id": {
-                "type": "string"
-              },
-              "version": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "content_hash": {
-                "type": "string",
-                "pattern": "^sha256:[0-9a-f]{64}$",
-                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "profile_id",
-              "version",
-              "content_hash"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "solver": {
-            "type": "string"
-          },
-          "solver_version": {
-            "type": "string"
-          },
-          "settings": {
+          "items": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
+                "parameter_set_ref": {
+                  "type": "object",
+                  "properties": {
+                    "parameter_set_id": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "content_hash": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "parameter_set_id",
+                    "version",
+                    "content_hash"
+                  ]
+                },
                 "name": {
                   "type": "string"
                 },
-                "value": {
-                  "type": [
-                    "number",
-                    "integer",
-                    "string",
-                    "boolean"
-                  ]
+                "parameters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": [
+                          "number",
+                          "integer",
+                          "string",
+                          "boolean"
+                        ]
+                      },
+                      "unit": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "value"
+                    ]
+                  }
                 }
               },
               "additionalProperties": false,
               "required": [
+                "parameter_set_ref",
                 "name",
-                "value"
+                "parameters"
               ]
             }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
           }
         },
         "additionalProperties": false,
         "required": [
-          "simulation_profile_ref",
-          "name",
-          "solver",
-          "solver_version",
-          "settings"
+          "items",
+          "total",
+          "query"
         ]
       },
-      "schema_hash": "sha256:b61c02a549ddc8f47ca30de1d456160b5a512d6bd21e2646b85bc5e551d7244c",
+      "schema_hash": "sha256:1abaf63bd949fe50d24312aedff34648be6ef8555e686e8dd46d2c459fc35b30",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -42469,6 +42796,387 @@
         {
           "code": "simulation_profile_not_found",
           "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "simulation.result.compare",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "simulation.result.compare",
+      "description": "Compare immutable Simulation result references.",
+      "use_when": "Compare immutable Simulation result references.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-run",
+          "payload_path": "left_result_ref.run_id",
+          "required": true
+        },
+        {
+          "resource_type": "simulation-run",
+          "payload_path": "right_result_ref.run_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "left_result_ref": {
+            "type": "object",
+            "properties": {
+              "run_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "run_id",
+              "source_fingerprint",
+              "result_hash"
+            ]
+          },
+          "right_result_ref": {
+            "type": "object",
+            "properties": {
+              "run_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "run_id",
+              "source_fingerprint",
+              "result_hash"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "left_result_ref",
+          "right_result_ref"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "left_result_ref": {
+            "type": "object",
+            "properties": {
+              "run_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "run_id",
+              "source_fingerprint",
+              "result_hash"
+            ]
+          },
+          "right_result_ref": {
+            "type": "object",
+            "properties": {
+              "run_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "run_id",
+              "source_fingerprint",
+              "result_hash"
+            ]
+          },
+          "same_inputs": {
+            "type": "boolean"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string"
+                },
+                "change_type": {
+                  "type": "string",
+                  "enum": [
+                    "artifact_added",
+                    "artifact_removed",
+                    "artifact_changed"
+                  ]
+                },
+                "before_sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "after_sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "artifact_id",
+                "change_type",
+                "before_sha256",
+                "after_sha256"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "left_result_ref",
+          "right_result_ref",
+          "same_inputs",
+          "changes"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "left_result_ref": {
+            "type": "object",
+            "properties": {
+              "run_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "run_id",
+              "source_fingerprint",
+              "result_hash"
+            ]
+          },
+          "right_result_ref": {
+            "type": "object",
+            "properties": {
+              "run_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "run_id",
+              "source_fingerprint",
+              "result_hash"
+            ]
+          },
+          "same_inputs": {
+            "type": "boolean"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "artifact_id": {
+                  "type": "string"
+                },
+                "change_type": {
+                  "type": "string",
+                  "enum": [
+                    "artifact_added",
+                    "artifact_removed",
+                    "artifact_changed"
+                  ]
+                },
+                "before_sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "after_sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "artifact_id",
+                "change_type",
+                "before_sha256",
+                "after_sha256"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "left_result_ref",
+          "right_result_ref",
+          "same_inputs",
+          "changes"
+        ]
+      },
+      "schema_hash": "sha256:787a7da670f530664d94644467e872dad9015e48b89a3bd04a2cafc964d359a1",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
           "retryable": false
         },
         {
@@ -42542,6 +43250,30 @@
       "output_schema": {
         "type": "object",
         "properties": {
+          "result_ref": {
+            "type": "object",
+            "properties": {
+              "run_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "run_id",
+              "source_fingerprint",
+              "result_hash"
+            ]
+          },
           "run_id": {
             "type": "string"
           },
@@ -42591,6 +43323,7 @@
         },
         "additionalProperties": false,
         "required": [
+          "result_ref",
           "run_id",
           "status",
           "source_fingerprint",
@@ -42600,6 +43333,30 @@
       "agent_output_schema": {
         "type": "object",
         "properties": {
+          "result_ref": {
+            "type": "object",
+            "properties": {
+              "run_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "run_id",
+              "source_fingerprint",
+              "result_hash"
+            ]
+          },
           "run_id": {
             "type": "string"
           },
@@ -42649,13 +43406,14 @@
         },
         "additionalProperties": false,
         "required": [
+          "result_ref",
           "run_id",
           "status",
           "source_fingerprint",
           "result_artifact_refs"
         ]
       },
-      "schema_hash": "sha256:c65c7307cfa25076c883938e8594342dba84e5a182fcccdc4dccfbe7a4b3984f",
+      "schema_hash": "sha256:d8159a0459c244e9f06ace9f3cee8f5468534c67a4173f36e5bfbbaceadee4b0",
       "artifact_policy": "output",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -42687,6 +43445,11 @@
         {
           "code": "simulation_profile_not_found",
           "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
           "retryable": false
         },
         {
@@ -42940,6 +43703,294 @@
           "retryable": false
         },
         {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "simulation.run.search",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "simulation.run.search",
+      "description": "Search Simulation runs.",
+      "use_when": "Search Simulation runs.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "environment_id": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "run_id": {
+                  "type": "string"
+                },
+                "environment_id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "source_fingerprint": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                "craft_commit_ref": {
+                  "type": "string"
+                },
+                "model_snapshot_hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                "parameter_version": {
+                  "type": "integer"
+                },
+                "solver_version": {
+                  "type": "string"
+                },
+                "operation_ref": {
+                  "type": "object",
+                  "properties": {
+                    "operation_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "accepted",
+                        "running",
+                        "completed",
+                        "failed",
+                        "cancelled",
+                        "outcome_unknown"
+                      ]
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "operation_id",
+                    "status",
+                    "version"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "run_id",
+                "environment_id",
+                "status",
+                "source_fingerprint",
+                "craft_commit_ref",
+                "model_snapshot_hash",
+                "parameter_version",
+                "solver_version",
+                "operation_ref"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "run_id": {
+                  "type": "string"
+                },
+                "environment_id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "source_fingerprint": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                "craft_commit_ref": {
+                  "type": "string"
+                },
+                "model_snapshot_hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                },
+                "parameter_version": {
+                  "type": "integer"
+                },
+                "solver_version": {
+                  "type": "string"
+                },
+                "operation_ref": {
+                  "type": "object",
+                  "properties": {
+                    "operation_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "accepted",
+                        "running",
+                        "completed",
+                        "failed",
+                        "cancelled",
+                        "outcome_unknown"
+                      ]
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "operation_id",
+                    "status",
+                    "version"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "run_id",
+                "environment_id",
+                "status",
+                "source_fingerprint",
+                "craft_commit_ref",
+                "model_snapshot_hash",
+                "parameter_version",
+                "solver_version",
+                "operation_ref"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total"
+        ]
+      },
+      "schema_hash": "sha256:f4c188bb72a554ff6801080392dee6877ce0cab9204acf6e112e57ad73200b20",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
           "code": "simulation_environment_not_found",
           "meaning": "The Simulation environment is unavailable or not visible.",
           "retryable": false
@@ -43187,6 +44238,829 @@
         {
           "code": "simulation_profile_not_found",
           "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "simulation.solver_profile.create",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "simulation.solver_profile.create",
+      "description": "Create an immutable solver profile.",
+      "use_when": "Create an immutable solver profile.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "solver": {
+            "type": "string"
+          },
+          "solver_version": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "boolean"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "solver",
+          "solver_version",
+          "settings"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "simulation_profile_ref": {
+            "type": "object",
+            "properties": {
+              "profile_id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "profile_id",
+              "version",
+              "content_hash"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "solver": {
+            "type": "string"
+          },
+          "solver_version": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "boolean"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "simulation_profile_ref",
+          "name",
+          "solver",
+          "solver_version",
+          "settings"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "simulation_profile_ref": {
+            "type": "object",
+            "properties": {
+              "profile_id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "profile_id",
+              "version",
+              "content_hash"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "solver": {
+            "type": "string"
+          },
+          "solver_version": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "boolean"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "simulation_profile_ref",
+          "name",
+          "solver",
+          "solver_version",
+          "settings"
+        ]
+      },
+      "schema_hash": "sha256:097b3f62cfee1d5c68016b05e846ccfeda9170986f6a16abfacc9aff207d0306",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "simulation.solver_profile.get",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "simulation.solver_profile.get",
+      "description": "Read an immutable solver profile.",
+      "use_when": "Read an immutable solver profile.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [
+        {
+          "resource_type": "simulation-profile",
+          "payload_path": "simulation_profile_ref.profile_id",
+          "required": true
+        }
+      ],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "simulation_profile_ref": {
+            "type": "object",
+            "properties": {
+              "profile_id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "profile_id",
+              "version",
+              "content_hash"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "simulation_profile_ref"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "simulation_profile_ref": {
+            "type": "object",
+            "properties": {
+              "profile_id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "profile_id",
+              "version",
+              "content_hash"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "solver": {
+            "type": "string"
+          },
+          "solver_version": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "boolean"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "simulation_profile_ref",
+          "name",
+          "solver",
+          "solver_version",
+          "settings"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "simulation_profile_ref": {
+            "type": "object",
+            "properties": {
+              "profile_id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "profile_id",
+              "version",
+              "content_hash"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "solver": {
+            "type": "string"
+          },
+          "solver_version": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "boolean"
+                  ]
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "simulation_profile_ref",
+          "name",
+          "solver",
+          "solver_version",
+          "settings"
+        ]
+      },
+      "schema_hash": "sha256:b61c02a549ddc8f47ca30de1d456160b5a512d6bd21e2646b85bc5e551d7244c",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_environment_not_found",
+          "meaning": "The Simulation environment is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_run_not_found",
+          "meaning": "The Simulation run is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_result_not_ready",
+          "meaning": "The Simulation run has no completed result artifacts.",
+          "retryable": true
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different Simulation request.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "simulation.solver_profile.search",
+      "major_version": 1,
+      "owner_domain": "simulation",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "simulation.solver_profile.search",
+      "description": "Search immutable solver profiles.",
+      "use_when": "Search immutable solver profiles.",
+      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "simulation.v2:simulation.use",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "simulation_profile_ref": {
+                  "type": "object",
+                  "properties": {
+                    "profile_id": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "content_hash": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "profile_id",
+                    "version",
+                    "content_hash"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "solver": {
+                  "type": "string"
+                },
+                "solver_version": {
+                  "type": "string"
+                },
+                "settings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": [
+                          "number",
+                          "integer",
+                          "string",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "value"
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "simulation_profile_ref",
+                "name",
+                "solver",
+                "solver_version",
+                "settings"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "query"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "simulation_profile_ref": {
+                  "type": "object",
+                  "properties": {
+                    "profile_id": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "content_hash": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$",
+                      "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "profile_id",
+                    "version",
+                    "content_hash"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "solver": {
+                  "type": "string"
+                },
+                "solver_version": {
+                  "type": "string"
+                },
+                "settings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": [
+                          "number",
+                          "integer",
+                          "string",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "value"
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "simulation_profile_ref",
+                "name",
+                "solver",
+                "solver_version",
+                "settings"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "total",
+          "query"
+        ]
+      },
+      "schema_hash": "sha256:a9b32f2dfab84a796927a6bf77bdb62005374f7d9b71a6272c605b84c64bb1e3",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "source_resolver_unavailable",
+          "meaning": "A required owning-domain resolver is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "source_version_mismatch",
+          "meaning": "A referenced source no longer matches its immutable hash or version.",
+          "retryable": false
+        },
+        {
+          "code": "parameter_set_not_found",
+          "meaning": "The immutable parameter set is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "simulation_profile_not_found",
+          "meaning": "The immutable Simulation profile is unavailable or not visible.",
+          "retryable": false
+        },
+        {
+          "code": "solver_not_allowed",
+          "meaning": "The requested solver coordinate is not in the governed allowlist.",
           "retryable": false
         },
         {
@@ -45326,8 +47200,8 @@
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:fdc5eacfeb974842279a70d00798f64f63d08073cde3e7ee4be28cae737646d1"
+      "artifact_hash": "sha256:01d13e92934650fac586c365529e53e3775b39d171b5a78b069b662dc67d8100"
     }
   ],
-  "created_at": "2026-08-12T08:57:42.865481Z"
+  "created_at": "2026-08-12T09:08:00.957410Z"
 }

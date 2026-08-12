@@ -4072,6 +4072,31 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
+    "capability:simulation.environment.archive": {
+      "function_id": "capability:simulation.environment.archive",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.environment.archive",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
     "capability:simulation.environment.create": {
       "function_id": "capability:simulation.environment.create",
       "domain": "Simulation",
@@ -4122,14 +4147,14 @@
         "plugins/simulation/simulation_backend/capabilities/provider.py"
       ]
     },
-    "capability:simulation.environment.list": {
-      "function_id": "capability:simulation.environment.list",
+    "capability:simulation.environment.search": {
+      "function_id": "capability:simulation.environment.search",
       "domain": "Simulation",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "simulation.environment.list",
+      "target_capability": "simulation.environment.search",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
@@ -4195,14 +4220,14 @@
         "plugins/simulation/simulation_backend/capabilities/provider.py"
       ]
     },
-    "capability:simulation.profile.create": {
-      "function_id": "capability:simulation.profile.create",
+    "capability:simulation.parameter_set.search": {
+      "function_id": "capability:simulation.parameter_set.search",
       "domain": "Simulation",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "simulation.profile.create",
+      "target_capability": "simulation.parameter_set.search",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
@@ -4219,14 +4244,14 @@
         "plugins/simulation/simulation_backend/capabilities/models.py"
       ]
     },
-    "capability:simulation.profile.get": {
-      "function_id": "capability:simulation.profile.get",
+    "capability:simulation.result.compare": {
+      "function_id": "capability:simulation.result.compare",
       "domain": "Simulation",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "simulation.profile.get",
+      "target_capability": "simulation.result.compare",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
@@ -4294,6 +4319,30 @@
         "plugins/simulation/simulation_backend/capabilities/provider.py"
       ]
     },
+    "capability:simulation.run.search": {
+      "function_id": "capability:simulation.run.search",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.run.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py"
+      ]
+    },
     "capability:simulation.run.start": {
       "function_id": "capability:simulation.run.start",
       "domain": "Simulation",
@@ -4317,6 +4366,79 @@
         "plugins/simulation/simulation_backend/capabilities/contracts.py",
         "plugins/simulation/simulation_backend/capabilities/models.py",
         "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.solver_profile.create": {
+      "function_id": "capability:simulation.solver_profile.create",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.solver_profile.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py"
+      ]
+    },
+    "capability:simulation.solver_profile.get": {
+      "function_id": "capability:simulation.solver_profile.get",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.solver_profile.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py",
+        "plugins/simulation/simulation_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:simulation.solver_profile.search": {
+      "function_id": "capability:simulation.solver_profile.search",
+      "domain": "Simulation",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "simulation.solver_profile.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Simulation",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/simulation/simulation_backend/capabilities/contracts.py",
+        "plugins/simulation/simulation_backend/capabilities/models.py"
       ]
     },
     "capability:system.activity.search": {

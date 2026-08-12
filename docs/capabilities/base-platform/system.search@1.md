@@ -8,7 +8,7 @@ Search stable references across registered domain providers.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
+- Catalog Release：`rel_386d62dabf4e43e02ee660709e6398a1`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -78,7 +78,7 @@ Search stable references across registered domain providers.
 ```json
 {
   "capability_id": "system.search",
-  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
+  "catalog_release": "rel_386d62dabf4e43e02ee660709e6398a1",
   "major_version": 1,
   "payload": {
     "query": "example"

@@ -8,7 +8,7 @@ Atomically activate a verified direct forward release.
 - 不适用：Publishing or rolling back directly.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
+- Catalog Release：`rel_386d62dabf4e43e02ee660709e6398a1`
 - Schema 精度：`legacy_partial`
 - 暂未开放原因：`legacy_partial_schema`
 
@@ -79,7 +79,7 @@ Atomically activate a verified direct forward release.
 ```json
 {
   "capability_id": "ontology.release.activate",
-  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
+  "catalog_release": "rel_386d62dabf4e43e02ee660709e6398a1",
   "major_version": 1,
   "payload": {
     "attestations": "example",

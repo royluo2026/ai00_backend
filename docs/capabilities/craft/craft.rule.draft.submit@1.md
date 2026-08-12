@@ -8,7 +8,7 @@ craft.rule.draft.submit
 - 不适用：Rules are unreviewed or inputs are mutable.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
+- Catalog Release：`rel_386d62dabf4e43e02ee660709e6398a1`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -104,7 +104,7 @@ craft.rule.draft.submit
 ```json
 {
   "capability_id": "craft.rule.draft.submit",
-  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
+  "catalog_release": "rel_386d62dabf4e43e02ee660709e6398a1",
   "major_version": 1,
   "payload": {}
 }

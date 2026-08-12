@@ -1,14 +1,14 @@
-# simulation.profile.get@1
+# simulation.parameter_set.search@1
 
-Read an immutable solver profile.
+Search immutable Simulation parameter sets.
 
 ## 使用判断
 
-- 适用：Read an immutable solver profile.
+- 适用：Search immutable Simulation parameter sets.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
+- Catalog Release：`rel_386d62dabf4e43e02ee660709e6398a1`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -35,7 +35,7 @@ Read an immutable solver profile.
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `simulation-profile` ← `simulation_profile_ref.profile_id`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
@@ -59,33 +59,15 @@ Read an immutable solver profile.
 {
   "additionalProperties": false,
   "properties": {
-    "simulation_profile_ref": {
-      "additionalProperties": false,
-      "properties": {
-        "content_hash": {
-          "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "pattern": "^sha256:[0-9a-f]{64}$",
-          "type": "string"
-        },
-        "profile_id": {
-          "type": "string"
-        },
-        "version": {
-          "minimum": 1,
-          "type": "integer"
-        }
-      },
-      "required": [
-        "profile_id",
-        "version",
-        "content_hash"
-      ],
-      "type": "object"
+    "limit": {
+      "maximum": 200,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "query": {
+      "type": "string"
     }
   },
-  "required": [
-    "simulation_profile_ref"
-  ],
   "type": "object"
 }
 ```
@@ -94,16 +76,10 @@ Read an immutable solver profile.
 
 ```json
 {
-  "capability_id": "simulation.profile.get",
-  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
+  "capability_id": "simulation.parameter_set.search",
+  "catalog_release": "rel_386d62dabf4e43e02ee660709e6398a1",
   "major_version": 1,
-  "payload": {
-    "simulation_profile_ref": {
-      "content_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-      "profile_id": "example",
-      "version": 1
-    }
-  }
+  "payload": {}
 }
 ```
 
@@ -115,69 +91,84 @@ Read an immutable solver profile.
 {
   "additionalProperties": false,
   "properties": {
-    "name": {
-      "type": "string"
-    },
-    "settings": {
+    "items": {
       "items": {
         "additionalProperties": false,
         "properties": {
           "name": {
             "type": "string"
           },
-          "value": {
-            "type": [
-              "number",
-              "integer",
-              "string",
-              "boolean"
-            ]
+          "parameter_set_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "content_hash": {
+                "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "parameter_set_id": {
+                "type": "string"
+              },
+              "version": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "parameter_set_id",
+              "version",
+              "content_hash"
+            ],
+            "type": "object"
+          },
+          "parameters": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": [
+                    "number",
+                    "integer",
+                    "string",
+                    "boolean"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "value"
+              ],
+              "type": "object"
+            },
+            "type": "array"
           }
         },
         "required": [
+          "parameter_set_ref",
           "name",
-          "value"
+          "parameters"
         ],
         "type": "object"
       },
       "type": "array"
     },
-    "simulation_profile_ref": {
-      "additionalProperties": false,
-      "properties": {
-        "content_hash": {
-          "example": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "pattern": "^sha256:[0-9a-f]{64}$",
-          "type": "string"
-        },
-        "profile_id": {
-          "type": "string"
-        },
-        "version": {
-          "minimum": 1,
-          "type": "integer"
-        }
-      },
-      "required": [
-        "profile_id",
-        "version",
-        "content_hash"
-      ],
-      "type": "object"
-    },
-    "solver": {
+    "query": {
       "type": "string"
     },
-    "solver_version": {
-      "type": "string"
+    "total": {
+      "type": "integer"
     }
   },
   "required": [
-    "simulation_profile_ref",
-    "name",
-    "solver",
-    "solver_version",
-    "settings"
+    "items",
+    "total",
+    "query"
   ],
   "type": "object"
 }
@@ -219,6 +210,7 @@ Read an immutable solver profile.
 - `source_version_mismatch`：A referenced source no longer matches its immutable hash or version.（retryable=false）
 - `parameter_set_not_found`：The immutable parameter set is unavailable or not visible.（retryable=false）
 - `simulation_profile_not_found`：The immutable Simulation profile is unavailable or not visible.（retryable=false）
+- `solver_not_allowed`：The requested solver coordinate is not in the governed allowlist.（retryable=false）
 - `simulation_environment_not_found`：The Simulation environment is unavailable or not visible.（retryable=false）
 - `simulation_run_not_found`：The Simulation run is unavailable or not visible.（retryable=false）
 - `simulation_result_not_ready`：The Simulation run has no completed result artifacts.（retryable=true）

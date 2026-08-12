@@ -222,16 +222,21 @@
     "project-management/project.task_template.read@1.md",
     "project-management/project.workbench.change.apply@1.md",
     "project-management/project.workbench.read@1.md",
+    "simulation/simulation.environment.archive@1.md",
     "simulation/simulation.environment.create@1.md",
     "simulation/simulation.environment.get@1.md",
-    "simulation/simulation.environment.list@1.md",
+    "simulation/simulation.environment.search@1.md",
     "simulation/simulation.parameter_set.create@1.md",
     "simulation/simulation.parameter_set.get@1.md",
-    "simulation/simulation.profile.create@1.md",
-    "simulation/simulation.profile.get@1.md",
+    "simulation/simulation.parameter_set.search@1.md",
+    "simulation/simulation.result.compare@1.md",
     "simulation/simulation.result.get@1.md",
     "simulation/simulation.run.get@1.md",
-    "simulation/simulation.run.start@1.md"
+    "simulation/simulation.run.search@1.md",
+    "simulation/simulation.run.start@1.md",
+    "simulation/simulation.solver_profile.create@1.md",
+    "simulation/simulation.solver_profile.get@1.md",
+    "simulation/simulation.solver_profile.search@1.md"
   ],
   "schema_version": 1
 }

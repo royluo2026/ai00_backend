@@ -8,7 +8,7 @@ Project one BOP structure into a line, station or role work package.
 - 不适用：The caller needs the complete BOP structure.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_91d463504f565162861a144daa9db0fd`
+- Catalog Release：`rel_386d62dabf4e43e02ee660709e6398a1`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -99,7 +99,7 @@ Project one BOP structure into a line, station or role work package.
 ```json
 {
   "capability_id": "craft.bop.work_package.get",
-  "catalog_release": "rel_91d463504f565162861a144daa9db0fd",
+  "catalog_release": "rel_386d62dabf4e43e02ee660709e6398a1",
   "major_version": 1,
   "payload": {
     "scope": {
