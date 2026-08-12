@@ -55,6 +55,8 @@ runs-on: [self-hosted, test-server, capability-v2-rc]
 
 现有 runner 只有在明确加入 `capability-v2-rc` 标签后才能领取该 job。标签配置属于运维状态，不由仓库测试自动放宽。工作流继续使用 `capability-v2-release-candidate` environment 名称和显式 `environment_id` 输入；RC evidence 必须绑定 Gitea run ID、attempt、Git commit 和 environment ID。
 
+Gitea bootstrap 模式只从受保护 secret 注入 `AI00_RC_ADMIN_DB_URL`。二十二个领域 URL 由 bootstrap 写入受 ACL 保护的临时 env 文件，再由同一 job 导入后续 migration、Provider 和 verifier 步骤；它们不是二十二个长期 Gitea secrets。GitHub 工作流可以继续使用预配的二十二个领域 secrets，但两种凭据来源最终必须提供相同的十一域环境变量集合，且不得改变发布门禁。
+
 ### 3.3 十一域数据库 Bootstrap
 
 新增 CLI：
@@ -132,7 +134,7 @@ strict completion report check ────────► 发布允许或失败
 - Gitea RC 文件存在且 YAML 可解析。
 - runner 标签包含 `capability-v2-rc`，不能只有 `test-server`。
 - GitHub/Gitea 两份 RC 工作流的强制门禁集合和顺序一致。
-- Gitea 工作流必须引用全部十一域 runtime/DDL secret 名称。
+- Gitea 工作流必须只把管理员 URL 作为数据库 secret 输入，并从 bootstrap 输出导入全部十一域 runtime/DDL 环境变量；测试要拒绝缺域、长期保存生成 URL或上传 env 文件。
 - acceptance 后必须执行 report completion 复核并上传三份证据。
 
 ### 7.2 Bootstrap 单元测试
@@ -160,7 +162,7 @@ strict completion report check ────────► 发布允许或失败
 本设计只有在以下条件同时满足时完成：
 
 1. Gitea 能发现并调度专用 RC workflow；
-2. runner 带 `capability-v2-rc` 标签且所需 secrets 已配置；
+2. runner 带 `capability-v2-rc` 标签，且管理员、身份、服务健康检查等所需受保护 secrets 已配置；
 3. 十一数据库和二十二账号由 bootstrap 建立并通过 live grant verifier；
 4. 所有 migration ledger 与当前 Git commit 的冻结清单一致；
 5. 真实进程 evidence 绑定当前 environment/run/commit；
