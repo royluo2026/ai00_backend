@@ -85,6 +85,7 @@ class InMemoryItemEntryRepository:
         self.task_templates = {}
         self.template_items = {}
         self.created_tasks = []
+        self.approval_orders = {}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -274,6 +275,17 @@ class InMemoryItemEntryRepository:
         self.template_items[gid].update(updates); return True
     def delete_task_template_item(self, gid): return self.template_items.pop(gid, None) is not None
     def create_tasks_from_template(self, tasks): self.created_tasks.extend(tasks)
+    def search_approval_orders(self, filters, scope): return list(self.approval_orders.values())
+    def create_approval_order(self, gid, values): self.approval_orders[gid] = {"gid": gid, "status": "pending", "opinions": [], "created_at": "2026-08-12", "updated_at": "2026-08-12", **values}
+    def get_approval_order(self, gid): return self.approval_orders.get(gid)
+    def transition_approval_order(self, gid, action, actor_gid, comment):
+        row = self.approval_orders.get(gid)
+        expected = {"start": "pending", "approve": "in_review", "reject": "in_review", "withdraw": ("pending", "in_review")}[action]
+        if not row or row["status"] not in ((expected,) if isinstance(expected, str) else expected): return None
+        if action in {"start", "withdraw"} and row["applicant_gid"] != actor_gid: return None
+        row["status"] = {"start": "in_review", "approve": "approved", "reject": "rejected", "withdraw": "withdrawn"}[action]
+        row["opinions"].append({"actor_gid": actor_gid, "action": action, "comment": comment}); return row
+    def apply_scope_upgrade(self, item_type, item_gid, target_scope): return True
 
 
 def _application():
@@ -605,3 +617,12 @@ def test_task_template_lifecycle_and_instantiation_are_project_owned():
     assert detail["data"]["items"][0]["title_pattern"] == "Prepare {{project_name}}"
     created = application.invoke("project.task_template.change.apply", {"operation": "task_templates.instantiate", "arguments": {"gid": "template-1", "project_gid": "project-1", "start_date": "2026-08-12", "title_vars": {"project_name": "P1"}}}, CONTEXT)
     assert created == {"success": True, "data": [{"gid": "task-1", "title": "Prepare P1", "due_date": "2026-08-14", "assignee_gid": None, "template_item_gid": "item-1"}], "count": 1}
+
+
+def test_approval_lifecycle_is_project_owned_and_emits_notification_intent():
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: "approval-1")
+    created = application.invoke("project.approval.change.apply", {"operation": "approval.orders.create", "arguments": {"title": "Release", "reviewer_gid": "user-2"}}, CONTEXT)
+    assert created["data"]["gid"] == "approval-1"
+    assert application.invoke("project.approval.change.apply", {"operation": "approval.orders.start", "arguments": {"gid": "approval-1"}}, CONTEXT) == {"success": True}
+    approved = application.invoke("project.approval.change.apply", {"operation": "approval.orders.approve", "arguments": {"gid": "approval-1", "comment": "ok"}}, CapabilityContext(user_gid="user-2", team_gid="team-1", active_roles=("project_admin",)))
+    assert approved["notification"]["recipient_gid"] == "user-1"

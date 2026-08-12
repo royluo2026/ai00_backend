@@ -449,3 +449,36 @@ class ProjectManagementRepository:
                 connection.commit()
             except Exception:
                 connection.rollback(); raise
+
+    def search_approval_orders(self, filters: dict[str, Any], scope: dict[str, Any]) -> list[dict[str, Any]]:
+        clauses = ["(applicant_gid=%s OR reviewer_gid=%s)"]; params: list[Any] = [scope["user_gid"], scope["user_gid"]]
+        if bool(scope.get("is_admin")): clauses = ["1=1"]; params = []
+        if filters.get("status"): clauses.append("status=%s"); params.append(filters["status"])
+        if filters.get("project_gid"): clauses.append("project_gid=%s"); params.append(filters["project_gid"])
+        return self.fetch_all("SELECT gid,project_gid,order_type,title,applicant_gid,reviewer_gid,status,source_ref,share_scope,created_at,updated_at FROM workmanship_proj_approval_orders WHERE " + " AND ".join(clauses) + " ORDER BY updated_at DESC", tuple(params))
+
+    def create_approval_order(self, gid: str, values: dict[str, Any]) -> None:
+        self.execute("INSERT INTO workmanship_proj_approval_orders (gid,title,order_type,project_gid,applicant_gid,reviewer_gid,source_ref,content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (gid, values["title"], values["order_type"], values["project_gid"], values["applicant_gid"], values["reviewer_gid"], values["source_ref"], json.dumps(values["content"], ensure_ascii=False)))
+
+    def get_approval_order(self, gid: str) -> dict[str, Any] | None:
+        return self.fetch_one("SELECT gid,project_gid,order_type,title,applicant_gid,reviewer_gid,status,source_ref,content,opinions,meta,created_at,updated_at FROM workmanship_proj_approval_orders WHERE gid=%s", (gid,))
+
+    def transition_approval_order(self, gid: str, action: str, actor_gid: str, comment: str) -> dict[str, Any] | None:
+        target = {"start": "in_review", "approve": "approved", "reject": "rejected", "withdraw": "withdrawn"}[action]
+        expected = {"start": ("pending",), "approve": ("in_review",), "reject": ("in_review",), "withdraw": ("pending", "in_review")}[action]
+        with get_project_management_conn() as connection:
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT * FROM workmanship_proj_approval_orders WHERE gid=%s FOR UPDATE", (gid,)); raw = cursor.fetchone()
+                    if not raw: connection.rollback(); return None
+                    row = dict(raw)
+                    if row["status"] not in expected or (action in {"start", "withdraw"} and str(row["applicant_gid"]) != actor_gid): connection.rollback(); return None
+                    opinion = json.dumps([{"actor_gid": actor_gid, "action": action, "comment": comment}], ensure_ascii=False)
+                    cursor.execute("UPDATE workmanship_proj_approval_orders SET status=%s,opinions=JSON_MERGE_PRESERVE(COALESCE(opinions,JSON_ARRAY()),%s),updated_at=NOW() WHERE gid=%s", (target, opinion, gid))
+                connection.commit(); row["status"] = target; return row
+            except Exception:
+                connection.rollback(); raise
+
+    def apply_scope_upgrade(self, item_type: str, item_gid: str, target_scope: str) -> bool:
+        table = {"project": "workmanship_proj_projects", "approval": "workmanship_proj_approval_orders"}.get(item_type)
+        return bool(table and self.execute(f"UPDATE {table} SET share_scope=%s WHERE gid=%s", (target_scope, item_gid)))

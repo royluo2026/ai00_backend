@@ -76,6 +76,11 @@ class ItemEntryRepository(Protocol):
     def update_task_template_item(self, gid: str, updates: dict[str, Any]) -> bool: ...
     def delete_task_template_item(self, gid: str) -> bool: ...
     def create_tasks_from_template(self, tasks: list[dict[str, Any]]) -> None: ...
+    def search_approval_orders(self, filters: dict[str, Any], scope: dict[str, Any]) -> list[dict[str, Any]]: ...
+    def create_approval_order(self, gid: str, values: dict[str, Any]) -> None: ...
+    def get_approval_order(self, gid: str) -> dict[str, Any] | None: ...
+    def transition_approval_order(self, gid: str, action: str, actor_gid: str, comment: str) -> dict[str, Any] | None: ...
+    def apply_scope_upgrade(self, item_type: str, item_gid: str, target_scope: str) -> bool: ...
 
 
 _OPERATIONS = {
@@ -106,6 +111,8 @@ _OPERATIONS = {
     "project.project.change.apply": frozenset({"projects.create", "projects.update", "projects.delete", "vehicle_models.create", "vehicle_models.update", "vehicle_models.delete"}),
     "project.task_template.read": frozenset({"task_templates.list", "task_templates.get"}),
     "project.task_template.change.apply": frozenset({"task_templates.create", "task_templates.update", "task_templates.delete", "task_templates.items.create", "task_templates.items.update", "task_templates.items.delete", "task_templates.instantiate"}),
+    "project.approval.read": frozenset({"approval.orders.search", "approval.orders.get"}),
+    "project.approval.change.apply": frozenset({"approval.orders.create", "approval.orders.start", "approval.orders.approve", "approval.orders.reject", "approval.orders.withdraw", "approval.scope_upgrade.create"}),
 }
 
 
@@ -263,6 +270,8 @@ class ProjectManagementApplication:
             return self._vehicle_model(operation, arguments, _context)
         if operation.startswith("task_templates."):
             return self._task_template(operation, arguments, _context)
+        if operation.startswith("approval."):
+            return self._approval(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -347,6 +356,35 @@ class ProjectManagementApplication:
             raise CapabilityBusinessError("invalid_input", "no update fields")
         self._repository.update_list(gid, updates)
         return {"success": True}
+
+    def _approval(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if operation == "approval.orders.search":
+            scope = arguments.get("scope")
+            if not isinstance(scope, Mapping) or str(scope.get("user_gid") or "") != user_gid: raise CapabilityBusinessError("invalid_input", "server-derived scope is required")
+            return {"success": True, "data": self._repository.search_approval_orders({"status": str(arguments.get("status") or "") or None, "project_gid": str(arguments.get("project_gid") or "") or None}, dict(scope))}
+        if operation == "approval.orders.create":
+            gid = self._next_id(); self._repository.create_approval_order(gid, {"title": _required_text(arguments, "title"), "order_type": str(arguments.get("order_type") or "general"), "project_gid": arguments.get("project_gid"), "applicant_gid": user_gid, "reviewer_gid": arguments.get("reviewer_gid"), "source_ref": arguments.get("source_ref"), "content": dict(arguments.get("content") or {})})
+            return {"success": True, "data": {"gid": gid}}
+        if operation == "approval.scope_upgrade.create":
+            current_scope = _required_text(arguments, "current_scope"); target_scope = _required_text(arguments, "target_scope"); order = ["local", "project", "team", "global"]
+            if target_scope not in order or current_scope not in order or order.index(target_scope) <= order.index(current_scope): raise CapabilityBusinessError("invalid_input", "target scope must be higher than current scope")
+            content = {key: arguments.get(key) for key in ("item_type", "item_gid", "item_title", "current_scope", "target_scope", "reason")}
+            gid = self._next_id(); self._repository.create_approval_order(gid, {"title": f"范围提升申请：{content['item_title']}（{current_scope} → {target_scope}）", "order_type": "scope_upgrade", "project_gid": None, "applicant_gid": user_gid, "reviewer_gid": arguments.get("reviewer_gid"), "source_ref": None, "content": content})
+            return {"success": True, "data": {"gid": gid, "reviewer_gid": arguments.get("reviewer_gid")}}
+        gid = _required_text(arguments, "gid")
+        if operation == "approval.orders.get":
+            row = self._repository.get_approval_order(gid)
+            if row is None: raise CapabilityBusinessError("not_found", "approval order not found")
+            return {"success": True, "data": row}
+        action = operation.rsplit(".", 1)[-1]
+        row = self._repository.transition_approval_order(gid, action, user_gid, str(arguments.get("comment") or ("提交审批" if action == "start" else "已撤回" if action == "withdraw" else "")))
+        if row is None: raise CapabilityBusinessError("invalid_state", "approval state or permission does not allow this action")
+        if action == "approve" and row.get("order_type") == "scope_upgrade":
+            content = row.get("content") or {}; self._repository.apply_scope_upgrade(str(content.get("item_type") or ""), str(content.get("item_gid") or ""), str(content.get("target_scope") or ""))
+        result = {"success": True}
+        if action in {"approve", "reject"}: result["notification"] = {"recipient_gid": row["applicant_gid"], "event": f"scope_{'approved' if action == 'approve' else 'rejected'}", "item_type": (row.get("content") or {}).get("item_type"), "item_gid": (row.get("content") or {}).get("item_gid")}
+        return result
 
     def _project(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
         user_gid = str(getattr(context, "user_gid", "") or "")
