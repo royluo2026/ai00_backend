@@ -15,8 +15,8 @@ def test_official_domain_providers_load_without_kernel_importing_domains():
     loaded = loader.register_capabilities(CapabilityRegistry())
 
     assert loaded == (
-        "official.craft", "official.local-integration", "official.digital-model",
-        "official.project-management", "official.simulation",
+        "base", "craft", "digital_model", "knowledge", "local_runtime",
+        "ontology", "project_management", "simulation",
     )
     kernel_source = (root / "backend/capabilities/registry_next.py").read_text(encoding="utf-8")
     assert "craft_backend" not in kernel_source
@@ -43,10 +43,12 @@ def test_third_party_manifest_cannot_load_backend_provider(tmp_path):
     found = loader.discover()
 
     assert "backend" not in found[0]
-    assert loader.register_capabilities(CapabilityRegistry()) == ()
+    loaded = loader.register_capabilities(CapabilityRegistry())
+    assert "third.example" not in loaded
+    assert "base" in loaded
 
 
-def test_declared_official_provider_failure_aborts_registration(tmp_path):
+def test_discovered_official_backend_cannot_bypass_central_manifest(tmp_path):
     packages = tmp_path / "packages"
     plugins = tmp_path / "plugins"
     package = packages / "broken"
@@ -64,5 +66,6 @@ def test_declared_official_provider_failure_aborts_registration(tmp_path):
     loader = PluginLoader(packages, plugins)
     loader.discover()
 
-    with pytest.raises(RuntimeError, match="official.broken"):
-        loader.register_capabilities(CapabilityRegistry())
+    loaded = loader.register_capabilities(CapabilityRegistry())
+
+    assert "official.broken" not in loaded

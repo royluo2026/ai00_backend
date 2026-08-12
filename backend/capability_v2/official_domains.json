@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "domains": [
+    {
+      "domain_id": "base",
+      "artifact": {
+        "plugin_id": "official.base",
+        "module": "backend.base.official_provider",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:193ead8d21eff5ebad5f5fd726049a55dfeab3aa2a13db0732c26f19d12c3f9f"
+      },
+      "artifact_path": "backend/base",
+      "allowed_owners": [
+        "base"
+      ],
+      "database": {
+        "database_name": "ai00_base",
+        "runtime_url_env": "AI00_BASE_DB_URL",
+        "ddl_url_env": "AI00_BASE_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/base"
+      },
+      "search_export": {
+        "capability_id": "system.search",
+        "major_version": 1
+      },
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "craft",
+      "artifact": {
+        "plugin_id": "official.craft",
+        "module": "craft_backend.capabilities",
+        "version": "1.2.0",
+        "artifact_hash": "sha256:e66c835b45c55cec24e5465996c16552a7a3dfc6a458519344cc77f499a264ad"
+      },
+      "artifact_path": "plugins/craft/craft_backend",
+      "allowed_owners": [
+        "craft"
+      ],
+      "database": {
+        "database_name": "ai00_craft",
+        "runtime_url_env": "AI00_CRAFT_DB_URL",
+        "ddl_url_env": "AI00_CRAFT_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/craft"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "digital_model",
+      "artifact": {
+        "plugin_id": "official.digital-model",
+        "module": "digital_model_backend.capabilities",
+        "version": "1.1.0",
+        "artifact_hash": "sha256:db0b213ef84ff65ed50cc8a1e29c9aafbe3f3c6ff46cdde5c206b8ea88333931"
+      },
+      "artifact_path": "plugins/digital_model/digital_model_backend",
+      "allowed_owners": [
+        "digital_model"
+      ],
+      "database": {
+        "database_name": "ai00_digital_model",
+        "runtime_url_env": "AI00_DIGITAL_MODEL_DB_URL",
+        "ddl_url_env": "AI00_DIGITAL_MODEL_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/digital_model"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "knowledge",
+      "artifact": {
+        "plugin_id": "official.knowledge",
+        "module": "backend.knowledge.official_provider",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:ee4bf4f10505bc0a5c60b9ff0024a9b6ee3bbe56fe7d6c8a93362e3d98b397a7"
+      },
+      "artifact_path": "backend/knowledge",
+      "allowed_owners": [
+        "knowledge"
+      ],
+      "database": {
+        "database_name": "ai00_knowledge",
+        "runtime_url_env": "AI00_KNOWLEDGE_DB_URL",
+        "ddl_url_env": "AI00_KNOWLEDGE_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/knowledge"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "local_runtime",
+      "artifact": {
+        "plugin_id": "official.local-runtime",
+        "module": "device_backend.capabilities",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:30bc10e6c978dad6b8dd895224f68a24e92a7f47be9d9cb4d9b734a893e7b7ed"
+      },
+      "artifact_path": "plugins/device/device_backend",
+      "allowed_owners": [
+        "local_runtime",
+        "local_integration"
+      ],
+      "database": {
+        "database_name": "ai00_local_runtime",
+        "runtime_url_env": "AI00_LOCAL_RUNTIME_DB_URL",
+        "ddl_url_env": "AI00_LOCAL_RUNTIME_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/local_runtime"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "ontology",
+      "artifact": {
+        "plugin_id": "official.ontology",
+        "module": "backend.ontology.official_provider",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:3f4b1818a435021936fb275b95e5f655d0325d65942e4653a8a73de162359c1d"
+      },
+      "artifact_path": "backend/ontology",
+      "allowed_owners": [
+        "ontology"
+      ],
+      "database": {
+        "database_name": "ai00_ontology",
+        "runtime_url_env": "AI00_ONTOLOGY_DB_URL",
+        "ddl_url_env": "AI00_ONTOLOGY_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/ontology"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "project_management",
+      "artifact": {
+        "plugin_id": "official.project-management",
+        "module": "project_management_backend.capabilities",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:36abeebd3709cd022156a523027ea3224c70a0be86929f2d808c0e00d15d6474"
+      },
+      "artifact_path": "plugins/project_management/project_management_backend",
+      "allowed_owners": [
+        "project_management"
+      ],
+      "database": {
+        "database_name": "ai00_project_management",
+        "runtime_url_env": "AI00_PROJECT_MANAGEMENT_DB_URL",
+        "ddl_url_env": "AI00_PROJECT_MANAGEMENT_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/project_management"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
+      "domain_id": "simulation",
+      "artifact": {
+        "plugin_id": "official.simulation",
+        "module": "simulation_backend.capabilities",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
+      },
+      "artifact_path": "plugins/simulation/simulation_backend",
+      "allowed_owners": [
+        "simulation"
+      ],
+      "database": {
+        "database_name": "ai00_simulation",
+        "runtime_url_env": "AI00_SIMULATION_DB_URL",
+        "ddl_url_env": "AI00_SIMULATION_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/simulation"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    }
+  ]
+}

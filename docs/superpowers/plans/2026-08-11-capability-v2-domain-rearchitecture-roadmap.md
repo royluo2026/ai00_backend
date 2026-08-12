@@ -46,6 +46,7 @@ This roadmap decomposes the approved multi-domain specification into independent
 - Plan 08 converts BOP CapabilitySpec registrations to native V2 Descriptor/Provider, implements the §14.6 PreviewRef contract, records BOP CommitRef through CraftBopRevisionAdapter and links the exact PBOM CommitRef. Factory mutable references go to the Base impact projection through events, not fake commits.
 - Plan 09 adds GBOP/Rule native V2 Providers and GBOP lineage edges without changing already published BOP or PBOM commits.
 - Plan 12 first delivers Integration Core after Plans 01-02. A Knowledge sync Adapter can ship after Plan 05; every later Adapter declares and waits for its own target Provider rather than blocking Core on all domains.
+- Plan 13 must replace the current VisMockup `local_integration` owner with `local_runtime` and remove that sole compatibility alias from `official_domains.json` before Local Runtime finalization; no other domain may introduce a legacy owner alias.
 - Plan 14 freezes legacy handwritten Agent tools until removal, replaces them with Catalog-generated tools, and cancels all pending ApprovalRequests for a Run before completing `system.job.cancel`.
 - Plan 15 removes the V1 adapter, legacy Agent token forwarding, compatibility routes, old PBOM/eBOM surfaces and reclassified boundary baseline only after all consumers pass parity tests.
 

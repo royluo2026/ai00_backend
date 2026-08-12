@@ -15,17 +15,15 @@ import sys
 from pathlib import Path
 
 from backend.capability_v2.catalog import ProviderArtifact
+from backend.capability_v2.domain_manifest import load_domain_manifests
+from backend.capability_v2.provider_loader import DomainProviderLoader, ProviderTrustError
 
 logger = logging.getLogger(__name__)
 
 _PROJECT_ROOT = Path(__file__).parent.parent
 _PACKAGES_DIR = _PROJECT_ROOT / "packages"
 _PLUGINS_DIR  = _PROJECT_ROOT / "plugins"
-_OFFICIAL_PROVIDERS_PATH = Path(__file__).with_name("capability_v2") / "official_providers.json"
-
-
-class ProviderTrustError(RuntimeError):
-    pass
+_OFFICIAL_DOMAINS_PATH = Path(__file__).with_name("capability_v2") / "official_domains.json"
 
 
 def hash_provider_artifact(package_dir: Path, module: str) -> str:
@@ -49,26 +47,25 @@ def hash_provider_artifact(package_dir: Path, module: str) -> str:
     return "sha256:" + digest.hexdigest()
 
 
-def _load_official_providers(path: Path = _OFFICIAL_PROVIDERS_PATH) -> tuple[ProviderArtifact, ...]:
-    if not path.is_file():
-        return ()
-    document = json.loads(path.read_text(encoding="utf-8"))
-    return tuple(ProviderArtifact.model_validate(item) for item in document.get("providers", ()))
-
-
 class PluginLoader:
     def __init__(self, packages_dir: Path = _PACKAGES_DIR, plugins_dir: Path = _PLUGINS_DIR,
-                 *, provider_artifacts=None):
+                 *, provider_artifacts=None, domain_manifests=None):
         self._packages_dir = packages_dir
         self._plugins_dir  = plugins_dir
         self._plugins: list[dict] = []
         self._plugin_dirs: dict[str, Path] = {}         # plugin_id → 插件目录（web 路径用）
         self._plugin_backend_dirs: dict[str, Path] = {} # plugin_id → 后端代码目录（sys.path 注入用）
-        artifacts = _load_official_providers() if provider_artifacts is None else tuple(provider_artifacts)
+        artifacts = () if provider_artifacts is None else tuple(provider_artifacts)
         self._provider_artifacts = {
             item.plugin_id: item if isinstance(item, ProviderArtifact) else ProviderArtifact.model_validate(item)
             for item in artifacts
         }
+        if domain_manifests is not None:
+            self._domain_manifests = domain_manifests
+        elif provider_artifacts is None:
+            self._domain_manifests = load_domain_manifests(_OFFICIAL_DOMAINS_PATH)
+        else:
+            self._domain_manifests = None
 
     def authorize_capability_provider(self, plugin_id: str, *, module: str, version: str,
                                       artifact_hash: str) -> ProviderArtifact:
@@ -182,48 +179,30 @@ class PluginLoader:
         return routers
 
     def register_capabilities(self, registry) -> tuple[str, ...]:
-        """Load only Capability providers pinned by the frozen build allowlist."""
-        loaded: list[str] = []
-        for manifest in self._plugins:
-            plugin_id = str(manifest.get("plugin_id") or "")
-            if not plugin_id.startswith("official."):
+        """Load official Providers only from the frozen central domain manifest."""
+        if self._domain_manifests is None:
+            return ()
+
+        from backend.capabilities.registry_next import CapabilityRegistry
+
+        validated_registry = CapabilityRegistry()
+        loaded = DomainProviderLoader(
+            _PROJECT_ROOT,
+            self._domain_manifests,
+        ).register_all(validated_registry)
+        existing = set(registry.keys())
+        for item in validated_registry.snapshot():
+            key = (item.spec.id, item.spec.version)
+            if key in existing:
+                current = registry.get(*key)
+                if current.spec != item.spec or current.descriptor != item.descriptor:
+                    raise ProviderTrustError(
+                        f"existing_capability_mismatch: {item.spec.id}@{item.spec.version}"
+                    )
                 continue
-            module_path = manifest.get("backend", {}).get("capabilities_module")
-            if not module_path:
-                continue
-
-            pkg_dir = self._plugin_backend_dirs.get(plugin_id) or self._plugin_dirs.get(plugin_id)
-            provider_version = manifest.get("backend", {}).get("provider_version")
-            if not pkg_dir or not provider_version:
-                raise ProviderTrustError(f"provider_metadata_missing: {plugin_id}")
-            artifact_hash = hash_provider_artifact(pkg_dir, module_path)
-            self.authorize_capability_provider(
-                plugin_id,
-                module=module_path,
-                version=str(provider_version),
-                artifact_hash=artifact_hash,
-            )
-            pkg_dir_str = str(pkg_dir) if pkg_dir else None
-            injected = False
-            if pkg_dir_str and pkg_dir_str not in sys.path:
-                sys.path.insert(0, pkg_dir_str)
-                injected = True
-
-            try:
-                mod = importlib.import_module(module_path)
-                register = getattr(mod, "register_capabilities")
-                register(registry)
-                loaded.append(plugin_id)
-                logger.info(f"[PluginLoader] 加载 Capability provider: {plugin_id} from {module_path}")
-            except Exception as exc:
-                raise RuntimeError(
-                    f"Capability provider load failed: {plugin_id} ({module_path})"
-                ) from exc
-            finally:
-                if injected and pkg_dir_str in sys.path:
-                    sys.path.remove(pkg_dir_str)
-
-        return tuple(loaded)
+            registry.register(item.spec, item.handler, descriptor=item.descriptor)
+            existing.add(key)
+        return loaded
 
     def get_web_registry(self) -> dict:
         """

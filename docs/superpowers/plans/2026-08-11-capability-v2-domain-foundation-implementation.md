@@ -312,7 +312,7 @@ def _owners(register):
 
 
 def test_official_entrypoints_register_only_their_domain_owner():
-    assert _owners(register_base) == {"base", "plugin"}
+    assert _owners(register_base) == {"base"}
     assert _owners(register_knowledge) == {"knowledge"}
     assert _owners(register_ontology) == {"ontology"}
 ~~~
@@ -436,7 +436,7 @@ Expected: collection fails for provider_loader.
 
 - [ ] **Step 3: Implement artifact hashing and fail-closed loading**
 
-The hash covers every file below artifact_path with suffix .py or .json, normalizes line endings, includes each repository-relative filename, rejects symlinks/path escapes, and imports only the frozen module. register_all snapshots registry keys before and after each module registration and rejects any newly registered Capability whose owner is outside manifest.allowed_owners. After all Providers load, validate every non-null search_export resolves to a registered read Descriptor whose owner is in that same DomainManifest.allowed_owners. The Base manifest declares allowed_owners as [base, plugin]; every other current manifest declares only its domain_id.
+The hash covers every file below artifact_path with suffix .py or .json, normalizes line endings, includes each repository-relative filename, rejects symlinks/path escapes, and imports only the frozen module. register_all snapshots registry keys before and after each module registration and rejects any newly registered Capability whose owner is outside manifest.allowed_owners. After all Providers load, validate every non-null search_export resolves to a registered read Descriptor whose owner is in that same DomainManifest.allowed_owners. The Base Provider governance wrapper normalizes current Plugin Platform specs to owner base, so the Base manifest declares only allowed_owners [base]; every other current manifest declares only its domain_id except the explicitly recorded Local Runtime transition alias.
 
 Core loop:
 

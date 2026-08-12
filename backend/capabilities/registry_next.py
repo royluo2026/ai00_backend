@@ -50,6 +50,9 @@ class CapabilityRegistry:
     def snapshot(self) -> tuple[RegisteredCapability, ...]:
         """Return an exact, deterministically ordered provider registration snapshot."""
         return tuple(self._items[key] for key in sorted(self._items))
+    def keys(self) -> tuple[tuple[str, int], ...]:
+        """Return stable public identities without exposing registry storage."""
+        return tuple(sorted(self._items))
     async def invoke(self, capability_id: str, payload: dict[str, Any], context: CapabilityContext, *, version: int | None = None) -> CapabilityResult:
         item = self.get(capability_id, version)
         validate_payload(dict(item.spec.input_schema), payload)

@@ -1,5 +1,5 @@
 {
-  "plugin_id": "official.local-integration",
+  "plugin_id": "official.local-runtime",
   "name": "本地集成",
   "backend": {
     "capabilities_module": "device_backend.capabilities",
