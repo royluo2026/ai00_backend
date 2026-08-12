@@ -8,7 +8,7 @@ Read the active VisMockup product tree.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`local_integration`
-- Catalog Release：`rel_2f488a97fee37007042044de4e8bca90`
+- Catalog Release：`rel_8040279f7935726fd96d793f13704af6`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -84,7 +84,7 @@ Read the active VisMockup product tree.
 ```json
 {
   "capability_id": "vismockup.tree",
-  "catalog_release": "rel_2f488a97fee37007042044de4e8bca90",
+  "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
   "major_version": 1,
   "payload": {
     "device_id": "example"

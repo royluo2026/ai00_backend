@@ -117,4 +117,6 @@
 /plugins/craft/craft_backend/routers/change_logs.py @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/collab.py @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/item_entries.py @ai00/project-management-maintainers
+/plugins/craft/craft_backend/routers/permission_requests.py @ai00/project-management-maintainers
+/plugins/craft/craft_backend/routers/share_links.py @ai00/project-management-maintainers
 /backend/domain_ports/knowledge.py @ai00/knowledge-maintainers

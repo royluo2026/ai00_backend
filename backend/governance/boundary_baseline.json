@@ -1915,46 +1915,6 @@
     },
     {
       "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/permission_requests.py",
-      "scope": "approve_permission_request",
-      "target": "workmanship_work_list_shares",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_list_shares",
-      "fingerprint": "9f5f446acc9ef42ae3ef"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/permission_requests.py",
-      "scope": "approve_permission_request",
-      "target": "workmanship_work_permission_requests",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_permission_requests",
-      "fingerprint": "a782bd2839dcade81747"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/permission_requests.py",
-      "scope": "create_permission_request",
-      "target": "workmanship_work_permission_requests",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_permission_requests",
-      "fingerprint": "ecab7b8d363c58d81dd7"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/permission_requests.py",
-      "scope": "list_permission_requests",
-      "target": "workmanship_work_permission_requests",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_permission_requests",
-      "fingerprint": "a0a3f19a569330c9b7b5"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/permission_requests.py",
-      "scope": "reject_permission_request",
-      "target": "workmanship_work_permission_requests",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_permission_requests",
-      "fingerprint": "6eb19cd35b7a546df4e1"
-    },
-    {
-      "category": "cross_domain_sql",
       "path": "plugins/craft/craft_backend/routers/projects.py",
       "scope": "_get_editable_line_gids",
       "target": "workmanship_bop_bop_entries",
@@ -2168,46 +2128,6 @@
       "target": "workmanship_work_lists",
       "detail": "craft SQL accesses project_management-owned table workmanship_work_lists",
       "fingerprint": "e89b392fd2f6c0065e0d"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/share_links.py",
-      "scope": "_check_list_access",
-      "target": "workmanship_work_list_shares",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_list_shares",
-      "fingerprint": "75dcd3a77c4adc8b697e"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/share_links.py",
-      "scope": "_check_list_access",
-      "target": "workmanship_work_lists",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_lists",
-      "fingerprint": "ff2c290f934d97aee605"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/share_links.py",
-      "scope": "create_share_link",
-      "target": "workmanship_work_share_links",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_share_links",
-      "fingerprint": "f02af38f0222ff21fadd"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/share_links.py",
-      "scope": "delete_share_link",
-      "target": "workmanship_work_share_links",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_share_links",
-      "fingerprint": "e7428a4dd830a4f64bc9"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/share_links.py",
-      "scope": "resolve_share_link",
-      "target": "workmanship_work_share_links",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_share_links",
-      "fingerprint": "4572d7cfed37e4793048"
     },
     {
       "category": "cross_domain_sql",
