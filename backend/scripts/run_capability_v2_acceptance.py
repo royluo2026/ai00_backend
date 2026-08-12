@@ -190,6 +190,10 @@ def _git(*args: str) -> str:
     ).stdout.strip()
 
 
+def _tracked_worktree_clean() -> bool:
+    return not bool(_git("status", "--porcelain", "--untracked-files=no"))
+
+
 def _migration_binding() -> dict:
     candidates = sorted((ROOT / "backend/db/migrations").glob("*.sql"))
     latest = candidates[-1]
@@ -451,7 +455,7 @@ def build_report(
     completion: CompletionReport | None = None,
 ) -> dict:
     commit = _git("rev-parse", "HEAD")
-    clean = not bool(_git("status", "--porcelain", "--untracked-files=no"))
+    clean = _tracked_worktree_clean()
     stable_count = len(manifest.get("capabilities", {}))
     declared_cases = sum(len(value) for value in manifest.get("capabilities", {}).values())
     counts = test_result["outcome_counts"]
@@ -540,7 +544,7 @@ def main() -> int:
         evidence_errors, runtime_evidence_hash = validate_runtime_evidence(catalog, manifest, current_env)
         blockers.extend(evidence_errors)
         try:
-            if _git("status", "--porcelain"):
+            if not _tracked_worktree_clean():
                 blockers.append("release-candidate requires a clean working tree")
         except subprocess.CalledProcessError:
             blockers.append("release-candidate cannot resolve git working tree")

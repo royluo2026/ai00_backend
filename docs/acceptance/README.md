@@ -51,7 +51,8 @@ RC also requires:
 - Local Runtime health JSON with `service: ai00-local-runtime`, protocol
   `ai00.local-operation.v2` and the exact environment ID;
 - successful Agent, MCP and Windows .NET suites in the same sequential CI job;
-- a clean Git working tree.
+- no tracked Git working-tree changes. Untracked operator handoff/review files
+  are excluded because they are not release inputs and must not be mutated by the runner.
 
 The repository does not fabricate RC evidence. The environment-owned E2E harness
 must create it after exercising the real Gateway, Provider and consumer paths.

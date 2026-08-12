@@ -1,5 +1,6 @@
 import json
 import hashlib
+import subprocess
 import sys
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
@@ -8,10 +9,12 @@ from types import SimpleNamespace
 
 from backend.capability_v2.completion import evaluate_completion
 from backend.capability_v2.domain_manifest import load_domain_manifests
+from backend.scripts import run_capability_v2_acceptance as acceptance_runner
 from backend.scripts.run_capability_v2_acceptance import (
     MANDATORY_CASES,
     _domain_manifest_binding,
     _domain_migration_bindings,
+    _tracked_worktree_clean,
     acceptance_temp_root,
     contract_test_command,
     _http_json_probe,
@@ -103,6 +106,33 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
     }
     assert all(row["sha256"].startswith("sha256:") for row in migration_bindings)
     assert all(row["artifact_version"] for row in migration_bindings)
+
+
+def test_rc_cleanliness_ignores_untracked_files_but_rejects_tracked_changes(
+    tmp_path, monkeypatch
+):
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repository, check=True)
+    tracked = repository / "tracked.txt"
+    tracked.write_text("released\n", encoding="utf-8")
+    subprocess.run(["git", "add", "tracked.txt"], cwd=repository, check=True)
+    subprocess.run(
+        [
+            "git", "-c", "user.name=Acceptance Test",
+            "-c", "user.email=acceptance@example.invalid",
+            "commit", "-q", "-m", "initial",
+        ],
+        cwd=repository,
+        check=True,
+    )
+    (repository / "handoff-untracked.md").write_text("preserve\n", encoding="utf-8")
+    monkeypatch.setattr(acceptance_runner, "ROOT", repository)
+
+    assert _tracked_worktree_clean() is True
+
+    tracked.write_text("changed\n", encoding="utf-8")
+    assert _tracked_worktree_clean() is False
 
 
 def test_current_manifest_is_release_complete():
