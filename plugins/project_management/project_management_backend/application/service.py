@@ -56,6 +56,15 @@ class ItemEntryRepository(Protocol):
     def update_list(self, gid: str, updates: dict[str, Any]) -> bool: ...
     def archive_list(self, gid: str) -> bool: ...
     def retarget_list_items(self, gid: str, new_list_gid: str, item_type: str) -> bool: ...
+    def search_projects(self, filters: dict[str, Any], scope: dict[str, Any]) -> list[dict[str, Any]]: ...
+    def create_project(self, gid: str, values: dict[str, Any]) -> None: ...
+    def get_project(self, gid: str) -> dict[str, Any] | None: ...
+    def update_project(self, gid: str, updates: dict[str, Any]) -> bool: ...
+    def delete_project(self, gid: str) -> bool: ...
+    def list_vehicle_models(self) -> list[dict[str, Any]]: ...
+    def create_vehicle_model(self, gid: str, values: dict[str, Any]) -> None: ...
+    def update_vehicle_model(self, gid: str, values: dict[str, Any]) -> bool: ...
+    def delete_vehicle_model(self, gid: str) -> bool: ...
 
 
 _OPERATIONS = {
@@ -82,6 +91,8 @@ _OPERATIONS = {
     "project.permission_request.change.apply": frozenset(
         {"permission_requests.create", "permission_requests.approve", "permission_requests.reject"}
     ),
+    "project.project.read": frozenset({"projects.search", "projects.get", "vehicle_models.list"}),
+    "project.project.change.apply": frozenset({"projects.create", "projects.update", "projects.delete", "vehicle_models.create", "vehicle_models.update", "vehicle_models.delete"}),
 }
 
 
@@ -162,6 +173,26 @@ def _project_list(row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _project_name(project_code: str, model_year: Any, suffix: str) -> str:
+    return "-".join(str(value) for value in (project_code, model_year, suffix) if value) or project_code
+
+
+def _project(row: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "gid": row["gid"], "name": row["name"], "project_code": row.get("project_code") or "",
+        "model_year": row.get("model_year"), "suffix": row.get("suffix") or "",
+        "description": row.get("description") or "", "status": row["status"],
+        "vehicle_model_gid": row.get("vehicle_model_gid"), "factory_gid": row.get("factory_gid"),
+        "team_id": row.get("team_id"), "owner_gid": row.get("owner_gid"),
+        "owner_name": row.get("owner_name") or "", "share_scope": row.get("share_scope") or "team",
+        "jph": row.get("jph"), "is_deleted": bool(row.get("is_deleted")),
+        "is_archived": bool(row.get("is_archived")),
+        "deleted_at": str(row["deleted_at"]) if row.get("deleted_at") else None,
+        "archived_at": str(row["archived_at"]) if row.get("archived_at") else None,
+        "created_at": str(row["created_at"]), "updated_at": str(row["updated_at"]),
+    }
+
+
 class ProjectManagementApplication:
     def __init__(
         self,
@@ -201,6 +232,10 @@ class ProjectManagementApplication:
             return self._direct_share(operation, arguments, _context)
         if operation.startswith("lists."):
             return self._list(operation, arguments, _context)
+        if operation.startswith("projects."):
+            return self._project(operation, arguments, _context)
+        if operation.startswith("vehicle_models."):
+            return self._vehicle_model(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -284,6 +319,75 @@ class ProjectManagementApplication:
         if not updates:
             raise CapabilityBusinessError("invalid_input", "no update fields")
         self._repository.update_list(gid, updates)
+        return {"success": True}
+
+    def _project(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        team_gid = str(getattr(context, "team_gid", "") or "")
+        if not user_gid:
+            raise CapabilityBusinessError("unauthenticated", "user identity is required")
+        if operation == "projects.search":
+            scope = arguments.get("scope")
+            if not isinstance(scope, Mapping) or str(scope.get("user_gid") or "") != user_gid:
+                raise CapabilityBusinessError("invalid_input", "server-derived scope is required")
+            rows = self._repository.search_projects(
+                {"include_deleted": bool(arguments.get("include_deleted")), "include_archived": bool(arguments.get("include_archived"))}, dict(scope)
+            )
+            return {"success": True, "data": [_project(row) for row in rows]}
+        if operation == "projects.create":
+            code = _required_text(arguments, "project_code")
+            year = arguments.get("model_year")
+            if year is not None and (isinstance(year, bool) or not isinstance(year, int) or not 2000 <= year <= 2099):
+                raise CapabilityBusinessError("invalid_input", "model_year must be between 2000 and 2099")
+            suffix = str(arguments.get("suffix") or "").strip()
+            name = _project_name(code, year, suffix); gid = self._next_id()
+            self._repository.create_project(gid, {
+                "name": name, "project_code": code, "model_year": year, "suffix": suffix,
+                "description": str(arguments.get("description") or ""), "status": str(arguments.get("status") or "preparing"),
+                "vehicle_model_gid": arguments.get("vehicle_model_gid"), "factory_gid": arguments.get("factory_gid"),
+                "team_id": str(arguments.get("team_id") or team_gid), "owner_gid": user_gid,
+                "jph": arguments.get("jph"), "share_scope": "team",
+            })
+            return {"success": True, "data": {"gid": gid, "name": name}}
+        gid = _required_text(arguments, "gid")
+        row = self._repository.get_project(gid)
+        if row is None:
+            raise CapabilityBusinessError("not_found", "project not found")
+        if operation == "projects.get":
+            result = _project(row); result["meta"] = row.get("meta"); return {"success": True, "data": result}
+        if operation == "projects.delete":
+            self._repository.delete_project(gid); return {"success": True}
+        source = arguments.get("updates")
+        if not isinstance(source, Mapping):
+            raise CapabilityBusinessError("invalid_input", "updates must be an object")
+        allowed = {"project_code", "model_year", "suffix", "description", "status", "vehicle_model_gid", "owner_gid", "jph", "is_archived", "factory_gid"}
+        updates = {key: value for key, value in source.items() if key in allowed and value is not None}
+        if not updates:
+            raise CapabilityBusinessError("invalid_input", "no update fields")
+        year = updates.get("model_year")
+        if year is not None and (isinstance(year, bool) or not isinstance(year, int) or not 2000 <= year <= 2099):
+            raise CapabilityBusinessError("invalid_input", "model_year must be between 2000 and 2099")
+        if {"project_code", "model_year", "suffix"} & updates.keys():
+            updates["name"] = _project_name(str(updates.get("project_code", row.get("project_code") or "")).strip(), updates.get("model_year", row.get("model_year")), str(updates.get("suffix", row.get("suffix") or "")).strip())
+        self._repository.update_project(gid, updates); return {"success": True}
+
+    def _vehicle_model(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        if operation == "vehicle_models.list":
+            return {"success": True, "data": [{**row, "created_at": str(row["created_at"]), "vehicle_type": row.get("vehicle_type") or ""} for row in self._repository.list_vehicle_models()]}
+        if operation == "vehicle_models.create":
+            gid = self._next_id(); values = {
+                "name": _required_text(arguments, "name"), "brand": str(arguments.get("brand") or ""),
+                "platform": str(arguments.get("platform") or ""), "vehicle_type": str(arguments.get("vehicle_type") or ""),
+                "team_id": str(arguments.get("team_id") or getattr(context, "team_gid", "") or ""),
+            }
+            self._repository.create_vehicle_model(gid, values); return {"success": True, "data": {"gid": gid, "name": values["name"]}}
+        gid = _required_text(arguments, "gid")
+        if operation == "vehicle_models.delete":
+            if not self._repository.delete_vehicle_model(gid): raise CapabilityBusinessError("not_found", "vehicle model not found")
+            return {"success": True}
+        values = {key: str(arguments.get(key) or "") for key in ("name", "brand", "platform", "vehicle_type")}
+        if not values["name"]: raise CapabilityBusinessError("invalid_input", "name is required")
+        if not self._repository.update_vehicle_model(gid, values): raise CapabilityBusinessError("not_found", "vehicle model not found")
         return {"success": True}
 
     def _search_change_logs(

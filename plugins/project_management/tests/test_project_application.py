@@ -80,6 +80,8 @@ class InMemoryItemEntryRepository:
         self.list_shares = {}
         self.item_shares = {}
         self.lists = {}
+        self.projects = {}
+        self.vehicle_models = {}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -230,6 +232,30 @@ class InMemoryItemEntryRepository:
 
     def retarget_list_items(self, gid, new_list_gid, item_type):
         return gid in self.lists
+
+    def search_projects(self, filters, scope):
+        return list(self.projects.values())
+
+    def create_project(self, gid, values):
+        self.projects[gid] = {"gid": gid, "created_at": "2026-08-12", "updated_at": "2026-08-12", "deleted_at": None, "archived_at": None, "is_deleted": False, "is_archived": False, "share_scope": "team", **values}
+
+    def get_project(self, gid):
+        return self.projects.get(gid)
+
+    def update_project(self, gid, updates):
+        if gid not in self.projects: return False
+        self.projects[gid].update(updates); return True
+
+    def delete_project(self, gid):
+        if gid not in self.projects: return False
+        self.projects[gid]["is_deleted"] = True; return True
+
+    def list_vehicle_models(self): return list(self.vehicle_models.values())
+    def create_vehicle_model(self, gid, values): self.vehicle_models[gid] = {"gid": gid, "created_at": "2026-08-12", **values}
+    def update_vehicle_model(self, gid, values):
+        if gid not in self.vehicle_models: return False
+        self.vehicle_models[gid].update(values); return True
+    def delete_vehicle_model(self, gid): return self.vehicle_models.pop(gid, None) is not None
 
 
 def _application():
@@ -536,3 +562,17 @@ def test_project_lists_create_read_update_and_archive_under_owner_policy():
         application.invoke("project.list.change.apply", {"operation": "lists.delete", "arguments": {"gid": "list-1"}}, CapabilityContext(user_gid="user-2", team_gid="team-1"))
     assert error.value.code == "forbidden"
     assert application.invoke("project.list.change.apply", {"operation": "lists.delete", "arguments": {"gid": "list-1"}}, CONTEXT) == {"success": True}
+
+
+def test_projects_create_read_update_delete_and_vehicle_models():
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: "generated-1")
+    created = application.invoke("project.project.change.apply", {"operation": "projects.create", "arguments": {"project_code": "EV", "model_year": 2028, "suffix": "SOP"}}, CONTEXT)
+    assert created == {"success": True, "data": {"gid": "generated-1", "name": "EV-2028-SOP"}}
+    listed = application.invoke("project.project.read", {"operation": "projects.search", "arguments": {"scope": {"user_gid": "user-1"}}}, CONTEXT)
+    assert listed["data"][0]["owner_gid"] == "user-1"
+    assert application.invoke("project.project.change.apply", {"operation": "projects.update", "arguments": {"gid": "generated-1", "updates": {"suffix": "PRE"}}}, CONTEXT) == {"success": True}
+    assert application.invoke("project.project.read", {"operation": "projects.get", "arguments": {"gid": "generated-1"}}, CONTEXT)["data"]["name"] == "EV-2028-PRE"
+    assert application.invoke("project.project.change.apply", {"operation": "projects.delete", "arguments": {"gid": "generated-1"}}, CONTEXT) == {"success": True}
+    model = application.invoke("project.project.change.apply", {"operation": "vehicle_models.create", "arguments": {"name": "Sedan", "brand": "AI00"}}, CONTEXT)
+    assert model["data"]["name"] == "Sedan"
+    assert application.invoke("project.project.read", {"operation": "vehicle_models.list", "arguments": {}}, CONTEXT)["data"][0]["brand"] == "AI00"

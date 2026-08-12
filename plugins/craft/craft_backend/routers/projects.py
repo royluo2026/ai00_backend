@@ -16,13 +16,17 @@ backend/routers/projects.py
   POST /api/projects/vehicle_models       → 创建车型
 """
 from typing import Optional
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..data.connection import get_conn
 from backend.platform_sdk.access import build_access_scope
 from backend.platform_sdk.auth import get_current_user, require_role, get_user_grants, derive_org_role
+from backend.platform_sdk.auth import get_authenticated_principal
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.project_management import build_web_compatibility_envelope, invoke_compatibility
 from backend.platform_sdk.ids import next_gid
 from backend.platform_sdk.project_access import (
     add_project_member as add_project_access_member,
@@ -41,6 +45,21 @@ _ANY_MEMBER = require_role("super_admin", "team_admin", "project_admin",
                            "rule_admin", "knowledge_admin", "member")
 _PROJECT_WRITE = require_role("super_admin", "team_admin", "project_admin")
 _ADMIN = require_role("super_admin", "team_admin")
+
+
+async def _invoke_project(request, user, principal, gateway, operation, arguments, *, write=False):
+    request_id = request.headers.get("X-Request-ID") or f"project_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="project.project.change.apply" if write else "project.project.read",
+        payload={"operation": operation, "arguments": arguments}, current_user=user, principal=principal,
+        request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") if write else None,
+        approval_reference=request.headers.get("X-Capability-Approval") if write else None,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else ""
+        raise HTTPException(status_code={"not_found": 404, "forbidden": 403, "invalid_input": 400}.get(code, 422), detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
 
 
 class CreateProjectBody(BaseModel):
@@ -143,126 +162,42 @@ def _row_to_project(r):
 # ── 车型 ──────────────────────────────────────────────────────────
 
 @router.get("/vehicle_models")
-def list_vehicle_models(current_user: dict = Depends(_ANY_MEMBER)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT gid, name, brand, platform, vehicle_type, created_at FROM workmanship_proj_vehicle_models ORDER BY created_at DESC")
-            rows = cur.fetchall()
-    return {"success": True, "data": [
-        {"gid": r["gid"], "name": r["name"], "brand": r["brand"],
-         "platform": r["platform"], "vehicle_type": r.get("vehicle_type") or "",
-         "created_at": str(r["created_at"])}
-        for r in rows
-    ]}
+async def list_vehicle_models(request: Request, current_user: dict = Depends(_ANY_MEMBER), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, "vehicle_models.list", {})
 
 
 @router.post("/vehicle_models", status_code=201)
-def create_vehicle_model(body: CreateVehicleModelBody, current_user: dict = Depends(_ADMIN)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_proj_vehicle_models (gid, name, brand, platform, vehicle_type, team_id, meta) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                (gid, body.name, body.brand, body.platform, body.vehicle_type, body.team_id or current_user.get("team_id"), '{}')
-            )
-        conn.commit()
-    return {"success": True, "data": {"gid": gid, "name": body.name}}
+async def create_vehicle_model(body: CreateVehicleModelBody, request: Request, current_user: dict = Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, "vehicle_models.create", body.model_dump(), write=True)
 
 
 @router.patch("/vehicle_models/{gid}")
-def update_vehicle_model(gid: str, body: CreateVehicleModelBody, current_user: dict = Depends(_ADMIN)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE workmanship_proj_vehicle_models SET name=%s, brand=%s, platform=%s, vehicle_type=%s WHERE gid=%s",
-                (body.name, body.brand, body.platform, body.vehicle_type, gid)
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="车型不存在")
-        conn.commit()
-    return {"success": True}
+async def update_vehicle_model(gid: str, body: CreateVehicleModelBody, request: Request, current_user: dict = Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, "vehicle_models.update", {"gid": gid, **body.model_dump()}, write=True)
 
 
 @router.delete("/vehicle_models/{gid}")
-def delete_vehicle_model(gid: str, current_user: dict = Depends(_ADMIN)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM workmanship_proj_vehicle_models WHERE gid=%s", (gid,))
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="车型不存在")
-        conn.commit()
-    return {"success": True}
+async def delete_vehicle_model(gid: str, request: Request, current_user: dict = Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, "vehicle_models.delete", {"gid": gid}, write=True)
 
 
 # ── 项目 CRUD ─────────────────────────────────────────────────────
 
 @router.get("")
-def list_projects(
+async def list_projects(
     include_deleted: bool = Query(False),
     include_archived: bool = Query(False),
+    request: Request = None,
     current_user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway),
 ):
     access = build_access_scope(current_user)
-    conditions = []
-    params = []
-    if not access["is_admin"]:
-        visible = ["p.share_scope = 'global'", "p.owner_gid = %s"]
-        params.append(access["user_gid"])
-        if access["team_gids"]:
-            placeholders = ",".join(["%s"] * len(access["team_gids"]))
-            visible.append(f"(p.share_scope = 'team' AND p.team_id IN ({placeholders}))")
-            params.extend(access["team_gids"])
-        if access["project_gids"]:
-            placeholders = ",".join(["%s"] * len(access["project_gids"]))
-            visible.append(f"(p.share_scope IN ('team','project') AND p.gid IN ({placeholders}))")
-            params.extend(access["project_gids"])
-        conditions.append("(" + " OR ".join(visible) + ")")
-    if not include_deleted:
-        conditions.append("p.is_deleted = FALSE")
-    if not include_archived:
-        conditions.append("p.is_archived = FALSE")
-    where = " AND ".join(conditions) or "1=1"
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT p.gid, p.name, p.project_code, p.model_year, p.suffix, "
-                f"p.description, p.status, p.vehicle_model_gid, p.factory_gid, "
-                f"p.team_id, p.owner_gid, p.share_scope, p.jph, "
-                f"p.is_deleted, p.is_archived, p.deleted_at, p.archived_at, "
-                f"p.created_at, p.updated_at FROM workmanship_proj_projects p "
-                f"WHERE {where} ORDER BY p.updated_at DESC",
-                params,
-            )
-            rows = [dict(row) for row in cur.fetchall()]
-    profiles = get_user_profiles(row["owner_gid"] for row in rows)
-    for row in rows:
-        row["owner_name"] = profiles.get(str(row["owner_gid"]), {}).get("name", "")
-    return {"success": True, "data": [_row_to_project(row) for row in rows]}
+    return await _invoke_project(request, current_user, principal, gateway, "projects.search", {"include_deleted": include_deleted, "include_archived": include_archived, "scope": access})
 
 
 @router.post("", status_code=201)
-def create_project(body: CreateProjectBody, current_user: dict = Depends(_PROJECT_WRITE)):
-    if not body.project_code.strip():
-        raise HTTPException(status_code=400, detail="project_code 不能为空")
-    if body.model_year is not None and not (2000 <= body.model_year <= 2099):
-        raise HTTPException(status_code=400, detail="model_year 须为 2000–2099 的年份")
-    gid = str(next_gid())
-    name = _compute_name(body.project_code.strip(), body.model_year, body.suffix.strip())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_proj_projects "
-                 "(gid, name, project_code, model_year, suffix, description, status, "
-                 " vehicle_model_gid, team_id, owner_gid, jph, factory_gid, share_scope, project_type, meta) "
-                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (gid, name, body.project_code.strip(), body.model_year,
-                  body.suffix.strip(), body.description, body.status,
-                 body.vehicle_model_gid,
-                 body.team_id or current_user.get("team_id"), current_user["gid"],
-                 body.jph, body.factory_gid, 'team', 'active', '{}')
-            )
-        conn.commit()
-    return {"success": True, "data": {"gid": gid, "name": name}}
+async def create_project(body: CreateProjectBody, request: Request, current_user: dict = Depends(_PROJECT_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, "projects.create", body.model_dump(), write=True)
 
 
 @router.get("/members/matrix")
@@ -303,106 +238,19 @@ def get_members_matrix(current_user: dict = Depends(get_current_user)):
 
 
 @router.get("/{gid}")
-def get_project(gid: str, current_user: dict = Depends(get_current_user)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid, name, project_code, model_year, suffix, description, status, "
-                "vehicle_model_gid, factory_gid, team_id, owner_gid, share_scope, jph, "
-                "is_deleted, is_archived, deleted_at, archived_at, meta, created_at, updated_at "
-                "FROM workmanship_proj_projects WHERE gid = %s",
-                (gid,)
-            )
-            row = cur.fetchone()
-    if not row:
-        raise HTTPException(status_code=404, detail="项目不存在")
-    result = _row_to_project(row)
-    result["meta"] = row["meta"]
-    return {"success": True, "data": result}
+async def get_project(gid: str, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, "projects.get", {"gid": gid})
 
 
 @router.patch("/{gid}")
-def update_project(gid: str, body: UpdateProjectBody, current_user: dict = Depends(_PROJECT_WRITE)):
-    if body.model_year is not None and not (2000 <= body.model_year <= 2099):
-        raise HTTPException(status_code=400, detail="model_year 须为 2000–2099 的年份")
-
-    set_parts = []
-    vals = []
-
-    # 收集三个派生 name 的字段变更
-    name_fields_changed = any(v is not None for v in [body.project_code, body.model_year, body.suffix])
-
-    if body.project_code is not None:
-        set_parts.append("project_code = %s"); vals.append(body.project_code.strip())
-    if body.model_year is not None:
-        set_parts.append("model_year = %s"); vals.append(body.model_year)
-    if body.suffix is not None:
-        set_parts.append("suffix = %s"); vals.append(body.suffix.strip())
-    if body.description is not None:
-        set_parts.append("description = %s"); vals.append(body.description)
-    if body.status is not None:
-        set_parts.append("status = %s"); vals.append(body.status)
-    if body.vehicle_model_gid is not None:
-        set_parts.append("vehicle_model_gid = %s"); vals.append(body.vehicle_model_gid)
-    if body.owner_gid is not None:
-        set_parts.append("owner_gid = %s"); vals.append(body.owner_gid)
-    if body.jph is not None:
-        set_parts.append("jph = %s"); vals.append(body.jph)
-    if body.factory_gid is not None:
-        set_parts.append("factory_gid = %s"); vals.append(body.factory_gid)
-    if body.is_archived is not None:
-        set_parts.append("is_archived = %s"); vals.append(body.is_archived)
-        if body.is_archived:
-            set_parts.append("archived_at = NOW()")
-        else:
-            set_parts.append("archived_at = NULL")
-
-    if not set_parts:
-        raise HTTPException(status_code=400, detail="没有需要更新的字段")
-
-    # 如果三个 name 派生字段任意变更，重新计算 name
-    if name_fields_changed:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT project_code, model_year, suffix FROM workmanship_proj_projects WHERE gid = %s",
-                    (gid,)
-                )
-                cur_row = cur.fetchone()
-        if not cur_row:
-            raise HTTPException(status_code=404, detail="项目不存在或已删除")
-        new_code  = body.project_code.strip() if body.project_code is not None else (cur_row["project_code"] or "")
-        new_year  = body.model_year  if body.model_year  is not None else cur_row["model_year"]
-        new_suf   = body.suffix.strip() if body.suffix is not None else (cur_row["suffix"] or "")
-        new_name  = _compute_name(new_code, new_year, new_suf)
-        set_parts.append("name = %s"); vals.append(new_name)
-
-    set_parts.append("updated_at = NOW()")
-    vals.append(gid)
-
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"UPDATE workmanship_proj_projects SET {', '.join(set_parts)} WHERE gid = %s AND is_deleted = FALSE", vals)
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="项目不存在或已删除")
-        conn.commit()
-    return {"success": True}
+async def update_project(gid: str, body: UpdateProjectBody, request: Request, current_user: dict = Depends(_PROJECT_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, "projects.update", {"gid": gid, "updates": body.model_dump(exclude_none=True)}, write=True)
 
 
 @router.delete("/{gid}")
-def delete_project(gid: str, current_user: dict = Depends(_ADMIN)):
+async def delete_project(gid: str, request: Request, current_user: dict = Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """软删除：标记 is_deleted=TRUE，数据不实际删除。"""
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE workmanship_proj_projects SET is_deleted = TRUE, deleted_at = NOW(), updated_at = NOW() "
-                "WHERE gid = %s AND is_deleted = FALSE",
-                (gid,)
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="项目不存在或已删除")
-        conn.commit()
-    return {"success": True}
+    return await _invoke_project(request, current_user, principal, gateway, "projects.delete", {"gid": gid}, write=True)
 
 
 # ── 项目成员 ──────────────────────────────────────────────────────

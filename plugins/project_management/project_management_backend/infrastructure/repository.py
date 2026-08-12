@@ -362,3 +362,51 @@ class ProjectManagementRepository:
                 connection.commit(); return bool(affected)
             except Exception:
                 connection.rollback(); raise
+
+    def search_projects(self, filters: dict[str, Any], scope: dict[str, Any]) -> list[dict[str, Any]]:
+        clauses: list[str] = []
+        params: list[Any] = []
+        if not bool(scope.get("is_admin")):
+            visible = ["p.share_scope='global'", "p.owner_gid=%s"]; params.append(scope["user_gid"])
+            team_gids = list(scope.get("team_gids") or [])
+            if team_gids:
+                placeholders = ",".join(["%s"] * len(team_gids)); visible.append(f"(p.share_scope='team' AND p.team_id IN ({placeholders}))"); params.extend(team_gids)
+            project_gids = list(scope.get("project_gids") or [])
+            if project_gids:
+                placeholders = ",".join(["%s"] * len(project_gids)); visible.append(f"(p.share_scope IN ('team','project') AND p.gid IN ({placeholders}))"); params.extend(project_gids)
+            clauses.append("(" + " OR ".join(visible) + ")")
+        if not filters["include_deleted"]: clauses.append("p.is_deleted=FALSE")
+        if not filters["include_archived"]: clauses.append("p.is_archived=FALSE")
+        return self.fetch_all("SELECT p.* FROM workmanship_proj_projects p WHERE " + (" AND ".join(clauses) or "1=1") + " ORDER BY p.updated_at DESC", tuple(params))
+
+    def create_project(self, gid: str, values: dict[str, Any]) -> None:
+        self.execute(
+            "INSERT INTO workmanship_proj_projects (gid,name,project_code,model_year,suffix,description,status,vehicle_model_gid,team_id,owner_gid,jph,factory_gid,share_scope,project_type,meta) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'active','{}')",
+            (gid, values["name"], values["project_code"], values["model_year"], values["suffix"], values["description"], values["status"], values["vehicle_model_gid"], values["team_id"], values["owner_gid"], values["jph"], values["factory_gid"], values["share_scope"]),
+        )
+
+    def get_project(self, gid: str) -> dict[str, Any] | None:
+        return self.fetch_one("SELECT * FROM workmanship_proj_projects WHERE gid=%s", (gid,))
+
+    def update_project(self, gid: str, updates: dict[str, Any]) -> bool:
+        assignments = [f"{key}=%s" for key in updates]
+        params: list[Any] = list(updates.values())
+        if "is_archived" in updates:
+            assignments.append("archived_at=" + ("NOW()" if updates["is_archived"] else "NULL"))
+        assignments.append("updated_at=NOW()"); params.append(gid)
+        return bool(self.execute(f"UPDATE workmanship_proj_projects SET {', '.join(assignments)} WHERE gid=%s AND is_deleted=FALSE", tuple(params)))
+
+    def delete_project(self, gid: str) -> bool:
+        return bool(self.execute("UPDATE workmanship_proj_projects SET is_deleted=TRUE,deleted_at=NOW(),updated_at=NOW() WHERE gid=%s AND is_deleted=FALSE", (gid,)))
+
+    def list_vehicle_models(self) -> list[dict[str, Any]]:
+        return self.fetch_all("SELECT gid,name,brand,platform,vehicle_type,created_at FROM workmanship_proj_vehicle_models ORDER BY created_at DESC")
+
+    def create_vehicle_model(self, gid: str, values: dict[str, Any]) -> None:
+        self.execute("INSERT INTO workmanship_proj_vehicle_models (gid,name,brand,platform,vehicle_type,team_id,meta) VALUES (%s,%s,%s,%s,%s,%s,'{}')", (gid, values["name"], values["brand"], values["platform"], values["vehicle_type"], values["team_id"]))
+
+    def update_vehicle_model(self, gid: str, values: dict[str, Any]) -> bool:
+        return bool(self.execute("UPDATE workmanship_proj_vehicle_models SET name=%s,brand=%s,platform=%s,vehicle_type=%s WHERE gid=%s", (values["name"], values["brand"], values["platform"], values["vehicle_type"], gid)))
+
+    def delete_vehicle_model(self, gid: str) -> bool:
+        return bool(self.execute("DELETE FROM workmanship_proj_vehicle_models WHERE gid=%s", (gid,)))
