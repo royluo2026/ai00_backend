@@ -29,6 +29,7 @@
 # Agent
 /plugins/agent/** @ai00/agent-maintainers
 /services/agent-runtime/** @ai00/agent-maintainers
+/backend/db/migrations/domains/agent/** @ai00/agent-maintainers
 /backend/db/migrations/202608030001_agent_private_sessions.sql @ai00/agent-maintainers
 /backend/db/migrations/202608030002_agent_memory_skills_audit.sql @ai00/agent-maintainers
 /backend/db/migrations/202608030003_agent_private_flows.sql @ai00/agent-maintainers

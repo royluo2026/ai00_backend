@@ -82,4 +82,8 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "integration.mapping.archive", "integration.mapping.create", "integration.mapping.get",
     "integration.mapping.preview", "integration.mapping.search", "integration.mapping.update",
     "integration.sync.start",
+    "agent.audit.read", "agent.audit.record", "agent.flow.change.apply", "agent.flow.read",
+    "agent.interaction.request", "agent.memory.change.apply", "agent.memory.read",
+    "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
+    "agent.skill.change.apply", "agent.skill.read",
 }) | _BASE_V2_APPROVED | _PROJECT_V2_APPROVED

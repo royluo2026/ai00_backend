@@ -51,6 +51,7 @@
       "code_paths": ["plugins/agent/**", "services/agent-runtime/**"],
       "provider_paths": ["plugins/agent/agent_backend/capabilities/**", "services/agent-runtime/src/**"],
       "migration_paths": [
+        "backend/db/migrations/domains/agent/**",
         "backend/db/migrations/202608030001_agent_private_sessions.sql",
         "backend/db/migrations/202608030002_agent_memory_skills_audit.sql",
         "backend/db/migrations/202608030003_agent_private_flows.sql",
@@ -205,7 +206,11 @@
       "module_prefixes": ["plugins.device"],
       "code_paths": ["plugins/device/**", "local-runtime/**", "backend/domain_ports/local_integration.py"],
       "provider_paths": ["plugins/device/device_backend/capabilities/**", "local-runtime/src/**"],
-      "migration_paths": ["backend/db/migrations/domains/local_runtime/**"],
+      "migration_paths": [
+        "backend/db/migrations/domains/local_runtime/**",
+        "backend/db/migrations/202608030004_device_control_plane.sql",
+        "backend/db/migrations/202608100011_device_operation_protocol_v2.sql"
+      ],
       "test_paths": ["plugins/device/**/test_*.py", "backend/tests/test_local_*.py", "backend/tests/test_device_*.py", "local-runtime/**/Tests/**"],
       "documentation_paths": ["docs/capabilities/local-runtime/**"]
     }

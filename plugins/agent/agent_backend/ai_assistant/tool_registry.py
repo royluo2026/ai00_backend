@@ -773,3 +773,23 @@ def get_all_tools_with_skills(owner_gid: str = "", auth_mode: str = "feishu") ->
     except Exception:
         pass
     return tools
+
+
+def build_catalog_tool_registry(release, *, client=None):
+    """Build the authoritative Agent tool set from one pinned Catalog release."""
+    from .catalog_tools import CatalogToolRegistry
+    return CatalogToolRegistry(release, client=client)
+
+
+def catalog_tools_openai(registry) -> list[dict]:
+    return [
+        {
+            "type": "function",
+            "function": {
+                "name": tool.name,
+                "description": tool.description,
+                "parameters": tool.input_schema,
+            },
+        }
+        for tool in registry.tools()
+    ]

@@ -84,3 +84,14 @@ def execute_tool(
         )
     except Exception as e:
         return {"error": str(e), "tool": tool_name}
+
+
+async def execute_catalog_tool(
+    registry, tool_name: str, inputs: dict, *, identity, correlation,
+    idempotency_key: str | None = None,
+):
+    """Execute only a stored Catalog reverse mapping through DomainCapabilityClient."""
+    return await registry.execute(
+        tool_name, inputs, identity=identity, correlation=correlation,
+        idempotency_key=idempotency_key,
+    )
