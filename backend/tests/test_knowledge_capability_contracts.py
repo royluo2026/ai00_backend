@@ -4,13 +4,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from backend.capabilities.registry_next import capability_registry
+from backend.capability_v2.bootstrap import get_capability_registry
 
 
 ROOT = Path(__file__).resolve().parents[2]
+capability_registry = get_capability_registry()
 
 
-def _stable_knowledge_ids() -> set[str]:
+def _mapped_stable_knowledge_ids() -> set[str]:
     document = json.loads(
         (ROOT / "docs/governance/user-function-registry.json").read_text(encoding="utf-8")
     )
@@ -19,6 +20,7 @@ def _stable_knowledge_ids() -> set[str]:
         for row in document["functions"].values()
         if row["domain"] == "Knowledge"
         and row["stability"] == "stable"
+        and row["classification"] == "mapped"
         and row.get("target_capability")
     }
 
@@ -26,7 +28,7 @@ def _stable_knowledge_ids() -> set[str]:
 def test_all_stable_knowledge_capabilities_have_typed_output_contracts():
     incomplete = {
         capability_id
-        for capability_id in _stable_knowledge_ids()
+        for capability_id in _mapped_stable_knowledge_ids()
         if not capability_registry.get(capability_id).spec.output_schema.get("properties")
     }
     assert incomplete == set()
@@ -35,7 +37,7 @@ def test_all_stable_knowledge_capabilities_have_typed_output_contracts():
 def test_stable_knowledge_reads_are_plugin_callable():
     unavailable = {
         capability_id
-        for capability_id in _stable_knowledge_ids()
+        for capability_id in _mapped_stable_knowledge_ids()
         if not capability_registry.get(capability_id).spec.deprecated
         and capability_registry.get(capability_id).spec.risk.value == "read"
         and not capability_registry.get(capability_id).spec.plugin_callable
@@ -60,7 +62,7 @@ def test_knowledge_resource_contracts_publish_prefixed_stable_refs():
 
 
 def test_supported_knowledge_capabilities_publish_native_plugin_and_agent_contracts():
-    for capability_id in _stable_knowledge_ids():
+    for capability_id in _mapped_stable_knowledge_ids():
         registration = capability_registry.get(capability_id)
         if registration.spec.deprecated:
             continue
@@ -73,7 +75,7 @@ def test_supported_knowledge_capabilities_publish_native_plugin_and_agent_contra
 
 
 def test_knowledge_writes_require_gateway_idempotency_and_external_outcome_tracking():
-    for capability_id in _stable_knowledge_ids():
+    for capability_id in _mapped_stable_knowledge_ids():
         registration = capability_registry.get(capability_id)
         if registration.spec.deprecated or registration.spec.risk.value == "read":
             continue

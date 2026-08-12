@@ -210,8 +210,8 @@ from backend.plugin_loader import PluginLoader as _PluginLoader
 
 _plugin_loader = _PluginLoader()
 _plugin_loader.discover()
-from backend.capabilities.registry_next import capability_registry as _capability_registry
-_plugin_capability_providers = _plugin_loader.register_capabilities(_capability_registry)
+from backend.capability_v2.bootstrap import get_capability_registry as _get_capability_registry
+_capability_registry = _get_capability_registry()
 from backend.capability_v2.gateway import configure_default_gateway as _configure_capability_gateway
 from backend.capability_v2.policies import LegacyServerGatewayPolicy as _LegacyGatewayPolicy
 from backend.capability_v2.outcomes import SqlOutcomeStore as _SqlOutcomeStore

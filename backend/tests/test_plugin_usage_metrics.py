@@ -41,11 +41,11 @@ class PluginUsageMetricsTests(unittest.TestCase):
 
     def test_web_counts_requests_but_agent_deduplicates_a_run(self):
         web = CapabilityContext(user_gid="u1", team_gid="t1", source="plugin", request_id="req-1", plugin_id="acme.ai00.hello", plugin_version="1.0.0")
-        self.assertNotEqual(usage_dedupe_key(web, "system.echo"), usage_dedupe_key(web.model_copy(update={"request_id": "req-2"}), "system.echo"))
+        self.assertNotEqual(usage_dedupe_key(web, "test.first.read"), usage_dedupe_key(web.model_copy(update={"request_id": "req-2"}), "test.first.read"))
         agent = CapabilityContext(user_gid="u1", team_gid="t1", source="agent", request_id="req-1", plugin_id="acme.ai00.hello", plugin_version="1.0.0", agent_run_id="run-1")
-        self.assertEqual(usage_dedupe_key(agent, "system.echo"), usage_dedupe_key(agent, "plugin.storage.get"))
+        self.assertEqual(usage_dedupe_key(agent, "test.first.read"), usage_dedupe_key(agent, "test.second.read"))
         with self.assertRaises(ValueError):
-            usage_dedupe_key(CapabilityContext(user_gid="u1", source="agent", plugin_id="acme.ai00.hello"), "system.echo")
+            usage_dedupe_key(CapabilityContext(user_gid="u1", source="agent", plugin_id="acme.ai00.hello"), "test.first.read")
 
     def test_automatic_close_targets_previous_month_once_per_tenant(self):
         rows = [{"tenant_gid": "t1"}, {"tenant_gid": "t2"}]

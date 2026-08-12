@@ -4,13 +4,14 @@ from backend.capabilities.agreed_catalog import (
     APPROVED_CAPABILITY_IDS,
     FORBIDDEN_INTERNAL_PROTOCOL_IDS,
 )
-from backend.capabilities.registry_next import CapabilityRegistry, capability_registry
+from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capability_v2.bootstrap import get_capability_registry
 from plugins.craft.craft_backend.capabilities import register_capabilities
 
 
 def test_catalog_contains_only_implemented_approved_ids():
     craft = CapabilityRegistry(); register_capabilities(craft)
-    implemented = {spec.id for spec in capability_registry.list()} | {spec.id for spec in craft.list()}
+    implemented = {spec.id for spec in get_capability_registry().list()} | {spec.id for spec in craft.list()}
     assert implemented <= APPROVED_CAPABILITY_IDS
     assert implemented.isdisjoint(FORBIDDEN_INTERNAL_PROTOCOL_IDS)
 

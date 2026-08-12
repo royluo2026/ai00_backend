@@ -185,7 +185,7 @@ def test_plugin_mount_invoke_constructs_trusted_identity_and_returns_full_result
         user_id="user-1", tenant_id="tenant-1", installation_id="install-1",
         plugin_id="acme.ai00.example", plugin_version="1.0.0",
         artifact_sha256="a" * 64, catalog_release="rel_" + "b" * 32,
-        capability_grants=("system.echo@1",), resource_scopes=("tenant:tenant-1",),
+        capability_grants=("test.plugin.read@1",), resource_scopes=("tenant:tenant-1",),
         data_scopes=("internal",), revocation_version=1, authenticated_at=NOW,
     )
     captured = []
@@ -203,7 +203,7 @@ def test_plugin_mount_invoke_constructs_trusted_identity_and_returns_full_result
     monkeypatch.setattr(router_module, "_resolve_mount_for_user", lambda *_args, **_kwargs: issued.session)
     monkeypatch.setattr(router_module, "get_default_gateway", lambda: Gateway())
     result = asyncio.run(router_module.invoke_from_mount(
-        issued.session.mount_session_id, "system.echo",
+        issued.session.mount_session_id, "test.plugin.read",
         router_module.MountInvokeRequest(payload={"value": "x"}, major_version=1),
         {"gid": "user-1", "team_id": "tenant-1", "org_role": "member"},
         AuthenticatedPrincipal(

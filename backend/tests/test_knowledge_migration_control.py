@@ -6,11 +6,13 @@ from backend.capabilities.knowledge_migration_next import (
     migration_status,
     register_knowledge_migration_capabilities,
 )
-from backend.capabilities.registry_next import CapabilityRegistry, capability_registry
+from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capability_v2.bootstrap import get_capability_registry
 
 
 class KnowledgeMigrationControlTests(unittest.TestCase):
     def test_production_registry_contains_revision_and_migration_capabilities(self):
+        capability_registry = get_capability_registry()
         self.assertEqual(
             capability_registry.get("knowledge.document.get").spec.id,
             "knowledge.document.get",

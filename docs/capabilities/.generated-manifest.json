@@ -22,7 +22,6 @@
     "base-platform/semantic.context.get@1.md",
     "base-platform/system.activity.search@1.md",
     "base-platform/system.change_impact.preview@1.md",
-    "base-platform/system.echo@1.md",
     "base-platform/system.job.cancel@1.md",
     "base-platform/system.job.get@1.md",
     "base-platform/system.lineage.get@1.md",

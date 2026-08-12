@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from backend.capabilities.registry_next import capability_registry
+from backend.capability_v2.bootstrap import get_capability_registry
 from backend.capabilities.models_next import CapabilityContext
 from backend.base.operations import worker_health
 from backend.plugin_platform.storage import _identity
@@ -21,13 +21,14 @@ STABLE_CAPABILITIES = {
     "plugin.rollback", "plugin.storage.delete", "plugin.storage.get",
     "plugin.storage.list", "plugin.storage.put", "plugin.uninstall",
     "plugin.upgrade", "plugin.upgrade.finish", "semantic.context.get",
-    "system.activity.search", "system.change_impact.preview", "system.echo",
+    "system.activity.search", "system.change_impact.preview",
     "system.job.cancel", "system.job.get", "system.lineage.get", "system.search",
     "system.worker.outbox.health",
 }
 
 
 def _registrations():
+    capability_registry = get_capability_registry()
     return {item.spec.id: item for item in capability_registry.snapshot() if item.spec.id in STABLE_CAPABILITIES}
 
 

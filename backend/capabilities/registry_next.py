@@ -9,6 +9,7 @@ from backend.plugin_platform.metrics import record_usage
 from .confirmation_next import confirmation_manager
 from .audit_next import audit_sink
 
+
 class CapabilityPermissionError(PermissionError):
     pass
 
@@ -83,54 +84,3 @@ class CapabilityRegistry:
             audit["plugin_id"] = context.plugin_id
             audit["plugin_version"] = getattr(context, "plugin_version", None)
         return CapabilityResult(capability_id=item.spec.id, version=item.spec.version, data=value, evidence=evidence, audit=audit)
-
-capability_registry = CapabilityRegistry()
-from backend.base.provider import register_capability as register_base_capability
-register_base_capability(capability_registry, CapabilitySpec(id="system.echo", version=1, owner="base", description="Return the supplied JSON payload; used to verify adapters.", plugin_callable=True, input_schema={"type": "object"}, output_schema={"type": "object"}, tags=("system", "diagnostic")), lambda payload, _context: payload)
-from .knowledge_next import register_knowledge_capabilities
-register_knowledge_capabilities(capability_registry)
-
-from .knowledge_documents_next import register_knowledge_document_capabilities
-register_knowledge_document_capabilities(capability_registry)
-
-from .knowledge_context_next import register_knowledge_context_capability
-register_knowledge_context_capability(capability_registry)
-
-from .ontology_concepts_next import register_ontology_concept_capabilities
-register_ontology_concept_capabilities(capability_registry)
-
-from .ontology_proposals_next import register_ontology_proposal_capabilities
-register_ontology_proposal_capabilities(capability_registry)
-
-from .ontology_releases_next import register_ontology_release_capabilities
-register_ontology_release_capabilities(capability_registry)
-
-from .system_shared_next import register_system_shared_capabilities
-register_system_shared_capabilities(capability_registry)
-
-from .knowledge_migration_next import register_knowledge_migration_capabilities
-register_knowledge_migration_capabilities(capability_registry)
-
-from .proposals_next import register_proposal_capability
-register_proposal_capability(capability_registry)
-
-from .review_next import register_review_capability
-register_review_capability(capability_registry)
-
-from .proposal_query_next import register_proposal_query_capabilities
-register_proposal_query_capabilities(capability_registry)
-
-from .outbox_next import register_outbox_capability
-register_outbox_capability(capability_registry)
-
-from .outbox_retry_next import register_retry_capability
-register_retry_capability(capability_registry)
-
-from backend.base.operations import register_worker_capability
-register_worker_capability(capability_registry)
-
-from .plugin_marketplace_next import register_plugin_marketplace_capabilities
-register_plugin_marketplace_capabilities(capability_registry)
-
-from backend.plugin_platform.storage import register_plugin_storage_capabilities
-register_plugin_storage_capabilities(capability_registry)

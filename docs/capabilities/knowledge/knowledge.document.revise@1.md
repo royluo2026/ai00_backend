@@ -8,7 +8,7 @@ Publish a new immutable revision with optimistic concurrency.
 - 不适用：The caller has not loaded the current revision.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_84f5817abbc66e72c7c0e2fca722456f`
+- Catalog Release：`rel_eeb47612a439ab146bc55b6091ee5e01`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Publish a new immutable revision with optimistic concurrency.
 ```json
 {
   "capability_id": "knowledge.document.revise",
-  "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
+  "catalog_release": "rel_eeb47612a439ab146bc55b6091ee5e01",
   "major_version": 1,
   "payload": {
     "base_revision_gid": "example",

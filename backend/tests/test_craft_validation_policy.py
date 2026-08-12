@@ -54,8 +54,8 @@ def test_migration_is_oceanbase_safe_and_capabilities_remain_unregistered():
     root = Path(__file__).resolve().parents[2]
     sql = (root / "backend/db/migrations/202608060004_craft_validation_policies.sql").read_text(encoding="utf-8")
     assert "JSONB" not in sql.upper() and "RETURNING" not in sql.upper()
-    from backend.capabilities.registry_next import capability_registry
-    ids = {spec.id for spec in capability_registry.list()}
+    from backend.capability_v2.bootstrap import get_capability_registry
+    ids = {spec.id for spec in get_capability_registry().list()}
     assert "craft.bop.version.validate" not in ids
     assert "craft.bop.version.publish" not in ids
     assert "craft.pbom.vpps.validate" not in ids

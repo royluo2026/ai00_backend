@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_84f5817abbc66e72c7c0e2fca722456f",
-  "catalog_hash": "sha256:84f5817abbc66e72c7c0e2fca722456f09468233343db1c81ab488f900bfa152",
+  "release_id": "rel_eeb47612a439ab146bc55b6091ee5e01",
+  "catalog_hash": "sha256:eeb47612a439ab146bc55b6091ee5e01473f052ff26c8d96a86899f040b60762",
   "descriptors": [
     {
       "id": "base.project.search",
@@ -22440,123 +22440,6 @@
       "domain_errors_complete": true
     },
     {
-      "id": "system.echo",
-      "major_version": 1,
-      "owner_domain": "base",
-      "lifecycle_status": "stable",
-      "catalog_release": null,
-      "title": "system.echo",
-      "description": "Return the supplied JSON payload; used to verify adapters.",
-      "use_when": "Return the supplied JSON payload; used to verify adapters.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
-      "side_effect_level": "read",
-      "execution_mode": "cloud_sync",
-      "exposure": {
-        "web": true,
-        "plugin": true,
-        "agent": true,
-        "api": true,
-        "mcp": true,
-        "worker": false,
-        "local_runtime": false
-      },
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:authenticated",
-      "resource_selectors": [],
-      "data_classification": "confidential",
-      "required_auth_freshness_seconds": 0,
-      "delegation_policy": "scoped",
-      "input_schema": {
-        "type": "object",
-        "properties": {
-          "echo": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false
-      },
-      "output_schema": {
-        "type": "object",
-        "properties": {
-          "echo": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false
-      },
-      "agent_output_schema": {
-        "type": "object",
-        "properties": {
-          "echo": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false
-      },
-      "schema_hash": "sha256:dcf9afbe8ef5961e7498de5e5538673a2b543d4d73c494d4f1d812a7ae9ea681",
-      "artifact_policy": "none",
-      "operation_policy": "none",
-      "concurrency_policy": "none",
-      "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
-      "timeout_seconds": 30,
-      "rate_limit_cost": 1,
-      "confirmation_policy": "none",
-      "evidence_policy": "optional",
-      "audit_policy": "standard",
-      "deprecation_message": null,
-      "domain_errors": [
-        {
-          "code": "resource_not_found",
-          "meaning": "The requested Base resource does not exist or is not visible.",
-          "retryable": false
-        },
-        {
-          "code": "permission_denied",
-          "meaning": "The caller lacks a required Base Platform permission.",
-          "retryable": false
-        },
-        {
-          "code": "approval_required",
-          "meaning": "The governed operation requires a valid approval.",
-          "retryable": false
-        },
-        {
-          "code": "authentication_stale",
-          "meaning": "The caller must authenticate again before this high-risk operation.",
-          "retryable": false
-        },
-        {
-          "code": "idempotency_conflict",
-          "meaning": "The idempotency key is bound to a different request.",
-          "retryable": false
-        },
-        {
-          "code": "version_conflict",
-          "meaning": "The resource version differs from the expected version.",
-          "retryable": false
-        },
-        {
-          "code": "provider_unavailable",
-          "meaning": "A required domain provider is not registered.",
-          "retryable": true
-        },
-        {
-          "code": "plugin_state_conflict",
-          "meaning": "The plugin installation cannot perform this lifecycle transition.",
-          "retryable": false
-        }
-      ],
-      "domain_errors_complete": true
-    },
-    {
       "id": "system.job.cancel",
       "major_version": 1,
       "owner_domain": "base",
@@ -24553,35 +24436,53 @@
   ],
   "provider_artifacts": [
     {
+      "plugin_id": "official.base",
+      "module": "backend.base.official_provider",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:193ead8d21eff5ebad5f5fd726049a55dfeab3aa2a13db0732c26f19d12c3f9f"
+    },
+    {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:50f0b1ed106f16a801e92114a4bf2103939c08be91d48c1996bf3ac9f464171f"
+      "artifact_hash": "sha256:e66c835b45c55cec24e5465996c16552a7a3dfc6a458519344cc77f499a264ad"
     },
     {
       "plugin_id": "official.digital-model",
       "module": "digital_model_backend.capabilities",
       "version": "1.1.0",
-      "artifact_hash": "sha256:9ddf2440ddd5d929aafd5682c5f006393757cbcb7b76bee588d448378a7cb326"
+      "artifact_hash": "sha256:db0b213ef84ff65ed50cc8a1e29c9aafbe3f3c6ff46cdde5c206b8ea88333931"
     },
     {
-      "plugin_id": "official.local-integration",
+      "plugin_id": "official.knowledge",
+      "module": "backend.knowledge.official_provider",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:ee4bf4f10505bc0a5c60b9ff0024a9b6ee3bbe56fe7d6c8a93362e3d98b397a7"
+    },
+    {
+      "plugin_id": "official.local-runtime",
       "module": "device_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:11db2d769431f6509fa69be6f234a13993e73b3324fece12f773d14000edb534"
+      "artifact_hash": "sha256:30bc10e6c978dad6b8dd895224f68a24e92a7f47be9d9cb4d9b734a893e7b7ed"
+    },
+    {
+      "plugin_id": "official.ontology",
+      "module": "backend.ontology.official_provider",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:3f4b1818a435021936fb275b95e5f655d0325d65942e4653a8a73de162359c1d"
     },
     {
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:15bec7ce65ca53100ce79eee368b8f1dd6c79fc596871b5e012336c4a0c2336d"
+      "artifact_hash": "sha256:36abeebd3709cd022156a523027ea3224c70a0be86929f2d808c0e00d15d6474"
     },
     {
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:7c593c94096c99fb5101472da2df37b5229668bd0995ff2611441bc61a551bc0"
+      "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
     }
   ],
-  "created_at": "2026-08-10T13:20:50.456673Z"
+  "created_at": "2026-08-12T01:31:03.857744Z"
 }

@@ -20,7 +20,7 @@ def descriptor():
         "name": "Hello", "description": "test", "version": "1.2.3",
         "compatibility": {"platform_api": ">=1.0.0 <2.0.0", "web_sdk": "^0.1.0"},
         "runtimes": {"web": {"entry": "index.html", "sandbox": "allow-scripts"}},
-        "permissions": ["system.echo"],
+        "permissions": ["plugin.storage.get"],
         "data": {"stores_personal_data": False, "retention": "none", "uninstall": "delete"},
     }
 

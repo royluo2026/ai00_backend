@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from backend.capabilities.registry_next import capability_registry
+from backend.capability_v2.bootstrap import get_capability_registry
 from backend.plugin_platform.service import validate_capability_grants
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -9,12 +9,12 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class PluginAuthorityBoundaryTests(unittest.TestCase):
     def test_capability_must_opt_in_to_plugin_exposure(self):
-        self.assertTrue(capability_registry.get("system.echo").spec.plugin_callable)
+        capability_registry = get_capability_registry()
         install = capability_registry.get("plugin.install")
         self.assertTrue(install.spec.plugin_callable)
         self.assertEqual(
-            validate_capability_grants(["system.echo", "plugin.install"]),
-            ("plugin.install", "system.echo"),
+            validate_capability_grants(["plugin.install"]),
+            ("plugin.install",),
         )
         self.assertEqual(install.descriptor.automation_level.value, "A0")
         self.assertEqual(install.descriptor.confirmation_policy, "admin")

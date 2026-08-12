@@ -32,7 +32,8 @@ def _tenant_for_user(user: dict) -> str:
 def validate_capability_grants(values: Any) -> tuple[str, ...]:
     """Reject unknown or platform-internal capabilities before a release can be installed."""
     grants = tuple(sorted({str(value) for value in (values or ())}))
-    from backend.capabilities.registry_next import capability_registry
+    from backend.capability_v2.bootstrap import get_capability_registry
+    capability_registry = get_capability_registry()
     for capability_id in grants:
         try:
             spec = capability_registry.get(capability_id).spec

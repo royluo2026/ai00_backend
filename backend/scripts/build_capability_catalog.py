@@ -10,7 +10,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-from backend.capabilities.registry_next import CapabilityRegistry, capability_registry
+from backend.capability_v2.bootstrap import build_capability_registry
 from backend.capability_v2.catalog import (
     CatalogRelease,
     ProviderArtifact,
@@ -18,30 +18,22 @@ from backend.capability_v2.catalog import (
     compatibility_errors,
 )
 from backend.capability_v2.v1_adapter import adapt_v1_spec
-from backend.plugin_loader import PluginLoader
 
 
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-release.json"
-PROVIDERS_PATH = REPOSITORY_ROOT / "backend" / "capability_v2" / "official_providers.json"
+PROVIDERS_PATH = REPOSITORY_ROOT / "backend" / "capability_v2" / "official_domains.json"
 
 
 def _providers() -> tuple[ProviderArtifact, ...]:
     document = json.loads(PROVIDERS_PATH.read_text(encoding="utf-8"))
-    return tuple(ProviderArtifact.model_validate(item) for item in document["providers"])
+    return tuple(ProviderArtifact.model_validate(item["artifact"]) for item in document["domains"])
 
 
 def current_release() -> CatalogRelease:
-    loader = PluginLoader()
-    loader.discover()
-    provider_registry = CapabilityRegistry()
-    loader.register_capabilities(provider_registry)
+    registry = build_capability_registry(REPOSITORY_ROOT, PROVIDERS_PATH)
     registrations = {
-        (item.spec.id, item.spec.version): item
-        for item in (*capability_registry.snapshot(), *provider_registry.snapshot())
+        (item.spec.id, item.spec.version): item for item in registry.snapshot()
     }
-    expected_count = len(capability_registry.snapshot()) + len(provider_registry.snapshot())
-    if len(registrations) != expected_count:
-        raise ValueError("duplicate capability registration across official providers")
     descriptors = [
         registrations[key].descriptor or adapt_v1_spec(registrations[key].spec)
         for key in sorted(registrations)

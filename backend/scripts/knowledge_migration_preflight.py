@@ -72,7 +72,8 @@ def evaluate(
         "present" if not missing_migrations else "missing: " + ", ".join(missing_migrations),
     ))
 
-    from backend.capabilities.registry_next import capability_registry
+    from backend.capability_v2.bootstrap import get_capability_registry
+    capability_registry = get_capability_registry()
     required_capabilities = (
         "knowledge.document.get",
         "knowledge.document.history.get",

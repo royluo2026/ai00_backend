@@ -476,8 +476,8 @@ def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
 
 def get_default_gateway() -> CapabilityGatewayService:
     if _default_gateway is None:
-        from backend.capabilities.registry_next import capability_registry
-        return configure_default_gateway(capability_registry)
+        from .bootstrap import get_capability_registry
+        return configure_default_gateway(get_capability_registry())
     return _default_gateway
 
 
