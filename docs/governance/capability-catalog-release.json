@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_743ca47bacc80f7fdd97ae5654d0f6fc",
-  "catalog_hash": "sha256:743ca47bacc80f7fdd97ae5654d0f6fcb8676343105f84b1f362867d5362fecd",
+  "release_id": "rel_2f488a97fee37007042044de4e8bca90",
+  "catalog_hash": "sha256:2f488a97fee37007042044de4e8bca90c31f59d70d8b6140c22437bc0f8cd03f",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -32233,7 +32233,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:f7a3df930005cf1f49e4a39cfb80fdbd60a86ea4727c8d4bedc6d44e6def4352"
+      "artifact_hash": "sha256:73d073018711c8d88d0db5667e7e3d2b6c29782e150559bb5da8624e55e2aaac"
     },
     {
       "plugin_id": "official.digital-model",
@@ -32263,7 +32263,7 @@
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:9b3cc335655d70bf3af8be5ac6e2dd7fb49a27b0afb3445cbdb792808aa89e25"
+      "artifact_hash": "sha256:9c1216e92392a8f4b7a79539b26e0c23ad9b8929ec42a16442d2c5a697ec51e5"
     },
     {
       "plugin_id": "official.simulation",
@@ -32272,5 +32272,5 @@
       "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
     }
   ],
-  "created_at": "2026-08-12T06:35:23.158986Z"
+  "created_at": "2026-08-12T06:44:47.336163Z"
 }

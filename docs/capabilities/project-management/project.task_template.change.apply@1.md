@@ -8,7 +8,7 @@ Execute the reviewed project.task_template.change.apply project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_743ca47bacc80f7fdd97ae5654d0f6fc`
+- Catalog Release：`rel_2f488a97fee37007042044de4e8bca90`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Execute the reviewed project.task_template.change.apply project outcome.
 ```json
 {
   "capability_id": "project.task_template.change.apply",
-  "catalog_release": "rel_743ca47bacc80f7fdd97ae5654d0f6fc",
+  "catalog_release": "rel_2f488a97fee37007042044de4e8bca90",
   "major_version": 1,
   "payload": {
     "arguments": {},

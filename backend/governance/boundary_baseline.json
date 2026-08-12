@@ -1227,46 +1227,6 @@
     },
     {
       "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/collab.py",
-      "scope": "create_session",
-      "target": "workmanship_proj_collab_sessions",
-      "detail": "craft SQL accesses project_management-owned table workmanship_proj_collab_sessions",
-      "fingerprint": "0e0b0ec423e4dd2bebe8"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/collab.py",
-      "scope": "end_session",
-      "target": "workmanship_proj_collab_sessions",
-      "detail": "craft SQL accesses project_management-owned table workmanship_proj_collab_sessions",
-      "fingerprint": "df8f2c468e2991f99e77"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/collab.py",
-      "scope": "get_session",
-      "target": "workmanship_proj_collab_sessions",
-      "detail": "craft SQL accesses project_management-owned table workmanship_proj_collab_sessions",
-      "fingerprint": "bae00aab306e55e50c56"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/collab.py",
-      "scope": "join_session",
-      "target": "workmanship_proj_collab_sessions",
-      "detail": "craft SQL accesses project_management-owned table workmanship_proj_collab_sessions",
-      "fingerprint": "3d61c8795e9322ffb8a9"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/collab.py",
-      "scope": "list_sessions",
-      "target": "workmanship_proj_collab_sessions",
-      "detail": "craft SQL accesses project_management-owned table workmanship_proj_collab_sessions",
-      "fingerprint": "dc3dd645e475b3332e75"
-    },
-    {
-      "category": "cross_domain_sql",
       "path": "plugins/craft/craft_backend/routers/factory.py",
       "scope": "create_section",
       "target": "workmanship_factory_factory_sections",
