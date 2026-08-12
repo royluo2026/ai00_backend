@@ -64,7 +64,7 @@ async def create(body: CreateEnvironmentBody, request: Request, user: dict = Dep
 
 @router.get("")
 async def list_all(request: Request, limit: int = 50, user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal)):
-    return await _invoke("simulation.environment.list", {"limit": limit}, request, user, principal)
+    return await _invoke("simulation.environment.search", {"limit": limit}, request, user, principal)
 
 
 @router.get("/{environment_gid}")

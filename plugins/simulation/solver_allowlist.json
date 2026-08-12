@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "solvers": [
+    {"solver": "solver-x", "version": "5.4.1"}
+  ]
+}

@@ -41,32 +41,52 @@ RUN = obj({
     "craft_commit_ref": STRING, "model_snapshot_hash": HASH, "parameter_version": INTEGER,
     "solver_version": STRING, "operation_ref": OPERATION_REF,
 }, ("run_id", "environment_id", "status", "source_fingerprint", "craft_commit_ref", "model_snapshot_hash", "parameter_version", "solver_version", "operation_ref"))
+PARAMETER_SET = obj({"parameter_set_ref": PARAMETER_SET_REF, "name": STRING, "parameters": {"type": "array", "items": PARAMETER}}, ("parameter_set_ref", "name", "parameters"))
+SOLVER_PROFILE = obj({"simulation_profile_ref": PROFILE_REF, "name": STRING, "solver": STRING, "solver_version": STRING, "settings": {"type": "array", "items": SETTING}}, ("simulation_profile_ref", "name", "solver", "solver_version", "settings"))
+RESULT_REF = obj({"run_id": STRING, "source_fingerprint": HASH, "result_hash": HASH}, ("run_id", "source_fingerprint", "result_hash"))
+RESULT = obj({"result_ref": RESULT_REF, "run_id": STRING, "status": STRING, "source_fingerprint": HASH, "result_artifact_refs": {"type": "array", "items": ARTIFACT_REF}}, ("result_ref", "run_id", "status", "source_fingerprint", "result_artifact_refs"))
+RESULT_CHANGE = obj({
+    "artifact_id": STRING,
+    "change_type": {"type": "string", "enum": ["artifact_added", "artifact_removed", "artifact_changed"]},
+    "before_sha256": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+    "after_sha256": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+}, ("artifact_id", "change_type", "before_sha256", "after_sha256"))
 
 
 INPUT_SCHEMAS = {
     "simulation.parameter_set.create": obj({"name": STRING, "parameters": {"type": "array", "items": PARAMETER}}, ("name", "parameters")),
     "simulation.parameter_set.get": obj({"parameter_set_ref": PARAMETER_SET_REF}, ("parameter_set_ref",)),
-    "simulation.profile.create": obj({"name": STRING, "solver": STRING, "solver_version": STRING, "settings": {"type": "array", "items": SETTING}}, ("name", "solver", "solver_version", "settings")),
-    "simulation.profile.get": obj({"simulation_profile_ref": PROFILE_REF}, ("simulation_profile_ref",)),
+    "simulation.parameter_set.search": obj({"query": STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
+    "simulation.solver_profile.create": obj({"name": STRING, "solver": STRING, "solver_version": STRING, "settings": {"type": "array", "items": SETTING}}, ("name", "solver", "solver_version", "settings")),
+    "simulation.solver_profile.get": obj({"simulation_profile_ref": PROFILE_REF}, ("simulation_profile_ref",)),
+    "simulation.solver_profile.search": obj({"query": STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
     "simulation.environment.create": obj({"name": STRING, "execution_plan_ref": EXECUTION_PLAN_REF, "model_snapshot_ref": MODEL_SNAPSHOT_REF, "parameter_set_ref": PARAMETER_SET_REF, "simulation_profile_ref": PROFILE_REF}, ("name", "execution_plan_ref", "model_snapshot_ref", "parameter_set_ref", "simulation_profile_ref")),
     "simulation.environment.get": obj({"environment_id": STRING}, ("environment_id",)),
-    "simulation.environment.list": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
+    "simulation.environment.search": obj({"limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
+    "simulation.environment.archive": obj({"environment_id": STRING}, ("environment_id",)),
     "simulation.run.start": obj({"environment_id": STRING}, ("environment_id",)),
     "simulation.run.get": obj({"run_id": STRING}, ("run_id",)),
+    "simulation.run.search": obj({"environment_id": STRING, "limit": {"type": "integer", "minimum": 1, "maximum": 200}}),
     "simulation.result.get": obj({"run_id": STRING}, ("run_id",)),
+    "simulation.result.compare": obj({"left_result_ref": RESULT_REF, "right_result_ref": RESULT_REF}, ("left_result_ref", "right_result_ref")),
 }
 
 OUTPUT_SCHEMAS = {
-    "simulation.parameter_set.create": obj({"parameter_set_ref": PARAMETER_SET_REF, "name": STRING, "parameters": {"type": "array", "items": PARAMETER}}, ("parameter_set_ref", "name", "parameters")),
-    "simulation.parameter_set.get": obj({"parameter_set_ref": PARAMETER_SET_REF, "name": STRING, "parameters": {"type": "array", "items": PARAMETER}}, ("parameter_set_ref", "name", "parameters")),
-    "simulation.profile.create": obj({"simulation_profile_ref": PROFILE_REF, "name": STRING, "solver": STRING, "solver_version": STRING, "settings": {"type": "array", "items": SETTING}}, ("simulation_profile_ref", "name", "solver", "solver_version", "settings")),
-    "simulation.profile.get": obj({"simulation_profile_ref": PROFILE_REF, "name": STRING, "solver": STRING, "solver_version": STRING, "settings": {"type": "array", "items": SETTING}}, ("simulation_profile_ref", "name", "solver", "solver_version", "settings")),
+    "simulation.parameter_set.create": PARAMETER_SET,
+    "simulation.parameter_set.get": PARAMETER_SET,
+    "simulation.parameter_set.search": obj({"items": {"type": "array", "items": PARAMETER_SET}, "total": INTEGER, "query": STRING}, ("items", "total", "query")),
+    "simulation.solver_profile.create": SOLVER_PROFILE,
+    "simulation.solver_profile.get": SOLVER_PROFILE,
+    "simulation.solver_profile.search": obj({"items": {"type": "array", "items": SOLVER_PROFILE}, "total": INTEGER, "query": STRING}, ("items", "total", "query")),
     "simulation.environment.create": ENVIRONMENT,
     "simulation.environment.get": ENVIRONMENT,
-    "simulation.environment.list": obj({"items": {"type": "array", "items": ENVIRONMENT}, "total": INTEGER}, ("items", "total")),
+    "simulation.environment.search": obj({"items": {"type": "array", "items": ENVIRONMENT}, "total": INTEGER}, ("items", "total")),
+    "simulation.environment.archive": ENVIRONMENT,
     "simulation.run.start": RUN,
     "simulation.run.get": RUN,
-    "simulation.result.get": obj({"run_id": STRING, "status": STRING, "source_fingerprint": HASH, "result_artifact_refs": {"type": "array", "items": ARTIFACT_REF}}, ("run_id", "status", "source_fingerprint", "result_artifact_refs")),
+    "simulation.run.search": obj({"items": {"type": "array", "items": RUN}, "total": INTEGER}, ("items", "total")),
+    "simulation.result.get": RESULT,
+    "simulation.result.compare": obj({"left_result_ref": RESULT_REF, "right_result_ref": RESULT_REF, "same_inputs": {"type": "boolean"}, "changes": {"type": "array", "items": RESULT_CHANGE}}, ("left_result_ref", "right_result_ref", "same_inputs", "changes")),
 }
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

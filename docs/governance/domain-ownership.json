@@ -140,7 +140,7 @@
       "module_prefixes": ["plugins.simulation"],
       "code_paths": ["plugins/simulation/**", "backend/domain_ports/simulation.py", "backend/capability_v2/revision/simulation_adapter.py"],
       "provider_paths": ["plugins/simulation/simulation_backend/capabilities/**"],
-      "migration_paths": ["backend/db/migrations/202608030009_simulation_environments.sql", "backend/db/migrations/202608100010_simulation_reproducibility.sql"],
+      "migration_paths": ["backend/db/migrations/domains/simulation/**", "backend/db/migrations/202608030009_simulation_environments.sql", "backend/db/migrations/202608100010_simulation_reproducibility.sql"],
       "test_paths": ["plugins/simulation/**/test_*.py", "backend/tests/test_simulation_*.py"],
       "documentation_paths": ["docs/capabilities/simulation/**"]
     },

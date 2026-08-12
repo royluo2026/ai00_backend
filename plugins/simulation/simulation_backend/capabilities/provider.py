@@ -11,7 +11,7 @@ from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
 
 _RESOURCES = {
     "simulation.parameter_set.get": (("simulation-parameter-set", "parameter_set_ref.parameter_set_id"),),
-    "simulation.profile.get": (("simulation-profile", "simulation_profile_ref.profile_id"),),
+    "simulation.solver_profile.get": (("simulation-profile", "simulation_profile_ref.profile_id"),),
     "simulation.environment.create": (
         ("craft-bop-version", "execution_plan_ref.version_gid"),
         ("digital-model", "model_snapshot_ref.model_id"),
@@ -20,9 +20,11 @@ _RESOURCES = {
         ("simulation-profile", "simulation_profile_ref.profile_id"),
     ),
     "simulation.environment.get": (("simulation-environment", "environment_id"),),
+    "simulation.environment.archive": (("simulation-environment", "environment_id"),),
     "simulation.run.start": (("simulation-environment", "environment_id"),),
     "simulation.run.get": (("simulation-run", "run_id"),),
     "simulation.result.get": (("simulation-run", "run_id"),),
+    "simulation.result.compare": (("simulation-run", "left_result_ref.run_id"), ("simulation-run", "right_result_ref.run_id")),
 }
 _ERRORS = tuple(DomainErrorContract(
     code=code, meaning=meaning,
@@ -32,6 +34,7 @@ _ERRORS = tuple(DomainErrorContract(
     ("source_version_mismatch", "A referenced source no longer matches its immutable hash or version."),
     ("parameter_set_not_found", "The immutable parameter set is unavailable or not visible."),
     ("simulation_profile_not_found", "The immutable Simulation profile is unavailable or not visible."),
+    ("solver_not_allowed", "The requested solver coordinate is not in the governed allowlist."),
     ("simulation_environment_not_found", "The Simulation environment is unavailable or not visible."),
     ("simulation_run_not_found", "The Simulation run is unavailable or not visible."),
     ("simulation_result_not_ready", "The Simulation run has no completed result artifacts."),

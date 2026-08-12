@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import secrets
+from pathlib import Path
 from typing import Any, Mapping
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
@@ -11,6 +12,10 @@ from backend.domain_ports.simulation import ExecutionPlanRef, ParameterSetRef, S
 from backend.domain_ports.versioned_resources import versioned_resource_resolvers
 
 from ..data.connection import get_simulation_conn
+
+
+_SOLVER_POLICY = json.loads((Path(__file__).resolve().parents[2] / "solver_allowlist.json").read_text(encoding="utf-8"))
+_ALLOWED_SOLVERS = frozenset((str(item["solver"]), str(item["version"])) for item in _SOLVER_POLICY["solvers"])
 
 
 def _canonical(value: Any) -> tuple[str, str]:
@@ -66,6 +71,17 @@ class SimulationRepository:
                 row = cur.fetchone()
         return dict(row) if row else None
 
+    def search_parameter_sets(self, query: str, limit: int, context: CapabilityContext) -> list[dict[str, Any]]:
+        with get_simulation_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT parameter_set_id,version,name,content_hash,parameters_json FROM workmanship_sim_parameter_sets "
+                    "WHERE (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s)) AND (%s='' OR LOWER(name) LIKE %s) "
+                    "ORDER BY created_at DESC LIMIT %s",
+                    (context.user_gid, context.team_gid, context.team_gid, query, f"%{query.casefold()}%", limit),
+                )
+                return [dict(row) for row in cur.fetchall()]
+
     def create_profile(self, row: Mapping[str, Any]) -> None:
         with get_simulation_conn() as conn:
             with conn.cursor() as cur:
@@ -83,6 +99,17 @@ class SimulationRepository:
                 )
                 row = cur.fetchone()
         return dict(row) if row else None
+
+    def search_profiles(self, query: str, limit: int, context: CapabilityContext) -> list[dict[str, Any]]:
+        with get_simulation_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT profile_id,version,name,solver,solver_version,content_hash,settings_json FROM workmanship_sim_profiles "
+                    "WHERE (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s)) AND (%s='' OR LOWER(name) LIKE %s) "
+                    "ORDER BY created_at DESC LIMIT %s",
+                    (context.user_gid, context.team_gid, context.team_gid, query, f"%{query.casefold()}%", limit),
+                )
+                return [dict(row) for row in cur.fetchall()]
 
     def create_environment(self, row: Mapping[str, Any]) -> None:
         source = row["source"]
@@ -111,6 +138,18 @@ class SimulationRepository:
         for row in rows: row["source"] = _loads(row.get("source"), {})
         return rows
 
+    def archive_environment(self, environment_id: str, context: CapabilityContext) -> dict[str, Any] | None:
+        with get_simulation_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE workmanship_sim_environments SET status='archived',updated_at=NOW() WHERE gid=%s "
+                    "AND status<>'archived' AND (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s))",
+                    (environment_id, context.user_gid, context.team_gid, context.team_gid),
+                )
+                if cur.rowcount != 1:
+                    return None
+        return self.get_environment(environment_id, context)
+
     def create_run(self, row: Mapping[str, Any]) -> None:
         source = row["source"]
         with get_simulation_conn() as conn:
@@ -135,6 +174,21 @@ class SimulationRepository:
         if row:
             row = dict(row); row["source"] = _loads(row.get("source"), {}); row["result_artifact_refs"] = _loads(row.get("result_artifact_refs"), [])
         return row
+
+    def search_runs(self, environment_id: str, limit: int, context: CapabilityContext) -> list[dict[str, Any]]:
+        with get_simulation_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT run_id,environment_id,operation_id,status,source_fingerprint,pinned_source AS source,result_artifact_refs "
+                    "FROM workmanship_sim_runs WHERE (%s='' OR environment_id=%s) AND "
+                    "(owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s)) ORDER BY created_at DESC LIMIT %s",
+                    (environment_id, environment_id, context.user_gid, context.team_gid, context.team_gid, limit),
+                )
+                rows = [dict(row) for row in cur.fetchall()]
+        for row in rows:
+            row["source"] = _loads(row.get("source"), {})
+            row["result_artifact_refs"] = _loads(row.get("result_artifact_refs"), [])
+        return rows
 
 
 repository = SimulationRepository()
@@ -179,7 +233,16 @@ def get_parameter_set(payload: dict[str, Any], context: CapabilityContext) -> Ca
     return CapabilityOutput(data=_parameter(row))
 
 
+def search_parameter_sets(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    query = str(payload.get("query") or "").strip()
+    rows = repository.search_parameter_sets(query, max(1, min(int(payload.get("limit") or 50), 200)), context)
+    return CapabilityOutput(data={"items": [_parameter(row) for row in rows], "total": len(rows), "query": query})
+
+
 def create_profile(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    solver_coordinate = (str(payload["solver"]), str(payload["solver_version"]))
+    if solver_coordinate not in _ALLOWED_SOLVERS:
+        raise CapabilityBusinessError("solver_not_allowed", "Solver and version are not present in the Simulation allowlist")
     settings = sorted((dict(item) for item in payload["settings"]), key=lambda item: item["name"])
     content_hash, settings_json = _canonical({"solver": payload["solver"], "solver_version": payload["solver_version"], "settings": settings})
     row = {"profile_id": "spf_" + secrets.token_hex(16), "version": 1, "name": str(payload["name"]).strip(), "solver": str(payload["solver"]), "solver_version": str(payload["solver_version"]), "content_hash": content_hash, "settings": settings, "settings_json": settings_json, "owner_gid": context.user_gid, "team_gid": context.team_gid}
@@ -193,6 +256,12 @@ def get_profile(payload: dict[str, Any], context: CapabilityContext) -> Capabili
     row = repository.get_profile(ref, context)
     if not row: raise CapabilityBusinessError("simulation_profile_not_found", "Simulation profile not found")
     return CapabilityOutput(data=_profile(row))
+
+
+def search_profiles(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    query = str(payload.get("query") or "").strip()
+    rows = repository.search_profiles(query, max(1, min(int(payload.get("limit") or 50), 200)), context)
+    return CapabilityOutput(data={"items": [_profile(row) for row in rows], "total": len(rows), "query": query})
 
 
 def create_environment(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
@@ -226,6 +295,13 @@ def list_environments(payload: dict[str, Any], context: CapabilityContext) -> Ca
     return CapabilityOutput(data={"items": items, "total": len(items)})
 
 
+def archive_environment(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    row = repository.archive_environment(str(payload["environment_id"]), context)
+    if not row:
+        raise CapabilityBusinessError("simulation_environment_not_found", "Simulation environment not found or already archived")
+    return CapabilityOutput(data={key: row[key] for key in ("environment_id", "name", "status", "source")})
+
+
 def _run(row: Mapping[str, Any]) -> dict[str, Any]:
     source = _verified_source(row["source"]); execution = source["execution_plan"]; model = source["model_snapshot"]; parameter = source["parameter_set"]; profile = source["simulation_profile"]
     operation_id = str(row.get("operation_id") or row["operation_ref"]["operation_id"])
@@ -237,7 +313,7 @@ def start_run(payload: dict[str, Any], context: CapabilityContext) -> Capability
     if not environment: raise CapabilityBusinessError("simulation_environment_not_found", "Simulation environment not found")
     source = _verified_source(environment["source"])
     operation_id = str(getattr(context, "operation_id", None) or ("op_" + secrets.token_hex(16)))
-    row = {"run_id": operation_id, "environment_id": environment["environment_id"], "status": "queued", "source_fingerprint": source["source_fingerprint"], "source": source, "operation_ref": {"operation_id": operation_id, "status": "accepted", "version": 1}, "owner_gid": context.user_gid, "team_gid": context.team_gid}
+    row = {"run_id": "srun_" + secrets.token_hex(16), "environment_id": environment["environment_id"], "status": "queued", "source_fingerprint": source["source_fingerprint"], "source": source, "operation_ref": {"operation_id": operation_id, "status": "accepted", "version": 1}, "owner_gid": context.user_gid, "team_gid": context.team_gid}
     repository.create_run(row)
     data = _run(row)
     return CapabilityOutput(data=data, evidence=(EvidenceRef(kind="simulation.run", reference=f"simulation://run/{row['run_id']}", digest=row["source_fingerprint"]),))
@@ -249,12 +325,56 @@ def get_run(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOu
     return CapabilityOutput(data=_run(row))
 
 
+def search_runs(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    rows = repository.search_runs(str(payload.get("environment_id") or ""), max(1, min(int(payload.get("limit") or 50), 200)), context)
+    return CapabilityOutput(data={"items": [_run(row) for row in rows], "total": len(rows)})
+
+
+def _result(row: Mapping[str, Any]) -> dict[str, Any]:
+    artifacts = list(row.get("result_artifact_refs") or ())
+    if row["status"] != "completed" or not artifacts:
+        raise CapabilityBusinessError("simulation_result_not_ready", "Simulation result is not ready", retryable=True)
+    result_hash, _ = _canonical(artifacts)
+    return {
+        "result_ref": {"run_id": str(row["run_id"]), "source_fingerprint": str(row["source_fingerprint"]), "result_hash": result_hash},
+        "run_id": str(row["run_id"]), "status": str(row["status"]),
+        "source_fingerprint": str(row["source_fingerprint"]), "result_artifact_refs": artifacts,
+    }
+
+
 def get_result(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
     row = repository.get_run(str(payload["run_id"]), context)
     if not row: raise CapabilityBusinessError("simulation_run_not_found", "Simulation run not found")
-    artifacts = list(row.get("result_artifact_refs") or ())
-    if row["status"] != "completed" or not artifacts: raise CapabilityBusinessError("simulation_result_not_ready", "Simulation result is not ready", retryable=True)
-    return CapabilityOutput(data={"run_id": row["run_id"], "status": row["status"], "source_fingerprint": row["source_fingerprint"], "result_artifact_refs": artifacts}, evidence=tuple(EvidenceRef(kind="simulation.result", reference=f"artifact:{item['artifact_id']}", digest="sha256:" + item["sha256"]) for item in artifacts))
+    data = _result(row)
+    return CapabilityOutput(data=data, evidence=tuple(EvidenceRef(kind="simulation.result", reference=f"artifact:{item['artifact_id']}", digest="sha256:" + item["sha256"]) for item in data["result_artifact_refs"]))
+
+
+def compare_results(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    resolved = []
+    for key in ("left_result_ref", "right_result_ref"):
+        ref = dict(payload[key])
+        row = repository.get_run(str(ref["run_id"]), context)
+        if not row:
+            raise CapabilityBusinessError("simulation_run_not_found", "Simulation run not found")
+        result = _result(row)
+        if result["result_ref"] != ref:
+            raise CapabilityBusinessError("source_version_mismatch", "Simulation result no longer matches the pinned reference")
+        resolved.append(result)
+    left, right = resolved
+    before_items = {item["artifact_id"]: item for item in left["result_artifact_refs"]}
+    after_items = {item["artifact_id"]: item for item in right["result_artifact_refs"]}
+    changes = []
+    for artifact_id in sorted(set(before_items) | set(after_items)):
+        before, after = before_items.get(artifact_id), after_items.get(artifact_id)
+        if before == after:
+            continue
+        change_type = "artifact_added" if before is None else "artifact_removed" if after is None else "artifact_changed"
+        changes.append({"artifact_id": artifact_id, "change_type": change_type, "before_sha256": before["sha256"] if before else None, "after_sha256": after["sha256"] if after else None})
+    evidence = tuple(
+        EvidenceRef(kind="simulation.result", reference=f"simulation://result/{item['run_id']}", digest=item["result_hash"])
+        for item in (left["result_ref"], right["result_ref"])
+    )
+    return CapabilityOutput(data={"left_result_ref": left["result_ref"], "right_result_ref": right["result_ref"], "same_inputs": left["source_fingerprint"] == right["source_fingerprint"], "changes": changes}, evidence=evidence)
 
 
 def specs() -> tuple[tuple[CapabilitySpec, Any], ...]:
@@ -262,14 +382,19 @@ def specs() -> tuple[tuple[CapabilitySpec, Any], ...]:
     return (
         (CapabilitySpec(id="simulation.parameter_set.create", description="Create an immutable Simulation parameter set.", risk="write", confirmation="user", **common), create_parameter_set),
         (CapabilitySpec(id="simulation.parameter_set.get", description="Read an immutable Simulation parameter set.", **common), get_parameter_set),
-        (CapabilitySpec(id="simulation.profile.create", description="Create an immutable solver profile.", risk="write", confirmation="user", **common), create_profile),
-        (CapabilitySpec(id="simulation.profile.get", description="Read an immutable solver profile.", **common), get_profile),
+        (CapabilitySpec(id="simulation.parameter_set.search", description="Search immutable Simulation parameter sets.", **common), search_parameter_sets),
+        (CapabilitySpec(id="simulation.solver_profile.create", description="Create an immutable solver profile.", risk="write", confirmation="user", **common), create_profile),
+        (CapabilitySpec(id="simulation.solver_profile.get", description="Read an immutable solver profile.", **common), get_profile),
+        (CapabilitySpec(id="simulation.solver_profile.search", description="Search immutable solver profiles.", **common), search_profiles),
         (CapabilitySpec(id="simulation.environment.create", description="Create a reproducible environment from four immutable references.", risk="write", confirmation="user", **common), create_environment),
         (CapabilitySpec(id="simulation.environment.get", description="Read a reproducible Simulation environment.", **common), get_environment),
-        (CapabilitySpec(id="simulation.environment.list", description="List visible Simulation environments.", **common), list_environments),
+        (CapabilitySpec(id="simulation.environment.search", description="Search visible Simulation environments.", **common), list_environments),
+        (CapabilitySpec(id="simulation.environment.archive", description="Archive a Simulation environment.", risk="write", confirmation="user", **common), archive_environment),
         (CapabilitySpec(id="simulation.run.start", description="Queue a Simulation run with exact pinned inputs.", risk="write", confirmation="user", idempotent=False, **common), start_run),
         (CapabilitySpec(id="simulation.run.get", description="Read Simulation run state and pinned versions.", **common), get_run),
+        (CapabilitySpec(id="simulation.run.search", description="Search Simulation runs.", **common), search_runs),
         (CapabilitySpec(id="simulation.result.get", description="Read completed Simulation result ArtifactRefs.", **common), get_result),
+        (CapabilitySpec(id="simulation.result.compare", description="Compare immutable Simulation result references.", **common), compare_results),
     )
 
 

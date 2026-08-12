@@ -71,6 +71,7 @@
 
 # Simulation
 /plugins/simulation/** @ai00/simulation-maintainers
+/backend/db/migrations/domains/simulation/** @ai00/simulation-maintainers
 /backend/db/migrations/202608030009_simulation_environments.sql @ai00/simulation-maintainers
 /backend/db/migrations/202608100010_simulation_reproducibility.sql @ai00/simulation-maintainers
 /backend/domain_ports/simulation.py @ai00/simulation-maintainers
