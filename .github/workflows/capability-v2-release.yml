@@ -29,7 +29,31 @@ jobs:
       AI00_ACCEPTANCE_OAUTH_DISCOVERY_URL: ${{ secrets.CAPABILITY_V2_OAUTH_DISCOVERY_URL }}
       AI00_ACCEPTANCE_OAUTH_ISSUER: ${{ secrets.CAPABILITY_V2_OAUTH_ISSUER }}
       AI00_ACCEPTANCE_LOCAL_RUNTIME_HEALTH_URL: ${{ secrets.CAPABILITY_V2_LOCAL_RUNTIME_HEALTH_URL }}
-      AI00_ACCEPTANCE_RC_EVIDENCE: ${{ secrets.CAPABILITY_V2_RC_EVIDENCE_PATH }}
+      AI00_ACCEPTANCE_RUNTIME_EVIDENCE_SOURCE: ${{ secrets.CAPABILITY_V2_RUNTIME_EVIDENCE_PATH }}
+      AI00_ACCEPTANCE_PROVIDER_CRUD_EVIDENCE: ${{ secrets.CAPABILITY_V2_PROVIDER_CRUD_EVIDENCE_PATH }}
+      AI00_ACCEPTANCE_RC_EVIDENCE: artifacts/capability-v2-rc-evidence.json
+      AI00_AGENT_DB_URL: ${{ secrets.CAPABILITY_V2_AGENT_DB_URL }}
+      AI00_AGENT_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_AGENT_DDL_DB_URL }}
+      AI00_BASE_DB_URL: ${{ secrets.CAPABILITY_V2_BASE_DB_URL }}
+      AI00_BASE_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_BASE_DDL_DB_URL }}
+      AI00_CRAFT_DB_URL: ${{ secrets.CAPABILITY_V2_CRAFT_DB_URL }}
+      AI00_CRAFT_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_CRAFT_DDL_DB_URL }}
+      AI00_DIGITAL_MODEL_DB_URL: ${{ secrets.CAPABILITY_V2_DIGITAL_MODEL_DB_URL }}
+      AI00_DIGITAL_MODEL_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_DIGITAL_MODEL_DDL_DB_URL }}
+      AI00_FACTORY_DB_URL: ${{ secrets.CAPABILITY_V2_FACTORY_DB_URL }}
+      AI00_FACTORY_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_FACTORY_DDL_DB_URL }}
+      AI00_INTEGRATION_DB_URL: ${{ secrets.CAPABILITY_V2_INTEGRATION_DB_URL }}
+      AI00_INTEGRATION_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_INTEGRATION_DDL_DB_URL }}
+      AI00_KNOWLEDGE_DB_URL: ${{ secrets.CAPABILITY_V2_KNOWLEDGE_DB_URL }}
+      AI00_KNOWLEDGE_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_KNOWLEDGE_DDL_DB_URL }}
+      AI00_LOCAL_RUNTIME_DB_URL: ${{ secrets.CAPABILITY_V2_LOCAL_RUNTIME_DB_URL }}
+      AI00_LOCAL_RUNTIME_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_LOCAL_RUNTIME_DDL_DB_URL }}
+      AI00_ONTOLOGY_DB_URL: ${{ secrets.CAPABILITY_V2_ONTOLOGY_DB_URL }}
+      AI00_ONTOLOGY_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_ONTOLOGY_DDL_DB_URL }}
+      AI00_PROJECT_MANAGEMENT_DB_URL: ${{ secrets.CAPABILITY_V2_PROJECT_MANAGEMENT_DB_URL }}
+      AI00_PROJECT_MANAGEMENT_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_PROJECT_MANAGEMENT_DDL_DB_URL }}
+      AI00_SIMULATION_DB_URL: ${{ secrets.CAPABILITY_V2_SIMULATION_DB_URL }}
+      AI00_SIMULATION_DDL_DB_URL: ${{ secrets.CAPABILITY_V2_SIMULATION_DDL_DB_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -58,10 +82,17 @@ jobs:
       - run: npm test
         working-directory: services/mcp-gateway
       - run: dotnet test local-runtime/Ai00.LocalRuntime.sln -c Release
+      - name: Verify live domain database isolation
+        run: python backend/scripts/verify_domain_database_isolation.py --provider-evidence "$env:AI00_ACCEPTANCE_PROVIDER_CRUD_EVIDENCE" --output artifacts/database-isolation.json
+      - name: Assemble current-run RC evidence
+        run: python backend/scripts/assemble_capability_v2_rc_evidence.py --runtime-evidence "$env:AI00_ACCEPTANCE_RUNTIME_EVIDENCE_SOURCE" --database-evidence artifacts/database-isolation.json --output "$env:AI00_ACCEPTANCE_RC_EVIDENCE"
       - run: python backend/scripts/run_capability_v2_acceptance.py --mode release-candidate --strict --report artifacts/capability-v2-release-candidate.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: capability-v2-release-candidate-report
-          path: artifacts/capability-v2-release-candidate.json
+          path: |
+            artifacts/capability-v2-release-candidate.json
+            artifacts/capability-v2-rc-evidence.json
+            artifacts/database-isolation.json
           if-no-files-found: error

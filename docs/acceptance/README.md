@@ -26,8 +26,11 @@ skips, a nonzero pytest status or an incomplete case count.
 
 ## Release-candidate evidence
 
-The protected RC runner requires `AI00_ACCEPTANCE_RC_EVIDENCE` to point to JSON
-matching `capability-v2-rc-evidence.schema.json`. Evidence must bind the exact
+The protected RC runner generates `AI00_ACCEPTANCE_RC_EVIDENCE` from two
+environment-harness source documents and the repository's live database probe.
+`AI00_ACCEPTANCE_RUNTIME_EVIDENCE_SOURCE` points to the runtime JSON and
+`AI00_ACCEPTANCE_PROVIDER_CRUD_EVIDENCE` points to the Provider CRUD JSON. The
+assembled document must match `capability-v2-rc-evidence.schema.json` and bind the exact
 Git commit, workflow run identity, recent generation time, Catalog Release/hash,
 latest platform migration checksum, the DomainManifest digest, every domain
 migration checksum/artifact version, Provider artifact hashes and environment ID. It must
@@ -35,9 +38,10 @@ contain exactly the stable Capability keys and mark all seven runtime cases
 `passed`. It must also contain exactly eleven successful owner-operation rows
 and all 110 ordered cross-domain credential pairs with both reads and writes
 marked `denied`. A stale document or a label without an executable external result is
-rejected. The environment harness must rewrite the configured evidence path for
-the current `AI00_ACCEPTANCE_RUN_ID`; a reusable static evidence document cannot
-pass a later workflow run.
+rejected. The environment harness must rewrite both source paths for the current
+`AI00_ACCEPTANCE_RUN_ID`; the workflow verifies the environment, run and commit
+bindings before producing the final document. Reusable static evidence cannot pass
+a later workflow run.
 
 RC also requires:
 
@@ -67,9 +71,19 @@ python backend/scripts/verify_domain_database_isolation.py `
 ```
 
 The Provider document contains `schema_version: 1` and a `domains` object whose
-keys are exactly the eleven domain IDs and whose values are all `passed`. Merge
-the generated document's `database_isolation` member into the final
-`AI00_ACCEPTANCE_RC_EVIDENCE` JSON. The verifier uses TLS and each domain's DDL
+keys are exactly the eleven domain IDs and whose values are all `passed`. Assemble
+the generated database fragment with the runtime fragment using:
+
+```powershell
+python backend/scripts/assemble_capability_v2_rc_evidence.py `
+  --runtime-evidence .runtime/runtime-e2e.json `
+  --database-evidence .runtime/database-isolation.json `
+  --output .runtime/capability-v2-rc-evidence.json
+```
+
+The assembler rejects fragments from different environments, runs or commits,
+validates the final schema and atomically replaces the output. The release workflow
+performs both commands automatically. The verifier uses TLS and each domain's DDL
 credential to compare the live `ai00_schema_migrations` ledger with every frozen
 migration. It never prints database secrets, rolls back owner probes and performs
 writes with `WHERE 1=0`.
