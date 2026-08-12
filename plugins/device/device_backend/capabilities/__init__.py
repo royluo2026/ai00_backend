@@ -5,6 +5,7 @@ from typing import Any
 
 from .provider import register
 from .runtime import specs
+from .reviewed import register_reviewed_capabilities
 from backend.domain_ports.resource_authorization import resource_authorizers
 from .. import control_plane
 
@@ -19,6 +20,7 @@ def register_capabilities(registry: Any) -> None:
     resource_authorizers.register("device", _authorize_owned_device)
     for spec, handler in specs():
         register(registry, spec, handler)
+    register_reviewed_capabilities(registry)
 
 
 __all__ = ["register_capabilities"]

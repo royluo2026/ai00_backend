@@ -166,6 +166,15 @@ def test_merge_preserves_reviewed_dispositions_and_adds_new_candidates(builder, 
     assert merged["unreviewed_functions"]["rest:GET:/api/new-route"]["resolution"] == "unreviewed"
 
 
+def test_merge_drops_a_reviewed_disposition_that_moved_to_another_domain(builder, fixture):
+    """Catches the old owner retaining a function after its Registry domain changes."""
+    reviewed = fixture("minimal-valid.json")
+
+    merged = builder.merge_domain_review(reviewed, [])
+
+    assert merged["capabilities"] == {}
+
+
 def test_aligns_reviewed_function_with_its_current_published_capability(builder, fixture):
     """Catches a reviewed transport disposition remaining under a retired Capability ID."""
     document = fixture("minimal-valid.json")

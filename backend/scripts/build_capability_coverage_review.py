@@ -187,6 +187,19 @@ def merge_domain_review(existing: dict, discovered: list[dict]) -> dict:
         function_id: row for function_id, row in merged["unreviewed_functions"].items()
         if function_id in discovered_ids
     }
+    merged["excluded_functions"] = {
+        function_id: row for function_id, row in merged["excluded_functions"].items()
+        if function_id in discovered_ids
+    }
+    for capability_id in list(merged["capabilities"]):
+        group = merged["capabilities"][capability_id]
+        group["function_dispositions"] = {
+            function_id: disposition
+            for function_id, disposition in group["function_dispositions"].items()
+            if function_id in discovered_ids
+        }
+        if not group["function_dispositions"]:
+            del merged["capabilities"][capability_id]
     known = _reviewed_function_ids(merged)
     for row in sorted(discovered, key=lambda item: item["function_id"]):
         function_id = row["function_id"]

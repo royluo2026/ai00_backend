@@ -59,6 +59,7 @@ def test_first_class_domains_include_independent_maintainer_boundaries():
         "Knowledge",
         "Integration",
         "Local Integration",
+        "Factory",
     }
 
 
@@ -93,6 +94,10 @@ def test_domain_classification_uses_business_owner_not_consumer_surface():
         "capability:craft.gbop.item.knowledge.list",
         "plugins/craft/craft_backend/capabilities/gbop_read.py",
     ) == "Craft"
+    assert builder._domain(
+        "capability:factory.asset.search",
+        "backend/capabilities/agreed_catalog.py",
+    ) == "Factory"
 
 
 def test_registry_schema_exposes_every_independently_owned_domain():

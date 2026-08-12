@@ -2981,7 +2981,7 @@
     },
     "capability:factory.asset.get": {
       "function_id": "capability:factory.asset.get",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -2995,7 +2995,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3004,7 +3004,7 @@
     },
     "capability:factory.asset.maintenance.complete": {
       "function_id": "capability:factory.asset.maintenance.complete",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3018,7 +3018,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3027,7 +3027,7 @@
     },
     "capability:factory.asset.maintenance.start": {
       "function_id": "capability:factory.asset.maintenance.start",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3041,7 +3041,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3050,7 +3050,7 @@
     },
     "capability:factory.asset.register": {
       "function_id": "capability:factory.asset.register",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3064,7 +3064,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3073,7 +3073,7 @@
     },
     "capability:factory.asset.scrap": {
       "function_id": "capability:factory.asset.scrap",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3087,7 +3087,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3097,7 +3097,7 @@
     },
     "capability:factory.asset.search": {
       "function_id": "capability:factory.asset.search",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3111,7 +3111,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3120,7 +3120,7 @@
     },
     "capability:factory.asset.update": {
       "function_id": "capability:factory.asset.update",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3134,7 +3134,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3143,7 +3143,7 @@
     },
     "capability:factory.resource.read": {
       "function_id": "capability:factory.resource.read",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3157,7 +3157,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3166,7 +3166,7 @@
     },
     "capability:factory.resource_catalog.create": {
       "function_id": "capability:factory.resource_catalog.create",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3180,7 +3180,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3189,7 +3189,7 @@
     },
     "capability:factory.resource_catalog.deprecate": {
       "function_id": "capability:factory.resource_catalog.deprecate",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3203,7 +3203,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3212,7 +3212,7 @@
     },
     "capability:factory.resource_catalog.get": {
       "function_id": "capability:factory.resource_catalog.get",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3226,7 +3226,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3235,7 +3235,7 @@
     },
     "capability:factory.resource_catalog.publish": {
       "function_id": "capability:factory.resource_catalog.publish",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3249,7 +3249,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3258,7 +3258,7 @@
     },
     "capability:factory.resource_catalog.revise": {
       "function_id": "capability:factory.resource_catalog.revise",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3272,7 +3272,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3281,7 +3281,7 @@
     },
     "capability:factory.resource_catalog.search": {
       "function_id": "capability:factory.resource_catalog.search",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3295,7 +3295,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3304,7 +3304,7 @@
     },
     "capability:factory.structure.archive": {
       "function_id": "capability:factory.structure.archive",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3318,7 +3318,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3327,7 +3327,7 @@
     },
     "capability:factory.structure.create": {
       "function_id": "capability:factory.structure.create",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3341,7 +3341,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3350,7 +3350,7 @@
     },
     "capability:factory.structure.get": {
       "function_id": "capability:factory.structure.get",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3364,7 +3364,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3373,7 +3373,7 @@
     },
     "capability:factory.structure.search": {
       "function_id": "capability:factory.structure.search",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3387,7 +3387,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -3396,7 +3396,7 @@
     },
     "capability:factory.structure.update": {
       "function_id": "capability:factory.structure.update",
-      "domain": "Base Platform",
+      "domain": "Factory",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -3410,7 +3410,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Base Platform",
+      "owner": "Factory",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",

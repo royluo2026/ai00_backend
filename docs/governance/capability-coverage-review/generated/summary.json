@@ -21,7 +21,7 @@
       "unreviewed": 0
     },
     "Base Platform": {
-      "existing_capability": 86,
+      "existing_capability": 67,
       "new_capability": 0,
       "excluded": 78,
       "unreviewed": 0
@@ -34,6 +34,12 @@
     },
     "Digital Model": {
       "existing_capability": 8,
+      "new_capability": 0,
+      "excluded": 0,
+      "unreviewed": 0
+    },
+    "Factory": {
+      "existing_capability": 19,
       "new_capability": 0,
       "excluded": 0,
       "unreviewed": 0

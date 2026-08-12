@@ -191,25 +191,6 @@
 | Base Platform | `rest:POST:/teams/{gid}/members` | existing_capability | `base.team.membership.change.apply` |
 | Base Platform | `rest:GET:/teams` | existing_capability | `base.team.read` |
 | Base Platform | `rest:GET:/teams/{gid}/members` | existing_capability | `base.team.read` |
-| Base Platform | `capability:factory.asset.get` | existing_capability | `factory.asset.get` |
-| Base Platform | `capability:factory.asset.maintenance.complete` | existing_capability | `factory.asset.maintenance.complete` |
-| Base Platform | `capability:factory.asset.maintenance.start` | existing_capability | `factory.asset.maintenance.start` |
-| Base Platform | `capability:factory.asset.register` | existing_capability | `factory.asset.register` |
-| Base Platform | `capability:factory.asset.scrap` | existing_capability | `factory.asset.scrap` |
-| Base Platform | `capability:factory.asset.search` | existing_capability | `factory.asset.search` |
-| Base Platform | `capability:factory.asset.update` | existing_capability | `factory.asset.update` |
-| Base Platform | `capability:factory.resource.read` | existing_capability | `factory.resource.read` |
-| Base Platform | `capability:factory.resource_catalog.create` | existing_capability | `factory.resource_catalog.create` |
-| Base Platform | `capability:factory.resource_catalog.deprecate` | existing_capability | `factory.resource_catalog.deprecate` |
-| Base Platform | `capability:factory.resource_catalog.get` | existing_capability | `factory.resource_catalog.get` |
-| Base Platform | `capability:factory.resource_catalog.publish` | existing_capability | `factory.resource_catalog.publish` |
-| Base Platform | `capability:factory.resource_catalog.revise` | existing_capability | `factory.resource_catalog.revise` |
-| Base Platform | `capability:factory.resource_catalog.search` | existing_capability | `factory.resource_catalog.search` |
-| Base Platform | `capability:factory.structure.archive` | existing_capability | `factory.structure.archive` |
-| Base Platform | `capability:factory.structure.create` | existing_capability | `factory.structure.create` |
-| Base Platform | `capability:factory.structure.get` | existing_capability | `factory.structure.get` |
-| Base Platform | `capability:factory.structure.search` | existing_capability | `factory.structure.search` |
-| Base Platform | `capability:factory.structure.update` | existing_capability | `factory.structure.update` |
 | Base Platform | `capability:identity.principal.search` | existing_capability | `identity.principal.search` |
 | Base Platform | `rest:GET:/api/users/` | existing_capability | `identity.principal.search` |
 | Base Platform | `rest:GET:/api/users/search` | existing_capability | `identity.principal.search` |
@@ -554,6 +535,25 @@
 | Digital Model | `capability:digital_model.version.create` | existing_capability | `digital_model.version.create` |
 | Digital Model | `capability:digital_model.version.get` | existing_capability | `digital_model.version.get` |
 | Digital Model | `capability:digital_model.version.search` | existing_capability | `digital_model.version.search` |
+| Factory | `capability:factory.asset.get` | existing_capability | `factory.asset.get` |
+| Factory | `capability:factory.asset.maintenance.complete` | existing_capability | `factory.asset.maintenance.complete` |
+| Factory | `capability:factory.asset.maintenance.start` | existing_capability | `factory.asset.maintenance.start` |
+| Factory | `capability:factory.asset.register` | existing_capability | `factory.asset.register` |
+| Factory | `capability:factory.asset.scrap` | existing_capability | `factory.asset.scrap` |
+| Factory | `capability:factory.asset.search` | existing_capability | `factory.asset.search` |
+| Factory | `capability:factory.asset.update` | existing_capability | `factory.asset.update` |
+| Factory | `capability:factory.resource.read` | existing_capability | `factory.resource.read` |
+| Factory | `capability:factory.resource_catalog.create` | existing_capability | `factory.resource_catalog.create` |
+| Factory | `capability:factory.resource_catalog.deprecate` | existing_capability | `factory.resource_catalog.deprecate` |
+| Factory | `capability:factory.resource_catalog.get` | existing_capability | `factory.resource_catalog.get` |
+| Factory | `capability:factory.resource_catalog.publish` | existing_capability | `factory.resource_catalog.publish` |
+| Factory | `capability:factory.resource_catalog.revise` | existing_capability | `factory.resource_catalog.revise` |
+| Factory | `capability:factory.resource_catalog.search` | existing_capability | `factory.resource_catalog.search` |
+| Factory | `capability:factory.structure.archive` | existing_capability | `factory.structure.archive` |
+| Factory | `capability:factory.structure.create` | existing_capability | `factory.structure.create` |
+| Factory | `capability:factory.structure.get` | existing_capability | `factory.structure.get` |
+| Factory | `capability:factory.structure.search` | existing_capability | `factory.structure.search` |
+| Factory | `capability:factory.structure.update` | existing_capability | `factory.structure.update` |
 | Integration | `capability:integration.connector.archive` | existing_capability | `integration.connector.archive` |
 | Integration | `capability:integration.connector.connection.test` | existing_capability | `integration.connector.connection.test` |
 | Integration | `capability:integration.connector.create` | existing_capability | `integration.connector.create` |

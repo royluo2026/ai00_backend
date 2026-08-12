@@ -32,6 +32,7 @@ DOMAINS = (
     "Knowledge",
     "Integration",
     "Local Integration",
+    "Factory",
 )
 VALID_EXCLUSIONS = {
     "internal", "operations", "ui_transient", "transport_adapter",
@@ -93,6 +94,7 @@ def _domain(value: str, path: str = "") -> str:
             ("knowledge.", "Knowledge"),
             ("ontology.", "Ontology"),
             ("agent.", "Agent"),
+            ("factory.", "Factory"),
             ("simulation.", "Simulation"),
         ):
             if capability_id.startswith(prefix):

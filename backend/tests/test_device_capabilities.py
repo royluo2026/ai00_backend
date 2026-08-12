@@ -29,8 +29,25 @@ def test_every_local_action_uses_durable_operation_and_device_resource_selector(
     register_capabilities(registry)
     for registration in registry.snapshot():
         descriptor = registration.descriptor
-        if descriptor.id == "local.command.get":
+        if not descriptor.id.startswith("vismockup."):
             continue
         assert descriptor.operation_policy == "required"
         assert descriptor.execution_mode.value == "local"
         assert any(selector.resource_type == "device" and selector.payload_path == "device_id" for selector in descriptor.resource_selectors)
+
+
+def test_device_lifecycle_outcomes_execute_in_the_cloud_control_plane():
+    registry = CapabilityRegistry()
+    register_capabilities(registry)
+
+    descriptors = {
+        item.descriptor.id: item.descriptor
+        for item in registry.snapshot()
+        if item.descriptor.id.startswith("local.device.")
+    }
+
+    assert set(descriptors) == {"local.device.change.apply", "local.device.read"}
+    assert all(item.execution_mode.value == "cloud_sync" for item in descriptors.values())
+    assert descriptors["local.device.read"].operation_policy == "none"
+    assert descriptors["local.device.change.apply"].operation_policy == "optional"
+    assert descriptors["local.device.change.apply"].idempotency_policy == "required"

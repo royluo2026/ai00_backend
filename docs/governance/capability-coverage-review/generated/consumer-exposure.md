@@ -33,25 +33,6 @@
 | Base Platform | `base.team.change.apply` | rest |
 | Base Platform | `base.team.membership.change.apply` | rest |
 | Base Platform | `base.team.read` | rest |
-| Base Platform | `factory.asset.get` | none |
-| Base Platform | `factory.asset.maintenance.complete` | none |
-| Base Platform | `factory.asset.maintenance.start` | none |
-| Base Platform | `factory.asset.register` | none |
-| Base Platform | `factory.asset.scrap` | none |
-| Base Platform | `factory.asset.search` | none |
-| Base Platform | `factory.asset.update` | none |
-| Base Platform | `factory.resource.read` | none |
-| Base Platform | `factory.resource_catalog.create` | none |
-| Base Platform | `factory.resource_catalog.deprecate` | none |
-| Base Platform | `factory.resource_catalog.get` | none |
-| Base Platform | `factory.resource_catalog.publish` | none |
-| Base Platform | `factory.resource_catalog.revise` | none |
-| Base Platform | `factory.resource_catalog.search` | none |
-| Base Platform | `factory.structure.archive` | none |
-| Base Platform | `factory.structure.create` | none |
-| Base Platform | `factory.structure.get` | none |
-| Base Platform | `factory.structure.search` | none |
-| Base Platform | `factory.structure.update` | none |
 | Base Platform | `identity.principal.search` | rest |
 | Base Platform | `plugin.disable` | none |
 | Base Platform | `plugin.enable` | none |
@@ -143,6 +124,25 @@
 | Digital Model | `digital_model.version.create` | none |
 | Digital Model | `digital_model.version.get` | none |
 | Digital Model | `digital_model.version.search` | none |
+| Factory | `factory.asset.get` | none |
+| Factory | `factory.asset.maintenance.complete` | none |
+| Factory | `factory.asset.maintenance.start` | none |
+| Factory | `factory.asset.register` | none |
+| Factory | `factory.asset.scrap` | none |
+| Factory | `factory.asset.search` | none |
+| Factory | `factory.asset.update` | none |
+| Factory | `factory.resource.read` | none |
+| Factory | `factory.resource_catalog.create` | none |
+| Factory | `factory.resource_catalog.deprecate` | none |
+| Factory | `factory.resource_catalog.get` | none |
+| Factory | `factory.resource_catalog.publish` | none |
+| Factory | `factory.resource_catalog.revise` | none |
+| Factory | `factory.resource_catalog.search` | none |
+| Factory | `factory.structure.archive` | none |
+| Factory | `factory.structure.create` | none |
+| Factory | `factory.structure.get` | none |
+| Factory | `factory.structure.search` | none |
+| Factory | `factory.structure.update` | none |
 | Integration | `integration.connector.archive` | none |
 | Integration | `integration.connector.connection.test` | none |
 | Integration | `integration.connector.create` | none |

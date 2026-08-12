@@ -10,6 +10,7 @@ from .rule_descriptors import register_rule_capabilities
 from .pbom_descriptors import register_pbom_capabilities
 from .bop_writes import register_bop_write_capabilities
 from .provider import NativeContractRegistry
+from .reviewed import register_reviewed_capabilities
 from backend.domain_ports.versioned_resources import versioned_resource_resolvers
 from .bop_structure import resolve_execution_plan_reference
 
@@ -24,4 +25,5 @@ def register_capabilities(registry: Any) -> None:
     register_gbop_capabilities(native)
     register_rule_capabilities(native)
     register_bop_write_capabilities(native)
+    register_reviewed_capabilities(registry)
     versioned_resource_resolvers.register("craft.execution_plan", resolve_execution_plan_reference)

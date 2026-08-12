@@ -68,6 +68,7 @@ _DOMAIN_ERRORS = tuple(
         ("active_gbop_not_found", "No active GBOP release exists."),
         ("multiple_active_gbop_releases", "More than one active GBOP release exists."),
         ("active_gbop_item_not_found", "The GBOP item is not in the active release."),
+        ("provider_unavailable", "The Craft application provider is unavailable."),
     )
 )
 

@@ -15,6 +15,7 @@ _ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retrya
     ("local_operation_signing_key_unavailable", "The server cannot sign a local operation.", True),
     ("local_operation_failed", "The workstation returned a sanitized local execution error.", False),
     ("local_operation_outcome_unknown", "Execution may have occurred and must be reconciled before retry.", True),
+    ("provider_unavailable", "The Local Runtime application provider is unavailable.", True),
 ))
 
 
@@ -25,9 +26,9 @@ def governed_spec(spec: Any) -> Any:
 def descriptor_for(spec: Any):
     governed = governed_spec(spec)
     descriptor = descriptor_from_provider_spec(governed)
-    is_local = governed.id != "local.command.get"
+    is_local = governed.id.startswith("vismockup.")
     is_write = descriptor.side_effect_level is not SideEffectLevel.READ
-    selectors = [ResourceSelector(resource_type="device", payload_path="device_id")] if is_local else [ResourceSelector(resource_type="local-operation", payload_path="command_id")]
+    selectors = [ResourceSelector(resource_type="device", payload_path="device_id")] if is_local else ([ResourceSelector(resource_type="local-operation", payload_path="command_id")] if governed.id == "local.command.get" else [])
     if governed.id == "vismockup.model.open":
         selectors.append(ResourceSelector(resource_type="artifact", payload_path="artifact_ref.artifact_id"))
     return descriptor.model_copy(update={
@@ -39,8 +40,8 @@ def descriptor_for(spec: Any):
         "delegation_policy": "scoped", "agent_output_schema": descriptor.output_schema,
         "execution_mode": ExecutionMode.LOCAL if is_local else ExecutionMode.CLOUD_SYNC,
         "artifact_policy": "input" if governed.id == "vismockup.model.open" else ("output" if governed.id == "vismockup.capture" else "none"),
-        "operation_policy": "required" if is_local else "none",
-        "concurrency_policy": "none", "idempotency_policy": ("required" if is_write else "optional") if is_local else "none",
+        "operation_policy": "required" if is_local else ("optional" if is_write else "none"),
+        "concurrency_policy": "none", "idempotency_policy": "required" if is_write else ("optional" if is_local else "none"),
         "consistency_policy": "external" if is_local else "strong", "evidence_policy": "required",
         "domain_errors": _ERRORS, "domain_errors_complete": True,
     })

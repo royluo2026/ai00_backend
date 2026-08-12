@@ -202,5 +202,19 @@ for _capability_id in (*GBOP_CAPABILITY_IDS, *RULE_CAPABILITY_IDS):
     INPUT_SCHEMAS.setdefault(_capability_id, _object(_fields("ref", "release_ref", "lineage_refs", "evidence", "item_gid", "query", "limit")))
     OUTPUT_SCHEMAS.setdefault(_capability_id, _object(_fields("capability_id", "ref", "release_ref", "status", "lineage_refs", "evidence", "active_release_gid", "item_gid", "items"), required=("status",) if _capability_id not in {"craft.gbop.item.search", "craft.gbop.item.usage.get", "craft.gbop.item.knowledge.list"} else ("items",)))
 
+from .reviewed_ids import CRAFT_REVIEWED_CAPABILITIES
+for _capability_id in CRAFT_REVIEWED_CAPABILITIES:
+    INPUT_SCHEMAS.setdefault(
+        _capability_id,
+        _object(
+            {"operation": STRING, "arguments": {}, "expected_version": INTEGER},
+            required=("operation", "arguments"),
+        ),
+    )
+    OUTPUT_SCHEMAS.setdefault(
+        _capability_id,
+        _object({"data": {}}, required=("data",)),
+    )
+
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]
