@@ -81,6 +81,15 @@ class ItemEntryRepository(Protocol):
     def get_approval_order(self, gid: str) -> dict[str, Any] | None: ...
     def transition_approval_order(self, gid: str, action: str, actor_gid: str, comment: str) -> dict[str, Any] | None: ...
     def apply_scope_upgrade(self, item_type: str, item_gid: str, target_scope: str) -> bool: ...
+    def list_workbenches(self, user_gid: str, team_gid: str | None) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[Any, Any]]: ...
+    def count_workbenches(self, owner_type: str, owner_gid: str) -> int: ...
+    def create_workbench(self, gid: str, values: dict[str, Any]) -> None: ...
+    def get_workbench(self, gid: str) -> dict[str, Any] | None: ...
+    def update_workbench(self, gid: str, updates: dict[str, Any]) -> bool: ...
+    def delete_workbench(self, gid: str) -> bool: ...
+    def get_workbench_override(self, gid: str, user_gid: str) -> dict[str, Any] | None: ...
+    def upsert_workbench_override(self, gid: str, user_gid: str, widgets: list[Any]) -> None: ...
+    def delete_workbench_override(self, gid: str, user_gid: str) -> None: ...
 
 
 _OPERATIONS = {
@@ -113,6 +122,8 @@ _OPERATIONS = {
     "project.task_template.change.apply": frozenset({"task_templates.create", "task_templates.update", "task_templates.delete", "task_templates.items.create", "task_templates.items.update", "task_templates.items.delete", "task_templates.instantiate"}),
     "project.approval.read": frozenset({"approval.orders.search", "approval.orders.get"}),
     "project.approval.change.apply": frozenset({"approval.orders.create", "approval.orders.start", "approval.orders.approve", "approval.orders.reject", "approval.orders.withdraw", "approval.scope_upgrade.create"}),
+    "project.workbench.read": frozenset({"workbenches.list", "workbenches.overrides.get"}),
+    "project.workbench.change.apply": frozenset({"workbenches.create", "workbenches.update", "workbenches.delete", "workbenches.overrides.upsert", "workbenches.overrides.delete"}),
 }
 
 
@@ -225,6 +236,12 @@ def _template_item_values(arguments: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _workbench(row: Mapping[str, Any], override: Mapping[str, Any] | list[Any] | None = None) -> dict[str, Any]:
+    result = {"gid": row["gid"], "owner_type": row["owner_type"], "owner_gid": row["owner_gid"], "name": row["name"], "sort_order": row["sort_order"], "widgets": row["widgets"] if isinstance(row.get("widgets"), list) else [], "created_at": str(row["created_at"]), "updated_at": str(row["updated_at"])}
+    if override is not None: result["override"] = override.get("widgets", []) if isinstance(override, Mapping) else override
+    return result
+
+
 class ProjectManagementApplication:
     def __init__(
         self,
@@ -272,6 +289,8 @@ class ProjectManagementApplication:
             return self._task_template(operation, arguments, _context)
         if operation.startswith("approval."):
             return self._approval(operation, arguments, _context)
+        if operation.startswith("workbenches."):
+            return self._workbench(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -385,6 +404,42 @@ class ProjectManagementApplication:
         result = {"success": True}
         if action in {"approve", "reject"}: result["notification"] = {"recipient_gid": row["applicant_gid"], "event": f"scope_{'approved' if action == 'approve' else 'rejected'}", "item_type": (row.get("content") or {}).get("item_type"), "item_gid": (row.get("content") or {}).get("item_gid")}
         return result
+
+    def _workbench(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or ""); team_gid = str(getattr(context, "team_gid", "") or "") or None
+        roles = frozenset(getattr(context, "active_roles", ()) or ())
+        if operation == "workbenches.list":
+            personal, teams, overrides = self._repository.list_workbenches(user_gid, team_gid)
+            return {"success": True, "data": {"personal": [_workbench(row) for row in personal], "team": [_workbench(row, overrides.get((row["gid"], user_gid)) or overrides.get(row["gid"])) for row in teams]}}
+        if operation == "workbenches.create":
+            owner_type = str(arguments.get("owner_type") or "user")
+            if owner_type == "team" and not roles & {"super_admin", "team_admin"}: raise CapabilityBusinessError("forbidden", "only team administrators can create team workbenches")
+            owner_gid = _required_text(arguments, "owner_gid") if owner_type == "team" and arguments.get("owner_gid") else (team_gid if owner_type == "team" else user_gid)
+            if not owner_gid: raise CapabilityBusinessError("invalid_input", "owner_gid is required")
+            if self._repository.count_workbenches(owner_type, owner_gid) >= 3: raise CapabilityBusinessError("invalid_input", "at most three workbenches are allowed per owner")
+            gid = self._next_id(); self._repository.create_workbench(gid, {"owner_type": owner_type, "owner_gid": owner_gid, "name": _required_text(arguments, "name"), "sort_order": int(arguments.get("sort_order") or 0), "widgets": list(arguments.get("widgets") or [])})
+            return {"success": True, "data": {"gid": gid, "name": arguments["name"]}}
+        gid = _required_text(arguments, "gid")
+        if operation == "workbenches.overrides.get":
+            row = self._repository.get_workbench_override(gid, user_gid)
+            return {"success": True, "data": ({"widgets": row["widgets"] if isinstance(row.get("widgets"), list) else [], "updated_at": str(row["updated_at"])} if row else None)}
+        if operation.startswith("workbenches.overrides."):
+            workbench = self._repository.get_workbench(gid)
+            if workbench is None: raise CapabilityBusinessError("not_found", "workbench not found")
+            if operation.endswith("upsert"):
+                if workbench["owner_type"] != "team": raise CapabilityBusinessError("invalid_input", "only team workbenches support member overrides")
+                self._repository.upsert_workbench_override(gid, user_gid, list(arguments.get("widgets") or []))
+            else: self._repository.delete_workbench_override(gid, user_gid)
+            return {"success": True}
+        row = self._repository.get_workbench(gid)
+        if row is None: raise CapabilityBusinessError("not_found", "workbench not found")
+        if row["owner_type"] == "user" and row["owner_gid"] != user_gid: raise CapabilityBusinessError("forbidden", "workbench access denied")
+        if row["owner_type"] == "team" and not roles & {"super_admin", "team_admin"}: raise CapabilityBusinessError("forbidden", "only team administrators can modify team workbenches")
+        if operation == "workbenches.delete": self._repository.delete_workbench(gid); return {"success": True}
+        source = arguments.get("updates") if isinstance(arguments.get("updates"), Mapping) else arguments
+        updates = {key: value for key, value in source.items() if key in {"name", "widgets", "sort_order"} and value is not None}
+        if not updates: raise CapabilityBusinessError("invalid_input", "no update fields")
+        self._repository.update_workbench(gid, updates); return {"success": True}
 
     def _project(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
         user_gid = str(getattr(context, "user_gid", "") or "")

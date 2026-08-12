@@ -86,6 +86,8 @@ class InMemoryItemEntryRepository:
         self.template_items = {}
         self.created_tasks = []
         self.approval_orders = {}
+        self.workbenches = {}
+        self.workbench_overrides = {}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -286,6 +288,18 @@ class InMemoryItemEntryRepository:
         row["status"] = {"start": "in_review", "approve": "approved", "reject": "rejected", "withdraw": "withdrawn"}[action]
         row["opinions"].append({"actor_gid": actor_gid, "action": action, "comment": comment}); return row
     def apply_scope_upgrade(self, item_type, item_gid, target_scope): return True
+    def list_workbenches(self, user_gid, team_gid):
+        return ([row for row in self.workbenches.values() if row["owner_type"] == "user" and row["owner_gid"] == user_gid], [row for row in self.workbenches.values() if row["owner_type"] == "team" and row["owner_gid"] == team_gid], dict(self.workbench_overrides))
+    def count_workbenches(self, owner_type, owner_gid): return sum(row["owner_type"] == owner_type and row["owner_gid"] == owner_gid for row in self.workbenches.values())
+    def create_workbench(self, gid, values): self.workbenches[gid] = {"gid": gid, "created_at": "2026-08-12", "updated_at": "2026-08-12", **values}
+    def get_workbench(self, gid): return self.workbenches.get(gid)
+    def update_workbench(self, gid, updates):
+        if gid not in self.workbenches: return False
+        self.workbenches[gid].update(updates); return True
+    def delete_workbench(self, gid): return self.workbenches.pop(gid, None) is not None
+    def get_workbench_override(self, gid, user_gid): return self.workbench_overrides.get((gid, user_gid))
+    def upsert_workbench_override(self, gid, user_gid, widgets): self.workbench_overrides[(gid, user_gid)] = {"widgets": widgets, "updated_at": "2026-08-12"}
+    def delete_workbench_override(self, gid, user_gid): self.workbench_overrides.pop((gid, user_gid), None)
 
 
 def _application():
@@ -626,3 +640,14 @@ def test_approval_lifecycle_is_project_owned_and_emits_notification_intent():
     assert application.invoke("project.approval.change.apply", {"operation": "approval.orders.start", "arguments": {"gid": "approval-1"}}, CONTEXT) == {"success": True}
     approved = application.invoke("project.approval.change.apply", {"operation": "approval.orders.approve", "arguments": {"gid": "approval-1", "comment": "ok"}}, CapabilityContext(user_gid="user-2", team_gid="team-1", active_roles=("project_admin",)))
     assert approved["notification"]["recipient_gid"] == "user-1"
+
+
+def test_workbench_lifecycle_and_member_override_are_project_owned():
+    ids = iter(["workbench-1"])
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: next(ids))
+    application.invoke("project.workbench.change.apply", {"operation": "workbenches.create", "arguments": {"name": "Mine", "widgets": [{"type": "tasks"}]}}, CONTEXT)
+    listed = application.invoke("project.workbench.read", {"operation": "workbenches.list", "arguments": {}}, CONTEXT)
+    assert listed["data"]["personal"][0]["name"] == "Mine"
+    with pytest.raises(CapabilityBusinessError) as error:
+        application.invoke("project.workbench.change.apply", {"operation": "workbenches.overrides.upsert", "arguments": {"gid": "workbench-1", "widgets": []}}, CONTEXT)
+    assert error.value.code == "invalid_input"

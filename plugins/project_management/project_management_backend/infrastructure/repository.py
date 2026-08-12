@@ -482,3 +482,40 @@ class ProjectManagementRepository:
     def apply_scope_upgrade(self, item_type: str, item_gid: str, target_scope: str) -> bool:
         table = {"project": "workmanship_proj_projects", "approval": "workmanship_proj_approval_orders"}.get(item_type)
         return bool(table and self.execute(f"UPDATE {table} SET share_scope=%s WHERE gid=%s", (target_scope, item_gid)))
+
+    def list_workbenches(self, user_gid: str, team_gid: str | None) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[Any, Any]]:
+        personal = self.fetch_all("SELECT * FROM workmanship_app_workbench_configs WHERE owner_type='user' AND owner_gid=%s ORDER BY sort_order,created_at", (user_gid,))
+        teams = self.fetch_all("SELECT * FROM workmanship_app_workbench_configs WHERE owner_type='team' AND owner_gid=%s ORDER BY sort_order,created_at", (team_gid,)) if team_gid else []
+        overrides = {}
+        if teams:
+            gids = [row["gid"] for row in teams]; placeholders = ",".join(["%s"] * len(gids))
+            for row in self.fetch_all(f"SELECT workbench_gid,user_gid,widgets,updated_at FROM workmanship_app_workbench_member_overrides WHERE user_gid=%s AND workbench_gid IN ({placeholders})", tuple([user_gid] + gids)):
+                overrides[(row["workbench_gid"], row["user_gid"])] = row
+        return personal, teams, overrides
+
+    def count_workbenches(self, owner_type: str, owner_gid: str) -> int:
+        row = self.fetch_one("SELECT COUNT(*) AS count FROM workmanship_app_workbench_configs WHERE owner_type=%s AND owner_gid=%s", (owner_type, owner_gid))
+        return int((row or {}).get("count", 0))
+
+    def create_workbench(self, gid: str, values: dict[str, Any]) -> None:
+        self.execute("INSERT INTO workmanship_app_workbench_configs (gid,owner_type,owner_gid,name,sort_order,widgets) VALUES (%s,%s,%s,%s,%s,%s)", (gid, values["owner_type"], values["owner_gid"], values["name"], values["sort_order"], json.dumps(values["widgets"])))
+
+    def get_workbench(self, gid: str) -> dict[str, Any] | None:
+        return self.fetch_one("SELECT * FROM workmanship_app_workbench_configs WHERE gid=%s", (gid,))
+
+    def update_workbench(self, gid: str, updates: dict[str, Any]) -> bool:
+        normalized = {key: json.dumps(value) if key == "widgets" else value for key, value in updates.items()}
+        assignments = ",".join(f"{key}=%s" for key in normalized)
+        return bool(self.execute(f"UPDATE workmanship_app_workbench_configs SET {assignments},updated_at=NOW() WHERE gid=%s", tuple(normalized.values()) + (gid,)))
+
+    def delete_workbench(self, gid: str) -> bool:
+        return bool(self.execute("DELETE FROM workmanship_app_workbench_configs WHERE gid=%s", (gid,)))
+
+    def get_workbench_override(self, gid: str, user_gid: str) -> dict[str, Any] | None:
+        return self.fetch_one("SELECT widgets,updated_at FROM workmanship_app_workbench_member_overrides WHERE workbench_gid=%s AND user_gid=%s", (gid, user_gid))
+
+    def upsert_workbench_override(self, gid: str, user_gid: str, widgets: list[Any]) -> None:
+        self.execute("INSERT INTO workmanship_app_workbench_member_overrides (gid,workbench_gid,user_gid,widgets) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE widgets=VALUES(widgets),updated_at=NOW()", (str(__import__('uuid').uuid4()), gid, user_gid, json.dumps(widgets)))
+
+    def delete_workbench_override(self, gid: str, user_gid: str) -> None:
+        self.execute("DELETE FROM workmanship_app_workbench_member_overrides WHERE workbench_gid=%s AND user_gid=%s", (gid, user_gid))
