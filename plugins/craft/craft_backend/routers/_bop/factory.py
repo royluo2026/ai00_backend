@@ -1,24 +1,20 @@
-"""
-backend/routers/_bop/factory.py
-────────────────────────────────
-工厂 / 工段 / 工位 + 布局模板路由。
-"""
+"""Legacy BOP factory routes composed through the official Factory Provider."""
+from __future__ import annotations
+
 import json
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel, Field
 
-from ...data.connection import get_conn
-from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from ..factory import _invoke
+from ._constants import _ADMIN, _READ
 
-from ._constants import _ADMIN, _READ, _SEC_COLS, _SEC_KEYS, _STA_COLS, _STA_KEYS, _LTPL_COLS, _LTPL_KEYS
-from ._helpers import _row, _rows, _not_found
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
 
-
-# ── Pydantic 模型 ─────────────────────────────────────────────────────────────
 
 class CreateFactoryBody(BaseModel):
     name: str
@@ -33,7 +29,7 @@ class UpdateFactoryBody(BaseModel):
 class CreateSectionBody(BaseModel):
     name: str
     sort_order: int = 0
-    color: str = '#7287fd'
+    color: str = "#7287fd"
     canvas_x: float = 0
     canvas_y: float = 0
     canvas_w: float = 400
@@ -53,7 +49,7 @@ class UpdateSectionBody(BaseModel):
 
 class CreateStationBody(BaseModel):
     code: str
-    name: str = ''
+    name: str = ""
     canvas_x: float = 0
     canvas_y: float = 0
     takt_time: float = 60
@@ -72,7 +68,7 @@ class UpdateStationBody(BaseModel):
 class CreateLayoutTemplateBody(BaseModel):
     name: str
     team_id: Optional[str] = None
-    stations: list = []
+    stations: list = Field(default_factory=list)
 
 
 class ApplyLayoutTemplateBody(BaseModel):
@@ -81,277 +77,156 @@ class ApplyLayoutTemplateBody(BaseModel):
     drop_y: float = 0
 
 
-# ══════════════════════════════════════════════════════════════
-# 工厂
-# ══════════════════════════════════════════════════════════════
+async def _get_structure(gid, request, user, principal, gateway):
+    row = await _invoke(request, user, principal, gateway, "factory.structure.get", {"gid": gid})
+    if not row: raise HTTPException(404, "记录不存在")
+    return row
+
+
+async def _update_structure(gid, body, request, user, principal, gateway):
+    row = await _get_structure(gid, request, user, principal, gateway)
+    values = body.model_dump(exclude_none=True) if hasattr(body, "model_dump") else dict(body)
+    name = values.pop("name", None)
+    updates = {"attributes": {**(row.get("attributes") or {}), **values}}
+    if name is not None: updates["name"] = name
+    return await _invoke(request, user, principal, gateway, "factory.structure.update", {"gid": gid, "expected_version": row["version"], "updates": updates}, write=True)
+
+
+async def _archive_structure(gid, request, user, principal, gateway):
+    row = await _get_structure(gid, request, user, principal, gateway)
+    await _invoke(request, user, principal, gateway, "factory.structure.archive", {"gid": gid, "expected_version": row["version"]}, write=True)
+
 
 @router.get("/factories")
-def list_factories(_u=Depends(_READ)):
-    keys = ['gid','name','team_id','meta','created_at']
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT gid,name,team_id,meta,created_at FROM workmanship_factory_factories ORDER BY created_at")
-            return {"data": _rows(cur, keys)}
+async def list_factories(request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _invoke(request, _u, principal, gateway, "factory.structure.search", {"kind": "factory"})}
 
 
 @router.post("/factories", status_code=201)
-def create_factory(body: CreateFactoryBody, _u=Depends(_ADMIN)):
-    gid = str(next_gid())
-    keys = ['gid','name','team_id','meta','created_at']
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_factory_factories (gid,name,team_id,meta) VALUES (%s,%s,%s,%s)",
-                (gid, body.name, body.team_id, '{}')
-            )
-            conn.commit()
-            cur.execute("SELECT gid,name,team_id,meta,created_at FROM workmanship_factory_factories WHERE gid=%s", (gid,))
-            return {"data": _row(cur, keys)}
+async def create_factory(body: CreateFactoryBody, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _invoke(request, _u, principal, gateway, "factory.structure.create", {"kind": "factory", "name": body.name, "attributes": {"team_id": body.team_id}}, write=True)}
 
 
 @router.get("/factories/{gid}")
-def get_factory(gid: str, _u=Depends(_READ)):
-    keys = ['gid','name','team_id','meta','created_at']
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT gid,name,team_id,meta,created_at FROM workmanship_factory_factories WHERE gid=%s", (gid,))
-            row = _row(cur, keys)
-            if not row: _not_found(gid)
-            return {"data": row}
+async def get_factory(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _get_structure(gid, request, _u, principal, gateway)}
 
 
 @router.patch("/factories/{gid}")
-def update_factory(gid: str, body: UpdateFactoryBody, _u=Depends(_ADMIN)):
-    updates = {k: v for k, v in body.model_dump().items() if v is not None}
-    if not updates:
-        raise HTTPException(400, "无更新字段")
-    set_clause = ", ".join(f"{k}=%s" for k in updates)
-    keys = ['gid','name','team_id','meta','created_at']
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"UPDATE workmanship_factory_factories SET {set_clause} WHERE gid=%s",
-                list(updates.values()) + [gid]
-            )
-            cur.execute("SELECT gid,name,team_id,meta,created_at FROM workmanship_factory_factories WHERE gid=%s", (gid,))
-            row = _row(cur, keys)
-            if not row: _not_found(gid)
-            conn.commit()
-            return {"data": row}
+async def update_factory(gid: str, body: UpdateFactoryBody, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _update_structure(gid, body, request, _u, principal, gateway)}
 
 
 @router.delete("/factories/{gid}", status_code=204)
-def delete_factory(gid: str, _u=Depends(_ADMIN)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM workmanship_factory_factories WHERE gid=%s", (gid,))
-            if cur.rowcount == 0: _not_found(gid)
-            conn.commit()
+async def delete_factory(gid: str, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    await _archive_structure(gid, request, _u, principal, gateway)
 
-
-# ══════════════════════════════════════════════════════════════
-# 工段
-# ══════════════════════════════════════════════════════════════
 
 @router.get("/factories/{factory_gid}/sections")
-def list_sections(factory_gid: str, _u=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"SELECT {_SEC_COLS} FROM workmanship_factory_factory_sections WHERE factory_gid=%s ORDER BY sort_order", (factory_gid,))
-            return {"data": _rows(cur, _SEC_KEYS)}
+async def list_sections(factory_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _invoke(request, _u, principal, gateway, "factory.structure.search", {"kind": "section", "parent_gid": factory_gid})}
 
 
 @router.post("/factories/{factory_gid}/sections", status_code=201)
-def create_section(factory_gid: str, body: CreateSectionBody, _u=Depends(_ADMIN)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"INSERT INTO workmanship_factory_factory_sections (gid,name,factory_gid,sort_order,color,canvas_x,canvas_y,canvas_w,canvas_h) "
-                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                (gid, body.name, factory_gid, body.sort_order, body.color,
-                 body.canvas_x, body.canvas_y, body.canvas_w, body.canvas_h)
-            )
-            conn.commit()
-            cur.execute(f"SELECT {_SEC_COLS} FROM workmanship_factory_factory_sections WHERE gid=%s", (gid,))
-            return {"data": _row(cur, _SEC_KEYS)}
+async def create_section(factory_gid: str, body: CreateSectionBody, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    values = body.model_dump(); name = values.pop("name")
+    return {"data": await _invoke(request, _u, principal, gateway, "factory.structure.create", {"kind": "section", "name": name, "parent_gid": factory_gid, "attributes": values}, write=True)}
 
 
 @router.patch("/factory_sections/{gid}")
-def update_section(gid: str, body: UpdateSectionBody, _u=Depends(_ADMIN)):
-    updates = {k: v for k, v in body.model_dump().items() if v is not None}
-    if not updates:
-        raise HTTPException(400, "无更新字段")
-    set_clause = ", ".join(f"{k}=%s" for k in updates)
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"UPDATE workmanship_factory_factory_sections SET {set_clause} WHERE gid=%s",
-                list(updates.values()) + [gid]
-            )
-            cur.execute(f"SELECT {_SEC_COLS} FROM workmanship_factory_factory_sections WHERE gid=%s", (gid,))
-            row = _row(cur, _SEC_KEYS)
-            if not row: _not_found(gid)
-            conn.commit()
-            return {"data": row}
+async def update_section(gid: str, body: UpdateSectionBody, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _update_structure(gid, body, request, _u, principal, gateway)}
 
 
 @router.delete("/factory_sections/{gid}", status_code=204)
-def delete_section(gid: str, _u=Depends(_ADMIN)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM workmanship_factory_factory_sections WHERE gid=%s", (gid,))
-            if cur.rowcount == 0: _not_found(gid)
-            conn.commit()
+async def delete_section(gid: str, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    await _archive_structure(gid, request, _u, principal, gateway)
 
-
-# ══════════════════════════════════════════════════════════════
-# 工位
-# ══════════════════════════════════════════════════════════════
 
 @router.get("/factory_sections/{section_gid}/stations")
-def list_stations(section_gid: str, _u=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"SELECT {_STA_COLS} FROM workmanship_factory_factory_stations WHERE factory_section_gid=%s ORDER BY canvas_x", (section_gid,))
-            return {"data": _rows(cur, _STA_KEYS)}
+async def list_stations(section_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _invoke(request, _u, principal, gateway, "factory.structure.search", {"kind": "station", "parent_gid": section_gid})}
 
 
 @router.post("/factory_sections/{section_gid}/stations", status_code=201)
-def create_station(section_gid: str, body: CreateStationBody, _u=Depends(_ADMIN)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"INSERT INTO workmanship_factory_factory_stations (gid,code,name,factory_section_gid,canvas_x,canvas_y,takt_time,height_mm) "
-                f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                (gid, body.code, body.name, section_gid, body.canvas_x, body.canvas_y, body.takt_time, body.height_mm)
-            )
-            conn.commit()
-            cur.execute(f"SELECT {_STA_COLS} FROM workmanship_factory_factory_stations WHERE gid=%s", (gid,))
-            return {"data": _row(cur, _STA_KEYS)}
+async def create_station(section_gid: str, body: CreateStationBody, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    values = body.model_dump(); name = values.pop("name") or values["code"]
+    return {"data": await _invoke(request, _u, principal, gateway, "factory.structure.create", {"kind": "station", "name": name, "parent_gid": section_gid, "attributes": values}, write=True)}
 
 
 @router.patch("/factory_stations/{gid}")
-def update_station(gid: str, body: UpdateStationBody, _u=Depends(_ADMIN)):
-    updates = {k: v for k, v in body.model_dump().items() if v is not None}
-    if not updates:
-        raise HTTPException(400, "无更新字段")
-    set_clause = ", ".join(f"{k}=%s" for k in updates)
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"UPDATE workmanship_factory_factory_stations SET {set_clause} WHERE gid=%s",
-                list(updates.values()) + [gid]
-            )
-            cur.execute(f"SELECT {_STA_COLS} FROM workmanship_factory_factory_stations WHERE gid=%s", (gid,))
-            row = _row(cur, _STA_KEYS)
-            if not row: _not_found(gid)
-            conn.commit()
-            return {"data": row}
+async def update_station(gid: str, body: UpdateStationBody, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _update_structure(gid, body, request, _u, principal, gateway)}
 
 
 @router.delete("/factory_stations/{gid}", status_code=204)
-def delete_station(gid: str, _u=Depends(_ADMIN)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM workmanship_factory_factory_stations WHERE gid=%s", (gid,))
-            if cur.rowcount == 0: _not_found(gid)
-            conn.commit()
+async def delete_station(gid: str, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    await _archive_structure(gid, request, _u, principal, gateway)
 
 
-# ══════════════════════════════════════════════════════════════
-# 工厂布局模板
-# ══════════════════════════════════════════════════════════════
+async def _layout_search(factory_gid, request, user, principal, gateway):
+    rows = await _invoke(request, user, principal, gateway, "factory.resource_catalog.search", {"resource_type": "fixture"})
+    result = []
+    for row in rows:
+        spec = row.get("specification") or {}
+        if isinstance(spec, str):
+            try: spec = json.loads(spec)
+            except ValueError: spec = {}
+        if spec.get("legacy_kind") == "layout_template" and spec.get("factory_gid") == factory_gid:
+            result.append({**row, "stations": spec.get("stations", [])})
+    return result
+
 
 @router.get("/factories/{factory_gid}/layout_templates")
-def list_layout_templates(factory_gid: str, _u=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT {_LTPL_COLS} FROM workmanship_factory_factory_layout_templates WHERE factory_gid=%s ORDER BY created_at DESC",
-                (factory_gid,)
-            )
-            return {"data": _rows(cur, _LTPL_KEYS)}
+async def list_layout_templates(factory_gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _layout_search(factory_gid, request, _u, principal, gateway)}
 
 
 @router.post("/factories/{factory_gid}/layout_templates", status_code=201)
-def create_layout_template(factory_gid: str, body: CreateLayoutTemplateBody, _u=Depends(_ADMIN)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"INSERT INTO workmanship_factory_factory_layout_templates (gid,name,factory_gid,team_id,stations) "
-                f"VALUES (%s,%s,%s,%s,%s)",
-                (gid, body.name, factory_gid, body.team_id, json.dumps(body.stations))
-            )
-            conn.commit()
-            cur.execute(f"SELECT {_LTPL_COLS} FROM workmanship_factory_factory_layout_templates WHERE gid=%s", (gid,))
-            return {"data": _row(cur, _LTPL_KEYS)}
+async def create_layout_template(factory_gid: str, body: CreateLayoutTemplateBody, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return {"data": await _invoke(request, _u, principal, gateway, "factory.resource_catalog.create", {"resource_type": "fixture", "name": body.name, "specification": {"legacy_kind": "layout_template", "factory_gid": factory_gid, "team_id": body.team_id, "stations": body.stations}}, write=True)}
 
 
 @router.get("/layout_templates/{gid}")
-def get_layout_template(gid: str, _u=Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"SELECT {_LTPL_COLS} FROM workmanship_factory_factory_layout_templates WHERE gid=%s", (gid,))
-            row = _row(cur, _LTPL_KEYS)
-            if not row: _not_found(gid)
-            return {"data": row}
+async def get_layout_template(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    row = await _invoke(request, _u, principal, gateway, "factory.resource_catalog.get", {"gid": gid})
+    if not row: raise HTTPException(404, "记录不存在")
+    return {"data": row}
 
 
 @router.patch("/layout_templates/{gid}")
-def update_layout_template(gid: str, body: dict, _u=Depends(_ADMIN)):
-    sets, vals = [], []
-    for col in ('name', 'stations'):
-        if col in body:
-            sets.append(f"{col}=%s")
-            vals.append(json.dumps(body[col]) if col == 'stations' else body[col])
-    if not sets:
-        raise HTTPException(400, "无更新字段")
-    vals.append(gid)
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"UPDATE workmanship_factory_factory_layout_templates SET {','.join(sets)} WHERE gid=%s", vals)
-            cur.execute(f"SELECT {_LTPL_COLS} FROM workmanship_factory_factory_layout_templates WHERE gid=%s", (gid,))
-            row = _row(cur, _LTPL_KEYS)
-            if not row: _not_found(gid)
-            conn.commit()
-            return {"data": row}
+async def update_layout_template(gid: str, body: dict, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    row = await _invoke(request, _u, principal, gateway, "factory.resource_catalog.get", {"gid": gid})
+    if not row: raise HTTPException(404, "记录不存在")
+    data = {"gid": gid, "expected_revision": row["revision"]}
+    if "name" in body: data["name"] = body["name"]
+    if "stations" in body:
+        spec = row.get("specification") or {}
+        if isinstance(spec, str): spec = json.loads(spec)
+        data["specification"] = {**spec, "stations": body["stations"]}
+    return {"data": await _invoke(request, _u, principal, gateway, "factory.resource_catalog.revise", data, write=True)}
 
 
 @router.delete("/layout_templates/{gid}", status_code=204)
-def delete_layout_template(gid: str, _u=Depends(_ADMIN)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM workmanship_factory_factory_layout_templates WHERE gid=%s", (gid,))
-            if cur.rowcount == 0: _not_found(gid)
-            conn.commit()
+async def delete_layout_template(gid: str, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    row = await _invoke(request, _u, principal, gateway, "factory.resource_catalog.get", {"gid": gid})
+    if not row: raise HTTPException(404, "记录不存在")
+    if row.get("status") == "draft":
+        await _invoke(request, _u, principal, gateway, "factory.resource_catalog.publish", {"gid": gid, "expected_revision": row["revision"]}, write=True)
+        row = await _invoke(request, _u, principal, gateway, "factory.resource_catalog.get", {"gid": gid})
+        revision = row["revision"]
+    else: revision = row["revision"]
+    await _invoke(request, _u, principal, gateway, "factory.resource_catalog.deprecate", {"gid": gid, "expected_revision": revision}, write=True)
 
 
 @router.post("/layout_templates/{gid}/apply", status_code=201)
-def apply_layout_template(gid: str, body: ApplyLayoutTemplateBody, _u=Depends(_ADMIN)):
-    """将模板中的相对坐标工位批量创建到指定工段，返回创建的工位列表"""
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT stations FROM workmanship_factory_factory_layout_templates WHERE gid=%s", (gid,))
-            row = cur.fetchone()
-            if not row: _not_found(gid)
-            station_defs = row[0] or []
-
-            created = []
-            for s in station_defs:
-                sgid = str(next_gid())
-                abs_x = body.drop_x + s.get('rel_x', 0)
-                abs_y = body.drop_y + s.get('rel_y', 0)
-                cur.execute(
-                    f"INSERT INTO workmanship_factory_factory_stations (gid,code,name,factory_section_gid,canvas_x,canvas_y,takt_time,height_mm) "
-                    f"VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-                    (sgid, s.get('code',''), s.get('name',''),
-                     body.factory_section_gid, abs_x, abs_y,
-                     s.get('takt_time', 60), s.get('height_mm', 1200))
-                )
-                cur.execute(f"SELECT {_STA_COLS} FROM workmanship_factory_factory_stations WHERE gid=%s", (sgid,))
-                created.append(_row(cur, _STA_KEYS))
-            conn.commit()
-            return {"data": created}
+async def apply_layout_template(gid: str, body: ApplyLayoutTemplateBody, request: Request, _u=Depends(_ADMIN), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    row = await _invoke(request, _u, principal, gateway, "factory.resource_catalog.get", {"gid": gid})
+    if not row: raise HTTPException(404, "记录不存在")
+    spec = row.get("specification") or {}
+    if isinstance(spec, str): spec = json.loads(spec)
+    created = []
+    for station in spec.get("stations", []):
+        attrs = dict(station); attrs["canvas_x"] = body.drop_x + attrs.pop("rel_x", 0); attrs["canvas_y"] = body.drop_y + attrs.pop("rel_y", 0)
+        created.append(await _invoke(request, _u, principal, gateway, "factory.structure.create", {"kind": "station", "name": attrs.get("name") or attrs.get("code") or "Station", "parent_gid": body.factory_section_gid, "attributes": attrs}, write=True))
+    return {"data": created}

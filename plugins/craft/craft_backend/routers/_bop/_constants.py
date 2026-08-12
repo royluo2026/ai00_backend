@@ -204,16 +204,12 @@ _LINK_SNAPSHOT_MAP = {
 # field_name → (table, name_col)
 _GID_RESOLVE_MAP: dict = {
     'project_gid':          ('workmanship_proj_projects',            'name'),
-    'factory_gid':          ('workmanship_factory_factories',        'name'),
-    'factory_section_gid':  ('workmanship_factory_factory_sections', 'name'),
     'vehicle_model_gid':    ('workmanship_proj_vehicle_models',      'name'),
     'version_gid':          ('workmanship_bop_bop_versions',         'bop_name'),
     'bop_version_gid':      ('workmanship_bop_bop_versions',         'bop_name'),
     'pbom_version_gid':     ('workmanship_bop_bop_versions',         'bop_name'),
     'parent_version_gid':   ('workmanship_bop_bop_versions',         'bop_name'),
     'version_family_gid':   ('workmanship_bop_bop_versions',         'bop_name'),
-    'factory_line_gid':     ('workmanship_factory_factory_lines',    'name'),
-    'station_gid':          ('workmanship_factory_factory_stations', 'name'),
 }
 
 # ── 图片上传 ──────────────────────────────────────────────────────────────────
@@ -280,10 +276,10 @@ _LINK_TARGET_TABLE = {
     'pbom_part':            'workmanship_bop_pbom',
     'usesPart':             'workmanship_bop_pbom',
     # 物理实物资源（工厂现有）
-    'physical_equipment':   'workmanship_factory_factory_equipments',
-    'physical_tool':        'workmanship_factory_factory_tools',
-    'physical_fixture':     'workmanship_factory_factory_fixtures',
-    'physical_station':     'workmanship_factory_factory_stations',
+    'physical_equipment':   None,
+    'physical_tool':        None,
+    'physical_fixture':     None,
+    'physical_station':     None,
     # 项目资源需求
     'project_equipment':    'workmanship_bop_bop_equipments',
     'project_tooling':      'workmanship_bop_bop_fixtures',
@@ -323,10 +319,10 @@ _LINK_TARGET_TABLES = {
     'pbom_part':            ('workmanship_bop_pbom',                    'gid', None),
     'usesPart':             ('workmanship_bop_pbom',                    'gid', None),
     # 物理实物资源（工厂现有）
-    'physical_equipment':   ('workmanship_factory_factory_equipments',  'gid', None),
-    'physical_tool':        ('workmanship_factory_factory_tools',       'gid', None),
-    'physical_fixture':     ('workmanship_factory_factory_fixtures',    'gid', None),
-    'physical_station':     ('workmanship_factory_factory_stations',    'gid', None),
+    'physical_equipment':   None,
+    'physical_tool':        None,
+    'physical_fixture':     None,
+    'physical_station':     None,
     # 项目资源需求
     'project_equipment':    ('workmanship_bop_bop_equipments',          'gid', None),
     'project_tooling':      ('workmanship_bop_bop_fixtures',            'gid', None),

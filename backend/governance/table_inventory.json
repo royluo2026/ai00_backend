@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 176,
+  "table_count": 179,
   "tables": [
     {
       "table": "workmanship_agent_run_approvals",
@@ -478,6 +478,11 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_factory_assets",
+      "owner": "factory",
+      "runtime_domain": "factory"
+    },
+    {
       "table": "workmanship_factory_factories",
       "owner": "factory",
       "runtime_domain": "factory"
@@ -514,6 +519,16 @@
     },
     {
       "table": "workmanship_factory_factory_tools",
+      "owner": "factory",
+      "runtime_domain": "factory"
+    },
+    {
+      "table": "workmanship_factory_resource_catalog",
+      "owner": "factory",
+      "runtime_domain": "factory"
+    },
+    {
+      "table": "workmanship_factory_structures",
       "owner": "factory",
       "runtime_domain": "factory"
     },

@@ -6,11 +6,14 @@ BOP 版本 CRUD + 生命周期 + 画布全量数据 + V1 废弃端点。
 import json
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from ...data.connection import get_conn
 from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal
+from ..factory import _invoke as _invoke_factory
 
 from ._constants import _WRITE, _READ, _VER_COLS, _VER_KEYS, _SEC_COLS, _SEC_KEYS, _STA_COLS, _STA_KEYS
 from ._helpers import _row, _rows, _not_found, _snapshot_links, _clear_snapshots, _copy_entries_and_links
@@ -600,7 +603,7 @@ def unarchive_family(family_gid: str, _u=Depends(_WRITE)):
 # ── 画布全量数据 ──────────────────────────────────────────────────────────────
 
 @router.get("/versions/{gid}/canvas")
-def get_canvas(gid: str, _u=Depends(_READ)):
+async def get_canvas(gid: str, request: Request, _u=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(f"SELECT {_VER_COLS} FROM workmanship_bop_bop_versions WHERE gid=%s", (gid,))
@@ -611,20 +614,6 @@ def get_canvas(gid: str, _u=Depends(_READ)):
             if not factory_gid:
                 return {"data": {"bop": bop, "factory": None}}
 
-            cur.execute("SELECT gid,name,team_id,meta,created_at FROM workmanship_factory_factories WHERE gid=%s", (factory_gid,))
-            factory = _row(cur, ['gid','name','team_id','meta','created_at'])
-
-            cur.execute(f"SELECT {_SEC_COLS} FROM workmanship_factory_factory_sections WHERE factory_gid=%s ORDER BY sort_order", (factory_gid,))
-            sections = _rows(cur, _SEC_KEYS)
-
-            cur.execute(
-                f"SELECT {_STA_COLS} FROM workmanship_factory_factory_stations "
-                f"WHERE factory_section_gid IN (SELECT gid FROM workmanship_factory_factory_sections WHERE factory_gid=%s) "
-                f"ORDER BY canvas_x",
-                (factory_gid,)
-            )
-            stations = _rows(cur, _STA_KEYS)
-
             cur.execute(
                 "SELECT gid, version_gid, parent_gid, node_type, sort_order, level, "
                 "ai00_level, title, vpps, owner_gid, created_at, updated_at "
@@ -634,7 +623,8 @@ def get_canvas(gid: str, _u=Depends(_READ)):
             )
             bop_entries_list = [dict(r) for r in cur.fetchall()]
 
-            return {"data": {"bop": bop, "factory": factory}}
+    factory = await _invoke_factory(request, _u, principal, gateway, "factory.structure.get", {"gid": factory_gid})
+    return {"data": {"bop": bop, "factory": factory}}
 
 
 # ══════════════════════════════════════════════════════════════

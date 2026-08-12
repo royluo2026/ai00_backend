@@ -892,10 +892,10 @@ _SEED_CLASSES = [
 
     # ── 物理资源（工厂现有实物）────────────────────────────────────────────────
     ("ResourceEntity",      "物理资源",   None,                None,                  True,  10, "#8b5cf6", None),
-    ("station_factory",     "实物工位",   "ResourceEntity",    "station_factory",     False, 11, "#a78bfa", "workmanship_factory_factory_stations"),
-    ("equipment_factory",   "实物设备",   "ResourceEntity",    "equipment_factory",   False, 12, "#a78bfa", "workmanship_factory_factory_equipments"),
-    ("tool_factory",        "实物工具",   "ResourceEntity",    "tool_factory",        False, 13, "#a78bfa", "workmanship_factory_factory_tools"),
-    ("fixture_factory",     "实物工装",   "ResourceEntity",    "fixture_factory",     False, 14, "#a78bfa", "workmanship_factory_factory_fixtures"),
+    ("station_factory",     "实物工位",   "ResourceEntity",    "station_factory",     False, 11, "#a78bfa", None),
+    ("equipment_factory",   "实物设备",   "ResourceEntity",    "equipment_factory",   False, 12, "#a78bfa", None),
+    ("tool_factory",        "实物工具",   "ResourceEntity",    "tool_factory",        False, 13, "#a78bfa", None),
+    ("fixture_factory",     "实物工装",   "ResourceEntity",    "fixture_factory",     False, 14, "#a78bfa", None),
     ("man",                 "操作人员",   "ResourceEntity",    "man",                 False, 15, "#c4b5fd", None),
 
     # ── 需求实体（项目资源需求）────────────────────────────────────────────────
