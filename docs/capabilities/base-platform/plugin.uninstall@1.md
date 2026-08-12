@@ -8,7 +8,7 @@ Uninstall a disabled or revoked plugin.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_4227f82570395820b4085ce8ceefd893`
+- Catalog Release：`rel_6e6085cb234487b057ef4946e65d85a8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -75,7 +75,7 @@ Uninstall a disabled or revoked plugin.
 ```json
 {
   "capability_id": "plugin.uninstall",
-  "catalog_release": "rel_4227f82570395820b4085ce8ceefd893",
+  "catalog_release": "rel_6e6085cb234487b057ef4946e65d85a8",
   "major_version": 1,
   "payload": {
     "plugin_id": "example"

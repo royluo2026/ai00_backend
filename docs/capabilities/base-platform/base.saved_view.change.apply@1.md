@@ -1,14 +1,14 @@
-# plugin.upgrade.finish@1
+# base.saved_view.change.apply@1
 
-Complete or fail a staged upgrade after health validation.
+Execute the reviewed base.saved_view.change.apply Base outcome.
 
 ## 使用判断
 
-- 适用：Complete or fail a staged upgrade after health validation.
+- 适用：Execute the reviewed base.saved_view.change.apply Base outcome.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_4227f82570395820b4085ce8ceefd893`
+- Catalog Release：`rel_6e6085cb234487b057ef4946e65d85a8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,28 +28,28 @@ Complete or fail a staged upgrade after health validation.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:system.plugin.manage`
-- 自动化等级：`A0`
-- 数据分类：`restricted`
+- 授权策略：`base.v2:base.write`
+- 自动化等级：`A1`
+- 数据分类：`confidential`
 - Delegation：`scoped`
-- 认证新鲜度：300 秒
+- 认证新鲜度：0 秒
 
 资源选择器：
-- `plugin-installation` ← `plugin_id`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
 - 副作用：`write`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
-- 审批：`admin`
+- 审批：`user`
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
 - 一致性：`external`
 - Operation：`optional`
 - Artifact：`none`
-- 审计：`high_risk`
+- 审计：`standard`
 - Evidence：`optional`
 - 配额成本：1
 
@@ -59,16 +59,20 @@ Complete or fail a staged upgrade after health validation.
 {
   "additionalProperties": false,
   "properties": {
-    "healthy": {
-      "type": "boolean"
+    "expected_version": {
+      "type": "integer"
     },
-    "plugin_id": {
+    "operation": {
       "type": "string"
+    },
+    "resource": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
     }
   },
   "required": [
-    "plugin_id",
-    "healthy"
+    "operation"
   ],
   "type": "object"
 }
@@ -78,12 +82,11 @@ Complete or fail a staged upgrade after health validation.
 
 ```json
 {
-  "capability_id": "plugin.upgrade.finish",
-  "catalog_release": "rel_4227f82570395820b4085ce8ceefd893",
+  "capability_id": "base.saved_view.change.apply",
+  "catalog_release": "rel_6e6085cb234487b057ef4946e65d85a8",
   "major_version": 1,
   "payload": {
-    "healthy": false,
-    "plugin_id": "example"
+    "operation": "example"
   }
 }
 ```
@@ -96,20 +99,14 @@ Complete or fail a staged upgrade after health validation.
 {
   "additionalProperties": false,
   "properties": {
-    "plugin_id": {
-      "type": "string"
-    },
-    "state": {
-      "type": "string"
-    },
-    "version": {
-      "type": "string"
+    "result": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
     }
   },
   "required": [
-    "plugin_id",
-    "version",
-    "state"
+    "result"
   ],
   "type": "object"
 }

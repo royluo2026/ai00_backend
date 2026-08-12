@@ -2996,7 +2996,7 @@
       ],
       "data_classification": "internal",
       "classification": "operations",
-      "migration_status": "registered",
+      "migration_status": "excluded",
       "owner": "Base Platform",
       "exclusion_reason": "Plugin upgrade finish is a trusted deployment-health callback owned by the control plane, not a business Capability.",
       "source_paths": [
@@ -3427,7 +3427,7 @@
       ],
       "data_classification": "internal",
       "classification": "operations",
-      "migration_status": "registered",
+      "migration_status": "excluded",
       "owner": "Base Platform",
       "exclusion_reason": "Worker heartbeat and outbox health are authenticated operations telemetry, not an independently invokable business outcome.",
       "source_paths": [
@@ -4564,7 +4564,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -4586,7 +4586,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -4916,7 +4916,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -5158,7 +5158,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -5224,7 +5224,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -5246,7 +5246,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -5532,7 +5532,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -7732,7 +7732,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -7754,7 +7754,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -7776,7 +7776,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -8440,7 +8440,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -8638,7 +8638,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -8660,7 +8660,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -8682,7 +8682,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9012,7 +9012,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9122,7 +9122,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9144,7 +9144,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9166,7 +9166,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9188,7 +9188,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9210,7 +9210,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9232,7 +9232,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9342,7 +9342,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9914,7 +9914,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9937,7 +9937,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -9981,7 +9981,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -10883,7 +10883,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -11303,7 +11303,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -11325,7 +11325,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -11413,7 +11413,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -11435,7 +11435,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -14339,7 +14339,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -14537,7 +14537,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -14955,7 +14955,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -15725,7 +15725,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -15747,7 +15747,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -15769,7 +15769,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -15791,7 +15791,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -15989,7 +15989,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -16011,7 +16011,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -16275,7 +16275,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -16297,7 +16297,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -16385,7 +16385,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,
@@ -16561,7 +16561,7 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
       "owner": "Base Platform",
       "exclusion_reason": null,

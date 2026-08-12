@@ -16,23 +16,6 @@
 | Agent | Deliver the governed session read business outcome for Agent. | `agent.session.read` |
 | Agent | Deliver the governed skill change apply business outcome for Agent. | `agent.skill.change.apply` |
 | Agent | Deliver the governed skill read business outcome for Agent. | `agent.skill.read` |
-| Base Platform | Deliver the governed annotation change apply business outcome for Base Platform. | `base.annotation.change.apply` |
-| Base Platform | Deliver the governed annotation read business outcome for Base Platform. | `base.annotation.read` |
-| Base Platform | Deliver the governed authorization grant change apply business outcome for Base Platform. | `base.authorization.grant.change.apply` |
-| Base Platform | Deliver the governed authorization grant read business outcome for Base Platform. | `base.authorization.grant.read` |
-| Base Platform | Deliver the governed export template change apply business outcome for Base Platform. | `base.export_template.change.apply` |
-| Base Platform | Deliver the governed export template read business outcome for Base Platform. | `base.export_template.read` |
-| Base Platform | Deliver the governed identity directory sync business outcome for Base Platform. | `base.identity.directory.sync` |
-| Base Platform | Deliver the governed identity role assign business outcome for Base Platform. | `base.identity.role.assign` |
-| Base Platform | Deliver the governed identity session get business outcome for Base Platform. | `base.identity.session.get` |
-| Base Platform | Deliver the governed plugin marketplace publisher register business outcome for Base Platform. | `base.plugin.marketplace.publisher.register` |
-| Base Platform | Deliver the governed plugin marketplace release change apply business outcome for Base Platform. | `base.plugin.marketplace.release.change.apply` |
-| Base Platform | Deliver the governed plugin marketplace search business outcome for Base Platform. | `base.plugin.marketplace.search` |
-| Base Platform | Deliver the governed saved view change apply business outcome for Base Platform. | `base.saved_view.change.apply` |
-| Base Platform | Deliver the governed saved view read business outcome for Base Platform. | `base.saved_view.read` |
-| Base Platform | Deliver the governed team change apply business outcome for Base Platform. | `base.team.change.apply` |
-| Base Platform | Deliver the governed team membership change apply business outcome for Base Platform. | `base.team.membership.change.apply` |
-| Base Platform | Deliver the governed team read business outcome for Base Platform. | `base.team.read` |
 | Craft | Deliver the governed canvas change apply business outcome for Craft. | `craft.canvas.change.apply` |
 | Craft | Deliver the governed canvas read business outcome for Craft. | `craft.canvas.read` |
 | Craft | Deliver the governed data exchange export business outcome for Craft. | `craft.data_exchange.export` |

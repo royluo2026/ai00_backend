@@ -3,15 +3,14 @@
   "domains": 11,
   "stable_functions": 752,
   "resolutions": {
-    "existing_capability": 255,
-    "new_capability": 396,
+    "existing_capability": 298,
+    "new_capability": 353,
     "excluded": 101,
     "unreviewed": 0
   },
-  "candidate_capabilities": 94,
+  "candidate_capabilities": 77,
   "candidate_additions_by_domain": {
     "Agent": 13,
-    "Base Platform": 17,
     "Craft": 11,
     "Integration": 13,
     "Knowledge": 5,
@@ -27,8 +26,8 @@
       "unreviewed": 0
     },
     "Base Platform": {
-      "existing_capability": 24,
-      "new_capability": 43,
+      "existing_capability": 67,
+      "new_capability": 0,
       "excluded": 78,
       "unreviewed": 0
     },
@@ -82,9 +81,9 @@
     }
   },
   "consolidation_ratio": {
-    "new_function_dispositions": 396,
-    "candidate_capabilities": 94,
-    "functions_per_candidate": 4.213
+    "new_function_dispositions": 353,
+    "candidate_capabilities": 77,
+    "functions_per_candidate": 4.584
   },
   "enabled_exposures": {
     "web": 2,
@@ -100,9 +99,9 @@
     "dependency": 37,
     "migration": 2
   },
-  "catalog_descriptors": 102,
-  "current_catalog_capabilities": 86,
-  "proposed_final_catalog_capabilities": 180,
+  "catalog_descriptors": 128,
+  "current_catalog_capabilities": 112,
+  "proposed_final_catalog_capabilities": 189,
   "evidence": {
     "module_dependencies": 7,
     "boundary_violations": 338,

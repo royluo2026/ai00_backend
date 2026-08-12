@@ -1,14 +1,14 @@
-# system.worker.outbox.health@1
+# base.notification.read_state.set@1
 
-Read the Knowledge publication worker heartbeat, queue totals, and alert total.
+Execute base.notification.read_state.set in the Base collaboration service.
 
 ## 使用判断
 
-- 适用：Read the Knowledge publication worker heartbeat, queue totals, and alert total.
+- 适用：Execute base.notification.read_state.set in the Base collaboration service.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_4227f82570395820b4085ce8ceefd893`
+- Catalog Release：`rel_6e6085cb234487b057ef4946e65d85a8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,8 +28,8 @@ Read the Knowledge publication worker heartbeat, queue totals, and alert total.
 
 ## 授权与数据边界
 
-- 授权策略：`base.v2:system.tech_config`
-- 自动化等级：`A2`
+- 授权策略：`base.v2:base.collaboration.write`
+- 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
@@ -39,15 +39,15 @@ Read the Knowledge publication worker heartbeat, queue totals, and alert total.
 
 ## 执行与可靠性
 
-- 副作用：`read`
+- 副作用：`write`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
-- 审批：`none`
-- 幂等：`none`
+- 审批：`user`
+- 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
-- Operation：`none`
+- 一致性：`external`
+- Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
 - Evidence：`optional`
@@ -58,7 +58,18 @@ Read the Knowledge publication worker heartbeat, queue totals, and alert total.
 ```json
 {
   "additionalProperties": false,
-  "properties": {},
+  "properties": {
+    "notification_id": {
+      "type": "string"
+    },
+    "read": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "notification_id",
+    "read"
+  ],
   "type": "object"
 }
 ```
@@ -67,10 +78,13 @@ Read the Knowledge publication worker heartbeat, queue totals, and alert total.
 
 ```json
 {
-  "capability_id": "system.worker.outbox.health",
-  "catalog_release": "rel_4227f82570395820b4085ce8ceefd893",
+  "capability_id": "base.notification.read_state.set",
+  "catalog_release": "rel_6e6085cb234487b057ef4946e65d85a8",
   "major_version": 1,
-  "payload": {}
+  "payload": {
+    "notification_id": "example",
+    "read": false
+  }
 }
 ```
 
@@ -82,68 +96,37 @@ Read the Knowledge publication worker heartbeat, queue totals, and alert total.
 {
   "additionalProperties": false,
   "properties": {
-    "heartbeat": {
+    "created_at": {
+      "type": "string"
+    },
+    "notification_id": {
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "read_at": {
       "anyOf": [
         {
-          "type": "null"
+          "type": "string"
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "details": {},
-            "heartbeat_at": {
-              "type": "string"
-            },
-            "started_at": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string"
-            },
-            "worker_id": {
-              "type": "string"
-            },
-            "worker_name": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "worker_name",
-            "worker_id",
-            "status",
-            "heartbeat_at",
-            "started_at"
-          ],
-          "type": "object"
+          "type": "null"
         }
       ]
     },
-    "open_alerts": {
-      "type": "integer"
-    },
-    "outbox_counts": {
-      "additionalProperties": false,
-      "properties": {
-        "completed": {
-          "type": "integer"
-        },
-        "dead": {
-          "type": "integer"
-        },
-        "pending": {
-          "type": "integer"
-        },
-        "publishing": {
-          "type": "integer"
-        }
-      },
-      "type": "object"
+    "subject_ref": {
+      "type": "string"
     }
   },
   "required": [
-    "heartbeat",
-    "outbox_counts",
-    "open_alerts"
+    "notification_id",
+    "subject_ref",
+    "payload",
+    "read_at",
+    "created_at"
   ],
   "type": "object"
 }
