@@ -55,8 +55,8 @@
 | Knowledge | Deliver the governed personalization change apply business outcome for Knowledge. | `knowledge.personalization.change.apply` |
 | Knowledge | Deliver the governed personalization read business outcome for Knowledge. | `knowledge.personalization.read` |
 | Knowledge | Deliver the governed space change apply business outcome for Knowledge. | `knowledge.space.change.apply` |
-| Local Integration | Deliver the governed device change apply business outcome for Local Integration. | `local.device.change.apply` |
-| Local Integration | Deliver the governed device read business outcome for Local Integration. | `local.device.read` |
+| Local Runtime | Deliver the governed device change apply business outcome for Local Runtime. | `local.device.change.apply` |
+| Local Runtime | Deliver the governed device read business outcome for Local Runtime. | `local.device.read` |
 | Ontology | Deliver the governed mapping change apply business outcome for Ontology. | `ontology.mapping.change.apply` |
 | Ontology | Deliver the governed schema change apply business outcome for Ontology. | `ontology.schema.change.apply` |
 | Project Management | Deliver the governed activity aggregate business outcome for Project Management. | `project.activity.aggregate` |

@@ -15,9 +15,10 @@ class DomainGrantGenerationTests(unittest.TestCase):
             "generate_domain_grants.py", "--inventory", str(inventory), "--database", "workmanship",
             "--account", "base=ai00_base", "--account", "craft=ai00_craft",
             "--account", "simulation=ai00_sim", "--account", "agent=ai00_agent",
-            "--account", "device=ai00_device", "--account", "digital_model=ai00_model",
+            "--account", "local_runtime=ai00_device", "--account", "digital_model=ai00_model",
             "--account", "project_management=ai00_project", "--account", "ontology=ai00_ontology",
-            "--account", "knowledge=ai00_knowledge", "--include-revokes",
+            "--account", "knowledge=ai00_knowledge", "--account", "factory=ai00_factory",
+            "--account", "integration=ai00_integration", "--include-revokes",
         ]
         output = io.StringIO()
         with patch.object(sys, "argv", args), contextlib.redirect_stdout(output):

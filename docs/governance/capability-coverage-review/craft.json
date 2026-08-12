@@ -3,9 +3,9 @@
   "domain": "Craft",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:dc5653a22aba6fbbaf5158d52c7b3bbb4bc2e4864ebd9c4112c06e2ad9ee9a93",
-    "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
-    "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
+    "registry_sha256": "sha256:4029e423d8d266d783ef7ddd7fa4c60084b304d62b8a620c3e5496f42ff7a9d6",
+    "catalog_release": "rel_4227f82570395820b4085ce8ceefd893",
+    "catalog_sha256": "sha256:71f59b251723a1b48cf925fba0995354de738f8e3c90dc12faca5b7b4300d62d"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -4725,62 +4725,6 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
-      "table": "workmanship_factory_factories",
-      "owner_domain": "Craft",
-      "access_mode": "read_write",
-      "migration_stream": "craft",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_factory_factory_equipments",
-      "owner_domain": "Craft",
-      "access_mode": "read_write",
-      "migration_stream": "craft",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_factory_factory_fixtures",
-      "owner_domain": "Craft",
-      "access_mode": "read_write",
-      "migration_stream": "craft",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_factory_factory_layout_templates",
-      "owner_domain": "Craft",
-      "access_mode": "read_write",
-      "migration_stream": "craft",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_factory_factory_lines",
-      "owner_domain": "Craft",
-      "access_mode": "read_write",
-      "migration_stream": "craft",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_factory_factory_sections",
-      "owner_domain": "Craft",
-      "access_mode": "read_write",
-      "migration_stream": "craft",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_factory_factory_stations",
-      "owner_domain": "Craft",
-      "access_mode": "read_write",
-      "migration_stream": "craft",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_factory_factory_tools",
-      "owner_domain": "Craft",
-      "access_mode": "read_write",
-      "migration_stream": "craft",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
       "table": "workmanship_know_craft_rules",
       "owner_domain": "Craft",
       "access_mode": "read_write",
@@ -4874,6 +4818,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_work_list_bitable_bindings"
     },
     {
+      "id": "boundary:00f82372f0215ccd29fc",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
+    },
+    {
       "id": "boundary:01060bd90e37ee3a2c0a",
       "category": "database",
       "source_paths": [
@@ -4886,6 +4844,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_properties"
+    },
+    {
+      "id": "boundary:01b3bc6d3aceefead404",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
     },
     {
       "id": "boundary:076747da0db951127bf6",
@@ -4928,6 +4900,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_projects"
+    },
+    {
+      "id": "boundary:0d2380f38c6e026604d9",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
     },
     {
       "id": "boundary:0e0b0ec423e4dd2bebe8",
@@ -5042,6 +5028,34 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_tasks"
     },
     {
+      "id": "boundary:1758e59d8fcf2220e556",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
+    },
+    {
+      "id": "boundary:1787f527a73fd2a809ca",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
+    },
+    {
       "id": "boundary:1972be211950c6f5e2d1",
       "category": "database",
       "source_paths": [
@@ -5056,6 +5070,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_axioms"
     },
     {
+      "id": "boundary:19cf105c8834c30a8ea9",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
+    },
+    {
       "id": "boundary:19ea318c07f743ed2b5e",
       "category": "database",
       "source_paths": [
@@ -5068,6 +5096,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_item_entries"
+    },
+    {
+      "id": "boundary:19ed07a9a503dbe3b6eb",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factories"
     },
     {
       "id": "boundary:1dcf73a7a48519c5770e",
@@ -5098,6 +5140,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_properties"
     },
     {
+      "id": "boundary:2190335b6e0620344d1e",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factories"
+    },
+    {
       "id": "boundary:23d6d339ddfe7325d316",
       "category": "database",
       "source_paths": [
@@ -5110,6 +5166,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_tasks"
+    },
+    {
+      "id": "boundary:256a7d5088a6fc6e5c2e",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/_constants.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
     },
     {
       "id": "boundary:259122f5e2d16d36c788",
@@ -5196,6 +5266,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_work_lists"
     },
     {
+      "id": "boundary:2dd39badb0d4b10336a0",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factories"
+    },
+    {
       "id": "boundary:3089590ea7629c324223",
       "category": "database",
       "source_paths": [
@@ -5208,6 +5292,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_list_bitable_bindings"
+    },
+    {
+      "id": "boundary:32ce367feb332402b21f",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/_constants.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factories"
     },
     {
       "id": "boundary:35a6bc7b733e9678e681",
@@ -5224,6 +5322,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_work_list_bitable_bindings"
     },
     {
+      "id": "boundary:363c586caf9b06f68b0b",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_layout_templates"
+    },
+    {
       "id": "boundary:36bf4d4d25b729cea51d",
       "category": "dependency",
       "source_paths": [
@@ -5236,6 +5348,20 @@
       "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft imports base internal module backend.capabilities.models_next"
+    },
+    {
+      "id": "boundary:3703bdd05ce293b476a3",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/versions.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factories"
     },
     {
       "id": "boundary:3784e5a2a335bf04b4ba",
@@ -5308,6 +5434,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_properties"
     },
     {
+      "id": "boundary:3b4a23ea850aa327e2c3",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
       "id": "boundary:3b89b30c3c73c8e7379f",
       "category": "database",
       "source_paths": [
@@ -5320,6 +5460,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_tasks"
+    },
+    {
+      "id": "boundary:3c4151b380e70d710f27",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
     },
     {
       "id": "boundary:3cc4a1cd0425b9deae20",
@@ -5364,6 +5518,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_properties"
     },
     {
+      "id": "boundary:3dcee5407dd97e4d9a6c",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
+    },
+    {
       "id": "boundary:3e288e78d30bff823e3a",
       "category": "database",
       "source_paths": [
@@ -5406,6 +5574,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_relations"
     },
     {
+      "id": "boundary:40d3fe73ed99992661cb",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
       "id": "boundary:4132a750e5e7217d49d1",
       "category": "database",
       "source_paths": [
@@ -5418,6 +5600,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_tasks"
+    },
+    {
+      "id": "boundary:41afe58c5657dec213bb",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
     },
     {
       "id": "boundary:4572d7cfed37e4793048",
@@ -5532,6 +5728,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_work_lists"
     },
     {
+      "id": "boundary:52a72282af0c0e6c2bb7",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
+    },
+    {
       "id": "boundary:52ac22a3453d6f9f3c68",
       "category": "database",
       "source_paths": [
@@ -5544,6 +5754,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_properties"
+    },
+    {
+      "id": "boundary:53577d5b231c9d88b1b4",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
     },
     {
       "id": "boundary:552e99607f1de3f92f47",
@@ -5588,6 +5812,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_relations"
     },
     {
+      "id": "boundary:5c5575c79ca2c222345a",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
+    },
+    {
       "id": "boundary:5c5bc3af1e7e98f82931",
       "category": "database",
       "source_paths": [
@@ -5600,6 +5838,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_task_templates"
+    },
+    {
+      "id": "boundary:5da9a44492984fbce390",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
     },
     {
       "id": "boundary:5dca8776d07c734d823d",
@@ -5840,6 +6092,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_work_permission_requests"
     },
     {
+      "id": "boundary:6f8b9571ecdbb6943791",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
+    },
+    {
       "id": "boundary:7074a30df986cd10a20b",
       "category": "database",
       "source_paths": [
@@ -5896,6 +6162,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_work_list_bitable_record_map"
     },
     {
+      "id": "boundary:741d77d875bdc2a4f3d2",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
       "id": "boundary:75d00b5cbe24f37144eb",
       "category": "database",
       "source_paths": [
@@ -5922,6 +6202,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_list_shares"
+    },
+    {
+      "id": "boundary:75f6f10246206d68acde",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
     },
     {
       "id": "boundary:780fa82d51c9f8bbf208",
@@ -6078,6 +6372,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_classes"
     },
     {
+      "id": "boundary:8388646905f591c0f17b",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/_constants.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
+    },
+    {
       "id": "boundary:8418ebcff4978c5f61d4",
       "category": "database",
       "source_paths": [
@@ -6148,6 +6456,48 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_classes"
     },
     {
+      "id": "boundary:8a492730164de246c53a",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
+      "id": "boundary:90ac4677ac0bf9ebc767",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
+    },
+    {
+      "id": "boundary:918ce4d61c67cc0dc3e3",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
+    },
+    {
       "id": "boundary:92f42029c51e69647054",
       "category": "database",
       "source_paths": [
@@ -6160,6 +6510,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_classes"
+    },
+    {
+      "id": "boundary:948a6ead9d2b6197c411",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/versions.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
     },
     {
       "id": "boundary:94b4c5f4c957977d1676",
@@ -6202,6 +6566,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_relations"
+    },
+    {
+      "id": "boundary:97a6570b1a01ebf7a2fe",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_layout_templates"
     },
     {
       "id": "boundary:97e9525ecafd1062b056",
@@ -6428,6 +6806,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_approval_orders"
     },
     {
+      "id": "boundary:a9f834e42f41f6d70c4b",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/_constants.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_lines"
+    },
+    {
       "id": "boundary:ab16788cb3f96749052a",
       "category": "database",
       "source_paths": [
@@ -6470,6 +6862,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_classes"
     },
     {
+      "id": "boundary:ad18aee25d3101844122",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
+    },
+    {
       "id": "boundary:ae908b5318b9fd2b5b72",
       "category": "database",
       "source_paths": [
@@ -6496,6 +6902,34 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_classes"
+    },
+    {
+      "id": "boundary:af620ba19ee5a38b4a71",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
+      "id": "boundary:af910ab0d5ce8680b935",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
     },
     {
       "id": "boundary:afb88b8dc91c99d93c10",
@@ -6554,6 +6988,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_properties"
     },
     {
+      "id": "boundary:b34209353d9c409e1fcb",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
+    },
+    {
       "id": "boundary:b471d91eeed42a39887d",
       "category": "database",
       "source_paths": [
@@ -6582,6 +7030,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_issues"
     },
     {
+      "id": "boundary:b4fea57b24fac0f3ff80",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_layout_templates"
+    },
+    {
       "id": "boundary:b524745321d34b7fcf9f",
       "category": "database",
       "source_paths": [
@@ -6608,6 +7070,20 @@
       "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft imports base internal module backend.capabilities.models_next"
+    },
+    {
+      "id": "boundary:b7b39e4422f7749e584f",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
     },
     {
       "id": "boundary:b860697e72e420c0be91",
@@ -6680,6 +7156,20 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_approval_orders"
     },
     {
+      "id": "boundary:bccf918536c0c68569cc",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factories"
+    },
+    {
       "id": "boundary:bd40f177b46cbb08fe68",
       "category": "database",
       "source_paths": [
@@ -6720,6 +7210,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_list_bitable_bindings"
+    },
+    {
+      "id": "boundary:c06685da9ebe97afa6b0",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
     },
     {
       "id": "boundary:c3ef5c730281212d8622",
@@ -6818,6 +7322,48 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_lists"
+    },
+    {
+      "id": "boundary:ccac47e123fe77199855",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
+    },
+    {
+      "id": "boundary:ccc436357e9ede3f4735",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factories"
+    },
+    {
+      "id": "boundary:cd3c42f177567740471e",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
     },
     {
       "id": "boundary:cd42ac28fc9a4d43bce7",
@@ -6974,6 +7520,90 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_classes"
     },
     {
+      "id": "boundary:d87a32c2a23d44e24608",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
+    },
+    {
+      "id": "boundary:d8f37f4455d91f6d79a9",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
+      "id": "boundary:d9d5e1992a82acbbaf04",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_layout_templates"
+    },
+    {
+      "id": "boundary:da75081ab89856640123",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
+    },
+    {
+      "id": "boundary:dc221acc741cba800720",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/versions.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
+      "id": "boundary:dc296459eddc5ac917b1",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/_constants.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
+    },
+    {
       "id": "boundary:dc3dd645e475b3332e75",
       "category": "database",
       "source_paths": [
@@ -7000,6 +7630,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_approval_orders"
+    },
+    {
+      "id": "boundary:dec84877c9eb083380d2",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/ontology.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
     },
     {
       "id": "boundary:df8f2c468e2991f99e77",
@@ -7044,6 +7688,48 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_relations"
     },
     {
+      "id": "boundary:e1a94a8910b3360b1f22",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_fixtures"
+    },
+    {
+      "id": "boundary:e577f5cc0bb852322e02",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
+      "id": "boundary:e60a7deb868b01fd3403",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
+    },
+    {
       "id": "boundary:e7428a4dd830a4f64bc9",
       "category": "database",
       "source_paths": [
@@ -7070,6 +7756,34 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_lists"
+    },
+    {
+      "id": "boundary:e91aed3cea68ce42f94a",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
+      "id": "boundary:ea983ee21db27d3ea2e9",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
     },
     {
       "id": "boundary:eb8fece773c696e49b01",
@@ -7112,6 +7826,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_permission_requests"
+    },
+    {
+      "id": "boundary:ed44b2998bd7b9694ec0",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/_constants.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
     },
     {
       "id": "boundary:ed5ed4100ce020887487",
@@ -7170,6 +7898,34 @@
       "reason": "craft SQL accesses project_management-owned table workmanship_proj_issues"
     },
     {
+      "id": "boundary:f3f5ea69f43a701bbfd3",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_sections"
+    },
+    {
+      "id": "boundary:f51442ee95563fd8b9f7",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_layout_templates"
+    },
+    {
       "id": "boundary:f599ebbf9a2cdc5ee8a5",
       "category": "database",
       "source_paths": [
@@ -7226,6 +7982,20 @@
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_classes"
     },
     {
+      "id": "boundary:f7fccabe5610d408bc45",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/_constants.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_stations"
+    },
+    {
       "id": "boundary:f87f487db503e7967602",
       "category": "database",
       "source_paths": [
@@ -7238,6 +8008,34 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses project_management-owned table workmanship_work_lists"
+    },
+    {
+      "id": "boundary:fb2ca6b112f28ba14035",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
+    },
+    {
+      "id": "boundary:fb5808b79c093169ae07",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_equipments"
     },
     {
       "id": "boundary:fb5ed16e3f4356f93eb3",
@@ -7294,6 +8092,34 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "craft SQL accesses ontology-owned table workmanship_onto_relations"
+    },
+    {
+      "id": "boundary:fd242cc20f55d55831f7",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/_bop/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_layout_templates"
+    },
+    {
+      "id": "boundary:fd969d258069eeee13ff",
+      "category": "database",
+      "source_paths": [
+        "plugins/craft/craft_backend/routers/factory.py"
+      ],
+      "owner_domain": "Craft",
+      "current_owner": "Craft",
+      "target_owner": "Factory",
+      "replacement_boundary": "application_port:factory",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "craft SQL accesses factory-owned table workmanship_factory_factory_tools"
     },
     {
       "id": "boundary:fe02389c512fe56409c9",

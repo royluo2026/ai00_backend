@@ -13,6 +13,17 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 OWNERSHIP_PATH = REPOSITORY_ROOT / "docs" / "governance" / "domain-ownership.json"
 BASELINE_PATH = REPOSITORY_ROOT / "docs" / "governance" / "domain-dependency-baseline.json"
 REVIEW_PATH = REPOSITORY_ROOT / "docs" / "governance" / "capability-coverage-review"
+APPROVED_SHARED_PREFIXES = frozenset(
+    {
+        "backend.capability_v2",
+        "backend.contracts",
+        "backend.domain_ports",
+        "backend.platform_sdk",
+    }
+)
+PRIVATE_MODULE_SEGMENTS = frozenset(
+    {"domain", "application", "infrastructure", "repositories", "api", "routers"}
+)
 
 
 def _load(path: Path) -> dict:
@@ -59,8 +70,23 @@ def _imports(path: Path) -> set[str]:
     return imported
 
 
+def _is_domain_public_module(imported_module: str, descriptor: dict) -> bool:
+    for prefix in descriptor.get("module_prefixes", ()):
+        for public_segment in ("ports", "public"):
+            public_prefix = f"{prefix}.{public_segment}"
+            if imported_module == public_prefix or imported_module.startswith(public_prefix + "."):
+                return True
+    return False
+
+
 def discover_violations(ownership: dict) -> tuple[list[dict], list[str]]:
     errors: list[str] = []
+    configured_shared = set(ownership["shared_import_prefixes"])
+    unsupported_shared = configured_shared - APPROVED_SHARED_PREFIXES
+    if unsupported_shared:
+        errors.append(
+            "unsupported shared import prefixes: " + ", ".join(sorted(unsupported_shared))
+        )
     sources: dict[str, tuple[Path, str]] = {}
     candidate_paths: set[Path] = set()
     for descriptor in ownership["domains"].values():
@@ -100,12 +126,24 @@ def discover_violations(ownership: dict) -> tuple[list[dict], list[str]]:
                 continue
             if target_domain == source_domain:
                 continue
+            if target_domain is not None and _is_domain_public_module(
+                imported_module,
+                ownership["domains"][target_domain],
+            ):
+                continue
+            imported_segments = set(imported_module.split("."))
+            private_kind = sorted(imported_segments & PRIVATE_MODULE_SEGMENTS)
+            reason = (
+                f"Cross-domain import reaches private {private_kind[0]} implementation."
+                if private_kind
+                else "Domain code imports an implementation outside its owned package or approved shared contract."
+            )
             violations.append({
                 "source": relative,
                 "imported_module": imported_module,
                 "source_domain": source_domain,
                 "target_domain": target_domain or "Unowned Internal",
-                "reason": "Domain code imports an implementation outside its owned package or approved shared contract.",
+                "reason": reason,
             })
     return violations, sorted(set(errors))
 

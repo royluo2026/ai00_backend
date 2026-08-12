@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Mapping
 
-from backend.capabilities.models_next import (
+from backend.capability_v2.provider_contracts import (
     CapabilityBusinessError,
     CapabilityContext,
     CapabilityOutput,

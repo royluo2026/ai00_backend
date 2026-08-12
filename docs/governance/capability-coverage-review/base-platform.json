@@ -3,9 +3,9 @@
   "domain": "Base Platform",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:dc5653a22aba6fbbaf5158d52c7b3bbb4bc2e4864ebd9c4112c06e2ad9ee9a93",
-    "catalog_release": "rel_84f5817abbc66e72c7c0e2fca722456f",
-    "catalog_sha256": "sha256:b6f0063eb5ed1085dd4285f3aeba09fdfed47077a8362b493a2bb7a8abcffc72"
+    "registry_sha256": "sha256:4029e423d8d266d783ef7ddd7fa4c60084b304d62b8a620c3e5496f42ff7a9d6",
+    "catalog_release": "rel_4227f82570395820b4085ce8ceefd893",
+    "catalog_sha256": "sha256:71f59b251723a1b48cf925fba0995354de738f8e3c90dc12faca5b7b4300d62d"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -3597,55 +3597,6 @@
         }
       }
     },
-    "system.echo": {
-      "kind": "existing",
-      "function_dispositions": {
-        "capability:system.echo": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/capabilities/agreed_catalog.py",
-            "backend/capabilities/registry_next.py"
-          ],
-          "owner": "Base Platform",
-          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
-          "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        }
-      },
-      "consumer_exposure": {
-        "shared_pipeline": "capability_provider_gateway",
-        "web": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "plugin": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "agent": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "mcp": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        },
-        "local_runtime": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
-          "policy_ref": "existing-registry-policy"
-        }
-      }
-    },
     "system.job.cancel": {
       "kind": "existing",
       "function_dispositions": {
@@ -4082,6 +4033,62 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_revision_branches",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_revision_changesets",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_revision_commit_parents",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_revision_commits",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_revision_diffs",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_revision_lineage_edges",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_revision_repositories",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_revision_snapshots",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_schema_migrations",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
@@ -4097,27 +4104,6 @@
     },
     {
       "table": "workmanship_display_id_counters",
-      "owner_domain": "Base Platform",
-      "access_mode": "read_write",
-      "migration_stream": "base",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_int_ext_datasources",
-      "owner_domain": "Base Platform",
-      "access_mode": "read_write",
-      "migration_stream": "base",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_int_ext_field_mappings",
-      "owner_domain": "Base Platform",
-      "access_mode": "read_write",
-      "migration_stream": "base",
-      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
-    },
-    {
-      "table": "workmanship_int_ext_mappings",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",
@@ -4188,6 +4174,48 @@
     }
   ],
   "debt_dispositions": [
+    {
+      "id": "boundary:056038616b499f32f140",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_mappings"
+    },
+    {
+      "id": "boundary:0e3ba68dae82ff7f2186",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
+    },
+    {
+      "id": "boundary:1391674a0d76312f04f7",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_mappings"
+    },
     {
       "id": "boundary:15ce567ee01921ed8d9a",
       "category": "database",
@@ -4343,6 +4371,20 @@
       "reason": "base SQL accesses knowledge-owned table workmanship_know_folders"
     },
     {
+      "id": "boundary:2ef9b61387673c72858b",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_field_mappings"
+    },
+    {
       "id": "boundary:3355fcf95f432c7970ef",
       "category": "database",
       "source_paths": [
@@ -4469,6 +4511,20 @@
       "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
     },
     {
+      "id": "boundary:4d26e4179991cf2f8883",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_field_mappings"
+    },
+    {
       "id": "boundary:4dd8d9636470c8a9340f",
       "category": "database",
       "source_paths": [
@@ -4567,6 +4623,20 @@
       "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
     },
     {
+      "id": "boundary:6760404006f20ceeb202",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_field_mappings"
+    },
+    {
       "id": "boundary:6800494e3d6e8f3ae8a9",
       "category": "database",
       "source_paths": [
@@ -4635,6 +4705,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "base SQL accesses project_management-owned table workmanship_app_workbench_configs"
+    },
+    {
+      "id": "boundary:77ce2eb81be27f14caa9",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
     },
     {
       "id": "boundary:79015650b59f870f8c6a",
@@ -4735,6 +4819,90 @@
       "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
     },
     {
+      "id": "boundary:984387b11a0f2bc73dd4",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_mappings"
+    },
+    {
+      "id": "boundary:99f21d2c5a9483a1585c",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_field_mappings"
+    },
+    {
+      "id": "boundary:9be4345d559ed781f333",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_mappings"
+    },
+    {
+      "id": "boundary:a142a74de0d56c943544",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
+    },
+    {
+      "id": "boundary:a25d7ddbf1c4bb9eb51a",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_mappings"
+    },
+    {
+      "id": "boundary:a4af2528f2c352e3308d",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
+    },
+    {
       "id": "boundary:a5ece08dd35d662380ae",
       "category": "database",
       "source_paths": [
@@ -4775,6 +4943,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "base SQL accesses knowledge-owned table workmanship_know_items"
+    },
+    {
+      "id": "boundary:b8631a6978cb356daeb9",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
     },
     {
       "id": "boundary:bc6576cce706d91993ef",
@@ -4833,6 +5015,34 @@
       "reason": "base SQL accesses project_management-owned table workmanship_app_wb_annotations"
     },
     {
+      "id": "boundary:c036d8db0ce5e021744a",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
+    },
+    {
+      "id": "boundary:c308a1a056aeab9aeba0",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
+    },
+    {
       "id": "boundary:c7121c55b61283924e05",
       "category": "database",
       "source_paths": [
@@ -4859,6 +5069,20 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "base SQL accesses knowledge-owned table workmanship_know_favorites"
+    },
+    {
+      "id": "boundary:ccee606facb78383960b",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
     },
     {
       "id": "boundary:cd56dec3d9e7a6be551d",
@@ -5013,6 +5237,48 @@
       "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
       "disposition": "remove_after_extraction",
       "reason": "base SQL accesses knowledge-owned table workmanship_know_document_acl"
+    },
+    {
+      "id": "boundary:e437575e1d6431244b84",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_mappings"
+    },
+    {
+      "id": "boundary:e81e935d6c4dc202a56e",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_datasources"
+    },
+    {
+      "id": "boundary:e888f0713f4b39d98a1c",
+      "category": "database",
+      "source_paths": [
+        "backend/routers/ext_datasource.py"
+      ],
+      "owner_domain": "Base Platform",
+      "current_owner": "Base Platform",
+      "target_owner": "Integration",
+      "replacement_boundary": "application_port:integration",
+      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
+      "disposition": "remove_after_extraction",
+      "reason": "base SQL accesses integration-owned table workmanship_int_ext_mappings"
     },
     {
       "id": "boundary:eae972e5308a5a8ea946",

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Iterable, Mapping
 
-from backend.capabilities.models_next import CapabilityBusinessError
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from backend.contracts import CraftExecutionStructureV1
 
 from ..data.connection import get_craft_conn

@@ -8,7 +8,7 @@ Revoke one explicit document access grant.
 - 不适用：Revoking the creator's mandatory administrator access.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_eeb47612a439ab146bc55b6091ee5e01`
+- Catalog Release：`rel_4227f82570395820b4085ce8ceefd893`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -87,7 +87,7 @@ Revoke one explicit document access grant.
 ```json
 {
   "capability_id": "knowledge.document.acl.revoke",
-  "catalog_release": "rel_eeb47612a439ab146bc55b6091ee5e01",
+  "catalog_release": "rel_4227f82570395820b4085ce8ceefd893",
   "major_version": 1,
   "payload": {
     "document_gid": "example",

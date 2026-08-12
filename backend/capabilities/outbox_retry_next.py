@@ -6,7 +6,7 @@ from typing import Any
 from backend.knowledge.contracts import OUTBOX_SCHEMA, entry_ref, outbox_ref
 from backend.knowledge.provider import register_capability
 from backend.knowledge.ids import new_knowledge_id
-from backend.capabilities.models_next import CapabilityBusinessError
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 from backend.knowledge.storage import publish_proposal_markdown
 
 

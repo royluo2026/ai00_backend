@@ -3,7 +3,6 @@
   "resolution": "The most specific matching code path wins; equal-specificity claims are invalid.",
   "shared_import_prefixes": [
     "backend.capability_v2",
-    "backend.capabilities.models_next",
     "backend.domain_ports",
     "backend.contracts",
     "backend.platform_sdk"
@@ -88,6 +87,26 @@
       "test_paths": ["plugins/digital_model/tests/**", "backend/tests/test_digital_model_*.py"],
       "documentation_paths": ["docs/capabilities/digital-model/**"]
     },
+    "Factory": {
+      "maintainers": ["@ai00/factory-maintainers"],
+      "artifact": "ai00-factory-plugin",
+      "module_prefixes": ["plugins.factory"],
+      "code_paths": ["plugins/factory/**", "backend/domain_ports/factory.py"],
+      "provider_paths": ["plugins/factory/factory_backend/capabilities/**"],
+      "migration_paths": ["plugins/factory/migrations/**"],
+      "test_paths": ["plugins/factory/tests/**"],
+      "documentation_paths": ["docs/capabilities/factory/**"]
+    },
+    "Integration": {
+      "maintainers": ["@ai00/integration-maintainers"],
+      "artifact": "ai00-integration-plugin",
+      "module_prefixes": ["plugins.integration"],
+      "code_paths": ["plugins/integration/**", "backend/domain_ports/integration.py"],
+      "provider_paths": ["plugins/integration/integration_backend/capabilities/**"],
+      "migration_paths": ["plugins/integration/migrations/**"],
+      "test_paths": ["plugins/integration/tests/**"],
+      "documentation_paths": ["docs/capabilities/integration/**"]
+    },
     "Project Management": {
       "maintainers": ["@ai00/project-management-maintainers"],
       "artifact": "ai00-project-management-plugin",
@@ -165,15 +184,15 @@
       "test_paths": ["backend/tests/test_knowledge_*.py"],
       "documentation_paths": ["docs/capabilities/knowledge/**"]
     },
-    "Local Integration": {
-      "maintainers": ["@ai00/local-integration-maintainers"],
+    "Local Runtime": {
+      "maintainers": ["@ai00/local-runtime-maintainers"],
       "artifact": "ai00-local-runtime",
       "module_prefixes": ["plugins.device"],
       "code_paths": ["plugins/device/**", "local-runtime/**", "backend/domain_ports/local_integration.py"],
       "provider_paths": ["plugins/device/device_backend/capabilities/**", "local-runtime/src/**"],
       "migration_paths": ["backend/db/migrations/202608030004_device_control_plane.sql", "backend/db/migrations/202608100011_device_operation_protocol_v2.sql"],
       "test_paths": ["plugins/device/**/test_*.py", "backend/tests/test_local_*.py", "backend/tests/test_device_*.py", "local-runtime/**/Tests/**"],
-      "documentation_paths": ["docs/capabilities/local-integration/**"]
+      "documentation_paths": ["docs/capabilities/local-runtime/**"]
     }
   }
 }

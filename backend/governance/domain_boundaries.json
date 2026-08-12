@@ -4,10 +4,12 @@
     "base",
     "digital_model",
     "project_management",
+    "factory",
     "craft",
+    "integration",
     "simulation",
     "agent",
-    "device",
+    "local_runtime",
     "ontology",
     "knowledge"
   ],
@@ -19,6 +21,14 @@
     "craft": {
       "runtime_domain": "craft",
       "new_table_prefix": "workmanship_craft_"
+    },
+    "factory": {
+      "runtime_domain": "factory",
+      "new_table_prefix": "workmanship_factory_"
+    },
+    "integration": {
+      "runtime_domain": "integration",
+      "new_table_prefix": "workmanship_int_"
     },
     "digital_model": {
       "runtime_domain": "digital_model",
@@ -36,8 +46,8 @@
       "runtime_domain": "agent",
       "new_table_prefix": "workmanship_agent_"
     },
-    "device": {
-      "runtime_domain": "device",
+    "local_runtime": {
+      "runtime_domain": "local_runtime",
       "new_table_prefix": "workmanship_device_"
     },
     "knowledge": {
@@ -55,12 +65,20 @@
       "domain": "craft"
     },
     {
+      "path": "plugins/factory",
+      "domain": "factory"
+    },
+    {
+      "path": "plugins/integration",
+      "domain": "integration"
+    },
+    {
       "path": "plugins/agent",
       "domain": "agent"
     },
     {
       "path": "plugins/device",
-      "domain": "device"
+      "domain": "local_runtime"
     },
     {
       "path": "plugins/simulation",
@@ -162,7 +180,7 @@
     },
     {
       "prefix": "workmanship_device_",
-      "owner": "device"
+      "owner": "local_runtime"
     },
     {
       "prefix": "workmanship_knowledge_",
@@ -190,7 +208,7 @@
     },
     {
       "prefix": "workmanship_runtime_",
-      "owner": "device"
+      "owner": "local_runtime"
     },
     {
       "prefix": "workmanship_bop_",
@@ -198,7 +216,7 @@
     },
     {
       "prefix": "workmanship_factory_",
-      "owner": "craft"
+      "owner": "factory"
     },
     {
       "prefix": "workmanship_tpl_",
@@ -222,7 +240,7 @@
     },
     {
       "prefix": "workmanship_int_",
-      "owner": "base"
+      "owner": "integration"
     }
   ],
   "table_overrides": {
@@ -257,9 +275,11 @@
     "workmanship_work_notifications": "project_management"
   },
   "migration_owner_overrides": {
+    "202608030004": "local_runtime",
     "202608050002": "project_management",
     "202608050003": "project_management",
-    "202608060003": "ontology"
+    "202608060003": "ontology",
+    "202608100011": "local_runtime"
   },
   "migration_table_exceptions": {
     "202608030005": {

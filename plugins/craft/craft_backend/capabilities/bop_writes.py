@@ -4,7 +4,7 @@ import copy, hashlib, json, time
 from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from typing import Any, Mapping
-from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from backend.platform_sdk.ids import next_gid
 from ..data.connection import get_craft_conn
 

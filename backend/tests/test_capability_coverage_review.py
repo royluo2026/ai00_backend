@@ -182,8 +182,8 @@ def test_every_baseline_violation_and_table_has_one_generated_review_row(builder
     tables = [row["table"] for document in documents for row in document["database_boundaries"]]
 
     assert len(debt_ids) == len(set(debt_ids))
-    assert len(baseline_debt_ids) == len(set(baseline_debt_ids)) == 299
-    assert len(tables) == len(set(tables)) == 162
+    assert len(baseline_debt_ids) == len(set(baseline_debt_ids)) == 345
+    assert len(tables) == len(set(tables)) == 176
     assert {row["category"] for document in documents for row in document["debt_dispositions"]} == {
         "dependency", "database"
     }
@@ -198,7 +198,7 @@ def test_complete_audit_has_zero_unreviewed_and_consistent_candidates(builder):
     assert builder.audit_consistency_errors(documents, sources) == []
     assert summary["resolutions"]["unreviewed"] == 0
     assert summary["candidate_capabilities"] == 87
-    assert summary["proposed_final_catalog_capabilities"] == 174
+    assert summary["proposed_final_catalog_capabilities"] == 173
     assert max(summary["candidate_additions_by_domain"].values()) == 31
 
 
@@ -214,6 +214,6 @@ def test_strict_stops_at_architecture_threshold_with_exact_counts():
     assert result.returncode == 3
     payload = json.loads(result.stdout)
     assert payload["status"] == "architecture_review_required"
-    assert payload["current_catalog_capabilities"] == 87
+    assert payload["current_catalog_capabilities"] == 86
     assert payload["candidate_capabilities"] == 87
-    assert payload["proposed_final_catalog_capabilities"] == 174
+    assert payload["proposed_final_catalog_capabilities"] == 173

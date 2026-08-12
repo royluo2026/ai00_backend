@@ -8,6 +8,7 @@ from backend.capabilities.models_next import (
     CapabilityBusinessError,
     CapabilityContext,
     CapabilityOutput,
+    CapabilityRisk,
     CapabilitySpec,
     EvidenceRef,
 )
@@ -16,6 +17,7 @@ __all__ = [
     "CapabilityBusinessError",
     "CapabilityContext",
     "CapabilityOutput",
+    "CapabilityRisk",
     "CapabilitySpec",
     "EvidenceRef",
 ]

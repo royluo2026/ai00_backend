@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from backend.capabilities.models_next import CapabilityRisk, CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilityRisk, CapabilitySpec
 from backend.base.provider import register_capability
 
 MAX_VALUE_BYTES = 256 * 1024

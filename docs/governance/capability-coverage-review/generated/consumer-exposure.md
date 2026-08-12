@@ -55,7 +55,6 @@
 | Base Platform | `semantic.context.get` | none |
 | Base Platform | `system.activity.search` | none |
 | Base Platform | `system.change_impact.preview` | none |
-| Base Platform | `system.echo` | none |
 | Base Platform | `system.job.cancel` | none |
 | Base Platform | `system.job.get` | none |
 | Base Platform | `system.lineage.get` | none |
@@ -127,16 +126,16 @@
 | Knowledge | `knowledge.space.create` | rest |
 | Knowledge | `knowledge.space.list` | rest |
 | Knowledge | `knowledge.space.search` | none |
-| Local Integration | `local.command.get` | none |
-| Local Integration | `local.device.change.apply` | rest |
-| Local Integration | `local.device.read` | rest |
-| Local Integration | `vismockup.capture` | none |
-| Local Integration | `vismockup.highlight` | none |
-| Local Integration | `vismockup.launch` | agent, local_runtime |
-| Local Integration | `vismockup.model.open` | none |
-| Local Integration | `vismockup.status` | none |
-| Local Integration | `vismockup.tree` | none |
-| Local Integration | `vismockup.visibility` | none |
+| Local Runtime | `local.command.get` | none |
+| Local Runtime | `local.device.change.apply` | rest |
+| Local Runtime | `local.device.read` | rest |
+| Local Runtime | `vismockup.capture` | none |
+| Local Runtime | `vismockup.highlight` | none |
+| Local Runtime | `vismockup.launch` | agent, local_runtime |
+| Local Runtime | `vismockup.model.open` | none |
+| Local Runtime | `vismockup.status` | none |
+| Local Runtime | `vismockup.tree` | none |
+| Local Runtime | `vismockup.visibility` | none |
 | Ontology | `ontology.change.proposal.create` | none |
 | Ontology | `ontology.change.proposal.get` | none |
 | Ontology | `ontology.change.proposal.review.submit` | none |

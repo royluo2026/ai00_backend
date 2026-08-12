@@ -3320,29 +3320,6 @@
         "backend/capabilities/system_shared_next.py"
       ]
     },
-    "capability:system.echo": {
-      "function_id": "capability:system.echo",
-      "domain": "Base Platform",
-      "stability": "stable",
-      "current_consumers": [
-        "Capability Registry"
-      ],
-      "target_capability": "system.echo",
-      "exposure": "Capability",
-      "automation_level": "automated",
-      "resource_types": [
-        "system"
-      ],
-      "data_classification": "internal",
-      "classification": "mapped",
-      "migration_status": "registered",
-      "owner": "Base Platform",
-      "exclusion_reason": null,
-      "source_paths": [
-        "backend/capabilities/agreed_catalog.py",
-        "backend/capabilities/registry_next.py"
-      ]
-    },
     "capability:system.job.cancel": {
       "function_id": "capability:system.job.cancel",
       "domain": "Base Platform",

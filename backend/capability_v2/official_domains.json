@@ -7,7 +7,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:193ead8d21eff5ebad5f5fd726049a55dfeab3aa2a13db0732c26f19d12c3f9f"
+        "artifact_hash": "sha256:f84e84506435a1ab05d82bed61cc3b67c3cadae60575d72305c5eba317a49a9d"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -31,7 +31,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:e66c835b45c55cec24e5465996c16552a7a3dfc6a458519344cc77f499a264ad"
+        "artifact_hash": "sha256:f94e357b10930fd3d157e07c7ce708b26522f38a506d72f3f0b2f4f66887366c"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [

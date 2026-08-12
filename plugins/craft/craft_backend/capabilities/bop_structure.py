@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from backend.capabilities.models_next import (
+from backend.capability_v2.provider_contracts import (
     CapabilityBusinessError,
     CapabilityContext,
     CapabilityOutput,

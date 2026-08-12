@@ -29,8 +29,9 @@ BOUNDARY_BASELINE_PATH = REPOSITORY_ROOT / "backend" / "governance" / "boundary_
 TABLE_INVENTORY_PATH = REPOSITORY_ROOT / "backend" / "governance" / "table_inventory.json"
 RUNTIME_OWNERSHIP_PATH = REPOSITORY_ROOT / "backend" / "governance" / "domain_boundaries.json"
 DOMAINS = (
-    "Base Platform", "Agent", "Craft", "Digital Model", "Project Management",
-    "Simulation", "Ontology", "Knowledge", "Local Integration",
+    "Base Platform", "Project Management", "Factory", "Craft", "Knowledge",
+    "Ontology", "Agent", "Integration", "Local Runtime", "Digital Model",
+    "Simulation",
 )
 DOMAIN_FILES = {domain: domain.lower().replace(" ", "-") + ".json" for domain in DOMAINS}
 CONSUMERS = ("web", "rest", "plugin", "agent", "mcp", "local_runtime")
@@ -38,9 +39,11 @@ BOOTSTRAP_REVIEWER = "existing-user-function-registry"
 BOOTSTRAP_DATE = "2026-08-11"
 RUNTIME_TO_DOMAIN = {
     "base": "Base Platform", "agent": "Agent", "craft": "Craft",
+    "factory": "Factory", "integration": "Integration",
     "digital_model": "Digital Model", "project_management": "Project Management",
     "simulation": "Simulation", "ontology": "Ontology", "knowledge": "Knowledge",
-    "device": "Local Integration", "local_integration": "Local Integration",
+    "device": "Local Runtime", "local_integration": "Local Runtime",
+    "local_runtime": "Local Runtime",
 }
 
 
@@ -99,7 +102,9 @@ def load_sources(root: Path = REPOSITORY_ROOT) -> AuditSources:
 def _discovered(row: dict) -> dict:
     return {
         "function_id": row["function_id"],
-        "domain": row["domain"],
+        "domain": (
+            "Local Runtime" if row["domain"] == "Local Integration" else row["domain"]
+        ),
         "source_paths": sorted(row["source_paths"]),
         "current_consumers": sorted(row.get("current_consumers", [])),
         "target_capability": row.get("target_capability"),
@@ -257,8 +262,8 @@ def _module_debt(row: dict) -> dict:
 def _owner_slug(domain: str) -> str:
     if domain == "Base Platform":
         return "base"
-    if domain == "Local Integration":
-        return "local_integration"
+    if domain == "Local Runtime":
+        return "local_runtime"
     return domain.lower().replace(" ", "_")
 
 
@@ -339,6 +344,21 @@ def initialize_documents(sources: AuditSources, existing: dict[str, dict] | None
         document = copy.deepcopy(existing.get(domain)) if domain in existing else _empty_review(domain, sources.reviewed_against)
         if domain not in existing:
             document = _bootstrap_existing(document, domain_rows)
+        document["excluded_functions"].pop("capability:system.echo", None)
+        if domain == "Base Platform" and "system.echo" in document["capabilities"]:
+            echo = document["capabilities"].pop("system.echo")
+            disposition = echo["function_dispositions"]["capability:system.echo"]
+            document["excluded_functions"]["capability:system.echo"] = {
+                "resolution": "excluded",
+                "target_capability": None,
+                "source_paths": disposition["source_paths"],
+                "evidence": "The legacy echo probe is absent from the frozen business Capability Catalog.",
+                "reason": "system.echo is a development probe, not an independently invokable business outcome.",
+                "classification": "operations",
+                "owner": "Base Platform",
+                "reviewer": "capability-v2-architecture-review",
+                "reviewed_at": BOOTSTRAP_DATE,
+            }
         document["reviewed_against"] = copy.deepcopy(sources.reviewed_against)
         document = merge_domain_review(document, domain_rows)
         result.append(_merge_evidence(document, sources))
@@ -475,6 +495,15 @@ def _load_documents() -> dict[str, dict]:
     result = {}
     for domain, filename in DOMAIN_FILES.items():
         path = REVIEW_ROOT / filename
+        if domain == "Local Runtime" and not path.exists():
+            legacy_path = REVIEW_ROOT / "local-integration.json"
+            if legacy_path.exists():
+                legacy = legacy_path.read_text(encoding="utf-8").replace(
+                    "Local Integration",
+                    "Local Runtime",
+                )
+                result[domain] = json.loads(legacy)
+                continue
         if path.exists():
             result[domain] = _json(path)
     return result

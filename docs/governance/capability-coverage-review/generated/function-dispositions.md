@@ -210,7 +210,6 @@
 | Base Platform | `capability:semantic.context.get` | existing_capability | `semantic.context.get` |
 | Base Platform | `capability:system.activity.search` | existing_capability | `system.activity.search` |
 | Base Platform | `capability:system.change_impact.preview` | existing_capability | `system.change_impact.preview` |
-| Base Platform | `capability:system.echo` | existing_capability | `system.echo` |
 | Base Platform | `capability:system.job.cancel` | existing_capability | `system.job.cancel` |
 | Base Platform | `capability:system.job.get` | existing_capability | `system.job.get` |
 | Base Platform | `capability:system.lineage.get` | existing_capability | `system.lineage.get` |
@@ -552,31 +551,31 @@
 | Knowledge | `capability:knowledge.space.list` | existing_capability | `knowledge.space.list` |
 | Knowledge | `rest:GET:/api/knowledge_hub/folders` | existing_capability | `knowledge.space.list` |
 | Knowledge | `capability:knowledge.space.search` | existing_capability | `knowledge.space.search` |
-| Local Integration | `rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}` | excluded | — |
-| Local Integration | `rest:POST:/api/v1/device-runtime/activate` | excluded | — |
-| Local Integration | `rest:POST:/api/v1/device-runtime/commands/lease` | excluded | — |
-| Local Integration | `rest:POST:/api/v1/device-runtime/commands/{command_gid}/complete` | excluded | — |
-| Local Integration | `rest:POST:/api/v1/device-runtime/heartbeat` | excluded | — |
-| Local Integration | `rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact` | excluded | — |
-| Local Integration | `capability:local.command.get` | existing_capability | `local.command.get` |
-| Local Integration | `rest:DELETE:/api/v1/devices/{device_gid}` | new_capability | `local.device.change.apply` |
-| Local Integration | `rest:POST:/api/v1/devices/enrollments` | new_capability | `local.device.change.apply` |
-| Local Integration | `rest:GET:/api/v1/devices` | new_capability | `local.device.read` |
-| Local Integration | `capability:vismockup.capture` | existing_capability | `vismockup.capture` |
-| Local Integration | `local_command:vismockup.capture` | existing_capability | `vismockup.capture` |
-| Local Integration | `capability:vismockup.highlight` | existing_capability | `vismockup.highlight` |
-| Local Integration | `local_command:vismockup.highlight` | existing_capability | `vismockup.highlight` |
-| Local Integration | `agent_tool:open_in_container` | existing_capability | `vismockup.launch` |
-| Local Integration | `capability:vismockup.launch` | existing_capability | `vismockup.launch` |
-| Local Integration | `local_command:vismockup.launch` | existing_capability | `vismockup.launch` |
-| Local Integration | `capability:vismockup.model.open` | existing_capability | `vismockup.model.open` |
-| Local Integration | `local_command:vismockup.model.open` | existing_capability | `vismockup.model.open` |
-| Local Integration | `capability:vismockup.status` | existing_capability | `vismockup.status` |
-| Local Integration | `local_command:vismockup.status` | existing_capability | `vismockup.status` |
-| Local Integration | `capability:vismockup.tree` | existing_capability | `vismockup.tree` |
-| Local Integration | `local_command:vismockup.tree` | existing_capability | `vismockup.tree` |
-| Local Integration | `capability:vismockup.visibility` | existing_capability | `vismockup.visibility` |
-| Local Integration | `local_command:vismockup.visibility` | existing_capability | `vismockup.visibility` |
+| Local Runtime | `rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}` | excluded | — |
+| Local Runtime | `rest:POST:/api/v1/device-runtime/activate` | excluded | — |
+| Local Runtime | `rest:POST:/api/v1/device-runtime/commands/lease` | excluded | — |
+| Local Runtime | `rest:POST:/api/v1/device-runtime/commands/{command_gid}/complete` | excluded | — |
+| Local Runtime | `rest:POST:/api/v1/device-runtime/heartbeat` | excluded | — |
+| Local Runtime | `rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact` | excluded | — |
+| Local Runtime | `capability:local.command.get` | existing_capability | `local.command.get` |
+| Local Runtime | `rest:DELETE:/api/v1/devices/{device_gid}` | new_capability | `local.device.change.apply` |
+| Local Runtime | `rest:POST:/api/v1/devices/enrollments` | new_capability | `local.device.change.apply` |
+| Local Runtime | `rest:GET:/api/v1/devices` | new_capability | `local.device.read` |
+| Local Runtime | `capability:vismockup.capture` | existing_capability | `vismockup.capture` |
+| Local Runtime | `local_command:vismockup.capture` | existing_capability | `vismockup.capture` |
+| Local Runtime | `capability:vismockup.highlight` | existing_capability | `vismockup.highlight` |
+| Local Runtime | `local_command:vismockup.highlight` | existing_capability | `vismockup.highlight` |
+| Local Runtime | `agent_tool:open_in_container` | existing_capability | `vismockup.launch` |
+| Local Runtime | `capability:vismockup.launch` | existing_capability | `vismockup.launch` |
+| Local Runtime | `local_command:vismockup.launch` | existing_capability | `vismockup.launch` |
+| Local Runtime | `capability:vismockup.model.open` | existing_capability | `vismockup.model.open` |
+| Local Runtime | `local_command:vismockup.model.open` | existing_capability | `vismockup.model.open` |
+| Local Runtime | `capability:vismockup.status` | existing_capability | `vismockup.status` |
+| Local Runtime | `local_command:vismockup.status` | existing_capability | `vismockup.status` |
+| Local Runtime | `capability:vismockup.tree` | existing_capability | `vismockup.tree` |
+| Local Runtime | `local_command:vismockup.tree` | existing_capability | `vismockup.tree` |
+| Local Runtime | `capability:vismockup.visibility` | existing_capability | `vismockup.visibility` |
+| Local Runtime | `local_command:vismockup.visibility` | existing_capability | `vismockup.visibility` |
 | Ontology | `rest:GET:/api/ontology/db-tables` | excluded | — |
 | Ontology | `capability:ontology.change.proposal.create` | existing_capability | `ontology.change.proposal.create` |
 | Ontology | `capability:ontology.change.proposal.get` | existing_capability | `ontology.change.proposal.get` |

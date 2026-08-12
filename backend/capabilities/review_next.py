@@ -6,7 +6,7 @@ from typing import Any
 from backend.knowledge.contracts import PROPOSAL_SCHEMA, proposal_ref
 from backend.knowledge.provider import register_capability
 from backend.knowledge.ids import new_knowledge_id
-from backend.capabilities.models_next import CapabilityBusinessError
+from backend.capability_v2.provider_contracts import CapabilityBusinessError
 
 def review_proposal(payload: dict[str, Any], context) -> dict[str, Any]:
     proposal_gid = str(payload.get("proposal_gid") or "").strip()

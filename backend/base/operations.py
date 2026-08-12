@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.capabilities.models_next import CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilitySpec
 from backend.domain_ports.operations import operations_registry
 
 from .provider import register_capability

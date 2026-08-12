@@ -51,6 +51,16 @@
 /backend/capability_v2/revision/digital_model_adapter.py @ai00/digital-model-maintainers
 /backend/db/migrations/202608100009_digital_model_snapshots.sql @ai00/digital-model-maintainers
 
+# Factory
+/plugins/factory/** @ai00/factory-maintainers
+/plugins/factory/migrations/** @ai00/factory-maintainers
+/backend/domain_ports/factory.py @ai00/factory-maintainers
+
+# Integration
+/plugins/integration/** @ai00/integration-maintainers
+/plugins/integration/migrations/** @ai00/integration-maintainers
+/backend/domain_ports/integration.py @ai00/integration-maintainers
+
 # Project Management (specific legacy rules must follow the broad Craft rule)
 /plugins/project_management/** @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/projects.py @ai00/project-management-maintainers
@@ -86,12 +96,12 @@
 /backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql @ai00/knowledge-maintainers
 /backend/db/migrations/202608060002_knowledge_revision_attribution.sql @ai00/knowledge-maintainers
 
-# Local Integration
-/plugins/device/** @ai00/local-integration-maintainers
-/local-runtime/** @ai00/local-integration-maintainers
-/backend/domain_ports/local_integration.py @ai00/local-integration-maintainers
-/backend/db/migrations/202608030004_device_control_plane.sql @ai00/local-integration-maintainers
-/backend/db/migrations/202608100011_device_operation_protocol_v2.sql @ai00/local-integration-maintainers
+# Local Runtime
+/plugins/device/** @ai00/local-runtime-maintainers
+/local-runtime/** @ai00/local-runtime-maintainers
+/backend/domain_ports/local_integration.py @ai00/local-runtime-maintainers
+/backend/db/migrations/202608030004_device_control_plane.sql @ai00/local-runtime-maintainers
+/backend/db/migrations/202608100011_device_operation_protocol_v2.sql @ai00/local-runtime-maintainers
 
 # Shared kernel and governance require platform review in addition to domain contract tests.
 /backend/capability_v2/** @ai00/base-maintainers

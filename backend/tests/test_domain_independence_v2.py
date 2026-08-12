@@ -7,6 +7,7 @@ from fnmatch import fnmatch
 from pathlib import Path
 
 from backend.governance import load_registry as load_runtime_domain_registry
+from backend.scripts import check_domain_dependencies as dependency_checker
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -19,22 +20,26 @@ EXPECTED_DOMAINS = {
     "Agent",
     "Craft",
     "Digital Model",
+    "Factory",
+    "Integration",
     "Project Management",
     "Simulation",
     "Ontology",
     "Knowledge",
-    "Local Integration",
+    "Local Runtime",
 }
 DOMAIN_SLUGS = {
     "Base Platform": "base",
     "Agent": "agent",
     "Craft": "craft",
     "Digital Model": "digital_model",
+    "Factory": "factory",
+    "Integration": "integration",
     "Project Management": "project_management",
     "Simulation": "simulation",
     "Ontology": "ontology",
     "Knowledge": "knowledge",
-    "Local Integration": "device",
+    "Local Runtime": "local_runtime",
 }
 
 
@@ -66,6 +71,31 @@ def test_owned_code_patterns_are_unique_and_project_management_overrides_craft_l
     project_patterns = set(document["domains"]["Project Management"]["code_paths"])
     assert "plugins/craft/craft_backend/routers/projects.py" in project_patterns
     assert "plugins/craft/craft_backend/routers/workbench_home.py" in project_patterns
+
+
+def test_factory_and_integration_reserve_unique_foundation_paths():
+    document = _ownership()
+    expected = {
+        "Factory": {
+            "code_paths": "plugins/factory/**",
+            "migration_paths": "plugins/factory/migrations/**",
+            "provider_paths": "plugins/factory/factory_backend/capabilities/**",
+            "test_paths": "plugins/factory/tests/**",
+            "documentation_paths": "docs/capabilities/factory/**",
+        },
+        "Integration": {
+            "code_paths": "plugins/integration/**",
+            "migration_paths": "plugins/integration/migrations/**",
+            "provider_paths": "plugins/integration/integration_backend/capabilities/**",
+            "test_paths": "plugins/integration/tests/**",
+            "documentation_paths": "docs/capabilities/integration/**",
+        },
+    }
+
+    for domain_name, paths in expected.items():
+        descriptor = document["domains"][domain_name]
+        for field, path in paths.items():
+            assert path in descriptor[field], (domain_name, field, path)
 
 
 def test_every_versioned_migration_has_exactly_one_domain_owner():
@@ -120,6 +150,77 @@ def test_dependency_baseline_is_exact_and_checker_rejects_new_violations():
         check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_dependency_checker_rejects_private_cross_domain_imports(tmp_path, monkeypatch):
+    source = tmp_path / "plugins" / "craft" / "consumer.py"
+    target = (
+        tmp_path
+        / "plugins"
+        / "factory"
+        / "factory_backend"
+        / "infrastructure"
+        / "database.py"
+    )
+    source.parent.mkdir(parents=True)
+    target.parent.mkdir(parents=True)
+    source.write_text(
+        "import plugins.factory.factory_backend.infrastructure.database\n",
+        encoding="utf-8",
+    )
+    target.write_text("DATABASE = object()\n", encoding="utf-8")
+    ownership = {
+        "shared_import_prefixes": [
+            "backend.capability_v2",
+            "backend.contracts",
+            "backend.domain_ports",
+            "backend.platform_sdk",
+        ],
+        "domains": {
+            "Craft": {
+                "module_prefixes": ["plugins.craft"],
+                "code_paths": ["plugins/craft/**"],
+            },
+            "Factory": {
+                "module_prefixes": ["plugins.factory.factory_backend"],
+                "code_paths": ["plugins/factory/**"],
+            },
+        },
+    }
+    monkeypatch.setattr(dependency_checker, "REPOSITORY_ROOT", tmp_path)
+
+    violations, errors = dependency_checker.discover_violations(ownership)
+
+    assert errors == []
+    assert [(row["source_domain"], row["target_domain"]) for row in violations] == [
+        ("Craft", "Factory")
+    ]
+
+
+def test_dependency_checker_allows_shared_domain_ports(tmp_path, monkeypatch):
+    source = tmp_path / "plugins" / "craft" / "consumer.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("import backend.domain_ports.factory\n", encoding="utf-8")
+    ownership = {
+        "shared_import_prefixes": [
+            "backend.capability_v2",
+            "backend.contracts",
+            "backend.domain_ports",
+            "backend.platform_sdk",
+        ],
+        "domains": {
+            "Craft": {
+                "module_prefixes": ["plugins.craft"],
+                "code_paths": ["plugins/craft/**"],
+            }
+        },
+    }
+    monkeypatch.setattr(dependency_checker, "REPOSITORY_ROOT", tmp_path)
+
+    violations, errors = dependency_checker.discover_violations(ownership)
+
+    assert errors == []
+    assert violations == []
 
 
 def test_codeowners_names_every_domain_maintainer_group():

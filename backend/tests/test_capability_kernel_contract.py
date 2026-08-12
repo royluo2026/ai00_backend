@@ -1,8 +1,10 @@
 import asyncio
 import unittest
+from pathlib import Path
 
-from backend.capabilities import models_next
-from backend.capabilities.models_next import CapabilityContext, CapabilitySpec
+from backend.capability_v2 import provider_contracts as models_next
+from backend.capability_v2.bootstrap import build_capability_registry
+from backend.capability_v2.provider_contracts import CapabilityContext, CapabilitySpec
 from backend.capabilities.registry_next import CapabilityRegistry
 
 
@@ -26,10 +28,12 @@ class CapabilityKernelContractTests(unittest.TestCase):
             "simulation": "simulation",
             "vismockup": "local_integration",
         }
-        for spec in __import__(
-            "backend.capabilities.registry_next",
-            fromlist=["capability_registry"],
-        ).capability_registry.list():
+        repository_root = Path(__file__).resolve().parents[2]
+        registry = build_capability_registry(
+            repository_root,
+            repository_root / "backend/capability_v2/official_domains.json",
+        )
+        for spec in registry.list():
             expected_owner = (
                 "project_management"
                 if spec.id.startswith("base.project.")

@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import Any
 
-from backend.capabilities.models_next import CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.capability_v2.provider_contracts import CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from ..services.execution_structure import _normalize, repository
 
 
