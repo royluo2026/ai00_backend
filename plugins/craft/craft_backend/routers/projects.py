@@ -45,6 +45,15 @@ _PROJECT_WRITE = require_role("super_admin", "team_admin", "project_admin")
 _ADMIN = require_role("super_admin", "team_admin")
 
 
+def _row_to_project(row: dict) -> dict:
+    """Legacy serialization shim retained for compatibility tests and callers."""
+    result = dict(row)
+    for field in ("created_at", "updated_at", "deleted_at", "archived_at"):
+        if result.get(field) is not None:
+            result[field] = str(result[field])
+    return result
+
+
 async def _invoke_project(request, user, principal, gateway, operation, arguments, *, write=False):
     request_id = request.headers.get("X-Request-ID") or f"project_{uuid4().hex}"
     result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
