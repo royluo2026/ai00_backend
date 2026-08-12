@@ -15,6 +15,7 @@ FACTORY_CAPABILITY_IDS = (
     "factory.asset.register", "factory.asset.get", "factory.asset.search",
     "factory.asset.update", "factory.asset.maintenance.start",
     "factory.asset.maintenance.complete", "factory.asset.scrap",
+    "factory.resource.read",
 )
 
 

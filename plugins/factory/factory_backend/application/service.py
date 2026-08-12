@@ -33,6 +33,17 @@ class FactoryApplication:
         data["tenant_gid"] = tenant_gid
         repo = self.repository
 
+        if capability_id == "factory.resource.read":
+            self._required(data, "resource_ref")
+            parts = str(data["resource_ref"]).split(":", 2)
+            if len(parts) != 3 or parts[0] != "factory":
+                raise CapabilityBusinessError("invalid_input", "Factory resource_ref must be factory:<kind>:<gid>")
+            kind, gid = parts[1], parts[2]
+            row = repo.asset_get(gid, tenant_gid) if kind == "asset" else repo.structure_get(gid, tenant_gid)
+            if not row:
+                raise CapabilityBusinessError("resource_not_found", "Factory resource was not found")
+            return {"resource_ref": data["resource_ref"], "version": row.get("version", 1), "kind": kind, "gid": gid}
+
         if capability_id == "factory.structure.create":
             self._required(data, "kind", "name"); return repo.structure_create(data)
         if capability_id == "factory.structure.get":

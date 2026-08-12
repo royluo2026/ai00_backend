@@ -1,5 +1,14 @@
 {
   "schema_version": 1,
-  "sync": [],
+  "sync": [
+    {
+      "path_id": "craft-factory-resource-binding",
+      "caller": "craft",
+      "callee": "factory",
+      "contract": "factory.resource.read@1",
+      "source_modules": ["plugins/craft/craft_backend/infrastructure/domain_clients.py"],
+      "test_node": "plugins/craft/tests/test_bop_domain_sharing.py::test_bop_binding_uses_gateway"
+    }
+  ],
   "async": []
 }

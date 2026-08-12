@@ -5,6 +5,7 @@ INPUT_SCHEMA = {
     "additionalProperties": True,
     "properties": {
         "gid": {"type": "string"},
+        "resource_ref": {"type": "string"},
         "expected_version": {"type": "integer", "minimum": 1},
         "expected_revision": {"type": "integer", "minimum": 1},
     },
@@ -15,4 +16,3 @@ OUTPUT_SCHEMA = {
     "required": ["data"],
     "properties": {"data": {}},
 }
-
