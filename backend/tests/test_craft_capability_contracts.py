@@ -23,8 +23,16 @@ STABLE_CAPABILITIES = {
     "craft.gbop.item.search",
     "craft.gbop.item.usage.get",
     "craft.pbom.part.search",
-    "craft.pbom.snapshot.compare",
-    "craft.pbom.snapshot.get",
+    "craft.pbom.draft.change.apply",
+    "craft.pbom.draft.change.preview",
+    "craft.pbom.import.preview",
+    "craft.pbom.version.archive",
+    "craft.pbom.version.compare",
+    "craft.pbom.version.create",
+    "craft.pbom.version.get",
+    "craft.pbom.version.publish",
+    "craft.pbom.version.search",
+    "craft.pbom.version.submit",
 }
 
 
@@ -67,6 +75,11 @@ def test_craft_write_and_revision_contracts_are_governed():
         "craft.bop.draft.change.apply",
         "craft.bop.version.archive",
         "craft.bop.version.create",
+        "craft.pbom.draft.change.apply",
+        "craft.pbom.version.archive",
+        "craft.pbom.version.create",
+        "craft.pbom.version.publish",
+        "craft.pbom.version.submit",
     }
     expected_revision = {
         "craft.bop.draft.change.preview": "expected_revision",
@@ -92,7 +105,7 @@ def test_craft_contracts_publish_stable_resource_selectors():
     selected = {
         "craft.bop.version.get": ("craft-bop-version", "version_gid"),
         "craft.bop.version.archive": ("craft-bop-version", "version_gid"),
-        "craft.pbom.snapshot.get": ("craft-pbom-snapshot", "snapshot_gid"),
+        "craft.pbom.version.get": ("craft-pbom-version", "version_gid"),
         "craft.gbop.item.usage.get": ("craft-gbop-item", "item_gid"),
     }
 

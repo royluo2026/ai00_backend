@@ -183,5 +183,33 @@ OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
     ),
 }
 
+INPUT_SCHEMAS.update({
+    "craft.pbom.version.create": _object(_fields("project_ref", "version_tag", "knowledge_revision_ref", "ontology_release_ref", "revision_commit_ref"), required=("project_ref", "version_tag")),
+    "craft.pbom.version.get": _object({"version_gid": STRING}, required=("version_gid",)),
+    "craft.pbom.version.search": _object(_fields("project_ref", "limit")),
+    "craft.pbom.version.submit": _object({"version_gid": STRING}, required=("version_gid",)),
+    "craft.pbom.version.publish": _object({"version_gid": STRING}, required=("version_gid",)),
+    "craft.pbom.version.archive": _object({"version_gid": STRING}, required=("version_gid",)),
+    "craft.pbom.version.compare": _object({"from_version_gid": STRING, "to_version_gid": STRING}, required=("from_version_gid", "to_version_gid")),
+    "craft.pbom.draft.change.preview": _object(_fields("version_gid", "changes"), required=("version_gid", "changes")),
+    "craft.pbom.draft.change.apply": _object(_fields("version_gid", "preview_gid", "changes"), required=("version_gid", "preview_gid", "changes")),
+    "craft.pbom.part.search": _object(_fields("version_gid", "query", "limit"), required=("version_gid",)),
+    "craft.pbom.import.preview": _object({"document": {}}, required=("document",)),
+})
+
+OUTPUT_SCHEMAS.update({
+    "craft.pbom.version.create": _object(_fields("gid", "project_ref", "version_tag", "status", "revision"), required=("gid", "status", "revision")),
+    "craft.pbom.version.get": _object(_fields("gid", "project_ref", "version_tag", "status", "revision"), required=("gid", "status", "revision")),
+    "craft.pbom.version.search": _object({"items": ARRAY}, required=("items",)),
+    "craft.pbom.version.submit": _object(_fields("gid", "status", "revision"), required=("gid", "status", "revision")),
+    "craft.pbom.version.publish": _object(_fields("gid", "status", "revision"), required=("gid", "status", "revision")),
+    "craft.pbom.version.archive": _object(_fields("gid", "status", "revision"), required=("gid", "status", "revision")),
+    "craft.pbom.version.compare": _object(_fields("added", "removed", "changed"), required=("added", "removed", "changed")),
+    "craft.pbom.draft.change.preview": _object(_fields("preview_gid", "version_gid", "changes"), required=("preview_gid", "version_gid", "changes")),
+    "craft.pbom.draft.change.apply": _object(_fields("version_gid", "applied", "results"), required=("version_gid", "applied", "results")),
+    "craft.pbom.part.search": _object(_fields("version_gid", "items"), required=("version_gid", "items")),
+    "craft.pbom.import.preview": _object(_fields("import_preview_gid", "content_sha256", "part_count"), required=("import_preview_gid", "content_sha256", "part_count")),
+})
+
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

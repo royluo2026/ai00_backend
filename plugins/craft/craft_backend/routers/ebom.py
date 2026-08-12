@@ -1,18 +1,12 @@
 """
-backend/routers/ebom.py
+Native PBOM HTTP transport (legacy module filename retained until route-loader cutover).
 ─────────────────────────
 PBOM API（pbom_versions / pbom）
 
 端点：
-  GET  /api/ebom/snapshots                      → 版本列表（按项目过滤）
-  POST /api/ebom/snapshots                      → 创建版本
-  GET  /api/ebom/snapshots/{gid}                → 版本详情
-  DELETE /api/ebom/snapshots/{gid}              → 删除版本
-  GET  /api/ebom/snapshots/{gid}/parts          → 零件列表
-  POST /api/ebom/snapshots/{gid}/parts          → 添加零件
-  POST /api/ebom/snapshots/{gid}/parts/batch    → 批量添加零件
-  PATCH /api/ebom/parts/{gid}                   → 更新零件
-  DELETE /api/ebom/parts/{gid}                  → 删除零件
+  GET/POST /api/pbom/versions                    → 版本查询/创建
+  GET/DELETE /api/pbom/versions/{gid}            → 版本详情/归档
+  GET/POST /api/pbom/versions/{gid}/parts        → 零件查询/变更
 """
 from typing import Optional, List
 
@@ -23,7 +17,9 @@ from ..data.connection import get_conn
 from backend.platform_sdk.auth import get_current_user, require_role
 from backend.platform_sdk.ids import next_gid
 
-router = APIRouter(prefix="/api/ebom", tags=["ebom"])
+# Compatibility path stays mounted until the production consumer-cutover task;
+# all native Provider contracts use PBOM naming now.
+router = APIRouter(prefix="/api/ebom", tags=["pbom"])
 _log = __import__('logging').getLogger(__name__)
 
 _READ = require_role("super_admin", "team_admin", "project_admin",
@@ -550,7 +546,7 @@ def vpps_check(
                 )
                 ignored_rule4_gids: set = {r["pbom_row_gid"] for r in cur.fetchall()}
             except Exception:
-                _log.warning("ebom export: 查询 rule4_bulk_ignore 失败", exc_info=True)
+                _log.warning("pbom export: 查询 rule4_bulk_ignore 失败", exc_info=True)
                 ignored_rule4_gids = set()
 
     # ── 主数据索引 ─────────────────────────────────────────────────

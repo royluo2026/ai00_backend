@@ -22,8 +22,8 @@ def test_approved_compare_pbom_gbop_ids_are_registered():
     ids = {spec.id for spec in _registry().list()}
     assert {
         "craft.bop.version.compare",
-        "craft.pbom.snapshot.get",
-        "craft.pbom.snapshot.compare",
+        "craft.pbom.version.get",
+        "craft.pbom.version.compare",
         "craft.pbom.part.search",
         "craft.gbop.item.search",
         "craft.gbop.item.usage.get",
