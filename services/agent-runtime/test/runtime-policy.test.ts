@@ -19,7 +19,12 @@ test("session state is authenticated encryption", () => {
   const encoded = seal({ messages: ["private"] }, key);
   assert.equal(encoded.includes("private"), false);
   assert.deepEqual(open(encoded, key), { messages: ["private"] });
-  assert.throws(() => open(encoded.slice(0, -1) + "x", key));
+  const [version, iv, tag, data] = encoded.split(".");
+  assert.ok(version && iv && tag && data);
+  const ciphertext = Buffer.from(data, "base64url");
+  ciphertext.writeUInt8(ciphertext.readUInt8(0) ^ 1, 0);
+  const tampered = [version, iv, tag, ciphertext.toString("base64url")].join(".");
+  assert.throws(() => open(tampered, key));
 });
 test("delegated invocation preserves CapabilityResult", async () => {
   const originalFetch = globalThis.fetch;
