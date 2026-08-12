@@ -185,7 +185,7 @@ git commit -m "feat: enforce capability v2 three-goal completion"
 - Consumes: frozen Base candidate/exposure rows and Foundation Provider/Database contracts.
 - Produces: Base Descriptors and Provider for Tenant, Approval, Notification, Workspace, Plugin Platform and System search/lineage/impact; Base-owned event projections used by later domains. It produces no external-datasource or mapping business implementation.
 
-- [ ] **Step 1: Write failing Base completeness and isolation tests**
+- [x] **Step 1: Write failing Base completeness and isolation tests**
 
 ```python
 def test_base_provider_matches_frozen_review(frozen_review):
@@ -199,13 +199,13 @@ def test_base_runtime_grant_cannot_read_knowledge(base_runtime_db):
     )
 ```
 
-- [ ] **Step 2: Run the focused tests and capture failures**
+- [x] **Step 2: Run the focused tests and capture failures**
 
 Run: `python -m pytest backend/tests/test_base_capability_contracts.py backend/tests/test_plugin_platform_next.py backend/tests/test_system_shared_capabilities.py -q`
 
 Expected: FAIL on missing frozen Base outcomes and direct access to non-Base tables.
 
-- [ ] **Step 3: Implement Base vertical slices**
+- [x] **Step 3: Implement Base vertical slices**
 
 Keep domain state in `ai00_base`; use the Base runtime connection only. Implement pending Approval lookup by `subject_ref`, idempotent per-approval cancellation with expected pending state, Notification, Workspace, Plugin installation/grant/revoke and manifest-driven `system.search`. Remove health, echo, retry, deployment callbacks, monthly-close operations and transport pseudo-capabilities from business Descriptors.
 
@@ -219,17 +219,17 @@ def register_capabilities(registry: CapabilityRegistry) -> None:
     register_system_shared_capabilities(registry)
 ```
 
-- [ ] **Step 4: Prove Plugin discovery and denial use Catalog + Gateway**
+- [x] **Step 4: Prove Plugin discovery and denial use Catalog + Gateway**
 
 Add E2E tests that install a real test plugin, discover its allowed Catalog subset, invoke one permitted Base Capability, reject one ungranted Capability and match both results to audit records. Assert the plugin adapter imports no Base application or repository module.
 
-- [ ] **Step 5: Run Base, Plugin and database tests**
+- [x] **Step 5: Run Base, Plugin and database tests**
 
 Run: `python -m pytest backend/tests/test_base_capability_contracts.py backend/tests/test_plugin_platform_next.py backend/tests/test_plugin_authority_boundary.py backend/tests/test_domain_database_config.py -q`
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit domain code, then serially freeze central artifacts**
+- [x] **Step 6: Commit domain code, then serially freeze central artifacts**
 
 ```powershell
 git add -- backend/base backend/plugin_platform backend/db/migrations/domains/base backend/tests/test_base_capability_contracts.py backend/tests/test_plugin_platform_next.py backend/tests/test_system_shared_capabilities.py
