@@ -147,10 +147,11 @@ def _require(key: str) -> str:
 
 
 def _configured_users_db_url() -> str:
-    """Resolve the base-domain database without bypassing deployment isolation.
+    """Resolve the legacy shared database without bypassing deployment isolation.
 
     An explicit ENV_FILE is an immutable deployment boundary. Desktop-saved
     settings remain a legacy convenience only when no deployment file is used.
+    New domain-owned database configuration never falls back to this value.
     """
     if _env_file:
         return _require("USERS_DB_URL")
