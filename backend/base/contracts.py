@@ -40,6 +40,21 @@ APPROVAL_ITEM = _object(
         "decision_reason", "decided_by", "created_at", "updated_at",
     ),
 )
+NOTIFICATION_ITEM = _object(
+    {
+        "notification_id": STRING, "subject_ref": STRING, "payload": {},
+        "read_at": {"anyOf": [STRING, {"type": "null"}]}, "created_at": STRING,
+    },
+    ("notification_id", "subject_ref", "payload", "read_at", "created_at"),
+)
+PREFERENCES = _object({"version": INTEGER, "preferences": {}}, ("version", "preferences"))
+WORKSPACE_TEMPLATE = _object(
+    {
+        "template_id": STRING, "version": INTEGER, "template": {},
+        "publisher_gid": STRING, "published_at": STRING,
+    },
+    ("template_id", "version", "template", "publisher_gid", "published_at"),
+)
 
 REVIEWED_READ_CAPABILITIES = {
     "base.annotation.read",
@@ -150,6 +165,22 @@ INPUT_SCHEMAS = {
         {"approval_id": STRING, "expected_state": STRING},
         ("approval_id", "expected_state"),
     ),
+    "base.notification.search": _object({}),
+    "base.notification.read_state.set": _object(
+        {"notification_id": STRING, "read": BOOLEAN}, ("notification_id", "read")
+    ),
+    "base.notification.preference.get": _object({}),
+    "base.notification.preference.update": _object(
+        {"expected_version": INTEGER, "preferences": {}},
+        ("expected_version", "preferences"),
+    ),
+    "base.workspace.template.read": _object(
+        {"template_id": STRING, "version": INTEGER}, ("template_id",)
+    ),
+    "base.workspace.template.publish": _object(
+        {"template_id": STRING, "expected_version": INTEGER, "template": {}},
+        ("template_id", "expected_version", "template"),
+    ),
 }
 
 OUTPUT_SCHEMAS = {
@@ -195,6 +226,14 @@ OUTPUT_SCHEMAS = {
     ),
     "base.approval.request.decide": APPROVAL_ITEM,
     "base.approval.request.cancel": APPROVAL_ITEM,
+    "base.notification.search": _object(
+        {"items": {"type": "array", "items": NOTIFICATION_ITEM}}, ("items",)
+    ),
+    "base.notification.read_state.set": NOTIFICATION_ITEM,
+    "base.notification.preference.get": PREFERENCES,
+    "base.notification.preference.update": PREFERENCES,
+    "base.workspace.template.read": WORKSPACE_TEMPLATE,
+    "base.workspace.template.publish": WORKSPACE_TEMPLATE,
 }
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

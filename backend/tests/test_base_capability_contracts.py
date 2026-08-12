@@ -8,6 +8,7 @@ from backend.capabilities.models_next import CapabilityContext
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.base.official_provider import register_capabilities
 from backend.base.approval import APPROVAL_CAPABILITY_IDS
+from backend.base.collaboration import COLLABORATION_CAPABILITY_IDS
 from backend.base.operations import worker_health
 from backend.plugin_platform.storage import _identity
 from backend.domain_ports.operations import operations_registry
@@ -24,7 +25,9 @@ from backend.tests.capability_completion_support import (
 
 ROOT = Path(__file__).resolve().parents[2]
 STABLE_CAPABILITIES = (
-    FrozenCoverageReview(ROOT).capability_ids("base") | APPROVAL_CAPABILITY_IDS
+    FrozenCoverageReview(ROOT).capability_ids("base")
+    | APPROVAL_CAPABILITY_IDS
+    | COLLABORATION_CAPABILITY_IDS
 )
 
 
@@ -33,6 +36,7 @@ def test_base_provider_matches_corrected_frozen_review():
     expected = (
         FrozenCoverageReview(root).capability_ids("base")
         | APPROVAL_CAPABILITY_IDS
+        | COLLABORATION_CAPABILITY_IDS
     )
 
     actual = registered_descriptor_ids("backend.base.official_provider")

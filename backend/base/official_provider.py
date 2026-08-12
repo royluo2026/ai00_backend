@@ -8,6 +8,7 @@ from backend.capabilities.system_shared_next import register_system_shared_capab
 from backend.plugin_platform.storage import register_plugin_storage_capabilities
 from backend.base.reviewed_capabilities import register_reviewed_base_capabilities
 from backend.base.approval import register_approval_capabilities
+from backend.base.collaboration import register_collaboration_capabilities
 
 def register_capabilities(registry: Any) -> None:
     register_system_shared_capabilities(registry)
@@ -17,6 +18,7 @@ def register_capabilities(registry: Any) -> None:
     register_plugin_storage_capabilities(registry)
     register_reviewed_base_capabilities(registry)
     register_approval_capabilities(registry)
+    register_collaboration_capabilities(registry)
 
 
 __all__ = ["register_capabilities"]

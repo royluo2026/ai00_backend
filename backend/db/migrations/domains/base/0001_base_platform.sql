@@ -30,6 +30,15 @@ CREATE TABLE IF NOT EXISTS workmanship_base_notifications (
     KEY idx_base_notification_recipient (tenant_gid, recipient_gid, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS workmanship_base_notification_preferences (
+    tenant_gid VARCHAR(64) NOT NULL,
+    user_gid VARCHAR(64) NOT NULL,
+    version BIGINT NOT NULL,
+    preferences_json JSON NOT NULL,
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (tenant_gid, user_gid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS workmanship_base_workspace_templates (
     tenant_gid VARCHAR(64) NOT NULL,
     template_id VARCHAR(64) NOT NULL,
