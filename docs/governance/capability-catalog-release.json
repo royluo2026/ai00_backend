@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_96e6828af0498b4b3e281c0d7c701a5e",
-  "catalog_hash": "sha256:96e6828af0498b4b3e281c0d7c701a5e8c222fa4989aebf95ea8c1b35ac28d7a",
+  "release_id": "rel_5e26bcbacb0f06d12462a7ecb7df592a",
+  "catalog_hash": "sha256:5e26bcbacb0f06d12462a7ecb7df592a7c22071b6b54c976c0695803a6fb0e34",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -3352,7 +3352,7 @@
       "title": "base.annotation.change.apply",
       "description": "Execute the reviewed base.annotation.change.apply Base outcome.",
       "use_when": "Execute the reviewed base.annotation.change.apply Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -3484,7 +3484,7 @@
       "title": "base.annotation.read",
       "description": "Execute the reviewed base.annotation.read Base outcome.",
       "use_when": "Execute the reviewed base.annotation.read Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -3616,7 +3616,7 @@
       "title": "base.approval.request.cancel",
       "description": "Execute base.approval.request.cancel in the Base Approval service.",
       "use_when": "Execute base.approval.request.cancel in the Base Approval service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -3870,7 +3870,7 @@
       "title": "base.approval.request.create",
       "description": "Execute base.approval.request.create in the Base Approval service.",
       "use_when": "Execute base.approval.request.create in the Base Approval service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -4143,7 +4143,7 @@
       "title": "base.approval.request.decide",
       "description": "Execute base.approval.request.decide in the Base Approval service.",
       "use_when": "Execute base.approval.request.decide in the Base Approval service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -4405,7 +4405,7 @@
       "title": "base.approval.request.get",
       "description": "Execute base.approval.request.get in the Base Approval service.",
       "use_when": "Execute base.approval.request.get in the Base Approval service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -4655,7 +4655,7 @@
       "title": "base.approval.request.search",
       "description": "Execute base.approval.request.search in the Base Approval service.",
       "use_when": "Execute base.approval.request.search in the Base Approval service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -4929,7 +4929,7 @@
       "title": "base.authorization.grant.change.apply",
       "description": "Execute the reviewed base.authorization.grant.change.apply Base outcome.",
       "use_when": "Execute the reviewed base.authorization.grant.change.apply Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -5061,7 +5061,7 @@
       "title": "base.authorization.grant.read",
       "description": "Execute the reviewed base.authorization.grant.read Base outcome.",
       "use_when": "Execute the reviewed base.authorization.grant.read Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -5193,7 +5193,7 @@
       "title": "base.export_template.change.apply",
       "description": "Execute the reviewed base.export_template.change.apply Base outcome.",
       "use_when": "Execute the reviewed base.export_template.change.apply Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -5325,7 +5325,7 @@
       "title": "base.export_template.read",
       "description": "Execute the reviewed base.export_template.read Base outcome.",
       "use_when": "Execute the reviewed base.export_template.read Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -5457,7 +5457,7 @@
       "title": "base.identity.directory.sync",
       "description": "Execute the reviewed base.identity.directory.sync Base outcome.",
       "use_when": "Execute the reviewed base.identity.directory.sync Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -5589,7 +5589,7 @@
       "title": "base.identity.role.assign",
       "description": "Execute the reviewed base.identity.role.assign Base outcome.",
       "use_when": "Execute the reviewed base.identity.role.assign Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -5721,7 +5721,7 @@
       "title": "base.identity.session.get",
       "description": "Execute the reviewed base.identity.session.get Base outcome.",
       "use_when": "Execute the reviewed base.identity.session.get Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -5853,7 +5853,7 @@
       "title": "base.notification.preference.get",
       "description": "Execute base.notification.preference.get in the Base collaboration service.",
       "use_when": "Execute base.notification.preference.get in the Base collaboration service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -5978,7 +5978,7 @@
       "title": "base.notification.preference.update",
       "description": "Execute base.notification.preference.update in the Base collaboration service.",
       "use_when": "Execute base.notification.preference.update in the Base collaboration service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -6116,7 +6116,7 @@
       "title": "base.notification.read_state.set",
       "description": "Execute base.notification.read_state.set in the Base collaboration service.",
       "use_when": "Execute base.notification.read_state.set in the Base collaboration service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -6290,7 +6290,7 @@
       "title": "base.notification.search",
       "description": "Execute base.notification.search in the Base collaboration service.",
       "use_when": "Execute base.notification.search in the Base collaboration service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -6477,7 +6477,7 @@
       "title": "base.plugin.marketplace.publisher.register",
       "description": "Execute the reviewed base.plugin.marketplace.publisher.register Base outcome.",
       "use_when": "Execute the reviewed base.plugin.marketplace.publisher.register Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -6609,7 +6609,7 @@
       "title": "base.plugin.marketplace.release.change.apply",
       "description": "Execute the reviewed base.plugin.marketplace.release.change.apply Base outcome.",
       "use_when": "Execute the reviewed base.plugin.marketplace.release.change.apply Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -6741,7 +6741,7 @@
       "title": "base.plugin.marketplace.search",
       "description": "Execute the reviewed base.plugin.marketplace.search Base outcome.",
       "use_when": "Execute the reviewed base.plugin.marketplace.search Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -7061,7 +7061,7 @@
       "title": "base.saved_view.change.apply",
       "description": "Execute the reviewed base.saved_view.change.apply Base outcome.",
       "use_when": "Execute the reviewed base.saved_view.change.apply Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -7193,7 +7193,7 @@
       "title": "base.saved_view.read",
       "description": "Execute the reviewed base.saved_view.read Base outcome.",
       "use_when": "Execute the reviewed base.saved_view.read Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -7325,7 +7325,7 @@
       "title": "base.team.change.apply",
       "description": "Execute the reviewed base.team.change.apply Base outcome.",
       "use_when": "Execute the reviewed base.team.change.apply Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -7457,7 +7457,7 @@
       "title": "base.team.membership.change.apply",
       "description": "Execute the reviewed base.team.membership.change.apply Base outcome.",
       "use_when": "Execute the reviewed base.team.membership.change.apply Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -7589,7 +7589,7 @@
       "title": "base.team.read",
       "description": "Execute the reviewed base.team.read Base outcome.",
       "use_when": "Execute the reviewed base.team.read Base outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -7721,7 +7721,7 @@
       "title": "base.workspace.template.publish",
       "description": "Execute base.workspace.template.publish in the Base collaboration service.",
       "use_when": "Execute base.workspace.template.publish in the Base collaboration service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -7887,7 +7887,7 @@
       "title": "base.workspace.template.read",
       "description": "Execute base.workspace.template.read in the Base collaboration service.",
       "use_when": "Execute base.workspace.template.read in the Base collaboration service.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -8046,7 +8046,7 @@
       "title": "craft.bop.draft.change.apply",
       "description": "Apply one exact typed BOP draft preview atomically.",
       "use_when": "Apply one exact typed BOP draft preview atomically.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -8286,7 +8286,7 @@
       "title": "craft.bop.draft.change.preview",
       "description": "Preview a typed BOP draft change without side effects.",
       "use_when": "Preview a typed BOP draft change without side effects.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -9135,7 +9135,7 @@
       "title": "craft.bop.import.preview",
       "description": "Parse and hash a BOP import document without mutating Craft state.",
       "use_when": "Parse and hash a BOP import document without mutating Craft state.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -10117,7 +10117,7 @@
       "title": "craft.bop.version.archive",
       "description": "Archive a BOP version without deleting its snapshot or references.",
       "use_when": "Archive a BOP version without deleting its snapshot or references.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -10604,7 +10604,7 @@
       "title": "craft.bop.version.create",
       "description": "Create a BOP draft from an empty, version, template or import preview source.",
       "use_when": "Create a BOP draft from an empty, version, template or import preview source.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -21561,7 +21561,7 @@
       "title": "digital_model.component.search",
       "description": "Search components in an immutable Digital Model snapshot.",
       "use_when": "Search components in an immutable Digital Model snapshot.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -21812,7 +21812,7 @@
       "title": "digital_model.model.create",
       "description": "Create a governed Digital Model identity.",
       "use_when": "Create a governed Digital Model identity.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -21978,7 +21978,7 @@
       "title": "digital_model.model.get",
       "description": "Read a governed Digital Model identity.",
       "use_when": "Read a governed Digital Model identity.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -22140,7 +22140,7 @@
       "title": "digital_model.model.search",
       "description": "Search visible Digital Model identities.",
       "use_when": "Search visible Digital Model identities.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -22339,7 +22339,7 @@
       "title": "digital_model.version.compare",
       "description": "Compare Digital Model Versions semantically.",
       "use_when": "Compare Digital Model Versions semantically.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -22515,7 +22515,7 @@
       "title": "digital_model.version.create",
       "description": "Create an immutable artifact-backed Digital Model snapshot.",
       "use_when": "Create an immutable artifact-backed Digital Model snapshot.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -22838,7 +22838,7 @@
       "title": "digital_model.version.get",
       "description": "Read an immutable Digital Model Version.",
       "use_when": "Read an immutable Digital Model Version.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -23175,7 +23175,7 @@
       "title": "digital_model.version.search",
       "description": "Search immutable Digital Model Versions.",
       "use_when": "Search immutable Digital Model Versions.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -30973,7 +30973,7 @@
       "title": "knowledge.get",
       "description": "读取当前用户有权访问的知识条目及 Markdown 正文.",
       "use_when": "读取当前用户有权访问的知识条目及 Markdown 正文.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -31327,7 +31327,7 @@
       "title": "knowledge.migration.status",
       "description": "Inspect tenant-safe legacy Markdown migration readiness and audited runs.",
       "use_when": "Inspect tenant-safe legacy Markdown migration readiness and audited runs.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -32229,7 +32229,7 @@
       "title": "knowledge.proposal.get",
       "description": "获取一份知识提案的完整 Markdown 和审核状态。",
       "use_when": "获取一份知识提案的完整 Markdown 和审核状态。",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -32623,7 +32623,7 @@
       "title": "knowledge.proposal.list",
       "description": "列出当前管理员可审核的知识提案。",
       "use_when": "列出当前管理员可审核的知识提案。",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -33055,7 +33055,7 @@
       "title": "knowledge.proposal.outbox.list",
       "description": "查看当前用户或团队可见的知识发布补偿队列。",
       "use_when": "查看当前用户或团队可见的知识发布补偿队列。",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -33390,7 +33390,7 @@
       "title": "knowledge.proposal.outbox.retry",
       "description": "重试一个 OIS 知识发布补偿任务，幂等创建正式知识条目。",
       "use_when": "重试一个 OIS 知识发布补偿任务，幂等创建正式知识条目。",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -33698,7 +33698,7 @@
       "title": "knowledge.proposal.review",
       "description": "审核知识提案；通过后将 Markdown 写入 OIS 并生成正式知识条目。",
       "use_when": "审核知识提案；通过后将 Markdown 写入 OIS 并生成正式知识条目。",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -34104,7 +34104,7 @@
       "title": "knowledge.propose",
       "description": "提交一份待评审的 Markdown 知识提案，不直接修改正式知识库。",
       "use_when": "提交一份待评审的 Markdown 知识提案，不直接修改正式知识库。",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -34723,7 +34723,7 @@
       "title": "knowledge.search",
       "description": "按标题、Markdown 正文和标签搜索知识条目.",
       "use_when": "按标题、Markdown 正文和标签搜索知识条目.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -35824,7 +35824,7 @@
       "title": "local.command.get",
       "description": "Read an owned local operation outcome.",
       "use_when": "Read an owned local operation outcome.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -41289,7 +41289,7 @@
       "title": "plugin.disable",
       "description": "Disable an installed plugin.",
       "use_when": "Disable an installed plugin.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -41431,7 +41431,7 @@
       "title": "plugin.enable",
       "description": "Enable an installed plugin.",
       "use_when": "Enable an installed plugin.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -41573,7 +41573,7 @@
       "title": "plugin.install",
       "description": "Install a platform-signed release in disabled state.",
       "use_when": "Install a platform-signed release in disabled state.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -41726,7 +41726,7 @@
       "title": "plugin.revoke",
       "description": "Revoke an installed plugin immediately.",
       "use_when": "Revoke an installed plugin immediately.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -41868,7 +41868,7 @@
       "title": "plugin.rollback",
       "description": "Roll back to the previous platform-signed version.",
       "use_when": "Roll back to the previous platform-signed version.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -42010,7 +42010,7 @@
       "title": "plugin.storage.delete",
       "description": "Delete a value using optional optimistic versioning.",
       "use_when": "Delete a value using optional optimistic versioning.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -42147,7 +42147,7 @@
       "title": "plugin.storage.get",
       "description": "Read a value from the caller plugin namespace.",
       "use_when": "Read a value from the caller plugin namespace.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -42301,7 +42301,7 @@
       "title": "plugin.storage.list",
       "description": "List keys in the caller plugin namespace.",
       "use_when": "List keys in the caller plugin namespace.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -42469,7 +42469,7 @@
       "title": "plugin.storage.put",
       "description": "Create or replace a value using optimistic versioning.",
       "use_when": "Create or replace a value using optimistic versioning.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -42612,7 +42612,7 @@
       "title": "plugin.uninstall",
       "description": "Uninstall a disabled or revoked plugin.",
       "use_when": "Uninstall a disabled or revoked plugin.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -42754,7 +42754,7 @@
       "title": "plugin.upgrade",
       "description": "Stage a signed version upgrade pending health result.",
       "use_when": "Stage a signed version upgrade pending health result.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -46706,7 +46706,7 @@
       "title": "simulation.environment.archive",
       "description": "Archive a Simulation environment.",
       "use_when": "Archive a Simulation environment.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -47269,7 +47269,7 @@
       "title": "simulation.environment.create",
       "description": "Create a reproducible environment from four immutable references.",
       "use_when": "Create a reproducible environment from four immutable references.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -47980,7 +47980,7 @@
       "title": "simulation.environment.get",
       "description": "Read a reproducible Simulation environment.",
       "use_when": "Read a reproducible Simulation environment.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -48543,7 +48543,7 @@
       "title": "simulation.environment.search",
       "description": "Search visible Simulation environments.",
       "use_when": "Search visible Simulation environments.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -49131,7 +49131,7 @@
       "title": "simulation.parameter_set.create",
       "description": "Create an immutable Simulation parameter set.",
       "use_when": "Create an immutable Simulation parameter set.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -49388,7 +49388,7 @@
       "title": "simulation.parameter_set.get",
       "description": "Read an immutable Simulation parameter set.",
       "use_when": "Read an immutable Simulation parameter set.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -49643,7 +49643,7 @@
       "title": "simulation.parameter_set.search",
       "description": "Search immutable Simulation parameter sets.",
       "use_when": "Search immutable Simulation parameter sets.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -49914,7 +49914,7 @@
       "title": "simulation.result.compare",
       "description": "Compare immutable Simulation result references.",
       "use_when": "Compare immutable Simulation result references.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -50290,7 +50290,7 @@
       "title": "simulation.result.get",
       "description": "Read completed Simulation result ArtifactRefs.",
       "use_when": "Read completed Simulation result ArtifactRefs.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -50563,7 +50563,7 @@
       "title": "simulation.run.get",
       "description": "Read Simulation run state and pinned versions.",
       "use_when": "Read Simulation run state and pinned versions.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -50818,7 +50818,7 @@
       "title": "simulation.run.search",
       "description": "Search Simulation runs.",
       "use_when": "Search Simulation runs.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -51101,7 +51101,7 @@
       "title": "simulation.run.start",
       "description": "Queue a Simulation run with exact pinned inputs.",
       "use_when": "Queue a Simulation run with exact pinned inputs.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_async",
       "exposure": {
@@ -51356,7 +51356,7 @@
       "title": "simulation.solver_profile.create",
       "description": "Create an immutable solver profile.",
       "use_when": "Create an immutable solver profile.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -51628,7 +51628,7 @@
       "title": "simulation.solver_profile.get",
       "description": "Read an immutable solver profile.",
       "use_when": "Read an immutable solver profile.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -51893,7 +51893,7 @@
       "title": "simulation.solver_profile.search",
       "description": "Search immutable solver profiles.",
       "use_when": "Search immutable solver profiles.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "cloud_sync",
       "exposure": {
@@ -53126,7 +53126,7 @@
       "title": "vismockup.capture",
       "description": "Capture the active VisMockup view as an ArtifactRef.",
       "use_when": "Capture the active VisMockup view as an ArtifactRef.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
@@ -53274,7 +53274,7 @@
       "title": "vismockup.highlight",
       "description": "Highlight occurrences by CATIA occurrence name.",
       "use_when": "Highlight occurrences by CATIA occurrence name.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
@@ -53432,7 +53432,7 @@
       "title": "vismockup.launch",
       "description": "Launch or connect to VisMockup.",
       "use_when": "Launch or connect to VisMockup.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
@@ -53580,7 +53580,7 @@
       "title": "vismockup.model.open",
       "description": "Materialize and open an authorized model ArtifactRef.",
       "use_when": "Materialize and open an authorized model ArtifactRef.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
@@ -53773,7 +53773,7 @@
       "title": "vismockup.status",
       "description": "Read VisMockup connection state.",
       "use_when": "Read VisMockup connection state.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "local",
       "exposure": {
@@ -53921,7 +53921,7 @@
       "title": "vismockup.tree",
       "description": "Read the active VisMockup product tree.",
       "use_when": "Read the active VisMockup product tree.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "read",
       "execution_mode": "local",
       "exposure": {
@@ -54077,7 +54077,7 @@
       "title": "vismockup.visibility",
       "description": "Change active-view visibility or selection.",
       "use_when": "Change active-view visibility or selection.",
-      "do_not_use_when": "Use a governed Capability V2 contract when one is available.",
+      "do_not_use_when": "Use the owning domain's governed Capability.",
       "side_effect_level": "write",
       "execution_mode": "local",
       "exposure": {
@@ -54231,68 +54231,68 @@
       "plugin_id": "official.agent",
       "module": "agent_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:d191c1f15fad32c53978be65d675a2725dd23be8bc3614af9dbabc4517e0ea37"
+      "artifact_hash": "sha256:8323111065fd08f23c816bb824a834b3b727a5ed809266529b02536da49f8a02"
     },
     {
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:feb6f47c5cf3cd166f6c34c50e1296e799930f41c4d47cd0a3dd6c7ed046f563"
+      "artifact_hash": "sha256:91c02b53ada1fe4a6f1057f542879de71996791b4604eae489384c92927a8384"
     },
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:e403c578485c677326ad378fc5c89ca258e787a257e36de421eef45a1ea44491"
+      "artifact_hash": "sha256:cb1a0d9a5ef24b5dc362face305eff10c1ee7ffeaf6c472895931b650fe753cd"
     },
     {
       "plugin_id": "official.digital-model",
       "module": "digital_model_backend.capabilities",
       "version": "1.1.0",
-      "artifact_hash": "sha256:8621c4ae44ed33d203114a49e278c9c6c2e79771f0d968d36729fd7587c0fe0e"
+      "artifact_hash": "sha256:cffb00a81a0364b47ec4e8faadff96b75a0b91c7208dabc73abc02d785eb8388"
     },
     {
       "plugin_id": "official.factory",
       "module": "factory_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:0239a9ea27f7624d3dbec6d89a29ec79bdfbc3ca0d8f133488d30956202e586a"
+      "artifact_hash": "sha256:50db2601d1f68c1f788db285d3bc5e25e667782b5647842d162a6d721fd83aea"
     },
     {
       "plugin_id": "official.integration",
       "module": "integration_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:7b7e56cb3180ac2def3ff432e9d898365ff1b6e82988b2b552196374c758ba09"
+      "artifact_hash": "sha256:ebe84bb12720ec5e7a7631b13e64b2c83e00a363b73bc801ac5779e809acb0de"
     },
     {
       "plugin_id": "official.knowledge",
       "module": "knowledge_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:908e60a58ff875435f1b5b5b631dbe8c3426c6552731e76c9f1a4a1d9bda0057"
+      "artifact_hash": "sha256:36e5f5b7191f1149be0c37a8b9c388ca3c6ccb0e86a93b683a847df434c859c5"
     },
     {
       "plugin_id": "official.local-runtime",
       "module": "device_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:0e3db6315b87dcacd4ca2155c1692ee5e5d098ecc8019dfc2e44014b92229ed1"
+      "artifact_hash": "sha256:37c825c6f73fb31b16d42e5ff0ba6a7a782b17320c604ed1d988ef7bd2e303bc"
     },
     {
       "plugin_id": "official.ontology",
       "module": "ontology_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:fde918fd00311419d00df007266f925b163a8cd64fa17a9326ba1d8d7ed84c74"
+      "artifact_hash": "sha256:00f04f9a14a16ab1573aa0f4c36c432ea151cab1e5ef1a0bb1a747ea04e8a8e0"
     },
     {
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:493200e5098b8186064b0737f4d8dec78417cf393eedd06fbc134025ba8e1461"
+      "artifact_hash": "sha256:4463f75f218bd51ea8ccaeb736c1542a9524d21bb7a462973ac12ca8430ab46d"
     },
     {
       "plugin_id": "official.simulation",
       "module": "simulation_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:01d13e92934650fac586c365529e53e3775b39d171b5a78b069b662dc67d8100"
+      "artifact_hash": "sha256:2a1508a1a247c946261071aab86ff56a3e0b64bc58a91a17474e695eb5762d4d"
     }
   ],
-  "created_at": "2026-08-12T09:51:59.729848Z"
+  "created_at": "2026-08-12T10:00:12.575674Z"
 }
