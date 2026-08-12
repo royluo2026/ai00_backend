@@ -7,22 +7,26 @@ FORBIDDEN_INTERNAL_PROTOCOL_IDS = frozenset({
 
 AGREED_WAVE_PREFIXES = ("craft.", "ontology.", "semantic.", "identity.", "base.", "system.search", "system.activity", "system.job", "system.lineage", "system.change_impact", "knowledge.context", "knowledge.document", "knowledge.space")
 
+_BASE_V2_APPROVED = frozenset(
+    "base." + suffix
+    for suffix in {
+        "annotation.change.apply", "annotation.read",
+        "approval.request.cancel", "approval.request.create",
+        "approval.request.decide", "approval.request.get", "approval.request.search",
+        "authorization.grant.change.apply", "authorization.grant.read",
+        "export_template.change.apply", "export_template.read",
+        "identity.directory.sync", "identity.role.assign", "identity.session.get",
+        "notification.preference.get", "notification.preference.update",
+        "notification.read_state.set", "notification.search",
+        "plugin.marketplace.publisher.register",
+        "plugin.marketplace.release.change.apply", "plugin.marketplace.search",
+        "saved_view.change.apply", "saved_view.read", "team.change.apply",
+        "team.membership.change.apply", "team.read",
+        "workspace.template.publish", "workspace.template.read",
+    }
+)
+
 APPROVED_CAPABILITY_IDS = frozenset({
-    "base.annotation.change.apply", "base.annotation.read",
-    "base.approval.request.cancel", "base.approval.request.create",
-    "base.approval.request.decide", "base.approval.request.get",
-    "base.approval.request.search", "base.authorization.grant.change.apply",
-    "base.authorization.grant.read", "base.export_template.change.apply",
-    "base.export_template.read", "base.identity.directory.sync",
-    "base.identity.role.assign", "base.identity.session.get",
-    "base.notification.preference.get", "base.notification.preference.update",
-    "base.notification.read_state.set", "base.notification.search",
-    "base.plugin.marketplace.publisher.register",
-    "base.plugin.marketplace.release.change.apply",
-    "base.plugin.marketplace.search", "base.saved_view.change.apply",
-    "base.saved_view.read", "base.team.change.apply",
-    "base.team.membership.change.apply", "base.team.read",
-    "base.workspace.template.publish", "base.workspace.template.read",
     "base.project.search", "identity.principal.search", "knowledge.context.retrieve",
     "knowledge.document.create", "knowledge.document.diff", "knowledge.document.get",
     "knowledge.document.history.get", "knowledge.document.restore", "knowledge.document.revise", "knowledge.document.search",
@@ -55,4 +59,4 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "simulation.profile.create", "simulation.profile.get",
     "simulation.environment.create", "simulation.environment.get", "simulation.environment.list",
     "simulation.run.start", "simulation.run.get", "simulation.result.get",
-})
+}) | _BASE_V2_APPROVED
