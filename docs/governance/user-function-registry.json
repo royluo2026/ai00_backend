@@ -15,8 +15,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -59,8 +59,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -81,8 +81,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -103,8 +103,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -125,8 +125,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -169,8 +169,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -191,8 +191,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -213,8 +213,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -235,8 +235,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -257,8 +257,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -279,8 +279,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -345,8 +345,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -455,8 +455,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -543,8 +543,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -851,8 +851,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -873,8 +873,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -1005,8 +1005,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -1071,8 +1071,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -1093,8 +1093,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -5274,8 +5274,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -5890,8 +5890,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -6484,8 +6484,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -6902,8 +6902,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -6924,8 +6924,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -6946,8 +6946,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -6968,8 +6968,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -8860,8 +8860,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -8904,8 +8904,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -8926,8 +8926,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -8948,8 +8948,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -10272,8 +10272,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13025,8 +13025,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13069,8 +13069,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13091,8 +13091,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13113,8 +13113,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13135,8 +13135,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13157,8 +13157,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -13179,8 +13179,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -15379,8 +15379,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -15401,8 +15401,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -15423,8 +15423,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -15445,8 +15445,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -16743,8 +16743,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -17953,8 +17953,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [
@@ -18063,8 +18063,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Agent",
       "exclusion_reason": null,
       "source_paths": [

@@ -8,7 +8,7 @@ Read one BOP version identity, lifecycle and revision evidence.
 - 不适用：The caller needs to discover or compare versions.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
+- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -76,7 +76,7 @@ Read one BOP version identity, lifecycle and revision evidence.
 ```json
 {
   "capability_id": "craft.bop.version.get",
-  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
+  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
   "major_version": 1,
   "payload": {
     "version_gid": "example"

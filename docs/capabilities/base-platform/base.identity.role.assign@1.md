@@ -8,7 +8,7 @@ Execute the reviewed base.identity.role.assign Base outcome.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_51d142e49671e1a08cc117b946a782ba`
+- Catalog Release：`rel_ba4496adc4b8a9598b657dda5c86fd23`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Execute the reviewed base.identity.role.assign Base outcome.
 ```json
 {
   "capability_id": "base.identity.role.assign",
-  "catalog_release": "rel_51d142e49671e1a08cc117b946a782ba",
+  "catalog_release": "rel_ba4496adc4b8a9598b657dda5c86fd23",
   "major_version": 1,
   "payload": {
     "operation": "example"

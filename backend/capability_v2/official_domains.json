@@ -2,6 +2,27 @@
   "schema_version": 1,
   "domains": [
     {
+      "domain_id": "agent",
+      "artifact": {
+        "plugin_id": "official.agent",
+        "module": "agent_backend.capabilities",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:05f5619445e18a99ee98b8b7dde3a99090d6eac2e9a770996cf9e2a9e9788249"
+      },
+      "artifact_path": "plugins/agent/agent_backend",
+      "allowed_owners": [
+        "agent"
+      ],
+      "database": {
+        "database_name": "ai00_agent",
+        "runtime_url_env": "AI00_AGENT_DB_URL",
+        "ddl_url_env": "AI00_AGENT_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/agent"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
       "domain_id": "base",
       "artifact": {
         "plugin_id": "official.base",
@@ -23,25 +44,6 @@
         "capability_id": "system.search",
         "major_version": 1
       },
-      "event_subscriptions": []
-    },
-    {
-      "domain_id": "agent",
-      "artifact": {
-        "plugin_id": "official.agent",
-        "module": "agent_backend.capabilities",
-        "version": "1.0.0",
-        "artifact_hash": "sha256:05f5619445e18a99ee98b8b7dde3a99090d6eac2e9a770996cf9e2a9e9788249"
-      },
-      "artifact_path": "plugins/agent/agent_backend",
-      "allowed_owners": ["agent"],
-      "database": {
-        "database_name": "ai00_agent",
-        "runtime_url_env": "AI00_AGENT_DB_URL",
-        "ddl_url_env": "AI00_AGENT_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/agent"
-      },
-      "search_export": null,
       "event_subscriptions": []
     },
     {

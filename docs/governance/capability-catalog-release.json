@@ -1,7 +1,3348 @@
 {
-  "release_id": "rel_51d142e49671e1a08cc117b946a782ba",
-  "catalog_hash": "sha256:51d142e49671e1a08cc117b946a782ba330ae77c6218154c56998a3364aa41c2",
+  "release_id": "rel_ba4496adc4b8a9598b657dda5c86fd23",
+  "catalog_hash": "sha256:ba4496adc4b8a9598b657dda5c86fd23fcd5a87505b66778f446cb5e3e08bec1",
   "descriptors": [
+    {
+      "id": "agent.audit.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.audit.read",
+      "description": "Execute the governed agent.audit.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.audit.record",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.audit.record",
+      "description": "Execute the governed agent.audit.record Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.flow.change.apply",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.flow.change.apply",
+      "description": "Execute the governed agent.flow.change.apply Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.flow.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.flow.read",
+      "description": "Execute the governed agent.flow.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.interaction.request",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.interaction.request",
+      "description": "Execute the governed agent.interaction.request Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_async",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "required",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.memory.change.apply",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.memory.change.apply",
+      "description": "Execute the governed agent.memory.change.apply Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.memory.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.memory.read",
+      "description": "Execute the governed agent.memory.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.run.change.apply",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.run.change.apply",
+      "description": "Execute the governed agent.run.change.apply Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.run.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.run.read",
+      "description": "Execute the governed agent.run.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.session.change.apply",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.session.change.apply",
+      "description": "Execute the governed agent.session.change.apply Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.session.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.session.read",
+      "description": "Execute the governed agent.session.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.skill.change.apply",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.skill.change.apply",
+      "description": "Execute the governed agent.skill.change.apply Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "agent.v2:agent.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "agent.skill.read",
+      "major_version": 1,
+      "owner_domain": "agent",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "agent.skill.read",
+      "description": "Execute the governed agent.skill.read Agent outcome.",
+      "use_when": "A consumer needs Agent-owned run, session, memory, skill, flow, trace, audit, or interaction state.",
+      "do_not_use_when": "The outcome belongs to another business domain; invoke that domain Capability instead.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "agent.v2:agent.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "resource_gid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resource_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "content_json": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "resource_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "resource_type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {}
+                },
+                "content_json": {
+                  "type": [
+                    "object",
+                    "string"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "interaction_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:e76362cdcd0c049c41c8725b0b29d36c69919a25c306d60b888e35c5642e95d6",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Agent request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Agent resource.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Agent resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Agent resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "catalog_release_unavailable",
+          "meaning": "The pinned Catalog release is unavailable.",
+          "retryable": true
+        },
+        {
+          "code": "delegation_expired",
+          "meaning": "The Agent delegation is missing or expired.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The delegated operation requires Base approval.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
     {
       "id": "base.annotation.change.apply",
       "major_version": 1,
@@ -49156,6 +52497,12 @@
   ],
   "provider_artifacts": [
     {
+      "plugin_id": "official.agent",
+      "module": "agent_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:05f5619445e18a99ee98b8b7dde3a99090d6eac2e9a770996cf9e2a9e9788249"
+    },
+    {
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
@@ -49216,5 +52563,5 @@
       "artifact_hash": "sha256:01d13e92934650fac586c365529e53e3775b39d171b5a78b069b662dc67d8100"
     }
   ],
-  "created_at": "2026-08-12T09:26:19.093734Z"
+  "created_at": "2026-08-12T09:33:32.601661Z"
 }
