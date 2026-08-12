@@ -1,4 +1,4 @@
-"""Operationally safe standalone worker for OIS publication outbox jobs."""
+"""Knowledge-owned worker for OIS publication outbox jobs."""
 from __future__ import annotations
 
 import asyncio

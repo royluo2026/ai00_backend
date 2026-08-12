@@ -562,8 +562,6 @@ async def bitable_webhook(request: _Request):
     真实事件在后台线程处理，立即返回 200。
     """
     import json as _json
-    import threading as _threading
-    from backend.services.bitable_sync_service import bitable_sync_service
 
     body_bytes = await request.body()
     try:
@@ -580,11 +578,4 @@ async def bitable_webhook(request: _Request):
         _log.debug("bitable_webhook: encrypted payload, skipping")
         return {"code": 0}
 
-    # 后台线程处理，立即返回 200 避免飞书重试
-    _threading.Thread(
-        target=bitable_sync_service.handle_webhook_event,
-        args=(payload,),
-        daemon=True,
-        name="bitable-webhook",
-    ).start()
-    return {"code": 0}
+    return {"code": 1, "msg": "legacy Bitable webhook retired; use Integration sync capabilities"}

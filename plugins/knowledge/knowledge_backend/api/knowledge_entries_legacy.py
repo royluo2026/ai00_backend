@@ -1,5 +1,5 @@
 """
-backend/routers/knowledge.py
+Knowledge-owned compatibility routes for historical entry APIs.
 ─────────────────────────────
 知识条目 CRUD API（云端 PG）
 
@@ -16,13 +16,25 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
-from backend.db.sequences import next_display_id
+from ..data.connection import get_knowledge_conn as get_conn
 from backend.routers.deps import build_profile, get_current_user
 from backend.platform_sdk.identity import get_active_team_member_gids
 from backend.utils.gid import next_gid
 
 router = APIRouter(tags=["knowledge"])
+
+
+def next_display_id(seq_name: str) -> int:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO workmanship_know_display_counters (seq_name,val) VALUES (%s,1) "
+                "ON DUPLICATE KEY UPDATE val=LAST_INSERT_ID(val+1)", (seq_name,),
+            )
+            cur.execute("SELECT val FROM workmanship_know_display_counters WHERE seq_name=%s", (seq_name,))
+            value = int(cur.fetchone()["val"])
+        conn.commit()
+    return value
 
 
 def _permissions(user: dict) -> set[str]:

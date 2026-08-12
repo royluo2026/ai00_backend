@@ -27,10 +27,6 @@ class DomainGovernanceTests(unittest.TestCase):
         registry = load_registry()
         self.assertEqual(registry.source_domain("backend/capabilities/knowledge_context_next.py"), "knowledge")
         self.assertEqual(registry.source_domain("backend/capabilities/ontology_releases_next.py"), "ontology")
-        self.assertEqual(
-            registry.source_domain("plugins/craft/craft_backend/routers/workbench_home.py"),
-            "project_management",
-        )
 
     def test_audit_does_not_report_same_domain_import_as_base_internal(self):
         root = Path(__file__).resolve().parents[2]
@@ -40,6 +36,12 @@ class DomainGovernanceTests(unittest.TestCase):
             if item.path == "backend/ontology/proposals.py"
             and item.target == "backend.ontology.canonical"
         ])
+
+    def test_runtime_domain_boundary_audit_is_empty(self):
+        """Any production cross-domain SQL/import is a release-blocking boundary break."""
+        root = Path(__file__).resolve().parents[2]
+        violations, _ = audit_repository(root, load_registry())
+        self.assertEqual([], violations)
 
     def test_sql_splitter_preserves_semicolons_inside_literals_and_comments(self):
         sql = "INSERT INTO t VALUES ('a;b'); -- x;y\nUPDATE t SET c=\"z;z\";"

@@ -1,5 +1,5 @@
 """
-backend/utils/follow_trigger.py
+Project Management follower notification trigger.
 ─────────────────────────────────
 关注条件触发 → 写通知
 
@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import logging
 
-from backend.utils.notif import create_notification
+from .public import publish_notification
 
 logger = logging.getLogger(__name__)
 
@@ -99,14 +99,9 @@ def notify_followers(
         # 构建通知文案
         event_label = _events_label(events)
         try:
-            gid = create_notification(
-                conn,
-                user_gid=follow_user_gid,
-                type_="item_status",
-                item_type=item_type,
-                item_gid=item_gid,
-                title=f"{_item_label(item_type)}更新：{item_title}",
-                body=event_label,
+            gid = publish_notification(
+                user_gid=follow_user_gid, type_="item_status", item_type=item_type,
+                item_gid=item_gid, title=f"{_item_label(item_type)}更新：{item_title}", body=event_label,
             )
             if gid:
                 count += 1

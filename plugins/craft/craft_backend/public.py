@@ -28,51 +28,6 @@ def list_rule_workbench_items(user_gid: str, list_gids: list[str] | None = None)
             return [dict(row) for row in cur.fetchall()]
 
 
-_FOLLOW_OWNER_FIELDS = {
-    "project": ("workmanship_proj_projects", "owner_gid"),
-    "std_op": ("workmanship_tpl_gbop_entries", "created_by"),
-    "approval": ("workmanship_proj_approval_orders", "applicant_gid"),
-}
-
-
-def get_follow_item_owner(item_type: str, item_gid: str) -> str | None:
-    """Resolve a Craft-owned item's owner without exposing Craft table names."""
-    target = _FOLLOW_OWNER_FIELDS.get(item_type)
-    if not target:
-        return None
-    table, column = target
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"SELECT {column} FROM {table} WHERE gid=%s", (item_gid,))
-            row = cur.fetchone()
-    return str(row[column]) if row and row.get(column) else None
-
-
-def append_item_history(item_type: str, item_gid: str, author_name: str, author_gid: str, content: str) -> dict:
-    gid, entry_id = str(next_gid()), str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_work_item_entries "
-                "(gid,id,item_type,item_gid,section,author,author_name,author_gid,content,sort_order,read_by_human,resolved,created_at,updated_at) "
-                "VALUES (%s,%s,%s,%s,'history','human',%s,%s,%s,UNIX_TIMESTAMP(),TRUE,FALSE,NOW(),NOW())",
-                (gid, entry_id, item_type, item_gid, author_name, author_gid, content),
-            )
-        conn.commit()
-    return {"gid": gid, "id": entry_id}
-
-
-def list_item_history(item_type: str, item_gid: str) -> list[dict]:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid,id,author_name,content,created_at FROM workmanship_work_item_entries "
-                "WHERE item_type=%s AND item_gid=%s AND section='history' ORDER BY created_at DESC",
-                (item_type, item_gid),
-            )
-            return [dict(row) for row in cur.fetchall()]
-
-
 def ontology_class_labels(gids) -> dict[str, str]:
     return get_ontology_concept_labels(gids)
 
@@ -116,4 +71,4 @@ def upsert_external_bop_entries(node_type: str, rows: list[dict], unique_field: 
         conn.commit()
     return {"imported": imported, "updated": updated, "skipped": skipped, "errors": errors[:10]}
 
-__all__ = ["append_item_history", "get_follow_item_owner", "list_item_history", "list_rule_workbench_items", "ontology_class", "ontology_class_labels", "ontology_properties", "upsert_external_bop_entries"]
+__all__ = ["list_rule_workbench_items", "ontology_class", "ontology_class_labels", "ontology_properties", "upsert_external_bop_entries"]

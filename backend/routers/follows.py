@@ -11,7 +11,7 @@ from backend.capability_v2.gateway import get_default_gateway
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
 from backend.platform_sdk.notifications import publish_notification
 from backend.platform_sdk.project_management import build_web_compatibility_envelope, invoke_compatibility
-from plugins.craft.craft_backend.public import get_follow_item_owner
+from plugins.project_management.project_management_backend.public import get_follow_item_owner
 
 router = APIRouter(prefix="/api/follows", tags=["follows"])
 

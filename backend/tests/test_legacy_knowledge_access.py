@@ -6,10 +6,12 @@ from pathlib import Path
 class LegacyKnowledgeAccessTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        root = Path(__file__).resolve().parents[1]
-        cls.router_text = (root / "routers/knowledge.py").read_text(encoding="utf-8")
+        root = Path(__file__).resolve().parents[2]
+        cls.router_text = (
+            root / "plugins/knowledge/knowledge_backend/api/knowledge_entries_legacy.py"
+        ).read_text(encoding="utf-8")
         cls.router_tree = ast.parse(cls.router_text)
-        cls.capability_text = (root / "capabilities/knowledge_next.py").read_text(encoding="utf-8")
+        cls.capability_text = (root / "backend/capabilities/knowledge_next.py").read_text(encoding="utf-8")
 
     def _function(self, name: str) -> str:
         node = next(

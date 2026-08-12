@@ -6,7 +6,8 @@ from pathlib import Path
 class KnowledgeHubAccessBoundaryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.path = Path(__file__).resolve().parents[1] / "routers/knowledge_hub.py"
+        root = Path(__file__).resolve().parents[2]
+        cls.path = root / "plugins/knowledge/knowledge_backend/api/knowledge_hub_legacy.py"
         cls.text = cls.path.read_text(encoding="utf-8")
         cls.tree = ast.parse(cls.text)
 

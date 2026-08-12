@@ -7,7 +7,9 @@ from unittest.mock import Mock, patch
 import pytest
 
 from backend.capability_v2.provider_contracts import CapabilityContext
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import (
+    descriptor_from_provider_spec as adapt_v1_spec,
+)
 from plugins.project_management.project_management_backend.capabilities import (
     register_capabilities,
 )

@@ -12,7 +12,6 @@ from .projects import router as projects_router
 from .approval import router as approval_router
 from .canvases import router as canvases_router
 from .import_export import router as import_export_router
-from .bitable_sync import router as bitable_sync_router
 from .task_templates import router as task_templates_router
 from .vpps_audit import router as vpps_audit_router
 from .promotion import router as promotion_router
@@ -20,7 +19,6 @@ from .ontology import router as ontology_router
 from .rule_engine import router as rule_engine_router
 from .rules import router as rules_router
 from .lists import router as lists_router
-from .workbench_home import router as workbench_home_router
 from .collab import router as collab_router
 from .change_logs import router as change_logs_router
 from .item_entries import router as item_entries_router
@@ -34,9 +32,9 @@ def get_routers():
         bop_router, gbop_router, ebom_router, factory_router,
         craft_library_router, std_op_router, projects_router,
         approval_router, canvases_router, import_export_router,
-        bitable_sync_router, task_templates_router,
+        task_templates_router,
         vpps_audit_router, promotion_router, ontology_router, rule_engine_router, rules_router, lists_router,
-        workbench_home_router, collab_router, change_logs_router, item_entries_router,
+        collab_router, change_logs_router, item_entries_router,
         permission_requests_router, share_links_router, shares_router,
     ]
 
@@ -45,5 +43,5 @@ def get_routers():
 OWNED_MODULES = {
     "bop", "gbop", "ebom", "factory", "craft_library", "std_op",
     "projects", "approval", "canvases", "import_export",
-    "bitable_sync", "task_templates", "vpps_audit", "promotion", "ontology", "rule_engine", "rules", "lists", "workbench_home", "collab", "change_logs", "item_entries", "permission_requests", "share_links", "shares",
+    "task_templates", "vpps_audit", "promotion", "ontology", "rule_engine", "rules", "lists", "collab", "change_logs", "item_entries", "permission_requests", "share_links", "shares",
 }

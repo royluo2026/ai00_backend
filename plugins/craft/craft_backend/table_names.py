@@ -7,15 +7,11 @@ _IDENTIFIER = re.compile(r"^[a-z][a-z0-9_]*$")
 _SCHEMA_PREFIX = {
     "bop": "workmanship_bop_",
     "factory": "workmanship_factory_",
-    "proj": "workmanship_proj_",
     "template": "workmanship_tpl_",
-    "work": "workmanship_work_",
 }
 _ALLOWED_PREFIXES = tuple(_SCHEMA_PREFIX.values())
 _SPECIAL = {
     "template.gbop": "workmanship_tpl_gbop_entries",
-    "proj.task_templates": "workmanship_work_task_templates",
-    "proj.task_template_items": "workmanship_work_task_template_items",
     "knowledge.craft_rules": "workmanship_know_craft_rules",
 }
 

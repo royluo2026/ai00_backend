@@ -159,34 +159,9 @@ def _compute_stats(cur, version_gid: str, line_gid: Optional[str]) -> dict:
     r = cur.fetchone()
     equipment_total, equipment_bound = (r['total'], r['bound']) if r else (0, 0)
 
-    # 绑定任务完成度（workmanship_proj_tasks，status='done' 或 completion=100）
-    cur.execute(f"""
-        SELECT
-          COUNT(*) AS total,
-          COALESCE(SUM(CASE WHEN t.status IN ('done','completed','closed','resolved') OR t.completion = 100 THEN 1 ELSE 0 END), 0) AS done
-        FROM workmanship_bop_bop_entries e
-        JOIN workmanship_bop_bop_entry_links l
-          ON l.entry_gid = e.gid
-          AND l.link_type IN ('task_std','task_custom')
-          AND l.is_deleted = FALSE
-        JOIN workmanship_proj_tasks t ON t.gid = l.entity_gid AND t.is_deleted = FALSE
-        WHERE {entry_filter}
-    """, entry_params)
-    r = cur.fetchone()
-    tasks_total, tasks_done = (r['total'], r['done']) if r else (0, 0)
-
-    # 开放问题数（workmanship_proj_issues，status NOT IN closed states）
-    cur.execute(f"""
-        SELECT COUNT(*) AS cnt
-        FROM workmanship_bop_bop_entries e
-        JOIN workmanship_bop_bop_entry_links l
-          ON l.entry_gid = e.gid AND l.link_type = 'issue' AND l.is_deleted = FALSE
-        JOIN workmanship_proj_issues i ON i.gid = l.entity_gid
-          AND i.status NOT IN ('resolved','closed','cancelled','withdrawn')
-        WHERE {entry_filter}
-    """, entry_params)
-    r = cur.fetchone()
-    issues_open = r['cnt'] if r else 0
+    # Project task/issue state is cross-domain. This Craft-owned snapshot does
+    # not infer it from Project tables; governed Project capabilities provide it.
+    tasks_total = tasks_done = issues_open = 0
 
     # 工艺交付物完成度（有工艺卡/控制计划/人机姿态 link 的工序数）
     del_filter = "AND (l2.is_deleted IS NULL OR l2.is_deleted=FALSE)"

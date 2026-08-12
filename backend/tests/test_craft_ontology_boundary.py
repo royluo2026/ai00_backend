@@ -16,6 +16,10 @@ class CraftOntologyBoundaryTests(unittest.TestCase):
 
         self.assertEqual(craft_entity_table_name("bop.bop_entries"), "workmanship_bop_bop_entries")
         with self.assertRaises(ValueError):
+            craft_entity_table_name("proj.projects")
+        with self.assertRaises(ValueError):
+            craft_entity_table_name("work.task_templates")
+        with self.assertRaises(ValueError):
             craft_entity_table_name("knowledge.onto_classes")
         with self.assertRaises(ValueError):
             craft_entity_table_name("auth.users")

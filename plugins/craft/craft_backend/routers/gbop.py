@@ -1796,13 +1796,9 @@ def station_autolink_preview(
                     pbom_versions = [dict(r) for r in cur.fetchall()]
                 return {"need_select": True, "pbom_versions": pbom_versions, "data": []}
 
-            # 2. 取项目名
+            # Project display data is resolved by the Project capability at the
+            # composition layer. Craft persists only the opaque project GID.
             project_name = ''
-            if project_gid:
-                cur.execute("SELECT name FROM workmanship_proj_projects WHERE gid=%s", (project_gid,))
-                proj_row = cur.fetchone()
-                if proj_row:
-                    project_name = proj_row['name'] or ''
 
             # 3. 取 PBOM 版本名
             cur.execute(

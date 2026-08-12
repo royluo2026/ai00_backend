@@ -9,7 +9,7 @@ import argparse
 import asyncio
 import logging
 
-from backend.capabilities.outbox_worker_next import run_forever
+from plugins.knowledge.knowledge_backend.infrastructure.publication_outbox_worker import run_forever
 
 
 def main() -> None:

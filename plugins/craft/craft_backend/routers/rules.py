@@ -67,14 +67,9 @@ def list_rules(
     params: list = [uid]
     if is_admin:
         clauses[0] += " OR r.share_scope='project')"
-    elif projects:
-        placeholders = ",".join(["%s"] * len(projects))
-        clauses[0] += (
-            " OR (r.share_scope='project' AND r.list_gid IN "
-            f"(SELECT gid FROM workmanship_work_lists WHERE project_gid IN ({placeholders}))))"
-        )
-        params.extend(projects)
     else:
+        # Non-admin project visibility cannot be inferred by joining the
+        # Project database. Project-scoped rule composition uses capabilities.
         clauses[0] += ")"
     if status:
         clauses.append("r.status=%s"); params.append(status)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Copy legacy knowledge content_md into immutable OIS revisions; never deletes source text."""
+"""Knowledge-owned migration from legacy markdown to immutable revisions."""
 from __future__ import annotations
 
 import argparse

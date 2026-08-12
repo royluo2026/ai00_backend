@@ -1,5 +1,5 @@
 """
-backend/routers/knowledge_hub.py
+Knowledge-owned compatibility routes for the historical knowledge-hub API.
 ──────────────────────────────────
 知识库 Hub 云端 API（公共/团队知识库，需飞书登录）
 
@@ -11,12 +11,34 @@ from typing import Optional, Any
 from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
+from ..data.connection import get_knowledge_conn as get_conn
 from backend.routers.deps import build_profile, get_current_user
 from backend.utils.gid import next_gid
-from plugins.craft.craft_backend.public import append_item_history, list_item_history
 
 router = APIRouter(prefix="/api/knowledge_hub", tags=["knowledge_hub"])
+
+
+def _append_item_history(item_gid: str, author_name: str, author_gid: str, content: str) -> dict:
+    gid, entry_id = str(next_gid()), str(next_gid())
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO workmanship_know_item_history "
+                "(gid,id,item_gid,author_name,author_gid,content) VALUES (%s,%s,%s,%s,%s,%s)",
+                (gid, entry_id, item_gid, author_name, author_gid, content),
+            )
+        conn.commit()
+    return {"gid": gid, "id": entry_id}
+
+
+def _list_item_history(item_gid: str) -> list[dict]:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT gid,id,author_name,content,created_at FROM workmanship_know_item_history "
+                "WHERE item_gid=%s ORDER BY created_at DESC", (item_gid,),
+            )
+            return [dict(row) for row in cur.fetchall()]
 
 def _permissions(user: dict) -> set[str]:
     return set(build_profile(user).get("permissions", []))
@@ -395,7 +417,7 @@ def patch_item(gid: str, body: ItemPatch, current_user = Depends(get_current_use
     if changed_fields:
         author_name = current_user.get("display_name") or current_user.get("name") or current_user.get("gid", "")
         author_gid = current_user.get("gid", "")
-        append_item_history("knowledge_item", gid, author_name, author_gid, "更新了：" + "、".join(changed_fields))
+        _append_item_history(gid, author_name, author_gid, "更新了：" + "、".join(changed_fields))
     return {"success": True}
 
 
@@ -411,7 +433,7 @@ def get_item_history(gid: str, current_user = Depends(get_current_user)):
             )
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="not_found")
-    rows = list_item_history("knowledge_item", gid)
+    rows = _list_item_history(gid)
 
     return {"success": True, "data": [
         {"gid": r["gid"], "id": r["id"], "author_name": r["author_name"],

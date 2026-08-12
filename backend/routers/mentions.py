@@ -12,9 +12,8 @@ from typing import List
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from backend.db.connection import get_conn
 from backend.routers.deps import get_current_user
-from backend.utils.notif import create_notification
+from plugins.project_management.project_management_backend.public import publish_notification
 
 logger = logging.getLogger(__name__)
 
@@ -49,27 +48,18 @@ def send_mention_notifications(
     body_text = (body.context[:150] + "…") if len(body.context) > 150 else body.context
 
     count = 0
-    with get_conn() as conn:
-        for gid in set(body.mentioned_gids):
-            if gid == current_user["gid"]:
-                continue
-            try:
-                notif_gid = create_notification(
-                    conn,
-                    user_gid=gid,
-                    type_="mentioned",
-                    item_type=body.item_type,
-                    item_gid=body.item_gid,
-                    title=f"{sender_name} 在「{body.item_title}」中 @了你",
-                    body=body_text,
-                )
-                if notif_gid:
-                    count += 1
-                    if body.is_important:
-                        # 预留：重要标记 → 飞书消息推送（best-effort，不影响主流程）
-                        _try_feishu_important(conn, gid, sender_name, body)
-            except Exception as e:
-                logger.warning(f"[mentions] 通知写入失败 user={gid}: {e}")
+    for gid in set(body.mentioned_gids):
+        if gid == current_user["gid"]:
+            continue
+        try:
+            notif_gid = publish_notification(
+                user_gid=gid, type_="mentioned", item_type=body.item_type,
+                item_gid=body.item_gid, title=f"{sender_name} 在「{body.item_title}」中 @了你", body=body_text,
+            )
+            if notif_gid:
+                count += 1
+        except Exception as e:
+            logger.warning(f"[mentions] 通知写入失败 user={gid}: {e}")
 
     return {"success": True, "data": {"sent": count}}
 

@@ -1,0 +1,7 @@
+{
+  "plugin_id": "official.knowledge",
+  "name": "知识",
+  "backend": {
+    "routers_module": "knowledge_backend.api"
+  }
+}

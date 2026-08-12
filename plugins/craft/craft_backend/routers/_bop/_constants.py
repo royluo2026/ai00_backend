@@ -193,9 +193,6 @@ _LINK_SNAPSHOT_MAP = {
     'process_chart':      ('workmanship_bop_bop_process_charts',    None),
     'jack_pos':           ('workmanship_bop_bop_jack_pos',          None),
     'pbom_part':          ('workmanship_bop_pbom',                  None),
-    'issue':              ('workmanship_work_issues',               None),
-    'task_std':           ('workmanship_work_tasks',                None),
-    'task_custom':        ('workmanship_work_tasks',                None),
     'rule_std':           ('workmanship_know_craft_rules',     None),
     'rule_custom':        ('workmanship_know_craft_rules',     None),
 }
@@ -203,8 +200,6 @@ _LINK_SNAPSHOT_MAP = {
 # ── GID 字段解析映射（entity-detail 面板用） ─────────────────────────────────
 # field_name → (table, name_col)
 _GID_RESOLVE_MAP: dict = {
-    'project_gid':          ('workmanship_proj_projects',            'name'),
-    'vehicle_model_gid':    ('workmanship_proj_vehicle_models',      'name'),
     'version_gid':          ('workmanship_bop_bop_versions',         'bop_name'),
     'bop_version_gid':      ('workmanship_bop_bop_versions',         'bop_name'),
     'pbom_version_gid':     ('workmanship_bop_bop_versions',         'bop_name'),
@@ -334,9 +329,11 @@ _LINK_TARGET_TABLES = {
     'process_chart':        ('workmanship_bop_bop_process_charts',      'gid', None),
     'jack_pos':             ('workmanship_bop_bop_jack_pos',            'gid', None),
     # 工作项 / 知识 / 规则
-    'issue':                ('workmanship_proj_issues',                 'gid', None),
-    'task_custom':          ('workmanship_proj_tasks',                  'gid', None),
-    'task_std':             ('workmanship_proj_tasks',                  'gid', None),
+    # Cross-domain work items are opaque references. Their details and state
+    # must be resolved through Project capabilities rather than Craft SQL.
+    'issue':                None,
+    'task_custom':          None,
+    'task_std':             None,
     'rule_std':             ('workmanship_know_craft_rules',       'gid', None),
     'rule_custom':          ('workmanship_know_craft_rules',       'gid', None),
 }
