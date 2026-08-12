@@ -112,7 +112,14 @@ def test_native_local_provider_is_stable_and_exposed_to_plugins_and_agents():
         assert descriptor.owner_domain == "local_runtime"
         assert descriptor.lifecycle_status.value == "stable"
         assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
-        assert descriptor.operation_policy == ("none" if capability_id == "local.command.get" else "required")
+        expected_operation_policy = (
+            "none"
+            if capability_id in {"local.command.get", "local.device.read"}
+            else "optional"
+            if capability_id == "local.device.change.apply"
+            else "required"
+        )
+        assert descriptor.operation_policy == expected_operation_policy
 
 
 @pytest.mark.parametrize("status,error_code", [

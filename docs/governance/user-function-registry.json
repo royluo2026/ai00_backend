@@ -1874,6 +1874,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -1896,6 +1897,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -1918,6 +1920,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -1940,6 +1943,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -1962,6 +1966,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -1984,6 +1989,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -2221,6 +2227,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -2381,6 +2388,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -2403,6 +2411,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -2698,6 +2707,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -2858,6 +2868,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
@@ -4800,6 +4811,7 @@
       "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
         "plugins/device/device_backend/capabilities/reviewed.py"
       ]
@@ -4823,6 +4835,7 @@
       "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
         "plugins/device/device_backend/capabilities/reviewed.py"
       ]

@@ -431,7 +431,7 @@ def test_check_cli_passes_when_source_evidence_matches_with_governance_candidate
     assert "User Function Registry check passed" in result.stdout
 
 
-def test_strict_cli_rejects_reviewed_candidates_until_they_are_published():
+def test_strict_cli_accepts_registry_after_reviewed_candidates_are_published():
     result = subprocess.run(
         [sys.executable, str(SCRIPT_PATH), "--strict"],
         cwd=REPOSITORY_ROOT,
@@ -440,8 +440,8 @@ def test_strict_cli_rejects_reviewed_candidates_until_they_are_published():
         check=False,
     )
 
-    assert result.returncode == 1
-    assert "proposed Capability is not published in Catalog" in result.stderr
+    assert result.returncode == 0
+    assert "User Function Registry strict check passed" in result.stdout
 
 
 def test_review_linkage_rejects_registry_row_missing_from_domain_review():

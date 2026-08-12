@@ -71,6 +71,16 @@ _COMPLETION_V2_APPROVED = frozenset({
     "ontology.schema.change.apply",
 })
 
+_FINAL_REVIEWED_APPROVED = frozenset({
+    "craft.canvas.change.apply", "craft.canvas.read",
+    "craft.data_exchange.export",
+    "craft.ebom.change.apply", "craft.ebom.read",
+    "craft.gbop.change.apply", "craft.gbop.read",
+    "craft.manufacturing_resource.change.apply", "craft.manufacturing_resource.read",
+    "craft.rule.change.apply", "craft.rule.read",
+    "local.device.change.apply", "local.device.read",
+})
+
 APPROVED_CAPABILITY_IDS = frozenset({
     "base.project.search", "identity.principal.search", "knowledge.context.retrieve",
     "knowledge.document.create", "knowledge.document.diff", "knowledge.document.get",
@@ -115,4 +125,4 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "agent.interaction.request", "agent.memory.change.apply", "agent.memory.read",
     "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
     "agent.skill.change.apply", "agent.skill.read",
-}) | _BASE_V2_APPROVED | _PROJECT_V2_APPROVED | _COMPLETION_V2_APPROVED
+}) | _BASE_V2_APPROVED | _PROJECT_V2_APPROVED | _COMPLETION_V2_APPROVED | _FINAL_REVIEWED_APPROVED
