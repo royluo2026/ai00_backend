@@ -41,7 +41,7 @@ Capability V2 的代码、离线验收和边界门禁已经完成，但真实 RC
   - 当前运行 RC evidence 组装；
   - strict release-candidate acceptance；
   - 对最终报告再次执行 strict completion 检查；
-  - 无论成功或失败均上传数据库、RC evidence 和最终报告。
+  - 无论成功或失败均上传通过 schema/secret 扫描的 Provider、runtime、数据库、assembled RC evidence 和最终报告。
 
 测试通过解析 YAML 后比较规范化步骤，不通过脆弱的全文比较实现一致性。
 
@@ -135,7 +135,7 @@ strict completion report check ────────► 发布允许或失败
 - runner 标签包含 `capability-v2-rc`，不能只有 `test-server`。
 - GitHub/Gitea 两份 RC 工作流的强制门禁集合和顺序一致。
 - Gitea 工作流必须只把管理员 URL 作为数据库 secret 输入，并从 bootstrap 输出导入全部十一域 runtime/DDL 环境变量；测试要拒绝缺域、长期保存生成 URL或上传 env 文件。
-- acceptance 后必须执行 report completion 复核并上传三份证据。
+- acceptance 后必须执行 report completion 复核，并上传五份可独立审计且不含 secret 的 Provider、runtime、数据库、assembled RC 和最终报告证据。
 
 ### 7.2 Bootstrap 单元测试
 
