@@ -1,0 +1,1 @@
+"""Knowledge-owned persistence adapters."""

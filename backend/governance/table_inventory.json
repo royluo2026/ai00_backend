@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 179,
+  "table_count": 182,
   "tables": [
     {
       "table": "workmanship_agent_run_approvals",
@@ -558,6 +558,11 @@
       "runtime_domain": "knowledge"
     },
     {
+      "table": "workmanship_know_domain_outbox",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge"
+    },
+    {
       "table": "workmanship_know_documents",
       "owner": "knowledge",
       "runtime_domain": "knowledge"
@@ -604,6 +609,16 @@
     },
     {
       "table": "workmanship_know_recent",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge"
+    },
+    {
+      "table": "workmanship_know_reference_datasets",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge"
+    },
+    {
+      "table": "workmanship_know_reference_versions",
       "owner": "knowledge",
       "runtime_domain": "knowledge"
     },

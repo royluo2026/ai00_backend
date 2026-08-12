@@ -162,8 +162,9 @@
     "Knowledge": {
       "maintainers": ["@ai00/knowledge-maintainers"],
       "artifact": "ai00-knowledge-domain",
-      "module_prefixes": ["backend.knowledge"],
+      "module_prefixes": ["plugins.knowledge", "backend.knowledge"],
       "code_paths": [
+        "plugins/knowledge/**",
         "backend/knowledge/**",
         "backend/domain_ports/knowledge.py",
         "backend/capabilities/knowledge_*",
@@ -174,6 +175,7 @@
         "backend/capabilities/outbox_retry_next.py"
       ],
       "provider_paths": [
+        "plugins/knowledge/knowledge_backend/capabilities/**",
         "backend/capabilities/knowledge_*",
         "backend/capabilities/proposals_next.py",
         "backend/capabilities/proposal_query_next.py",
@@ -182,12 +184,13 @@
         "backend/capabilities/outbox_retry_next.py"
       ],
       "migration_paths": [
+        "backend/db/migrations/domains/knowledge/**",
         "backend/db/migrations/202608030007_knowledge_proposal_outbox.sql",
         "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql",
         "backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql",
         "backend/db/migrations/202608060002_knowledge_revision_attribution.sql"
       ],
-      "test_paths": ["backend/tests/test_knowledge_*.py"],
+      "test_paths": ["plugins/knowledge/tests/**", "backend/tests/test_knowledge_*.py"],
       "documentation_paths": ["docs/capabilities/knowledge/**"]
     },
     "Local Runtime": {
