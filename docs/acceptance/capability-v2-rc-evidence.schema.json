@@ -71,12 +71,13 @@
           "additionalProperties": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["provider_crud", "migration_ledger", "database_read", "database_write"],
+            "required": ["provider_crud", "migration_ledger", "database_read", "database_write", "runtime_ddl"],
             "properties": {
               "provider_crud": {"const": "passed"},
               "migration_ledger": {"const": "passed"},
               "database_read": {"const": "passed"},
-              "database_write": {"const": "passed"}
+              "database_write": {"const": "passed"},
+              "runtime_ddl": {"const": "denied"}
             }
           }
         },

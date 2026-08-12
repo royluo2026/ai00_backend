@@ -185,6 +185,44 @@ def _migration_ledger_probe(connection: object, target: DatabaseProbeTarget) -> 
         )
 
 
+def _runtime_ddl_is_denied(
+    connection: object,
+    target: DatabaseProbeTarget,
+) -> bool:
+    probe_table = _quoted(f"ai00_rc_ddl_probe_{target.domain_id}")
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(f"CREATE TABLE {probe_table} (probe_id BIGINT NOT NULL)")
+    except Exception as exc:
+        if _is_access_denied(exc):
+            return True
+        raise DatabaseIsolationError(
+            f"runtime_ddl_probe_failed:{target.domain_id}:{type(exc).__name__}"
+        ) from exc
+    return False
+
+
+def _cleanup_runtime_ddl_probe(
+    target: DatabaseProbeTarget,
+    ddl_url: DomainDatabaseUrl,
+    ca_path: str,
+    connect: Callable[[DomainDatabaseUrl, str], object],
+) -> None:
+    connection = None
+    try:
+        connection = connect(ddl_url, ca_path)
+        probe_table = _quoted(f"ai00_rc_ddl_probe_{target.domain_id}")
+        with connection.cursor() as cursor:
+            cursor.execute(f"DROP TABLE IF EXISTS {probe_table}")
+    except Exception as exc:
+        raise DatabaseIsolationError(
+            f"runtime_ddl_cleanup_failed:{target.domain_id}:{type(exc).__name__}"
+        ) from exc
+    finally:
+        if connection is not None:
+            connection.close()
+
+
 def _query_is_denied(connection: object, sql: str) -> bool:
     try:
         with connection.cursor() as cursor:
@@ -245,9 +283,11 @@ def verify_database_grants(
             if ddl_connection is not None:
                 ddl_connection.close()
         connection = None
+        runtime_ddl_denied = False
         try:
             connection = connect(urls[target.domain_id], ca_path)
             owner_columns[target.domain_id] = _owner_probe(connection, target)
+            runtime_ddl_denied = _runtime_ddl_is_denied(connection, target)
         except Exception as exc:
             if isinstance(exc, DatabaseIsolationError):
                 raise
@@ -257,10 +297,21 @@ def verify_database_grants(
         finally:
             if connection is not None:
                 connection.close()
+        if not runtime_ddl_denied:
+            _cleanup_runtime_ddl_probe(
+                target,
+                ddl_urls[target.domain_id],
+                ca_path,
+                connect,
+            )
+            raise DatabaseIsolationError(
+                f"runtime_ddl_allowed:{target.domain_id}"
+            )
         owner_operations[target.domain_id] = {
             "migration_ledger": "passed",
             "database_read": "passed",
             "database_write": "passed",
+            "runtime_ddl": "denied",
         }
 
     cross_domain = []

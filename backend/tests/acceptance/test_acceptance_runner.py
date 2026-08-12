@@ -58,6 +58,7 @@ def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
                     "migration_ledger": "passed",
                     "database_read": "passed",
                     "database_write": "passed",
+                    "runtime_ddl": "denied",
                 }
                 for domain_id in domain_ids
             },
@@ -381,6 +382,35 @@ def test_runtime_evidence_requires_exact_database_isolation_matrix(tmp_path, mon
 
     assert "RC evidence database owner operations do not cover exactly eleven domains" in errors
     assert "RC evidence database isolation matrix is incomplete or duplicated" in errors
+
+
+def test_runtime_evidence_requires_runtime_ddl_denial_for_every_domain(
+    tmp_path, monkeypatch
+):
+    catalog, manifest = load_documents()
+    commit = "a" * 40
+    monkeypatch.setattr(
+        "backend.scripts.run_capability_v2_acceptance._git",
+        lambda *args: commit,
+    )
+    evidence = _runtime_evidence(catalog, manifest, commit=commit)
+    evidence["database_isolation"]["owner_operations"]["agent"].pop(
+        "runtime_ddl"
+    )
+    path = tmp_path / "missing-runtime-ddl.json"
+    path.write_text(json.dumps(evidence), encoding="utf-8")
+
+    errors, _ = validate_runtime_evidence(
+        catalog,
+        manifest,
+        {
+            "AI00_ACCEPTANCE_RC_EVIDENCE": str(path),
+            "AI00_ACCEPTANCE_ENVIRONMENT_ID": "rc-isolated-42",
+            "AI00_ACCEPTANCE_RUN_ID": "rc-run-42",
+        },
+    )
+
+    assert any("runtime_ddl" in error for error in errors)
 
 
 def test_schema_invalid_runtime_evidence_fails_without_structural_exception(tmp_path):

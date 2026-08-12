@@ -55,6 +55,8 @@ class Cursor:
         self.connection.queries.append(sql)
         if self.connection.deny:
             raise DatabaseDenied(1142, "denied")
+        if sql.startswith("CREATE TABLE") and self.connection.deny_ddl:
+            raise DatabaseDenied(1142, "ddl denied")
         if sql.startswith("SHOW COLUMNS"):
             self._row = ("gid",)
 
@@ -66,8 +68,9 @@ class Cursor:
 
 
 class Connection:
-    def __init__(self, *, deny=False, ledger_rows=()):
+    def __init__(self, *, deny=False, deny_ddl=True, ledger_rows=()):
         self.deny = deny
+        self.deny_ddl = deny_ddl
         self.ledger_rows = tuple(ledger_rows)
         self.queries = []
         self.closed = False
@@ -148,6 +151,7 @@ def test_grant_probe_proves_owner_access_and_all_110_cross_domain_denials():
         if principal.endswith("_ddl"):
             domain_id = principal.removesuffix("_ddl")
             connection = Connection(
+                deny_ddl=False,
                 ledger_rows=_ledger_rows(targets_by_domain[domain_id])
             )
         else:
@@ -168,6 +172,7 @@ def test_grant_probe_proves_owner_access_and_all_110_cross_domain_denials():
     assert set(result["owner_operations"]) == {target.domain_id for target in targets}
     assert all(row["database_read"] == "passed" for row in result["owner_operations"].values())
     assert all(row["database_write"] == "passed" for row in result["owner_operations"].values())
+    assert all(row["runtime_ddl"] == "denied" for row in result["owner_operations"].values())
     assert len(result["cross_domain"]) == 110
     assert all(row["read"] == row["write"] == "denied" for row in result["cross_domain"])
     assert all(connection.closed for connection in connections)
@@ -181,7 +186,10 @@ def test_grant_probe_requires_exact_live_migration_ledgers():
         principal = url.username
         if principal.endswith("_ddl"):
             domain_id = principal.removesuffix("_ddl")
-            return Connection(ledger_rows=_ledger_rows(targets_by_domain[domain_id]))
+            return Connection(
+                deny_ddl=False,
+                ledger_rows=_ledger_rows(targets_by_domain[domain_id]),
+            )
         return Connection(
             deny=principal.removesuffix("_runtime")
             != url.database.removeprefix("ai00_")
@@ -207,7 +215,10 @@ def test_grant_probe_fails_if_any_cross_domain_query_is_allowed():
     def connect(url, _ca_path):
         if url.username.endswith("_ddl"):
             domain_id = url.username.removesuffix("_ddl")
-            return Connection(ledger_rows=_ledger_rows(targets_by_domain[domain_id]))
+            return Connection(
+                deny_ddl=False,
+                ledger_rows=_ledger_rows(targets_by_domain[domain_id]),
+            )
         return Connection(deny=False)
 
     with pytest.raises(DatabaseIsolationError, match="cross_domain_read_allowed"):
@@ -226,7 +237,10 @@ def test_grant_probe_does_not_misreport_unexpected_database_errors_as_denial():
     def connect(url, _ca_path):
         if url.username.endswith("_ddl"):
             domain_id = url.username.removesuffix("_ddl")
-            return Connection(ledger_rows=_ledger_rows(targets_by_domain[domain_id]))
+            return Connection(
+                deny_ddl=False,
+                ledger_rows=_ledger_rows(targets_by_domain[domain_id]),
+            )
         raise RuntimeError("network unavailable")
 
     with pytest.raises(DatabaseIsolationError, match="owner_probe_failed"):
@@ -249,7 +263,7 @@ def test_grant_probe_rejects_missing_or_changed_live_migration_rows():
             rows = _ledger_rows(targets_by_domain[domain_id])
             if domain_id == "agent":
                 rows = ()
-            return Connection(ledger_rows=rows)
+            return Connection(deny_ddl=False, ledger_rows=rows)
         return Connection(deny=False)
 
     with pytest.raises(DatabaseIsolationError, match="migration_ledger_mismatch:agent"):
@@ -301,7 +315,7 @@ def test_cli_binds_provider_crud_and_writes_complete_rc_fragment(tmp_path):
         if url.username.endswith("_ddl"):
             domain_id = url.username.removesuffix("_ddl")
             target = next(item for item in targets if item.domain_id == domain_id)
-            return Connection(ledger_rows=_ledger_rows(target))
+            return Connection(deny_ddl=False, ledger_rows=_ledger_rows(target))
         return Connection(
             deny=url.username.removesuffix("_runtime")
             != url.database.removeprefix("ai00_")
@@ -327,5 +341,44 @@ def test_cli_binds_provider_crud_and_writes_complete_rc_fragment(tmp_path):
         "migration_ledger": "passed",
         "database_read": "passed",
         "database_write": "passed",
+        "runtime_ddl": "denied",
     }
     assert len(document["database_isolation"]["cross_domain"]) == 110
+
+
+def test_grant_probe_cleans_up_and_fails_if_runtime_ddl_is_allowed():
+    targets = load_probe_targets(ROOT)
+    targets_by_domain = {target.domain_id: target for target in targets}
+    ddl_connections = []
+
+    def connect(url, _ca_path):
+        principal = url.username
+        if principal.endswith("_ddl"):
+            domain_id = principal.removesuffix("_ddl")
+            connection = Connection(
+                deny_ddl=False,
+                ledger_rows=_ledger_rows(targets_by_domain[domain_id]),
+            )
+            ddl_connections.append((domain_id, connection))
+            return connection
+        domain_id = principal.removesuffix("_runtime")
+        return Connection(
+            deny=domain_id != url.database.removeprefix("ai00_"),
+            deny_ddl=domain_id != "agent",
+        )
+
+    with pytest.raises(DatabaseIsolationError, match="runtime_ddl_allowed:agent"):
+        verify_database_grants(
+            targets,
+            _environment(targets),
+            ca_path="ca.pem",
+            connect=connect,
+        )
+
+    agent_ddl_queries = [
+        sql
+        for domain_id, connection in ddl_connections
+        if domain_id == "agent"
+        for sql in connection.queries
+    ]
+    assert any(sql.startswith("DROP TABLE IF EXISTS") for sql in agent_ddl_queries)
