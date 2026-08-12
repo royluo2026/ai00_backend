@@ -364,7 +364,7 @@ def test_current_repository_reports_progress_without_claiming_completion() -> No
 
     assert report.complete is False
     assert report.independent_domains == 2
-    assert report.cross_domain_sql == 332
+    assert report.cross_domain_sql == 329
     assert report.internal_imports == 6
     assert "missing_domain:agent" in report.failed
     assert "missing_domain:factory" in report.failed
@@ -414,4 +414,4 @@ def test_completion_cli_reports_progress_and_fails_strict() -> None:
     assert progress.returncode == 0
     assert json.loads(progress.stdout)["complete"] is False
     assert strict.returncode == 1
-    assert json.loads(strict.stdout)["cross_domain_sql"] == 332
+    assert json.loads(strict.stdout)["cross_domain_sql"] == 329

@@ -226,7 +226,6 @@ def mock_conn():
         "backend.routers.views.get_conn",
         "backend.routers.workbenches.get_conn",
         "agent_backend.routers.flows.get_agent_conn",
-        "craft_backend.routers.item_entries.get_conn",
         "craft_backend.routers.lists.get_conn",
         "craft_backend.routers.promotion.get_conn",
         "craft_backend.routers.rules.get_conn",
@@ -418,14 +417,6 @@ class TestSqlSchemaPrefix:
         client.get("/api/workbenches")
         sqls = self._get_executed_sqls(mc)
         self._assert_all_sql_have_schema(sqls, "GET /api/workbenches")
-
-    # ── item_entries ──
-
-    def test_item_entries_get(self, client, mock_conn):
-        _, mc = mock_conn
-        client.get("/api/item-entries/task/fake-gid")
-        sqls = self._get_executed_sqls(mc)
-        self._assert_all_sql_have_schema(sqls, "GET /api/item-entries/{item_type}/{item_gid}")
 
     # ── knowledge ──
 

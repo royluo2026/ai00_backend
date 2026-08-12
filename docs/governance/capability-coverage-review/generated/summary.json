@@ -103,8 +103,8 @@
   "proposed_final_catalog_capabilities": 190,
   "evidence": {
     "module_dependencies": 7,
-    "boundary_violations": 338,
-    "cross_domain_sql": 332,
+    "boundary_violations": 335,
+    "cross_domain_sql": 329,
     "internal_import": 6,
     "tables": 176,
     "migrations": 35

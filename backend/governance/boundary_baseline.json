@@ -1523,30 +1523,6 @@
     },
     {
       "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/item_entries.py",
-      "scope": "delete_item_entries",
-      "target": "workmanship_work_item_entries",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_item_entries",
-      "fingerprint": "3a4d5aef950d1cc46168"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/item_entries.py",
-      "scope": "get_item_entries",
-      "target": "workmanship_work_item_entries",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_item_entries",
-      "fingerprint": "19ea318c07f743ed2b5e"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/item_entries.py",
-      "scope": "put_item_entries",
-      "target": "workmanship_work_item_entries",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_item_entries",
-      "fingerprint": "b9d0d4ba08957ac35e1a"
-    },
-    {
-      "category": "cross_domain_sql",
       "path": "plugins/craft/craft_backend/routers/lists.py",
       "scope": "create_cloud_list",
       "target": "workmanship_work_lists",

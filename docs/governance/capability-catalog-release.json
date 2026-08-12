@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_9b6efb77d4635f59c96c5081b82936fb",
-  "catalog_hash": "sha256:9b6efb77d4635f59c96c5081b82936fbee99106170a015120c5119a89ac9dcb4",
+  "release_id": "rel_0d13b058da7bf7eed9efb688470df27f",
+  "catalog_hash": "sha256:0d13b058da7bf7eed9efb688470df27f6b8b58a1f7b89f6f279c2901f5a8f5f3",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -22817,7 +22817,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -22848,7 +22863,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -22919,7 +22934,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -22950,7 +22980,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -23021,7 +23051,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23052,7 +23097,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -23123,7 +23168,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23154,7 +23214,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -23225,7 +23285,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23256,7 +23331,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -23327,7 +23402,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23358,7 +23448,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -23429,7 +23519,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23460,7 +23565,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -23531,7 +23636,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23562,7 +23682,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -23633,7 +23753,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23664,7 +23799,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -23735,7 +23870,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23766,7 +23916,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -23837,7 +23987,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23868,7 +24033,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -23939,7 +24104,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -23970,7 +24150,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24041,7 +24221,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24072,7 +24267,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -24143,7 +24338,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24174,7 +24384,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24245,7 +24455,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24276,7 +24501,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -24347,7 +24572,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24378,7 +24618,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24449,7 +24689,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24480,7 +24735,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -24551,7 +24806,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24582,7 +24852,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24653,7 +24923,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24684,7 +24969,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -24755,7 +25040,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24786,7 +25086,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24857,7 +25157,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24888,7 +25203,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -24959,7 +25274,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -24990,7 +25320,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25061,7 +25391,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25092,7 +25437,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25163,7 +25508,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25194,7 +25554,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25265,7 +25625,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25296,7 +25671,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25367,7 +25742,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25398,7 +25788,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25469,7 +25859,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25500,7 +25905,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25571,7 +25976,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25602,7 +26022,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25673,7 +26093,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25704,7 +26139,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25775,7 +26210,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25806,7 +26256,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25877,7 +26327,22 @@
       "delegation_policy": "scoped",
       "input_schema": {
         "type": "object",
-        "properties": {},
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
         "additionalProperties": false
       },
       "output_schema": {
@@ -25908,7 +26373,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:5328db11e60c439fdbe5c8ebe97c7d9a225f5089297236fff28eaf2cfc6cd71f",
+      "schema_hash": "sha256:b9d4229962496ed7946b4b9377a5bcfff1d0f86c3041cfcd82b94297eef493ea",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -31768,7 +32233,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:f94e357b10930fd3d157e07c7ce708b26522f38a506d72f3f0b2f4f66887366c"
+      "artifact_hash": "sha256:d3cbf3b8b164e9a8a35ef27fa910ececc8185421aa368feedcee7086acabab5b"
     },
     {
       "plugin_id": "official.digital-model",
@@ -31798,7 +32263,7 @@
       "plugin_id": "official.project-management",
       "module": "project_management_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:39edf13d83e44155add2afd7b0c36b43ccb37d6560f1e85ac28d2acbf5ae710b"
+      "artifact_hash": "sha256:1a496113ba5d61dd9996a18c2e0c38b6b85ee82562c7fb711012735ed2a021e0"
     },
     {
       "plugin_id": "official.simulation",
@@ -31807,5 +32272,5 @@
       "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
     }
   ],
-  "created_at": "2026-08-12T05:55:39.119273Z"
+  "created_at": "2026-08-12T06:22:45.773101Z"
 }
