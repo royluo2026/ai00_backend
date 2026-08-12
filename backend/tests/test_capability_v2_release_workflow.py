@@ -110,4 +110,8 @@ def test_artifact_upload_is_allowlisted_and_preceded_by_secret_schema_scan():
         assert upload["if"] == "always()"
         assert set(upload["with"]["path"].splitlines()) == allowed
         assert ".runtime" not in upload["with"]["path"]
-        assert "password|token|secret|credential|database_url|dsn" in steps[scan_index]["run"]
+        for forbidden in (
+            "password", "token", "secret", "credential", "database_url", "dsn",
+            "authorization", "admin_url", "private_key",
+        ):
+            assert forbidden in steps[scan_index]["run"]

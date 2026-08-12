@@ -103,7 +103,7 @@ jobs:
             "artifacts/capability-v2-rc-evidence.json",
             "artifacts/capability-v2-release-candidate.json"
           )
-          $forbidden = '"(?:password|token|secret|credential|database_url|dsn)"\s*:'
+          $forbidden = '"(?:password|token|secret|credential|database_url|dsn|authorization|admin_url|private_key)"\s*:'
           foreach ($file in $files) {
             if ((Test-Path -LiteralPath $file) -and ((Get-Content -Raw -LiteralPath $file) -match $forbidden)) {
               throw "Forbidden secret-shaped JSON field in $file"

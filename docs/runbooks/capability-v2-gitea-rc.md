@@ -12,6 +12,18 @@
 - 探针计划由受保护文件 `AI00_RC_PROBE_CONFIG` 提供。文件须覆盖 5 个组件以及 11 个 Domain 的 manifest-owned smoke capability；载荷不得提交到仓库。
 - PowerShell 进程中必须存在用户/设备/服务凭据，但不要把凭据写进命令行、日志或 artifact。
 
+受保护的 probe config 是 JSON，`schema_version` 固定为 1。`gateway_headers_env` 和每个 step 的 `headers_env` 将 HTTP header 映射到环境变量名，文件中不得出现真实凭据。`components` 必须精确包含 `backend_gateway`、`plugin`、`agent`、`mcp`、`local_runtime`；check 名称分别固定为：
+
+- Backend：`health`、`catalog`、`unauthenticated_denial`、`permitted_invoke`、`audit`
+- Plugin：`catalog`、`permitted`、`denied`、`approval`
+- Agent：`health`、`tools`、`permitted`、`denied`、`approval`
+- MCP：`initialize`、`tools`、`permitted`、`denied`
+- Local Runtime：`heartbeat`、`lease`
+
+每个 step 还需提供 `target`、`method`、`path`、`body`、`expect` 和可选 `timeout_seconds`。Plugin path 必须位于 `/api/v1/plugin-marketplace/` 下，Local Runtime path 必须位于 `/api/v1/device-runtime/` 下。`expect` 只能表达真实的 `health`、`catalog`、`success`、`approval` 或 `denied` 结果；denied 必须收到 401/403/404。
+
+`providers` 必须精确包含 official manifest 的 11 个 `domain_id`。每项包含 `capability_id`、`major_version`、`payload` 和可选 timeout；脚本会校验 capability 的 `owner_domain` 确属该 Domain，并只通过 Backend `/api/v1/capabilities/{id}:invoke` 调用。该文件通常含 RC seed ID 或业务载荷，必须由环境所有者生成并存放在 runner 受保护路径，不能提交到 Git 或上传为 artifact。
+
 缺少管理员 URL、TLS CA、受保护 runner 标签或真实服务凭据时，结论只能是“环境阻塞”。禁止用 `sys`、生产环境、模拟 evidence、常量 `passed` 或通用 runner 绕过。
 
 在 WSL 内启动依赖进程时，只对该进程树提高文件句柄限制：
