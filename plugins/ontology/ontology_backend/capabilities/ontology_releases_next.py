@@ -24,21 +24,22 @@ from ..infrastructure.ids import next_gid
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from .ontology_concepts_next import ONTOLOGY_VERSION_REF_SCHEMA
 
+JSON_VALUE_SCHEMA = {"type": ["object", "array", "string", "number", "boolean", "null"]}
 
 RELEASE_SCHEMA = {
     "type": "object",
     "required": ["release_gid", "content_sha256", "ontology_version_ref"],
     "properties": {
         "release_gid": {"type": "string"},
-        "parent_release_gid": {},
+        "parent_release_gid": {"type": ["string", "null"]},
         "content_sha256": {"type": "string", "pattern": r"^[0-9a-f]{64}$"},
         "object_count": {"type": "integer", "minimum": 0},
         "ois_object_key": {"type": "string"},
         "source": {"type": "string"},
-        "source_gid": {},
-        "revision_commit_id": {},
+        "source_gid": {"type": ["string", "null"]},
+        "revision_commit_id": {"type": ["string", "null"]},
         "created_by": {"type": "string"},
-        "created_at": {},
+        "created_at": {"type": "string"},
         "compatibility": {
             "type": "string",
             "enum": ["backward_compatible", "migration_required", "breaking"],
@@ -60,10 +61,10 @@ _DIFF_CATEGORY_SCHEMA = {
     "type": "object",
     "required": ["added", "changed", "deprecated", "removed"],
     "properties": {
-        "added": {"type": "array", "items": {}},
-        "changed": {"type": "array", "items": {}},
-        "deprecated": {"type": "array", "items": {}},
-        "removed": {"type": "array", "items": {}},
+        "added": {"type": "array", "items": JSON_VALUE_SCHEMA},
+        "changed": {"type": "array", "items": JSON_VALUE_SCHEMA},
+        "deprecated": {"type": "array", "items": JSON_VALUE_SCHEMA},
+        "removed": {"type": "array", "items": JSON_VALUE_SCHEMA},
     },
 }
 
@@ -306,6 +307,6 @@ def register_ontology_release_capabilities(registry: Any) -> None:
     common = {"owner": "ontology", "plugin_callable": True, "subject_concepts": ("ontology.release",), "tags": ("ontology", "release")}
     registry.register(CapabilitySpec(**common, id="ontology.release.get", description="Read one immutable or active release.", use_when="A release identity or current active release is needed.", do_not_use_when="Comparing two releases.", effects=("read:ontology.release",), output_schema=RELEASE_SCHEMA, input_schema={"type": "object"}), get_release)
     registry.register(CapabilitySpec(**common, id="ontology.release.search", description="Search immutable release metadata.", use_when="Release history is required.", do_not_use_when="A release identity is known.", effects=("read:ontology.release",), output_schema=RELEASE_SEARCH_SCHEMA, input_schema={"type": "object"}), search_releases)
-    registry.register(CapabilitySpec(**common, id="ontology.release.diff", description="Compute a semantic stable-identity release diff.", use_when="Change impact between two releases is needed.", do_not_use_when="Raw JSON text differences are expected.", effects=("read:ontology.release",), output_schema=RELEASE_DIFF_SCHEMA, input_schema={"type": "object", "required": ["from_release_gid", "to_release_gid"]}), diff_releases)
-    registry.register(CapabilitySpec(**common, id="ontology.release.publish", description="Publish an approved proposal as a new immutable inactive release.", use_when="An exact proposal revision has independent approval.", do_not_use_when="Changing the active release.", effects=("create:ontology.release",), risk="write", confirmation="admin", idempotent=False, permissions=("ontology.publish",), output_schema=RELEASE_SCHEMA, input_schema={"type": "object", "required": ["proposal_gid", "proposal_revision_gid", "content_sha256"]}), publish_release)
-    registry.register(CapabilitySpec(**common, id="ontology.release.activate", description="Atomically activate a verified direct forward release.", use_when="All compatibility providers report zero blockers.", do_not_use_when="Publishing or rolling back directly.", effects=("update:ontology.active_ref",), risk="write", confirmation="admin", idempotent=False, permissions=("ontology.activate",), output_schema=ACTIVATION_SCHEMA, input_schema={"type": "object", "required": ["release_gid", "release_sha256", "expected_active_release_gid", "attestations"]}), activate_release)
+    registry.register(CapabilitySpec(**common, id="ontology.release.diff", description="Compute a semantic stable-identity release diff.", use_when="Change impact between two releases is needed.", do_not_use_when="Raw JSON text differences are expected.", effects=("read:ontology.release",), output_schema=RELEASE_DIFF_SCHEMA, input_schema={"type": "object", "properties": {"from_release_gid": {"type": "string"}, "to_release_gid": {"type": "string"}}, "required": ["from_release_gid", "to_release_gid"]}), diff_releases)
+    registry.register(CapabilitySpec(**common, id="ontology.release.publish", description="Publish an approved proposal as a new immutable inactive release.", use_when="An exact proposal revision has independent approval.", do_not_use_when="Changing the active release.", effects=("create:ontology.release",), risk="write", confirmation="admin", idempotent=False, permissions=("ontology.publish",), output_schema=RELEASE_SCHEMA, input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}, "proposal_revision_gid": {"type": "string"}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}, "required": ["proposal_gid", "proposal_revision_gid", "content_sha256"]}), publish_release)
+    registry.register(CapabilitySpec(**common, id="ontology.release.activate", description="Atomically activate a verified direct forward release.", use_when="All compatibility providers report zero blockers.", do_not_use_when="Publishing or rolling back directly.", effects=("update:ontology.active_ref",), risk="write", confirmation="admin", idempotent=False, permissions=("ontology.activate",), output_schema=ACTIVATION_SCHEMA, input_schema={"type": "object", "properties": {"release_gid": {"type": "string"}, "release_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "expected_active_release_gid": {"type": ["string", "null"]}, "attestations": {"type": "array", "items": {"type": "object", "properties": {"provider": {"type": "string"}, "status": {"type": "string"}, "blocking_count": {"type": "integer", "minimum": 0}}, "required": ["provider", "status", "blocking_count"], "additionalProperties": False}}}, "required": ["release_gid", "release_sha256", "expected_active_release_gid", "attestations"]}), activate_release)

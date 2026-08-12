@@ -17,7 +17,21 @@ ONTOLOGY_VERSION_REF_SCHEMA = {
     "properties": {
         "release_gid": {"type": "string"},
         "content_hash": {"type": "string", "pattern": r"^sha256:[0-9a-f]{64}$"},
-        "revision_ref": {},
+        "revision_ref": {"anyOf": [{
+            "type": "object",
+            "required": ["repository", "commit_id", "content_hash"],
+            "properties": {
+                "repository": {
+                    "type": "object",
+                    "required": ["tenant_id", "repository_id", "owner_domain", "resource_id"],
+                    "properties": {name: {"type": "string"} for name in ("tenant_id", "repository_id", "owner_domain", "resource_id")},
+                    "additionalProperties": False,
+                },
+                "commit_id": {"type": "string", "pattern": "^cmt_[0-9a-f]{40}$"},
+                "content_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            },
+            "additionalProperties": False,
+        }, {"type": "null"}]},
     },
 }
 

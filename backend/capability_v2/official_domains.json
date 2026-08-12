@@ -181,7 +181,7 @@
         "plugin_id": "official.ontology",
         "module": "ontology_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:ba13af6547a54fe86b992636e2ea7cd8c046d80bbc30f3311dbe167b605b6b58"
+        "artifact_hash": "sha256:d29ce8f2f43821ef3e17cedb71af0f1df275e5cd454ac43425581bb9b98d5c49"
       },
       "artifact_path": "plugins/ontology/ontology_backend",
       "allowed_owners": [

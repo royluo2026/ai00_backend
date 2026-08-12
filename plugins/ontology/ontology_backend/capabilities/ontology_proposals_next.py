@@ -16,6 +16,17 @@ from ..infrastructure.ids import next_gid
 from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from .ontology_concepts_next import ONTOLOGY_VERSION_REF_SCHEMA
 
+JSON_VALUE_SCHEMA = {"type": ["object", "array", "string", "number", "boolean", "null"]}
+CHANGE_SCHEMA = {
+    "type": "object",
+    "required": ["operation", "stable_gid", "value", "source_evidence"],
+    "properties": {
+        "operation": {"type": "string"}, "stable_gid": {"type": "string"},
+        "value": JSON_VALUE_SCHEMA,
+        "source_evidence": {"type": "array", "items": JSON_VALUE_SCHEMA},
+    },
+    "additionalProperties": False,
+}
 
 PROPOSAL_SCHEMA = {
     "type": "object",
@@ -29,11 +40,11 @@ PROPOSAL_SCHEMA = {
         "revision_no": {"type": "integer", "minimum": 1},
         "base_release_gid": {"type": "string"},
         "content_sha256": {"type": "string", "pattern": r"^[0-9a-f]{64}$"},
-        "changes": {"type": "array", "items": {}},
+        "changes": {"type": "array", "items": CHANGE_SCHEMA},
         "status": {"type": "string"},
         "author_gid": {"type": "string"},
         "channel": {"type": "string"},
-        "created_at": {},
+        "created_at": {"type": "string"},
         "base_ontology_version_ref": ONTOLOGY_VERSION_REF_SCHEMA,
     },
 }
@@ -169,12 +180,12 @@ def register_ontology_proposal_capabilities(registry: Any) -> None:
         use_when="A governed ontology change is being proposed.", do_not_use_when="Direct mutation of an active release is expected.",
         effects=("create:ontology.proposal", "create:ontology.proposal_revision"), risk="write", confirmation="user", idempotent=False,
         output_schema=PROPOSAL_SCHEMA,
-        input_schema={"type": "object", "required": ["base_release_gid", "changes"]}), create_proposal)
+        input_schema={"type": "object", "properties": {"base_release_gid": {"type": "string"}, "changes": {"type": "array", "minItems": 1, "items": CHANGE_SCHEMA}}, "required": ["base_release_gid", "changes"]}), create_proposal)
     registry.register(CapabilitySpec(
         **common, id="ontology.change.proposal.get", description="Read the current immutable proposal revision.",
         use_when="A proposal GID is known.", do_not_use_when="Searching proposals.", effects=("read:ontology.proposal",),
         output_schema=PROPOSAL_SCHEMA,
-        input_schema={"type": "object", "required": ["proposal_gid"]}), get_proposal)
+        input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}}, "required": ["proposal_gid"]}), get_proposal)
     registry.register(CapabilitySpec(
         **common, id="ontology.change.proposal.search", description="Search proposal metadata by governed status.",
         use_when="A review queue or proposal list is required.", do_not_use_when="A proposal GID is known.", effects=("read:ontology.proposal",),
@@ -184,4 +195,4 @@ def register_ontology_proposal_capabilities(registry: Any) -> None:
         use_when="A human reviewer makes a formal decision.", do_not_use_when="An Agent is attempting to approve.",
         effects=("create:ontology.proposal_review",), risk="write", confirmation="user", idempotent=False,
         permissions=("ontology.review",), output_schema=REVIEW_SCHEMA,
-        input_schema={"type": "object", "required": ["proposal_gid", "proposal_revision_gid", "content_sha256", "decision"]}), submit_review)
+        input_schema={"type": "object", "properties": {"proposal_gid": {"type": "string"}, "proposal_revision_gid": {"type": "string"}, "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "decision": {"type": "string", "enum": ["approve", "reject", "request_changes"]}, "comment": {"type": "string", "maxLength": 4000}}, "required": ["proposal_gid", "proposal_revision_gid", "content_sha256", "decision"]}), submit_review)
