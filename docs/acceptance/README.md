@@ -29,7 +29,8 @@ skips, a nonzero pytest status or an incomplete case count.
 The protected RC runner requires `AI00_ACCEPTANCE_RC_EVIDENCE` to point to JSON
 matching `capability-v2-rc-evidence.schema.json`. Evidence must bind the exact
 Git commit, workflow run identity, recent generation time, Catalog Release/hash,
-latest migration checksum, Provider artifact hashes and environment ID. It must
+latest platform migration checksum, the DomainManifest digest, every domain
+migration checksum/artifact version, Provider artifact hashes and environment ID. It must
 contain exactly the stable Capability keys and mark all seven runtime cases
 `passed`. It must also contain exactly eleven successful owner-operation rows
 and all 110 ordered cross-domain credential pairs with both reads and writes

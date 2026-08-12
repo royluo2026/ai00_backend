@@ -7,7 +7,8 @@
   "required": [
     "schema_version", "report_id", "generated_at", "mode", "status",
     "git_commit", "working_tree_clean", "catalog_release", "catalog_hash",
-    "schema_hashes", "migration", "provider_artifacts", "environment_id",
+    "schema_hashes", "migration", "domain_manifest", "domain_migrations",
+    "provider_artifacts", "environment_id",
     "validation_scope", "runtime_evidence_hash", "component_results", "completion",
     "cases", "test_run", "blockers"
   ],
@@ -29,6 +30,28 @@
         "migration_id": {"type": "string", "pattern": "^[0-9]{12}$"},
         "filename": {"type": "string", "pattern": "^[0-9]{12}_[a-z0-9_]+\\.sql$"},
         "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "domain_manifest": {
+      "type": "object", "additionalProperties": false,
+      "required": ["filename", "sha256"],
+      "properties": {
+        "filename": {"const": "backend/capability_v2/official_domains.json"},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "domain_migrations": {
+      "type": "array", "minItems": 11, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["domain_id", "migration_id", "filename", "sha256", "artifact_version"],
+        "properties": {
+          "domain_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "migration_id": {"type": "string", "pattern": "^[0-9]{4}$"},
+          "filename": {"type": "string", "pattern": "^[0-9]{4}_[a-z][a-z0-9_]*\\.sql$"},
+          "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "artifact_version": {"type": "string", "minLength": 1}
+        }
       }
     },
     "provider_artifacts": {

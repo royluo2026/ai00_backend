@@ -10,6 +10,8 @@ from backend.capability_v2.completion import evaluate_completion
 from backend.capability_v2.domain_manifest import load_domain_manifests
 from backend.scripts.run_capability_v2_acceptance import (
     MANDATORY_CASES,
+    _domain_manifest_binding,
+    _domain_migration_bindings,
     acceptance_temp_root,
     contract_test_command,
     _http_json_probe,
@@ -42,6 +44,8 @@ def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
         "catalog_release": catalog["release_id"],
         "catalog_hash": catalog["catalog_hash"],
         "migration": _migration_binding(),
+        "domain_manifest": _domain_manifest_binding(),
+        "domain_migrations": _domain_migration_bindings(),
         "provider_artifacts": catalog["provider_artifacts"],
         "environment_id": "rc-isolated-42",
         "database_isolation": {
@@ -70,6 +74,35 @@ def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
             for key, cases in manifest["capabilities"].items()
         },
     }
+
+
+def test_release_bindings_cover_manifest_and_every_domain_migration():
+    manifest_binding = _domain_manifest_binding()
+    migration_bindings = _domain_migration_bindings()
+
+    assert manifest_binding["filename"] == "backend/capability_v2/official_domains.json"
+    assert manifest_binding["sha256"].startswith("sha256:")
+    assert {
+        (row["domain_id"], row["filename"])
+        for row in migration_bindings
+    } == {
+        ("agent", "0001_agent.sql"),
+        ("base", "0001_base_platform.sql"),
+        ("base", "0002_domain_inbox.sql"),
+        ("craft", "0001_pbom.sql"),
+        ("digital_model", "0001_digital_model.sql"),
+        ("factory", "0001_factory.sql"),
+        ("integration", "0001_integration.sql"),
+        ("knowledge", "0001_knowledge.sql"),
+        ("knowledge", "0002_domain_outbox_delivery.sql"),
+        ("knowledge", "0003_display_counters.sql"),
+        ("local_runtime", "0001_local_runtime.sql"),
+        ("ontology", "0001_ontology.sql"),
+        ("project_management", "0001_project_management.sql"),
+        ("simulation", "0001_simulation.sql"),
+    }
+    assert all(row["sha256"].startswith("sha256:") for row in migration_bindings)
+    assert all(row["artifact_version"] for row in migration_bindings)
 
 
 def test_current_manifest_is_release_complete():
@@ -135,6 +168,8 @@ def test_generated_report_validates_against_checked_in_schema():
     assert validate_report_schema(report) == []
     assert report["completion"]["complete"] is True
     assert report["completion"]["cross_domain_sql"] == 0
+    assert report["domain_manifest"] == _domain_manifest_binding()
+    assert report["domain_migrations"] == _domain_migration_bindings()
 
 
 def test_only_release_candidate_is_blocked_by_incomplete_program():
@@ -268,6 +303,8 @@ def test_runtime_evidence_rejects_stale_or_rebound_document(tmp_path, monkeypatc
     evidence = _runtime_evidence(catalog, manifest, commit="a" * 40, run_id="old-run")
     evidence["catalog_hash"] = "sha256:" + "0" * 64
     evidence["migration"]["sha256"] = "sha256:" + "0" * 64
+    evidence["domain_manifest"]["sha256"] = "sha256:" + "0" * 64
+    evidence["domain_migrations"][0]["sha256"] = "sha256:" + "0" * 64
     evidence["provider_artifacts"] = []
     evidence["generated_at"] = (datetime.now(UTC) - timedelta(days=1)).isoformat()
     path = tmp_path / "stale.json"
@@ -283,6 +320,8 @@ def test_runtime_evidence_rejects_stale_or_rebound_document(tmp_path, monkeypatc
     assert "RC evidence run identity mismatch" in errors
     assert "RC evidence catalog hash mismatch" in errors
     assert "RC evidence migration binding mismatch" in errors
+    assert "RC evidence domain manifest binding mismatch" in errors
+    assert "RC evidence domain migration bindings mismatch" in errors
     assert "RC evidence provider artifact binding mismatch" in errors
     assert "RC evidence generation time is stale or in the future" in errors
 

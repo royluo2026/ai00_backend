@@ -3,7 +3,7 @@
   "title": "Capability V2 RC Runtime Evidence",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "run_id", "generated_at", "catalog_release", "catalog_hash", "git_commit", "migration", "provider_artifacts", "environment_id", "database_isolation", "capabilities"],
+  "required": ["schema_version", "run_id", "generated_at", "catalog_release", "catalog_hash", "git_commit", "migration", "domain_manifest", "domain_migrations", "provider_artifacts", "environment_id", "database_isolation", "capabilities"],
   "properties": {
     "schema_version": {"const": 1},
     "run_id": {"type": "string", "minLength": 1},
@@ -19,6 +19,32 @@
         "migration_id": {"type": "string", "minLength": 1},
         "filename": {"type": "string", "pattern": "^[^/\\\\]+\\.sql$"},
         "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "domain_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "sha256"],
+      "properties": {
+        "filename": {"const": "backend/capability_v2/official_domains.json"},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "domain_migrations": {
+      "type": "array",
+      "minItems": 11,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["domain_id", "migration_id", "filename", "sha256", "artifact_version"],
+        "properties": {
+          "domain_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+          "migration_id": {"type": "string", "pattern": "^[0-9]{4}$"},
+          "filename": {"type": "string", "pattern": "^[0-9]{4}_[a-z][a-z0-9_]*\\.sql$"},
+          "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "artifact_version": {"type": "string", "minLength": 1}
+        }
       }
     },
     "provider_artifacts": {

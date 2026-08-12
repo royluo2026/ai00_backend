@@ -200,6 +200,35 @@ def _migration_binding() -> dict:
     }
 
 
+def _domain_manifest_binding() -> dict:
+    relative_path = Path("backend/capability_v2/official_domains.json")
+    path = ROOT / relative_path
+    return {
+        "filename": relative_path.as_posix(),
+        "sha256": "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest(),
+    }
+
+
+def _domain_migration_bindings() -> list[dict]:
+    from backend.capability_v2.domain_manifest import load_domain_manifests
+    from backend.capability_v2.domain_migrations import discover_domain_migrations
+
+    manifests = load_domain_manifests(
+        ROOT / "backend/capability_v2/official_domains.json"
+    )
+    return [
+        {
+            "domain_id": manifest.domain_id,
+            "migration_id": migration.migration_id,
+            "filename": migration.path.name,
+            "sha256": "sha256:" + migration.checksum,
+            "artifact_version": migration.artifact_version,
+        }
+        for manifest in sorted(manifests.domains, key=lambda item: item.domain_id)
+        for migration in discover_domain_migrations(ROOT, manifest)
+    ]
+
+
 def catalog_integrity_errors(catalog: dict) -> list[str]:
     from backend.capability_v2.catalog import CatalogRelease
     from backend.capability_v2.docs.generator import build_documentation
@@ -258,6 +287,10 @@ def validate_runtime_evidence(catalog: dict, manifest: dict, env: dict[str, str]
         errors.append("RC evidence git commit mismatch")
     if evidence.get("migration") != _migration_binding():
         errors.append("RC evidence migration binding mismatch")
+    if evidence.get("domain_manifest") != _domain_manifest_binding():
+        errors.append("RC evidence domain manifest binding mismatch")
+    if evidence.get("domain_migrations") != _domain_migration_bindings():
+        errors.append("RC evidence domain migration bindings mismatch")
     if evidence.get("provider_artifacts") != catalog.get("provider_artifacts", []):
         errors.append("RC evidence provider artifact binding mismatch")
     errors.extend(_database_isolation_evidence_errors(evidence))
@@ -438,6 +471,8 @@ def build_report(
             for item in catalog["capabilities"]
         },
         "migration": _migration_binding(),
+        "domain_manifest": _domain_manifest_binding(),
+        "domain_migrations": _domain_migration_bindings(),
         "provider_artifacts": catalog.get("provider_artifacts", []),
         "environment_id": os.environ.get("AI00_ACCEPTANCE_ENVIRONMENT_ID", f"offline:{socket.gethostname()}"),
         "validation_scope": "runtime_e2e" if mode == "release-candidate" else "contract",
