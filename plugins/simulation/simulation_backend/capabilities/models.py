@@ -42,7 +42,7 @@ class RegisteredSourceResolver:
 
     def resolve_model_snapshot(self, ref: Mapping[str, Any], context: CapabilityContext) -> dict[str, Any]:
         try:
-            return versioned_resource_resolvers.resolve("digital_model.snapshot", ref, context)
+            return versioned_resource_resolvers.resolve("digital_model.version", ref, context)
         except LookupError as exc:
             raise CapabilityBusinessError("source_resolver_unavailable", str(exc)) from exc
 

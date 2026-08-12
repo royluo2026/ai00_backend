@@ -10,10 +10,12 @@ import pytest
 from pydantic import ValidationError
 
 from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.agreed_catalog import APPROVED_CAPABILITY_IDS
 from backend.capabilities.models_next import CapabilityContext
 from backend.capabilities.validation_next import validate_payload
 from backend.capability_v2.revision.digital_model_adapter import DigitalModelRevisionAdapter
 from backend.domain_ports.digital_model import ModelSnapshotRef
+from backend.domain_ports.versioned_resources import versioned_resource_resolvers
 from plugins.digital_model.digital_model_backend.capabilities import register_capabilities
 from plugins.digital_model.digital_model_backend.capabilities import models as model_capabilities
 from plugins.digital_model.digital_model_backend.capabilities.contracts import INPUT_SCHEMAS
@@ -25,8 +27,9 @@ CAPABILITY_IDS = {
     "digital_model.model.get",
     "digital_model.model.search",
     "digital_model.version.create",
-    "digital_model.snapshot.get",
-    "digital_model.snapshot.compare",
+    "digital_model.version.get",
+    "digital_model.version.search",
+    "digital_model.version.compare",
     "digital_model.component.search",
 }
 GOLDEN_ROOT = Path(__file__).with_name("golden") / "digital_model"
@@ -69,6 +72,14 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
         assert descriptor.output_schema["additionalProperties"] is False
         assert descriptor.output_schema["properties"]
         assert descriptor.domain_errors_complete is True
+
+    assert [selector.payload_path for selector in registrations["digital_model.version.get"].descriptor.resource_selectors] == ["model_id", "version_id"]
+    assert [selector.payload_path for selector in registrations["digital_model.version.compare"].descriptor.resource_selectors] == ["model_id", "from_version_id", "to_version_id"]
+    assert registrations["digital_model.version.search"].descriptor.output_schema["properties"]["items"]["items"]["additionalProperties"] is False
+    assert "digital_model.version" in versioned_resource_resolvers._resolvers
+    assert CAPABILITY_IDS <= APPROVED_CAPABILITY_IDS
+    assert "digital_model.snapshot.get" not in APPROVED_CAPABILITY_IDS
+    assert "digital_model.snapshot.compare" not in APPROVED_CAPABILITY_IDS
 
 
 def test_model_snapshot_refs_never_accept_or_emit_server_file_paths():

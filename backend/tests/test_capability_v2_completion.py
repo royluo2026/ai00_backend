@@ -363,7 +363,7 @@ def test_current_repository_reports_progress_without_claiming_completion() -> No
     report = evaluate_completion(root, mode="progress")
 
     assert report.complete is False
-    assert report.independent_domains == 6
+    assert report.independent_domains == 7
     assert report.cross_domain_sql == 312
     assert report.internal_imports == 6
     assert "missing_domain:agent" in report.failed

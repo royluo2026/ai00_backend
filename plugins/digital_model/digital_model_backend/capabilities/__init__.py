@@ -12,7 +12,7 @@ from backend.domain_ports.versioned_resources import versioned_resource_resolver
 def register_capabilities(registry: Any) -> None:
     for spec, handler in specs():
         register(registry, spec, handler)
-    versioned_resource_resolvers.register("digital_model.snapshot", resolve_snapshot_reference)
+    versioned_resource_resolvers.register("digital_model.version", resolve_snapshot_reference)
 
 
 __all__ = ["register_capabilities"]

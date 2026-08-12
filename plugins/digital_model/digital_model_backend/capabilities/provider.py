@@ -16,8 +16,9 @@ _RESOURCES = {
     "digital_model.model.create": (("project", "project_ref"),),
     "digital_model.model.get": (("digital-model", "model_id"),),
     "digital_model.version.create": (("digital-model", "model_id"),),
-    "digital_model.snapshot.get": (("digital-model", "model_id"), ("digital-model-version", "version_id")),
-    "digital_model.snapshot.compare": (("digital-model", "model_id"), ("digital-model-version", "from_version_id"), ("digital-model-version", "to_version_id")),
+    "digital_model.version.get": (("digital-model", "model_id"), ("digital-model-version", "version_id")),
+    "digital_model.version.search": (("digital-model", "model_id"),),
+    "digital_model.version.compare": (("digital-model", "model_id"), ("digital-model-version", "from_version_id"), ("digital-model-version", "to_version_id")),
     "digital_model.component.search": (("digital-model", "model_id"), ("digital-model-version", "version_id")),
 }
 _ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning) for code, meaning in (
@@ -61,7 +62,7 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
         "expected_version_payload_path": "expected_head_version_id" if expected_version else None,
         "idempotency_policy": "required" if is_write else "none",
         "consistency_policy": "external" if is_write else "strong",
-        "evidence_policy": "required" if governed.id in {"digital_model.version.create", "digital_model.snapshot.get"} else "optional",
+        "evidence_policy": "required" if governed.id in {"digital_model.version.create", "digital_model.version.get"} else "optional",
         "domain_errors": _ERRORS,
         "domain_errors_complete": True,
     }

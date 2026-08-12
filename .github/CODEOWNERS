@@ -49,6 +49,7 @@
 /plugins/digital_model/** @ai00/digital-model-maintainers
 /backend/domain_ports/digital_model.py @ai00/digital-model-maintainers
 /backend/capability_v2/revision/digital_model_adapter.py @ai00/digital-model-maintainers
+/backend/db/migrations/domains/digital_model/** @ai00/digital-model-maintainers
 /backend/db/migrations/202608100009_digital_model_snapshots.sql @ai00/digital-model-maintainers
 
 # Factory

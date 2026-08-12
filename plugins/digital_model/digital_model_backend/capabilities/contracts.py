@@ -44,8 +44,9 @@ INPUT_SCHEMAS = {
         "model_id": STRING, "version_label": STRING, "expected_head_version_id": STRING,
         "artifact_ref": ARTIFACT_REF, "components": {"type": "array", "items": COMPONENT},
     }, ("model_id", "version_label", "expected_head_version_id", "artifact_ref", "components")),
-    "digital_model.snapshot.get": obj({"model_id": STRING, "version_id": STRING}, ("model_id", "version_id")),
-    "digital_model.snapshot.compare": obj({
+    "digital_model.version.get": obj({"model_id": STRING, "version_id": STRING}, ("model_id", "version_id")),
+    "digital_model.version.search": obj({"model_id": STRING}, ("model_id",)),
+    "digital_model.version.compare": obj({
         "model_id": STRING, "from_version_id": STRING, "to_version_id": STRING,
     }, ("model_id", "from_version_id", "to_version_id")),
     "digital_model.component.search": obj({
@@ -58,8 +59,9 @@ OUTPUT_SCHEMAS = {
     "digital_model.model.get": MODEL,
     "digital_model.model.search": obj({"items": {"type": "array", "items": MODEL}, "total": INTEGER, "query": STRING}, ("items", "total", "query")),
     "digital_model.version.create": obj({"snapshot_ref": SNAPSHOT_REF, "version_label": STRING, "component_count": INTEGER}, ("snapshot_ref", "version_label", "component_count")),
-    "digital_model.snapshot.get": obj({"snapshot_ref": SNAPSHOT_REF, "version_label": STRING, "components": {"type": "array", "items": COMPONENT}}, ("snapshot_ref", "version_label", "components")),
-    "digital_model.snapshot.compare": obj({
+    "digital_model.version.get": obj({"snapshot_ref": SNAPSHOT_REF, "version_label": STRING, "components": {"type": "array", "items": COMPONENT}}, ("snapshot_ref", "version_label", "components")),
+    "digital_model.version.search": obj({"items": {"type": "array", "items": {}}}, ("items",)),
+    "digital_model.version.compare": obj({
         "model_id": STRING, "from_version_id": STRING, "to_version_id": STRING,
         "changes": {"type": "array", "items": {}}, "breaking": {"type": "boolean"},
     }, ("model_id", "from_version_id", "to_version_id", "changes", "breaking")),

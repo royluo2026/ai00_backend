@@ -134,6 +134,18 @@ class DigitalModelRepository:
                 row = cur.fetchone()
         return dict(row) if row else None
 
+    def search_versions(self, model_id: str, context: CapabilityContext) -> list[dict[str, Any]]:
+        with get_digital_model_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT v.version_id,v.model_id,v.version_label,v.snapshot_hash,v.artifact_id,v.artifact_media_type,"
+                    "v.artifact_sha256,v.artifact_byte_size,v.artifact_version,v.snapshot_json FROM workmanship_model_versions v "
+                    "JOIN workmanship_model_models m ON m.model_id=v.model_id WHERE v.model_id=%s "
+                    "AND (m.owner_gid=%s OR (%s IS NOT NULL AND m.team_gid=%s)) ORDER BY v.created_at DESC",
+                    (model_id, context.user_gid, context.team_gid, context.team_gid),
+                )
+                return [dict(row) for row in cur.fetchall()]
+
 
 repository = DigitalModelRepository()
 adapter = DigitalModelRevisionAdapter()
@@ -225,6 +237,11 @@ def get_snapshot(payload: dict[str, Any], context: CapabilityContext) -> Capabil
     return CapabilityOutput(data=_snapshot(row))
 
 
+def search_versions(payload: dict[str, Any], context: CapabilityContext) -> CapabilityOutput:
+    rows = repository.search_versions(str(payload["model_id"]), context)
+    return CapabilityOutput(data={"items": [_snapshot(row) for row in rows]})
+
+
 def resolve_snapshot_reference(reference: Mapping[str, Any], context: CapabilityContext) -> dict[str, Any]:
     """Resolve and verify an exact immutable model snapshot for downstream domains."""
     row = repository.get_snapshot(str(reference.get("model_id") or ""), str(reference.get("version_id") or ""), context)
@@ -262,7 +279,8 @@ def search_components(payload: dict[str, Any], context: CapabilityContext) -> Ca
     query = str(payload.get("query") or "").strip().casefold()
     limit = max(1, min(int(payload.get("limit") or 50), 200))
     items = [item for item in snapshot["components"] if not query or query in item["name"].casefold() or query in item["component_id"].casefold()][:limit]
-    return CapabilityOutput(data={"model_id": str(payload["model_id"]), "version_id": str(payload["version_id"]), "items": items, "total": len(items)})
+    ref = snapshot["snapshot_ref"]
+    return CapabilityOutput(data={"model_id": str(payload["model_id"]), "version_id": str(payload["version_id"]), "items": items, "total": len(items)}, evidence=(EvidenceRef(kind="digital_model.trusted_component_extraction", reference=f"model:{payload['model_id']}@{payload['version_id']}", digest=ref["snapshot_hash"]),))
 
 
 def specs() -> tuple[tuple[CapabilitySpec, Any], ...]:
@@ -272,8 +290,9 @@ def specs() -> tuple[tuple[CapabilitySpec, Any], ...]:
         (CapabilitySpec(id="digital_model.model.get", description="Read a governed Digital Model identity.", **common), get_model),
         (CapabilitySpec(id="digital_model.model.search", description="Search visible Digital Model identities.", **common), search_models),
         (CapabilitySpec(id="digital_model.version.create", description="Create an immutable artifact-backed Digital Model snapshot.", risk="write", confirmation="user", idempotent=False, **common), create_version),
-        (CapabilitySpec(id="digital_model.snapshot.get", description="Read an immutable Digital Model snapshot.", **common), get_snapshot),
-        (CapabilitySpec(id="digital_model.snapshot.compare", description="Compare Digital Model snapshots semantically.", **common), compare_snapshots),
+        (CapabilitySpec(id="digital_model.version.get", description="Read an immutable Digital Model Version.", **common), get_snapshot),
+        (CapabilitySpec(id="digital_model.version.search", description="Search immutable Digital Model Versions.", **common), search_versions),
+        (CapabilitySpec(id="digital_model.version.compare", description="Compare Digital Model Versions semantically.", **common), compare_snapshots),
         (CapabilitySpec(id="digital_model.component.search", description="Search components in an immutable Digital Model snapshot.", **common), search_components),
     )
 
