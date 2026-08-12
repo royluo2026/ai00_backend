@@ -21,17 +21,15 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from ..data.connection import get_conn
 from backend.platform_sdk.access import build_access_scope
-from backend.platform_sdk.auth import get_current_user, require_role, get_user_grants, derive_org_role
+from backend.platform_sdk.auth import get_current_user, require_role, derive_org_role
 from backend.platform_sdk.auth import get_authenticated_principal
 from backend.capability_v2.gateway import get_default_gateway
 from backend.platform_sdk.project_management import build_web_compatibility_envelope, invoke_compatibility
-from backend.platform_sdk.ids import next_gid
+from backend.platform_sdk.craft_project_scope import equivalent_line_gids, line_titles, line_titles_for_project, project_bop_lines
 from backend.platform_sdk.project_access import (
     add_project_member as add_project_access_member,
     can_manage_project,
-    get_user_profiles,
     list_all_project_memberships,
     list_project_access_entries,
     remove_project_member as remove_project_access_member,
@@ -87,12 +85,6 @@ class UpdateProjectBody(BaseModel):
     factory_gid: Optional[str] = None
 
 
-def _compute_name(project_code: str, model_year, suffix: str) -> str:
-    """name 由 project_code + model_year + suffix 用 '-' 拼接，空部分跳过。"""
-    parts = [p for p in [project_code, str(model_year) if model_year else None, suffix] if p]
-    return "-".join(parts) or project_code
-
-
 class AddMemberBody(BaseModel):
     user_gid: str
     project_role: str = "member"
@@ -116,47 +108,6 @@ def _can_manage_project_lines(user: dict, project_gid: str) -> bool:
     """Base owns project membership and grant semantics."""
     org_role = user.get("org_role") or derive_org_role(user.get("system_role", "external"))
     return org_role == "super_admin" or can_manage_project(user["gid"], project_gid)
-
-
-def _get_editable_line_gids(cur, user: dict, project_gid: str) -> set[str]:
-    org_role = user.get("org_role") or derive_org_role(user.get("system_role", "external"))
-    if org_role == "super_admin":
-        cur.execute(
-            "SELECT gid FROM workmanship_bop_bop_entries WHERE node_type = 'line_process' AND is_deleted = FALSE"
-        )
-        return {r["gid"] for r in cur.fetchall()}
-
-    if _can_manage_project_lines(user, project_gid):
-        cur.execute(
-            "SELECT gid FROM workmanship_bop_bop_entries WHERE node_type = 'line_process' AND is_deleted = FALSE"
-        )
-        return {r["gid"] for r in cur.fetchall()}
-
-    grants = get_user_grants(user["gid"])
-    return {g["scope_gid"] for g in grants if g["grant_type"] == "section_lead" and g.get("scope_gid")}
-def _row_to_project(r):
-    return {
-        "gid":               r["gid"],
-        "name":              r["name"],
-        "project_code":      r["project_code"] or "",
-        "model_year":        r["model_year"],
-        "suffix":            r["suffix"] or "",
-        "description":       r["description"] or "",
-        "status":            r["status"],
-        "vehicle_model_gid": r["vehicle_model_gid"],
-        "factory_gid":       r.get("factory_gid"),
-        "team_id":           r["team_id"],
-        "owner_gid":         r["owner_gid"],
-        "owner_name":        r.get("owner_name") or "",
-        "share_scope":       r["share_scope"],
-        "jph":               r["jph"],
-        "is_deleted":        r["is_deleted"],
-        "is_archived":       r["is_archived"],
-        "deleted_at":        str(r["deleted_at"]) if r["deleted_at"] else None,
-        "archived_at":       str(r["archived_at"]) if r["archived_at"] else None,
-        "created_at":        str(r["created_at"]),
-        "updated_at":        str(r["updated_at"]),
-    }
 
 
 # ── 车型 ──────────────────────────────────────────────────────────
@@ -201,30 +152,15 @@ async def create_project(body: CreateProjectBody, request: Request, current_user
 
 
 @router.get("/members/matrix")
-def get_members_matrix(current_user: dict = Depends(get_current_user)):
+async def get_members_matrix(request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """Compose the Auth membership projection with Craft-owned project/line names."""
     memberships = list_all_project_memberships()
     project_gids = sorted({row["project_gid"] for row in memberships if row.get("project_gid")})
     line_gids = sorted({row["scope_gid"] for row in memberships if row.get("scope_gid")})
-    projects = {}
-    sections = {}
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            if project_gids:
-                placeholders = ",".join(["%s"] * len(project_gids))
-                cur.execute(
-                    f"SELECT gid, name FROM workmanship_proj_projects "
-                    f"WHERE is_deleted=FALSE AND gid IN ({placeholders})",
-                    project_gids,
-                )
-                projects = {row["gid"]: row["name"] for row in cur.fetchall()}
-            if line_gids:
-                placeholders = ",".join(["%s"] * len(line_gids))
-                cur.execute(
-                    f"SELECT gid, title FROM workmanship_bop_bop_entries WHERE gid IN ({placeholders})",
-                    line_gids,
-                )
-                sections = {row["gid"]: row["title"] for row in cur.fetchall()}
+    access = build_access_scope(current_user)
+    project_result = await _invoke_project(request, current_user, principal, gateway, "projects.search", {"include_deleted": False, "include_archived": True, "scope": access})
+    projects = {row["gid"]: row["name"] for row in project_result["data"] if row["gid"] in project_gids}
+    sections = line_titles(line_gids)
     return {"success": True, "data": [
         {
             "user_gid": row["user_gid"], "name": row["name"],
@@ -257,17 +193,8 @@ async def delete_project(gid: str, request: Request, current_user: dict = Depend
 
 @router.get("/{gid}/members")
 def list_project_members(gid: str, current_user: dict = Depends(get_current_user)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT e.gid, e.title FROM workmanship_bop_bop_entries e "
-                "JOIN workmanship_bop_bop_versions v ON v.gid=e.version_gid "
-                "WHERE v.project_gid=%s AND v.archived_at IS NULL "
-                "AND e.node_type='line_process' AND e.is_deleted=FALSE",
-                (gid,),
-            )
-            line_titles = {row["gid"]: row["title"] or "" for row in cur.fetchall()}
-    rows = list_project_access_entries(gid, line_titles)
+    titles = line_titles_for_project(gid)
+    rows = list_project_access_entries(gid, titles)
     seen = set()
     result = []
     for row in rows:
@@ -280,19 +207,15 @@ def list_project_members(gid: str, current_user: dict = Depends(get_current_user
             "email": row["email"], "avatar_url": row["avatar_url"],
             "project_role": row["role"], "scope_gid": row.get("scope_gid"),
             "scope_type": row.get("scope_type") or "",
-            "line_title": line_titles.get(row.get("scope_gid"), ""),
+            "line_title": titles.get(row.get("scope_gid"), ""),
             "created_at": str(row["created_at"]),
         })
     return {"success": True, "data": result}
 
 
 @router.post("/{gid}/members", status_code=201)
-def add_project_member(gid: str, body: AddMemberBody, current_user: dict = Depends(_PROJECT_WRITE)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid=%s AND is_deleted=FALSE", (gid,))
-            if not cur.fetchone():
-                raise HTTPException(status_code=404, detail="项目不存在")
+async def add_project_member(gid: str, body: AddMemberBody, request: Request, current_user: dict = Depends(_PROJECT_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    await _invoke_project(request, current_user, principal, gateway, "projects.get", {"gid": gid})
     try:
         member_gid = add_project_access_member(
             gid, body.user_gid, body.project_role, body.section_gid
@@ -312,60 +235,18 @@ def remove_project_member(gid: str, member_gid: str, current_user: dict = Depend
 @router.get("/{gid}/bop-lines")
 def get_project_bop_lines(gid: str, current_user: dict = Depends(get_current_user)):
     """返回项目所有活动 BOP 版本的线体，同名合并，附带所有相关 gid。"""
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid, title, sort_order FROM workmanship_bop_bop_entries "
-                "WHERE version_gid IN ("
-                "  SELECT gid FROM workmanship_bop_bop_versions "
-                "  WHERE project_gid = %s AND archived_at IS NULL"
-                ") AND node_type = 'line_process' AND is_deleted = FALSE "
-                "ORDER BY sort_order, title",
-                (gid,)
-            )
-            rows = cur.fetchall()
-    # 按 title 分组：收集所有 gid
-    by_title = {}
-    for r in rows:
-        title = r["title"] or ""
-        if title not in by_title:
-            by_title[title] = {"gid": r["gid"], "title": r["title"] or "（未命名线体）",
-                               "seq_no": r["sort_order"], "all_gids": []}
-        by_title[title]["all_gids"].append(r["gid"])
-    return {"success": True, "data": list(by_title.values())}
+    return {"success": True, "data": project_bop_lines(gid)}
 
 
 @router.put("/{gid}/line-assignment")
-def upsert_line_assignment(gid: str, body: LineGrantBody, current_user: dict = Depends(get_current_user)):
+async def upsert_line_assignment(gid: str, body: LineGrantBody, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """Replace project-manager or same-title line-lead assignments through Base access APIs."""
     if not _can_manage_project_lines(current_user, gid):
         raise HTTPException(status_code=403, detail="权限不足")
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT 1 FROM workmanship_proj_projects WHERE gid=%s AND is_deleted=FALSE", (gid,))
-            if not cur.fetchone():
-                raise HTTPException(status_code=404, detail="项目不存在")
-            if not body.line_gid:
-                line_gids = []
-            else:
-                cur.execute(
-                    "SELECT title FROM workmanship_bop_bop_entries "
-                    "WHERE gid=%s AND node_type='line_process' AND is_deleted=FALSE",
-                    (body.line_gid,),
-                )
-                row = cur.fetchone()
-                if not row:
-                    raise HTTPException(status_code=404, detail="线体不存在")
-                cur.execute(
-                    "SELECT e.gid FROM workmanship_bop_bop_entries e "
-                    "JOIN workmanship_bop_bop_versions v ON v.gid=e.version_gid "
-                    "WHERE v.project_gid=%s AND v.archived_at IS NULL "
-                    "AND e.node_type='line_process' AND e.is_deleted=FALSE AND e.title=%s",
-                    (gid, row["title"]),
-                )
-                line_gids = [item["gid"] for item in cur.fetchall()]
-                if not line_gids:
-                    raise HTTPException(status_code=404, detail="线体不存在")
+    await _invoke_project(request, current_user, principal, gateway, "projects.get", {"gid": gid})
+    line_gids = equivalent_line_gids(gid, body.line_gid) if body.line_gid else []
+    if body.line_gid and not line_gids:
+        raise HTTPException(status_code=404, detail="线体不存在")
     if not body.line_gid:
         replace_project_manager(gid, body.user_gid)
     else:
