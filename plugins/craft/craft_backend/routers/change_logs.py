@@ -1,112 +1,62 @@
-"""
-backend/routers/change_logs.py
-──────────────────────────────
-条目变更历史查询
-
-GET /api/change-logs?item_type=&item_gid=  单条目历史
-GET /api/change-logs?list_gid=             清单全量历史（仅 owner）
-"""
+"""Temporary legacy adapter for Project Management change-log reads."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query, HTTPException
-from ..data.connection import get_conn
-from backend.platform_sdk.auth import get_current_user
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
+from plugins.project_management.project_management_backend.api.compatibility import (
+    build_web_compatibility_envelope,
+    invoke_compatibility,
+)
 
 router = APIRouter(prefix="/api/change-logs", tags=["change_logs"])
 
 
 @router.get("")
-def list_change_logs(
+async def list_change_logs(
+    request: Request,
     item_type: str | None = Query(None),
-    item_gid:  str | None = Query(None),
-    list_gid:  str | None = Query(None),
-    limit:     int        = Query(100, le=500),
-    offset:    int        = Query(0),
-    user: dict = Depends(get_current_user),
+    item_gid: str | None = Query(None),
+    list_gid: str | None = Query(None),
+    limit: int = Query(100, le=500),
+    offset: int = Query(0),
+    current_user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
 ):
-    """
-    查询变更历史。
-    - item_type + item_gid：单条目历史
-      - owner（清单创建者）返回全量；其他人仅返回自己操作的
-    - list_gid：清单维度，仅清单 owner 可访问
-    """
     if not item_gid and not list_gid:
         raise HTTPException(400, "item_gid 或 list_gid 至少提供一个")
-
-    user_gid = user["gid"]
-    org_role  = user.get("org_role") or user.get("system_role", "member")
-    is_super  = org_role == "super_admin"
-
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            if list_gid:
-                # 检查是否为清单 owner（或超管）
-                if not is_super:
-                    cur.execute(
-                        "SELECT owner_gid FROM workmanship_work_lists WHERE gid = %s",
-                        (list_gid,),
-                    )
-                    row = cur.fetchone()
-                    if not row or row["owner_gid"] != user_gid:
-                        raise HTTPException(403, "仅清单 owner 可查看全量变更历史")
-
-                cur.execute(
-                    """
-                    SELECT gid, item_type, item_gid, list_gid, changed_by,
-                           changed_at, field_name, old_value, new_value
-                    FROM workmanship_work_item_change_logs
-                    WHERE list_gid = %s
-                    ORDER BY changed_at DESC
-                    LIMIT %s OFFSET %s
-                    """,
-                    (list_gid, limit, offset),
-                )
-            else:
-                # 单条目历史：先检查是否为 owner
-                is_owner = False
-                if not is_super:
-                    # 通过 list_gid 反查 owner
-                    cur.execute(
-                        """
-                        SELECT l.owner_gid
-                        FROM workmanship_work_item_change_logs cl
-                        JOIN workmanship_work_lists l ON l.gid = cl.list_gid
-                        WHERE cl.item_type = %s AND cl.item_gid = %s
-                        LIMIT 1
-                        """,
-                        (item_type, item_gid),
-                    )
-                    owner_row = cur.fetchone()
-                    is_owner = owner_row and owner_row["owner_gid"] == user_gid
-
-                if is_super or is_owner:
-                    # 全量
-                    cur.execute(
-                        """
-                        SELECT gid, item_type, item_gid, list_gid, changed_by,
-                               changed_at, field_name, old_value, new_value
-                        FROM workmanship_work_item_change_logs
-                        WHERE item_type = %s AND item_gid = %s
-                        ORDER BY changed_at DESC
-                        LIMIT %s OFFSET %s
-                        """,
-                        (item_type, item_gid, limit, offset),
-                    )
-                else:
-                    # 仅自己的操作
-                    cur.execute(
-                        """
-                        SELECT gid, item_type, item_gid, list_gid, changed_by,
-                               changed_at, field_name, old_value, new_value
-                        FROM workmanship_work_item_change_logs
-                        WHERE item_type = %s AND item_gid = %s
-                          AND changed_by = %s
-                        ORDER BY changed_at DESC
-                        LIMIT %s OFFSET %s
-                        """,
-                        (item_type, item_gid, user_gid, limit, offset),
-                    )
-
-            rows = cur.fetchall()
-
-    return [dict(r) for r in rows]
+    request_id = request.headers.get("X-Request-ID") or f"project_{uuid4().hex}"
+    trace_id = request.headers.get("X-Trace-ID") or request_id
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id="project.change_log.read",
+            payload={
+                "operation": "change_logs.search",
+                "arguments": {
+                    "item_type": item_type,
+                    "item_gid": item_gid,
+                    "list_gid": list_gid,
+                    "limit": limit,
+                    "offset": offset,
+                },
+            },
+            current_user=current_user,
+            principal=principal,
+            request_id=request_id,
+            trace_id=trace_id,
+        ),
+    )
+    if not result.ok:
+        code = result.error.code if result.error else "provider_failed"
+        status_code = 403 if code == "forbidden" else 400 if code == "invalid_input" else 422
+        raise HTTPException(
+            status_code=status_code,
+            detail=result.error.model_dump(mode="json") if result.error else None,
+        )
+    return result.data["data"]

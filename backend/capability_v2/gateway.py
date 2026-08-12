@@ -385,6 +385,7 @@ class CapabilityGatewayService:
         return CapabilityContext(
             user_gid=actor.user_id or actor.service_id or "",
             team_gid=envelope.identity.tenant.tenant_id,
+            active_roles=envelope.identity.tenant.active_roles,
             source=envelope.identity.consumer.type.value,
             request_id=envelope.request_id,
             confirmation_token=envelope.approval_reference,

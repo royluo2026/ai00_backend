@@ -44,6 +44,7 @@ class CapabilityContext(BaseModel):
     team_gid: str | None = None
     confirmation_token: str | None = None
     permissions: tuple[str, ...] = ()
+    active_roles: tuple[str, ...] = ()
 
 class EvidenceRef(BaseModel):
     """Small, transport-safe evidence pointer; large content stays in its owner store."""

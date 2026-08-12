@@ -8,7 +8,9 @@ from fastapi.testclient import TestClient
 
 from backend.capability_v2.identity import AuthenticatedPrincipal
 from backend.capability_v2.gateway import get_default_gateway
+from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
+from plugins.craft.craft_backend.routers.change_logs import router as change_logs_router
 from plugins.craft.craft_backend.routers.item_entries import router as item_entries_router
 from plugins.project_management.project_management_backend.api.compatibility import (
     build_web_compatibility_envelope,
@@ -35,6 +37,16 @@ class RecordingGateway(GatewayRelease):
             }
         elif operation == "item_entries.delete":
             data = {"success": True}
+        elif operation == "change_logs.search":
+            data = [
+                {
+                    "gid": "change-1",
+                    "item_type": "task",
+                    "item_gid": "task-1",
+                    "list_gid": "list-1",
+                    "changed_by": "user-1",
+                }
+            ]
         else:
             data = {"entries": []}
         return SimpleNamespace(
@@ -75,6 +87,8 @@ def test_legacy_web_adapter_builds_a_server_derived_gateway_envelope():
     assert envelope.identity.tenant.active_roles == ("member",)
     assert envelope.identity.consumer.consumer_id == "ai00.web.compatibility"
     assert envelope.payload["operation"] == "item_entries.get"
+    context = CapabilityGatewayService._legacy_context(envelope)
+    assert context.active_roles == ("member",)
 
 
 def test_legacy_item_entry_read_uses_gateway_and_preserves_response_shape():
@@ -154,3 +168,50 @@ def test_legacy_item_entry_writes_use_gateway_governance_headers():
     ]
     assert all(item.idempotency_key == "idem-write-1" for item in gateway.envelopes)
     assert all(item.approval_reference == "approval-write-1" for item in gateway.envelopes)
+
+
+def test_legacy_change_log_read_uses_gateway_and_preserves_response_shape():
+    application = FastAPI()
+    application.include_router(change_logs_router)
+    gateway = RecordingGateway()
+    principal = AuthenticatedPrincipal(
+        user_id="user-1",
+        authentication_method="jwt",
+        authenticated_at=datetime(2026, 8, 12, tzinfo=UTC),
+    )
+    application.dependency_overrides[get_current_user] = lambda: {
+        "gid": "user-1",
+        "team_id": "team-1",
+        "org_role": "member",
+    }
+    application.dependency_overrides[get_authenticated_principal] = lambda: principal
+    application.dependency_overrides[get_default_gateway] = lambda: gateway
+
+    with TestClient(application) as client:
+        response = client.get(
+            "/api/change-logs",
+            params={"item_type": "task", "item_gid": "task-1", "limit": 25},
+            headers={"X-Request-ID": "request-change-1", "X-Trace-ID": "trace-change-1"},
+        )
+
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "gid": "change-1",
+            "item_type": "task",
+            "item_gid": "task-1",
+            "list_gid": "list-1",
+            "changed_by": "user-1",
+        }
+    ]
+    assert gateway.envelopes[0].capability_id == "project.change_log.read"
+    assert gateway.envelopes[0].payload == {
+        "operation": "change_logs.search",
+        "arguments": {
+            "item_type": "task",
+            "item_gid": "task-1",
+            "list_gid": None,
+            "limit": 25,
+            "offset": 0,
+        },
+    }
