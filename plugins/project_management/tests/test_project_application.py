@@ -79,6 +79,7 @@ class InMemoryItemEntryRepository:
         self.permission_requests = {}
         self.list_shares = {}
         self.item_shares = {}
+        self.lists = {}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -209,6 +210,26 @@ class InMemoryItemEntryRepository:
         if not row: return "not_found"
         if row["shared_by"] != user_gid: return "forbidden"
         del self.item_shares[gid]; return "deleted"
+
+    def search_lists(self, filters, scope):
+        return list(self.lists.values())
+
+    def create_list(self, gid, values):
+        self.lists[gid] = {"gid": gid, "created_at": "2026-08-12", "deleted_at": None, **values}
+
+    def get_list(self, gid):
+        return self.lists.get(gid)
+
+    def update_list(self, gid, updates):
+        if gid not in self.lists: return False
+        self.lists[gid].update(updates); return True
+
+    def archive_list(self, gid):
+        if gid not in self.lists: return False
+        self.lists[gid]["deleted_at"] = "2026-08-12"; return True
+
+    def retarget_list_items(self, gid, new_list_gid, item_type):
+        return gid in self.lists
 
 
 def _application():
@@ -502,3 +523,16 @@ def test_direct_shares_enforce_list_owner_and_item_share_creator():
     with pytest.raises(CapabilityBusinessError) as error:
         application.invoke("project.sharing.read", {"operation": "shares.list.list", "arguments": {"list_gid": "list-1"}}, CapabilityContext(user_gid="user-2", team_gid="team-1"))
     assert error.value.code == "forbidden"
+
+
+def test_project_lists_create_read_update_and_archive_under_owner_policy():
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: "list-1")
+    created = application.invoke("project.list.change.apply", {"operation": "lists.create", "arguments": {"name": "My tasks", "visibility": "private"}}, CONTEXT)
+    assert created == {"success": True, "data": {"gid": "list-1"}}
+    listed = application.invoke("project.list.read", {"operation": "lists.search", "arguments": {"item_type": "task", "scope": {"user_gid": "user-1"}}}, CONTEXT)
+    assert listed["data"][0]["read_scope"] == "personal"
+    assert application.invoke("project.list.change.apply", {"operation": "lists.update", "arguments": {"gid": "list-1", "updates": {"name": "Renamed"}}}, CONTEXT) == {"success": True}
+    with pytest.raises(CapabilityBusinessError) as error:
+        application.invoke("project.list.change.apply", {"operation": "lists.delete", "arguments": {"gid": "list-1"}}, CapabilityContext(user_gid="user-2", team_gid="team-1"))
+    assert error.value.code == "forbidden"
+    assert application.invoke("project.list.change.apply", {"operation": "lists.delete", "arguments": {"gid": "list-1"}}, CONTEXT) == {"success": True}

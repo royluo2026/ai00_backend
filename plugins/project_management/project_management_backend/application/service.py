@@ -50,6 +50,12 @@ class ItemEntryRepository(Protocol):
     def delete_list_share(self, list_gid: str, gid: str) -> None: ...
     def upsert_item_share(self, gid: str, values: dict[str, Any]) -> dict[str, Any]: ...
     def delete_item_share(self, gid: str, user_gid: str) -> str: ...
+    def search_lists(self, filters: dict[str, Any], scope: dict[str, Any]) -> list[dict[str, Any]]: ...
+    def create_list(self, gid: str, values: dict[str, Any]) -> None: ...
+    def get_list(self, gid: str) -> dict[str, Any] | None: ...
+    def update_list(self, gid: str, updates: dict[str, Any]) -> bool: ...
+    def archive_list(self, gid: str) -> bool: ...
+    def retarget_list_items(self, gid: str, new_list_gid: str, item_type: str) -> bool: ...
 
 
 _OPERATIONS = {
@@ -64,9 +70,9 @@ _OPERATIONS = {
             "collaboration.sessions.end",
         }
     ),
-    "project.list.read": frozenset({"item_entries.get"}),
+    "project.list.read": frozenset({"item_entries.get", "lists.search"}),
     "project.list.change.apply": frozenset(
-        {"item_entries.replace", "item_entries.delete"}
+        {"item_entries.replace", "item_entries.delete", "lists.create", "lists.update", "lists.delete", "lists.retarget"}
     ),
     "project.sharing.read": frozenset({"share_links.resolve", "shares.list.list"}),
     "project.sharing.change.apply": frozenset(
@@ -134,6 +140,28 @@ def _collaboration_session(
     return result
 
 
+def _visibility_to_read_scope(visibility: str) -> str:
+    return {"public": "global", "private": "personal", "team": "team", "project": "project"}.get(visibility, "team")
+
+
+def _visibility_to_write_scope(visibility: str) -> str:
+    return {"public": "team", "private": "personal", "team": "team", "project": "team"}.get(visibility, "personal")
+
+
+def _project_list(row: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "gid": row["gid"], "name": row["name"], "color": row["color"],
+        "storage_scope": row["storage_scope"], "owner_type": row["owner_type"],
+        "owner_gid": row["owner_gid"], "creator_gid": row.get("creator_gid") or "",
+        "visibility": row.get("visibility") or "team",
+        "read_scope": row.get("read_scope") or row.get("visibility") or "team",
+        "write_scope": row.get("write_scope") or "personal",
+        "deleted_at": str(row["deleted_at"]) if row.get("deleted_at") else None,
+        "item_type": row.get("item_type") or "task", "sort_order": row["sort_order"],
+        "created_at": str(row["created_at"]), "project_gid": row.get("project_gid") or None,
+    }
+
+
 class ProjectManagementApplication:
     def __init__(
         self,
@@ -171,6 +199,8 @@ class ProjectManagementApplication:
             return self._permission_request(operation, arguments, _context)
         if operation.startswith("shares."):
             return self._direct_share(operation, arguments, _context)
+        if operation.startswith("lists."):
+            return self._list(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -192,6 +222,69 @@ class ProjectManagementApplication:
             raise CapabilityBusinessError("invalid_input", "every entry must be an object")
         self._repository.replace_item_entries(item_type, item_gid, saved)
         return {"success": True, "count": len(saved), "entries": saved}
+
+    def _list(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if not user_gid:
+            raise CapabilityBusinessError("unauthenticated", "user identity is required")
+        roles = frozenset(getattr(context, "active_roles", ()) or ())
+        if operation == "lists.search":
+            scope = arguments.get("scope")
+            if not isinstance(scope, Mapping) or str(scope.get("user_gid") or "") != user_gid:
+                raise CapabilityBusinessError("invalid_input", "server-derived scope is required")
+            owner_team_gid = str(arguments.get("owner_team_gid") or "").strip() or None
+            team_gids = [str(value) for value in scope.get("team_gids", [])]
+            if owner_team_gid and owner_team_gid not in team_gids and not bool(scope.get("is_admin")):
+                raise CapabilityBusinessError("forbidden", "team list access denied")
+            rows = self._repository.search_lists(
+                {"item_type": str(arguments.get("item_type") or "").strip() or None,
+                 "owner_team_gid": owner_team_gid,
+                 "q": str(arguments.get("q") or "").strip() or None},
+                dict(scope),
+            )
+            return {"success": True, "data": [_project_list(row) for row in rows]}
+        if operation == "lists.create":
+            name = _required_text(arguments, "name")
+            owner_type = str(arguments.get("owner_type") or "user")
+            visibility = str(arguments.get("visibility") or "team")
+            values = {
+                "name": name, "color": str(arguments.get("color") or "#5b8dee"),
+                "storage_scope": str(arguments.get("storage_scope") or "cloud"),
+                "owner_type": owner_type,
+                "owner_gid": user_gid if owner_type == "user" else _required_text(arguments, "owner_gid"),
+                "creator_gid": user_gid, "visibility": visibility,
+                "read_scope": str(arguments.get("read_scope") or _visibility_to_read_scope(visibility)),
+                "write_scope": str(arguments.get("write_scope") or _visibility_to_write_scope(visibility)),
+                "item_type": str(arguments.get("item_type") or "task"),
+                "sort_order": int(arguments.get("sort_order") or 0),
+            }
+            gid = self._next_id(); self._repository.create_list(gid, values)
+            return {"success": True, "data": {"gid": gid}}
+        gid = _required_text(arguments, "gid")
+        row = self._repository.get_list(gid)
+        if row is None:
+            raise CapabilityBusinessError("not_found", "list not found")
+        is_admin = bool(roles & {"super_admin", "team_admin"})
+        owner_only = str(row.get("owner_gid") or "") != user_gid and (row.get("owner_type") == "user" or not is_admin)
+        update_source = arguments.get("updates") if isinstance(arguments.get("updates"), Mapping) else arguments
+        if operation in {"lists.delete", "lists.retarget"} or "owner_gid" in update_source:
+            if owner_only:
+                raise CapabilityBusinessError("forbidden", "only the list owner or administrator can operate")
+        if operation == "lists.delete":
+            self._repository.archive_list(gid); return {"success": True}
+        if operation == "lists.retarget":
+            self._repository.retarget_list_items(gid, _required_text(arguments, "new_list_gid"), str(arguments.get("item_type") or ""))
+            return {"success": True}
+        allowed = {"name", "color", "sort_order", "owner_gid", "visibility", "read_scope", "write_scope", "project_gid", "shared_team_gid"}
+        updates = {key: value for key, value in update_source.items() if key in allowed and value is not None}
+        if update_source.get("project_gid") == "": updates["project_gid"] = None
+        if "visibility" in updates:
+            updates.setdefault("read_scope", _visibility_to_read_scope(str(updates["visibility"])))
+            updates.setdefault("write_scope", _visibility_to_write_scope(str(updates["visibility"])))
+        if not updates:
+            raise CapabilityBusinessError("invalid_input", "no update fields")
+        self._repository.update_list(gid, updates)
+        return {"success": True}
 
     def _search_change_logs(
         self, arguments: Mapping[str, Any], context: object

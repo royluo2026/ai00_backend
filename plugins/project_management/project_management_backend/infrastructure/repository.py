@@ -288,3 +288,77 @@ class ProjectManagementRepository:
         if not row: return "not_found"
         if str(row["shared_by"]) != user_gid: return "forbidden"
         self.execute("DELETE FROM workmanship_work_item_shares WHERE gid=%s", (gid,)); return "deleted"
+
+    def search_lists(self, filters: dict[str, Any], scope: dict[str, Any]) -> list[dict[str, Any]]:
+        clauses = ["deleted_at IS NULL"]
+        params: list[Any] = []
+        owner_team_gid = filters.get("owner_team_gid")
+        if owner_team_gid:
+            clauses.extend(["owner_type='team'", "owner_gid=%s"]); params.append(owner_team_gid)
+        else:
+            visible = ["(owner_type='user' AND owner_gid=%s)", "visibility='public'"]
+            params.append(scope["user_gid"])
+            for key, clause in (
+                ("team_gids", "(owner_type='team' AND owner_gid IN ({p}))"),
+                ("team_gids", "(visibility='team' AND shared_team_gid IN ({p}))"),
+                ("team_member_gids", "(visibility='team' AND shared_team_gid IS NULL AND creator_gid IN ({p}))"),
+                ("project_gids", "(visibility='project' AND project_gid IN ({p}))"),
+            ):
+                values = list(scope.get(key) or [])
+                if values:
+                    visible.append(clause.format(p=",".join(["%s"] * len(values)))); params.extend(values)
+            clauses.append("(" + " OR ".join(visible) + ")")
+        if filters.get("item_type"):
+            clauses.append("item_type=%s"); params.append(filters["item_type"])
+        if filters.get("q"):
+            clauses.append("name LIKE %s"); params.append(f"%{filters['q']}%")
+        return self.fetch_all(
+            "SELECT * FROM workmanship_work_lists WHERE " + " AND ".join(clauses)
+            + " ORDER BY owner_type,sort_order,created_at", tuple(params)
+        )
+
+    def create_list(self, gid: str, values: dict[str, Any]) -> None:
+        self.execute(
+            "INSERT INTO workmanship_work_lists "
+            "(gid,name,color,storage_scope,owner_type,owner_gid,creator_gid,visibility,read_scope,write_scope,item_type,sort_order) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            (gid, values["name"], values["color"], values["storage_scope"], values["owner_type"],
+             values["owner_gid"], values["creator_gid"], values["visibility"], values["read_scope"],
+             values["write_scope"], values["item_type"], values["sort_order"]),
+        )
+
+    def get_list(self, gid: str) -> dict[str, Any] | None:
+        return self.fetch_one(
+            "SELECT * FROM workmanship_work_lists WHERE gid=%s AND deleted_at IS NULL", (gid,)
+        )
+
+    def update_list(self, gid: str, updates: dict[str, Any]) -> bool:
+        assignments = ", ".join(f"{key}=%s" for key in updates)
+        return bool(self.execute(
+            f"UPDATE workmanship_work_lists SET {assignments} WHERE gid=%s AND deleted_at IS NULL",
+            tuple(updates.values()) + (gid,),
+        ))
+
+    def archive_list(self, gid: str) -> bool:
+        with get_project_management_conn() as connection:
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("UPDATE workmanship_proj_tasks SET list_gid=NULL WHERE list_gid=%s", (gid,))
+                    cursor.execute("UPDATE workmanship_proj_issues SET list_gid=NULL WHERE list_gid=%s", (gid,))
+                    affected = cursor.execute("UPDATE workmanship_work_lists SET deleted_at=NOW() WHERE gid=%s", (gid,))
+                connection.commit(); return bool(affected)
+            except Exception:
+                connection.rollback(); raise
+
+    def retarget_list_items(self, gid: str, new_list_gid: str, item_type: str) -> bool:
+        with get_project_management_conn() as connection:
+            try:
+                with connection.cursor() as cursor:
+                    affected = 0
+                    if item_type in {"task", ""}:
+                        affected += cursor.execute("UPDATE workmanship_proj_tasks SET list_gid=%s WHERE list_gid=%s", (new_list_gid, gid))
+                    if item_type in {"issue", ""}:
+                        affected += cursor.execute("UPDATE workmanship_proj_issues SET list_gid=%s WHERE list_gid=%s", (new_list_gid, gid))
+                connection.commit(); return bool(affected)
+            except Exception:
+                connection.rollback(); raise

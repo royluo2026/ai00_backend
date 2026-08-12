@@ -10,13 +10,19 @@ DELETE /api/lists/{gid}    → 软删除清单（仅 Owner 或 admin）
 """
 import json
 from typing import Optional
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.access import build_access_scope
 from ..data.connection import get_conn
-from backend.platform_sdk.auth import get_current_user
-from backend.platform_sdk.ids import next_gid
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
+from backend.platform_sdk.project_management import (
+    build_web_compatibility_envelope,
+    invoke_compatibility,
+)
 
 router = APIRouter(tags=["lists"])
 
@@ -50,6 +56,23 @@ _PATCH_ALLOWED = {"name", "color", "sort_order", "owner_gid", "visibility", "rea
 _ADMIN_ROLES = ("super_admin", "team_admin")
 
 
+async def _invoke_project(request, user, principal, gateway, operation, arguments, *, write=False):
+    request_id = request.headers.get("X-Request-ID") or f"project_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="project.list.change.apply" if write else "project.list.read",
+        payload={"operation": operation, "arguments": arguments}, current_user=user,
+        principal=principal, request_id=request_id,
+        trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") if write else None,
+        approval_reference=request.headers.get("X-Capability-Approval") if write else None,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else ""
+        status = {"not_found": 404, "forbidden": 403, "invalid_input": 400}.get(code, 422)
+        raise HTTPException(status_code=status, detail=result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
+
+
 def _row_to_list(r: dict) -> dict:
     return {
         "gid":           r["gid"],
@@ -71,11 +94,14 @@ def _row_to_list(r: dict) -> dict:
 
 
 @router.get("/api/lists")
-def list_cloud_lists(
+async def list_cloud_lists(
     item_type: Optional[str] = Query(default=None),
     owner_team_gid: Optional[str] = Query(default=None),
     q: Optional[str] = Query(default=None),
+    request: Request = None,
     current_user: dict = Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
 ):
     """List visible Craft project lists using a Base-issued access projection."""
     if item_type == "bop_version":
@@ -95,53 +121,10 @@ def list_cloud_lists(
                 row['created_at'] = str(row['created_at'])
         return {"success": True, "data": rows}
 
-    from backend.platform_sdk.access import build_access_scope
-
     scope = build_access_scope(current_user)
-    uid = scope["user_gid"]
-    team_gids = list(scope["team_gids"])
-    member_gids = list(scope["team_member_gids"])
-    project_gids = list(scope["project_gids"])
-    if owner_team_gid and owner_team_gid not in team_gids and not scope["is_admin"]:
-        raise HTTPException(status_code=403, detail="无权访问该团队清单")
-
-    clauses = ["deleted_at IS NULL"]
-    params: list = []
-    if owner_team_gid:
-        clauses.extend(["owner_type='team'", "owner_gid=%s"])
-        params.append(owner_team_gid)
-    else:
-        visible = ["(owner_type='user' AND owner_gid=%s)", "visibility='public'"]
-        params.append(uid)
-        if team_gids:
-            placeholders = ",".join(["%s"] * len(team_gids))
-            visible.append(f"(owner_type='team' AND owner_gid IN ({placeholders}))")
-            params.extend(team_gids)
-            visible.append(f"(visibility='team' AND shared_team_gid IN ({placeholders}))")
-            params.extend(team_gids)
-        if member_gids:
-            placeholders = ",".join(["%s"] * len(member_gids))
-            visible.append(f"(visibility='team' AND shared_team_gid IS NULL AND creator_gid IN ({placeholders}))")
-            params.extend(member_gids)
-        if project_gids:
-            placeholders = ",".join(["%s"] * len(project_gids))
-            visible.append(f"(visibility='project' AND project_gid IN ({placeholders}))")
-            params.extend(project_gids)
-        clauses.append("(" + " OR ".join(visible) + ")")
-    if item_type:
-        clauses.append("item_type=%s"); params.append(item_type)
-    if q:
-        clauses.append("name LIKE %s"); params.append(f"%{q}%")
-
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"SELECT * FROM workmanship_work_lists WHERE {' AND '.join(clauses)} "
-                "ORDER BY owner_type,sort_order,created_at",
-                params,
-            )
-            rows = cur.fetchall()
-    return {"success": True, "data": [_row_to_list(dict(row)) for row in rows]}
+    return await _invoke_project(request, current_user, principal, gateway, "lists.search", {
+        "item_type": item_type, "owner_team_gid": owner_team_gid, "q": q, "scope": scope,
+    })
 
 
 def _visibility_to_read_scope(visibility: str) -> str:
@@ -153,99 +136,22 @@ def _visibility_to_write_scope(visibility: str) -> str:
 
 
 @router.post("/api/lists", status_code=201)
-def create_cloud_list(body: ListBody, current_user: dict = Depends(get_current_user)):
-    uid = current_user["gid"]
-    gid = str(next_gid())
-    owner_gid = uid if body.owner_type == "user" else body.owner_gid
-    read_scope  = body.read_scope  or _visibility_to_read_scope(body.visibility)
-    write_scope = body.write_scope or _visibility_to_write_scope(body.visibility)
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO workmanship_work_lists
-                  (gid, name, color, storage_scope, owner_type, owner_gid,
-                   creator_gid, visibility, read_scope, write_scope, item_type, sort_order)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (gid, body.name, body.color, body.storage_scope,
-                 body.owner_type, owner_gid, uid, body.visibility,
-                 read_scope, write_scope, body.item_type, body.sort_order),
-            )
-        conn.commit()
-    return {"success": True, "data": {"gid": gid}}
+async def create_cloud_list(body: ListBody, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke_project(request, current_user, principal, gateway, "lists.create", body.model_dump(), write=True)
 
 
 @router.patch("/api/lists/{gid}")
-def update_cloud_list(gid: str, body: ListPatchBody,
-                      current_user: dict = Depends(get_current_user)):
-    uid = current_user["gid"]
-    role = current_user.get("system_role") or current_user.get("org_role", "")
-    is_team_admin = role in _ADMIN_ROLES
-
-    # 迁移软删除：只打 deleted_at，不解绑条目（条目在另一个 DB，解绑无意义）
+async def update_cloud_list(gid: str, body: ListPatchBody, request: Request,
+                            current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     if body.archive:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT owner_gid, owner_type FROM workmanship_work_lists WHERE gid = %s AND deleted_at IS NULL", (gid,)
-                )
-                row = cur.fetchone()
-                if not row:
-                    raise HTTPException(status_code=404, detail="清单不存在")
-                if row["owner_gid"] != uid:
-                    list_is_personal = row.get("owner_type") == "user"
-                    if list_is_personal or not is_team_admin:
-                        raise HTTPException(status_code=403, detail="仅清单 Owner 可操作个人清单")
-                cur.execute("UPDATE workmanship_work_lists SET deleted_at = NOW() WHERE gid = %s", (gid,))
-            conn.commit()
-        return {"success": True}
-
-    updates = {k: v for k, v in body.model_dump().items()
-               if v is not None and k in _PATCH_ALLOWED}
-    # project_gid 可以显式设为空字符串表示清除关联（转换为 NULL）
-    if body.project_gid == "" and "project_gid" not in updates:
-        updates["project_gid"] = None
-    # 若传了 visibility 但未传新字段，同步推导新字段
-    if "visibility" in updates and "read_scope" not in updates:
-        updates["read_scope"] = _visibility_to_read_scope(updates["visibility"])
-    if "visibility" in updates and "write_scope" not in updates:
-        updates["write_scope"] = _visibility_to_write_scope(updates["visibility"])
-    if not updates:
-        raise HTTPException(status_code=400, detail="无更新字段")
-
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            # 转让 owner 时，需是 owner 本人或管理员
-            if "owner_gid" in updates:
-                cur.execute(
-                    "SELECT owner_gid, owner_type FROM workmanship_work_lists WHERE gid = %s AND deleted_at IS NULL", (gid,)
-                )
-                row = cur.fetchone()
-                if not row:
-                    raise HTTPException(status_code=404, detail="清单不存在")
-                if row["owner_gid"] != uid:
-                    list_is_personal = row.get("owner_type") == "user"
-                    if list_is_personal or not is_team_admin:
-                        raise HTTPException(status_code=403, detail="仅清单 Owner 可操作个人清单")
-
-            set_clause = ", ".join(f"{k} = %s" for k in updates)
-            values = list(updates.values()) + [gid]
-            cur.execute(
-                f"UPDATE workmanship_work_lists SET {set_clause} WHERE gid = %s AND deleted_at IS NULL", values
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="清单不存在")
-        conn.commit()
-    return {"success": True}
+        return await _invoke_project(request, current_user, principal, gateway, "lists.delete", {"gid": gid}, write=True)
+    updates = body.model_dump(exclude_none=True)
+    updates.pop("archive", None)
+    return await _invoke_project(request, current_user, principal, gateway, "lists.update", {"gid": gid, "updates": updates}, write=True)
 
 
 @router.delete("/api/lists/{gid}")
-def delete_cloud_list(gid: str, current_user: dict = Depends(get_current_user)):
-    uid = current_user["gid"]
-    role = current_user.get("system_role") or current_user.get("org_role", "")
-    is_team_admin = role in _ADMIN_ROLES
-
+async def delete_cloud_list(gid: str, request: Request, current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     with get_conn() as conn:
         with conn.cursor() as cur:
             # bop_version 软删除（保留数据，仅标记 deleted_at）
@@ -254,27 +160,7 @@ def delete_cloud_list(gid: str, current_user: dict = Depends(get_current_user)):
                 cur.execute("UPDATE workmanship_bop_bop_versions SET deleted_at = NOW() WHERE gid = %s", (gid,))
                 conn.commit()
                 return {"success": True}
-
-            # 权限检查：仅 owner 或 admin（非个人清单时）可删除
-            cur.execute(
-                "SELECT owner_gid, owner_type FROM workmanship_work_lists WHERE gid = %s AND deleted_at IS NULL", (gid,)
-            )
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="清单不存在")
-            if row["owner_gid"] != uid:
-                list_is_personal = row.get("owner_type") == "user"
-                if list_is_personal or not is_team_admin:
-                    raise HTTPException(status_code=403, detail="仅清单 Owner 可操作个人清单")
-
-            # 软删除：解绑条目 + 标记 deleted_at
-            cur.execute("UPDATE workmanship_proj_tasks  SET list_gid = NULL WHERE list_gid = %s", (gid,))
-            cur.execute("UPDATE workmanship_proj_issues SET list_gid = NULL WHERE list_gid = %s", (gid,))
-            cur.execute(
-                "UPDATE workmanship_work_lists SET deleted_at = NOW() WHERE gid = %s", (gid,)
-            )
-        conn.commit()
-    return {"success": True}
+    return await _invoke_project(request, current_user, principal, gateway, "lists.delete", {"gid": gid}, write=True)
 
 
 class RetargetBody(BaseModel):
@@ -283,29 +169,7 @@ class RetargetBody(BaseModel):
 
 
 @router.post("/api/lists/{gid}/retarget")
-def retarget_cloud_list_items(gid: str, body: RetargetBody,
-                              current_user: dict = Depends(get_current_user)):
+async def retarget_cloud_list_items(gid: str, body: RetargetBody, request: Request,
+                                    current_user: dict = Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
     """迁移清单用：将云端条目的 list_gid 从旧清单改指向新清单（不移动条目本身）。"""
-    uid = current_user["gid"]
-    role = current_user.get("system_role") or current_user.get("org_role", "")
-    is_team_admin = role in _ADMIN_ROLES
-
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT owner_gid, owner_type FROM workmanship_work_lists WHERE gid = %s", (gid,))
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="清单不存在")
-            if row["owner_gid"] != uid:
-                list_is_personal = row.get("owner_type") == "user"
-                if list_is_personal or not is_team_admin:
-                    raise HTTPException(status_code=403, detail="仅清单 Owner 或管理员可操作")
-
-            if body.item_type in ("task", ""):
-                cur.execute("UPDATE workmanship_proj_tasks  SET list_gid = %s WHERE list_gid = %s",
-                            (body.new_list_gid, gid))
-            if body.item_type in ("issue", ""):
-                cur.execute("UPDATE workmanship_proj_issues SET list_gid = %s WHERE list_gid = %s",
-                            (body.new_list_gid, gid))
-        conn.commit()
-    return {"success": True}
+    return await _invoke_project(request, current_user, principal, gateway, "lists.retarget", {"gid": gid, **body.model_dump()}, write=True)
