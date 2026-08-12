@@ -76,6 +76,7 @@ class InMemoryItemEntryRepository:
         }
         self.share_links = {}
         self.list_access = {("list-1", "user-1", "team-1"): "write"}
+        self.permission_requests = {}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -167,6 +168,24 @@ class InMemoryItemEntryRepository:
             return "forbidden"
         del self.share_links[token]
         return "deleted"
+
+    def create_permission_request(self, gid, values):
+        row = {"gid": gid, **values, "status": "pending"}
+        self.permission_requests[gid] = row
+        return row
+
+    def list_permission_requests(self, target_gid, status_filter):
+        return [row for row in self.permission_requests.values() if (not target_gid or row["target_gid"] == target_gid) and (not status_filter or row["status"] == status_filter)]
+
+    def decide_permission_request(self, gid, responder_gid, decision):
+        row = self.permission_requests.get(gid)
+        if not row:
+            return "not_found", None
+        if row["status"] != "pending":
+            return "already_decided", row
+        row["status"] = decision
+        row["responded_by"] = responder_gid
+        return "updated", row
 
 
 def _application():
@@ -429,3 +448,25 @@ def test_share_link_delete_enforces_creator_or_trusted_super_admin():
             CapabilityContext(user_gid="user-2", team_gid="team-1"),
         )
     assert error.value.code == "forbidden"
+
+
+def test_permission_request_create_list_and_decide_return_notification_intent():
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: "request-1")
+    created = application.invoke(
+        "project.permission_request.change.apply",
+        {"operation": "permission_requests.create", "arguments": {"target_type": "list", "target_gid": "list-1", "want_permission": "read", "message": "Need access"}},
+        CONTEXT,
+    )
+    assert created["request"]["requester_gid"] == "user-1"
+    assert application.invoke(
+        "project.permission_request.read",
+        {"operation": "permission_requests.list", "arguments": {"target_gid": "list-1", "status": "pending"}}, CONTEXT,
+    )["requests"] == [created["request"]]
+    decided = application.invoke(
+        "project.permission_request.change.apply",
+        {"operation": "permission_requests.approve", "arguments": {"gid": "request-1"}}, CONTEXT,
+    )
+    assert decided == {"ok": True, "notification": {"recipient_gid": "user-1", "event": "permission_approved", "target_type": "list", "target_gid": "list-1"}}
+    with pytest.raises(CapabilityBusinessError) as error:
+        application.invoke("project.permission_request.change.apply", {"operation": "permission_requests.reject", "arguments": {"gid": "request-1"}}, CONTEXT)
+    assert error.value.code == "already_decided"

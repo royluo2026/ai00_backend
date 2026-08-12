@@ -1,143 +1,60 @@
-"""
-backend/routers/permission_requests.py
-─────────────────────────────────────────
-权限申请 API
-
-POST   /api/permission-requests                  申请访问
-GET    /api/permission-requests?target_gid=      列出申请（owner 查看）
-POST   /api/permission-requests/{gid}/approve    批准 → 写 list_shares → 站内通知
-POST   /api/permission-requests/{gid}/reject     拒绝 → 站内通知
-"""
+"""Temporary Gateway adapters for Project Management permission requests."""
 from typing import Optional
-
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from uuid import uuid4
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel
-
-from ..data.connection import get_conn
-from backend.platform_sdk.auth import get_current_user
-from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
 from backend.platform_sdk.identity import get_user_summaries
 from backend.platform_sdk.notifications import publish_notification
+from plugins.project_management.project_management_backend.api.compatibility import build_web_compatibility_envelope, invoke_compatibility
 
 router = APIRouter(tags=["permission_requests"])
-
-
 class PermReqBody(BaseModel):
-    target_type: str       # 'list' | 'item'
+    target_type: str
     target_gid: str
     want_permission: str = "read"
     message: str = ""
-
-
 class RejectBody(BaseModel):
     message: str = ""
 
+async def _invoke(request, user, principal, gateway, capability_id, operation, arguments):
+    request_id = request.headers.get("X-Request-ID") or f"project_{uuid4().hex}"
+    write = capability_id.endswith("change.apply")
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id=capability_id, payload={"operation": operation, "arguments": arguments}, current_user=user,
+        principal=principal, request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") if write else None,
+        approval_reference=request.headers.get("X-Capability-Approval") if write else None,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else "provider_failed"
+        raise HTTPException(404 if code == "not_found" else 400 if code == "already_decided" else 422, result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
 
 @router.post("/api/permission-requests", status_code=status.HTTP_201_CREATED)
-def create_permission_request(body: PermReqBody, current_user: dict = Depends(get_current_user)):
-    gid = next_gid()
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """INSERT INTO workmanship_work_permission_requests
-                   (gid, requester_gid, target_type, target_gid, want_permission, message, status)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (gid, current_user["gid"], body.target_type, body.target_gid,
-                 body.want_permission, body.message, 'pending'),
-            )
-            cur.execute("SELECT * FROM workmanship_work_permission_requests WHERE gid = %s", (gid,))
-            row = dict(cur.fetchone())
-        conn.commit()
-    return {"request": row}
-
+async def create_permission_request(body: PermReqBody, request: Request, user=Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke(request, user, principal, gateway, "project.permission_request.change.apply", "permission_requests.create", body.model_dump())
 
 @router.get("/api/permission-requests")
-def list_permission_requests(
-    target_gid: Optional[str] = Query(None),
-    status_filter: Optional[str] = Query(None, alias="status"),
-    current_user: dict = Depends(get_current_user),
-):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            clauses = ["1=1"]
-            params = []
-            if target_gid:
-                clauses.append("r.target_gid = %s")
-                params.append(target_gid)
-            if status_filter:
-                clauses.append("r.status = %s")
-                params.append(status_filter)
-            cur.execute(
-                f"SELECT r.* FROM workmanship_work_permission_requests r "
-                f"WHERE {' AND '.join(clauses)} "
-                f"ORDER BY r.created_at DESC LIMIT 200",
-                params,
-            )
-            requests = [dict(r) for r in cur.fetchall()]
-    users = get_user_summaries(row.get("requester_gid") for row in requests)
-    for row in requests:
-        user = users.get(str(row.get("requester_gid")), {})
-        row["requester_name"] = user.get("name")
-        row["requester_avatar"] = user.get("avatar_url")
-    return {"requests": requests}
+async def list_permission_requests(request: Request, target_gid: Optional[str] = Query(None), status_filter: Optional[str] = Query(None, alias="status"), user=Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    data = await _invoke(request, user, principal, gateway, "project.permission_request.read", "permission_requests.list", {"target_gid": target_gid, "status": status_filter})
+    users = get_user_summaries(row.get("requester_gid") for row in data["requests"])
+    for row in data["requests"]:
+        summary = users.get(str(row.get("requester_gid")), {})
+        row["requester_name"], row["requester_avatar"] = summary.get("name"), summary.get("avatar_url")
+    return data
 
+async def _decide(gid, decision, request, user, principal, gateway):
+    data = await _invoke(request, user, principal, gateway, "project.permission_request.change.apply", f"permission_requests.{decision}", {"gid": gid})
+    notice = data.pop("notification")
+    publish_notification(notice["recipient_gid"], notice["event"], notice["target_type"], notice["target_gid"], f"您申请访问 {notice['target_gid']} 的权限已{'批准' if decision == 'approve' else '被拒绝'}")
+    return data
 
 @router.post("/api/permission-requests/{gid}/approve")
-def approve_permission_request(gid: str, current_user: dict = Depends(get_current_user)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT * FROM workmanship_work_permission_requests WHERE gid = %s", (gid,))
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="申请不存在")
-            req = dict(row)
-            if req["status"] != "pending":
-                raise HTTPException(status_code=400, detail="申请已处理")
-
-            # 写 list_shares
-            if req["target_type"] == "list":
-                share_gid = next_gid()
-                cur.execute(
-                    """INSERT INTO workmanship_work_list_shares (gid, list_gid, shared_to, permission, shared_by)
-                       VALUES (%s, %s, %s, %s, %s)
-                       ON DUPLICATE KEY UPDATE
-                         permission = VALUES(permission)""",
-                    (share_gid, req["target_gid"], req["requester_gid"],
-                     req["want_permission"], current_user["gid"]),
-                )
-            # 更新申请状态
-            cur.execute(
-                "UPDATE workmanship_work_permission_requests SET status='approved', "
-                "responded_by=%s, responded_at=NOW() WHERE gid=%s",
-                (current_user["gid"], gid),
-            )
-        conn.commit()
-    publish_notification(req["requester_gid"], "permission_approved", req["target_type"], req["target_gid"],
-                         f"您申请访问 {req['target_gid']} 的权限已批准")
-    return {"ok": True}
-
+async def approve_permission_request(gid: str, request: Request, user=Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _decide(gid, "approve", request, user, principal, gateway)
 
 @router.post("/api/permission-requests/{gid}/reject")
-def reject_permission_request(
-    gid: str,
-    body: RejectBody,
-    current_user: dict = Depends(get_current_user),
-):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT * FROM workmanship_work_permission_requests WHERE gid = %s", (gid,))
-            row = cur.fetchone()
-            if not row:
-                raise HTTPException(status_code=404, detail="申请不存在")
-            req = dict(row)
-            if req["status"] != "pending":
-                raise HTTPException(status_code=400, detail="申请已处理")
-            cur.execute(
-                "UPDATE workmanship_work_permission_requests SET status='rejected', "
-                "responded_by=%s, responded_at=NOW() WHERE gid=%s",
-                (current_user["gid"], gid),
-            )
-        conn.commit()
-    publish_notification(req["requester_gid"], "permission_rejected", req["target_type"], req["target_gid"],
-                         f"您申请访问 {req['target_gid']} 的权限已被拒绝")
-    return {"ok": True}
+async def reject_permission_request(gid: str, body: RejectBody, request: Request, user=Depends(get_current_user), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _decide(gid, "reject", request, user, principal, gateway)

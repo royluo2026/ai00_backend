@@ -41,6 +41,9 @@ class ItemEntryRepository(Protocol):
     def resolve_share_link(self, token: str) -> dict[str, Any] | None: ...
     def get_list_access(self, list_gid: str, user_gid: str, team_gid: str | None) -> str: ...
     def delete_share_link(self, token: str, user_gid: str, is_super: bool) -> str: ...
+    def create_permission_request(self, gid: str, values: dict[str, Any]) -> dict[str, Any]: ...
+    def list_permission_requests(self, target_gid: str | None, status_filter: str | None) -> list[dict[str, Any]]: ...
+    def decide_permission_request(self, gid: str, responder_gid: str, decision: str) -> tuple[str, dict[str, Any] | None]: ...
 
 
 _OPERATIONS = {
@@ -62,6 +65,10 @@ _OPERATIONS = {
     "project.sharing.read": frozenset({"share_links.resolve"}),
     "project.sharing.change.apply": frozenset(
         {"share_links.create", "share_links.delete"}
+    ),
+    "project.permission_request.read": frozenset({"permission_requests.list"}),
+    "project.permission_request.change.apply": frozenset(
+        {"permission_requests.create", "permission_requests.approve", "permission_requests.reject"}
     ),
 }
 
@@ -154,6 +161,8 @@ class ProjectManagementApplication:
             return self._collaboration(operation, arguments, _context)
         if operation.startswith("share_links."):
             return self._share_link(operation, arguments, _context)
+        if operation.startswith("permission_requests."):
+            return self._permission_request(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -295,6 +304,36 @@ class ProjectManagementApplication:
         if result == "forbidden":
             raise CapabilityBusinessError("forbidden", "only the creator can revoke this link")
         return {"ok": True}
+
+    def _permission_request(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if operation == "permission_requests.list":
+            rows = self._repository.list_permission_requests(
+                str(arguments.get("target_gid") or "").strip() or None,
+                str(arguments.get("status") or "").strip() or None,
+            )
+            return {"requests": rows}
+        if operation == "permission_requests.create":
+            row = self._repository.create_permission_request(self._next_id(), {
+                "requester_gid": user_gid,
+                "target_type": _required_text(arguments, "target_type"),
+                "target_gid": _required_text(arguments, "target_gid"),
+                "want_permission": str(arguments.get("want_permission") or "read"),
+                "message": str(arguments.get("message") or ""),
+            })
+            return {"request": row}
+        gid = _required_text(arguments, "gid")
+        decision = "approved" if operation.endswith("approve") else "rejected"
+        result, row = self._repository.decide_permission_request(gid, user_gid, decision)
+        if result == "not_found":
+            raise CapabilityBusinessError("not_found", "permission request not found")
+        if result == "already_decided":
+            raise CapabilityBusinessError("already_decided", "permission request already decided")
+        assert row is not None
+        return {"ok": True, "notification": {
+            "recipient_gid": row["requester_gid"], "event": f"permission_{decision}",
+            "target_type": row["target_type"], "target_gid": row["target_gid"],
+        }}
 
 
 __all__ = ["ItemEntryRepository", "ProjectManagementApplication"]

@@ -226,3 +226,41 @@ class ProjectManagementRepository:
             return "forbidden"
         self.execute("DELETE FROM workmanship_work_share_links WHERE token=%s", (token,))
         return "deleted"
+
+    def create_permission_request(self, gid: str, values: dict[str, Any]) -> dict[str, Any]:
+        self.execute(
+            "INSERT INTO workmanship_work_permission_requests "
+            "(gid,requester_gid,target_type,target_gid,want_permission,message,status) "
+            "VALUES (%s,%s,%s,%s,%s,%s,'pending')",
+            (gid, values["requester_gid"], values["target_type"], values["target_gid"], values["want_permission"], values["message"]),
+        )
+        return self.fetch_one("SELECT * FROM workmanship_work_permission_requests WHERE gid=%s", (gid,)) or {"gid": gid, **values, "status": "pending"}
+
+    def list_permission_requests(self, target_gid: str | None, status_filter: str | None) -> list[dict[str, Any]]:
+        clauses, params = ["1=1"], []
+        if target_gid:
+            clauses.append("target_gid=%s"); params.append(target_gid)
+        if status_filter:
+            clauses.append("status=%s"); params.append(status_filter)
+        return self.fetch_all("SELECT * FROM workmanship_work_permission_requests WHERE " + " AND ".join(clauses) + " ORDER BY created_at DESC LIMIT 200", tuple(params))
+
+    def decide_permission_request(self, gid: str, responder_gid: str, decision: str) -> tuple[str, dict[str, Any] | None]:
+        with get_project_management_conn() as connection:
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT * FROM workmanship_work_permission_requests WHERE gid=%s FOR UPDATE", (gid,))
+                    raw = cursor.fetchone()
+                    if not raw:
+                        connection.rollback(); return "not_found", None
+                    row = dict(raw)
+                    if row["status"] != "pending":
+                        connection.rollback(); return "already_decided", row
+                    if decision == "approved" and row["target_type"] == "list":
+                        cursor.execute(
+                            "INSERT INTO workmanship_work_list_shares (gid,list_gid,shared_to,permission,shared_by) VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE permission=VALUES(permission)",
+                            (str(__import__('uuid').uuid4()), row["target_gid"], row["requester_gid"], row["want_permission"], responder_gid),
+                        )
+                    cursor.execute("UPDATE workmanship_work_permission_requests SET status=%s,responded_by=%s,responded_at=NOW() WHERE gid=%s", (decision, responder_gid, gid))
+                connection.commit(); row["status"] = decision; return "updated", row
+            except Exception:
+                connection.rollback(); raise
