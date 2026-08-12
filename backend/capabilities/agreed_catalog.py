@@ -42,6 +42,35 @@ _PROJECT_V2_APPROVED = frozenset(
     }
 )
 
+_COMPLETION_V2_APPROVED = frozenset({
+    "craft.bop.validation.get", "craft.bop.validation.run",
+    "craft.gbop.draft.change.apply", "craft.gbop.draft.change.preview",
+    "craft.gbop.draft.create", "craft.gbop.draft.get", "craft.gbop.draft.search",
+    "craft.gbop.draft.submit", "craft.gbop.release.activate", "craft.gbop.release.archive",
+    "craft.gbop.release.compare", "craft.gbop.release.get", "craft.gbop.release.publish",
+    "craft.gbop.release.search", "craft.pbom.draft.change.apply",
+    "craft.pbom.draft.change.preview", "craft.pbom.import.preview",
+    "craft.pbom.version.archive", "craft.pbom.version.compare", "craft.pbom.version.create",
+    "craft.pbom.version.get", "craft.pbom.version.publish", "craft.pbom.version.search",
+    "craft.pbom.version.submit", "craft.rule.draft.create", "craft.rule.draft.get",
+    "craft.rule.draft.revise", "craft.rule.draft.search", "craft.rule.draft.submit",
+    "craft.rule.evaluate", "craft.rule.release.activate", "craft.rule.release.get",
+    "craft.rule.release.publish", "craft.rule.release.search", "craft.rule.waiver.create",
+    "craft.rule.waiver.revoke", "craft.rule.waiver.search", "factory.asset.get",
+    "factory.asset.maintenance.complete", "factory.asset.maintenance.start",
+    "factory.asset.register", "factory.asset.scrap", "factory.asset.search",
+    "factory.asset.update", "factory.resource.read", "factory.resource_catalog.create",
+    "factory.resource_catalog.deprecate", "factory.resource_catalog.get",
+    "factory.resource_catalog.publish", "factory.resource_catalog.revise",
+    "factory.resource_catalog.search", "factory.structure.archive", "factory.structure.create",
+    "factory.structure.get", "factory.structure.search", "factory.structure.update",
+    "knowledge.document.archive", "knowledge.entry.change.apply",
+    "knowledge.personalization.change.apply", "knowledge.personalization.read",
+    "knowledge.reference_data.change.apply", "knowledge.reference_data.read",
+    "knowledge.space.change.apply", "ontology.mapping.change.apply",
+    "ontology.schema.change.apply",
+})
+
 APPROVED_CAPABILITY_IDS = frozenset({
     "base.project.search", "identity.principal.search", "knowledge.context.retrieve",
     "knowledge.document.create", "knowledge.document.diff", "knowledge.document.get",
@@ -86,4 +115,4 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "agent.interaction.request", "agent.memory.change.apply", "agent.memory.read",
     "agent.run.change.apply", "agent.run.read", "agent.session.change.apply", "agent.session.read",
     "agent.skill.change.apply", "agent.skill.read",
-}) | _BASE_V2_APPROVED | _PROJECT_V2_APPROVED
+}) | _BASE_V2_APPROVED | _PROJECT_V2_APPROVED | _COMPLETION_V2_APPROVED
