@@ -248,12 +248,20 @@ def test_mount_invocation_audits_permitted_and_ungranted_results(monkeypatch):
     from backend.routers import plugin_marketplace as router_module
 
     monkeypatch.setenv("AI00_PLUGIN_MOUNT_SECRET", "test-secret-value-with-at-least-thirty-two-bytes")
+    manifest_value = _manifest()
+    manifest_value["capabilities"] = {
+        "required": [{"id": "base.notification.preference.get", "major": 1}],
+        "optional": [{"id": "base.workspace.template.read", "major": 1}],
+    }
+    manifest = parse_manifest(manifest_value)
     store = InMemoryMountSessionStore(clock=lambda: NOW)
     issued = MountSessionService(store, clock=lambda: NOW).issue(
         user_id="user-1", tenant_id="tenant-1", installation_id="install-1",
-        plugin_id="acme.ai00.example", plugin_version="1.0.0",
-        artifact_sha256="a" * 64, catalog_release="rel_" + "b" * 32,
-        capability_grants=("base.notification.preference.get@1",),
+        plugin_id=manifest.plugin_id, plugin_version=manifest.version,
+        artifact_sha256=manifest.artifact.sha256, catalog_release="rel_" + "b" * 32,
+        capability_grants=tuple(
+            f"{item.id}@{item.major}" for item in manifest.capabilities.required
+        ),
         resource_scopes=("tenant:tenant-1",), data_scopes=("confidential",),
         revocation_version=1, authenticated_at=NOW,
     )
