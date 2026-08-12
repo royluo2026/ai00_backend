@@ -10,7 +10,7 @@ from typing import Any, Callable, Mapping, Sequence
 
 from backend.ontology.canonical import canonicalize_release
 from backend.ontology.repository import OntologyReleaseRepository
-from backend.utils.gid import next_gid
+from backend.platform_sdk.ids import next_gid
 
 LEGACY_TABLES = {
     "concept": "workmanship_onto_classes",
@@ -97,9 +97,9 @@ def main() -> int:
     parser.add_argument("--actor-gid", required=True)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
-    from backend.core.ois_storage import put_immutable
-    from plugins.craft.craft_backend.data.connection import get_conn as get_craft_conn
-    with get_craft_conn() as source_conn:
+    from plugins.ontology.ontology_backend.infrastructure.storage import put_immutable
+    from plugins.ontology.ontology_backend.infrastructure.connection import get_ontology_conn
+    with get_ontology_conn() as source_conn:
         objects = load_legacy_objects(source_conn)
     result = bootstrap_ontology_release(
         repository=OntologyReleaseRepository(), objects=objects, actor_gid=args.actor_gid,

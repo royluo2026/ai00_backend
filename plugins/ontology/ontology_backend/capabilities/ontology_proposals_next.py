@@ -3,17 +3,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.ontology.proposals import (
+from plugins.ontology.ontology_backend.proposals import (
     OntologyProposalRepository,
     ProposalConflict,
     ProposalIntegrityError,
     normalize_changes,
 )
-from backend.ontology.repository import OntologyReleaseRepository
+from plugins.ontology.ontology_backend.repository import OntologyReleaseRepository
 from backend.domain_ports.ontology import OntologyVersionRef
-from backend.platform_sdk.ids import next_gid
+from ..infrastructure.ids import next_gid
 
-from .models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from .ontology_concepts_next import ONTOLOGY_VERSION_REF_SCHEMA
 
 

@@ -1,11 +1,6 @@
 {
   "schema_version": 1,
   "violations": [
-    {"source": "backend/capabilities/ontology_proposals_next.py", "imported_module": "backend.utils.gid", "source_domain": "Ontology", "target_domain": "Base Platform", "reason": "Legacy ID implementation dependency; consume the stable platform ID port."},
-    {"source": "backend/capabilities/ontology_releases_next.py", "imported_module": "backend.core.ois_storage", "source_domain": "Ontology", "target_domain": "Base Platform", "reason": "Legacy object-storage implementation dependency; consume ArtifactPort."},
-    {"source": "backend/capabilities/ontology_releases_next.py", "imported_module": "backend.utils.gid", "source_domain": "Ontology", "target_domain": "Base Platform", "reason": "Legacy ID implementation dependency; consume the stable platform ID port."},
-    {"source": "backend/ontology/proposals.py", "imported_module": "backend.db.connection", "source_domain": "Ontology", "target_domain": "Base Platform", "reason": "Legacy direct infrastructure dependency; replace with an Ontology-owned repository adapter."},
-    {"source": "backend/ontology/repository.py", "imported_module": "backend.db.connection", "source_domain": "Ontology", "target_domain": "Base Platform", "reason": "Legacy direct infrastructure dependency; replace with an Ontology-owned repository adapter."},
     {"source": "plugins/agent/agent_backend/ai_assistant/tool_handlers/craft_tools.py", "imported_module": "backend.config", "source_domain": "Agent", "target_domain": "Base Platform", "reason": "Legacy configuration implementation dependency; inject Agent runtime configuration."},
     {"source": "plugins/craft/craft_backend/routers/workbench_home.py", "imported_module": "plugins.craft.craft_backend.public", "source_domain": "Project Management", "target_domain": "Craft", "reason": "Project Management code is still physically hosted in Craft; extract it and replace this import with a port."}
   ]

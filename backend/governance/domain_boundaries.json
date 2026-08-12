@@ -61,6 +61,10 @@
   },
   "source_roots": [
     {
+      "path": "plugins/ontology",
+      "domain": "ontology"
+    },
+    {
       "path": "plugins/craft",
       "domain": "craft"
     },
@@ -122,6 +126,7 @@
     {"path": "backend/capabilities/ontology_concepts_next.py", "domain": "ontology"},
     {"path": "backend/capabilities/ontology_proposals_next.py", "domain": "ontology"},
     {"path": "backend/capabilities/ontology_releases_next.py", "domain": "ontology"},
+    {"path": "backend/scripts/bootstrap_ontology_release.py", "domain": "ontology"},
     {"path": "backend/domain_ports/ontology.py", "domain": "ontology"},
     {"path": "backend/domain_ports/project_management.py", "domain": "project_management"},
     {"path": "backend/capability_v2/revision/ontology_adapter.py", "domain": "ontology"},

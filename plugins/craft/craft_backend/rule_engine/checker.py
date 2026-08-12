@@ -12,6 +12,8 @@ check_entry_rules(node_type, entry_gid) → list[dict]
 """
 import logging
 
+from plugins.ontology.public import active_projection
+
 from ..data.connection import get_conn
 from ..table_names import craft_entity_table_name
 from .executor import RuleResult, check_rule
@@ -44,21 +46,7 @@ _ENTITY_TABLE_MAP: dict[str, tuple[str, str, list[str]]] = {
 
 
 def _get_entity_table_from_db(cur, node_type: str):
-    """从 onto_classes 动态获取 entity_table。找不到时 fallback 到硬编码映射。"""
-    try:
-        cur.execute(
-            "SELECT entity_table FROM workmanship_onto_classes"
-            " WHERE node_type_binding=%s LIMIT 1",
-            (node_type,)
-        )
-        row = cur.fetchone()
-        if row and dict(row).get('entity_table'):
-            legacy = _ENTITY_TABLE_MAP.get(node_type)
-            link_type = legacy[0] if legacy else node_type
-            cols = legacy[2] if legacy else []
-            return (link_type, dict(row)['entity_table'], cols)
-    except Exception:
-        pass
+    """Entity storage is Craft-owned and never supplied by Ontology metadata."""
     return _ENTITY_TABLE_MAP.get(node_type)
 
 
@@ -72,33 +60,22 @@ def check_entry_rules(node_type: str, entry_gid: str) -> list[dict]:
 
 
 def _do_check(node_type: str, entry_gid: str) -> list[dict]:
+    projection = active_projection()
+    class_map = {
+        str(row["stable_gid"]): {**row, "parent_gid": row.get("parent_stable_gid") or row.get("parent_gid")}
+        for row in projection["concept"]
+    }
+    cls_row = next((row for row in class_map.values() if row.get("node_type_binding") == node_type), None)
+    if not cls_row:
+        return []
+    ancestor_gids = get_ancestor_gids(str(cls_row["stable_gid"]), class_map)
+    props = [
+        dict(row) for row in projection["property"]
+        if (row.get("class_stable_gid") or row.get("class_gid")) in ancestor_gids
+        and row.get("prop_kind", "data") == "data"
+    ]
     with get_conn() as conn:
         with conn.cursor() as cur:
-            # 找绑定的 onto_class
-            cur.execute(
-                "SELECT gid FROM workmanship_onto_classes"
-                " WHERE node_type_binding = %s LIMIT 1",
-                (node_type,),
-            )
-            cls_row = cur.fetchone()
-            if not cls_row:
-                return []
-
-            # 加载类表，构建祖先链
-            cur.execute("SELECT gid, parent_gid FROM workmanship_onto_classes")
-            class_map = {r["gid"]: dict(r) for r in cur.fetchall()}
-            ancestor_gids = get_ancestor_gids(cls_row["gid"], class_map)
-
-            # 加载 onto_properties（含继承）
-            _ph1 = ','.join(['%s'] * len(ancestor_gids))
-            cur.execute(
-                f"SELECT name, data_type, required, min_val, max_val, storage_hint"
-                f" FROM workmanship_onto_properties"
-                f" WHERE class_gid IN ({_ph1}) AND prop_kind = 'data'",
-                ancestor_gids,
-            )
-            props = [dict(r) for r in cur.fetchall()]
-
             # 加载含 expression 的激活规则（含继承）
             _ph2 = ','.join(['%s'] * len(ancestor_gids))
             cur.execute(
@@ -237,21 +214,17 @@ def _do_validate_with_proposed(
     proposed: dict,
     ext_conn=None,
 ) -> list[dict]:
+    projection = active_projection()
+    class_map = {
+        str(row["stable_gid"]): {**row, "parent_gid": row.get("parent_stable_gid") or row.get("parent_gid")}
+        for row in projection["concept"]
+    }
+    cls_row = next((row for row in class_map.values() if row.get("node_type_binding") == node_type), None)
+    if not cls_row:
+        return []
+    ancestor_gids = get_ancestor_gids(str(cls_row["stable_gid"]), class_map)
+
     def _run(cur):
-        # 找绑定的 onto_class
-        cur.execute(
-            "SELECT gid FROM workmanship_onto_classes"
-            " WHERE node_type_binding = %s LIMIT 1",
-            (node_type,),
-        )
-        cls_row = cur.fetchone()
-        if not cls_row:
-            return []
-
-        cur.execute("SELECT gid, parent_gid FROM workmanship_onto_classes")
-        class_map = {r["gid"]: dict(r) for r in cur.fetchall()}
-        ancestor_gids = get_ancestor_gids(cls_row["gid"], class_map)
-
         # 只加载含 expression 的激活规则
         _ph = ','.join(['%s'] * len(ancestor_gids))
         cur.execute(
@@ -281,45 +254,6 @@ def _do_validate_with_proposed(
             for k, v in meta.items():
                 if v is not None and isinstance(v, (int, float, str, bool)):
                     context[k] = v
-
-        # 从 onto_classes 取 entity_table，读当前实体字段
-        cur.execute(
-            "SELECT entity_table FROM workmanship_onto_classes"
-            " WHERE node_type_binding = %s LIMIT 1",
-            (node_type,),
-        )
-        cls2 = cur.fetchone()
-        if cls2 and cls2["entity_table"]:
-            cur.execute(
-                "SELECT entity_gid FROM workmanship_bop_bop_entry_links"
-                " WHERE entry_gid=%s AND is_primary=TRUE AND deleted_at IS NULL LIMIT 1",
-                (entry_gid,),
-            )
-            link = cur.fetchone()
-            if link:
-                mysql_table = _resolve_mysql_table(cls2["entity_table"])
-                cur.execute(
-                    "SELECT column_name FROM information_schema.columns"
-                    " WHERE table_schema='ai00' AND table_name=%s",
-                    (mysql_table,),
-                )
-                real_cols = [r["column_name"] for r in cur.fetchall()]
-                if real_cols:
-                    col_sql = ", ".join(f"`{c}`" for c in real_cols)
-                    cur.execute(
-                        f"SELECT {col_sql} FROM `{mysql_table}` WHERE gid=%s",
-                        (link["entity_gid"],),
-                    )
-                    entity_row = cur.fetchone()
-                    if entity_row:
-                        for k, v in dict(entity_row).items():
-                            if k != "ext" and v is not None and isinstance(v, (int, float, str, bool)):
-                                context[k] = v
-                        ext_val = entity_row.get("ext")
-                        if isinstance(ext_val, dict):
-                            for k, v in ext_val.items():
-                                if v is not None and isinstance(v, (int, float, str, bool)):
-                                    context[k] = v
 
         # 用 proposed 值覆盖 context
         for k, v in proposed.items():

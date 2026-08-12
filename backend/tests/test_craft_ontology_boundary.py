@@ -15,7 +15,8 @@ class CraftOntologyBoundaryTests(unittest.TestCase):
         from plugins.craft.craft_backend.table_names import craft_entity_table_name
 
         self.assertEqual(craft_entity_table_name("bop.bop_entries"), "workmanship_bop_bop_entries")
-        self.assertEqual(craft_entity_table_name("knowledge.onto_classes"), "workmanship_onto_classes")
+        with self.assertRaises(ValueError):
+            craft_entity_table_name("knowledge.onto_classes")
         with self.assertRaises(ValueError):
             craft_entity_table_name("auth.users")
 

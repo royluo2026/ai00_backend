@@ -144,19 +144,22 @@
     "Ontology": {
       "maintainers": ["@ai00/ontology-maintainers"],
       "artifact": "ai00-ontology-domain",
-      "module_prefixes": ["backend.ontology"],
+      "module_prefixes": ["plugins.ontology", "backend.ontology"],
       "code_paths": [
+        "plugins/ontology/**",
+        "backend/scripts/bootstrap_ontology_release.py",
         "backend/ontology/**",
         "backend/capabilities/ontology_*",
         "backend/domain_ports/ontology.py",
         "backend/capability_v2/revision/ontology_adapter.py"
       ],
-      "provider_paths": ["backend/capabilities/ontology_*"],
+      "provider_paths": ["plugins/ontology/ontology_backend/capabilities/**", "backend/capabilities/ontology_*"],
       "migration_paths": [
+        "backend/db/migrations/domains/ontology/**",
         "backend/db/migrations/202608060003_base_ontology_release_governance.sql",
         "backend/db/migrations/202608100008_ontology_revision_refs.sql"
       ],
-      "test_paths": ["backend/tests/test_ontology_*.py"],
+      "test_paths": ["plugins/ontology/tests/**", "backend/tests/test_ontology_*.py"],
       "documentation_paths": ["docs/capabilities/ontology/**"]
     },
     "Knowledge": {

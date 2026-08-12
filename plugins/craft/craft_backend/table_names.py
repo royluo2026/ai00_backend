@@ -11,15 +11,11 @@ _SCHEMA_PREFIX = {
     "template": "workmanship_tpl_",
     "work": "workmanship_work_",
 }
-_ALLOWED_PREFIXES = tuple(_SCHEMA_PREFIX.values()) + ("workmanship_onto_",)
+_ALLOWED_PREFIXES = tuple(_SCHEMA_PREFIX.values())
 _SPECIAL = {
     "template.gbop": "workmanship_tpl_gbop_entries",
     "proj.task_templates": "workmanship_work_task_templates",
     "proj.task_template_items": "workmanship_work_task_template_items",
-    "knowledge.onto_classes": "workmanship_onto_classes",
-    "knowledge.onto_properties": "workmanship_onto_properties",
-    "knowledge.onto_relations": "workmanship_onto_relations",
-    "knowledge.onto_axioms": "workmanship_onto_axioms",
     "knowledge.craft_rules": "workmanship_know_craft_rules",
 }
 

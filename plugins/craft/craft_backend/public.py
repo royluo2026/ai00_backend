@@ -4,6 +4,9 @@ from __future__ import annotations
 import json
 
 from backend.platform_sdk.ids import next_gid
+from plugins.ontology.public import concept as get_ontology_concept
+from plugins.ontology.public import concept_labels as get_ontology_concept_labels
+from plugins.ontology.public import properties as get_ontology_properties
 from .data.connection import get_conn
 
 
@@ -71,33 +74,15 @@ def list_item_history(item_type: str, item_gid: str) -> list[dict]:
 
 
 def ontology_class_labels(gids) -> dict[str, str]:
-    values = tuple(sorted({str(gid) for gid in gids if gid}))
-    if not values:
-        return {}
-    placeholders = ",".join(["%s"] * len(values))
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"SELECT gid,label_zh FROM workmanship_onto_classes WHERE gid IN ({placeholders})", values)
-            return {str(row["gid"]): row.get("label_zh") for row in cur.fetchall()}
+    return get_ontology_concept_labels(gids)
 
 
 def ontology_class(gid: str) -> dict | None:
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT gid,label_zh,node_type_binding FROM workmanship_onto_classes WHERE gid=%s", (gid,))
-            row = cur.fetchone()
-    return dict(row) if row else None
+    return get_ontology_concept(gid)
 
 
 def ontology_properties(gids) -> dict[str, dict]:
-    values = tuple(sorted({str(gid) for gid in gids if gid}))
-    if not values:
-        return {}
-    placeholders = ",".join(["%s"] * len(values))
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(f"SELECT gid,name,label_zh,storage_hint FROM workmanship_onto_properties WHERE gid IN ({placeholders})", values)
-            return {str(row["gid"]): dict(row) for row in cur.fetchall()}
+    return get_ontology_properties(gids)
 
 
 def upsert_external_bop_entries(node_type: str, rows: list[dict], unique_field: str | None = None) -> dict:

@@ -5,7 +5,7 @@ import json
 from contextlib import contextmanager
 from typing import Any, Callable, Iterator, Mapping, Sequence
 
-from backend.ontology.canonical import canonical_json_bytes
+from plugins.ontology.ontology_backend.canonical import canonical_json_bytes
 
 ALLOWED_OPERATIONS = frozenset(
     {f"{kind}.{action}" for kind in ("concept", "property", "relation", "mapping", "constraint") for action in ("add", "change", "deprecate")}
@@ -72,12 +72,12 @@ class ProposalIntegrityError(RuntimeError):
 class OntologyProposalRepository:
     def __init__(self, connection_factory: Callable[[], Any] | None = None):
         if connection_factory is None:
-            from plugins.ontology.ontology_backend.infrastructure.connection import get_ontology_conn
+            from .infrastructure.connection import get_ontology_conn
             connection_factory = get_ontology_conn
         self._connection_factory = connection_factory
 
     def get_active(self) -> dict[str, Any] | None:
-        from backend.ontology.repository import OntologyReleaseRepository
+        from plugins.ontology.ontology_backend.repository import OntologyReleaseRepository
         return OntologyReleaseRepository(self._connection_factory).get_active("default")
 
     def create(

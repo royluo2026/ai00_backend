@@ -3,15 +3,15 @@ from __future__ import annotations
 
 from typing import Any
 
-from plugins.ontology.ontology_backend.infrastructure.storage import put_immutable
-from backend.ontology.activation import validate_attestations
-from backend.ontology.canonical import canonicalize_release
-from backend.ontology.diff import semantic_diff
-from backend.ontology.proposals import OntologyProposalRepository
-from backend.ontology.repository import OntologyReleaseRepository, ReleaseIntegrityError, StaleActiveRelease
-from backend.ontology.releases import apply_changes
-from backend.ontology.review_policy import is_publishable
-from backend.ontology.impact_analysis import ImpactAnalysisService, official_impact_providers
+from ..infrastructure.storage import put_immutable
+from plugins.ontology.ontology_backend.activation import validate_attestations
+from plugins.ontology.ontology_backend.canonical import canonicalize_release
+from plugins.ontology.ontology_backend.diff import semantic_diff
+from plugins.ontology.ontology_backend.proposals import OntologyProposalRepository
+from plugins.ontology.ontology_backend.repository import OntologyReleaseRepository, ReleaseIntegrityError, StaleActiveRelease
+from plugins.ontology.ontology_backend.releases import apply_changes
+from plugins.ontology.ontology_backend.review_policy import is_publishable
+from plugins.ontology.ontology_backend.impact_analysis import ImpactAnalysisService, official_impact_providers
 from backend.capability_v2.revision.ontology_adapter import (
     ONTOLOGY_REVISION_REPOSITORY,
     OntologyRevisionAdapter,
@@ -19,9 +19,9 @@ from backend.capability_v2.revision.ontology_adapter import (
 )
 from backend.capability_v2.revision.runtime import get_default_revision_service
 from backend.domain_ports.ontology import OntologyVersionRef
-from backend.platform_sdk.ids import next_gid
+from ..infrastructure.ids import next_gid
 
-from .models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityContext, CapabilityOutput, CapabilitySpec, EvidenceRef
 from .ontology_concepts_next import ONTOLOGY_VERSION_REF_SCHEMA
 
 

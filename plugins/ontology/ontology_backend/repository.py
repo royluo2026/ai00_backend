@@ -33,7 +33,7 @@ def _open_connection(factory: Callable[[], Any]) -> Iterator[Any]:
 class OntologyReleaseRepository:
     def __init__(self, connection_factory: Callable[[], Any] | None = None):
         if connection_factory is None:
-            from plugins.ontology.ontology_backend.infrastructure.connection import get_ontology_conn
+            from .infrastructure.connection import get_ontology_conn
             connection_factory = get_ontology_conn
         self._connection_factory = connection_factory
 
