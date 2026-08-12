@@ -541,3 +541,19 @@ class ProjectManagementRepository:
 
     def delete_follow(self, gid: str, user_gid: str) -> bool:
         return bool(self.execute("DELETE FROM workmanship_work_follows WHERE gid=%s AND user_gid=%s", (gid, user_gid)))
+
+    def create_notification(self, gid: str, values: dict[str, Any]) -> None:
+        self.execute("INSERT INTO workmanship_work_notifications (gid,user_gid,type,item_type,item_gid,title,body) VALUES (%s,%s,%s,%s,%s,%s,%s)", (gid, values["user_gid"], values["type"], values["item_type"], values["item_gid"], values["title"], values["body"]))
+
+    def list_notifications(self, user_gid: str, unread_only: bool) -> list[dict[str, Any]]:
+        return self.fetch_all("SELECT gid,type,item_type,item_gid,title,body,is_read,created_at FROM workmanship_work_notifications WHERE user_gid=%s" + (" AND is_read=FALSE" if unread_only else "") + " ORDER BY created_at DESC LIMIT 100", (user_gid,))
+
+    def count_unread_notifications(self, user_gid: str) -> int:
+        row = self.fetch_one("SELECT COUNT(*) AS count FROM workmanship_work_notifications WHERE user_gid=%s AND is_read=FALSE", (user_gid,))
+        return int((row or {}).get("count", 0))
+
+    def mark_notification_read(self, gid: str, user_gid: str) -> bool:
+        return bool(self.execute("UPDATE workmanship_work_notifications SET is_read=TRUE WHERE gid=%s AND user_gid=%s", (gid, user_gid)))
+
+    def mark_all_notifications_read(self, user_gid: str) -> None:
+        self.execute("UPDATE workmanship_work_notifications SET is_read=TRUE WHERE user_gid=%s AND is_read=FALSE", (user_gid,))

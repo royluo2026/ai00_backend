@@ -96,6 +96,11 @@ class ItemEntryRepository(Protocol):
     def create_follow(self, gid: str, values: dict[str, Any]) -> bool: ...
     def update_follow(self, gid: str, user_gid: str, notify_on: list[str]) -> bool: ...
     def delete_follow(self, gid: str, user_gid: str) -> bool: ...
+    def create_notification(self, gid: str, values: dict[str, Any]) -> None: ...
+    def list_notifications(self, user_gid: str, unread_only: bool) -> list[dict[str, Any]]: ...
+    def count_unread_notifications(self, user_gid: str) -> int: ...
+    def mark_notification_read(self, gid: str, user_gid: str) -> bool: ...
+    def mark_all_notifications_read(self, user_gid: str) -> None: ...
 
 
 _OPERATIONS = {
@@ -132,6 +137,8 @@ _OPERATIONS = {
     "project.workbench.change.apply": frozenset({"workbenches.create", "workbenches.update", "workbenches.delete", "workbenches.overrides.upsert", "workbenches.overrides.delete"}),
     "project.follow.read": frozenset({"follows.list", "follows.check"}),
     "project.follow.change.apply": frozenset({"follows.create", "follows.update", "follows.delete"}),
+    "project.notification.read": frozenset({"notifications.list", "notifications.unread_count"}),
+    "project.notification.change.apply": frozenset({"notifications.create", "notifications.mark_read", "notifications.mark_all_read"}),
 }
 
 
@@ -313,6 +320,8 @@ class ProjectManagementApplication:
             return self._workbench(operation, arguments, _context)
         if operation.startswith("follows."):
             return self._follow(operation, arguments, _context)
+        if operation.startswith("notifications."):
+            return self._notification(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -488,6 +497,18 @@ class ProjectManagementApplication:
         conditions = [str(value) for value in arguments.get("notify_on", []) if str(value) in valid]
         if not self._repository.update_follow(gid, user_gid, conditions): raise CapabilityBusinessError("not_found", "follow not found")
         return {"success": True, "data": {"notify_on": conditions}}
+
+    def _notification(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if operation == "notifications.list":
+            rows = self._repository.list_notifications(user_gid, bool(arguments.get("unread_only")))
+            return {"success": True, "data": [{"gid": row["gid"], "type": row.get("type") or "", "item_type": row.get("item_type") or "", "item_gid": row.get("item_gid") or "", "title": row.get("title") or "", "body": row.get("body") or "", "is_read": bool(row.get("is_read")), "created_at": str(row.get("created_at") or "")} for row in rows]}
+        if operation == "notifications.unread_count": return {"success": True, "data": {"count": self._repository.count_unread_notifications(user_gid)}}
+        if operation == "notifications.create":
+            gid = self._next_id(); self._repository.create_notification(gid, {"user_gid": _required_text(arguments, "recipient_gid"), "type": _required_text(arguments, "type"), "item_type": arguments.get("item_type"), "item_gid": arguments.get("item_gid"), "title": _required_text(arguments, "title"), "body": str(arguments.get("body") or "")})
+            return {"success": True, "data": {"gid": gid}}
+        if operation == "notifications.mark_all_read": self._repository.mark_all_notifications_read(user_gid); return {"success": True}
+        self._repository.mark_notification_read(_required_text(arguments, "gid"), user_gid); return {"success": True}
 
     def _project(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
         user_gid = str(getattr(context, "user_gid", "") or "")

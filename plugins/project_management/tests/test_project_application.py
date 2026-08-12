@@ -89,6 +89,7 @@ class InMemoryItemEntryRepository:
         self.workbenches = {}
         self.workbench_overrides = {}
         self.follows = {}
+        self.notifications = {}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -310,6 +311,15 @@ class InMemoryItemEntryRepository:
         if gid not in self.follows or self.follows[gid]["user_gid"] != user_gid: return False
         self.follows[gid]["notify_on"] = notify_on; return True
     def delete_follow(self, gid, user_gid): return bool(self.follows.get(gid) and self.follows[gid]["user_gid"] == user_gid and not self.follows.pop(gid, None) is None)
+    def create_notification(self, gid, values): self.notifications[gid] = {"gid": gid, "is_read": False, "created_at": "2026-08-12", **values}
+    def list_notifications(self, user_gid, unread_only): return [row for row in self.notifications.values() if row["user_gid"] == user_gid and (not unread_only or not row["is_read"])]
+    def count_unread_notifications(self, user_gid): return sum(row["user_gid"] == user_gid and not row["is_read"] for row in self.notifications.values())
+    def mark_notification_read(self, gid, user_gid):
+        if gid not in self.notifications or self.notifications[gid]["user_gid"] != user_gid: return False
+        self.notifications[gid]["is_read"] = True; return True
+    def mark_all_notifications_read(self, user_gid):
+        for row in self.notifications.values():
+            if row["user_gid"] == user_gid: row["is_read"] = True
 
 
 def _application():
@@ -671,3 +681,12 @@ def test_follow_create_check_patch_and_delete_are_project_owned():
     assert checked["data"] == {"followed": True, "gid": "follow-1", "notify_on": ["status_change"]}
     assert application.invoke("project.follow.change.apply", {"operation": "follows.update", "arguments": {"gid": "follow-1", "notify_on": ["resolved"]}}, CONTEXT)["data"]["notify_on"] == ["resolved"]
     assert application.invoke("project.follow.change.apply", {"operation": "follows.delete", "arguments": {"gid": "follow-1"}}, CONTEXT) == {"success": True}
+
+
+def test_notification_create_read_and_mark_are_project_owned():
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: "notification-1")
+    application.invoke("project.notification.change.apply", {"operation": "notifications.create", "arguments": {"recipient_gid": "user-1", "type": "item_status", "title": "Changed"}}, CONTEXT)
+    assert application.invoke("project.notification.read", {"operation": "notifications.unread_count", "arguments": {}}, CONTEXT)["data"]["count"] == 1
+    listed = application.invoke("project.notification.read", {"operation": "notifications.list", "arguments": {"unread_only": True}}, CONTEXT)
+    assert listed["data"][0]["title"] == "Changed"
+    assert application.invoke("project.notification.change.apply", {"operation": "notifications.mark_read", "arguments": {"gid": "notification-1"}}, CONTEXT) == {"success": True}
