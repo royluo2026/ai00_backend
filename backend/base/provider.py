@@ -7,7 +7,7 @@ from backend.capability_v2.contracts import (
     AutomationLevel, CapabilityDescriptorV2, DomainErrorContract,
     ExposurePolicy, LifecycleStatus, ResourceSelector, SideEffectLevel,
 )
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
 
@@ -49,7 +49,7 @@ def _governed_spec(spec: Any) -> Any:
 
 def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     governed = _governed_spec(spec)
-    descriptor = adapt_v1_spec(governed)
+    descriptor = descriptor_from_provider_spec(governed)
     capability_id = governed.id
     is_write = capability_id in _WRITES or descriptor.side_effect_level is not SideEffectLevel.READ
     resource = _RESOURCE_FIELDS.get(capability_id)

@@ -12,7 +12,7 @@ from backend.capability_v2.contracts import (
     ResourceSelector,
     SideEffectLevel,
 )
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
 
@@ -88,7 +88,7 @@ def _governed_spec(spec: Any) -> Any:
 def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
     """Create the frozen native descriptor reviewed and released by Craft."""
     governed = _governed_spec(spec)
-    descriptor = adapt_v1_spec(governed)
+    descriptor = descriptor_from_provider_spec(governed)
     is_write = descriptor.side_effect_level is not SideEffectLevel.READ
     selectors = tuple(
         ResourceSelector(resource_type=resource_type, payload_path=payload_path)

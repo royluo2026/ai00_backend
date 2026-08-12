@@ -11,7 +11,7 @@ from backend.capability_v2.contracts import (
     LifecycleStatus,
     SideEffectLevel,
 )
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 
 DOMAIN_ERRORS = tuple(
@@ -27,7 +27,7 @@ DOMAIN_ERRORS = tuple(
 
 
 def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
-    descriptor = adapt_v1_spec(spec)
+    descriptor = descriptor_from_provider_spec(spec)
     is_write = descriptor.side_effect_level is not SideEffectLevel.READ
     return CapabilityDescriptorV2.model_validate(
         {

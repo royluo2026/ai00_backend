@@ -72,7 +72,6 @@ class AgentDataBoundaryTests(unittest.TestCase):
         paths = [
             root / "plugins/agent/agent_backend/routers/skills.py",
             root / "plugins/agent/agent_backend/routers/ai_audit.py",
-            root / "plugins/agent/agent_backend/ai_assistant/tool_handlers/memory_tools.py",
         ]
         text = "\n".join(path.read_text(encoding="utf-8") for path in paths)
         self.assertNotIn("from backend.db", text)

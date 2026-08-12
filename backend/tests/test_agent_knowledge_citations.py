@@ -6,14 +6,10 @@ class AgentKnowledgeCitationTests(unittest.TestCase):
     def test_agent_exposes_revision_tool_and_preserves_evidence(self):
         root = Path(__file__).resolve().parents[2]
         plugin = root / "plugins/agent/agent_backend/ai_assistant"
-        registry = (plugin / "tool_registry.py").read_text(encoding="utf-8")
-        adapter = (plugin / "tool_handlers/capability_tools.py").read_text(encoding="utf-8")
-        prompt = (plugin / "system_prompt.py").read_text(encoding="utf-8")
-        self.assertIn('"name": "get_knowledge_document"', registry)
-        self.assertIn('"knowledge.document.get"', adapter)
-        self.assertIn('invocation.get("evidence", [])', adapter)
-        self.assertIn("来源:", prompt)
-        self.assertIn('citation.get("digest"', prompt)
+        adapter = (plugin / "catalog_tools.py").read_text(encoding="utf-8")
+        self.assertIn("agent_output_schema or item.output_schema", adapter)
+        self.assertIn("return await self.client.invoke", adapter)
+        self.assertFalse(any((plugin / "tool_handlers").rglob("*.py")))
 
 
     def test_web_agent_stream_and_ui_preserve_structured_evidence(self):

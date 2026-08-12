@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from backend.capabilities.models_next import CapabilityExecution, CapabilityRisk, CapabilitySpec
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec as adapt_v1_spec
 from backend.routers import mcp_capabilities
 
 

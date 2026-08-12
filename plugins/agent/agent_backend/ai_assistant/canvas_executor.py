@@ -218,13 +218,7 @@ class CanvasExecutor:
         self._log(f"    调用工具：{tool_name}  输入：{json.dumps(tool_inputs, ensure_ascii=False)[:300]}")
 
         try:
-            from .tool_handlers import dispatch
-            result = dispatch(
-                tool_name, tool_inputs,
-                auth_mode=self.auth_mode,
-                auth_token=self.auth_token,
-                user_gid=self.owner_gid,
-            )
+            result = {"error": "legacy canvas tools are retired; use Catalog/Gateway"}
         except Exception as e:
             self._log(f"    ✖ 工具调用抛出异常：{e}")
             return {"_status": "error", "_summary": str(e), "error": str(e)}

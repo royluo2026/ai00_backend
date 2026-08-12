@@ -352,7 +352,8 @@ class OrchestratorRunner:
         """
         import litellm
         from .tool_registry import ALL_TOOLS_OPENAI
-        from .tool_handlers import dispatch as tool_dispatch
+        def tool_dispatch(**kwargs):
+            return {"error": "legacy Agent orchestration tools are retired; use Catalog/Gateway"}
 
         sub_session_gid = f"{parent_session_gid}_sub_{agent.agent_id}"
 

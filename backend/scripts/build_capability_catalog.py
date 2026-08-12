@@ -17,7 +17,7 @@ from backend.capability_v2.catalog import (
     build_release,
     compatibility_errors,
 )
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "capability-catalog-release.json"
@@ -35,7 +35,7 @@ def current_release() -> CatalogRelease:
         (item.spec.id, item.spec.version): item for item in registry.snapshot()
     }
     descriptors = [
-        registrations[key].descriptor or adapt_v1_spec(registrations[key].spec)
+        registrations[key].descriptor or descriptor_from_provider_spec(registrations[key].spec)
         for key in sorted(registrations)
     ]
     return build_release(descriptors, _providers())

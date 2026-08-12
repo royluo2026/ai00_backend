@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from backend.capability_v2.contracts import AutomationLevel, CapabilityDescriptorV2, DomainErrorContract, ExposurePolicy, LifecycleStatus, SideEffectLevel
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 ERRORS = (
     DomainErrorContract(code="resource_not_found", meaning="Ontology release or object was not found."),
@@ -11,7 +11,7 @@ ERRORS = (
 )
 
 def descriptor_for(spec):
-    base = adapt_v1_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
+    base = descriptor_from_provider_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
     return CapabilityDescriptorV2.model_validate({
         **base.model_dump(), "owner_domain": "ontology", "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True),
@@ -29,4 +29,3 @@ class GovernedRegistry:
     def __init__(self, target): self.target = target
     def register(self, spec, handler, *, descriptor=None):
         self.target.register(spec, handler, descriptor=descriptor or descriptor_for(spec))
-

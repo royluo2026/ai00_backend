@@ -25,22 +25,15 @@ def test_migrated_craft_is_plugin_callable():
 
 def test_agent_adapter_uses_bounded_context_and_never_advertises_discovery_tool():
     root = Path(__file__).resolve().parents[2]
-    source = (root / "plugins/agent/agent_backend/ai_assistant/tool_handlers/capability_tools.py").read_text(encoding="utf-8")
-    assert '"knowledge.context.retrieve"' in source
-    assert '"knowledge.document.search"' not in source
+    source = (root / "plugins/agent/agent_backend/ai_assistant/catalog_tools.py").read_text(encoding="utf-8")
+    assert "release.descriptors" in source
     assert "find_capabilities" not in source
     assert "database.sql.execute" not in source
 
 
 def test_agent_bop_and_ontology_reads_use_governed_capabilities():
     root = Path(__file__).resolve().parents[2]
-    handlers = root / "plugins/agent/agent_backend/ai_assistant/tool_handlers"
-    adapter = (handlers / "capability_tools.py").read_text(encoding="utf-8")
-    craft = (handlers / "craft_tools.py").read_text(encoding="utf-8")
-    knowledge = (handlers / "knowledge_tools.py").read_text(encoding="utf-8")
-
-    assert '"craft.bop.execution_structure.get"' in adapter
-    assert '"ontology.concept.resolve"' in adapter
-    assert '"ontology.concept.get"' in adapter
-    assert "/api/bop/versions/{version_gid}/entries" not in craft
-    assert "/api/ontology/schema/" not in knowledge
+    adapter = (root / "plugins/agent/agent_backend/ai_assistant/catalog_tools.py").read_text(encoding="utf-8")
+    assert "DomainInvocation" in adapter
+    assert "self.client.invoke" in adapter
+    assert not any((root / "plugins/agent/agent_backend/ai_assistant/tool_handlers").rglob("*.py"))

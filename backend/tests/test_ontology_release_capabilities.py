@@ -9,7 +9,7 @@ from backend.capabilities.ontology_releases_next import (
     register_ontology_release_capabilities,
 )
 from backend.capabilities.registry_next import CapabilityRegistry
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec as adapt_v1_spec
 from backend.ontology.diff import semantic_diff
 from backend.domain_ports.ontology import ImpactReference, ImpactReport
 from backend.domain_ports.ontology import OntologyVersionRef

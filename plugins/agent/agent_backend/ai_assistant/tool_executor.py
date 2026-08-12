@@ -70,20 +70,10 @@ def execute_tool(
     canvas_context: dict | None = None,
 ) -> dict[str, Any]:
     """分发工具调用。返回结果 dict，失败时含 error 字段。"""
-    try:
-        from .tool_handlers import dispatch as _d
-        return _d(
-            tool_name=tool_name,
-            inputs=inputs,
-            auth_mode=auth_mode,
-            auth_token=auth_token,
-            user_gid=user_gid,
-            session_gid=session_gid,
-            is_confirmed=is_confirmed,
-            canvas_context=canvas_context,
-        )
-    except Exception as e:
-        return {"error": str(e), "tool": tool_name}
+    return {
+        "error": "legacy Agent tool execution is retired; use a Catalog-generated tool through the Capability Gateway",
+        "tool": tool_name,
+    }
 
 
 async def execute_catalog_tool(

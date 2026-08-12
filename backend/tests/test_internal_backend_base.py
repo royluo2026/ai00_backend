@@ -1,6 +1,7 @@
 from backend.config import Settings, get_settings
 import importlib
 import sys
+from pathlib import Path
 
 
 REQUIRED_ENV = {
@@ -38,9 +39,6 @@ def test_frontend_config_prefers_public_url(monkeypatch):
     assert settings.public_url == 'https://api.example.com'
 
 
-def test_craft_tools_uses_settings_internal_backend_base(monkeypatch):
-    make_settings(monkeypatch, BACKEND_BASE_URL=None, HOST='10.9.8.7', PORT='8091')
-    sys.modules.pop('plugins.agent.agent_backend.ai_assistant.tool_handlers.craft_tools', None)
-    module = importlib.import_module('plugins.agent.agent_backend.ai_assistant.tool_handlers.craft_tools')
-    module = importlib.reload(module)
-    assert module._BASE_URL == 'http://10.9.8.7:8091'
+def test_agent_legacy_http_tool_handlers_are_retired():
+    root = Path(__file__).resolve().parents[2]
+    assert not any((root / "plugins/agent/agent_backend/ai_assistant/tool_handlers").rglob("*.py"))

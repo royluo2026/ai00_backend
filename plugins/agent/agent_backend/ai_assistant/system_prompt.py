@@ -6,8 +6,6 @@ backend/ai_assistant/system_prompt.py
 from __future__ import annotations
 
 from ..data.memory_repository import MemoryRepository
-from .tool_handlers.capability_tools import dispatch_knowledge
-
 _memory_repository = MemoryRepository()
 
 _SYSTEM_OVERVIEW = """你是小柔（AI00 智能助手），汽车工艺系统 AI00 的智能助理。
@@ -101,50 +99,9 @@ def build(
     except Exception:
         pass
 
-    # 团队知识必须经过公开 Capability 和当前用户权限过滤。
-    try:
-        result = dispatch_knowledge(
-            "search_knowledge", {"query": "system_doc", "limit": 5},
-            user_gid=owner_gid, auth_mode=auth_mode,
-        )
-        docs = result.get("items", [])
-        if docs:
-            evidence = result.get("evidence", [])
-            lines = ["## 系统参考文档（RAG）"]
-            for index, doc in enumerate(docs):
-                citation = evidence[index] if index < len(evidence) else {}
-                reference = citation.get("reference", "")
-                digest = citation.get("digest", "")
-                suffix = f" [来源: {reference} {digest}]" if reference else ""
-                lines.append(f"- {doc.get('title', '')}: {doc.get('content_preview', '')[:200]}{suffix}")
-            parts.append("\n".join(lines))
-    except Exception:
-        pass
-
     return "\n\n".join(parts)
 
 
 def _inject_wfc_guide(user_gid: str, auth_mode: str) -> str:
-    """Load a visible WFC guide through the public knowledge Capability."""
-    try:
-        search = dispatch_knowledge(
-            "search_knowledge", {"query": "wfc_guide", "limit": 1},
-            user_gid=user_gid, auth_mode=auth_mode,
-        )
-        items = search.get("items", [])
-        if not items:
-            return ""
-        detail_result = dispatch_knowledge(
-            "get_knowledge_entry", {"gid": items[0]["gid"]},
-            user_gid=user_gid, auth_mode=auth_mode,
-        )
-        detail = detail_result.get("data", {})
-        content = str(detail.get("content_md") or "").strip()
-        evidence = detail_result.get("evidence", [])
-        if not content:
-            return ""
-        citation = evidence[0] if evidence else {}
-        source = f"\n来源：{citation.get('reference', '')} {citation.get('digest', '')}" if citation.get("reference") else ""
-        return f"\n【{detail.get('title') or 'WFC 画布对话模式（自定义）'}】\n{content}{source}\n"
-    except Exception:
-        return ""
+    """Knowledge guidance is retrieved by Catalog tools during the Agent run."""
+    return ""

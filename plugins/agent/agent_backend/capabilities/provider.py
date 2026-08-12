@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from backend.capability_v2.contracts import AutomationLevel, CapabilityDescriptorV2, DomainErrorContract, ExecutionMode, ExposurePolicy, LifecycleStatus, SideEffectLevel
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
 
 ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryable) for code, meaning, retryable in (
@@ -16,7 +16,7 @@ ERRORS = tuple(DomainErrorContract(code=code, meaning=meaning, retryable=retryab
 
 
 def descriptor_for(spec) -> CapabilityDescriptorV2:
-    base = adapt_v1_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
+    base = descriptor_from_provider_spec(spec); write = base.side_effect_level is not SideEffectLevel.READ
     interaction = spec.id == "agent.interaction.request"
     return CapabilityDescriptorV2.model_validate({
         **base.model_dump(), "owner_domain": "agent", "lifecycle_status": LifecycleStatus.STABLE,

@@ -1,61 +1,30 @@
-from plugins.agent.agent_backend.ai_assistant.tool_handlers import capability_tools
+from types import SimpleNamespace
+
+import pytest
+
+from backend.capability_v2.contracts import CorrelationRef
+from plugins.agent.agent_backend.ai_assistant.catalog_tools import CatalogToolRegistry, tool_name_for
 
 
-def test_bop_structure_adapter_preserves_evidence(monkeypatch):
-    calls = []
+@pytest.mark.anyio
+async def test_catalog_agent_adapter_preserves_gateway_result_and_evidence():
+    expected = {"data": {"nodes": []}, "evidence": [{"reference": "craft://bop/v1"}]}
 
-    def fake_invoke(capability_id, payload, user_gid, auth_mode):
-        calls.append((capability_id, payload, user_gid, auth_mode))
-        return {
-            "data": {
-                "nodes": [{"kind": "operation", "name": "装配", "vpps": "OP10"}],
-                "operations": [],
-            },
-            "evidence": [{"kind": "craft.bop.execution_structure", "reference": "craft://bop/v1"}],
-        }
+    class Client:
+        async def invoke(self, invocation, identity, correlation):
+            assert invocation.capability_id == "craft.bop.execution_structure.get"
+            return expected
 
-    monkeypatch.setattr(capability_tools, "_invoke", fake_invoke)
-    result = capability_tools.dispatch_bop_structure(
-        {"version_gid": "v1"}, user_gid="u1", auth_mode="web"
+    descriptor = SimpleNamespace(
+        id="craft.bop.execution_structure.get", major_version=1, description="read bop",
+        input_schema={}, output_schema={}, agent_output_schema=None,
+        side_effect_level=SimpleNamespace(value="read"), automation_level=SimpleNamespace(value="A2"),
+        confirmation_policy="none", exposure=SimpleNamespace(agent=True),
     )
-
-    assert calls == [("craft.bop.execution_structure.get", {"version_gid": "v1"}, "u1", "web")]
-    assert result["source"] == "capability"
+    registry = CatalogToolRegistry(SimpleNamespace(descriptors=(descriptor,)), client=Client())
+    result = await registry.execute(
+        tool_name_for(descriptor.id, 1), {"version_gid": "v1"},
+        identity=object(), correlation=CorrelationRef(request_id="req_1"),
+    )
+    assert result is expected
     assert result["evidence"][0]["reference"] == "craft://bop/v1"
-    assert "装配" in result["text"]
-
-
-def test_ontology_adapter_resolves_then_reads_pinned_schema(monkeypatch):
-    calls = []
-
-    def fake_invoke(capability_id, payload, user_gid, auth_mode):
-        calls.append((capability_id, payload, user_gid, auth_mode))
-        if capability_id == "ontology.concept.resolve":
-            return {
-                "data": {
-                    "status": "resolved",
-                    "release_gid": "r1",
-                    "concept": {"stable_gid": "operation", "kind": "concept", "label_zh": "工序"},
-                },
-                "evidence": [{"reference": "ois://ontology/r1"}],
-            }
-        return {
-            "data": {"concept": {"stable_gid": "operation", "properties": ["duration"]}},
-            "evidence": [{"reference": "ois://ontology/r1"}],
-        }
-
-    monkeypatch.setattr(capability_tools, "_invoke", fake_invoke)
-    result = capability_tools.dispatch_ontology(
-        {"node_type": "operation"}, user_gid="u1", auth_mode="feishu"
-    )
-
-    assert calls[0][0] == "ontology.concept.resolve"
-    assert calls[1][0] == "ontology.concept.get"
-    assert calls[1][1] == {
-        "stable_gid": "operation",
-        "kind": "concept",
-        "release_gid": "r1",
-        "view": "schema",
-    }
-    assert result["source"] == "capability"
-    assert len(result["evidence"]) == 2

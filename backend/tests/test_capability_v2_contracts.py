@@ -18,7 +18,7 @@ from backend.capability_v2.contracts import (
     OperationRef,
     TenantIdentity,
 )
-from backend.capability_v2.v1_adapter import adapt_v1_spec
+from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec as adapt_v1_spec
 
 
 def _identity() -> ConsumerIdentity:
