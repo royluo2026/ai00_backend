@@ -11,6 +11,13 @@ from backend.capability_v2.bootstrap import get_capability_registry
 
 
 class KnowledgeMigrationControlTests(unittest.TestCase):
+    @staticmethod
+    def _migration_script() -> str:
+        root = Path(__file__).resolve().parents[2]
+        return (
+            root / "plugins/knowledge/knowledge_backend/infrastructure/migrate_markdown_revisions.py"
+        ).read_text(encoding="utf-8")
+
     def test_production_registry_contains_revision_and_migration_capabilities(self):
         capability_registry = get_capability_registry()
         self.assertEqual(
@@ -36,20 +43,18 @@ class KnowledgeMigrationControlTests(unittest.TestCase):
         self.assertIn("r.tenant_gid=%s", source)
 
     def test_apply_cannot_skip_ois_read_after_write_verification(self):
-        root = Path(__file__).resolve().parents[2]
-        script = (root / "backend/scripts/migrate_knowledge_markdown_revisions.py").read_text(encoding="utf-8")
+        script = self._migration_script()
         self.assertNotIn("--no-verify", script)
         self.assertIn("result = verify_migration_run(conn, run_gid)", script)
     def test_batch_level_failure_is_persisted_instead_of_staying_running(self):
-        root = Path(__file__).resolve().parents[2]
-        script = (root / "backend/scripts/migrate_knowledge_markdown_revisions.py").read_text(encoding="utf-8")
+        script = self._migration_script()
         self.assertIn("def fail_migration_run", script)
         self.assertIn("SET status='failed',last_error=%s", script)
         self.assertIn("result = fail_migration_run(conn, run_gid, exc)", script)
     def test_control_tables_are_knowledge_owned_and_source_is_never_deleted(self):
         root = Path(__file__).resolve().parents[2]
         ddl = (root / "backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql").read_text(encoding="utf-8")
-        script = (root / "backend/scripts/migrate_knowledge_markdown_revisions.py").read_text(encoding="utf-8")
+        script = self._migration_script()
         self.assertIn("workmanship_know_migration_runs", ddl)
         self.assertIn("workmanship_know_migration_items", ddl)
         self.assertNotIn("DELETE FROM WORKMANSHIP_KNOW_ENTRIES", script.upper())

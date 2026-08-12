@@ -33,6 +33,25 @@
 | Base Platform | `base.team.change.apply` | rest |
 | Base Platform | `base.team.membership.change.apply` | rest |
 | Base Platform | `base.team.read` | rest |
+| Base Platform | `factory.asset.get` | none |
+| Base Platform | `factory.asset.maintenance.complete` | none |
+| Base Platform | `factory.asset.maintenance.start` | none |
+| Base Platform | `factory.asset.register` | none |
+| Base Platform | `factory.asset.scrap` | none |
+| Base Platform | `factory.asset.search` | none |
+| Base Platform | `factory.asset.update` | none |
+| Base Platform | `factory.resource.read` | none |
+| Base Platform | `factory.resource_catalog.create` | none |
+| Base Platform | `factory.resource_catalog.deprecate` | none |
+| Base Platform | `factory.resource_catalog.get` | none |
+| Base Platform | `factory.resource_catalog.publish` | none |
+| Base Platform | `factory.resource_catalog.revise` | none |
+| Base Platform | `factory.resource_catalog.search` | none |
+| Base Platform | `factory.structure.archive` | none |
+| Base Platform | `factory.structure.create` | none |
+| Base Platform | `factory.structure.get` | none |
+| Base Platform | `factory.structure.search` | none |
+| Base Platform | `factory.structure.update` | none |
 | Base Platform | `identity.principal.search` | rest |
 | Base Platform | `plugin.disable` | none |
 | Base Platform | `plugin.enable` | none |
@@ -58,6 +77,8 @@
 | Craft | `craft.bop.execution_structure.preview` | none |
 | Craft | `craft.bop.import.preview` | rest |
 | Craft | `craft.bop.linked_parts.get` | rest |
+| Craft | `craft.bop.validation.get` | none |
+| Craft | `craft.bop.validation.run` | none |
 | Craft | `craft.bop.version.archive` | rest |
 | Craft | `craft.bop.version.compare` | none |
 | Craft | `craft.bop.version.create` | rest |
@@ -70,42 +91,76 @@
 | Craft | `craft.ebom.change.apply` | rest |
 | Craft | `craft.ebom.read` | rest |
 | Craft | `craft.gbop.change.apply` | rest |
+| Craft | `craft.gbop.draft.change.apply` | none |
+| Craft | `craft.gbop.draft.change.preview` | none |
+| Craft | `craft.gbop.draft.create` | none |
+| Craft | `craft.gbop.draft.get` | none |
+| Craft | `craft.gbop.draft.search` | none |
+| Craft | `craft.gbop.draft.submit` | none |
 | Craft | `craft.gbop.item.knowledge.list` | none |
 | Craft | `craft.gbop.item.search` | none |
 | Craft | `craft.gbop.item.usage.get` | none |
 | Craft | `craft.gbop.read` | rest |
+| Craft | `craft.gbop.release.activate` | none |
+| Craft | `craft.gbop.release.archive` | none |
+| Craft | `craft.gbop.release.compare` | none |
+| Craft | `craft.gbop.release.get` | none |
+| Craft | `craft.gbop.release.publish` | none |
+| Craft | `craft.gbop.release.search` | none |
 | Craft | `craft.manufacturing_resource.change.apply` | rest |
 | Craft | `craft.manufacturing_resource.read` | rest |
+| Craft | `craft.pbom.draft.change.apply` | none |
+| Craft | `craft.pbom.draft.change.preview` | none |
+| Craft | `craft.pbom.import.preview` | none |
 | Craft | `craft.pbom.part.search` | rest |
-| Craft | `craft.pbom.snapshot.compare` | none |
-| Craft | `craft.pbom.snapshot.get` | rest |
+| Craft | `craft.pbom.version.archive` | none |
+| Craft | `craft.pbom.version.compare` | none |
+| Craft | `craft.pbom.version.create` | none |
+| Craft | `craft.pbom.version.get` | rest |
+| Craft | `craft.pbom.version.publish` | none |
+| Craft | `craft.pbom.version.search` | rest |
+| Craft | `craft.pbom.version.submit` | none |
 | Craft | `craft.rule.change.apply` | rest |
+| Craft | `craft.rule.draft.create` | none |
+| Craft | `craft.rule.draft.get` | none |
+| Craft | `craft.rule.draft.revise` | none |
+| Craft | `craft.rule.draft.search` | none |
+| Craft | `craft.rule.draft.submit` | none |
+| Craft | `craft.rule.evaluate` | none |
 | Craft | `craft.rule.read` | rest, agent |
+| Craft | `craft.rule.release.activate` | none |
+| Craft | `craft.rule.release.get` | none |
+| Craft | `craft.rule.release.publish` | none |
+| Craft | `craft.rule.release.search` | none |
+| Craft | `craft.rule.waiver.create` | none |
+| Craft | `craft.rule.waiver.revoke` | none |
+| Craft | `craft.rule.waiver.search` | none |
 | Digital Model | `digital_model.component.search` | none |
 | Digital Model | `digital_model.model.create` | none |
 | Digital Model | `digital_model.model.get` | none |
 | Digital Model | `digital_model.model.search` | none |
-| Digital Model | `digital_model.snapshot.compare` | none |
-| Digital Model | `digital_model.snapshot.get` | none |
+| Digital Model | `digital_model.version.compare` | none |
 | Digital Model | `digital_model.version.create` | none |
-| Integration | `integration.connector.archive` | rest |
-| Integration | `integration.connector.connection.test` | rest |
-| Integration | `integration.connector.create` | rest |
-| Integration | `integration.connector.schema.discover` | rest |
-| Integration | `integration.connector.search` | rest |
-| Integration | `integration.connector.update` | rest |
-| Integration | `integration.mapping.archive` | rest |
-| Integration | `integration.mapping.create` | rest |
-| Integration | `integration.mapping.get` | rest |
-| Integration | `integration.mapping.preview` | rest |
-| Integration | `integration.mapping.search` | rest |
-| Integration | `integration.mapping.update` | rest |
-| Integration | `integration.sync.start` | rest |
+| Digital Model | `digital_model.version.get` | none |
+| Digital Model | `digital_model.version.search` | none |
+| Integration | `integration.connector.archive` | none |
+| Integration | `integration.connector.connection.test` | none |
+| Integration | `integration.connector.create` | none |
+| Integration | `integration.connector.schema.discover` | none |
+| Integration | `integration.connector.search` | none |
+| Integration | `integration.connector.update` | none |
+| Integration | `integration.mapping.archive` | none |
+| Integration | `integration.mapping.create` | none |
+| Integration | `integration.mapping.get` | none |
+| Integration | `integration.mapping.preview` | none |
+| Integration | `integration.mapping.search` | none |
+| Integration | `integration.mapping.update` | none |
+| Integration | `integration.sync.start` | none |
 | Knowledge | `knowledge.context.retrieve` | rest, agent |
 | Knowledge | `knowledge.document.acl.grant` | none |
 | Knowledge | `knowledge.document.acl.list` | none |
 | Knowledge | `knowledge.document.acl.revoke` | none |
-| Knowledge | `knowledge.document.archive` | rest |
+| Knowledge | `knowledge.document.archive` | none |
 | Knowledge | `knowledge.document.create` | rest |
 | Knowledge | `knowledge.document.diff` | none |
 | Knowledge | `knowledge.document.get` | rest, agent |
@@ -115,19 +170,21 @@
 | Knowledge | `knowledge.document.revisions` | none |
 | Knowledge | `knowledge.document.rollback` | none |
 | Knowledge | `knowledge.document.search` | none |
-| Knowledge | `knowledge.entry.change.apply` | rest |
+| Knowledge | `knowledge.entry.change.apply` | none |
 | Knowledge | `knowledge.get` | rest, agent |
 | Knowledge | `knowledge.migration.status` | none |
-| Knowledge | `knowledge.personalization.change.apply` | rest |
-| Knowledge | `knowledge.personalization.read` | rest |
+| Knowledge | `knowledge.personalization.change.apply` | none |
+| Knowledge | `knowledge.personalization.read` | none |
 | Knowledge | `knowledge.proposal.get` | none |
 | Knowledge | `knowledge.proposal.list` | none |
 | Knowledge | `knowledge.proposal.outbox.list` | none |
 | Knowledge | `knowledge.proposal.outbox.retry` | none |
 | Knowledge | `knowledge.proposal.review` | none |
 | Knowledge | `knowledge.propose` | none |
+| Knowledge | `knowledge.reference_data.change.apply` | none |
+| Knowledge | `knowledge.reference_data.read` | none |
 | Knowledge | `knowledge.search` | rest, agent |
-| Knowledge | `knowledge.space.change.apply` | rest |
+| Knowledge | `knowledge.space.change.apply` | none |
 | Knowledge | `knowledge.space.create` | rest |
 | Knowledge | `knowledge.space.list` | rest |
 | Knowledge | `knowledge.space.search` | none |
@@ -159,8 +216,8 @@
 | Project Management | `project.activity.aggregate` | agent |
 | Project Management | `project.approval.change.apply` | rest, agent |
 | Project Management | `project.approval.read` | rest, agent |
-| Project Management | `project.bitable_binding.change.apply` | rest |
-| Project Management | `project.bitable_binding.read` | rest |
+| Project Management | `project.bitable_binding.change.apply` | none |
+| Project Management | `project.bitable_binding.read` | none |
 | Project Management | `project.change_log.read` | rest |
 | Project Management | `project.collaboration.change.apply` | rest |
 | Project Management | `project.collaboration.read` | rest |
@@ -187,13 +244,18 @@
 | Project Management | `project.task_template.read` | rest |
 | Project Management | `project.workbench.change.apply` | rest |
 | Project Management | `project.workbench.read` | rest |
+| Simulation | `simulation.environment.archive` | none |
 | Simulation | `simulation.environment.create` | none |
 | Simulation | `simulation.environment.get` | none |
-| Simulation | `simulation.environment.list` | none |
+| Simulation | `simulation.environment.search` | rest |
 | Simulation | `simulation.parameter_set.create` | none |
 | Simulation | `simulation.parameter_set.get` | none |
-| Simulation | `simulation.profile.create` | none |
-| Simulation | `simulation.profile.get` | none |
+| Simulation | `simulation.parameter_set.search` | none |
+| Simulation | `simulation.result.compare` | none |
 | Simulation | `simulation.result.get` | none |
 | Simulation | `simulation.run.get` | none |
+| Simulation | `simulation.run.search` | none |
 | Simulation | `simulation.run.start` | none |
+| Simulation | `simulation.solver_profile.create` | none |
+| Simulation | `simulation.solver_profile.get` | none |
+| Simulation | `simulation.solver_profile.search` | none |

@@ -1,7 +1,7 @@
 from pathlib import Path
 import unittest
 
-from backend.scripts.migrate_knowledge_markdown_revisions import (
+from plugins.knowledge.knowledge_backend.infrastructure.migrate_markdown_revisions import (
     inventory_summary,
     partition_inventory,
     plan_legacy_revision,
@@ -44,7 +44,10 @@ class KnowledgeLegacyMigrationTests(unittest.TestCase):
         self.assertEqual([row["gid"] for row in result["quarantined"]], ["c", "d", "e"])
 
     def test_migration_preserves_local_vs_team_acl_semantics(self):
-        source = Path(__file__).resolve().parents[1].joinpath("scripts/migrate_knowledge_markdown_revisions.py").read_text(encoding="utf-8")
+        root = Path(__file__).resolve().parents[2]
+        source = root.joinpath(
+            "plugins/knowledge/knowledge_backend/infrastructure/migrate_markdown_revisions.py"
+        ).read_text(encoding="utf-8")
         self.assertIn('share_scope") or "team") == "team"', source)
         self.assertIn("VALUES (%s,'user',%s,'admin',%s)", source)
         self.assertIn("VALUES (%s,'team',%s,'edit',%s)", source)

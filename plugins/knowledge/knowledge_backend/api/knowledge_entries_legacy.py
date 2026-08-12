@@ -17,9 +17,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from ..data.connection import get_knowledge_conn as get_conn
-from backend.routers.deps import build_profile, get_current_user
+from backend.platform_sdk.auth import build_profile, get_current_user
 from backend.platform_sdk.identity import get_active_team_member_gids
-from backend.utils.gid import next_gid
+from backend.platform_sdk.ids import next_gid
 
 router = APIRouter(tags=["knowledge"])
 

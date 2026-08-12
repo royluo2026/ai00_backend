@@ -107,6 +107,8 @@ def test_reliability_migration_has_hash_only_approval_and_atomic_outcome_tables(
     assert "workmanship_base_capability_audit_ledger" in sql
     assert "unique key uq_base_capability_outcome_idempotency" in sql
 
-    worker = (root / "backend/capabilities/outbox_worker_next.py").read_text(encoding="utf-8")
+    worker = (
+        root / "plugins/knowledge/knowledge_backend/infrastructure/publication_outbox_worker.py"
+    ).read_text(encoding="utf-8")
     assert "deliver_capability_audit_once" in worker
     assert "INSERT IGNORE INTO workmanship_base_capability_audit_ledger" in worker

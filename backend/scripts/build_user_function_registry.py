@@ -38,7 +38,7 @@ VALID_EXCLUSIONS = {
     "unstable_product_surface",
 }
 ROUTE_METHODS = {"get", "post", "put", "patch", "delete", "head", "options"}
-CAPABILITY_PATTERN = r"(?:base|craft|digital_model|identity|integration|knowledge|local|ontology|plugin|semantic|simulation|system|vismockup)\.[a-z0-9_.]+"
+CAPABILITY_PATTERN = r"(?:agent|base|craft|digital_model|factory|identity|integration|knowledge|local|ontology|plugin|project|semantic|simulation|system|vismockup)\.[a-z0-9_.]+"
 CAPABILITY_RE = re.compile(rf"(?<![a-z0-9_.])({CAPABILITY_PATTERN})(?![a-z0-9_.])")
 FETCH_CALL_RE = re.compile(
     r"\b(?:fetch|_cloudFetch)\s*\(\s*(?P<quote>[\"'])(?P<endpoint>[^\"'\x60${]+)(?P=quote)(?P<options>\s*,\s*\{[^{}]*\})?\s*\)"
@@ -57,9 +57,12 @@ DEFAULT_EXCLUSION_REASON = "Operations or transient interface; not selected for 
 TARGET_CAPABILITIES = {
     "rest:GET:/api/bop/versions": "craft.bop.version.list",
     "rest:GET:/api/bop/versions/{version_gid}/entries": "craft.bop.execution_structure.get",
+    "rest:GET:/api/bop/pbom-snapshots": "craft.pbom.version.search",
+    "rest:GET:/api/bop/pbom-versions": "craft.pbom.version.search",
+    "rest:GET:/api/bop/pbom-versions/{pbom_gid}/gbop-match-preview": "craft.pbom.version.get",
     "rest:GET:/api/knowledge_hub/items": "knowledge.context.retrieve",
     "rest:GET:/api/ontology/schema/{node_type}": "ontology.concept.resolve",
-    "rest:GET:/api/simulation/environments": "simulation.environment.list",
+    "rest:GET:/api/simulation/environments": "simulation.environment.search",
     "rest:GET:/api/simulation/environments/{environment_gid}": "simulation.environment.get",
     "rest:POST:/api/simulation/environments": "simulation.environment.create",
     "agent_tool:get_bop_entries": "craft.bop.execution_structure.get",
@@ -485,6 +488,19 @@ def merge_discovery(existing: dict[str, dict], discovered: list[dict]) -> list[d
                 # permission/resource literal, or a capability already removed
                 # through the catalog compatibility process—not a callable.
                 continue
+            if (
+                retained.get("stability") == "stable"
+                and retained.get("target_capability")
+                and not function_id.startswith("capability:")
+            ):
+                # A reviewed transport surface that disappeared from source is
+                # retained as audit history, but it is no longer a stable live
+                # function and must not block current release governance.
+                retained.update(
+                    stability="deprecated",
+                    current_consumers=[],
+                    migration_status="retired",
+                )
             if retained.get("exclusion_reason") == DEFAULT_EXCLUSION_REASON:
                 retained.update({
                     "classification": "unreviewed",
@@ -677,6 +693,19 @@ def apply_review_dispositions(
         if disposition["review_domain"] != row.get("domain"):
             continue
         if sorted(disposition.get("source_paths", [])) != sorted(row.get("source_paths", [])):
+            continue
+        approved_target = TARGET_CAPABILITIES.get(function_id)
+        if (
+            approved_target
+            and disposition.get("capability_id") != approved_target
+            and catalog_owners.get(approved_target) == _owner_key(row["domain"])
+        ):
+            row.update(
+                target_capability=approved_target,
+                classification="mapped",
+                migration_status="registered",
+                exclusion_reason=None,
+            )
             continue
         resolution = disposition.get("resolution")
         if resolution == "existing_capability":

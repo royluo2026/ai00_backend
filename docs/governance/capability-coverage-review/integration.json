@@ -3,832 +3,662 @@
   "domain": "Integration",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:9d60dc984e81ac5525322eae1a75465fa0110ee887dc7c6af03d5e54a1995db7",
-    "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
-    "catalog_sha256": "sha256:0a45ee7907af88219c8db89c9db2730aaf57a25f55ebca8a38995f1098b30b09"
+    "registry_sha256": "sha256:9cac2f540d8b4c05ab62270295a4212987034185bab980244a8e3076ba60e31f",
+    "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
+    "catalog_sha256": "sha256:fb1fa8b262de5a09a7653201b36e988cf60593dc0be566fd675d2839c0f3748f"
   },
   "unreviewed_functions": {},
   "excluded_functions": {},
   "capabilities": {
     "integration.connector.archive": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:DELETE:/api/ext-datasources/{gid}": {
-          "resolution": "new_capability",
+        "capability:integration.connector.archive": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:DELETE:/api/ext-datasources/{gid} to integration.connector.archive.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.connector.archive"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.connector.archive business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.connector.archive",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.connector.connection.test": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:POST:/api/ext-datasources/{gid}/test": {
-          "resolution": "new_capability",
+        "capability:integration.connector.connection.test": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:POST:/api/ext-datasources/{gid}/test to integration.connector.connection.test.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.connection.test"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.connector.connection.test"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.connection.test"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.connection.test"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.connection.test"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.connection.test"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.connector.connection.test business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.connector.connection.test",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.connector.create": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:POST:/api/ext-datasources": {
-          "resolution": "new_capability",
+        "capability:integration.connector.create": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:POST:/api/ext-datasources to integration.connector.create.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.connector.create"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.connector.create business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.connector.create",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.connector.schema.discover": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/ext-datasources/{gid}/tables": {
-          "resolution": "new_capability",
+        "capability:integration.connector.schema.discover": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:GET:/api/ext-datasources/{gid}/tables to integration.connector.schema.discover.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
-        },
-        "rest:GET:/api/ext-mappings/{gid}/columns": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:GET:/api/ext-mappings/{gid}/columns to integration.connector.schema.discover.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.schema.discover"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.connector.schema.discover"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.schema.discover"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.schema.discover"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.schema.discover"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.schema.discover"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.connector.schema.discover business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.connector.schema.discover",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.connector.search": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/ext-datasources": {
-          "resolution": "new_capability",
+        "capability:integration.connector.search": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:GET:/api/ext-datasources to integration.connector.search.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.connector.search"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.connector.search business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.connector.search",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.connector.update": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:PATCH:/api/ext-datasources/{gid}": {
-          "resolution": "new_capability",
+        "capability:integration.connector.update": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:PATCH:/api/ext-datasources/{gid} to integration.connector.update.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.connector.update"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.connector.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.connector.update business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.connector.update",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_datasources"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.mapping.archive": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:DELETE:/api/ext-mappings/{gid}": {
-          "resolution": "new_capability",
+        "capability:integration.mapping.archive": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:DELETE:/api/ext-mappings/{gid} to integration.mapping.archive.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.mapping.archive"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.mapping.archive business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.mapping.archive",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.mapping.create": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:POST:/api/ext-mappings": {
-          "resolution": "new_capability",
+        "capability:integration.mapping.create": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:POST:/api/ext-mappings to integration.mapping.create.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.mapping.create"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.create"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.mapping.create business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.mapping.create",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.mapping.get": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/ext-field-mappings": {
-          "resolution": "new_capability",
+        "capability:integration.mapping.get": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:GET:/api/ext-field-mappings to integration.mapping.get.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.get"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.mapping.get"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.get"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.get"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.get"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.get"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.mapping.get business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.mapping.get",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.mapping.preview": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/ext-mappings/{gid}/preview": {
-          "resolution": "new_capability",
+        "capability:integration.mapping.preview": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:GET:/api/ext-mappings/{gid}/preview to integration.mapping.preview.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.preview"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.mapping.preview"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.preview"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.preview"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.preview"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.preview"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.mapping.preview business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.mapping.preview",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.mapping.search": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/ext-mappings": {
-          "resolution": "new_capability",
+        "capability:integration.mapping.search": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:GET:/api/ext-mappings to integration.mapping.search.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.mapping.search"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.search"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.mapping.search business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.mapping.search",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.mapping.update": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:PATCH:/api/ext-mappings/{gid}": {
-          "resolution": "new_capability",
+        "capability:integration.mapping.update": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:PATCH:/api/ext-mappings/{gid} to integration.mapping.update.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
-        },
-        "rest:PUT:/api/ext-field-mappings/batch": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/ext_datasource.py"
-          ],
-          "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:PUT:/api/ext-field-mappings/batch to integration.mapping.update.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.mapping.update"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.mapping.update"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.mapping.update business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.mapping.update",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "integration"
       }
     },
     "integration.sync.start": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:POST:/api/ext-mappings/{gid}/import": {
-          "resolution": "new_capability",
+        "capability:integration.sync.start": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/ext_datasource.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/integration/integration_backend/capabilities/contracts.py",
+            "plugins/integration/integration_backend/capabilities/descriptors.py",
+            "plugins/integration/integration_backend/capabilities/provider.py"
           ],
           "owner": "Integration",
-          "evidence": "Approved ownership correction maps rest:POST:/api/ext-mappings/{gid}/import to integration.sync.start.",
-          "reviewer": "capability-v2-base-integration-correction",
-          "reviewed_at": "2026-08-12"
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.sync.start"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "The approved REST compatibility adapter uses Catalog and Gateway.",
-          "policy_ref": "integration.sync.start"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.sync.start"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.sync.start"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.sync.start"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed consumer requires this corrected business outcome.",
-          "policy_ref": "integration.sync.start"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed integration.sync.start business outcome for Integration.",
-        "non_goals": [
-          "Does not bypass Catalog and Gateway or write another domain database."
-        ],
-        "owner_domain": "integration",
-        "application_port": "integration.sync.start",
-        "provider_artifact": "ai00-integration",
-        "owned_tables": [
-          "workmanship_int_ext_datasources",
-          "workmanship_int_ext_field_mappings",
-          "workmanship_int_ext_mappings"
-        ],
-        "migration_stream": "integration"
       }
     }
   },

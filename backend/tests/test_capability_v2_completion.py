@@ -357,15 +357,19 @@ def test_production_path_rejects_test_only_source(tmp_path: Path) -> None:
         evaluate_completion(root, mode="strict")
 
 
-def test_current_repository_reports_progress_without_claiming_completion() -> None:
+def test_current_repository_reports_three_goal_completion() -> None:
     root = Path(__file__).resolve().parents[2]
 
     report = evaluate_completion(root, mode="progress")
 
-    assert report.complete is False
+    assert report.complete is True
     assert report.independent_domains == 11
-    assert report.cross_domain_sql == 312
-    assert report.internal_imports == 6
+    assert report.cross_domain_sql == 0
+    assert report.internal_imports == 0
+    assert report.consumer_bypasses == 0
+    assert report.sync_production_paths >= 1
+    assert report.async_production_paths >= 1
+    assert report.failed == ()
     assert "missing_domain:agent" not in report.failed
     assert "missing_domain:factory" not in report.failed
     assert "missing_domain:integration" not in report.failed
@@ -393,7 +397,7 @@ def test_frozen_review_exposes_exact_capability_ids() -> None:
     assert len(integration_ids) == 13
 
 
-def test_completion_cli_reports_progress_and_fails_strict() -> None:
+def test_completion_cli_reports_complete_in_progress_and_strict_modes() -> None:
     root = Path(__file__).resolve().parents[2]
     script = root / "backend/scripts/check_capability_v2_completion.py"
 
@@ -413,6 +417,7 @@ def test_completion_cli_reports_progress_and_fails_strict() -> None:
     )
 
     assert progress.returncode == 0
-    assert json.loads(progress.stdout)["complete"] is False
-    assert strict.returncode == 1
-    assert json.loads(strict.stdout)["cross_domain_sql"] == 312
+    assert json.loads(progress.stdout)["complete"] is True
+    assert strict.returncode == 0
+    assert json.loads(strict.stdout)["complete"] is True
+    assert json.loads(strict.stdout)["cross_domain_sql"] == 0

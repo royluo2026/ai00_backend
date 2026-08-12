@@ -27,11 +27,6 @@ _RESOURCE_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
         ("craft-bop-version", "from_version_gid"),
         ("craft-bop-version", "to_version_gid"),
     ),
-    "craft.pbom.snapshot.get": (("craft-pbom-snapshot", "snapshot_gid"),),
-    "craft.pbom.snapshot.compare": (
-        ("craft-pbom-snapshot", "from_snapshot_gid"),
-        ("craft-pbom-snapshot", "to_snapshot_gid"),
-    ),
     "craft.pbom.part.search": (("craft-pbom-version", "version_gid"),),
     "craft.pbom.version.get": (("craft-pbom-version", "version_gid"),),
     "craft.pbom.version.submit": (("craft-pbom-version", "version_gid"),),

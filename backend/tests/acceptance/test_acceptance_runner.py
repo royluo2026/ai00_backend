@@ -1,6 +1,7 @@
 import json
 import hashlib
 import sys
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
@@ -98,18 +99,23 @@ def test_generated_report_validates_against_checked_in_schema():
     })
 
     assert validate_report_schema(report) == []
-    assert report["completion"]["complete"] is False
-    assert report["completion"]["cross_domain_sql"] == 312
+    assert report["completion"]["complete"] is True
+    assert report["completion"]["cross_domain_sql"] == 0
 
 
 def test_only_release_candidate_is_blocked_by_incomplete_program():
     root = Path(__file__).resolve().parents[3]
-    completion = evaluate_completion(root, mode="progress")
+    completion = replace(
+        evaluate_completion(root, mode="progress"),
+        cross_domain_sql=1,
+        consumer_bypasses=1,
+        failed=("cross_domain_sql:1", "consumer_bypasses:1"),
+    )
 
     assert completion_blockers("offline", completion) == []
     blockers = completion_blockers("release-candidate", completion)
-    assert "capability completion: cross_domain_sql:312" in blockers
-    assert "capability completion: consumer_bypasses:11" in blockers
+    assert "capability completion: cross_domain_sql:1" in blockers
+    assert "capability completion: consumer_bypasses:1" in blockers
     assert not any("missing_domain:" in blocker for blocker in blockers)
 
 
@@ -187,6 +193,8 @@ def test_passed_release_candidate_requires_both_production_sharing_paths():
             "cross_domain_sql": 0,
             "internal_imports": 0,
             "consumer_bypasses": 0,
+            "sync_production_paths": 0,
+            "async_production_paths": 0,
             "failed": [],
         }
     )

@@ -3,13 +3,64 @@
   "domain": "Simulation",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:9d60dc984e81ac5525322eae1a75465fa0110ee887dc7c6af03d5e54a1995db7",
-    "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
-    "catalog_sha256": "sha256:0a45ee7907af88219c8db89c9db2730aaf57a25f55ebca8a38995f1098b30b09"
+    "registry_sha256": "sha256:9cac2f540d8b4c05ab62270295a4212987034185bab980244a8e3076ba60e31f",
+    "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
+    "catalog_sha256": "sha256:fb1fa8b262de5a09a7653201b36e988cf60593dc0be566fd675d2839c0f3748f"
   },
   "unreviewed_functions": {},
   "excluded_functions": {},
   "capabilities": {
+    "simulation.environment.archive": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:simulation.environment.archive": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/simulation/simulation_backend/capabilities/contracts.py",
+            "plugins/simulation/simulation_backend/capabilities/models.py",
+            "plugins/simulation/simulation_backend/capabilities/provider.py"
+          ],
+          "owner": "Simulation",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "simulation.environment.create": {
       "kind": "existing",
       "function_dispositions": {
@@ -132,21 +183,9 @@
         }
       }
     },
-    "simulation.environment.list": {
+    "simulation.environment.search": {
       "kind": "existing",
       "function_dispositions": {
-        "capability:simulation.environment.list": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/capabilities/agreed_catalog.py",
-            "plugins/simulation/simulation_backend/capabilities/contracts.py",
-            "plugins/simulation/simulation_backend/capabilities/models.py"
-          ],
-          "owner": "Simulation",
-          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
-          "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:GET:/api/simulation/environments": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -154,6 +193,18 @@
           ],
           "owner": "Simulation",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:simulation.environment.search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/simulation/simulation_backend/capabilities/contracts.py",
+            "plugins/simulation/simulation_backend/capabilities/models.py"
+          ],
+          "owner": "Simulation",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
@@ -166,8 +217,8 @@
           "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": false,
-          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "enabled": true,
+          "reason": "Existing Registry evidence includes this consumer.",
           "policy_ref": "existing-registry-policy"
         },
         "plugin": {
@@ -293,10 +344,10 @@
         }
       }
     },
-    "simulation.profile.create": {
+    "simulation.parameter_set.search": {
       "kind": "existing",
       "function_dispositions": {
-        "capability:simulation.profile.create": {
+        "capability:simulation.parameter_set.search": {
           "resolution": "existing_capability",
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
@@ -304,7 +355,7 @@
             "plugins/simulation/simulation_backend/capabilities/models.py"
           ],
           "owner": "Simulation",
-          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
@@ -343,10 +394,10 @@
         }
       }
     },
-    "simulation.profile.get": {
+    "simulation.result.compare": {
       "kind": "existing",
       "function_dispositions": {
-        "capability:simulation.profile.get": {
+        "capability:simulation.result.compare": {
           "resolution": "existing_capability",
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
@@ -355,7 +406,7 @@
             "plugins/simulation/simulation_backend/capabilities/provider.py"
           ],
           "owner": "Simulation",
-          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
@@ -496,6 +547,56 @@
         }
       }
     },
+    "simulation.run.search": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:simulation.run.search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/simulation/simulation_backend/capabilities/contracts.py",
+            "plugins/simulation/simulation_backend/capabilities/models.py"
+          ],
+          "owner": "Simulation",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "simulation.run.start": {
       "kind": "existing",
       "function_dispositions": {
@@ -509,6 +610,157 @@
           ],
           "owner": "Simulation",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "simulation.solver_profile.create": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:simulation.solver_profile.create": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/simulation/simulation_backend/capabilities/contracts.py",
+            "plugins/simulation/simulation_backend/capabilities/models.py"
+          ],
+          "owner": "Simulation",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "simulation.solver_profile.get": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:simulation.solver_profile.get": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/simulation/simulation_backend/capabilities/contracts.py",
+            "plugins/simulation/simulation_backend/capabilities/models.py",
+            "plugins/simulation/simulation_backend/capabilities/provider.py"
+          ],
+          "owner": "Simulation",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "simulation.solver_profile.search": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:simulation.solver_profile.search": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/simulation/simulation_backend/capabilities/contracts.py",
+            "plugins/simulation/simulation_backend/capabilities/models.py"
+          ],
+          "owner": "Simulation",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }

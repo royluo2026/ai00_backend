@@ -3,9 +3,9 @@
   "domain": "Knowledge",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:9d60dc984e81ac5525322eae1a75465fa0110ee887dc7c6af03d5e54a1995db7",
-    "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
-    "catalog_sha256": "sha256:0a45ee7907af88219c8db89c9db2730aaf57a25f55ebca8a38995f1098b30b09"
+    "registry_sha256": "sha256:9cac2f540d8b4c05ab62270295a4212987034185bab980244a8e3076ba60e31f",
+    "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
+    "catalog_sha256": "sha256:fb1fa8b262de5a09a7653201b36e988cf60593dc0be566fd675d2839c0f3748f"
   },
   "unreviewed_functions": {},
   "excluded_functions": {},
@@ -38,16 +38,6 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "backend/capabilities/knowledge_context_next.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
-          "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/knowledge_hub/items": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
           ],
           "owner": "Knowledge",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
@@ -237,16 +227,17 @@
       }
     },
     "knowledge.document.archive": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:DELETE:/api/knowledge_hub/items/{gid}": {
-          "resolution": "new_capability",
+        "capability:knowledge.document.archive": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/knowledge_hub.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
           ],
           "owner": "Knowledge",
-          "evidence": "The stable surface rest:DELETE:/api/knowledge_hub/items/{gid} implements the reviewed knowledge.document.archive business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -254,48 +245,34 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "knowledge.document.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "knowledge.document.archive"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "knowledge.document.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "knowledge.document.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "knowledge.document.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "knowledge.document.archive"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed document archive business outcome for Knowledge.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "knowledge",
-        "application_port": "knowledge.document.archive",
-        "provider_artifact": "ai00-knowledge-domain",
-        "owned_tables": [
-          "workmanship_know_documents",
-          "workmanship_know_revisions"
-        ],
-        "migration_stream": "knowledge"
       }
     },
     "knowledge.document.create": {
@@ -310,16 +287,6 @@
           "owner": "Knowledge",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/knowledge_hub/items": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:POST:/api/knowledge_hub/items implements the reviewed knowledge.document.create business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -429,16 +396,6 @@
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/knowledge_hub/items/{gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:GET:/api/knowledge_hub/items/{gid} implements the reviewed knowledge.document.get business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -487,16 +444,6 @@
           "owner": "Knowledge",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/knowledge_hub/items/{gid}/history": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:GET:/api/knowledge_hub/items/{gid}/history implements the reviewed knowledge.document.history.get business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -595,16 +542,6 @@
           "owner": "Knowledge",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PATCH:/api/knowledge_hub/items/{gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:PATCH:/api/knowledge_hub/items/{gid} implements the reviewed knowledge.document.revise business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -790,36 +727,17 @@
       }
     },
     "knowledge.entry.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:DELETE:/api/knowledge_entries/{gid}": {
-          "resolution": "new_capability",
+        "capability:knowledge.entry.change.apply": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/knowledge.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
           ],
           "owner": "Knowledge",
-          "evidence": "The stable surface rest:DELETE:/api/knowledge_entries/{gid} implements the reviewed knowledge.entry.change.apply business outcome from backend/routers/knowledge.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PATCH:/api/knowledge_entries/{gid}": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/knowledge.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:PATCH:/api/knowledge_entries/{gid} implements the reviewed knowledge.entry.change.apply business outcome from backend/routers/knowledge.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/knowledge_entries": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/knowledge.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:POST:/api/knowledge_entries implements the reviewed knowledge.entry.change.apply business outcome from backend/routers/knowledge.py.",
-          "reviewer": "capability-v2-architecture-review",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -827,47 +745,34 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "knowledge.entry.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "knowledge.entry.change.apply"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "knowledge.entry.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "knowledge.entry.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "knowledge.entry.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "knowledge.entry.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed entry change apply business outcome for Knowledge.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "knowledge",
-        "application_port": "knowledge.entry.change.apply",
-        "provider_artifact": "ai00-knowledge-domain",
-        "owned_tables": [
-          "workmanship_know_entries"
-        ],
-        "migration_stream": "knowledge"
       }
     },
     "knowledge.get": {
@@ -892,16 +797,6 @@
           "owner": "Knowledge",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/knowledge_entries/{gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:GET:/api/knowledge_entries/{gid} implements the reviewed knowledge.get business outcome from backend/routers/knowledge.py.",
-          "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -989,26 +884,17 @@
       }
     },
     "knowledge.personalization.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:POST:/api/knowledge_hub/items/{gid}/favorite": {
-          "resolution": "new_capability",
+        "capability:knowledge.personalization.change.apply": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/knowledge_hub.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
           ],
           "owner": "Knowledge",
-          "evidence": "The stable surface rest:POST:/api/knowledge_hub/items/{gid}/favorite implements the reviewed knowledge.personalization.change.apply business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/knowledge_hub/items/{gid}/recent": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:POST:/api/knowledge_hub/items/{gid}/recent implements the reviewed knowledge.personalization.change.apply business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1016,71 +902,48 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "knowledge.personalization.change.apply"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed personalization change apply business outcome for Knowledge.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "knowledge",
-        "application_port": "knowledge.personalization.change.apply",
-        "provider_artifact": "ai00-knowledge-domain",
-        "owned_tables": [
-          "workmanship_know_favorites",
-          "workmanship_know_recent"
-        ],
-        "migration_stream": "knowledge"
       }
     },
     "knowledge.personalization.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/knowledge_hub/favorites": {
-          "resolution": "new_capability",
+        "capability:knowledge.personalization.read": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/knowledge_hub.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
           ],
           "owner": "Knowledge",
-          "evidence": "The stable surface rest:GET:/api/knowledge_hub/favorites implements the reviewed knowledge.personalization.read business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/knowledge_hub/recent": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:GET:/api/knowledge_hub/recent implements the reviewed knowledge.personalization.read business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1088,48 +951,34 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "knowledge.personalization.read"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "knowledge.personalization.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed personalization read business outcome for Knowledge.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "knowledge",
-        "application_port": "knowledge.personalization.read",
-        "provider_artifact": "ai00-knowledge-domain",
-        "owned_tables": [
-          "workmanship_know_favorites",
-          "workmanship_know_recent"
-        ],
-        "migration_stream": "knowledge"
       }
     },
     "knowledge.proposal.get": {
@@ -1427,6 +1276,104 @@
         }
       }
     },
+    "knowledge.reference_data.change.apply": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:knowledge.reference_data.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/knowledge/knowledge_backend/capabilities/reference_data.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
+    "knowledge.reference_data.read": {
+      "kind": "existing",
+      "function_dispositions": {
+        "capability:knowledge.reference_data.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/knowledge/knowledge_backend/capabilities/reference_data.py"
+          ],
+          "owner": "Knowledge",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
+        }
+      },
+      "consumer_exposure": {
+        "shared_pipeline": "capability_provider_gateway",
+        "web": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "rest": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "plugin": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "agent": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "mcp": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        },
+        "local_runtime": {
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
+        }
+      }
+    },
     "knowledge.search": {
       "kind": "existing",
       "function_dispositions": {
@@ -1449,26 +1396,6 @@
           "owner": "Knowledge",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/knowledge_entries": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:GET:/api/knowledge_entries implements the reviewed knowledge.search business outcome from backend/routers/knowledge.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/knowledge_entries/vector-search": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:POST:/api/knowledge_entries/vector-search implements the reviewed knowledge.search business outcome from backend/routers/knowledge.py.",
-          "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1507,26 +1434,17 @@
       }
     },
     "knowledge.space.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
-        "rest:DELETE:/api/knowledge_hub/folders/{gid}": {
-          "resolution": "new_capability",
+        "capability:knowledge.space.change.apply": {
+          "resolution": "existing_capability",
           "source_paths": [
-            "backend/routers/knowledge_hub.py"
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
           ],
           "owner": "Knowledge",
-          "evidence": "The stable surface rest:DELETE:/api/knowledge_hub/folders/{gid} implements the reviewed knowledge.space.change.apply business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PATCH:/api/knowledge_hub/folders/{gid}": {
-          "resolution": "new_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:PATCH:/api/knowledge_hub/folders/{gid} implements the reviewed knowledge.space.change.apply business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1534,48 +1452,34 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "knowledge.space.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "knowledge.space.change.apply"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "knowledge.space.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "knowledge.space.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "knowledge.space.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "knowledge.space.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed space change apply business outcome for Knowledge.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "knowledge",
-        "application_port": "knowledge.space.change.apply",
-        "provider_artifact": "ai00-knowledge-domain",
-        "owned_tables": [
-          "workmanship_know_folders",
-          "workmanship_know_spaces"
-        ],
-        "migration_stream": "knowledge"
       }
     },
     "knowledge.space.create": {
@@ -1590,16 +1494,6 @@
           "owner": "Knowledge",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/knowledge_hub/folders": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:POST:/api/knowledge_hub/folders implements the reviewed knowledge.space.create business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1649,16 +1543,6 @@
           "owner": "Knowledge",
           "evidence": "Existing reviewed Registry mapping to the frozen Capability Catalog.",
           "reviewer": "existing-user-function-registry",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/knowledge_hub/folders": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "backend/routers/knowledge_hub.py"
-          ],
-          "owner": "Knowledge",
-          "evidence": "The stable surface rest:GET:/api/knowledge_hub/folders implements the reviewed knowledge.space.list business outcome from backend/routers/knowledge_hub.py.",
-          "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1864,6 +1748,13 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_know_domain_outbox",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_know_entries",
       "owner_domain": "Knowledge",
       "access_mode": "read_write",
@@ -1927,6 +1818,20 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_know_reference_datasets",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_know_reference_versions",
+      "owner_domain": "Knowledge",
+      "access_mode": "read_write",
+      "migration_stream": "knowledge",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_know_revisions",
       "owner_domain": "Knowledge",
       "access_mode": "read_write",
@@ -1941,414 +1846,7 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     }
   ],
-  "debt_dispositions": [
-    {
-      "id": "boundary:0f990e26058cbfd0cdcb",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/outbox_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
-    },
-    {
-      "id": "boundary:12eff717e881ee6d8fc9",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/proposal_query_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
-    },
-    {
-      "id": "boundary:1381972d12d0aa6e07b2",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_migration_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:1bd603fd24b57d5b9e54",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:3a99fe185bfe52de0c23",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:3cf20cd1621747d72ad9",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_context_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:3d2fe3f8684e267c5672",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:4cc294b466b6ef610b4e",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/outbox_retry_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
-    },
-    {
-      "id": "boundary:55e937e24d78d64c60ae",
-      "category": "dependency",
-      "source_paths": [
-        "backend/knowledge/revision_store.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.core.ois_storage"
-    },
-    {
-      "id": "boundary:57e6cdd201303b99bc53",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:5d656b1200df6eca3b0b",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/outbox_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
-    },
-    {
-      "id": "boundary:629729e63135be71f9cd",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:642cb274f1ab6ed097eb",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/outbox_retry_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
-    },
-    {
-      "id": "boundary:67685a98b3ec11b13bf7",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:7fd742275ddcad04a564",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/outbox_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
-    },
-    {
-      "id": "boundary:82daf6811ce172daa0a5",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/review_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
-    },
-    {
-      "id": "boundary:8d69dd1321b25a756b84",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/proposals_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
-    },
-    {
-      "id": "boundary:92e8d088b2ae76f87694",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/outbox_retry_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
-    },
-    {
-      "id": "boundary:983c709c86b0b1955f77",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:9adfa3c98b9fa5d8deda",
-      "category": "dependency",
-      "source_paths": [
-        "backend/knowledge/revision_store.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.core.ois_storage"
-    },
-    {
-      "id": "boundary:9f763c056dfffb1833e8",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.utils.gid"
-    },
-    {
-      "id": "boundary:b24870bd09b8a1aad413",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/proposal_query_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_proposals"
-    },
-    {
-      "id": "boundary:b49c8e71e2b9aec007ff",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:bfa94125faebb019ba02",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.utils.gid"
-    },
-    {
-      "id": "boundary:c3ad64e3ba87a3b0c92e",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:c8e8226c6db8f21d2d4a",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/review_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_entries"
-    },
-    {
-      "id": "boundary:e9536a55b88b9fca51bd",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:f482035bd26430240f57",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/knowledge_documents_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "knowledge imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:f4ac41fdee05dfee22b0",
-      "category": "database",
-      "source_paths": [
-        "backend/capabilities/outbox_next.py"
-      ],
-      "owner_domain": "Knowledge",
-      "current_owner": "Knowledge",
-      "target_owner": "Knowledge",
-      "replacement_boundary": "application_port:knowledge",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "base SQL accesses knowledge-owned table workmanship_know_publish_outbox"
-    }
-  ],
+  "debt_dispositions": [],
   "review": {
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",

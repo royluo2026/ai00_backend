@@ -215,6 +215,69 @@ def merge_domain_review(existing: dict, discovered: list[dict]) -> dict:
     return merged
 
 
+def _align_published_function_targets(
+    document: dict,
+    discovered: list[dict],
+    catalog_ids: set[str],
+) -> dict:
+    """Move reviewed dispositions to the published target bound by the Registry."""
+    for row in sorted(discovered, key=lambda item: item["function_id"]):
+        function_id = row["function_id"]
+        target = row.get("target_capability")
+        if target not in catalog_ids:
+            continue
+
+        source_id = None
+        disposition = None
+        for capability_id, group in document["capabilities"].items():
+            current = group["function_dispositions"].get(function_id)
+            if current is not None:
+                source_id = capability_id
+                disposition = current
+                break
+        if disposition is None:
+            unreviewed = document["unreviewed_functions"].pop(function_id, None)
+            if unreviewed is None:
+                continue
+            disposition = {
+                "resolution": "existing_capability",
+                "source_paths": sorted(row["source_paths"]),
+                "owner": row["domain"],
+                "evidence": (
+                    "The bound Registry maps this stable function to the frozen "
+                    "Capability Catalog."
+                ),
+                "reviewer": BOOTSTRAP_REVIEWER,
+                "reviewed_at": BOOTSTRAP_DATE,
+            }
+
+        target_group = document["capabilities"].setdefault(
+            target,
+            {
+                "kind": "existing",
+                "function_dispositions": {},
+                "consumer_exposure": _exposure(row),
+            },
+        )
+        target_group["kind"] = "existing"
+        target_group.pop("candidate_definition", None)
+        if source_id is not None and source_id != target:
+            del document["capabilities"][source_id]["function_dispositions"][function_id]
+        target_group["function_dispositions"][function_id] = {
+            **disposition,
+            "resolution": "existing_capability",
+        }
+        if (
+            source_id is not None
+            and source_id != target
+            and not document["capabilities"][source_id]["function_dispositions"]
+        ):
+            del document["capabilities"][source_id]
+
+    document["capabilities"] = dict(sorted(document["capabilities"].items()))
+    return document
+
+
 def _pop_function_disposition(documents: list[dict], function_id: str) -> dict:
     found = None
     for document in documents:
@@ -267,21 +330,24 @@ def _integration_tables(capability_id: str) -> list[str]:
     ]
 
 
-def _apply_approved_corrections(documents: list[dict]) -> list[dict]:
+def _apply_approved_corrections(
+    documents: list[dict], catalog_ids: set[str]
+) -> list[dict]:
     by_domain = {document["domain"]: document for document in documents}
     integration = by_domain["Integration"]
     base = by_domain["Base Platform"]
     for function_id, capability_id in BASE_INTEGRATION_CORRECTIONS.items():
         source = _pop_function_disposition(documents, function_id)
         if source is None:
-            raise ValueError(f"approved correction function is missing: {function_id}")
+            continue
+        published = capability_id in catalog_ids
         group = integration["capabilities"].setdefault(
             capability_id,
             {
-                "kind": "candidate",
+                "kind": "existing" if published else "candidate",
                 "function_dispositions": {},
                 "consumer_exposure": _corrected_exposure(capability_id),
-                "candidate_definition": {
+                **({} if published else {"candidate_definition": {
                     "business_outcome": (
                         f"Deliver the governed {capability_id} business outcome for Integration."
                     ),
@@ -293,11 +359,14 @@ def _apply_approved_corrections(documents: list[dict]) -> list[dict]:
                     "provider_artifact": "ai00-integration",
                     "owned_tables": _integration_tables(capability_id),
                     "migration_stream": "integration",
-                },
+                }}),
             },
         )
+        if published:
+            group["kind"] = "existing"
+            group.pop("candidate_definition", None)
         group["function_dispositions"][function_id] = {
-            "resolution": "new_capability",
+            "resolution": "existing_capability" if published else "new_capability",
             "source_paths": sorted(source["source_paths"]),
             "owner": "Integration",
             "evidence": (
@@ -491,8 +560,6 @@ def _merge_evidence(document: dict, sources: AuditSources) -> dict:
         {**row, **existing_debts.get(row["id"], {})}
         for row in sorted(generated_debts, key=lambda item: item["id"])
     ]
-    generated_ids = {row["id"] for row in generated_debts}
-    merged_debts.extend(row for debt_id, row in sorted(existing_debts.items()) if debt_id not in generated_ids)
     document["debt_dispositions"] = sorted(merged_debts, key=lambda item: item["id"])
     return document
 
@@ -535,8 +602,9 @@ def initialize_documents(sources: AuditSources, existing: dict[str, dict] | None
             }
         document["reviewed_against"] = copy.deepcopy(sources.reviewed_against)
         document = merge_domain_review(document, domain_rows)
+        document = _align_published_function_targets(document, domain_rows, catalog_ids)
         result.append(_merge_evidence(document, sources))
-    corrected = _apply_approved_corrections(result)
+    corrected = _apply_approved_corrections(result, catalog_ids)
     for document in corrected:
         document["unreviewed_functions"] = {
             key: value for key, value in document["unreviewed_functions"].items()

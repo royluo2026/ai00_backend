@@ -241,6 +241,34 @@ def test_merge_migrates_retired_base_domain_without_losing_reviewed_governance()
     assert row["review_notes"] == ["Reviewed metadata must survive."]
 
 
+def test_merge_marks_a_removed_reviewed_transport_surface_deprecated():
+    builder = _builder_module()
+    existing = {
+        "rest:GET:/api/retired": {
+            "function_id": "rest:GET:/api/retired",
+            "domain": "Integration",
+            "stability": "stable",
+            "current_consumers": ["REST"],
+            "target_capability": "integration.connector.search",
+            "exposure": "Web/REST",
+            "automation_level": "interactive",
+            "resource_types": ["connector"],
+            "data_classification": "internal",
+            "classification": "mapped",
+            "migration_status": "migrated",
+            "owner": "Integration",
+            "exclusion_reason": None,
+            "source_paths": ["backend/routers/retired.py"],
+        }
+    }
+
+    row = builder.merge_discovery(existing, [])[0]
+
+    assert row["stability"] == "deprecated"
+    assert row["migration_status"] == "retired"
+    assert row["current_consumers"] == []
+
+
 def test_check_reports_missing_stable_function():
     builder = _builder_module()
 
@@ -490,3 +518,45 @@ def test_registry_projection_ignores_stale_review_source_evidence():
 
     assert projected[function_id]["target_capability"] is None
     assert projected[function_id]["classification"] == "unreviewed"
+
+
+def test_registry_projection_keeps_an_approved_explicit_target_over_stale_review():
+    """Catches an old review restoring a retired Capability after an approved remap."""
+    builder = _builder_module()
+    function_id = "rest:GET:/api/bop/pbom-snapshots"
+    row = {
+        "function_id": function_id,
+        "domain": "Craft",
+        "stability": "stable",
+        "source_paths": ["plugins/craft/craft_backend/routers/bop.py"],
+        "target_capability": "craft.pbom.version.search",
+        "classification": "mapped",
+        "migration_status": "mapped",
+        "exclusion_reason": None,
+    }
+    review = {
+        "domain": "Craft",
+        "excluded_functions": {},
+        "capabilities": {
+            "craft.pbom.snapshot.get": {
+                "kind": "existing",
+                "function_dispositions": {
+                    function_id: {
+                        "resolution": "existing_capability",
+                        "source_paths": row["source_paths"],
+                    }
+                },
+            }
+        },
+    }
+
+    projected = builder.apply_review_dispositions(
+        {function_id: row},
+        [review],
+        {
+            "craft.pbom.snapshot.get": "craft",
+            "craft.pbom.version.search": "craft",
+        },
+    )
+
+    assert projected[function_id]["target_capability"] == "craft.pbom.version.search"

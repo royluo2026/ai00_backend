@@ -3,9 +3,9 @@
   "domain": "Ontology",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:9d60dc984e81ac5525322eae1a75465fa0110ee887dc7c6af03d5e54a1995db7",
-    "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
-    "catalog_sha256": "sha256:0a45ee7907af88219c8db89c9db2730aaf57a25f55ebca8a38995f1098b30b09"
+    "registry_sha256": "sha256:9cac2f540d8b4c05ab62270295a4212987034185bab980244a8e3076ba60e31f",
+    "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
+    "catalog_sha256": "sha256:fb1fa8b262de5a09a7653201b36e988cf60593dc0be566fd675d2839c0f3748f"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -498,16 +498,27 @@
       }
     },
     "ontology.mapping.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:PATCH:/api/bop/entries/{entry_gid}/entity-props": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
           "owner": "Ontology",
           "evidence": "The stable surface rest:PATCH:/api/bop/entries/{entry_gid}/entity-props implements the reviewed ontology.mapping.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:ontology.mapping.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/ontology/ontology_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -543,22 +554,6 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "ontology.mapping.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed mapping change apply business outcome for Ontology.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "ontology",
-        "application_port": "ontology.mapping.change.apply",
-        "provider_artifact": "ai00-ontology-domain",
-        "owned_tables": [
-          "workmanship_onto_axioms",
-          "workmanship_onto_classes",
-          "workmanship_onto_properties",
-          "workmanship_onto_relations"
-        ],
-        "migration_stream": "ontology"
       }
     },
     "ontology.release.activate": {
@@ -817,10 +812,10 @@
       }
     },
     "ontology.schema.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:DELETE:/api/ontology/axioms/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -830,7 +825,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/ontology/classes/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -840,7 +835,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/ontology/properties/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -850,7 +845,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/ontology/relations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -860,7 +855,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/ontology/classes/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -870,7 +865,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/ontology/properties/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -880,7 +875,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/ontology/relations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -890,7 +885,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ontology/axioms": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -900,7 +895,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ontology/classes": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -910,7 +905,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ontology/classes/{gid}/sync-from-table": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -920,7 +915,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ontology/properties": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -930,7 +925,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ontology/relations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
@@ -940,13 +935,24 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ontology/seed": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ontology.py"
           ],
           "owner": "Ontology",
           "evidence": "The stable surface rest:POST:/api/ontology/seed implements the reviewed ontology.schema.change.apply business outcome from plugins/craft/craft_backend/routers/ontology.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:ontology.schema.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/ontology/ontology_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Ontology",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -982,22 +988,6 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "ontology.schema.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed schema change apply business outcome for Ontology.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "ontology",
-        "application_port": "ontology.schema.change.apply",
-        "provider_artifact": "ai00-ontology-domain",
-        "owned_tables": [
-          "workmanship_onto_axioms",
-          "workmanship_onto_classes",
-          "workmanship_onto_properties",
-          "workmanship_onto_relations"
-        ],
-        "migration_stream": "ontology"
       }
     }
   },
@@ -1125,148 +1115,7 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     }
   ],
-  "debt_dispositions": [
-    {
-      "id": "boundary:3b73b160652cc67cc497",
-      "category": "dependency",
-      "source_paths": [
-        "backend/ontology/repository.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "ontology imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:47779647717353062c4e",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/ontology_proposals_next.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "ontology imports base internal module backend.utils.gid"
-    },
-    {
-      "id": "boundary:52e8ee63be0e9c722bfd",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/ontology_releases_next.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "ontology imports base internal module backend.core.ois_storage"
-    },
-    {
-      "id": "boundary:6bfeff1829c7e06a1162",
-      "category": "dependency",
-      "source_paths": [
-        "backend/ontology/proposals.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "ontology imports base internal module backend.db.connection"
-    },
-    {
-      "id": "boundary:9d8d21880690619eef47",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/ontology_releases_next.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "ontology imports base internal module backend.utils.gid"
-    },
-    {
-      "id": "module:0e654045c9e3ba313245702a3404a3d2545e1a8772310be8ca2cac63157058b5",
-      "category": "dependency",
-      "source_paths": [
-        "backend/ontology/repository.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "Legacy direct infrastructure dependency; replace with an Ontology-owned repository adapter."
-    },
-    {
-      "id": "module:0f7c0eb6deb08afd59d72120de8316a4fc71b0c78470eb47ce91fb7b285b65f8",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/ontology_releases_next.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "Legacy object-storage implementation dependency; consume ArtifactPort."
-    },
-    {
-      "id": "module:73bda76f2e1cb9ab6c1c0914242bb3ae2a9bd728025c5778143d4965de387dbc",
-      "category": "dependency",
-      "source_paths": [
-        "backend/ontology/proposals.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "Legacy direct infrastructure dependency; replace with an Ontology-owned repository adapter."
-    },
-    {
-      "id": "module:9596d53724e9533498a105200fc3e03b97be18f57a53cfa1cfb05286083aac93",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/ontology_releases_next.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "Legacy ID implementation dependency; consume the stable platform ID port."
-    },
-    {
-      "id": "module:feac12edc0039e22e3f2c587fcca17d762257a22723e3e3710aa67a378f263fb",
-      "category": "dependency",
-      "source_paths": [
-        "backend/capabilities/ontology_proposals_next.py"
-      ],
-      "owner_domain": "Ontology",
-      "current_owner": "Ontology",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "Legacy ID implementation dependency; consume the stable platform ID port."
-    }
-  ],
+  "debt_dispositions": [],
   "review": {
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",

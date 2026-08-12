@@ -65,13 +65,6 @@ INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         {"from_version_gid": STRING, "to_version_gid": STRING},
         required=("from_version_gid", "to_version_gid"),
     ),
-    "craft.pbom.snapshot.get": _object(
-        {"snapshot_gid": STRING}, required=("snapshot_gid",)
-    ),
-    "craft.pbom.snapshot.compare": _object(
-        {"from_snapshot_gid": STRING, "to_snapshot_gid": STRING},
-        required=("from_snapshot_gid", "to_snapshot_gid"),
-    ),
     "craft.pbom.part.search": _object(
         {"snapshot_gid": STRING, "query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 100}},
         required=("snapshot_gid",),
@@ -148,14 +141,6 @@ OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
     "craft.bop.version.compare": _object(
         _fields("comparability", "from_version_gid", "to_version_gid", "added", "removed", "moved", "changed"),
         required=("comparability", "from_version_gid", "to_version_gid", "added", "removed", "moved", "changed"),
-    ),
-    "craft.pbom.snapshot.get": _object(
-        _fields("gid", "project_gid", "version_tag", "name", "source_type", "status", "created_at", "part_count"),
-        required=("gid", "part_count"),
-    ),
-    "craft.pbom.snapshot.compare": _object(
-        _fields("comparability", "from_snapshot_gid", "to_snapshot_gid", "added", "removed", "changed"),
-        required=("comparability", "from_snapshot_gid", "to_snapshot_gid", "added", "removed", "changed"),
     ),
     "craft.pbom.part.search": _object(_fields("snapshot_gid", "items"), required=("snapshot_gid", "items")),
     "craft.gbop.item.search": _object(_fields("active_release_gid", "items"), required=("active_release_gid", "items")),

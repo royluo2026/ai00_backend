@@ -30,6 +30,7 @@ class CapabilityKernelContractTests(unittest.TestCase):
             "local": "local_runtime",
             "simulation": "simulation",
             "vismockup": "local_runtime",
+            "agent": "agent",
         }
         repository_root = Path(__file__).resolve().parents[2]
         registry = build_capability_registry(

@@ -1,56 +1,52 @@
 {
   "schema_version": 1,
   "domains": 11,
-  "stable_functions": 752,
+  "stable_functions": 831,
   "resolutions": {
-    "existing_capability": 419,
-    "new_capability": 232,
+    "existing_capability": 582,
+    "new_capability": 148,
     "excluded": 101,
     "unreviewed": 0
   },
-  "candidate_capabilities": 46,
+  "candidate_capabilities": 13,
   "candidate_additions_by_domain": {
-    "Agent": 13,
     "Craft": 11,
-    "Integration": 13,
-    "Knowledge": 5,
-    "Local Runtime": 2,
-    "Ontology": 2
+    "Local Runtime": 2
   },
   "function_dispositions_by_domain": {
     "Agent": {
-      "existing_capability": 0,
-      "new_capability": 45,
+      "existing_capability": 58,
+      "new_capability": 0,
       "excluded": 9,
       "unreviewed": 0
     },
     "Base Platform": {
-      "existing_capability": 67,
+      "existing_capability": 86,
       "new_capability": 0,
       "excluded": 78,
       "unreviewed": 0
     },
     "Craft": {
-      "existing_capability": 126,
+      "existing_capability": 161,
       "new_capability": 145,
       "excluded": 6,
       "unreviewed": 0
     },
     "Digital Model": {
-      "existing_capability": 7,
+      "existing_capability": 8,
       "new_capability": 0,
       "excluded": 0,
       "unreviewed": 0
     },
     "Integration": {
-      "existing_capability": 0,
-      "new_capability": 15,
+      "existing_capability": 13,
+      "new_capability": 0,
       "excluded": 0,
       "unreviewed": 0
     },
     "Knowledge": {
-      "existing_capability": 40,
-      "new_capability": 10,
+      "existing_capability": 37,
+      "new_capability": 0,
       "excluded": 0,
       "unreviewed": 0
     },
@@ -61,52 +57,48 @@
       "unreviewed": 0
     },
     "Ontology": {
-      "existing_capability": 26,
-      "new_capability": 14,
+      "existing_capability": 42,
+      "new_capability": 0,
       "excluded": 1,
       "unreviewed": 0
     },
     "Project Management": {
-      "existing_capability": 124,
+      "existing_capability": 143,
       "new_capability": 0,
       "excluded": 1,
       "unreviewed": 0
     },
     "Simulation": {
-      "existing_capability": 13,
+      "existing_capability": 18,
       "new_capability": 0,
       "excluded": 0,
       "unreviewed": 0
     }
   },
   "consolidation_ratio": {
-    "new_function_dispositions": 232,
-    "candidate_capabilities": 46,
-    "functions_per_candidate": 5.043
+    "new_function_dispositions": 148,
+    "candidate_capabilities": 13,
+    "functions_per_candidate": 11.385
   },
   "enabled_exposures": {
     "web": 2,
-    "rest": 115,
+    "rest": 97,
     "plugin": 0,
     "agent": 27,
     "mcp": 0,
     "local_runtime": 1
   },
   "code_extractions": 58,
-  "debt_backlog": {
-    "database": 345,
-    "dependency": 37,
-    "migration": 2
-  },
-  "catalog_descriptors": 159,
-  "current_catalog_capabilities": 144,
-  "proposed_final_catalog_capabilities": 190,
+  "debt_backlog": {},
+  "catalog_descriptors": 254,
+  "current_catalog_capabilities": 251,
+  "proposed_final_catalog_capabilities": 264,
   "evidence": {
-    "module_dependencies": 7,
-    "boundary_violations": 318,
-    "cross_domain_sql": 312,
-    "internal_import": 6,
-    "tables": 176,
+    "module_dependencies": 0,
+    "boundary_violations": 0,
+    "cross_domain_sql": 0,
+    "internal_import": 0,
+    "tables": 182,
     "migrations": 35
   }
 }

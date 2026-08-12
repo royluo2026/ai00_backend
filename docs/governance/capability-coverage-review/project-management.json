@@ -3,9 +3,9 @@
   "domain": "Project Management",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:9d60dc984e81ac5525322eae1a75465fa0110ee887dc7c6af03d5e54a1995db7",
-    "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
-    "catalog_sha256": "sha256:0a45ee7907af88219c8db89c9db2730aaf57a25f55ebca8a38995f1098b30b09"
+    "registry_sha256": "sha256:9cac2f540d8b4c05ab62270295a4212987034185bab980244a8e3076ba60e31f",
+    "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
+    "catalog_sha256": "sha256:fb1fa8b262de5a09a7653201b36e988cf60593dc0be566fd675d2839c0f3748f"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -105,6 +105,16 @@
           "evidence": "The stable surface agent_tool:aggregate_history implements the reviewed project.activity.aggregate business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.activity.aggregate": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -203,6 +213,16 @@
           "evidence": "The stable surface rest:POST:/api/approval/orders/{gid}/withdraw implements the reviewed project.approval.change.apply business outcome from plugins/craft/craft_backend/routers/approval.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.approval.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -271,6 +291,16 @@
           "evidence": "The stable surface rest:GET:/api/approval/orders/{gid} implements the reviewed project.approval.read business outcome from plugins/craft/craft_backend/routers/approval.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.approval.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -310,64 +340,14 @@
     "project.bitable_binding.change.apply": {
       "kind": "existing",
       "function_dispositions": {
-        "rest:DELETE:/api/bitable-sync/bindings/{list_gid}": {
+        "capability:project.bitable_binding.change.apply": {
           "resolution": "existing_capability",
           "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
           ],
           "owner": "Project Management",
-          "evidence": "The stable surface rest:DELETE:/api/bitable-sync/bindings/{list_gid} implements the reviewed project.bitable_binding.change.apply business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/bitable-sync/bindings/{list_gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:POST:/api/bitable-sync/bindings/{list_gid} implements the reviewed project.bitable_binding.change.apply business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/bitable-sync/bindings/{list_gid}/pull": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:POST:/api/bitable-sync/bindings/{list_gid}/pull implements the reviewed project.bitable_binding.synchronize business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/bitable-sync/bindings/{list_gid}/push": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:POST:/api/bitable-sync/bindings/{list_gid}/push implements the reviewed project.bitable_binding.synchronize business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:POST:/api/bitable-sync/rows/push": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:POST:/api/bitable-sync/rows/push implements the reviewed project.bitable_binding.synchronize business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:PUT:/api/bitable-sync/bindings/{list_gid}": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:PUT:/api/bitable-sync/bindings/{list_gid} implements the reviewed project.bitable_binding.change.apply business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -375,77 +355,47 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "project.bitable_binding.change.apply"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.change.apply"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
       }
     },
     "project.bitable_binding.read": {
       "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/bitable-sync/bindings/{list_gid}": {
+        "capability:project.bitable_binding.read": {
           "resolution": "existing_capability",
           "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
           ],
           "owner": "Project Management",
-          "evidence": "The stable surface rest:GET:/api/bitable-sync/bindings/{list_gid} implements the reviewed project.bitable_binding.read business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:GET:/api/bitable-sync/bindings/{list_gid}/schema implements the reviewed project.bitable_binding.read business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token implements the reviewed project.bitable_binding.read business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/bitable-sync/bindings/{list_gid}/status": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/bitable_sync.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:GET:/api/bitable-sync/bindings/{list_gid}/status implements the reviewed project.bitable_binding.read business outcome from plugins/craft/craft_backend/routers/bitable_sync.py.",
-          "reviewer": "capability-v2-architecture-review",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -453,33 +403,33 @@
         "shared_pipeline": "capability_provider_gateway",
         "web": {
           "enabled": false,
-          "reason": "No reviewed web consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "rest": {
-          "enabled": true,
-          "reason": "Reviewed rest exposure uses the shared Capability Provider and Gateway pipeline.",
-          "policy_ref": "project.bitable_binding.read"
+          "enabled": false,
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "plugin": {
           "enabled": false,
-          "reason": "No reviewed plugin consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "agent": {
           "enabled": false,
-          "reason": "No reviewed agent consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "mcp": {
           "enabled": false,
-          "reason": "No reviewed mcp consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         },
         "local_runtime": {
           "enabled": false,
-          "reason": "No reviewed local_runtime consumer requires this business outcome.",
-          "policy_ref": "project.bitable_binding.read"
+          "reason": "No approved exposure for this consumer in the existing Registry.",
+          "policy_ref": "existing-registry-policy"
         }
       }
     },
@@ -494,6 +444,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/change-logs implements the reviewed project.change_log.read business outcome from plugins/craft/craft_backend/routers/change_logs.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.change_log.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -563,6 +523,16 @@
           "evidence": "The stable surface rest:POST:/api/collab/sessions/{gid}/join implements the reviewed project.collaboration.change.apply business outcome from plugins/craft/craft_backend/routers/collab.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.collaboration.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -621,6 +591,16 @@
           "evidence": "The stable surface rest:GET:/api/collab/sessions/{gid} implements the reviewed project.collaboration.read business outcome from plugins/craft/craft_backend/routers/collab.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.collaboration.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -668,6 +648,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/projects/{gid}/bop-lines implements the reviewed project.craft_scope.read business outcome from plugins/craft/craft_backend/routers/projects.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.craft_scope.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -737,6 +727,16 @@
           "evidence": "The stable surface rest:POST:/api/follows implements the reviewed project.follow.change.apply business outcome from backend/routers/follows.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.follow.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -794,6 +794,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/follows/check implements the reviewed project.follow.read business outcome from backend/routers/follows.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.follow.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -913,6 +923,16 @@
           "evidence": "The stable surface rest:PUT:/api/issues/{gid} implements the reviewed project.issue.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.issue.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1000,6 +1020,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/issues/{gid} implements the reviewed project.issue.read business outcome from plugins/craft/craft_backend/routers/promotion.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.issue.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1099,6 +1129,16 @@
           "evidence": "The stable surface rest:PUT:/api/item-entries/{item_type}/{item_gid} implements the reviewed project.item_entry.change.apply business outcome from plugins/craft/craft_backend/routers/item_entries.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.list.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1156,6 +1196,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/lists implements the reviewed project.list.read business outcome from plugins/craft/craft_backend/routers/lists.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.list.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1215,6 +1265,16 @@
           "evidence": "The stable surface rest:POST:/api/projects/{gid}/members implements the reviewed project.member.change.apply business outcome from plugins/craft/craft_backend/routers/projects.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.member.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1272,6 +1332,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/projects/{gid}/members implements the reviewed project.member.read business outcome from plugins/craft/craft_backend/routers/projects.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.member.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1352,6 +1422,16 @@
           "evidence": "The stable surface rest:POST:/api/mentions/notify implements the reviewed project.notification.send business outcome from backend/routers/mentions.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.notification.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1422,6 +1502,16 @@
           "evidence": "The stable surface rest:GET:/api/notifications/unread_count implements the reviewed project.notification.read business outcome from backend/routers/notifications.py, dist/web/core/notification_manager.js.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.notification.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1490,6 +1580,16 @@
           "evidence": "The stable surface rest:POST:/api/permission-requests/{gid}/reject implements the reviewed project.permission_request.decide business outcome from plugins/craft/craft_backend/routers/permission_requests.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.permission_request.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1537,6 +1637,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/permission-requests implements the reviewed project.permission_request.read business outcome from plugins/craft/craft_backend/routers/permission_requests.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.permission_request.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1646,6 +1756,16 @@
           "evidence": "The stable surface rest:PUT:/api/projects/{gid}/line-assignment implements the reviewed project.line_assignment.set business outcome from plugins/craft/craft_backend/routers/projects.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.project.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1703,6 +1823,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/projects/{gid} implements the reviewed project.project.read business outcome from plugins/craft/craft_backend/routers/projects.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.project.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1802,6 +1932,16 @@
           "evidence": "The stable surface rest:POST:/api/shares/lists/{list_gid} implements the reviewed project.share.change.apply business outcome from plugins/craft/craft_backend/routers/shares.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.sharing.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1859,6 +1999,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/shares/lists/{list_gid} implements the reviewed project.share.read business outcome from plugins/craft/craft_backend/routers/shares.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.sharing.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2018,6 +2168,16 @@
           "evidence": "The stable surface rest:PUT:/api/tasks/{gid} implements the reviewed project.task.change.apply business outcome from plugins/craft/craft_backend/routers/promotion.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.task.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -2115,6 +2275,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/tasks/{gid} implements the reviewed project.task.read business outcome from plugins/craft/craft_backend/routers/promotion.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.task.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2224,6 +2394,16 @@
           "evidence": "The stable surface rest:POST:/api/task-templates/{template_gid}/items implements the reviewed project.task_template.change.apply business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.task_template.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -2281,6 +2461,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/task-templates/{gid} implements the reviewed project.task_template.read business outcome from plugins/craft/craft_backend/routers/task_templates.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.task_template.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2370,6 +2560,16 @@
           "evidence": "The stable surface rest:PUT:/api/workbenches/{gid}/override implements the reviewed project.workbench.change.apply business outcome from backend/routers/workbenches.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:project.workbench.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -2409,26 +2609,6 @@
     "project.workbench.read": {
       "kind": "existing",
       "function_dispositions": {
-        "rest:GET:/api/workbench/home": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/workbench_home.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:GET:/api/workbench/home implements the reviewed project.workbench.dashboard.read business outcome from plugins/craft/craft_backend/routers/workbench_home.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
-        "rest:GET:/api/workbench/panel1": {
-          "resolution": "existing_capability",
-          "source_paths": [
-            "plugins/craft/craft_backend/routers/workbench_home.py"
-          ],
-          "owner": "Project Management",
-          "evidence": "The stable surface rest:GET:/api/workbench/panel1 implements the reviewed project.workbench.dashboard.read business outcome from plugins/craft/craft_backend/routers/workbench_home.py.",
-          "reviewer": "capability-v2-architecture-review",
-          "reviewed_at": "2026-08-11"
-        },
         "rest:GET:/api/workbenches": {
           "resolution": "existing_capability",
           "source_paths": [
@@ -2447,6 +2627,16 @@
           "owner": "Project Management",
           "evidence": "The stable surface rest:GET:/api/workbenches/{gid}/override implements the reviewed project.workbench.read business outcome from backend/routers/workbenches.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:project.workbench.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+          ],
+          "owner": "Project Management",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2801,204 +2991,7 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     }
   ],
-  "debt_dispositions": [
-    {
-      "id": "boundary:0b4134b3014d3ed288fd",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/projects.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
-    },
-    {
-      "id": "boundary:0bd527f63d794c1fdf85",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/workbench_home.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
-    },
-    {
-      "id": "boundary:3650a50f1c5a2945a932",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/projects.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
-    },
-    {
-      "id": "boundary:39ff62e8d261e8a1a477",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/projects.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
-    },
-    {
-      "id": "boundary:52accfaa3da9ed8a8510",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/projects.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
-    },
-    {
-      "id": "boundary:5bc13929696524e0369e",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/projects.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_entries"
-    },
-    {
-      "id": "boundary:5ce0bac82ba8d37d9fe0",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/workbench_home.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_pbom_versions"
-    },
-    {
-      "id": "boundary:5dfcb7aa8f27b022a5fc",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/workbench_home.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
-    },
-    {
-      "id": "boundary:60b036a3d9bc12da60b3",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/projects.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
-    },
-    {
-      "id": "boundary:89f433b49e3f2d4f7370",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/projects.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
-    },
-    {
-      "id": "boundary:a7d9e9ee0bd8f3e91542",
-      "category": "database",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/projects.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "application_port:craft",
-      "resolution_plan": "Remove direct SQL and route the operation through the target domain Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "project_management SQL accesses craft-owned table workmanship_bop_bop_versions"
-    },
-    {
-      "id": "migration:202608050002_craft_work_collaboration_tables",
-      "category": "migration",
-      "source_paths": [
-        "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Craft legacy migration stream",
-      "target_owner": "Project Management",
-      "replacement_boundary": "project_management versioned migration stream",
-      "resolution_plan": "Keep the applied migration immutable and add future corrective ownership changes in the Project Management stream.",
-      "disposition": "migrate",
-      "reason": "The immutable filename carries a Craft prefix while the tables and release responsibility belong to Project Management."
-    },
-    {
-      "id": "migration:202608050003_craft_list_team_visibility",
-      "category": "migration",
-      "source_paths": [
-        "backend/db/migrations/202608050003_craft_list_team_visibility.sql"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Craft legacy migration stream",
-      "target_owner": "Project Management",
-      "replacement_boundary": "project_management versioned migration stream",
-      "resolution_plan": "Keep the applied migration immutable and add future corrective ownership changes in the Project Management stream.",
-      "disposition": "migrate",
-      "reason": "The immutable filename carries a Craft prefix while the tables and release responsibility belong to Project Management."
-    },
-    {
-      "id": "module:0b580b8beb013377912678020e0c35a743a76a64942801f457d947032d3c0d78",
-      "category": "dependency",
-      "source_paths": [
-        "plugins/craft/craft_backend/routers/workbench_home.py"
-      ],
-      "owner_domain": "Project Management",
-      "current_owner": "Project Management",
-      "target_owner": "Craft",
-      "replacement_boundary": "versioned_public_port:craft",
-      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "Project Management code is still physically hosted in Craft; extract it and replace this import with a port."
-    }
-  ],
+  "debt_dispositions": [],
   "review": {
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",

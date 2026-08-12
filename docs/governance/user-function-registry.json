@@ -1189,6 +1189,306 @@
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
       ]
     },
+    "capability:agent.audit.read": {
+      "function_id": "capability:agent.audit.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.audit.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.audit.record": {
+      "function_id": "capability:agent.audit.record",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.audit.record",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.flow.change.apply": {
+      "function_id": "capability:agent.flow.change.apply",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.flow.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.flow.read": {
+      "function_id": "capability:agent.flow.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.flow.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.interaction.request": {
+      "function_id": "capability:agent.interaction.request",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.interaction.request",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py",
+        "plugins/agent/agent_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:agent.memory.change.apply": {
+      "function_id": "capability:agent.memory.change.apply",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.memory.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.memory.read": {
+      "function_id": "capability:agent.memory.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.memory.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.run.change.apply": {
+      "function_id": "capability:agent.run.change.apply",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.run.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.run.read": {
+      "function_id": "capability:agent.run.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.run.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.session.change.apply": {
+      "function_id": "capability:agent.session.change.apply",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.session.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.session.read": {
+      "function_id": "capability:agent.session.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.session.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.skill.change.apply": {
+      "function_id": "capability:agent.skill.change.apply",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.skill.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
+    "capability:agent.skill.read": {
+      "function_id": "capability:agent.skill.read",
+      "domain": "Agent",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "agent.skill.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Agent",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/agent/agent_backend/capabilities/contracts.py"
+      ]
+    },
     "capability:base.project.search": {
       "function_id": "capability:base.project.search",
       "domain": "Project Management",
@@ -1380,6 +1680,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -1402,6 +1703,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -1572,6 +1874,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1594,6 +1897,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1616,6 +1920,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1638,6 +1943,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1660,6 +1966,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1682,6 +1989,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1781,6 +2089,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1803,6 +2112,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1825,6 +2135,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1847,6 +2158,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1869,6 +2181,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1891,6 +2204,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
       ]
     },
@@ -1913,6 +2227,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -1937,6 +2252,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -1961,6 +2277,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py"
       ]
@@ -2010,6 +2327,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -2034,6 +2352,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -2058,6 +2377,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py"
       ]
@@ -2081,6 +2401,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -2105,6 +2426,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -2129,6 +2451,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py"
       ]
@@ -2152,6 +2475,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -2176,6 +2500,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2198,6 +2523,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2220,6 +2546,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2242,6 +2569,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2264,6 +2592,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2286,6 +2615,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2308,6 +2638,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2330,6 +2661,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2352,6 +2684,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2374,6 +2707,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2396,6 +2730,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2418,6 +2753,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2440,6 +2776,7 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
       ]
     },
@@ -2640,6 +2977,444 @@
         "plugins/digital_model/digital_model_backend/capabilities/contracts.py",
         "plugins/digital_model/digital_model_backend/capabilities/models.py",
         "plugins/digital_model/digital_model_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:factory.asset.get": {
+      "function_id": "capability:factory.asset.get",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.asset.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.asset.maintenance.complete": {
+      "function_id": "capability:factory.asset.maintenance.complete",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.asset.maintenance.complete",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.asset.maintenance.start": {
+      "function_id": "capability:factory.asset.maintenance.start",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.asset.maintenance.start",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.asset.register": {
+      "function_id": "capability:factory.asset.register",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.asset.register",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.asset.scrap": {
+      "function_id": "capability:factory.asset.scrap",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.asset.scrap",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py",
+        "plugins/factory/factory_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:factory.asset.search": {
+      "function_id": "capability:factory.asset.search",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.asset.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.asset.update": {
+      "function_id": "capability:factory.asset.update",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.asset.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.resource.read": {
+      "function_id": "capability:factory.resource.read",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.resource.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.resource_catalog.create": {
+      "function_id": "capability:factory.resource_catalog.create",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.resource_catalog.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.resource_catalog.deprecate": {
+      "function_id": "capability:factory.resource_catalog.deprecate",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.resource_catalog.deprecate",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.resource_catalog.get": {
+      "function_id": "capability:factory.resource_catalog.get",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.resource_catalog.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.resource_catalog.publish": {
+      "function_id": "capability:factory.resource_catalog.publish",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.resource_catalog.publish",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.resource_catalog.revise": {
+      "function_id": "capability:factory.resource_catalog.revise",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.resource_catalog.revise",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.resource_catalog.search": {
+      "function_id": "capability:factory.resource_catalog.search",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.resource_catalog.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.structure.archive": {
+      "function_id": "capability:factory.structure.archive",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.structure.archive",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.structure.create": {
+      "function_id": "capability:factory.structure.create",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.structure.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.structure.get": {
+      "function_id": "capability:factory.structure.get",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.structure.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.structure.search": {
+      "function_id": "capability:factory.structure.search",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.structure.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
+      ]
+    },
+    "capability:factory.structure.update": {
+      "function_id": "capability:factory.structure.update",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "factory.structure.update",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Base Platform",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/factory/factory_backend/capabilities/descriptors.py"
       ]
     },
     "capability:identity.principal.search": {
@@ -3093,6 +3868,7 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
       ]
     },
@@ -3331,6 +4107,7 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
       ]
     },
@@ -3401,6 +4178,7 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
       ]
     },
@@ -3423,6 +4201,7 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
       ]
     },
@@ -3519,7 +4298,6 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/outbox_retry_next.py",
-        "backend/capabilities/outbox_worker_next.py",
         "plugins/knowledge/knowledge_backend/capabilities/outbox_retry_next.py"
       ]
     },
@@ -3590,6 +4368,7 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/knowledge/knowledge_backend/capabilities/reference_data.py"
       ]
     },
@@ -3612,6 +4391,7 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/knowledge/knowledge_backend/capabilities/reference_data.py"
       ]
     },
@@ -3658,6 +4438,7 @@
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/knowledge/knowledge_backend/capabilities/reviewed.py"
       ]
     },
@@ -3945,6 +4726,7 @@
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/ontology/ontology_backend/capabilities/reviewed.py"
       ]
     },
@@ -4087,6 +4869,7 @@
       "owner": "Ontology",
       "exclusion_reason": null,
       "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
         "plugins/ontology/ontology_backend/capabilities/reviewed.py"
       ]
     },
@@ -4360,6 +5143,688 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "backend/capabilities/plugin_marketplace_next.py"
+      ]
+    },
+    "capability:project.activity.aggregate": {
+      "function_id": "capability:project.activity.aggregate",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.activity.aggregate",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.approval.change.apply": {
+      "function_id": "capability:project.approval.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.approval.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.approval.read": {
+      "function_id": "capability:project.approval.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.approval.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.bitable_binding.change.apply": {
+      "function_id": "capability:project.bitable_binding.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.bitable_binding.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.bitable_binding.read": {
+      "function_id": "capability:project.bitable_binding.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.bitable_binding.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.change_log.read": {
+      "function_id": "capability:project.change_log.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.change_log.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.collaboration.change.apply": {
+      "function_id": "capability:project.collaboration.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.collaboration.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.collaboration.read": {
+      "function_id": "capability:project.collaboration.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.collaboration.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.craft_scope.read": {
+      "function_id": "capability:project.craft_scope.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.craft_scope.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.follow.change.apply": {
+      "function_id": "capability:project.follow.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.follow.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.follow.read": {
+      "function_id": "capability:project.follow.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.follow.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.issue.change.apply": {
+      "function_id": "capability:project.issue.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.issue.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.issue.read": {
+      "function_id": "capability:project.issue.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.issue.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.list.change.apply": {
+      "function_id": "capability:project.list.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.list.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.list.read": {
+      "function_id": "capability:project.list.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.list.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.member.change.apply": {
+      "function_id": "capability:project.member.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.member.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.member.read": {
+      "function_id": "capability:project.member.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.member.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.notification.change.apply": {
+      "function_id": "capability:project.notification.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.notification.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.notification.read": {
+      "function_id": "capability:project.notification.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.notification.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.permission_request.change.apply": {
+      "function_id": "capability:project.permission_request.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.permission_request.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.permission_request.read": {
+      "function_id": "capability:project.permission_request.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.permission_request.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.project.change.apply": {
+      "function_id": "capability:project.project.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.project.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.project.read": {
+      "function_id": "capability:project.project.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.project.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.sharing.change.apply": {
+      "function_id": "capability:project.sharing.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.sharing.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.sharing.read": {
+      "function_id": "capability:project.sharing.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.sharing.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.task.change.apply": {
+      "function_id": "capability:project.task.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.task.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.task.read": {
+      "function_id": "capability:project.task.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.task.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.task_template.change.apply": {
+      "function_id": "capability:project.task_template.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.task_template.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.task_template.read": {
+      "function_id": "capability:project.task_template.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.task_template.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.workbench.change.apply": {
+      "function_id": "capability:project.workbench.change.apply",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.workbench.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:project.workbench.read": {
+      "function_id": "capability:project.workbench.read",
+      "domain": "Project Management",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "project.workbench.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "project"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Project Management",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/project_management/project_management_backend/capabilities/reviewed.py"
       ]
     },
     "capability:semantic.context.get": {
@@ -5285,10 +6750,8 @@
     "rest:DELETE:/api/bitable-sync/bindings/{list_gid}": {
       "function_id": "rest:DELETE:/api/bitable-sync/bindings/{list_gid}",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -5297,7 +6760,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -5725,10 +7188,8 @@
     "rest:DELETE:/api/ext-datasources/{gid}": {
       "function_id": "rest:DELETE:/api/ext-datasources/{gid}",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.connector.archive",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -5747,10 +7208,8 @@
     "rest:DELETE:/api/ext-mappings/{gid}": {
       "function_id": "rest:DELETE:/api/ext-mappings/{gid}",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.mapping.archive",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -6121,10 +7580,8 @@
     "rest:DELETE:/api/knowledge_entries/{gid}": {
       "function_id": "rest:DELETE:/api/knowledge_entries/{gid}",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.entry.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -6143,10 +7600,8 @@
     "rest:DELETE:/api/knowledge_hub/folders/{gid}": {
       "function_id": "rest:DELETE:/api/knowledge_hub/folders/{gid}",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.space.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -6165,10 +7620,8 @@
     "rest:DELETE:/api/knowledge_hub/items/{gid}": {
       "function_id": "rest:DELETE:/api/knowledge_hub/items/{gid}",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.document.archive",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -7067,10 +8520,8 @@
     "rest:GET:/api/bitable-sync/bindings/{list_gid}": {
       "function_id": "rest:GET:/api/bitable-sync/bindings/{list_gid}",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -7079,7 +8530,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7089,10 +8540,8 @@
     "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema": {
       "function_id": "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -7101,7 +8550,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7111,10 +8560,8 @@
     "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token": {
       "function_id": "rest:GET:/api/bitable-sync/bindings/{list_gid}/schema-by-token",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -7123,7 +8570,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7133,10 +8580,8 @@
     "rest:GET:/api/bitable-sync/bindings/{list_gid}/status": {
       "function_id": "rest:GET:/api/bitable-sync/bindings/{list_gid}/status",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -7145,7 +8590,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -7511,7 +8956,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.pbom.snapshot.get",
+      "target_capability": "craft.pbom.version.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7519,7 +8964,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7533,7 +8978,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.pbom.snapshot.get",
+      "target_capability": "craft.pbom.version.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7541,7 +8986,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7555,7 +9000,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "craft.pbom.snapshot.get",
+      "target_capability": "craft.pbom.version.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -7563,7 +9008,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8541,10 +9986,8 @@
     "rest:GET:/api/ext-datasources": {
       "function_id": "rest:GET:/api/ext-datasources",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.connector.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -8563,10 +10006,8 @@
     "rest:GET:/api/ext-datasources/{gid}/tables": {
       "function_id": "rest:GET:/api/ext-datasources/{gid}/tables",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.connector.schema.discover",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -8585,10 +10026,8 @@
     "rest:GET:/api/ext-field-mappings": {
       "function_id": "rest:GET:/api/ext-field-mappings",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.mapping.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -8607,10 +10046,8 @@
     "rest:GET:/api/ext-mappings": {
       "function_id": "rest:GET:/api/ext-mappings",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.mapping.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -8629,10 +10066,8 @@
     "rest:GET:/api/ext-mappings/{gid}/columns": {
       "function_id": "rest:GET:/api/ext-mappings/{gid}/columns",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.connector.schema.discover",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -8651,10 +10086,8 @@
     "rest:GET:/api/ext-mappings/{gid}/preview": {
       "function_id": "rest:GET:/api/ext-mappings/{gid}/preview",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.mapping.preview",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -9355,10 +10788,8 @@
     "rest:GET:/api/knowledge_entries": {
       "function_id": "rest:GET:/api/knowledge_entries",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -9367,7 +10798,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -9377,10 +10808,8 @@
     "rest:GET:/api/knowledge_entries/{gid}": {
       "function_id": "rest:GET:/api/knowledge_entries/{gid}",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -9389,7 +10818,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -9399,10 +10828,8 @@
     "rest:GET:/api/knowledge_hub/favorites": {
       "function_id": "rest:GET:/api/knowledge_hub/favorites",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.personalization.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -9421,10 +10848,8 @@
     "rest:GET:/api/knowledge_hub/folders": {
       "function_id": "rest:GET:/api/knowledge_hub/folders",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.space.list",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -9433,7 +10858,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -9443,10 +10868,8 @@
     "rest:GET:/api/knowledge_hub/items": {
       "function_id": "rest:GET:/api/knowledge_hub/items",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.context.retrieve",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -9455,7 +10878,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "mapped",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -9465,10 +10888,8 @@
     "rest:GET:/api/knowledge_hub/items/{gid}": {
       "function_id": "rest:GET:/api/knowledge_hub/items/{gid}",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.document.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -9477,7 +10898,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -9487,10 +10908,8 @@
     "rest:GET:/api/knowledge_hub/items/{gid}/history": {
       "function_id": "rest:GET:/api/knowledge_hub/items/{gid}/history",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.document.history.get",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -9499,7 +10918,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -9509,10 +10928,8 @@
     "rest:GET:/api/knowledge_hub/recent": {
       "function_id": "rest:GET:/api/knowledge_hub/recent",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.personalization.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -10221,7 +11638,7 @@
       "current_consumers": [
         "REST"
       ],
-      "target_capability": "simulation.environment.list",
+      "target_capability": "simulation.environment.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
       "resource_types": [
@@ -10229,7 +11646,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "mapped",
+      "migration_status": "registered",
       "owner": "Simulation",
       "exclusion_reason": null,
       "source_paths": [
@@ -10877,10 +12294,8 @@
     "rest:GET:/api/workbench/home": {
       "function_id": "rest:GET:/api/workbench/home",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -10889,7 +12304,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -10899,10 +12314,8 @@
     "rest:GET:/api/workbench/panel1": {
       "function_id": "rest:GET:/api/workbench/panel1",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -10911,7 +12324,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -12088,10 +13501,8 @@
     "rest:PATCH:/api/ext-datasources/{gid}": {
       "function_id": "rest:PATCH:/api/ext-datasources/{gid}",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.connector.update",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -12110,10 +13521,8 @@
     "rest:PATCH:/api/ext-mappings/{gid}": {
       "function_id": "rest:PATCH:/api/ext-mappings/{gid}",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.mapping.update",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -12396,10 +13805,8 @@
     "rest:PATCH:/api/knowledge_entries/{gid}": {
       "function_id": "rest:PATCH:/api/knowledge_entries/{gid}",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.entry.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -12418,10 +13825,8 @@
     "rest:PATCH:/api/knowledge_hub/folders/{gid}": {
       "function_id": "rest:PATCH:/api/knowledge_hub/folders/{gid}",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.space.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -12440,10 +13845,8 @@
     "rest:PATCH:/api/knowledge_hub/items/{gid}": {
       "function_id": "rest:PATCH:/api/knowledge_hub/items/{gid}",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.document.revise",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -12452,7 +13855,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -13322,10 +14725,8 @@
     "rest:POST:/api/bitable-sync/bindings/{list_gid}": {
       "function_id": "rest:POST:/api/bitable-sync/bindings/{list_gid}",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -13334,7 +14735,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -13344,10 +14745,8 @@
     "rest:POST:/api/bitable-sync/bindings/{list_gid}/pull": {
       "function_id": "rest:POST:/api/bitable-sync/bindings/{list_gid}/pull",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -13356,7 +14755,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -13366,10 +14765,8 @@
     "rest:POST:/api/bitable-sync/bindings/{list_gid}/push": {
       "function_id": "rest:POST:/api/bitable-sync/bindings/{list_gid}/push",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -13378,7 +14775,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -13388,10 +14785,8 @@
     "rest:POST:/api/bitable-sync/rows/push": {
       "function_id": "rest:POST:/api/bitable-sync/rows/push",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -13400,7 +14795,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -14840,10 +16235,8 @@
     "rest:POST:/api/ext-datasources": {
       "function_id": "rest:POST:/api/ext-datasources",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.connector.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -14862,10 +16255,8 @@
     "rest:POST:/api/ext-datasources/{gid}/test": {
       "function_id": "rest:POST:/api/ext-datasources/{gid}/test",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.connector.connection.test",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -14884,10 +16275,8 @@
     "rest:POST:/api/ext-mappings": {
       "function_id": "rest:POST:/api/ext-mappings",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.mapping.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -14906,10 +16295,8 @@
     "rest:POST:/api/ext-mappings/{gid}/import": {
       "function_id": "rest:POST:/api/ext-mappings/{gid}/import",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.sync.start",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -16072,10 +17459,8 @@
     "rest:POST:/api/knowledge_entries": {
       "function_id": "rest:POST:/api/knowledge_entries",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.entry.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -16094,10 +17479,8 @@
     "rest:POST:/api/knowledge_entries/vector-search": {
       "function_id": "rest:POST:/api/knowledge_entries/vector-search",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.search",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -16106,7 +17489,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -16116,10 +17499,8 @@
     "rest:POST:/api/knowledge_hub/folders": {
       "function_id": "rest:POST:/api/knowledge_hub/folders",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.space.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -16128,7 +17509,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -16138,10 +17519,8 @@
     "rest:POST:/api/knowledge_hub/items": {
       "function_id": "rest:POST:/api/knowledge_hub/items",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.document.create",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -16150,7 +17529,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "candidate",
+      "migration_status": "retired",
       "owner": "Knowledge",
       "exclusion_reason": null,
       "source_paths": [
@@ -16160,10 +17539,8 @@
     "rest:POST:/api/knowledge_hub/items/{gid}/favorite": {
       "function_id": "rest:POST:/api/knowledge_hub/items/{gid}/favorite",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.personalization.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -16182,10 +17559,8 @@
     "rest:POST:/api/knowledge_hub/items/{gid}/recent": {
       "function_id": "rest:POST:/api/knowledge_hub/items/{gid}/recent",
       "domain": "Knowledge",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "knowledge.personalization.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -17876,10 +19251,8 @@
     "rest:PUT:/api/bitable-sync/bindings/{list_gid}": {
       "function_id": "rest:PUT:/api/bitable-sync/bindings/{list_gid}",
       "domain": "Project Management",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "project.bitable_binding.change.apply",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -17888,7 +19261,7 @@
       ],
       "data_classification": "internal",
       "classification": "mapped",
-      "migration_status": "proposed",
+      "migration_status": "retired",
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
@@ -17920,10 +19293,8 @@
     "rest:PUT:/api/ext-field-mappings/batch": {
       "function_id": "rest:PUT:/api/ext-field-mappings/batch",
       "domain": "Integration",
-      "stability": "stable",
-      "current_consumers": [
-        "REST"
-      ],
+      "stability": "deprecated",
+      "current_consumers": [],
       "target_capability": "integration.mapping.update",
       "exposure": "Web/REST",
       "automation_level": "interactive",

@@ -218,18 +218,12 @@ def mock_conn():
         "backend.db.connection.get_conn",
         "backend.db.sequences.get_conn",
         "backend.platform_sdk.access.get_conn",
-        "backend.routers.annotations.get_conn",
-        "backend.routers.follows.get_conn",
-        "backend.routers.knowledge.get_conn",
-        "backend.routers.knowledge_hub.get_conn",
-        "backend.routers.notifications.get_conn",
+        "knowledge_backend.api.knowledge_entries_legacy.get_conn",
+        "knowledge_backend.api.knowledge_hub_legacy.get_conn",
         "backend.routers.views.get_conn",
-        "backend.routers.workbenches.get_conn",
         "agent_backend.routers.flows.get_agent_conn",
         "craft_backend.routers.lists.get_conn",
-        "craft_backend.routers.promotion.get_conn",
         "craft_backend.routers.rules.get_conn",
-        "craft_backend.routers.task_templates.get_conn",
     )
     with ExitStack() as stack:
         for target in targets:

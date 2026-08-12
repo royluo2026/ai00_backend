@@ -166,6 +166,64 @@ def test_merge_preserves_reviewed_dispositions_and_adds_new_candidates(builder, 
     assert merged["unreviewed_functions"]["rest:GET:/api/new-route"]["resolution"] == "unreviewed"
 
 
+def test_aligns_reviewed_function_with_its_current_published_capability(builder, fixture):
+    """Catches a reviewed transport disposition remaining under a retired Capability ID."""
+    document = fixture("minimal-valid.json")
+    row = {
+        "function_id": "rest:GET:/api/projects",
+        "domain": "Project Management",
+        "source_paths": ["backend/routers/projects.py"],
+        "current_consumers": ["REST"],
+        "target_capability": "project.project.create",
+    }
+
+    aligned = builder._align_published_function_targets(
+        document,
+        [row],
+        {"project.project.create"},
+    )
+
+    assert "project.project.list" not in aligned["capabilities"]
+    group = aligned["capabilities"]["project.project.create"]
+    assert group["kind"] == "existing"
+    assert "candidate_definition" not in group
+    assert group["function_dispositions"]["rest:GET:/api/projects"]["resolution"] == (
+        "existing_capability"
+    )
+
+
+def test_binds_new_registry_evidence_to_its_published_capability(builder, fixture):
+    """Catches mapped Catalog evidence being left in the unreviewed bucket."""
+    document = fixture("minimal-valid.json")
+    function_id = "capability:project.project.create"
+    document["unreviewed_functions"][function_id] = {
+        "resolution": "unreviewed",
+        "source_paths": ["plugins/project_management/capabilities/projects.py"],
+        "owner": "Project Management",
+        "evidence": "Discovered from the frozen provider.",
+    }
+    row = {
+        "function_id": function_id,
+        "domain": "Project Management",
+        "source_paths": ["plugins/project_management/capabilities/projects.py"],
+        "current_consumers": ["Capability"],
+        "target_capability": "project.project.create",
+    }
+
+    aligned = builder._align_published_function_targets(
+        document,
+        [row],
+        {"project.project.create"},
+    )
+
+    assert function_id not in aligned["unreviewed_functions"]
+    disposition = aligned["capabilities"]["project.project.create"][
+        "function_dispositions"
+    ][function_id]
+    assert disposition["resolution"] == "existing_capability"
+    assert disposition["source_paths"] == row["source_paths"]
+
+
 def test_generated_views_are_order_independent(builder, fixture):
     project = fixture("minimal-valid.json")
     base = fixture("minimal-valid.json")
@@ -176,17 +234,20 @@ def test_generated_views_are_order_independent(builder, fixture):
 
 def test_every_baseline_violation_and_table_has_one_generated_review_row(builder):
     sources = builder.load_sources(ROOT)
-    documents = builder.initialize_documents(sources)
+    documents = builder.initialize_documents(sources, builder._load_documents())
     debt_ids = [row["id"] for document in documents for row in document["debt_dispositions"]]
-    baseline_debt_ids = [debt_id for debt_id in debt_ids if debt_id.startswith(("module:", "boundary:"))]
+    expected_debt_ids = {
+        builder._module_debt(row)["id"]
+        for row in sources.dependency_baseline["violations"]
+    } | {
+        "boundary:" + row["fingerprint"]
+        for row in sources.boundary_baseline["violations"]
+    }
     tables = [row["table"] for document in documents for row in document["database_boundaries"]]
 
+    assert set(debt_ids) == expected_debt_ids
     assert len(debt_ids) == len(set(debt_ids))
-    assert len(baseline_debt_ids) == len(set(baseline_debt_ids)) == 325
-    assert len(tables) == len(set(tables)) == 176
-    assert {row["category"] for document in documents for row in document["debt_dispositions"]} == {
-        "dependency", "database"
-    }
+    assert len(tables) == len(set(tables)) == sources.table_inventory["table_count"]
 
 
 def test_complete_audit_has_zero_unreviewed_and_consistent_candidates(builder):
@@ -207,10 +268,11 @@ def test_complete_audit_has_zero_unreviewed_and_consistent_candidates(builder):
 
 
 def test_approved_base_integration_correction_is_applied(builder):
+    sources = builder.load_sources(ROOT)
     documents = {
         item["domain"]: item
         for item in builder.initialize_documents(
-            builder.load_sources(ROOT), builder._load_documents()
+            sources, builder._load_documents()
         )
     }
     base = documents["Base Platform"]["capabilities"]
@@ -244,12 +306,36 @@ def test_approved_base_integration_correction_is_applied(builder):
         "rest:GET:/api/ext-mappings/{gid}/columns": "integration.connector.schema.discover",
         "rest:GET:/api/ext-mappings/{gid}/preview": "integration.mapping.preview",
     }
+    stable_ids = {
+        function_id
+        for function_id, row in sources.registry["functions"].items()
+        if row.get("stability") == "stable"
+    }
+    expected = {key: value for key, value in expected.items() if key in stable_ids}
     actual = {
         function_id: capability_id
         for capability_id, capability in integration.items()
         for function_id in capability["function_dispositions"]
     }
     assert {key: actual.get(key) for key in expected} == expected
+
+
+def test_approved_corrections_ignore_functions_retired_from_the_registry(builder):
+    """Catches a second generation run failing after corrected REST surfaces retire."""
+    reviewed_against = {
+        "git_commit": "0" * 40,
+        "registry_sha256": "sha256:" + "0" * 64,
+        "catalog_release": "test-release",
+        "catalog_sha256": "sha256:" + "1" * 64,
+    }
+    documents = [
+        builder._empty_review("Base Platform", reviewed_against),
+        builder._empty_review("Integration", reviewed_against),
+    ]
+
+    corrected = builder._apply_approved_corrections(documents, set())
+
+    assert all(document["capabilities"] == {} for document in corrected)
 
 
 def test_strict_stops_at_architecture_threshold_with_exact_counts():

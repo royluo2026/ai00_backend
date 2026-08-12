@@ -3,9 +3,9 @@
   "domain": "Agent",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:9d60dc984e81ac5525322eae1a75465fa0110ee887dc7c6af03d5e54a1995db7",
-    "catalog_release": "rel_8040279f7935726fd96d793f13704af6",
-    "catalog_sha256": "sha256:0a45ee7907af88219c8db89c9db2730aaf57a25f55ebca8a38995f1098b30b09"
+    "registry_sha256": "sha256:9cac2f540d8b4c05ab62270295a4212987034185bab980244a8e3076ba60e31f",
+    "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
+    "catalog_sha256": "sha256:fb1fa8b262de5a09a7653201b36e988cf60593dc0be566fd675d2839c0f3748f"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -129,10 +129,10 @@
   },
   "capabilities": {
     "agent.audit.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:GET:/api/ai/audit-logs": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_audit.py"
           ],
@@ -142,7 +142,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/ai/balance": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_audit.py"
           ],
@@ -150,6 +150,17 @@
           "evidence": "The stable surface rest:GET:/api/ai/balance implements the reviewed agent.audit.read business outcome from plugins/agent/agent_backend/routers/ai_audit.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.audit.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -184,32 +195,30 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.audit.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed audit read business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.audit.read",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_ai_audit_logs"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.audit.record": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:POST:/api/ai/audit": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_audit.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface rest:POST:/api/ai/audit implements the reviewed agent.audit.record business outcome from plugins/agent/agent_backend/routers/ai_audit.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.audit.record": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -245,26 +254,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.audit.record"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed audit record business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.audit.record",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_ai_audit_logs"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.flow.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:DELETE:/api/flows/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
@@ -274,7 +270,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/flows": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
@@ -284,7 +280,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/flows/gen-script": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
@@ -294,7 +290,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/flows/runs/{run_gid}/step": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
@@ -304,7 +300,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/flows/{gid}/run": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
@@ -314,13 +310,24 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PUT:/api/flows/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface rest:PUT:/api/flows/{gid} implements the reviewed agent.flow.change.apply business outcome from plugins/agent/agent_backend/routers/flows.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.flow.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -356,27 +363,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.flow.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed flow change apply business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.flow.change.apply",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_flow_runs",
-          "workmanship_app_flows"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.flow.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:GET:/api/flows": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
@@ -386,7 +379,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/flows/runs": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
@@ -396,7 +389,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/flows/runs/{run_gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
@@ -406,13 +399,24 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/flows/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/flows.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface rest:GET:/api/flows/{gid} implements the reviewed agent.flow.read business outcome from plugins/agent/agent_backend/routers/flows.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.flow.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -448,27 +452,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.flow.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed flow read business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.flow.read",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_flow_runs",
-          "workmanship_app_flows"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.interaction.request": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_tool:ask_for_clarification": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -478,7 +468,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_tool:create_discussion_topic": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -488,13 +478,25 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_tool:flag_for_review": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface agent_tool:flag_for_review implements the reviewed agent.interaction.request business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.interaction.request": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py",
+            "plugins/agent/agent_backend/capabilities/provider.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -530,24 +532,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.interaction.request"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed interaction request business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.interaction.request",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [],
-        "migration_stream": "agent"
       }
     },
     "agent.memory.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_tool:save_memory": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -557,13 +548,24 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_tool:save_preference": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface agent_tool:save_preference implements the reviewed agent.memory.change.apply business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.memory.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -599,26 +601,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.memory.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed memory change apply business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.memory.change.apply",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_ai_memory"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.memory.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_tool:list_memories": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -628,7 +617,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_tool:list_preferences": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -638,13 +627,24 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_tool:recall_memory": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface agent_tool:recall_memory implements the reviewed agent.memory.read business outcome from plugins/agent/agent_backend/ai_assistant/tool_registry.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.memory.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -680,26 +680,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.memory.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed memory read business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.memory.read",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_ai_memory"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.run.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_runtime:POST:/v1/runs": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -709,7 +696,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_runtime:POST:/v1/runs/{session_gid}/(pause|resume|cancel)": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -719,7 +706,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_runtime:POST:/v1/runs/{session_gid}/approvals/{parameter_2}/decision": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -729,7 +716,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_runtime:POST:/v1/runs/{session_gid}/messages": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -739,7 +726,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_runtime:POST:/v1/runs/{session_gid}/messages/stream": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -749,7 +736,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ai/abort": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
@@ -759,7 +746,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ai/chat": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
@@ -769,7 +756,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ai/chat/stream": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
@@ -779,7 +766,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ai/confirm": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
@@ -789,13 +776,24 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ai/confirm/sync": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface rest:POST:/api/ai/confirm/sync implements the reviewed agent.run.change.apply business outcome from plugins/agent/agent_backend/routers/ai_chat.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.run.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -831,30 +829,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.run.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed run change apply business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.run.change.apply",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_agent_run_approvals",
-          "workmanship_agent_run_participants",
-          "workmanship_agent_run_tool_results",
-          "workmanship_agent_runs",
-          "workmanship_app_ai_turns"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.run.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_runtime:GET:/v1/runs/{session_gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -864,13 +845,24 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_runtime:GET:/v1/runs/{session_gid}/approvals": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
           "owner": "Agent",
           "evidence": "The stable surface agent_runtime:GET:/v1/runs/{session_gid}/approvals implements the reviewed agent.run.read business outcome from services/agent-runtime/src/server.ts.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.run.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -906,30 +898,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.run.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed run read business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.run.read",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_agent_run_approvals",
-          "workmanship_agent_run_participants",
-          "workmanship_agent_run_tool_results",
-          "workmanship_agent_runs",
-          "workmanship_app_ai_turns"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.session.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_runtime:DELETE:/v1/sessions/{session_gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -939,7 +914,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_runtime:POST:/v1/sessions": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -949,7 +924,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/ai/sessions/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
@@ -959,13 +934,24 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ai/sessions/new": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface rest:POST:/api/ai/sessions/new implements the reviewed agent.session.change.apply business outcome from plugins/agent/agent_backend/routers/ai_chat.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.session.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1001,26 +987,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.session.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed session change apply business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.session.change.apply",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_ai_sessions"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.session.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_runtime:GET:/v1/sessions": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -1030,7 +1003,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_runtime:GET:/v1/sessions/{session_gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "services/agent-runtime/src/server.ts"
           ],
@@ -1040,7 +1013,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/ai/sessions": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
@@ -1050,13 +1023,24 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/ai/sessions/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/ai_chat.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface rest:GET:/api/ai/sessions/{gid} implements the reviewed agent.session.read business outcome from plugins/agent/agent_backend/routers/ai_chat.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.session.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1092,26 +1076,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.session.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed session read business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.session.read",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_ai_sessions"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.skill.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:DELETE:/api/skills/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/skills.py"
           ],
@@ -1121,7 +1092,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/skills": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/skills.py"
           ],
@@ -1131,7 +1102,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PUT:/api/skills/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/skills.py"
           ],
@@ -1139,6 +1110,17 @@
           "evidence": "The stable surface rest:PUT:/api/skills/{gid} implements the reviewed agent.skill.change.apply business outcome from plugins/agent/agent_backend/routers/skills.py.",
           "reviewer": "capability-v2-architecture-review",
           "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.skill.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
+          "reviewed_at": "2026-08-11"
         }
       },
       "consumer_exposure": {
@@ -1173,32 +1155,30 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.skill.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed skill change apply business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.skill.change.apply",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_skills"
-        ],
-        "migration_stream": "agent"
       }
     },
     "agent.skill.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:GET:/api/skills": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/routers/skills.py"
           ],
           "owner": "Agent",
           "evidence": "The stable surface rest:GET:/api/skills implements the reviewed agent.skill.read business outcome from plugins/agent/agent_backend/routers/skills.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:agent.skill.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "backend/capabilities/agreed_catalog.py",
+            "plugins/agent/agent_backend/capabilities/contracts.py"
+          ],
+          "owner": "Agent",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1234,19 +1214,6 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "agent.skill.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed skill read business outcome for Agent.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "agent",
-        "application_port": "agent.skill.read",
-        "provider_artifact": "ai00-agent-runtime",
-        "owned_tables": [
-          "workmanship_app_skills"
-        ],
-        "migration_stream": "agent"
       }
     }
   },
@@ -1341,36 +1308,7 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     }
   ],
-  "debt_dispositions": [
-    {
-      "id": "boundary:7a4de0e438616145a35c",
-      "category": "dependency",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_handlers/craft_tools.py"
-      ],
-      "owner_domain": "Agent",
-      "current_owner": "Agent",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the internal module import with a versioned public contract or Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "agent imports base internal module backend.config"
-    },
-    {
-      "id": "module:cf87b7868a4e3827a38eb522c686219a4adeed29ac1a45adffcb8182f844b17c",
-      "category": "dependency",
-      "source_paths": [
-        "plugins/agent/agent_backend/ai_assistant/tool_handlers/craft_tools.py"
-      ],
-      "owner_domain": "Agent",
-      "current_owner": "Agent",
-      "target_owner": "Base Platform",
-      "replacement_boundary": "versioned_public_port:base",
-      "resolution_plan": "Replace the concrete cross-domain import with a versioned public Application Port.",
-      "disposition": "remove_after_extraction",
-      "reason": "Legacy configuration implementation dependency; inject Agent runtime configuration."
-    }
-  ],
+  "debt_dispositions": [],
   "review": {
     "reviewer": "pending-domain-review",
     "reviewed_at": "2026-08-11",

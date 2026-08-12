@@ -119,8 +119,6 @@ def compare_pbom_snapshots(payload: dict[str, Any], _context: CapabilityContext)
 def register_pbom_read_capabilities(registry: Any) -> None:
     common = {"owner": "craft", "plugin_callable": False, "permissions": (), "subject_concepts": ("craft.pbom.snapshot",), "effects": ("read:craft.pbom",)}
     specs = (
-        ("craft.pbom.snapshot.get", get_pbom_snapshot, ["snapshot_gid"], ["gid", "part_count"]),
-        ("craft.pbom.snapshot.compare", compare_pbom_snapshots, ["from_snapshot_gid", "to_snapshot_gid"], ["comparability", "added", "removed", "changed"]),
         ("craft.pbom.part.search", search_pbom_parts, ["snapshot_gid"], ["snapshot_gid", "items"]),
     )
     for capability_id, handler, required_input, required_output in specs:

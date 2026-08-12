@@ -9,7 +9,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -97,7 +97,7 @@ def _source_sha256(markdown: str) -> str:
 def create_migration_run(
     conn, rows: list[dict], *, tenant_gid: str, space_gid: str, actor_gid: str,
 ) -> str:
-    from backend.utils.gid import next_gid
+    from backend.platform_sdk.ids import next_gid
 
     run_gid = str(next_gid())
     summary = inventory_summary(rows)
@@ -336,7 +336,9 @@ def main() -> int:
     parser.add_argument("--scan-limit", type=int, default=10000, help="Maximum legacy rows to inventory")
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args()
-    from backend.db.connection import get_conn
+    from plugins.knowledge.knowledge_backend.data.connection import (
+        get_knowledge_conn as get_conn,
+    )
     from backend.platform_sdk.identity import get_user_summaries
     with get_conn() as conn:
         scanned = inventory(conn, max(1, min(args.scan_limit, 100000)))
