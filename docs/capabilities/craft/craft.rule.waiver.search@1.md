@@ -8,7 +8,7 @@ craft.rule.waiver.search
 - 不适用：Rules are unreviewed or inputs are mutable.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
+- Catalog Release：`rel_96e6828af0498b4b3e281c0d7c701a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -104,7 +104,7 @@ craft.rule.waiver.search
 ```json
 {
   "capability_id": "craft.rule.waiver.search",
-  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
+  "catalog_release": "rel_96e6828af0498b4b3e281c0d7c701a5e",
   "major_version": 1,
   "payload": {}
 }

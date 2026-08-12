@@ -28,7 +28,7 @@
         "plugin_id": "official.base",
         "module": "backend.base.official_provider",
         "version": "1.0.0",
-        "artifact_hash": "sha256:0536ab2cb71f05e391d99551b6b2f2b792e1a44608ed0a7860b51a5d46d60adb"
+        "artifact_hash": "sha256:feb6f47c5cf3cd166f6c34c50e1296e799930f41c4d47cd0a3dd6c7ed046f563"
       },
       "artifact_path": "backend/base",
       "allowed_owners": [
@@ -44,7 +44,15 @@
         "capability_id": "system.search",
         "major_version": 1
       },
-      "event_subscriptions": []
+      "event_subscriptions": [
+        {
+          "subscription_id": "base.knowledge_documents",
+          "producer_domain": "knowledge",
+          "event_type": "knowledge.document.published",
+          "min_version": 1,
+          "max_version": 1
+        }
+      ]
     },
     {
       "domain_id": "craft",
@@ -139,7 +147,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:5d238ff6574322ee2534cc021f5055e3da61e33d67b2063df1eda0fb4bc4de32"
+        "artifact_hash": "sha256:908e60a58ff875435f1b5b5b631dbe8c3426c6552731e76c9f1a4a1d9bda0057"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_27b7fa19d775a064b313534af05a2d3a",
-  "catalog_hash": "sha256:27b7fa19d775a064b313534af05a2d3a04139271355383b6c0b84c8af241a1e4",
+  "release_id": "rel_96e6828af0498b4b3e281c0d7c701a5e",
+  "catalog_hash": "sha256:96e6828af0498b4b3e281c0d7c701a5e8c222fa4989aebf95ea8c1b35ac28d7a",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -54237,7 +54237,7 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:0536ab2cb71f05e391d99551b6b2f2b792e1a44608ed0a7860b51a5d46d60adb"
+      "artifact_hash": "sha256:feb6f47c5cf3cd166f6c34c50e1296e799930f41c4d47cd0a3dd6c7ed046f563"
     },
     {
       "plugin_id": "official.craft",
@@ -54267,7 +54267,7 @@
       "plugin_id": "official.knowledge",
       "module": "knowledge_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:5d238ff6574322ee2534cc021f5055e3da61e33d67b2063df1eda0fb4bc4de32"
+      "artifact_hash": "sha256:908e60a58ff875435f1b5b5b631dbe8c3426c6552731e76c9f1a4a1d9bda0057"
     },
     {
       "plugin_id": "official.local-runtime",
@@ -54294,5 +54294,5 @@
       "artifact_hash": "sha256:01d13e92934650fac586c365529e53e3775b39d171b5a78b069b662dc67d8100"
     }
   ],
-  "created_at": "2026-08-12T09:45:37.213258Z"
+  "created_at": "2026-08-12T09:51:59.729848Z"
 }

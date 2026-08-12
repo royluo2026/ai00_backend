@@ -8,7 +8,7 @@ Execute the governed factory.asset.register Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_27b7fa19d775a064b313534af05a2d3a`
+- Catalog Release：`rel_96e6828af0498b4b3e281c0d7c701a5e`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Execute the governed factory.asset.register Factory outcome.
 ```json
 {
   "capability_id": "factory.asset.register",
-  "catalog_release": "rel_27b7fa19d775a064b313534af05a2d3a",
+  "catalog_release": "rel_96e6828af0498b4b3e281c0d7c701a5e",
   "major_version": 1,
   "payload": {}
 }
