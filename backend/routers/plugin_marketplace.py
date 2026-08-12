@@ -17,6 +17,7 @@ from backend.plugin_platform.metrics import close_month, monthly_ranking
 from backend.plugin_platform.mounts import (
     MountSessionError, MountSessionService, MountTokenError, SqlMountSessionStore, mount_url,
 )
+from backend.plugin_platform.invocation_audit import mount_invocation_audit
 from backend.plugin_platform.service import list_catalog, list_installations, list_lifecycle_events, list_releases, register_publisher, resolve_asset_object_key, review_release, revoke_release, submit_release, tenant_registry, verify_submission_signature
 from backend.plugin_platform.signing import SignatureError
 from backend.routers.deps import build_profile, get_authenticated_principal, get_current_user
@@ -92,6 +93,20 @@ def _resolved_mount_grants(item: dict, release: CatalogRelease) -> tuple[tuple[s
         elif (capability_id, major) in required:
             missing_required.append(f"{capability_id}@{major}")
     return tuple(selected), tuple(missing_required)
+
+
+def _mount_catalog(session, release: CatalogRelease) -> list[dict]:
+    """Project the immutable Catalog to the mount's exact versioned grants."""
+    granted = {
+        (value.rsplit("@", 1)[0], int(value.rsplit("@", 1)[1]))
+        for value in session.capability_grants
+    }
+    return [
+        descriptor.model_dump(mode="json")
+        for descriptor in release.descriptors
+        if (descriptor.id, descriptor.major_version) in granted
+        and descriptor.exposure.plugin
+    ]
 
 
 def _plugin_identity(session, user: dict, principal) -> ConsumerIdentity:
@@ -208,14 +223,19 @@ async def invoke_from_mount(
     user: dict = Depends(get_current_user),
     principal=Depends(get_authenticated_principal),
 ):
+    request_id = f"plugin_{uuid.uuid4().hex}"
     try:
         session = _resolve_mount_for_user(mount_session_id, user)
         if f"{capability_id}@{body.major_version}" not in session.capability_grants:
+            mount_invocation_audit.record(
+                session=session, capability_id=capability_id,
+                major_version=body.major_version, request_id=request_id,
+                payload=body.payload, status="denied", error="capability_not_granted",
+            )
             raise MountSessionError("capability is not granted to this mount session")
     except MountSessionError as exc:
         raise HTTPException(403, detail={"code": "plugin_mount_denied", "message": str(exc)}) from exc
     gateway = get_default_gateway()
-    request_id = f"plugin_{uuid.uuid4().hex}"
     result = await gateway.invoke(InvocationEnvelope(
         capability_id=capability_id,
         major_version=body.major_version,
@@ -228,7 +248,33 @@ async def invoke_from_mount(
         request_id=request_id,
         trace_id=request_id,
     ))
+    mount_invocation_audit.record(
+        session=session, capability_id=capability_id,
+        major_version=body.major_version, request_id=request_id,
+        payload=body.payload, status=result.status.value,
+        error=result.error.code if result.error else None,
+    )
     return result.model_dump(mode="json")
+
+
+@router.get("/mounts/{mount_session_id}/capabilities")
+def mount_capabilities(
+    mount_session_id: str,
+    user: dict = Depends(get_current_user),
+):
+    try:
+        session = _resolve_mount_for_user(mount_session_id, user)
+        release = _catalog_release()
+        if session.catalog_release != release.release_id:
+            raise MountSessionError("mount and gateway catalog releases differ")
+    except MountSessionError as exc:
+        raise HTTPException(
+            403, detail={"code": "plugin_mount_denied", "message": str(exc)}
+        ) from exc
+    return {
+        "catalog_release": release.release_id,
+        "capabilities": _mount_catalog(session, release),
+    }
 
 
 @router.post("/mounts/{mount_session_id}/capabilities/{capability_id}:confirm")

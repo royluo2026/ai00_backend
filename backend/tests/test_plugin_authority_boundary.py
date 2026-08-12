@@ -28,6 +28,8 @@ class PluginAuthorityBoundaryTests(unittest.TestCase):
         self.assertNotIn("def authorize_plugin_invocation", service)
         self.assertIn("_resolve_mount_for_user", router)
         self.assertIn("type=ConsumerType.PLUGIN", router)
+        self.assertNotIn("from backend.base", router)
+        self.assertNotIn("import backend.base", router)
 
 
 if __name__ == "__main__":

@@ -214,3 +214,121 @@ def test_plugin_mount_invoke_constructs_trusted_identity_and_returns_full_result
     assert "success" not in result
     assert captured[0].identity.consumer.mount_session_id == issued.session.mount_session_id
     assert captured[0].identity.consumer.installation_id == "install-1"
+
+
+def test_mount_catalog_discovery_returns_only_the_exact_granted_subset():
+    from backend.base.official_provider import register_capabilities
+    from backend.capabilities.registry_next import CapabilityRegistry
+    from backend.capability_v2.catalog import build_release
+    from backend.routers.plugin_marketplace import _mount_catalog
+
+    registry = CapabilityRegistry()
+    register_capabilities(registry)
+    release = build_release(
+        item.descriptor for item in registry.snapshot() if item.descriptor is not None
+    )
+    session = type("Session", (), {
+        "capability_grants": (
+            "base.notification.preference.get@1",
+            "base.notification.preference.update@1",
+        )
+    })()
+
+    discovered = _mount_catalog(session, release)
+
+    assert {(item["id"], item["major_version"]) for item in discovered} == {
+        ("base.notification.preference.get", 1),
+        ("base.notification.preference.update", 1),
+    }
+    assert all(item["exposure"]["plugin"] is True for item in discovered)
+
+
+def test_mount_invocation_audits_permitted_and_ungranted_results(monkeypatch):
+    from fastapi import HTTPException
+    from backend.routers import plugin_marketplace as router_module
+
+    monkeypatch.setenv("AI00_PLUGIN_MOUNT_SECRET", "test-secret-value-with-at-least-thirty-two-bytes")
+    store = InMemoryMountSessionStore(clock=lambda: NOW)
+    issued = MountSessionService(store, clock=lambda: NOW).issue(
+        user_id="user-1", tenant_id="tenant-1", installation_id="install-1",
+        plugin_id="acme.ai00.example", plugin_version="1.0.0",
+        artifact_sha256="a" * 64, catalog_release="rel_" + "b" * 32,
+        capability_grants=("base.notification.preference.get@1",),
+        resource_scopes=("tenant:tenant-1",), data_scopes=("confidential",),
+        revocation_version=1, authenticated_at=NOW,
+    )
+    events = []
+
+    class Gateway:
+        async def invoke(self, envelope):
+            return CapabilityResultV2(
+                ok=True, status=CapabilityStatus.COMPLETED,
+                capability_id=envelope.capability_id, major_version=1,
+                data={"version": 0, "preferences": {}},
+                correlation=CorrelationRef(
+                    request_id=envelope.request_id, trace_id=envelope.trace_id
+                ),
+            )
+
+    class Audit:
+        def record(self, **event): events.append(event)
+
+    monkeypatch.setattr(router_module, "_resolve_mount_for_user", lambda *_a, **_k: issued.session)
+    monkeypatch.setattr(router_module, "get_default_gateway", lambda: Gateway())
+    monkeypatch.setattr(router_module, "mount_invocation_audit", Audit())
+    user = {"gid": "user-1", "team_id": "tenant-1", "org_role": "member"}
+    principal = AuthenticatedPrincipal(
+        user_id="user-1", authentication_method="jwt", authenticated_at=NOW,
+    )
+
+    permitted = asyncio.run(router_module.invoke_from_mount(
+        issued.session.mount_session_id, "base.notification.preference.get",
+        router_module.MountInvokeRequest(payload={}, major_version=1), user, principal,
+    ))
+    with pytest.raises(HTTPException) as denied:
+        asyncio.run(router_module.invoke_from_mount(
+            issued.session.mount_session_id, "base.workspace.template.read",
+            router_module.MountInvokeRequest(
+                payload={"template_id": "hidden"}, major_version=1
+            ),
+            user, principal,
+        ))
+
+    assert permitted["ok"] is True
+    assert denied.value.status_code == 403
+    assert [(event["capability_id"], event["status"]) for event in events] == [
+        ("base.notification.preference.get", "completed"),
+        ("base.workspace.template.read", "denied"),
+    ]
+
+
+def test_plugin_invocation_audit_uses_base_owned_table_and_hashes_payload():
+    from backend.plugin_platform.invocation_audit import PluginInvocationAuditSink
+
+    statements = []
+
+    class Cursor:
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def execute(self, sql, params): statements.append((" ".join(sql.split()), params))
+
+    class Connection:
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def cursor(self): return Cursor()
+        def commit(self): pass
+
+    session = type("Session", (), {
+        "tenant_id": "tenant-1", "plugin_id": "acme.ai00.example",
+        "installation_id": "install-1", "mount_session_id": "mount-1",
+    })()
+    sink = PluginInvocationAuditSink(lambda: Connection())
+    event = sink.record(
+        session=session, capability_id="base.notification.preference.get",
+        major_version=1, request_id="plugin-request-1",
+        payload={"secret": "not-stored"}, status="completed",
+    )
+
+    assert "workmanship_base_plugin_invocation_audit" in statements[0][0]
+    assert "not-stored" not in repr(statements[0][1])
+    assert event["payload_hash"].startswith("sha256:")
