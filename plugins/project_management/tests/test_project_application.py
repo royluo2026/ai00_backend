@@ -74,6 +74,8 @@ class InMemoryItemEntryRepository:
                 "ended_at": None,
             }
         }
+        self.share_links = {}
+        self.list_access = {("list-1", "user-1", "team-1"): "write"}
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -146,6 +148,25 @@ class InMemoryItemEntryRepository:
         session["status"] = "ended"
         session["ended_at"] = "2026-08-12T04:00:00"
         return True
+
+    def create_share_link(self, token, values):
+        self.share_links[token] = {"token": token, **values}
+        return self.share_links[token]
+
+    def resolve_share_link(self, token):
+        return self.share_links.get(token)
+
+    def get_list_access(self, list_gid, user_gid, team_gid):
+        return self.list_access.get((list_gid, user_gid, team_gid), "none")
+
+    def delete_share_link(self, token, user_gid, is_super):
+        link = self.share_links.get(token)
+        if not link:
+            return "not_found"
+        if link["created_by"] != user_gid and not is_super:
+            return "forbidden"
+        del self.share_links[token]
+        return "deleted"
 
 
 def _application():
@@ -365,5 +386,46 @@ def test_collaboration_create_join_and_end_preserve_members_and_owner_rule():
             "project.collaboration.change.apply",
             {"operation": "collaboration.sessions.end", "arguments": {"gid": "session-2"}},
             member,
+        )
+    assert error.value.code == "forbidden"
+
+
+def test_share_link_create_resolve_and_delete_preserve_access_shape():
+    application = ProjectManagementApplication(
+        repository=InMemoryItemEntryRepository(), next_token=lambda: "token-1"
+    )
+    created = application.invoke(
+        "project.sharing.change.apply",
+        {
+            "operation": "share_links.create",
+            "arguments": {"target_type": "list", "target_gid": "list-1", "display_name": "Plan"},
+        },
+        CONTEXT,
+    )
+    assert created["token"] == "token-1"
+    assert application.invoke(
+        "project.sharing.read",
+        {"operation": "share_links.resolve", "arguments": {"token": "token-1"}},
+        CONTEXT,
+    ) == {
+        "target_type": "list", "target_gid": "list-1", "item_type": None,
+        "display_name": "Plan", "current_permission": "write", "can_request": False,
+    }
+    assert application.invoke(
+        "project.sharing.change.apply",
+        {"operation": "share_links.delete", "arguments": {"token": "token-1"}},
+        CONTEXT,
+    ) == {"ok": True}
+
+
+def test_share_link_delete_enforces_creator_or_trusted_super_admin():
+    repository = InMemoryItemEntryRepository()
+    repository.create_share_link("token-1", {"created_by": "user-1"})
+    application = ProjectManagementApplication(repository=repository)
+    with pytest.raises(CapabilityBusinessError, match="creator") as error:
+        application.invoke(
+            "project.sharing.change.apply",
+            {"operation": "share_links.delete", "arguments": {"token": "token-1"}},
+            CapabilityContext(user_gid="user-2", team_gid="team-1"),
         )
     assert error.value.code == "forbidden"

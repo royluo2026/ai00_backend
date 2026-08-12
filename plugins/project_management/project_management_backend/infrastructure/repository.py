@@ -179,3 +179,50 @@ class ProjectManagementRepository:
                 (gid, owner_gid),
             )
         )
+
+    def create_share_link(self, token: str, values: dict[str, Any]) -> dict[str, Any]:
+        self.execute(
+            "INSERT INTO workmanship_work_share_links "
+            "(token,target_type,target_gid,item_type,display_name,created_by,expires_at) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+            (token, values["target_type"], values["target_gid"], values.get("item_type"),
+             values.get("display_name", ""), values["created_by"], values.get("expires_at")),
+        )
+        return self.resolve_share_link(token) or {"token": token, **values}
+
+    def resolve_share_link(self, token: str) -> dict[str, Any] | None:
+        return self.fetch_one(
+            "SELECT * FROM workmanship_work_share_links WHERE token=%s "
+            "AND (expires_at IS NULL OR expires_at > NOW())", (token,)
+        )
+
+    def get_list_access(self, list_gid: str, user_gid: str, team_gid: str | None) -> str:
+        row = self.fetch_one(
+            "SELECT owner_gid,creator_gid,read_scope,team_id FROM workmanship_work_lists "
+            "WHERE gid=%s AND deleted_at IS NULL", (list_gid,)
+        )
+        if not row:
+            return "none"
+        if user_gid in {str(row.get("owner_gid") or ""), str(row.get("creator_gid") or "")}:
+            return "write"
+        share = self.fetch_one(
+            "SELECT permission FROM workmanship_work_list_shares WHERE list_gid=%s AND shared_to=%s",
+            (list_gid, user_gid),
+        )
+        if share:
+            return str(share["permission"])
+        scope = row.get("read_scope") or "team"
+        if scope == "global" or (scope == "team" and team_gid and team_gid == row.get("team_id")):
+            return "read"
+        return "none"
+
+    def delete_share_link(self, token: str, user_gid: str, is_super: bool) -> str:
+        row = self.fetch_one(
+            "SELECT created_by FROM workmanship_work_share_links WHERE token=%s", (token,)
+        )
+        if not row:
+            return "not_found"
+        if str(row["created_by"]) != user_gid and not is_super:
+            return "forbidden"
+        self.execute("DELETE FROM workmanship_work_share_links WHERE token=%s", (token,))
+        return "deleted"

@@ -12,6 +12,7 @@ from backend.capability_v2.gateway import CapabilityGatewayService
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
 from plugins.craft.craft_backend.routers.change_logs import router as change_logs_router
 import plugins.craft.craft_backend.routers.collab as collab_router_module
+import plugins.craft.craft_backend.routers.share_links as share_links_router_module
 from plugins.craft.craft_backend.routers.item_entries import router as item_entries_router
 from plugins.project_management.project_management_backend.api.compatibility import (
     build_web_compatibility_envelope,
@@ -54,6 +55,8 @@ class RecordingGateway(GatewayRelease):
             data = {"success": True, "data": {"gid": "session-2"}}
         elif operation in {"collaboration.sessions.join", "collaboration.sessions.end"}:
             data = {"success": True}
+        elif operation == "share_links.resolve":
+            data = {"target_type": "list", "target_gid": "list-1", "item_type": None, "display_name": "Plan", "current_permission": "read", "can_request": False}
         else:
             data = {"entries": []}
         return SimpleNamespace(
@@ -262,3 +265,19 @@ def test_legacy_collaboration_routes_use_read_and_governed_write_capabilities():
     assert gateway.envelopes[0].idempotency_key is None
     assert all(envelope.idempotency_key == "idem-collab-1" for envelope in gateway.envelopes[1:])
     assert all(envelope.approval_reference == "approval-collab-1" for envelope in gateway.envelopes[1:])
+
+
+def test_legacy_share_link_resolve_uses_project_sharing_capability():
+    application = FastAPI()
+    application.include_router(share_links_router_module.router)
+    gateway = RecordingGateway()
+    principal = AuthenticatedPrincipal(user_id="user-1", authentication_method="jwt", authenticated_at=datetime(2026, 8, 12, tzinfo=UTC))
+    application.dependency_overrides[get_current_user] = lambda: {"gid": "user-1", "team_id": "team-1", "org_role": "member"}
+    application.dependency_overrides[get_authenticated_principal] = lambda: principal
+    application.dependency_overrides[get_default_gateway] = lambda: gateway
+    with TestClient(application) as client:
+        response = client.get("/api/share-links/token-1", headers={"X-Request-ID": "request-share-1"})
+    assert response.status_code == 200
+    assert response.json()["current_permission"] == "read"
+    assert gateway.envelopes[0].capability_id == "project.sharing.read"
+    assert gateway.envelopes[0].payload == {"operation": "share_links.resolve", "arguments": {"token": "token-1"}}

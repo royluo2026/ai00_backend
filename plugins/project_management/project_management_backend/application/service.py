@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import Any, Protocol
 from uuid import uuid4
+import secrets
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
 
@@ -36,6 +37,10 @@ class ItemEntryRepository(Protocol):
     ) -> None: ...
     def join_collaboration_session(self, gid: str, participant_gid: str) -> None: ...
     def end_collaboration_session(self, gid: str, owner_gid: str) -> bool: ...
+    def create_share_link(self, token: str, values: dict[str, Any]) -> dict[str, Any]: ...
+    def resolve_share_link(self, token: str) -> dict[str, Any] | None: ...
+    def get_list_access(self, list_gid: str, user_gid: str, team_gid: str | None) -> str: ...
+    def delete_share_link(self, token: str, user_gid: str, is_super: bool) -> str: ...
 
 
 _OPERATIONS = {
@@ -53,6 +58,10 @@ _OPERATIONS = {
     "project.list.read": frozenset({"item_entries.get"}),
     "project.list.change.apply": frozenset(
         {"item_entries.replace", "item_entries.delete"}
+    ),
+    "project.sharing.read": frozenset({"share_links.resolve"}),
+    "project.sharing.change.apply": frozenset(
+        {"share_links.create", "share_links.delete"}
     ),
 }
 
@@ -118,9 +127,11 @@ class ProjectManagementApplication:
         repository: ItemEntryRepository,
         *,
         next_id: Callable[[], str] | None = None,
+        next_token: Callable[[], str] | None = None,
     ) -> None:
         self._repository = repository
         self._next_id = next_id or (lambda: str(uuid4()))
+        self._next_token = next_token or (lambda: secrets.token_urlsafe(16))
 
     def invoke(
         self,
@@ -141,6 +152,8 @@ class ProjectManagementApplication:
             return self._search_change_logs(arguments, _context)
         if operation.startswith("collaboration.sessions."):
             return self._collaboration(operation, arguments, _context)
+        if operation.startswith("share_links."):
+            return self._share_link(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -232,6 +245,56 @@ class ProjectManagementApplication:
                 "forbidden", "only the session owner can end this session"
             )
         return {"success": True}
+
+    def _share_link(
+        self, operation: str, arguments: Mapping[str, Any], context: object
+    ) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if not user_gid:
+            raise CapabilityBusinessError("unauthenticated", "user identity is required")
+        if operation == "share_links.create":
+            target_type = _required_text(arguments, "target_type")
+            target_gid = _required_text(arguments, "target_gid")
+            token = self._next_token()
+            row = self._repository.create_share_link(
+                token,
+                {
+                    "target_type": target_type,
+                    "target_gid": target_gid,
+                    "item_type": arguments.get("item_type"),
+                    "display_name": str(arguments.get("display_name") or ""),
+                    "created_by": user_gid,
+                    "expires_at": arguments.get("expires_at"),
+                },
+            )
+            return {"token": token, "link": row}
+        token = _required_text(arguments, "token")
+        if operation == "share_links.resolve":
+            link = self._repository.resolve_share_link(token)
+            if link is None:
+                raise CapabilityBusinessError("not_found", "share link not found or expired")
+            current_permission = "none"
+            can_request = False
+            if link["target_type"] == "list":
+                current_permission = self._repository.get_list_access(
+                    str(link["target_gid"]), user_gid, getattr(context, "team_gid", None)
+                )
+                can_request = current_permission == "none"
+            return {
+                "target_type": link["target_type"],
+                "target_gid": link["target_gid"],
+                "item_type": link.get("item_type"),
+                "display_name": link["display_name"],
+                "current_permission": current_permission,
+                "can_request": can_request,
+            }
+        is_super = "super_admin" in frozenset(getattr(context, "active_roles", ()) or ())
+        result = self._repository.delete_share_link(token, user_gid, is_super)
+        if result == "not_found":
+            raise CapabilityBusinessError("not_found", "share link not found")
+        if result == "forbidden":
+            raise CapabilityBusinessError("forbidden", "only the creator can revoke this link")
+        return {"ok": True}
 
 
 __all__ = ["ItemEntryRepository", "ProjectManagementApplication"]

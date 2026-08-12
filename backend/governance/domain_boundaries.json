@@ -128,6 +128,7 @@
     {"path": "plugins/craft/craft_backend/routers/change_logs.py", "domain": "project_management"},
     {"path": "plugins/craft/craft_backend/routers/collab.py", "domain": "project_management"},
     {"path": "plugins/craft/craft_backend/routers/item_entries.py", "domain": "project_management"},
+    {"path": "plugins/craft/craft_backend/routers/share_links.py", "domain": "project_management"},
     {"path": "plugins/craft/craft_backend/routers/projects.py", "domain": "project_management"},
     {"path": "plugins/craft/craft_backend/routers/workbench_home.py", "domain": "project_management"}
   ],
