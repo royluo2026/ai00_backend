@@ -8,7 +8,7 @@ Compose immutable provenance events and completeness.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_ac925e6c3f39ddd2ec3b335e2b45d627`
+- Catalog Release：`rel_43f5e74624f8b2dbf07dd372796dc3f8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -75,7 +75,7 @@ Compose immutable provenance events and completeness.
 ```json
 {
   "capability_id": "system.lineage.get",
-  "catalog_release": "rel_ac925e6c3f39ddd2ec3b335e2b45d627",
+  "catalog_release": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
   "major_version": 1,
   "payload": {
     "object_ref": "example"

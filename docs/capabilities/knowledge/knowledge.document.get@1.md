@@ -8,7 +8,7 @@ Read one immutable Markdown revision with evidence.
 - 不适用：Only bounded decision context is needed.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_ac925e6c3f39ddd2ec3b335e2b45d627`
+- Catalog Release：`rel_43f5e74624f8b2dbf07dd372796dc3f8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -78,7 +78,7 @@ Read one immutable Markdown revision with evidence.
 ```json
 {
   "capability_id": "knowledge.document.get",
-  "catalog_release": "rel_ac925e6c3f39ddd2ec3b335e2b45d627",
+  "catalog_release": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
   "major_version": 1,
   "payload": {
     "document_gid": "example"

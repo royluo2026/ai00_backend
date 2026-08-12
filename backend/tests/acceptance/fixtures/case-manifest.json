@@ -621,6 +621,15 @@
       "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[factory.asset.update@1]",
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[factory.asset.update@1]"
     },
+    "factory.resource.read@1": {
+      "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[factory.resource.read@1]",
+      "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[factory.resource.read@1]",
+      "output_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_output_contract_case[factory.resource.read@1]",
+      "resource_denied": "backend/tests/acceptance/test_mandatory_cases.py::test_resource_denied_case[factory.resource.read@1]",
+      "success": "backend/tests/acceptance/test_mandatory_cases.py::test_success_case[factory.resource.read@1]",
+      "unauthenticated": "backend/tests/acceptance/test_mandatory_cases.py::test_unauthenticated_case[factory.resource.read@1]",
+      "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[factory.resource.read@1]"
+    },
     "factory.resource_catalog.create@1": {
       "consumer_contract": "backend/tests/acceptance/test_mandatory_cases.py::test_consumer_contract_case[factory.resource_catalog.create@1]",
       "invalid_input": "backend/tests/acceptance/test_mandatory_cases.py::test_invalid_input_case[factory.resource_catalog.create@1]",
@@ -1720,7 +1729,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_ac925e6c3f39ddd2ec3b335e2b45d627",
+  "catalog_release": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
   "mandatory_cases": [
     "success",
     "invalid_input",

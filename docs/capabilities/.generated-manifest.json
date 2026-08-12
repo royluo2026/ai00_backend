@@ -94,6 +94,7 @@
     "factory/factory.asset.scrap@1.md",
     "factory/factory.asset.search@1.md",
     "factory/factory.asset.update@1.md",
+    "factory/factory.resource.read@1.md",
     "factory/factory.resource_catalog.create@1.md",
     "factory/factory.resource_catalog.deprecate@1.md",
     "factory/factory.resource_catalog.get@1.md",

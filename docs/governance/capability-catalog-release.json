@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_ac925e6c3f39ddd2ec3b335e2b45d627",
-  "catalog_hash": "sha256:ac925e6c3f39ddd2ec3b335e2b45d6279fba392a80cff7d188da9443d2e9f7a2",
+  "release_id": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
+  "catalog_hash": "sha256:43f5e74624f8b2dbf07dd372796dc3f86d360cbca248aa7a65fdab3b5c31fc36",
   "descriptors": [
     {
       "id": "base.annotation.change.apply",
@@ -12353,6 +12353,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -12391,7 +12394,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -12472,6 +12475,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -12510,7 +12516,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -12591,6 +12597,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -12629,7 +12638,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -12710,6 +12719,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -12748,7 +12760,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -12829,6 +12841,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -12867,7 +12882,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
@@ -12948,6 +12963,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -12986,7 +13004,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -13067,6 +13085,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -13105,7 +13126,129 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "invalid_input",
+          "meaning": "The Factory request is invalid.",
+          "retryable": false
+        },
+        {
+          "code": "resource_not_found",
+          "meaning": "The Factory resource does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller cannot access the Factory tenant.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The Factory resource changed concurrently.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The Factory change requires approval.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Factory provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "factory.resource.read",
+      "major_version": 1,
+      "owner_domain": "factory",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "factory.resource.read",
+      "description": "Execute the governed factory.resource.read Factory outcome.",
+      "use_when": "A consumer needs physical factory topology, catalog, or asset data.",
+      "do_not_use_when": "The resource is a BOP plan node or production schedule.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "factory.v2:factory.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": "string"
+          },
+          "resource_ref": {
+            "type": "string"
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -13186,6 +13329,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -13224,7 +13370,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -13305,6 +13451,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -13343,7 +13492,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -13424,6 +13573,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -13462,7 +13614,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -13543,6 +13695,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -13581,7 +13736,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -13662,6 +13817,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -13700,7 +13858,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -13781,6 +13939,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -13819,7 +13980,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -13900,6 +14061,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -13938,7 +14102,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -14019,6 +14183,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -14057,7 +14224,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -14138,6 +14305,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -14176,7 +14346,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14257,6 +14427,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -14295,7 +14468,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -14376,6 +14549,9 @@
           "gid": {
             "type": "string"
           },
+          "resource_ref": {
+            "type": "string"
+          },
           "expected_version": {
             "type": "integer",
             "minimum": 1
@@ -14414,7 +14590,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:b3cc28cdf31aa5b07a37563ee9f8a4db95e0439ff36c9285af022c4c081af6e5",
+      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -37476,7 +37652,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:d71d8f3e9e0cafe13c8ca6ff2c93d157c666e491bf80423bc19bd8b30df605eb"
+      "artifact_hash": "sha256:0d8786d800e3a69464bbbda30e17a203535e0805f7dda77eff8dbc56d472454c"
     },
     {
       "plugin_id": "official.digital-model",
@@ -37488,7 +37664,7 @@
       "plugin_id": "official.factory",
       "module": "factory_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:2a571a88403a7ab8649210b7bad41fb4319e2d01fe3cc6cc9a584b4a00e8e7a9"
+      "artifact_hash": "sha256:da8d7a93dd8e5a98f1a8c09ee7f8ca689cbd6b120cae2dd12ae4c66766d8c510"
     },
     {
       "plugin_id": "official.knowledge",
@@ -37521,5 +37697,5 @@
       "artifact_hash": "sha256:a3e0ca64f1bcd5747c13e9fc2091be8f5644ad5e33ed26502c5cf4bd98316fda"
     }
   ],
-  "created_at": "2026-08-12T08:37:56.396441Z"
+  "created_at": "2026-08-12T08:42:55.898763Z"
 }

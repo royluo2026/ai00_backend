@@ -1,13 +1,13 @@
-# knowledge.document.restore@1
+# factory.resource.read@1
 
-Restore historical content by publishing a new immutable revision.
+Execute the governed factory.resource.read Factory outcome.
 
 ## 使用判断
 
-- 适用：Historical content must become the new head without deleting history.
-- 不适用：Only reading old content.
+- 适用：A consumer needs physical factory topology, catalog, or asset data.
+- 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
-- 所属领域：`knowledge`
+- 所属领域：`factory`
 - Catalog Release：`rel_43f5e74624f8b2dbf07dd372796dc3f8`
 - Schema 精度：`typed`
 - 暂未开放原因：无
@@ -28,29 +28,29 @@ Restore historical content by publishing a new immutable revision.
 
 ## 授权与数据边界
 
-- 授权策略：`knowledge.v2:authenticated`
+- 授权策略：`factory.v2:factory.write`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `knowledge-document` ← `document_gid`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
 - 副作用：`write`
 - 执行模式：`cloud_sync`
 - 超时：30 秒
-- 审批：`user`
+- 审批：`none`
 - 幂等：`required`
-- 并发：`expected_version`
-- 信封 `expected_resource_version` 必须等于 payload `base_revision_gid`。
-- 一致性：`external`
+- 并发：`none`
+- 无预期版本信封要求。
+- 一致性：`strong`
 - Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
-- Evidence：`required`
+- Evidence：`optional`
 - 配额成本：1
 
 ## 输入 Schema
@@ -59,21 +59,21 @@ Restore historical content by publishing a new immutable revision.
 {
   "additionalProperties": false,
   "properties": {
-    "base_revision_gid": {
+    "expected_revision": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "expected_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "gid": {
       "type": "string"
     },
-    "document_gid": {
-      "type": "string"
-    },
-    "target_revision_gid": {
+    "resource_ref": {
       "type": "string"
     }
   },
-  "required": [
-    "document_gid",
-    "base_revision_gid",
-    "target_revision_gid"
-  ],
   "type": "object"
 }
 ```
@@ -82,14 +82,10 @@ Restore historical content by publishing a new immutable revision.
 
 ```json
 {
-  "capability_id": "knowledge.document.restore",
+  "capability_id": "factory.resource.read",
   "catalog_release": "rel_43f5e74624f8b2dbf07dd372796dc3f8",
   "major_version": 1,
-  "payload": {
-    "base_revision_gid": "example",
-    "document_gid": "example",
-    "target_revision_gid": "example"
-  }
+  "payload": {}
 }
 ```
 
@@ -101,55 +97,14 @@ Restore historical content by publishing a new immutable revision.
 {
   "additionalProperties": false,
   "properties": {
-    "content_sha256": {
-      "type": "string"
-    },
-    "document_gid": {
-      "type": "string"
-    },
-    "object_key": {
-      "type": "string"
-    },
-    "object_ref": {
-      "pattern": "^knowledge-document:[A-Za-z0-9_.:-]+$",
-      "type": "string"
-    },
-    "revision_gid": {
-      "type": "string"
-    },
-    "revision_no": {
-      "minimum": 1,
-      "type": "integer"
-    },
-    "revision_ref": {
-      "pattern": "^knowledge-revision:[A-Za-z0-9_.:-]+$",
-      "type": "string"
-    },
-    "space_gid": {
-      "type": "string"
-    },
-    "space_ref": {
-      "pattern": "^knowledge-space:[A-Za-z0-9_.:-]+$",
-      "type": "string"
-    },
-    "state": {
-      "type": "string"
-    },
-    "tenant_gid": {
-      "type": "string"
-    },
-    "title": {
-      "type": "string"
+    "data": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
     }
   },
   "required": [
-    "object_ref",
-    "revision_ref",
-    "space_ref",
-    "document_gid",
-    "revision_gid",
-    "revision_no",
-    "state"
+    "data"
   ],
   "type": "object"
 }
@@ -187,12 +142,12 @@ Restore historical content by publishing a new immutable revision.
 
 领域错误：
 
-- `resource_not_found`：The scoped Knowledge resource does not exist or is not visible.（retryable=false）
-- `revision_conflict`：The document head differs from the supplied base revision.（retryable=false）
-- `proposal_state_conflict`：The proposal is no longer in a state that accepts this transition.（retryable=false）
-- `knowledge_storage_unavailable`：The immutable Knowledge object store is unavailable.（retryable=true）
-- `publication_in_progress`：Another worker owns the current publication lease.（retryable=true）
-- `self_review_forbidden`：Proposal creators cannot approve or reject their own proposal.（retryable=false）
+- `invalid_input`：The Factory request is invalid.（retryable=false）
+- `resource_not_found`：The Factory resource does not exist.（retryable=false）
+- `permission_denied`：The caller cannot access the Factory tenant.（retryable=false）
+- `version_conflict`：The Factory resource changed concurrently.（retryable=false）
+- `approval_required`：The Factory change requires approval.（retryable=false）
+- `provider_unavailable`：The Factory provider is unavailable.（retryable=true）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 
