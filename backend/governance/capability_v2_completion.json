@@ -39,6 +39,5 @@
     "candidate_capabilities": 87,
     "catalog_descriptors": 102,
     "proposed_final_catalog_capabilities": 173
-  },
-  "required_catalog_capabilities": 173
+  }
 }

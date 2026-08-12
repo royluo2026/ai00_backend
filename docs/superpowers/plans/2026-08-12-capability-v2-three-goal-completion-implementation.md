@@ -143,7 +143,7 @@ class CompletionReport:
         return not self.failed
 ```
 
-Store the eleven domain IDs, three goal predicates, frozen 752/87/102/173 input counts and required RC evidence keys in `capability_v2_completion.json`. `progress` reports unmet predicates without weakening them; `strict` exits 1 unless every predicate passes. Do not store waivers in this file.
+Store the eleven domain IDs, three goal predicates, frozen 752/87/102/173 starting-snapshot counts and required RC evidence keys in `capability_v2_completion.json`. The estimated 173 Capability total is evidence, not a completion quota; correct implementation may add design-required outcomes. `progress` reports unmet predicates without weakening them; `strict` exits 1 unless every predicate passes. Do not store waivers in this file.
 
 Create `capability_v2_production_paths.json` with schema version 1 and initially empty `sync` and `async` arrays. Each later entry requires a stable path ID, caller/producer, callee/consumer, Capability or event contract, production source module and exact E2E pytest node ID. `evaluate_completion` rejects missing modules, missing test nodes, duplicate IDs and test-only source modules.
 

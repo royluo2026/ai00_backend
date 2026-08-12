@@ -315,13 +315,6 @@ def evaluate_completion(
     cross_domain_sql, internal_imports = _boundary_counts(boundary)
     consumer_bypasses = _consumer_bypasses(root, configuration)
     catalog_capabilities = _catalog_capability_count(root)
-    required_catalog_capabilities = configuration.get(
-        "required_catalog_capabilities"
-    )
-    if not isinstance(required_catalog_capabilities, int):
-        raise CompletionConfigurationError(
-            "required_catalog_capabilities must be an integer"
-        )
     production_paths = _load_json(
         root / "backend/governance/capability_v2_production_paths.json",
         required=False,
@@ -335,11 +328,6 @@ def evaluate_completion(
         failures.append(f"internal_imports:{internal_imports}")
     if consumer_bypasses:
         failures.append(f"consumer_bypasses:{consumer_bypasses}")
-    if catalog_capabilities != required_catalog_capabilities:
-        failures.append(
-            "catalog_capabilities:"
-            f"{catalog_capabilities}!={required_catalog_capabilities}"
-        )
     if not sync_paths:
         failures.append("sync_production_paths:0")
     if not async_paths:

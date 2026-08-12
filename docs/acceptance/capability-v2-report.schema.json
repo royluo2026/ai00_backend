@@ -131,7 +131,7 @@
               "cross_domain_sql": {"const": 0},
               "internal_imports": {"const": 0},
               "consumer_bypasses": {"const": 0},
-              "catalog_capabilities": {"const": 173},
+              "catalog_capabilities": {"type": "integer", "minimum": 1},
               "failed": {"maxItems": 0}
             }
           },

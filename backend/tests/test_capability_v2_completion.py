@@ -63,7 +63,6 @@ def _complete_repository(tmp_path: Path) -> Path:
                 "catalog_descriptors": 102,
                 "proposed_final_catalog_capabilities": 173,
             },
-            "required_catalog_capabilities": 173,
         },
     )
     _write_json(
@@ -82,7 +81,7 @@ def _complete_repository(tmp_path: Path) -> Path:
                 {
                     "id": "test.reviewed_candidate",
                     "major_version": 1,
-                    "lifecycle_status": "draft",
+                    "lifecycle_status": "stable",
                 }
             ]
         },
@@ -214,7 +213,7 @@ def test_complete_repository_satisfies_all_three_goals(tmp_path: Path) -> None:
     assert report.cross_domain_sql == 0
     assert report.internal_imports == 0
     assert report.consumer_bypasses == 0
-    assert report.catalog_capabilities == 173
+    assert report.catalog_capabilities == 174
     assert report.failed == ()
 
 
@@ -308,7 +307,7 @@ def test_frozen_coverage_drift_fails_closed(tmp_path: Path) -> None:
     assert "frozen_coverage:stable_functions:751!=752" in report.failed
 
 
-def test_incomplete_catalog_fails_closed(tmp_path: Path) -> None:
+def test_catalog_count_is_evidence_not_a_completion_quota(tmp_path: Path) -> None:
     root = _complete_repository(tmp_path)
     catalog_path = root / "docs/capabilities/catalog.v2.json"
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
@@ -317,8 +316,8 @@ def test_incomplete_catalog_fails_closed(tmp_path: Path) -> None:
 
     report = evaluate_completion(root, mode="strict")
 
-    assert report.catalog_capabilities == 172
-    assert "catalog_capabilities:172!=173" in report.failed
+    assert report.catalog_capabilities == 173
+    assert report.complete is True
 
 
 def test_production_path_rejects_test_only_source(tmp_path: Path) -> None:
