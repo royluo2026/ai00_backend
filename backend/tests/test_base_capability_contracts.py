@@ -2,9 +2,12 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from pathlib import Path
 
-from backend.capability_v2.bootstrap import get_capability_registry
 from backend.capabilities.models_next import CapabilityContext
+from backend.capabilities.registry_next import CapabilityRegistry
+from backend.base.official_provider import register_capabilities
+from backend.base.approval import APPROVAL_CAPABILITY_IDS
 from backend.base.operations import worker_health
 from backend.plugin_platform.storage import _identity
 from backend.domain_ports.operations import operations_registry
@@ -13,23 +16,46 @@ from backend.capability_v2.contracts import (
     InvocationEnvelope, TenantIdentity,
 )
 from backend.capability_v2.gateway import CapabilityGatewayService
+from backend.tests.capability_completion_support import (
+    FrozenCoverageReview,
+    registered_descriptor_ids,
+)
 
 
-STABLE_CAPABILITIES = {
-    "identity.principal.search",
-    "plugin.disable", "plugin.enable", "plugin.install", "plugin.revoke",
-    "plugin.rollback", "plugin.storage.delete", "plugin.storage.get",
-    "plugin.storage.list", "plugin.storage.put", "plugin.uninstall",
-    "plugin.upgrade", "plugin.upgrade.finish", "semantic.context.get",
-    "system.activity.search", "system.change_impact.preview",
-    "system.job.cancel", "system.job.get", "system.lineage.get", "system.search",
-    "system.worker.outbox.health",
-}
+ROOT = Path(__file__).resolve().parents[2]
+STABLE_CAPABILITIES = (
+    FrozenCoverageReview(ROOT).capability_ids("base") | APPROVAL_CAPABILITY_IDS
+)
+
+
+def test_base_provider_matches_corrected_frozen_review():
+    root = Path(__file__).resolve().parents[2]
+    expected = (
+        FrozenCoverageReview(root).capability_ids("base")
+        | APPROVAL_CAPABILITY_IDS
+    )
+
+    actual = registered_descriptor_ids("backend.base.official_provider")
+
+    assert actual == expected
+    assert "plugin.upgrade.finish" not in actual
+    assert "system.worker.outbox.health" not in actual
+
+
+def test_base_has_an_independent_migration_stream():
+    root = Path(__file__).resolve().parents[2]
+    migration = root / "backend/db/migrations/domains/base/0001_base_platform.sql"
+
+    assert migration.is_file()
+    sql = migration.read_text(encoding="utf-8")
+    assert "workmanship_base_schema_migrations" in sql
+    assert "workmanship_int_" not in sql
 
 
 def _registrations():
-    capability_registry = get_capability_registry()
-    return {item.spec.id: item for item in capability_registry.snapshot() if item.spec.id in STABLE_CAPABILITIES}
+    capability_registry = CapabilityRegistry()
+    register_capabilities(capability_registry)
+    return {item.spec.id: item for item in capability_registry.snapshot()}
 
 
 def test_all_stable_base_capabilities_have_native_open_contracts():
@@ -70,7 +96,7 @@ def test_base_writes_have_replay_protection():
     writes = {
         "plugin.disable", "plugin.enable", "plugin.install", "plugin.revoke",
         "plugin.rollback", "plugin.storage.delete", "plugin.storage.put",
-        "plugin.uninstall", "plugin.upgrade", "plugin.upgrade.finish",
+        "plugin.uninstall", "plugin.upgrade",
         "system.job.cancel",
     }
     for capability_id in writes:

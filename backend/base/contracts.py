@@ -13,6 +13,55 @@ STRING = {"type": "string"}
 INTEGER = {"type": "integer"}
 BOOLEAN = {"type": "boolean"}
 ANY_ARRAY = {"type": "array", "items": {}}
+REVIEWED_INPUT = _object(
+    {"operation": STRING, "resource": {}, "expected_version": INTEGER},
+    ("operation",),
+)
+REVIEWED_OUTPUT = _object({"result": {}}, ("result",))
+APPROVAL_ITEM = _object(
+    {
+        "approval_id": STRING,
+        "subject_ref": STRING,
+        "requester_gid": STRING,
+        "resource_ref": STRING,
+        "revision": STRING,
+        "content_hash": STRING,
+        "reason": STRING,
+        "approver_ids": {"type": "array", "items": STRING},
+        "status": STRING,
+        "decision_reason": {"anyOf": [STRING, {"type": "null"}]},
+        "decided_by": {"anyOf": [STRING, {"type": "null"}]},
+        "created_at": STRING,
+        "updated_at": STRING,
+    },
+    (
+        "approval_id", "subject_ref", "requester_gid", "resource_ref",
+        "revision", "content_hash", "reason", "approver_ids", "status",
+        "decision_reason", "decided_by", "created_at", "updated_at",
+    ),
+)
+
+REVIEWED_READ_CAPABILITIES = {
+    "base.annotation.read",
+    "base.authorization.grant.read",
+    "base.export_template.read",
+    "base.identity.session.get",
+    "base.plugin.marketplace.search",
+    "base.saved_view.read",
+    "base.team.read",
+}
+REVIEWED_WRITE_CAPABILITIES = {
+    "base.annotation.change.apply",
+    "base.authorization.grant.change.apply",
+    "base.export_template.change.apply",
+    "base.identity.directory.sync",
+    "base.identity.role.assign",
+    "base.plugin.marketplace.publisher.register",
+    "base.plugin.marketplace.release.change.apply",
+    "base.saved_view.change.apply",
+    "base.team.change.apply",
+    "base.team.membership.change.apply",
+}
 
 PLUGIN_ID = _object({"plugin_id": STRING}, ("plugin_id",))
 PLUGIN_RELEASE = _object(
@@ -64,6 +113,43 @@ INPUT_SCHEMAS = {
     "system.change_impact.preview": _object({"change_ref": STRING}, ("change_ref",)),
     "semantic.context.get": _object({"named_view": STRING, "depth": INTEGER, "limit": INTEGER}, ("named_view",)),
     "system.worker.outbox.health": _object({}),
+    **{
+        capability_id: REVIEWED_INPUT
+        for capability_id in REVIEWED_READ_CAPABILITIES | REVIEWED_WRITE_CAPABILITIES
+    },
+    "base.approval.request.create": _object(
+        {
+            "subject_ref": STRING,
+            "resource_ref": STRING,
+            "revision": STRING,
+            "content_hash": STRING,
+            "reason": STRING,
+            "approver_ids": {"type": "array", "items": STRING},
+        },
+        (
+            "subject_ref", "resource_ref", "revision", "content_hash",
+            "reason", "approver_ids",
+        ),
+    ),
+    "base.approval.request.get": _object(
+        {"approval_id": STRING}, ("approval_id",)
+    ),
+    "base.approval.request.search": _object(
+        {"subject_ref": STRING, "status": STRING}
+    ),
+    "base.approval.request.decide": _object(
+        {
+            "approval_id": STRING,
+            "expected_state": STRING,
+            "decision": STRING,
+            "reason": STRING,
+        },
+        ("approval_id", "expected_state", "decision", "reason"),
+    ),
+    "base.approval.request.cancel": _object(
+        {"approval_id": STRING, "expected_state": STRING},
+        ("approval_id", "expected_state"),
+    ),
 }
 
 OUTPUT_SCHEMAS = {
@@ -98,6 +184,17 @@ OUTPUT_SCHEMAS = {
         }),
         "open_alerts": INTEGER,
     }, ("heartbeat", "outbox_counts", "open_alerts")),
+    **{
+        capability_id: REVIEWED_OUTPUT
+        for capability_id in REVIEWED_READ_CAPABILITIES | REVIEWED_WRITE_CAPABILITIES
+    },
+    "base.approval.request.create": APPROVAL_ITEM,
+    "base.approval.request.get": APPROVAL_ITEM,
+    "base.approval.request.search": _object(
+        {"items": {"type": "array", "items": APPROVAL_ITEM}}, ("items",)
+    ),
+    "base.approval.request.decide": APPROVAL_ITEM,
+    "base.approval.request.cancel": APPROVAL_ITEM,
 }
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]
