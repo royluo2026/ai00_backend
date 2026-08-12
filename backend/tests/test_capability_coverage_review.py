@@ -181,7 +181,7 @@ def test_aligns_reviewed_function_with_its_current_published_capability(builder,
     row = {
         "function_id": "rest:GET:/api/projects",
         "domain": "Project Management",
-        "source_paths": ["backend/routers/projects.py"],
+        "source_paths": ["backend/routers/projects.py", "plugins/project_management/capabilities/projects.py"],
         "current_consumers": ["REST"],
         "target_capability": "project.project.create",
     }
@@ -198,6 +198,9 @@ def test_aligns_reviewed_function_with_its_current_published_capability(builder,
     assert "candidate_definition" not in group
     assert group["function_dispositions"]["rest:GET:/api/projects"]["resolution"] == (
         "existing_capability"
+    )
+    assert group["function_dispositions"]["rest:GET:/api/projects"]["source_paths"] == (
+        row["source_paths"]
     )
 
 

@@ -31,7 +31,7 @@ DOMAINS = (
     "Ontology",
     "Knowledge",
     "Integration",
-    "Local Integration",
+    "Local Runtime",
     "Factory",
 )
 VALID_EXCLUSIONS = {
@@ -100,7 +100,7 @@ def _domain(value: str, path: str = "") -> str:
             if capability_id.startswith(prefix):
                 return domain
     if "vismockup" in subject or "local" in subject or "device" in subject:
-        return "Local Integration"
+        return "Local Runtime"
     if "simulation" in subject:
         return "Simulation"
     if "digital" in subject:
@@ -126,7 +126,7 @@ def _domain(value: str, path: str = "") -> str:
     ):
         return "Craft"
     if value.lower() == "agent_tool:open_in_container":
-        return "Local Integration"
+        return "Local Runtime"
     if value.lower() in {"agent_tool:global_search", "agent_tool:search"}:
         return "Base Platform"
     if value.lower() in {
@@ -387,7 +387,7 @@ def scan_local_runtime_commands(root: Path) -> dict[str, dict]:
         return found
     content = path.read_text(encoding="utf-8")
     for command in re.findall(r"\(\s*[\"']((?:vismockup|local)\.[a-z0-9_.]+)[\"']", content):
-        _add(found, f"local_command:{command}", consumer="Local Runtime", source_path=_relative(path), domain="Local Integration")
+        _add(found, f"local_command:{command}", consumer="Local Runtime", source_path=_relative(path), domain="Local Runtime")
     return found
 
 
@@ -595,7 +595,7 @@ def registry_errors(
 def _owner_key(domain: str) -> str:
     return {
         "Base Platform": "base",
-        "Local Integration": "local_integration",
+        "Local Runtime": "local_runtime",
     }.get(domain, domain.lower().replace(" ", "_"))
 
 

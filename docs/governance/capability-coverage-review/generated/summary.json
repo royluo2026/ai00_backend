@@ -1,18 +1,15 @@
 {
   "schema_version": 1,
   "domains": 11,
-  "stable_functions": 831,
+  "stable_functions": 844,
   "resolutions": {
-    "existing_capability": 582,
-    "new_capability": 148,
+    "existing_capability": 743,
+    "new_capability": 0,
     "excluded": 101,
     "unreviewed": 0
   },
-  "candidate_capabilities": 13,
-  "candidate_additions_by_domain": {
-    "Craft": 11,
-    "Local Runtime": 2
-  },
+  "candidate_capabilities": 0,
+  "candidate_additions_by_domain": {},
   "function_dispositions_by_domain": {
     "Agent": {
       "existing_capability": 58,
@@ -27,8 +24,8 @@
       "unreviewed": 0
     },
     "Craft": {
-      "existing_capability": 161,
-      "new_capability": 145,
+      "existing_capability": 317,
+      "new_capability": 0,
       "excluded": 6,
       "unreviewed": 0
     },
@@ -57,8 +54,8 @@
       "unreviewed": 0
     },
     "Local Runtime": {
-      "existing_capability": 16,
-      "new_capability": 3,
+      "existing_capability": 21,
+      "new_capability": 0,
       "excluded": 6,
       "unreviewed": 0
     },
@@ -82,9 +79,9 @@
     }
   },
   "consolidation_ratio": {
-    "new_function_dispositions": 148,
-    "candidate_capabilities": 13,
-    "functions_per_candidate": 11.385
+    "new_function_dispositions": 0,
+    "candidate_capabilities": 0,
+    "functions_per_candidate": 0
   },
   "enabled_exposures": {
     "web": 2,
@@ -96,8 +93,8 @@
   },
   "code_extractions": 58,
   "debt_backlog": {},
-  "catalog_descriptors": 254,
-  "current_catalog_capabilities": 251,
+  "catalog_descriptors": 267,
+  "current_catalog_capabilities": 264,
   "proposed_final_catalog_capabilities": 264,
   "evidence": {
     "module_dependencies": 0,

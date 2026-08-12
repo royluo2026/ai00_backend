@@ -135,9 +135,7 @@ def load_sources(root: Path = REPOSITORY_ROOT) -> AuditSources:
 def _discovered(row: dict) -> dict:
     return {
         "function_id": row["function_id"],
-        "domain": (
-            "Local Runtime" if row["domain"] == "Local Integration" else row["domain"]
-        ),
+        "domain": row["domain"],
         "source_paths": sorted(row["source_paths"]),
         "current_consumers": sorted(row.get("current_consumers", [])),
         "target_capability": row.get("target_capability"),
@@ -279,6 +277,7 @@ def _align_published_function_targets(
         target_group["function_dispositions"][function_id] = {
             **disposition,
             "resolution": "existing_capability",
+            "source_paths": sorted(row["source_paths"]),
         }
         if (
             source_id is not None

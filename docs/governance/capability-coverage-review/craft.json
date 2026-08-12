@@ -3,9 +3,9 @@
   "domain": "Craft",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:27546a9983745b42cbf0c8cb226a03693d53360e995cd05683ad02bfca6c8d30",
-    "catalog_release": "rel_cf099f1e5c56bea32763a1e80aa6fbf6",
-    "catalog_sha256": "sha256:9d896414e90c396e53ccaa2c012e518f37cae9bd59c21796d453aa49c40e33ea"
+    "registry_sha256": "sha256:c063c2dc7701ec357e54fbb0b85c466e75d1f7bf570d054da644b4c0855e0c3a",
+    "catalog_release": "rel_8dea1627eea0dfd29059f7b863901656",
+    "catalog_sha256": "sha256:74ef08fd9c52147e3a801bde67f9f77739068d69a8c3e02f434476f199d716bc"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -1837,10 +1837,10 @@
       }
     },
     "craft.canvas.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_tool:generate_canvas": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -1850,7 +1850,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_tool:run_skill_canvas": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -1860,7 +1860,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/canvases/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/canvases.py"
           ],
@@ -1870,7 +1870,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/canvases/{gid}/shared": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/canvases.py"
           ],
@@ -1880,13 +1880,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/canvases": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/canvases.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:POST:/api/canvases implements the reviewed craft.canvas.change.apply business outcome from plugins/craft/craft_backend/routers/canvases.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.canvas.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -1922,26 +1932,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.canvas.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed canvas change apply business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.canvas.change.apply",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [
-          "workmanship_app_wfc_canvases"
-        ],
-        "migration_stream": "craft"
       }
     },
     "craft.canvas.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_tool:get_canvas_state": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -1951,7 +1948,7 @@
           "reviewed_at": "2026-08-11"
         },
         "agent_tool:get_selected_elements": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -1961,7 +1958,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/canvases": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/canvases.py"
           ],
@@ -1971,13 +1968,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/canvases/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/canvases.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:GET:/api/canvases/{gid} implements the reviewed craft.canvas.read business outcome from plugins/craft/craft_backend/routers/canvases.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.canvas.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2013,26 +2020,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.canvas.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed canvas read business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.canvas.read",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [
-          "workmanship_app_wfc_canvases"
-        ],
-        "migration_stream": "craft"
       }
     },
     "craft.data_exchange.export": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:POST:/api/import-export/export/diff-lark-sheet": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/import_export.py"
           ],
@@ -2042,7 +2036,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/import-export/export/diff-report": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/import_export.py"
           ],
@@ -2052,13 +2046,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/import-export/export/excel": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/import_export.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:POST:/api/import-export/export/excel implements the reviewed craft.data_exchange.export business outcome from plugins/craft/craft_backend/routers/import_export.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.data_exchange.export": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2094,24 +2098,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.data_exchange.export"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed data exchange export business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.data_exchange.export",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [],
-        "migration_stream": "craft"
       }
     },
     "craft.ebom.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:DELETE:/api/ebom/parts/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2121,7 +2114,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/ebom/snapshots/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2131,7 +2124,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/ebom/parts/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2141,7 +2134,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/ebom/snapshots/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2151,7 +2144,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/ebom/snapshots/{gid}/status": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2161,7 +2154,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/ebom/snapshots/{gid}/vpps-stats": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2171,7 +2164,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ebom/snapshots": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2181,7 +2174,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ebom/snapshots/{gid}/parts": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2191,13 +2184,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/ebom/snapshots/{gid}/parts/batch": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:POST:/api/ebom/snapshots/{gid}/parts/batch implements the reviewed craft.ebom.change.apply business outcome from plugins/craft/craft_backend/routers/ebom.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.ebom.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2233,24 +2236,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.ebom.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed ebom change apply business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.ebom.change.apply",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [],
-        "migration_stream": "craft"
       }
     },
     "craft.ebom.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:GET:/api/ebom/diff": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2260,7 +2252,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/ebom/snapshots": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2270,7 +2262,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/ebom/snapshots/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2280,7 +2272,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/ebom/snapshots/{gid}/parts": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
@@ -2290,13 +2282,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/ebom/vpps_check": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/ebom.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:GET:/api/ebom/vpps_check implements the reviewed craft.ebom.read business outcome from plugins/craft/craft_backend/routers/ebom.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.ebom.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2332,24 +2334,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.ebom.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed ebom read business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.ebom.read",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [],
-        "migration_stream": "craft"
       }
     },
     "craft.gbop.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:DELETE:/api/gbop/entries/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2359,7 +2350,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/gbop/entry-links/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2369,7 +2360,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/gbop/operations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2379,7 +2370,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/gbop/processes/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2389,7 +2380,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/gbop/version-families/{family_gid}/archive": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2399,7 +2390,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/gbop/entries/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2409,7 +2400,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/gbop/operations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2419,7 +2410,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/gbop/processes/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2429,7 +2420,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/gbop/versions/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2439,7 +2430,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/bop-versions/{bop_gid}/station-autolink": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2449,7 +2440,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/bop-versions/{bop_gid}/station-autolink-undo": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2459,7 +2450,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/entries": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2469,7 +2460,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/entry-links": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2479,7 +2470,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/operations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2489,7 +2480,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/pbom-versions/{pbom_gid}/vpps-auto-link": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2499,7 +2490,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/pbom-versions/{pbom_gid}/vpps-auto-link-confirm": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2509,7 +2500,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/processes": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2519,7 +2510,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/version-families/{family_gid}/archive": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2529,7 +2520,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/versions": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2539,7 +2530,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/versions/{gid}/freeze": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2549,7 +2540,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/versions/{source_gid}/fork": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2559,7 +2550,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/versions/{version_gid}/import-entries": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2569,7 +2560,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/versions/{version_gid}/import-tc-excel": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -2579,13 +2570,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/gbop/versions/{version_gid}/import-vpps-parts": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:POST:/api/gbop/versions/{version_gid}/import-vpps-parts implements the reviewed craft.gbop.change.apply business outcome from plugins/craft/craft_backend/routers/gbop.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.gbop.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -2621,25 +2622,6 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.gbop.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed gbop change apply business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.gbop.change.apply",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [
-          "workmanship_bop_gbop_match_staging",
-          "workmanship_bop_gbop_nav_bindings",
-          "workmanship_tpl_gbop_entries",
-          "workmanship_tpl_gbop_entry_links",
-          "workmanship_tpl_gbop_operations",
-          "workmanship_tpl_gbop_processes",
-          "workmanship_tpl_gbop_versions"
-        ],
-        "migration_stream": "craft"
       }
     },
     "craft.gbop.draft.change.apply": {
@@ -2944,6 +2926,7 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_descriptors.py",
             "plugins/craft/craft_backend/capabilities/gbop_read.py",
             "plugins/craft/craft_backend/capabilities/provider.py"
           ],
@@ -2995,6 +2978,7 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_descriptors.py",
             "plugins/craft/craft_backend/capabilities/gbop_read.py"
           ],
           "owner": "Craft",
@@ -3045,6 +3029,7 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/gbop_descriptors.py",
             "plugins/craft/craft_backend/capabilities/gbop_read.py",
             "plugins/craft/craft_backend/capabilities/provider.py"
           ],
@@ -3089,10 +3074,10 @@
       }
     },
     "craft.gbop.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:GET:/api/gbop/bop-versions/{bop_gid}/station-autolink-preview": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -3102,7 +3087,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/gbop/entries/{entry_gid}/links": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -3112,7 +3097,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/gbop/pbom-versions/{pbom_gid}/gbop-nav-link-summary": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -3122,7 +3107,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/gbop/pbom-versions/{pbom_gid}/process-hierarchy": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -3132,7 +3117,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/gbop/pbom-versions/{pbom_gid}/vpps-auto-link-status": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -3142,7 +3127,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/gbop/versions": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -3152,7 +3137,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/gbop/versions/{version_gid}/entries": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -3162,7 +3147,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/gbop/versions/{version_gid}/operations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
@@ -3172,13 +3157,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/gbop/versions/{version_gid}/processes": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/gbop.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:GET:/api/gbop/versions/{version_gid}/processes implements the reviewed craft.gbop.read business outcome from plugins/craft/craft_backend/routers/gbop.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.gbop.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -3214,25 +3209,6 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.gbop.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed gbop read business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.gbop.read",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [
-          "workmanship_bop_gbop_match_staging",
-          "workmanship_bop_gbop_nav_bindings",
-          "workmanship_tpl_gbop_entries",
-          "workmanship_tpl_gbop_entry_links",
-          "workmanship_tpl_gbop_operations",
-          "workmanship_tpl_gbop_processes",
-          "workmanship_tpl_gbop_versions"
-        ],
-        "migration_stream": "craft"
       }
     },
     "craft.gbop.release.activate": {
@@ -3530,10 +3506,10 @@
       }
     },
     "craft.manufacturing_resource.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:DELETE:/api/bop/factories/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3543,7 +3519,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/bop/factory_sections/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3553,7 +3529,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/bop/factory_stations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3563,7 +3539,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/bop/layout_templates/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3573,7 +3549,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/craft_lib/fasteners/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3583,7 +3559,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/craft_lib/part_names/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3593,7 +3569,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/craft_lib/tools/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3603,7 +3579,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/factory/equipments/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3613,7 +3589,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/factory/fixtures/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3623,7 +3599,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/factory/sections/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3633,7 +3609,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/factory/stations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3643,7 +3619,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/factory/tools/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3653,7 +3629,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:DELETE:/api/std_op/operations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/std_op.py"
           ],
@@ -3663,7 +3639,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/bop/factories/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3673,7 +3649,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/bop/factory_sections/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3683,7 +3659,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/bop/factory_stations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3693,7 +3669,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/bop/layout_templates/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3703,7 +3679,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/craft_lib/equipments/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3713,7 +3689,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/craft_lib/fasteners/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3723,7 +3699,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/craft_lib/fixtures/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3733,7 +3709,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/craft_lib/part_names/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3743,7 +3719,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/craft_lib/tools/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3753,7 +3729,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/factory/equipments/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3763,7 +3739,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/factory/fixtures/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3773,7 +3749,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/factory/sections/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3783,7 +3759,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/factory/stations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3793,7 +3769,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/factory/tools/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3803,7 +3779,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/std_op/operations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/std_op.py"
           ],
@@ -3813,7 +3789,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/bop/factories": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3823,7 +3799,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/bop/factories/{factory_gid}/layout_templates": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3833,7 +3809,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/bop/factories/{factory_gid}/sections": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3843,7 +3819,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/bop/factory_sections/{section_gid}/stations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3853,7 +3829,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/bop/layout_templates/{gid}/apply": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -3863,7 +3839,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/equipments": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3873,7 +3849,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/equipments/{gid}/obsolete": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3883,7 +3859,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/fasteners": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3893,7 +3869,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/fixtures": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3903,7 +3879,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/fixtures/{gid}/obsolete": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3913,7 +3889,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/part_names": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3923,7 +3899,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/part_names/batch_accept_alias": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3933,7 +3909,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/part_names/batch_add_from_pbom": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3943,7 +3919,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/part_names/{gid}/accept_alias": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3953,7 +3929,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/tools": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3963,7 +3939,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/craft_lib/tools/{gid}/obsolete": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -3973,7 +3949,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/equipments": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3983,7 +3959,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/equipments/{gid}/maintenance": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -3993,7 +3969,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/equipments/{gid}/return": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4003,7 +3979,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/equipments/{gid}/scrap": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4013,7 +3989,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/fixtures": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4023,7 +3999,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/fixtures/{gid}/maintenance": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4033,7 +4009,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/fixtures/{gid}/return": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4043,7 +4019,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/fixtures/{gid}/scrap": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4053,7 +4029,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/sections": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4063,7 +4039,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/stations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4073,7 +4049,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/tools": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4083,7 +4059,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/tools/{gid}/maintenance": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4093,7 +4069,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/tools/{gid}/return": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4103,7 +4079,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/factory/tools/{gid}/scrap": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4113,7 +4089,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/std_op/operations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/std_op.py"
           ],
@@ -4123,7 +4099,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/std_op/operations/{gid}/clone-to-post": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/std_op.py"
           ],
@@ -4133,7 +4109,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/std_op/operations/{gid}/deprecate": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/std_op.py"
           ],
@@ -4143,13 +4119,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/std_op/operations/{gid}/publish": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/std_op.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:POST:/api/std_op/operations/{gid}/publish implements the reviewed craft.manufacturing_resource.change.apply business outcome from plugins/craft/craft_backend/routers/std_op.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.manufacturing_resource.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -4185,49 +4171,13 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.manufacturing_resource.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed manufacturing resource change apply business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.manufacturing_resource.change.apply",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [
-          "workmanship_craft_bop_change_previews",
-          "workmanship_craft_bop_import_previews",
-          "workmanship_craft_bop_write_idempotency",
-          "workmanship_craft_validation_policies",
-          "workmanship_craft_validation_policy_checks",
-          "workmanship_factory_factories",
-          "workmanship_factory_factory_equipments",
-          "workmanship_factory_factory_fixtures",
-          "workmanship_factory_factory_layout_templates",
-          "workmanship_factory_factory_lines",
-          "workmanship_factory_factory_sections",
-          "workmanship_factory_factory_stations",
-          "workmanship_factory_factory_tools",
-          "workmanship_know_craft_rules",
-          "workmanship_tpl_fastener_spec",
-          "workmanship_tpl_gbop_entries",
-          "workmanship_tpl_gbop_entry_links",
-          "workmanship_tpl_gbop_operations",
-          "workmanship_tpl_gbop_processes",
-          "workmanship_tpl_gbop_versions",
-          "workmanship_tpl_vpps_equipments",
-          "workmanship_tpl_vpps_fixtures",
-          "workmanship_tpl_vpps_parts",
-          "workmanship_tpl_vpps_tools"
-        ],
-        "migration_stream": "craft"
       }
     },
     "craft.manufacturing_resource.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:GET:/api/bop/factories": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -4237,7 +4187,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/bop/factories/{factory_gid}/layout_templates": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -4247,7 +4197,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/bop/factories/{factory_gid}/sections": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -4257,7 +4207,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/bop/factories/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -4267,7 +4217,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/bop/factory_sections/{section_gid}/stations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -4277,7 +4227,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/bop/layout_templates/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/_bop/factory.py"
           ],
@@ -4287,7 +4237,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/craft_lib/equipments": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -4297,7 +4247,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/craft_lib/fasteners": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -4307,7 +4257,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/craft_lib/fixtures": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -4317,7 +4267,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/craft_lib/part_names": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -4327,7 +4277,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/craft_lib/tools": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/craft_library.py"
           ],
@@ -4337,7 +4287,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/factory/equipments": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4347,7 +4297,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/factory/fixtures": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4357,7 +4307,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/factory/sections": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4367,7 +4317,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/factory/stations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4377,7 +4327,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/factory/tools": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/factory.py"
           ],
@@ -4387,7 +4337,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/std_op/operations": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/std_op.py"
           ],
@@ -4397,13 +4347,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/std_op/operations/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/std_op.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:GET:/api/std_op/operations/{gid} implements the reviewed craft.manufacturing_resource.read business outcome from plugins/craft/craft_backend/routers/std_op.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.manufacturing_resource.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -4439,42 +4399,6 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.manufacturing_resource.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed manufacturing resource read business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.manufacturing_resource.read",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [
-          "workmanship_craft_bop_change_previews",
-          "workmanship_craft_bop_import_previews",
-          "workmanship_craft_bop_write_idempotency",
-          "workmanship_craft_validation_policies",
-          "workmanship_craft_validation_policy_checks",
-          "workmanship_factory_factories",
-          "workmanship_factory_factory_equipments",
-          "workmanship_factory_factory_fixtures",
-          "workmanship_factory_factory_layout_templates",
-          "workmanship_factory_factory_lines",
-          "workmanship_factory_factory_sections",
-          "workmanship_factory_factory_stations",
-          "workmanship_factory_factory_tools",
-          "workmanship_know_craft_rules",
-          "workmanship_tpl_fastener_spec",
-          "workmanship_tpl_gbop_entries",
-          "workmanship_tpl_gbop_entry_links",
-          "workmanship_tpl_gbop_operations",
-          "workmanship_tpl_gbop_processes",
-          "workmanship_tpl_gbop_versions",
-          "workmanship_tpl_vpps_equipments",
-          "workmanship_tpl_vpps_fixtures",
-          "workmanship_tpl_vpps_parts",
-          "workmanship_tpl_vpps_tools"
-        ],
-        "migration_stream": "craft"
       }
     },
     "craft.pbom.draft.change.apply": {
@@ -4637,6 +4561,7 @@
           "source_paths": [
             "backend/capabilities/agreed_catalog.py",
             "plugins/craft/craft_backend/capabilities/contracts.py",
+            "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
             "plugins/craft/craft_backend/capabilities/pbom_read.py",
             "plugins/craft/craft_backend/capabilities/provider.py"
           ],
@@ -5076,10 +5001,10 @@
       }
     },
     "craft.rule.change.apply": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "rest:DELETE:/api/rules/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/rules.py"
           ],
@@ -5089,7 +5014,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:PATCH:/api/rules/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/rules.py"
           ],
@@ -5099,13 +5024,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:POST:/api/rules": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/rules.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:POST:/api/rules implements the reviewed craft.rule.change.apply business outcome from plugins/craft/craft_backend/routers/rules.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.rule.change.apply": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -5141,21 +5076,6 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.rule.change.apply"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed rule change apply business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.rule.change.apply",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [
-          "workmanship_craft_validation_policies",
-          "workmanship_craft_validation_policy_checks",
-          "workmanship_know_craft_rules"
-        ],
-        "migration_stream": "craft"
       }
     },
     "craft.rule.draft.create": {
@@ -5453,10 +5373,10 @@
       }
     },
     "craft.rule.read": {
-      "kind": "candidate",
+      "kind": "existing",
       "function_dispositions": {
         "agent_tool:list_rules": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
           ],
@@ -5466,7 +5386,7 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/rules": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/rules.py"
           ],
@@ -5476,13 +5396,23 @@
           "reviewed_at": "2026-08-11"
         },
         "rest:GET:/api/rules/{gid}": {
-          "resolution": "new_capability",
+          "resolution": "existing_capability",
           "source_paths": [
             "plugins/craft/craft_backend/routers/rules.py"
           ],
           "owner": "Craft",
           "evidence": "The stable surface rest:GET:/api/rules/{gid} implements the reviewed craft.rule.read business outcome from plugins/craft/craft_backend/routers/rules.py.",
           "reviewer": "capability-v2-architecture-review",
+          "reviewed_at": "2026-08-11"
+        },
+        "capability:craft.rule.read": {
+          "resolution": "existing_capability",
+          "source_paths": [
+            "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+          ],
+          "owner": "Craft",
+          "evidence": "The bound Registry maps this stable function to the frozen Capability Catalog.",
+          "reviewer": "existing-user-function-registry",
           "reviewed_at": "2026-08-11"
         }
       },
@@ -5518,21 +5448,6 @@
           "reason": "No reviewed local_runtime consumer requires this business outcome.",
           "policy_ref": "craft.rule.read"
         }
-      },
-      "candidate_definition": {
-        "business_outcome": "Deliver the governed rule read business outcome for Craft.",
-        "non_goals": [
-          "Does not create consumer-specific business logic or bypass the shared Gateway."
-        ],
-        "owner_domain": "craft",
-        "application_port": "craft.rule.read",
-        "provider_artifact": "ai00-craft-plugin",
-        "owned_tables": [
-          "workmanship_craft_validation_policies",
-          "workmanship_craft_validation_policy_checks",
-          "workmanship_know_craft_rules"
-        ],
-        "migration_stream": "craft"
       }
     },
     "craft.rule.release.activate": {

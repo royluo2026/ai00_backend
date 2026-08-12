@@ -24,7 +24,7 @@
       "additionalProperties": false,
       "properties": {
         "function_id": {"type": "string", "minLength": 1},
-        "domain": {"enum": ["Base Platform", "Agent", "Craft", "Digital Model", "Project Management", "Simulation", "Ontology", "Knowledge", "Integration", "Local Integration", "Factory"]},
+        "domain": {"enum": ["Base Platform", "Agent", "Craft", "Digital Model", "Project Management", "Simulation", "Ontology", "Knowledge", "Integration", "Local Runtime", "Factory"]},
         "stability": {"enum": ["stable", "experimental", "deprecated"]},
         "current_consumers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "target_capability": {"type": ["string", "null"]},

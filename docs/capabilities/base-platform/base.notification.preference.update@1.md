@@ -8,7 +8,7 @@ Execute base.notification.preference.update in the Base collaboration service.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_70e0d61b9506f03f680f6e607e23de3d`
+- Catalog Release：`rel_8dea1627eea0dfd29059f7b863901656`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -81,7 +81,7 @@ Execute base.notification.preference.update in the Base collaboration service.
 ```json
 {
   "capability_id": "base.notification.preference.update",
-  "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
+  "catalog_release": "rel_8dea1627eea0dfd29059f7b863901656",
   "major_version": 1,
   "payload": {
     "expected_version": 0,

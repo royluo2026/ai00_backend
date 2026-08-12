@@ -58,7 +58,7 @@ def test_first_class_domains_include_independent_maintainer_boundaries():
         "Ontology",
         "Knowledge",
         "Integration",
-        "Local Integration",
+        "Local Runtime",
         "Factory",
     }
 
@@ -98,6 +98,10 @@ def test_domain_classification_uses_business_owner_not_consumer_surface():
         "capability:factory.asset.search",
         "backend/capabilities/agreed_catalog.py",
     ) == "Factory"
+    assert builder._domain(
+        "capability:local.device.read",
+        "plugins/device/device_backend/capabilities/reviewed.py",
+    ) == "Local Runtime"
 
 
 def test_registry_schema_exposes_every_independently_owned_domain():

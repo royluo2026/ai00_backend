@@ -8,7 +8,7 @@ Materialize and open an authorized model ArtifactRef.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`local_runtime`
-- Catalog Release：`rel_70e0d61b9506f03f680f6e607e23de3d`
+- Catalog Release：`rel_8dea1627eea0dfd29059f7b863901656`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -117,7 +117,7 @@ Materialize and open an authorized model ArtifactRef.
 ```json
 {
   "capability_id": "vismockup.model.open",
-  "catalog_release": "rel_70e0d61b9506f03f680f6e607e23de3d",
+  "catalog_release": "rel_8dea1627eea0dfd29059f7b863901656",
   "major_version": 1,
   "payload": {
     "artifact_ref": {
@@ -206,6 +206,7 @@ Materialize and open an authorized model ArtifactRef.
 - `local_operation_signing_key_unavailable`：The server cannot sign a local operation.（retryable=true）
 - `local_operation_failed`：The workstation returned a sanitized local execution error.（retryable=false）
 - `local_operation_outcome_unknown`：Execution may have occurred and must be reconciled before retry.（retryable=true）
+- `provider_unavailable`：The Local Runtime application provider is unavailable.（retryable=true）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

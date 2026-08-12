@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_70e0d61b9506f03f680f6e607e23de3d",
-  "catalog_hash": "sha256:70e0d61b9506f03f680f6e607e23de3d299603a66e1bee7886dfd8b827ae9497",
+  "release_id": "rel_8dea1627eea0dfd29059f7b863901656",
+  "catalog_hash": "sha256:8dea1627eea0dfd29059f7b86390165684d00fc1915c6af6ac51c891ecef8b03",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -8273,6 +8273,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -8573,6 +8578,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -8844,6 +8854,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -9122,6 +9137,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -9348,6 +9368,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -9547,6 +9572,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -9826,6 +9856,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -10104,6 +10139,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -10332,6 +10372,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -10591,6 +10636,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -10834,6 +10884,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -11245,6 +11300,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -11448,6 +11508,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -11756,6 +11821,1115 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.canvas.change.apply",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.canvas.change.apply",
+      "description": "Execute the reviewed craft.canvas.change.apply Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.canvas.read",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.canvas.read",
+      "description": "Execute the reviewed craft.canvas.read Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "craft.v2:craft.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.data_exchange.export",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.data_exchange.export",
+      "description": "Execute the reviewed craft.data_exchange.export Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.ebom.change.apply",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.ebom.change.apply",
+      "description": "Execute the reviewed craft.ebom.change.apply Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.ebom.read",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.ebom.read",
+      "description": "Execute the reviewed craft.ebom.read Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "craft.v2:craft.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.gbop.change.apply",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.gbop.change.apply",
+      "description": "Execute the reviewed craft.gbop.change.apply Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -12033,6 +13207,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -12312,6 +13491,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -12589,6 +13773,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -12868,6 +14057,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -13145,6 +14339,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -13424,6 +14623,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -13624,6 +14828,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -13806,6 +15015,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -14006,6 +15220,195 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.gbop.read",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.gbop.read",
+      "description": "Execute the reviewed craft.gbop.read Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "craft.v2:craft.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -14285,6 +15688,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -14562,6 +15970,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -14841,6 +16254,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -15118,6 +16536,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -15397,6 +16820,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -15675,6 +17103,379 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.manufacturing_resource.change.apply",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.manufacturing_resource.change.apply",
+      "description": "Execute the reviewed craft.manufacturing_resource.change.apply Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.manufacturing_resource.read",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.manufacturing_resource.read",
+      "description": "Execute the reviewed craft.manufacturing_resource.read Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "craft.v2:craft.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -15888,6 +17689,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -16095,6 +17901,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -16289,6 +18100,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -16489,6 +18305,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -16688,6 +18509,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -16898,6 +18724,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -17135,6 +18966,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -17355,6 +19191,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -17555,6 +19396,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -17733,6 +19579,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -17933,6 +19784,195 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.rule.change.apply",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.rule.change.apply",
+      "description": "Execute the reviewed craft.rule.change.apply Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "craft.v2:craft.write",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -18212,6 +20252,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -18489,6 +20534,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -18768,6 +20818,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -19045,6 +21100,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -19324,6 +21384,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -19601,6 +21666,195 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "craft.rule.read",
+      "major_version": 1,
+      "owner_domain": "craft",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "craft.rule.read",
+      "description": "Execute the reviewed craft.rule.read Craft outcome.",
+      "use_when": "A governed consumer needs this Craft-owned outcome.",
+      "do_not_use_when": "The operation belongs to another business domain.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "craft.v2:craft.read",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "expected_version": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:72666f859e6e33d3f2466d65eed0aa83d6c763e6c7a519f26b8ebbfdcce0daf8",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "bop_version_not_found",
+          "meaning": "The scoped BOP version does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_revision_unavailable",
+          "meaning": "The BOP has no authoritative revision.",
+          "retryable": false
+        },
+        {
+          "code": "revision_conflict",
+          "meaning": "The current BOP revision differs from the expected revision.",
+          "retryable": false
+        },
+        {
+          "code": "bop_entry_not_found",
+          "meaning": "A referenced BOP entry does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_link_not_found",
+          "meaning": "A referenced BOP link does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "bop_project_unassigned",
+          "meaning": "The BOP is not assigned to a project.",
+          "retryable": false
+        },
+        {
+          "code": "version_not_published",
+          "meaning": "An official execution structure requires a published BOP.",
+          "retryable": false
+        },
+        {
+          "code": "preview_not_found",
+          "meaning": "The requested BOP change preview does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "preview_expired",
+          "meaning": "The requested BOP change preview has expired.",
+          "retryable": false
+        },
+        {
+          "code": "preview_already_applied",
+          "meaning": "The requested BOP change preview was already committed.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is already bound to another Craft payload.",
+          "retryable": false
+        },
+        {
+          "code": "source_not_found",
+          "meaning": "The requested version creation source does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "archive_forbidden",
+          "meaning": "The BOP lifecycle forbids archiving this version.",
+          "retryable": false
+        },
+        {
+          "code": "pbom_snapshot_not_found",
+          "meaning": "The scoped PBOM snapshot does not exist.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_not_found",
+          "meaning": "No active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "multiple_active_gbop_releases",
+          "meaning": "More than one active GBOP release exists.",
+          "retryable": false
+        },
+        {
+          "code": "active_gbop_item_not_found",
+          "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -19880,6 +22134,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -20157,6 +22416,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -20436,6 +22700,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -20713,6 +22982,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -20992,6 +23266,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -21270,6 +23549,11 @@
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
           "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
+          "retryable": false
         }
       ],
       "domain_errors_complete": true
@@ -21547,6 +23831,11 @@
         {
           "code": "active_gbop_item_not_found",
           "meaning": "The GBOP item is not in the active release.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Craft application provider is unavailable.",
           "retryable": false
         }
       ],
@@ -36390,6 +38679,253 @@
         {
           "code": "local_operation_outcome_unknown",
           "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "local.device.change.apply",
+      "major_version": 1,
+      "owner_domain": "local_runtime",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "local.device.change.apply",
+      "description": "Execute the reviewed local.device.change.apply device outcome.",
+      "use_when": "A governed consumer manages its Local Runtime devices.",
+      "do_not_use_when": "The request executes a VisMockup workstation action.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:3775afbf70242f08390f335d7808934fd289076aa252d5be05142b854bec2664",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "user",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
+          "retryable": true
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "local.device.read",
+      "major_version": 1,
+      "owner_domain": "local_runtime",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "local.device.read",
+      "description": "Execute the reviewed local.device.read device outcome.",
+      "use_when": "A governed consumer manages its Local Runtime devices.",
+      "do_not_use_when": "The request executes a VisMockup workstation action.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "local-runtime.v2:agent.run",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "arguments": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "arguments"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ]
+      },
+      "schema_hash": "sha256:3775afbf70242f08390f335d7808934fd289076aa252d5be05142b854bec2664",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "confirmation_policy": "none",
+      "evidence_policy": "required",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "device_not_found",
+          "meaning": "The workstation is unavailable or is not owned by the caller.",
+          "retryable": false
+        },
+        {
+          "code": "device_capability_unavailable",
+          "meaning": "The workstation does not advertise the requested capability.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_signing_key_unavailable",
+          "meaning": "The server cannot sign a local operation.",
+          "retryable": true
+        },
+        {
+          "code": "local_operation_failed",
+          "meaning": "The workstation returned a sanitized local execution error.",
+          "retryable": false
+        },
+        {
+          "code": "local_operation_outcome_unknown",
+          "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true
         }
       ],
@@ -53261,6 +55797,11 @@
           "code": "local_operation_outcome_unknown",
           "meaning": "Execution may have occurred and must be reconciled before retry.",
           "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
+          "retryable": true
         }
       ],
       "domain_errors_complete": true
@@ -53419,6 +55960,11 @@
           "code": "local_operation_outcome_unknown",
           "meaning": "Execution may have occurred and must be reconciled before retry.",
           "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
+          "retryable": true
         }
       ],
       "domain_errors_complete": true
@@ -53566,6 +56112,11 @@
         {
           "code": "local_operation_outcome_unknown",
           "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true
         }
       ],
@@ -53760,6 +56311,11 @@
           "code": "local_operation_outcome_unknown",
           "meaning": "Execution may have occurred and must be reconciled before retry.",
           "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
+          "retryable": true
         }
       ],
       "domain_errors_complete": true
@@ -53907,6 +56463,11 @@
         {
           "code": "local_operation_outcome_unknown",
           "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true
         }
       ],
@@ -54063,6 +56624,11 @@
         {
           "code": "local_operation_outcome_unknown",
           "meaning": "Execution may have occurred and must be reconciled before retry.",
+          "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
           "retryable": true
         }
       ],
@@ -54221,6 +56787,11 @@
           "code": "local_operation_outcome_unknown",
           "meaning": "Execution may have occurred and must be reconciled before retry.",
           "retryable": true
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "The Local Runtime application provider is unavailable.",
+          "retryable": true
         }
       ],
       "domain_errors_complete": true
@@ -54243,7 +56814,7 @@
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:1b77a7674497563c132a816f8c43406e51a0886fead30970afe36bb1069c2566"
+      "artifact_hash": "sha256:43b9223b744daae673efb301473d74bd4b71dd0f2864db9e2caf040ac4d93825"
     },
     {
       "plugin_id": "official.digital-model",
@@ -54267,13 +56838,13 @@
       "plugin_id": "official.knowledge",
       "module": "knowledge_backend.capabilities",
       "version": "2.0.0",
-      "artifact_hash": "sha256:b2286f07d6402ce0ef8b2f834369acf44d68513afaf6485bf6ba1dd117fcf154"
+      "artifact_hash": "sha256:1995514665a872fa7cd2fb1e101bf973792e30bcbff3b5ca6000e34a5cd36261"
     },
     {
       "plugin_id": "official.local-runtime",
       "module": "device_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:37c825c6f73fb31b16d42e5ff0ba6a7a782b17320c604ed1d988ef7bd2e303bc"
+      "artifact_hash": "sha256:85bfa19e8a7052c37bd04f0fedfbc7636c73162e1c524163569aa16c59a70765"
     },
     {
       "plugin_id": "official.ontology",
@@ -54294,5 +56865,5 @@
       "artifact_hash": "sha256:2a1508a1a247c946261071aab86ff56a3e0b64bc58a91a17474e695eb5762d4d"
     }
   ],
-  "created_at": "2026-08-12T10:17:18.769288Z"
+  "created_at": "2026-08-12T10:46:19.006914Z"
 }

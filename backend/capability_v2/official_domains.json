@@ -60,7 +60,7 @@
         "plugin_id": "official.craft",
         "module": "craft_backend.capabilities",
         "version": "1.2.0",
-        "artifact_hash": "sha256:1b77a7674497563c132a816f8c43406e51a0886fead30970afe36bb1069c2566"
+        "artifact_hash": "sha256:43b9223b744daae673efb301473d74bd4b71dd0f2864db9e2caf040ac4d93825"
       },
       "artifact_path": "plugins/craft/craft_backend",
       "allowed_owners": [
@@ -147,7 +147,7 @@
         "plugin_id": "official.knowledge",
         "module": "knowledge_backend.capabilities",
         "version": "2.0.0",
-        "artifact_hash": "sha256:b2286f07d6402ce0ef8b2f834369acf44d68513afaf6485bf6ba1dd117fcf154"
+        "artifact_hash": "sha256:1995514665a872fa7cd2fb1e101bf973792e30bcbff3b5ca6000e34a5cd36261"
       },
       "artifact_path": "plugins/knowledge/knowledge_backend",
       "allowed_owners": [
@@ -168,7 +168,7 @@
         "plugin_id": "official.local-runtime",
         "module": "device_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:37c825c6f73fb31b16d42e5ff0ba6a7a782b17320c604ed1d988ef7bd2e303bc"
+        "artifact_hash": "sha256:85bfa19e8a7052c37bd04f0fedfbc7636c73162e1c524163569aa16c59a70765"
       },
       "artifact_path": "plugins/device/device_backend",
       "allowed_owners": [

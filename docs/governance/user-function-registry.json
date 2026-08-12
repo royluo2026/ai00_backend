@@ -565,8 +565,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -587,8 +587,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -719,8 +719,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -917,8 +917,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -971,7 +971,7 @@
     },
     "agent_tool:open_in_container": {
       "function_id": "agent_tool:open_in_container",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -985,7 +985,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "candidate",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -1049,8 +1049,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -1855,6 +1855,138 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.canvas.change.apply": {
+      "function_id": "capability:craft.canvas.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.canvas.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.canvas.read": {
+      "function_id": "capability:craft.canvas.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.canvas.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.data_exchange.export": {
+      "function_id": "capability:craft.data_exchange.export",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.data_exchange.export",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.ebom.change.apply": {
+      "function_id": "capability:craft.ebom.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.ebom.read": {
+      "function_id": "capability:craft.ebom.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.ebom.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.gbop.change.apply": {
+      "function_id": "capability:craft.gbop.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
     "capability:craft.gbop.draft.change.apply": {
       "function_id": "capability:craft.gbop.draft.change.apply",
       "domain": "Craft",
@@ -2070,6 +2202,28 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.gbop.read": {
+      "function_id": "capability:craft.gbop.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.gbop.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
     "capability:craft.gbop.release.activate": {
       "function_id": "capability:craft.gbop.release.activate",
       "domain": "Craft",
@@ -2206,6 +2360,50 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/gbop_descriptors.py"
+      ]
+    },
+    "capability:craft.manufacturing_resource.change.apply": {
+      "function_id": "capability:craft.manufacturing_resource.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.manufacturing_resource.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
+    "capability:craft.manufacturing_resource.read": {
+      "function_id": "capability:craft.manufacturing_resource.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.manufacturing_resource.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
     "capability:craft.pbom.draft.change.apply": {
@@ -2481,6 +2679,28 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.rule.change.apply": {
+      "function_id": "capability:craft.rule.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
+      ]
+    },
     "capability:craft.rule.draft.create": {
       "function_id": "capability:craft.rule.draft.create",
       "domain": "Craft",
@@ -2617,6 +2837,28 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/rule_descriptors.py"
+      ]
+    },
+    "capability:craft.rule.read": {
+      "function_id": "capability:craft.rule.read",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.rule.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/reviewed_ids.py"
       ]
     },
     "capability:craft.rule.release.activate": {
@@ -4516,7 +4758,7 @@
     },
     "capability:local.command.get": {
       "function_id": "capability:local.command.get",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -4530,13 +4772,59 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/device/device_backend/capabilities/contracts.py",
         "plugins/device/device_backend/capabilities/provider.py",
         "plugins/device/device_backend/capabilities/runtime.py"
+      ]
+    },
+    "capability:local.device.change.apply": {
+      "function_id": "capability:local.device.change.apply",
+      "domain": "Local Runtime",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "local.device.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "device"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Local Runtime",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/reviewed.py"
+      ]
+    },
+    "capability:local.device.read": {
+      "function_id": "capability:local.device.read",
+      "domain": "Local Runtime",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "local.device.read",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "device"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Local Runtime",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/device/device_backend/capabilities/contracts.py",
+        "plugins/device/device_backend/capabilities/reviewed.py"
       ]
     },
     "capability:ontology.change.proposal.create": {
@@ -6381,7 +6669,7 @@
     },
     "capability:vismockup.capture": {
       "function_id": "capability:vismockup.capture",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6395,7 +6683,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6406,7 +6694,7 @@
     },
     "capability:vismockup.highlight": {
       "function_id": "capability:vismockup.highlight",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6420,7 +6708,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6430,7 +6718,7 @@
     },
     "capability:vismockup.launch": {
       "function_id": "capability:vismockup.launch",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6444,7 +6732,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6454,7 +6742,7 @@
     },
     "capability:vismockup.model.open": {
       "function_id": "capability:vismockup.model.open",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6468,7 +6756,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6479,7 +6767,7 @@
     },
     "capability:vismockup.status": {
       "function_id": "capability:vismockup.status",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6493,7 +6781,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6503,7 +6791,7 @@
     },
     "capability:vismockup.tree": {
       "function_id": "capability:vismockup.tree",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6517,7 +6805,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6527,7 +6815,7 @@
     },
     "capability:vismockup.visibility": {
       "function_id": "capability:vismockup.visibility",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6541,7 +6829,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6551,7 +6839,7 @@
     },
     "local_command:vismockup.capture": {
       "function_id": "local_command:vismockup.capture",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6565,7 +6853,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6573,7 +6861,7 @@
     },
     "local_command:vismockup.highlight": {
       "function_id": "local_command:vismockup.highlight",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6587,7 +6875,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6595,7 +6883,7 @@
     },
     "local_command:vismockup.launch": {
       "function_id": "local_command:vismockup.launch",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6609,7 +6897,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6617,7 +6905,7 @@
     },
     "local_command:vismockup.model.open": {
       "function_id": "local_command:vismockup.model.open",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6631,7 +6919,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6639,7 +6927,7 @@
     },
     "local_command:vismockup.status": {
       "function_id": "local_command:vismockup.status",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6653,7 +6941,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6661,7 +6949,7 @@
     },
     "local_command:vismockup.tree": {
       "function_id": "local_command:vismockup.tree",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6675,7 +6963,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6683,7 +6971,7 @@
     },
     "local_command:vismockup.visibility": {
       "function_id": "local_command:vismockup.visibility",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6697,7 +6985,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6825,8 +7113,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6847,8 +7135,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6869,8 +7157,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -6913,8 +7201,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7067,8 +7355,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7089,8 +7377,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7111,8 +7399,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7133,8 +7421,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7155,8 +7443,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7177,8 +7465,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7239,8 +7527,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7261,8 +7549,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7283,8 +7571,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7305,8 +7593,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7327,8 +7615,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7393,8 +7681,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7415,8 +7703,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7437,8 +7725,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7459,8 +7747,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7481,8 +7769,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7827,8 +8115,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -7959,8 +8247,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8057,7 +8345,7 @@
     },
     "rest:DELETE:/api/v1/devices/{device_gid}": {
       "function_id": "rest:DELETE:/api/v1/devices/{device_gid}",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8069,9 +8357,9 @@
         "device"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -8743,8 +9031,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8765,8 +9053,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8787,8 +9075,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8809,8 +9097,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8831,8 +9119,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -8897,8 +9185,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9579,8 +9867,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9601,8 +9889,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9689,8 +9977,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9711,8 +9999,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9733,8 +10021,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9755,8 +10043,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9777,8 +10065,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9887,8 +10175,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9909,8 +10197,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9931,8 +10219,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9953,8 +10241,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -9975,8 +10263,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10117,8 +10405,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10139,8 +10427,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10161,8 +10449,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10183,8 +10471,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10205,8 +10493,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10447,8 +10735,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10469,8 +10757,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10491,8 +10779,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10513,8 +10801,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10535,8 +10823,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10557,8 +10845,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10579,8 +10867,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10601,8 +10889,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -10623,8 +10911,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -11491,8 +11779,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -11513,8 +11801,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -11711,8 +11999,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -11733,8 +12021,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -11941,7 +12229,7 @@
     },
     "rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}": {
       "function_id": "rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11955,7 +12243,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": "Device-authenticated artifact materialization transport; callers use vismockup.model.open instead.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -11963,7 +12251,7 @@
     },
     "rest:GET:/api/v1/devices": {
       "function_id": "rest:GET:/api/v1/devices",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -11975,9 +12263,9 @@
         "device"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -12984,8 +13272,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13006,8 +13294,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13028,8 +13316,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13072,8 +13360,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13292,8 +13580,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13314,8 +13602,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13336,8 +13624,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13358,8 +13646,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13380,8 +13668,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13402,8 +13690,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13424,8 +13712,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13446,8 +13734,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13468,8 +13756,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13490,8 +13778,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13552,8 +13840,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13574,8 +13862,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13596,8 +13884,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13618,8 +13906,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13640,8 +13928,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13684,8 +13972,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13706,8 +13994,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13728,8 +14016,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -13750,8 +14038,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14076,8 +14364,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14098,8 +14386,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14904,8 +15192,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14926,8 +15214,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14948,8 +15236,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -14970,8 +15258,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15014,8 +15302,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15828,8 +16116,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15916,8 +16204,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15938,8 +16226,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15960,8 +16248,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -15982,8 +16270,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16004,8 +16292,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16026,8 +16314,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16048,8 +16336,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16070,8 +16358,8 @@
         "pbom"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16092,8 +16380,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16114,8 +16402,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16136,8 +16424,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16180,8 +16468,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16202,8 +16490,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16224,8 +16512,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16326,8 +16614,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16348,8 +16636,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16370,8 +16658,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16392,8 +16680,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16414,8 +16702,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16436,8 +16724,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16458,8 +16746,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16480,8 +16768,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16502,8 +16790,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16524,8 +16812,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16546,8 +16834,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16568,8 +16856,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16590,8 +16878,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16612,8 +16900,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16876,8 +17164,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16898,8 +17186,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16920,8 +17208,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16942,8 +17230,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16964,8 +17252,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -16986,8 +17274,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17008,8 +17296,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17030,8 +17318,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17052,8 +17340,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17074,8 +17362,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17096,8 +17384,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17118,8 +17406,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17140,8 +17428,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17162,8 +17450,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17184,8 +17472,8 @@
         "bop"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17228,8 +17516,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17250,8 +17538,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -17272,8 +17560,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -18008,8 +18296,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -18162,8 +18450,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -18184,8 +18472,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -18206,8 +18494,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -18228,8 +18516,8 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
-      "migration_status": "proposed",
+      "classification": "mapped",
+      "migration_status": "registered",
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
@@ -18414,7 +18702,7 @@
     },
     "rest:POST:/api/v1/device-runtime/activate": {
       "function_id": "rest:POST:/api/v1/device-runtime/activate",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18428,7 +18716,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": "Device bootstrap transport authenticated by a one-time enrollment token; it is not a user business capability.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18436,7 +18724,7 @@
     },
     "rest:POST:/api/v1/device-runtime/commands/lease": {
       "function_id": "rest:POST:/api/v1/device-runtime/commands/lease",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18450,7 +18738,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": "Device-authenticated signed-operation lease transport; users invoke the corresponding governed capability.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18458,7 +18746,7 @@
     },
     "rest:POST:/api/v1/device-runtime/commands/{command_gid}/complete": {
       "function_id": "rest:POST:/api/v1/device-runtime/commands/{command_gid}/complete",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18472,7 +18760,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": "Device-authenticated signed-outcome reconciliation transport; users poll OperationRef or local.command.get.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18480,7 +18768,7 @@
     },
     "rest:POST:/api/v1/device-runtime/heartbeat": {
       "function_id": "rest:POST:/api/v1/device-runtime/heartbeat",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18494,7 +18782,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": "Device liveness protocol used only by enrolled Local Runtime instances, not by plugins or agents.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18502,7 +18790,7 @@
     },
     "rest:POST:/api/v1/devices/enrollments": {
       "function_id": "rest:POST:/api/v1/devices/enrollments",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18514,9 +18802,9 @@
         "device"
       ],
       "data_classification": "internal",
-      "classification": "proposed",
+      "classification": "mapped",
       "migration_status": "proposed",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -19510,7 +19798,7 @@
     },
     "rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact": {
       "function_id": "rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact",
-      "domain": "Local Integration",
+      "domain": "Local Runtime",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -19524,7 +19812,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Integration",
+      "owner": "Local Runtime",
       "exclusion_reason": "Device-authenticated capture upload transport; consumers receive the resulting ArtifactRef through the operation outcome.",
       "source_paths": [
         "backend/routers/device_runtime.py"
