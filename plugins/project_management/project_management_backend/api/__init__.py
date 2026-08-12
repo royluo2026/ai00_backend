@@ -1,5 +1,5 @@
 """Project Management transport adapters."""
 
-from .compatibility import invoke_compatibility
+from .compatibility import build_web_compatibility_envelope, invoke_compatibility
 
-__all__ = ["invoke_compatibility"]
+__all__ = ["build_web_compatibility_envelope", "invoke_compatibility"]

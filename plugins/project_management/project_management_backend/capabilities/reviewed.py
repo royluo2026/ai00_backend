@@ -45,6 +45,17 @@ PROJECT_CAPABILITY_IDS = frozenset(
     }
 )
 
+OPERATION_INPUT_SCHEMA = {
+    "type": "object",
+    "required": ["operation", "arguments"],
+    "properties": {
+        "operation": {"type": "string", "minLength": 1, "maxLength": 128},
+        # Each operation validates its own bounded argument contract in the
+        # Project application layer; the outer Gateway envelope stays closed.
+        "arguments": {},
+    },
+}
+
 
 def _handler(capability_id: str):
     def invoke(payload: dict[str, Any], context: object) -> dict[str, Any]:
@@ -67,7 +78,7 @@ def register_reviewed_capabilities(registry: Any) -> None:
                 risk=CapabilityRisk.WRITE if is_write else CapabilityRisk.READ,
                 confirmation="user" if is_write else "none",
                 permissions=("project.write",) if is_write else ("project.read",),
-                input_schema={"type": "object", "properties": {}},
+                input_schema=OPERATION_INPUT_SCHEMA,
                 output_schema={
                     "type": "object",
                     "required": ["data"],
@@ -79,4 +90,8 @@ def register_reviewed_capabilities(registry: Any) -> None:
         )
 
 
-__all__ = ["PROJECT_CAPABILITY_IDS", "register_reviewed_capabilities"]
+__all__ = [
+    "OPERATION_INPUT_SCHEMA",
+    "PROJECT_CAPABILITY_IDS",
+    "register_reviewed_capabilities",
+]

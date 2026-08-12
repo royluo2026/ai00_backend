@@ -67,6 +67,24 @@ def test_all_project_capabilities_have_native_stable_contracts():
         assert descriptor.domain_errors
 
 
+def test_consolidated_project_capabilities_accept_a_bounded_operation_envelope():
+    registry = SnapshotRegistry()
+    register_capabilities(registry)
+
+    generic = {
+        spec.id: descriptor.input_schema
+        for spec, _, descriptor in registry.items
+        if spec.id.startswith("project.")
+    }
+
+    assert generic
+    for capability_id, schema in generic.items():
+        assert schema["required"] == ["operation", "arguments"], capability_id
+        assert set(schema["properties"]) == {"operation", "arguments"}, capability_id
+        assert schema["properties"]["operation"]["type"] == "string", capability_id
+        assert schema["additionalProperties"] is False, capability_id
+
+
 def test_project_database_never_falls_back_to_base_credentials(monkeypatch):
     monkeypatch.delenv("AI00_PROJECT_MANAGEMENT_DB_URL", raising=False)
     monkeypatch.setenv("DATABASE_URL", "mysql://base:secret@db/base")

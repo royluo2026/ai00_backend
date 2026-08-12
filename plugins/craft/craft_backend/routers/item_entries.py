@@ -8,12 +8,17 @@ PUT  /api/item-entries/{item_type}/{item_gid}   → { success, count, entries }
 DELETE /api/item-entries/{item_type}/{item_gid} → { success }
 """
 
-from fastapi import APIRouter, Depends
+from uuid import uuid4
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
-from ..data.connection import get_conn
-from backend.platform_sdk.auth import get_current_user
-from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
+from plugins.project_management.project_management_backend.api.compatibility import (
+    build_web_compatibility_envelope,
+    invoke_compatibility,
+)
 
 router = APIRouter(prefix="/api/item-entries", tags=["item_entries"])
 
@@ -22,91 +27,91 @@ class EntryPutBody(BaseModel):
     entries: list = []
 
 
-def _row_to_entry(r) -> dict:
-    return {
-        "id":            r["id"],
-        "gid":           r.get("gid", ""),
-        "parent_id":     r.get("parent_id"),
-        "section":       r.get("section", "detail"),
-        "author":        r.get("author", "human"),
-        "author_name":   r.get("author_name", ""),
-        "author_gid":    r.get("author_gid", ""),
-        "content":       r.get("content", ""),
-        "resolved":      bool(r.get("resolved", False)),
-        "sort_order":    float(r.get("sort_order", 0)),
-        "read_by_human": bool(r.get("read_by_human", True)),
-        "ai_status":     r.get("ai_status", "unread"),
-        "created_at":    r.get("created_at", 0),
-    }
+async def _invoke_project(
+    request: Request,
+    current_user: dict,
+    principal,
+    gateway,
+    *,
+    capability_id: str,
+    operation: str,
+    arguments: dict,
+):
+    request_id = request.headers.get("X-Request-ID") or f"project_{uuid4().hex}"
+    trace_id = request.headers.get("X-Trace-ID") or request_id
+    result = await invoke_compatibility(
+        gateway,
+        build_web_compatibility_envelope(
+            gateway,
+            capability_id=capability_id,
+            payload={"operation": operation, "arguments": arguments},
+            current_user=current_user,
+            principal=principal,
+            request_id=request_id,
+            trace_id=trace_id,
+            idempotency_key=request.headers.get("X-Idempotency-Key"),
+            approval_reference=request.headers.get("X-Capability-Approval"),
+        ),
+    )
+    if not result.ok:
+        raise HTTPException(
+            status_code=422,
+            detail=result.error.model_dump(mode="json") if result.error else None,
+        )
+    return result.data["data"]
 
 
 @router.get("/{item_type}/{item_gid}")
-def get_item_entries(item_type: str, item_gid: str,
-                     current_user=Depends(get_current_user)):
-    with get_conn() as conn:
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT * FROM workmanship_work_item_entries WHERE item_type = %s AND item_gid = %s "
-            "ORDER BY sort_order",
-            (item_type, item_gid),
-        )
-        rows = cur.fetchall()
-        return {"entries": [_row_to_entry(r) for r in rows]}
+async def get_item_entries(
+    item_type: str,
+    item_gid: str,
+    request: Request,
+    current_user=Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_project(
+        request, current_user, principal, gateway,
+        capability_id="project.list.read",
+        operation="item_entries.get",
+        arguments={"item_type": item_type, "item_gid": item_gid},
+    )
 
 
 @router.put("/{item_type}/{item_gid}")
-def put_item_entries(item_type: str, item_gid: str, body: EntryPutBody,
-                     current_user=Depends(get_current_user)):
-    entries = body.entries or []
-    with get_conn() as conn:
-        cur = conn.cursor()
-        # 事务内全量替换
-        cur.execute(
-            "DELETE FROM workmanship_work_item_entries WHERE item_type = %s AND item_gid = %s",
-            (item_type, item_gid),
-        )
-        saved = []
-        for e in entries:
-            gid = e.get("gid") or str(next_gid())
-            cur.execute(
-                """
-                INSERT INTO workmanship_work_item_entries
-                  (gid, id, item_type, item_gid, parent_id, section, author,
-                   author_name, author_gid, content, resolved, sort_order,
-                   read_by_human, ai_status, created_at, updated_at)
-                VALUES
-                  (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-                """,
-                (
-                    gid,
-                    e.get("id"),
-                    item_type,
-                    item_gid,
-                    e.get("parent_id"),
-                    e.get("section", "detail"),
-                    e.get("author", "human"),
-                    e.get("author_name", ""),
-                    e.get("author_gid", ""),
-                    e.get("content", ""),
-                    bool(e.get("resolved", False)),
-                    float(e.get("sort_order", 0)),
-                    bool(e.get("read_by_human", True)),
-                    e.get("ai_status", "unread"),
-                ),
-            )
-            saved.append({**e, "gid": gid})
-        conn.commit()
-    return {"success": True, "count": len(entries), "entries": saved}
+async def put_item_entries(
+    item_type: str,
+    item_gid: str,
+    body: EntryPutBody,
+    request: Request,
+    current_user=Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_project(
+        request, current_user, principal, gateway,
+        capability_id="project.list.change.apply",
+        operation="item_entries.replace",
+        arguments={
+            "item_type": item_type,
+            "item_gid": item_gid,
+            "entries": body.entries or [],
+        },
+    )
 
 
 @router.delete("/{item_type}/{item_gid}")
-def delete_item_entries(item_type: str, item_gid: str,
-                        current_user=Depends(get_current_user)):
-    with get_conn() as conn:
-        cur = conn.cursor()
-        cur.execute(
-            "DELETE FROM workmanship_work_item_entries WHERE item_type = %s AND item_gid = %s",
-            (item_type, item_gid),
-        )
-        conn.commit()
-    return {"success": True}
+async def delete_item_entries(
+    item_type: str,
+    item_gid: str,
+    request: Request,
+    current_user=Depends(get_current_user),
+    principal=Depends(get_authenticated_principal),
+    gateway=Depends(get_default_gateway),
+):
+    return await _invoke_project(
+        request, current_user, principal, gateway,
+        capability_id="project.list.change.apply",
+        operation="item_entries.delete",
+        arguments={"item_type": item_type, "item_gid": item_gid},
+    )
