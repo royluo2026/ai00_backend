@@ -5,6 +5,8 @@ from collections.abc import Callable, Mapping
 from typing import Any, Protocol
 from uuid import uuid4
 import secrets
+import re
+from datetime import date, timedelta
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
 
@@ -65,6 +67,15 @@ class ItemEntryRepository(Protocol):
     def create_vehicle_model(self, gid: str, values: dict[str, Any]) -> None: ...
     def update_vehicle_model(self, gid: str, values: dict[str, Any]) -> bool: ...
     def delete_vehicle_model(self, gid: str) -> bool: ...
+    def list_task_templates(self) -> list[dict[str, Any]]: ...
+    def create_task_template(self, gid: str, values: dict[str, Any]) -> None: ...
+    def get_task_template(self, gid: str) -> dict[str, Any] | None: ...
+    def update_task_template(self, gid: str, updates: dict[str, Any]) -> bool: ...
+    def delete_task_template(self, gid: str) -> bool: ...
+    def create_task_template_item(self, gid: str, values: dict[str, Any]) -> None: ...
+    def update_task_template_item(self, gid: str, updates: dict[str, Any]) -> bool: ...
+    def delete_task_template_item(self, gid: str) -> bool: ...
+    def create_tasks_from_template(self, tasks: list[dict[str, Any]]) -> None: ...
 
 
 _OPERATIONS = {
@@ -93,6 +104,8 @@ _OPERATIONS = {
     ),
     "project.project.read": frozenset({"projects.search", "projects.get", "vehicle_models.list"}),
     "project.project.change.apply": frozenset({"projects.create", "projects.update", "projects.delete", "vehicle_models.create", "vehicle_models.update", "vehicle_models.delete"}),
+    "project.task_template.read": frozenset({"task_templates.list", "task_templates.get"}),
+    "project.task_template.change.apply": frozenset({"task_templates.create", "task_templates.update", "task_templates.delete", "task_templates.items.create", "task_templates.items.update", "task_templates.items.delete", "task_templates.instantiate"}),
 }
 
 
@@ -193,6 +206,18 @@ def _project(row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _template_item_values(arguments: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "title_pattern": _required_text(arguments, "title_pattern"),
+        "description": str(arguments.get("description") or ""),
+        "priority": str(arguments.get("priority") or "normal"),
+        "assignee_role": arguments.get("assignee_role"),
+        "due_offset_days": arguments.get("due_offset_days"),
+        "share_scope": str(arguments.get("share_scope") or "team"),
+        "sort_order": int(arguments.get("sort_order") or 0),
+    }
+
+
 class ProjectManagementApplication:
     def __init__(
         self,
@@ -236,6 +261,8 @@ class ProjectManagementApplication:
             return self._project(operation, arguments, _context)
         if operation.startswith("vehicle_models."):
             return self._vehicle_model(operation, arguments, _context)
+        if operation.startswith("task_templates."):
+            return self._task_template(operation, arguments, _context)
         item_type = _required_text(arguments, "item_type")
         item_gid = _required_text(arguments, "item_gid")
         if operation == "item_entries.get":
@@ -388,6 +415,46 @@ class ProjectManagementApplication:
         values = {key: str(arguments.get(key) or "") for key in ("name", "brand", "platform", "vehicle_type")}
         if not values["name"]: raise CapabilityBusinessError("invalid_input", "name is required")
         if not self._repository.update_vehicle_model(gid, values): raise CapabilityBusinessError("not_found", "vehicle model not found")
+        return {"success": True}
+
+    def _task_template(self, operation: str, arguments: Mapping[str, Any], context: object) -> dict[str, Any]:
+        user_gid = str(getattr(context, "user_gid", "") or "")
+        if operation == "task_templates.list":
+            return {"success": True, "data": self._repository.list_task_templates()}
+        if operation == "task_templates.create":
+            gid = self._next_id(); self._repository.create_task_template(gid, {"name": _required_text(arguments, "name"), "description": str(arguments.get("description") or ""), "scope": str(arguments.get("scope") or "system"), "owner_gid": user_gid})
+            return {"success": True, "data": {"gid": gid}}
+        if operation == "task_templates.get":
+            row = self._repository.get_task_template(_required_text(arguments, "gid"))
+            if row is None: raise CapabilityBusinessError("not_found", "task template not found")
+            return {"success": True, "data": row}
+        if operation == "task_templates.items.create":
+            gid = self._next_id(); self._repository.create_task_template_item(gid, {"template_gid": _required_text(arguments, "template_gid"), **_template_item_values(arguments)})
+            return {"success": True, "data": {"gid": gid}}
+        if operation == "task_templates.instantiate":
+            gid = _required_text(arguments, "gid"); template = self._repository.get_task_template(gid)
+            if template is None or not template.get("is_active", True): raise CapabilityBusinessError("not_found", "task template not found or inactive")
+            start_date = _required_text(arguments, "start_date"); title_vars = arguments.get("title_vars") if isinstance(arguments.get("title_vars"), Mapping) else {}
+            assignee_map = arguments.get("assignee_map") if isinstance(arguments.get("assignee_map"), Mapping) else {}
+            created = []
+            for item in template.get("items", []):
+                task_gid = self._next_id(); role = item.get("assignee_role")
+                due = None if item.get("due_offset_days") is None else (date.fromisoformat(start_date) + timedelta(days=int(item["due_offset_days"]))).isoformat()
+                title = re.sub(r"\{\{(.+?)\}\}", lambda match: str(title_vars.get(match.group(1).strip(), match.group(0))), item["title_pattern"])
+                assignee = assignee_map.get(role) if role else None
+                created.append({"gid": task_gid, "title": title, "due_date": due, "assignee_gid": assignee, "template_item_gid": item["gid"]})
+            self._repository.create_tasks_from_template([{**row, "description": next(item.get("description", "") for item in template["items"] if item["gid"] == row["template_item_gid"]), "owner_user_gid": str(arguments.get("owner_user_gid") or user_gid), "project_gid": _required_text(arguments, "project_gid"), "priority": next(item.get("priority", "normal") for item in template["items"] if item["gid"] == row["template_item_gid"]), "share_scope": next(item.get("share_scope", "team") for item in template["items"] if item["gid"] == row["template_item_gid"]), "template_source_version": template["version"]} for row in created])
+            return {"success": True, "data": created, "count": len(created)}
+        gid_key = "item_gid" if ".items." in operation else "gid"; gid = _required_text(arguments, gid_key)
+        if operation.endswith("delete"):
+            deleted = self._repository.delete_task_template_item(gid) if ".items." in operation else self._repository.delete_task_template(gid)
+            if not deleted: raise CapabilityBusinessError("not_found", "task template resource not found")
+            return {"success": True}
+        source = arguments.get("updates") if isinstance(arguments.get("updates"), Mapping) else arguments
+        updates = {key: value for key, value in source.items() if key in ({"title_pattern", "description", "priority", "assignee_role", "due_offset_days", "share_scope", "sort_order"} if ".items." in operation else {"name", "description", "scope", "is_active"}) and value is not None}
+        if not updates: raise CapabilityBusinessError("invalid_input", "no update fields")
+        updated = self._repository.update_task_template_item(gid, updates) if ".items." in operation else self._repository.update_task_template(gid, updates)
+        if not updated: raise CapabilityBusinessError("not_found", "task template resource not found")
         return {"success": True}
 
     def _search_change_logs(

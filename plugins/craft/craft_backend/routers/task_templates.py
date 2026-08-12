@@ -1,44 +1,25 @@
-"""
-backend/routers/task_templates.py
-──────────────────────────────────
-任务模板 API（task_templates / task_template_items）
+"""Legacy task-template HTTP adapter; Project owns all behavior and SQL."""
+from __future__ import annotations
 
-端点：
-  GET    /api/task-templates                    → 模板列表
-  POST   /api/task-templates                    → 创建模板
-  GET    /api/task-templates/{gid}              → 模板详情（含 items）
-  PATCH  /api/task-templates/{gid}              → 更新模板元信息
-  DELETE /api/task-templates/{gid}              → 删除模板
-  POST   /api/task-templates/{gid}/items        → 添加条目
-  PATCH  /api/task-templates/items/{item_gid}   → 更新条目
-  DELETE /api/task-templates/items/{item_gid}   → 删除条目
-  POST   /api/task-templates/{gid}/instantiate  → 实例化（批量创建任务）
-"""
-import json
-import re
-from datetime import date, timedelta
 from typing import Optional
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
-from ..data.connection import get_conn
-from backend.platform_sdk.auth import require_role
-from backend.platform_sdk.ids import next_gid
+from backend.capability_v2.gateway import get_default_gateway
+from backend.platform_sdk.auth import get_authenticated_principal, require_role
+from backend.platform_sdk.project_management import build_web_compatibility_envelope, invoke_compatibility
 
 router = APIRouter(prefix="/api/task-templates", tags=["task_templates"])
-
-_READ  = require_role("super_admin", "team_admin", "project_admin",
-                      "rule_admin", "knowledge_admin", "member")
+_READ = require_role("super_admin", "team_admin", "project_admin", "rule_admin", "knowledge_admin", "member")
 _WRITE = require_role("super_admin", "team_admin", "knowledge_admin")
 
-
-# ── Pydantic 模型 ──────────────────────────────────────────────
 
 class CreateTemplateBody(BaseModel):
     name: str
     description: str = ""
-    scope: str = "system"   # system|team|personal
+    scope: str = "system"
 
 
 class UpdateTemplateBody(BaseModel):
@@ -70,219 +51,67 @@ class UpdateItemBody(BaseModel):
 
 class InstantiateBody(BaseModel):
     project_gid: str
-    start_date: str                          # ISO date string YYYY-MM-DD
-    assignee_map: dict = {}                  # { "角色名": "user_gid" }
-    title_vars: dict = {}                    # { "project_name": "P12345" }
-    owner_user_gid: Optional[str] = None     # 创建人 gid
+    start_date: str
+    assignee_map: dict = {}
+    title_vars: dict = {}
+    owner_user_gid: Optional[str] = None
 
 
-# ── 工具函数 ──────────────────────────────────────────────────
+async def _invoke(request, user, principal, gateway, operation, arguments, *, write=False):
+    request_id = request.headers.get("X-Request-ID") or f"project_{uuid4().hex}"
+    result = await invoke_compatibility(gateway, build_web_compatibility_envelope(
+        gateway, capability_id="project.task_template.change.apply" if write else "project.task_template.read",
+        payload={"operation": operation, "arguments": arguments}, current_user=user, principal=principal,
+        request_id=request_id, trace_id=request.headers.get("X-Trace-ID") or request_id,
+        idempotency_key=request.headers.get("X-Idempotency-Key") if write else None,
+        approval_reference=request.headers.get("X-Capability-Approval") if write else None,
+    ))
+    if not result.ok:
+        code = result.error.code if result.error else ""
+        raise HTTPException({"not_found": 404, "forbidden": 403, "invalid_input": 400}.get(code, 422), result.error.model_dump(mode="json") if result.error else None)
+    return result.data["data"]
 
-def _render_title(pattern: str, vars_: dict) -> str:
-    """把 {{key}} 替换为 title_vars 里的值，缺失的变量保留原样"""
-    def replacer(m):
-        key = m.group(1).strip()
-        return str(vars_.get(key, m.group(0)))
-    return re.sub(r'\{\{(.+?)\}\}', replacer, pattern)
-
-
-def _calc_due_date(start_date_str: str, offset_days: Optional[int]) -> Optional[str]:
-    if offset_days is None:
-        return None
-    try:
-        d = date.fromisoformat(start_date_str) + timedelta(days=offset_days)
-        return d.isoformat()
-    except Exception:
-        return None
-
-
-# ══════════════════════════════════════════════════════════════
-# 模板 CRUD
-# ══════════════════════════════════════════════════════════════
 
 @router.get("")
-def list_templates(current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid, name, description, scope, version, is_active, created_at, updated_at "
-                "FROM workmanship_work_task_templates WHERE is_active = TRUE ORDER BY created_at DESC"
-            )
-            rows = cur.fetchall()
-    return {"success": True, "data": [dict(r) for r in rows]}
+async def list_templates(request: Request, current_user=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke(request, current_user, principal, gateway, "task_templates.list", {})
 
 
 @router.post("", status_code=201)
-def create_template(body: CreateTemplateBody, current_user: dict = Depends(_WRITE)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_work_task_templates (gid, name, description, scope, owner_gid) "
-                "VALUES (%s, %s, %s, %s, %s)",
-                (gid, body.name, body.description, body.scope, current_user["gid"])
-            )
-    return {"success": True, "data": {"gid": gid}}
+async def create_template(body: CreateTemplateBody, request: Request, current_user=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke(request, current_user, principal, gateway, "task_templates.create", body.model_dump(), write=True)
 
 
 @router.get("/{gid}")
-def get_template(gid: str, current_user: dict = Depends(_READ)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT gid, name, description, scope, version, is_active, created_at, updated_at "
-                "FROM workmanship_work_task_templates WHERE gid = %s",
-                (gid,)
-            )
-            tpl = cur.fetchone()
-            if not tpl:
-                raise HTTPException(404, "模板不存在")
-            tpl = dict(tpl)
-
-            cur.execute(
-                "SELECT gid, title_pattern, description, priority, assignee_role, "
-                "due_offset_days, share_scope, sort_order "
-                "FROM workmanship_work_task_template_items WHERE template_gid = %s ORDER BY sort_order",
-                (gid,)
-            )
-            tpl["items"] = [dict(r) for r in cur.fetchall()]
-    return {"success": True, "data": tpl}
+async def get_template(gid: str, request: Request, current_user=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke(request, current_user, principal, gateway, "task_templates.get", {"gid": gid})
 
 
 @router.patch("/{gid}")
-def update_template(gid: str, body: UpdateTemplateBody, current_user: dict = Depends(_WRITE)):
-    updates = {k: v for k, v in body.model_dump().items() if v is not None}
-    if not updates:
-        raise HTTPException(400, "无更新字段")
-    set_clause = ", ".join(f"{k}=%s" for k in updates)
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"UPDATE workmanship_work_task_templates SET {set_clause}, updated_at=NOW(), version=version+1 "
-                "WHERE gid=%s",
-                list(updates.values()) + [gid]
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(404, "模板不存在")
-    return {"success": True}
+async def update_template(gid: str, body: UpdateTemplateBody, request: Request, current_user=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke(request, current_user, principal, gateway, "task_templates.update", {"gid": gid, "updates": body.model_dump(exclude_none=True)}, write=True)
 
 
 @router.delete("/{gid}", status_code=204)
-def delete_template(gid: str, current_user: dict = Depends(_WRITE)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM workmanship_work_task_templates WHERE gid=%s", (gid,))
-            if cur.rowcount == 0:
-                raise HTTPException(404, "模板不存在")
+async def delete_template(gid: str, request: Request, current_user=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    await _invoke(request, current_user, principal, gateway, "task_templates.delete", {"gid": gid}, write=True)
 
-
-# ══════════════════════════════════════════════════════════════
-# 条目 CRUD
-# ══════════════════════════════════════════════════════════════
 
 @router.post("/{template_gid}/items", status_code=201)
-def add_item(template_gid: str, body: CreateItemBody, current_user: dict = Depends(_WRITE)):
-    gid = str(next_gid())
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO workmanship_work_task_template_items "
-                "(gid, template_gid, title_pattern, description, priority, "
-                " assignee_role, due_offset_days, share_scope, sort_order) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                (gid, template_gid, body.title_pattern, body.description,
-                 body.priority, body.assignee_role, body.due_offset_days,
-                 body.share_scope, body.sort_order)
-            )
-    return {"success": True, "data": {"gid": gid}}
+async def add_item(template_gid: str, body: CreateItemBody, request: Request, current_user=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke(request, current_user, principal, gateway, "task_templates.items.create", {"template_gid": template_gid, **body.model_dump()}, write=True)
 
 
 @router.patch("/items/{item_gid}")
-def update_item(item_gid: str, body: UpdateItemBody, current_user: dict = Depends(_WRITE)):
-    updates = {k: v for k, v in body.model_dump().items() if v is not None}
-    if not updates:
-        raise HTTPException(400, "无更新字段")
-    set_clause = ", ".join(f"{k}=%s" for k in updates)
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                f"UPDATE workmanship_work_task_template_items SET {set_clause} WHERE gid=%s",
-                list(updates.values()) + [item_gid]
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(404, "条目不存在")
-    return {"success": True}
+async def update_item(item_gid: str, body: UpdateItemBody, request: Request, current_user=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke(request, current_user, principal, gateway, "task_templates.items.update", {"item_gid": item_gid, "updates": body.model_dump(exclude_none=True)}, write=True)
 
 
 @router.delete("/items/{item_gid}", status_code=204)
-def delete_item(item_gid: str, current_user: dict = Depends(_WRITE)):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM workmanship_work_task_template_items WHERE gid=%s", (item_gid,))
-            if cur.rowcount == 0:
-                raise HTTPException(404, "条目不存在")
+async def delete_item(item_gid: str, request: Request, current_user=Depends(_WRITE), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    await _invoke(request, current_user, principal, gateway, "task_templates.items.delete", {"item_gid": item_gid}, write=True)
 
-
-# ══════════════════════════════════════════════════════════════
-# 实例化：批量创建任务
-# ══════════════════════════════════════════════════════════════
 
 @router.post("/{gid}/instantiate", status_code=201)
-def instantiate(gid: str, body: InstantiateBody, current_user: dict = Depends(_READ)):
-    """
-    将模板中所有条目实例化为任务行：
-    - title_pattern 中的 {{变量}} 被替换
-    - assignee_role 被映射为具体 user_gid
-    - due_offset_days 加上 start_date 得到 due_date
-    - 记录 template_item_gid 和 template_source_version
-    """
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            # 读取模板版本
-            cur.execute(
-                "SELECT version FROM workmanship_work_task_templates WHERE gid=%s AND is_active=TRUE",
-                (gid,)
-            )
-            tpl = cur.fetchone()
-            if not tpl:
-                raise HTTPException(404, "模板不存在或已停用")
-            tpl_version = tpl["version"]
-
-            # 读取所有条目
-            cur.execute(
-                "SELECT gid, title_pattern, description, priority, assignee_role, "
-                "due_offset_days, share_scope "
-                "FROM workmanship_work_task_template_items WHERE template_gid=%s ORDER BY sort_order",
-                (gid,)
-            )
-            items = [dict(r) for r in cur.fetchall()]
-
-            created = []
-            for item in items:
-                title = _render_title(item["title_pattern"], body.title_vars)
-                due_date = _calc_due_date(body.start_date, item["due_offset_days"])
-                assignee_gid = body.assignee_map.get(item["assignee_role"]) if item["assignee_role"] else None
-                owner_gid = body.owner_user_gid or current_user["gid"]
-
-                task_gid = str(next_gid())
-                cur.execute(
-                    """
-                    INSERT INTO workmanship_proj_tasks
-                      (gid, title, description, owner_user_gid, project_gid,
-                       priority, share_scope, due_date,
-                       template_item_gid, template_source_version)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                    """,
-                    (task_gid, title, item["description"], owner_gid,
-                     body.project_gid, item["priority"], item["share_scope"],
-                     due_date, item["gid"], tpl_version)
-                )
-                created.append({
-                    "gid": task_gid,
-                    "title": title,
-                    "due_date": due_date,
-                    "assignee_gid": assignee_gid,
-                    "template_item_gid": item["gid"],
-                })
-
-    return {"success": True, "data": created, "count": len(created)}
+async def instantiate(gid: str, body: InstantiateBody, request: Request, current_user=Depends(_READ), principal=Depends(get_authenticated_principal), gateway=Depends(get_default_gateway)):
+    return await _invoke(request, current_user, principal, gateway, "task_templates.instantiate", {"gid": gid, **body.model_dump()}, write=True)

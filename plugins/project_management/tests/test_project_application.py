@@ -82,6 +82,9 @@ class InMemoryItemEntryRepository:
         self.lists = {}
         self.projects = {}
         self.vehicle_models = {}
+        self.task_templates = {}
+        self.template_items = {}
+        self.created_tasks = []
 
     def list_item_entries(self, item_type, item_gid):
         return list(self.entries.get((item_type, item_gid), []))
@@ -256,6 +259,21 @@ class InMemoryItemEntryRepository:
         if gid not in self.vehicle_models: return False
         self.vehicle_models[gid].update(values); return True
     def delete_vehicle_model(self, gid): return self.vehicle_models.pop(gid, None) is not None
+    def list_task_templates(self): return list(self.task_templates.values())
+    def create_task_template(self, gid, values): self.task_templates[gid] = {"gid": gid, "version": 1, "is_active": True, "created_at": "2026-08-12", "updated_at": "2026-08-12", **values}
+    def get_task_template(self, gid):
+        row = self.task_templates.get(gid)
+        return ({**row, "items": [item for item in self.template_items.values() if item["template_gid"] == gid]} if row else None)
+    def update_task_template(self, gid, updates):
+        if gid not in self.task_templates: return False
+        self.task_templates[gid].update(updates); self.task_templates[gid]["version"] += 1; return True
+    def delete_task_template(self, gid): return self.task_templates.pop(gid, None) is not None
+    def create_task_template_item(self, gid, values): self.template_items[gid] = {"gid": gid, **values}
+    def update_task_template_item(self, gid, updates):
+        if gid not in self.template_items: return False
+        self.template_items[gid].update(updates); return True
+    def delete_task_template_item(self, gid): return self.template_items.pop(gid, None) is not None
+    def create_tasks_from_template(self, tasks): self.created_tasks.extend(tasks)
 
 
 def _application():
@@ -576,3 +594,14 @@ def test_projects_create_read_update_delete_and_vehicle_models():
     model = application.invoke("project.project.change.apply", {"operation": "vehicle_models.create", "arguments": {"name": "Sedan", "brand": "AI00"}}, CONTEXT)
     assert model["data"]["name"] == "Sedan"
     assert application.invoke("project.project.read", {"operation": "vehicle_models.list", "arguments": {}}, CONTEXT)["data"][0]["brand"] == "AI00"
+
+
+def test_task_template_lifecycle_and_instantiation_are_project_owned():
+    ids = iter(["template-1", "item-1", "task-1"])
+    application = ProjectManagementApplication(repository=InMemoryItemEntryRepository(), next_id=lambda: next(ids))
+    assert application.invoke("project.task_template.change.apply", {"operation": "task_templates.create", "arguments": {"name": "Launch"}}, CONTEXT)["data"]["gid"] == "template-1"
+    application.invoke("project.task_template.change.apply", {"operation": "task_templates.items.create", "arguments": {"template_gid": "template-1", "title_pattern": "Prepare {{project_name}}", "due_offset_days": 2}}, CONTEXT)
+    detail = application.invoke("project.task_template.read", {"operation": "task_templates.get", "arguments": {"gid": "template-1"}}, CONTEXT)
+    assert detail["data"]["items"][0]["title_pattern"] == "Prepare {{project_name}}"
+    created = application.invoke("project.task_template.change.apply", {"operation": "task_templates.instantiate", "arguments": {"gid": "template-1", "project_gid": "project-1", "start_date": "2026-08-12", "title_vars": {"project_name": "P1"}}}, CONTEXT)
+    assert created == {"success": True, "data": [{"gid": "task-1", "title": "Prepare P1", "due_date": "2026-08-14", "assignee_gid": None, "template_item_gid": "item-1"}], "count": 1}

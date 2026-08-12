@@ -410,3 +410,42 @@ class ProjectManagementRepository:
 
     def delete_vehicle_model(self, gid: str) -> bool:
         return bool(self.execute("DELETE FROM workmanship_proj_vehicle_models WHERE gid=%s", (gid,)))
+
+    def list_task_templates(self) -> list[dict[str, Any]]:
+        return self.fetch_all("SELECT gid,name,description,scope,version,is_active,created_at,updated_at FROM workmanship_work_task_templates WHERE is_active=TRUE ORDER BY created_at DESC")
+
+    def create_task_template(self, gid: str, values: dict[str, Any]) -> None:
+        self.execute("INSERT INTO workmanship_work_task_templates (gid,name,description,scope,owner_gid) VALUES (%s,%s,%s,%s,%s)", (gid, values["name"], values["description"], values["scope"], values["owner_gid"]))
+
+    def get_task_template(self, gid: str) -> dict[str, Any] | None:
+        row = self.fetch_one("SELECT gid,name,description,scope,version,is_active,created_at,updated_at FROM workmanship_work_task_templates WHERE gid=%s", (gid,))
+        if row is not None:
+            row["items"] = self.fetch_all("SELECT gid,template_gid,title_pattern,description,priority,assignee_role,due_offset_days,share_scope,sort_order FROM workmanship_work_task_template_items WHERE template_gid=%s ORDER BY sort_order", (gid,))
+        return row
+
+    def update_task_template(self, gid: str, updates: dict[str, Any]) -> bool:
+        assignments = ",".join(f"{key}=%s" for key in updates)
+        return bool(self.execute(f"UPDATE workmanship_work_task_templates SET {assignments},updated_at=NOW(),version=version+1 WHERE gid=%s", tuple(updates.values()) + (gid,)))
+
+    def delete_task_template(self, gid: str) -> bool:
+        return bool(self.execute("DELETE FROM workmanship_work_task_templates WHERE gid=%s", (gid,)))
+
+    def create_task_template_item(self, gid: str, values: dict[str, Any]) -> None:
+        self.execute("INSERT INTO workmanship_work_task_template_items (gid,template_gid,title_pattern,description,priority,assignee_role,due_offset_days,share_scope,sort_order) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)", (gid, values["template_gid"], values["title_pattern"], values["description"], values["priority"], values["assignee_role"], values["due_offset_days"], values["share_scope"], values["sort_order"]))
+
+    def update_task_template_item(self, gid: str, updates: dict[str, Any]) -> bool:
+        assignments = ",".join(f"{key}=%s" for key in updates)
+        return bool(self.execute(f"UPDATE workmanship_work_task_template_items SET {assignments} WHERE gid=%s", tuple(updates.values()) + (gid,)))
+
+    def delete_task_template_item(self, gid: str) -> bool:
+        return bool(self.execute("DELETE FROM workmanship_work_task_template_items WHERE gid=%s", (gid,)))
+
+    def create_tasks_from_template(self, tasks: list[dict[str, Any]]) -> None:
+        with get_project_management_conn() as connection:
+            try:
+                with connection.cursor() as cursor:
+                    for task in tasks:
+                        cursor.execute("INSERT INTO workmanship_proj_tasks (gid,title,description,owner_user_gid,project_gid,priority,share_scope,due_date,template_item_gid,template_source_version) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (task["gid"], task["title"], task["description"], task["owner_user_gid"], task["project_gid"], task["priority"], task["share_scope"], task["due_date"], task["template_item_gid"], task["template_source_version"]))
+                connection.commit()
+            except Exception:
+                connection.rollback(); raise
