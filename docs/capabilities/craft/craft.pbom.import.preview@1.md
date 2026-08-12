@@ -1,14 +1,14 @@
-# craft.pbom.snapshot.get@1
+# craft.pbom.import.preview@1
 
-craft.pbom.snapshot.get
+craft.pbom.import.preview
 
 ## 使用判断
 
-- 适用：A PBOM snapshot is explicitly selected.
-- 不适用：No exact PBOM snapshot is known.
+- 适用：A PBOM version is the explicit business subject.
+- 不适用：The subject is BOP or GBOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_129248ab04fdb72549a2f50f9e5316d9`
+- Catalog Release：`rel_ac925e6c3f39ddd2ec3b335e2b45d627`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -35,7 +35,7 @@ craft.pbom.snapshot.get
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `craft-pbom-snapshot` ← `snapshot_gid`（必填）
+- 无资源选择器；仍受租户、身份与权限策略约束。
 
 ## 执行与可靠性
 
@@ -59,13 +59,14 @@ craft.pbom.snapshot.get
 {
   "additionalProperties": false,
   "properties": {
-    "snapshot_gid": {
-      "minLength": 1,
-      "type": "string"
+    "document": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
     }
   },
   "required": [
-    "snapshot_gid"
+    "document"
   ],
   "type": "object"
 }
@@ -75,11 +76,11 @@ craft.pbom.snapshot.get
 
 ```json
 {
-  "capability_id": "craft.pbom.snapshot.get",
-  "catalog_release": "rel_129248ab04fdb72549a2f50f9e5316d9",
+  "capability_id": "craft.pbom.import.preview",
+  "catalog_release": "rel_ac925e6c3f39ddd2ec3b335e2b45d627",
   "major_version": 1,
   "payload": {
-    "snapshot_gid": "example"
+    "document": {}
   }
 }
 ```
@@ -92,17 +93,12 @@ craft.pbom.snapshot.get
 {
   "additionalProperties": false,
   "properties": {
-    "created_at": {
+    "content_sha256": {
       "additionalProperties": false,
       "properties": {},
       "type": "object"
     },
-    "gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "name": {
+    "import_preview_gid": {
       "additionalProperties": false,
       "properties": {},
       "type": "object"
@@ -111,30 +107,11 @@ craft.pbom.snapshot.get
       "additionalProperties": false,
       "properties": {},
       "type": "object"
-    },
-    "project_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "source_type": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "status": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "version_tag": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
     }
   },
   "required": [
-    "gid",
+    "import_preview_gid",
+    "content_sha256",
     "part_count"
   ],
   "type": "object"

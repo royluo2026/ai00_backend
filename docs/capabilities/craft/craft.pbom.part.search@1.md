@@ -4,11 +4,11 @@ craft.pbom.part.search
 
 ## 使用判断
 
-- 适用：A PBOM snapshot is explicitly selected.
-- 不适用：No exact PBOM snapshot is known.
+- 适用：A PBOM version is the explicit business subject.
+- 不适用：The subject is BOP or GBOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_129248ab04fdb72549a2f50f9e5316d9`
+- Catalog Release：`rel_ac925e6c3f39ddd2ec3b335e2b45d627`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -35,7 +35,7 @@ craft.pbom.part.search
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `craft-pbom-snapshot` ← `snapshot_gid`（必填）
+- `craft-pbom-version` ← `version_gid`（必填）
 
 ## 执行与可靠性
 
@@ -60,20 +60,23 @@ craft.pbom.part.search
   "additionalProperties": false,
   "properties": {
     "limit": {
-      "maximum": 100,
-      "minimum": 1,
-      "type": "integer"
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
     },
     "query": {
-      "type": "string"
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
     },
-    "snapshot_gid": {
-      "minLength": 1,
-      "type": "string"
+    "version_gid": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
     }
   },
   "required": [
-    "snapshot_gid"
+    "version_gid"
   ],
   "type": "object"
 }
@@ -84,10 +87,10 @@ craft.pbom.part.search
 ```json
 {
   "capability_id": "craft.pbom.part.search",
-  "catalog_release": "rel_129248ab04fdb72549a2f50f9e5316d9",
+  "catalog_release": "rel_ac925e6c3f39ddd2ec3b335e2b45d627",
   "major_version": 1,
   "payload": {
-    "snapshot_gid": "example"
+    "version_gid": {}
   }
 }
 ```
@@ -105,14 +108,14 @@ craft.pbom.part.search
       "properties": {},
       "type": "object"
     },
-    "snapshot_gid": {
+    "version_gid": {
       "additionalProperties": false,
       "properties": {},
       "type": "object"
     }
   },
   "required": [
-    "snapshot_gid",
+    "version_gid",
     "items"
   ],
   "type": "object"

@@ -1,14 +1,14 @@
-# craft.pbom.snapshot.compare@1
+# craft.pbom.version.compare@1
 
-craft.pbom.snapshot.compare
+craft.pbom.version.compare
 
 ## 使用判断
 
-- 适用：A PBOM snapshot is explicitly selected.
-- 不适用：No exact PBOM snapshot is known.
+- 适用：A PBOM version is the explicit business subject.
+- 不适用：The subject is BOP or GBOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_129248ab04fdb72549a2f50f9e5316d9`
+- Catalog Release：`rel_ac925e6c3f39ddd2ec3b335e2b45d627`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -35,8 +35,8 @@ craft.pbom.snapshot.compare
 - 认证新鲜度：0 秒
 
 资源选择器：
-- `craft-pbom-snapshot` ← `from_snapshot_gid`（必填）
-- `craft-pbom-snapshot` ← `to_snapshot_gid`（必填）
+- `craft-pbom-version` ← `from_version_gid`（必填）
+- `craft-pbom-version` ← `to_version_gid`（必填）
 
 ## 执行与可靠性
 
@@ -60,18 +60,18 @@ craft.pbom.snapshot.compare
 {
   "additionalProperties": false,
   "properties": {
-    "from_snapshot_gid": {
+    "from_version_gid": {
       "minLength": 1,
       "type": "string"
     },
-    "to_snapshot_gid": {
+    "to_version_gid": {
       "minLength": 1,
       "type": "string"
     }
   },
   "required": [
-    "from_snapshot_gid",
-    "to_snapshot_gid"
+    "from_version_gid",
+    "to_version_gid"
   ],
   "type": "object"
 }
@@ -81,12 +81,12 @@ craft.pbom.snapshot.compare
 
 ```json
 {
-  "capability_id": "craft.pbom.snapshot.compare",
-  "catalog_release": "rel_129248ab04fdb72549a2f50f9e5316d9",
+  "capability_id": "craft.pbom.version.compare",
+  "catalog_release": "rel_ac925e6c3f39ddd2ec3b335e2b45d627",
   "major_version": 1,
   "payload": {
-    "from_snapshot_gid": "example",
-    "to_snapshot_gid": "example"
+    "from_version_gid": "example",
+    "to_version_gid": "example"
   }
 }
 ```
@@ -109,31 +109,13 @@ craft.pbom.snapshot.compare
       "properties": {},
       "type": "object"
     },
-    "comparability": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "from_snapshot_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
     "removed": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "to_snapshot_gid": {
       "additionalProperties": false,
       "properties": {},
       "type": "object"
     }
   },
   "required": [
-    "comparability",
-    "from_snapshot_gid",
-    "to_snapshot_gid",
     "added",
     "removed",
     "changed"

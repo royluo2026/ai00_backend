@@ -1583,6 +1583,77 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.pbom.draft.change.apply": {
+      "function_id": "capability:craft.pbom.draft.change.apply",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.pbom.draft.change.apply",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "pbom"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.pbom.draft.change.preview": {
+      "function_id": "capability:craft.pbom.draft.change.preview",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.pbom.draft.change.preview",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "pbom"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.pbom.import.preview": {
+      "function_id": "capability:craft.pbom.import.preview",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.pbom.import.preview",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "pbom"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py"
+      ]
+    },
     "capability:craft.pbom.part.search": {
       "function_id": "capability:craft.pbom.part.search",
       "domain": "Craft",
@@ -1604,18 +1675,19 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/pbom_read.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
-    "capability:craft.pbom.snapshot.compare": {
-      "function_id": "capability:craft.pbom.snapshot.compare",
+    "capability:craft.pbom.version.archive": {
+      "function_id": "capability:craft.pbom.version.archive",
       "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "craft.pbom.snapshot.compare",
+      "target_capability": "craft.pbom.version.archive",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
@@ -1627,20 +1699,19 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
-        "plugins/craft/craft_backend/capabilities/pbom_read.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
-    "capability:craft.pbom.snapshot.get": {
-      "function_id": "capability:craft.pbom.snapshot.get",
+    "capability:craft.pbom.version.compare": {
+      "function_id": "capability:craft.pbom.version.compare",
       "domain": "Craft",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
       ],
-      "target_capability": "craft.pbom.snapshot.get",
+      "target_capability": "craft.pbom.version.compare",
       "exposure": "Capability",
       "automation_level": "automated",
       "resource_types": [
@@ -1652,9 +1723,126 @@
       "owner": "Craft",
       "exclusion_reason": null,
       "source_paths": [
-        "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
-        "plugins/craft/craft_backend/capabilities/pbom_read.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.pbom.version.create": {
+      "function_id": "capability:craft.pbom.version.create",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.pbom.version.create",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "pbom"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py"
+      ]
+    },
+    "capability:craft.pbom.version.get": {
+      "function_id": "capability:craft.pbom.version.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.pbom.version.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "pbom"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.pbom.version.publish": {
+      "function_id": "capability:craft.pbom.version.publish",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.pbom.version.publish",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "pbom"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.pbom.version.search": {
+      "function_id": "capability:craft.pbom.version.search",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.pbom.version.search",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "pbom"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py"
+      ]
+    },
+    "capability:craft.pbom.version.submit": {
+      "function_id": "capability:craft.pbom.version.submit",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.pbom.version.submit",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "pbom"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/pbom_descriptors.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
