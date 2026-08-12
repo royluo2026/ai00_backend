@@ -3,7 +3,7 @@
   "title": "Capability V2 RC Runtime Evidence",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "run_id", "generated_at", "catalog_release", "catalog_hash", "git_commit", "migration", "provider_artifacts", "environment_id", "capabilities"],
+  "required": ["schema_version", "run_id", "generated_at", "catalog_release", "catalog_hash", "git_commit", "migration", "provider_artifacts", "environment_id", "database_isolation", "capabilities"],
   "properties": {
     "schema_version": {"const": 1},
     "run_id": {"type": "string", "minLength": 1},
@@ -33,6 +33,44 @@
       }
     },
     "environment_id": {"type": "string", "minLength": 1},
+    "database_isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner_operations", "cross_domain"],
+      "properties": {
+        "owner_operations": {
+          "type": "object",
+          "minProperties": 11,
+          "maxProperties": 11,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["provider_crud", "database_read", "database_write"],
+            "properties": {
+              "provider_crud": {"const": "passed"},
+              "database_read": {"const": "passed"},
+              "database_write": {"const": "passed"}
+            }
+          }
+        },
+        "cross_domain": {
+          "type": "array",
+          "minItems": 110,
+          "maxItems": 110,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_domain", "target_domain", "read", "write"],
+            "properties": {
+              "source_domain": {"type": "string", "minLength": 1},
+              "target_domain": {"type": "string", "minLength": 1},
+              "read": {"const": "denied"},
+              "write": {"const": "denied"}
+            }
+          }
+        }
+      }
+    },
     "capabilities": {
       "type": "object",
       "additionalProperties": {

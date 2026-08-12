@@ -7,6 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from backend.capability_v2.completion import evaluate_completion
+from backend.capability_v2.domain_manifest import load_domain_manifests
 from backend.scripts.run_capability_v2_acceptance import (
     MANDATORY_CASES,
     acceptance_temp_root,
@@ -27,6 +28,12 @@ from backend.scripts.run_capability_v2_acceptance import (
 
 
 def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
+    domain_ids = sorted(
+        item.domain_id
+        for item in load_domain_manifests(
+            Path(__file__).resolve().parents[3] / "backend/capability_v2/official_domains.json"
+        ).domains
+    )
     return {
         "schema_version": 1,
         "run_id": run_id,
@@ -37,6 +44,27 @@ def _runtime_evidence(catalog, manifest, *, commit, run_id="rc-run-42"):
         "migration": _migration_binding(),
         "provider_artifacts": catalog["provider_artifacts"],
         "environment_id": "rc-isolated-42",
+        "database_isolation": {
+            "owner_operations": {
+                domain_id: {
+                    "provider_crud": "passed",
+                    "database_read": "passed",
+                    "database_write": "passed",
+                }
+                for domain_id in domain_ids
+            },
+            "cross_domain": [
+                {
+                    "source_domain": source,
+                    "target_domain": target,
+                    "read": "denied",
+                    "write": "denied",
+                }
+                for source in domain_ids
+                for target in domain_ids
+                if source != target
+            ],
+        },
         "capabilities": {
             key: {case: "passed" for case in cases}
             for key, cases in manifest["capabilities"].items()
@@ -88,6 +116,12 @@ def test_release_candidate_never_passes_on_missing_external_environment():
         "AI00_ACCEPTANCE_OAUTH_DISCOVERY_URL", "AI00_ACCEPTANCE_LOCAL_RUNTIME_HEALTH_URL",
     ):
         assert f"missing {variable}" in errors
+    manifests = load_domain_manifests(
+        Path(__file__).resolve().parents[3] / "backend/capability_v2/official_domains.json"
+    )
+    for domain in manifests.domains:
+        assert f"missing {domain.database.runtime_url_env}" in errors
+        assert f"missing {domain.database.ddl_url_env}" in errors
 
 
 def test_generated_report_validates_against_checked_in_schema():
@@ -251,6 +285,32 @@ def test_runtime_evidence_rejects_stale_or_rebound_document(tmp_path, monkeypatc
     assert "RC evidence migration binding mismatch" in errors
     assert "RC evidence provider artifact binding mismatch" in errors
     assert "RC evidence generation time is stale or in the future" in errors
+
+
+def test_runtime_evidence_requires_exact_database_isolation_matrix(tmp_path, monkeypatch):
+    catalog, manifest = load_documents()
+    commit = "a" * 40
+    monkeypatch.setattr("backend.scripts.run_capability_v2_acceptance._git", lambda *args: commit)
+    evidence = _runtime_evidence(catalog, manifest, commit=commit)
+    removed = evidence["database_isolation"]["cross_domain"].pop()
+    evidence["database_isolation"]["cross_domain"].append(
+        evidence["database_isolation"]["cross_domain"][0]
+    )
+    owner_result = evidence["database_isolation"]["owner_operations"].pop(
+        removed["target_domain"]
+    )
+    evidence["database_isolation"]["owner_operations"]["rogue"] = owner_result
+    path = tmp_path / "incomplete-database-matrix.json"
+    path.write_text(json.dumps(evidence), encoding="utf-8")
+
+    errors, _ = validate_runtime_evidence(catalog, manifest, {
+        "AI00_ACCEPTANCE_RC_EVIDENCE": str(path),
+        "AI00_ACCEPTANCE_ENVIRONMENT_ID": "rc-isolated-42",
+        "AI00_ACCEPTANCE_RUN_ID": "rc-run-42",
+    })
+
+    assert "RC evidence database owner operations do not cover exactly eleven domains" in errors
+    assert "RC evidence database isolation matrix is incomplete or duplicated" in errors
 
 
 def test_schema_invalid_runtime_evidence_fails_without_structural_exception(tmp_path):

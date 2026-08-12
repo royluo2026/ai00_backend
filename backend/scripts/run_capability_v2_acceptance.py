@@ -149,6 +149,16 @@ def environment_errors(mode: str, env: dict[str, str], *, probe: bool = True) ->
         return errors
     if not env.get("AI00_ACCEPTANCE_RUN_ID", "").strip():
         errors.append("missing AI00_ACCEPTANCE_RUN_ID")
+    from backend.capability_v2.domain_manifest import load_domain_manifests
+
+    manifests = load_domain_manifests(ROOT / "backend/capability_v2/official_domains.json")
+    for domain in manifests.domains:
+        for variable in (
+            domain.database.runtime_url_env,
+            domain.database.ddl_url_env,
+        ):
+            if not env.get(variable, "").strip():
+                errors.append(f"missing {variable}")
     oceanbase = env.get("AI00_ACCEPTANCE_OCEANBASE_URL", "").strip()
     if not oceanbase:
         errors.append("missing AI00_ACCEPTANCE_OCEANBASE_URL")
@@ -250,6 +260,7 @@ def validate_runtime_evidence(catalog: dict, manifest: dict, env: dict[str, str]
         errors.append("RC evidence migration binding mismatch")
     if evidence.get("provider_artifacts") != catalog.get("provider_artifacts", []):
         errors.append("RC evidence provider artifact binding mismatch")
+    errors.extend(_database_isolation_evidence_errors(evidence))
     try:
         generated_at = datetime.fromisoformat(evidence["generated_at"].replace("Z", "+00:00"))
     except (TypeError, ValueError):
@@ -267,6 +278,41 @@ def validate_runtime_evidence(catalog: dict, manifest: dict, env: dict[str, str]
     for extra in sorted(set(results) - set(manifest.get("capabilities", {}))):
         errors.append(f"{extra}: RC evidence is not an exact stable capability")
     return errors, evidence_hash
+
+
+def _database_isolation_evidence_errors(evidence: dict) -> list[str]:
+    from backend.capability_v2.domain_manifest import load_domain_manifests
+
+    domain_ids = {
+        item.domain_id
+        for item in load_domain_manifests(
+            ROOT / "backend/capability_v2/official_domains.json"
+        ).domains
+    }
+    isolation = evidence.get("database_isolation", {})
+    owners = isolation.get("owner_operations", {})
+    errors: list[str] = []
+    if set(owners) != domain_ids:
+        errors.append(
+            "RC evidence database owner operations do not cover exactly eleven domains"
+        )
+
+    rows = isolation.get("cross_domain", [])
+    actual_pairs = [
+        (row.get("source_domain"), row.get("target_domain"))
+        for row in rows
+    ]
+    expected_pairs = {
+        (source, target)
+        for source in domain_ids
+        for target in domain_ids
+        if source != target
+    }
+    if len(actual_pairs) != len(set(actual_pairs)) or set(actual_pairs) != expected_pairs:
+        errors.append(
+            "RC evidence database isolation matrix is incomplete or duplicated"
+        )
+    return errors
 
 
 def evaluate_case_outcomes(manifest: dict, outcomes: dict[str, str]) -> tuple[dict[str, int], list[str]]:
