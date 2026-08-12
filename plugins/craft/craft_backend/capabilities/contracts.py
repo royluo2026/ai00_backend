@@ -211,5 +211,11 @@ OUTPUT_SCHEMAS.update({
     "craft.pbom.import.preview": _object(_fields("import_preview_gid", "content_sha256", "part_count"), required=("import_preview_gid", "content_sha256", "part_count")),
 })
 
+from .gbop_descriptors import GBOP_CAPABILITY_IDS
+from .rule_descriptors import RULE_CAPABILITY_IDS
+for _capability_id in (*GBOP_CAPABILITY_IDS, *RULE_CAPABILITY_IDS):
+    INPUT_SCHEMAS.setdefault(_capability_id, _object(_fields("ref", "release_ref", "lineage_refs", "evidence", "item_gid", "query", "limit")))
+    OUTPUT_SCHEMAS.setdefault(_capability_id, _object(_fields("capability_id", "ref", "release_ref", "status", "lineage_refs", "evidence", "active_release_gid", "item_gid", "items"), required=("status",) if _capability_id not in {"craft.gbop.item.search", "craft.gbop.item.usage.get", "craft.gbop.item.knowledge.list"} else ("items",)))
+
 
 __all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]

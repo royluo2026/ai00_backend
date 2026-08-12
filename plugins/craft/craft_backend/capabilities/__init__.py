@@ -5,7 +5,8 @@ from typing import Any
 from .bop_compare import register_bop_compare_capability
 from .bop_structure import register_bop_structure_capabilities
 from .bop_versions import register_bop_version_capabilities
-from .gbop_read import register_gbop_read_capabilities
+from .gbop_descriptors import register_gbop_capabilities
+from .rule_descriptors import register_rule_capabilities
 from .pbom_descriptors import register_pbom_capabilities
 from .bop_writes import register_bop_write_capabilities
 from .provider import NativeContractRegistry
@@ -20,6 +21,7 @@ def register_capabilities(registry: Any) -> None:
     register_bop_structure_capabilities(native)
     register_bop_compare_capability(native)
     register_pbom_capabilities(native)
-    register_gbop_read_capabilities(native)
+    register_gbop_capabilities(native)
+    register_rule_capabilities(native)
     register_bop_write_capabilities(native)
     versioned_resource_resolvers.register("craft.execution_plan", resolve_execution_plan_reference)

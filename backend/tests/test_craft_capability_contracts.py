@@ -4,6 +4,8 @@ from __future__ import annotations
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.domain_ports.craft import CraftCommandPort, CraftQueryPort
 from plugins.craft.craft_backend.capabilities import register_capabilities
+from plugins.craft.craft_backend.capabilities.gbop_descriptors import GBOP_CAPABILITY_IDS
+from plugins.craft.craft_backend.capabilities.rule_descriptors import RULE_CAPABILITY_IDS
 
 
 STABLE_CAPABILITIES = {
@@ -34,6 +36,8 @@ STABLE_CAPABILITIES = {
     "craft.pbom.version.search",
     "craft.pbom.version.submit",
 }
+STABLE_CAPABILITIES.update(GBOP_CAPABILITY_IDS)
+STABLE_CAPABILITIES.update(RULE_CAPABILITY_IDS)
 
 
 def test_craft_publishes_query_and_command_ports_without_implementation_imports():
