@@ -7,6 +7,7 @@ import sys
 
 import pytest
 
+from backend.capability_v2.domain_database import DomainDatabaseConfigurationError
 from backend.capability_v2.database_isolation import (
     DatabaseIsolationError,
     load_probe_targets,
@@ -257,6 +258,24 @@ def test_grant_probe_rejects_missing_or_changed_live_migration_rows():
             _environment(targets),
             ca_path="ca.pem",
             connect=connect,
+        )
+
+
+def test_grant_probe_rejects_shared_runtime_and_ddl_credentials_before_connecting():
+    targets = load_probe_targets(ROOT)
+    environment = _environment(targets)
+    agent = next(target for target in targets if target.domain_id == "agent")
+    environment[agent.ddl_url_env] = environment[agent.runtime_url_env]
+
+    with pytest.raises(
+        DomainDatabaseConfigurationError,
+        match="credential_separation_required",
+    ):
+        verify_database_grants(
+            targets,
+            environment,
+            ca_path="ca.pem",
+            connect=lambda *_args: pytest.fail("must reject before connecting"),
         )
 
 

@@ -7,7 +7,10 @@ from pathlib import Path
 import re
 from typing import Callable, Mapping
 
-from .domain_database import DomainDatabaseUrl, load_domain_database_url
+from .domain_database import (
+    DomainDatabaseUrl,
+    load_domain_database_config,
+)
 from .domain_manifest import load_domain_manifests
 from .domain_migrations import discover_domain_migrations
 
@@ -212,17 +215,17 @@ def verify_database_grants(
             / "backend/capability_v2/official_domains.json"
         ).domains
     }
-    urls = {
-        target.domain_id: load_domain_database_url(
-            manifests[target.domain_id], environ, role="runtime"
+    configs = {
+        target.domain_id: load_domain_database_config(
+            manifests[target.domain_id], environ
         )
         for target in targets
     }
+    urls = {
+        domain_id: config.runtime_url for domain_id, config in configs.items()
+    }
     ddl_urls = {
-        target.domain_id: load_domain_database_url(
-            manifests[target.domain_id], environ, role="ddl"
-        )
-        for target in targets
+        domain_id: config.ddl_url for domain_id, config in configs.items()
     }
     owner_operations: dict[str, dict[str, str]] = {}
     owner_columns: dict[str, str] = {}
