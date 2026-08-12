@@ -10,12 +10,12 @@ _lock = Lock()
 
 
 def _params():
-    raw = os.getenv("AI00_DEVICE_DB_URL", "")
+    raw = os.getenv("AI00_LOCAL_RUNTIME_DB_URL", "")
     if not raw:
-        raise RuntimeError("AI00_DEVICE_DB_URL is required; Base DB credentials are not a fallback")
+        raise RuntimeError("AI00_LOCAL_RUNTIME_DB_URL is required; legacy Device/Base credentials are not a fallback")
     parsed = urlparse(raw)
     if parsed.scheme not in {"mysql", "mysql+pymysql"} or not parsed.hostname or not parsed.path.strip("/"):
-        raise RuntimeError("AI00_DEVICE_DB_URL must be an explicit mysql:// database URL")
+        raise RuntimeError("AI00_LOCAL_RUNTIME_DB_URL must be an explicit mysql:// database URL")
     return {
         "host": parsed.hostname, "port": parsed.port or 3306,
         "user": unquote(parsed.username or ""), "password": unquote(parsed.password or ""),

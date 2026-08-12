@@ -11,7 +11,8 @@ class DeviceDomainBoundaryTests(unittest.TestCase):
         self.assertFalse(base_adapter.exists())
         self.assertNotIn("CREATE TABLE", device.upper())
         self.assertNotIn("backend.db", device)
-        self.assertIn("AI00_DEVICE_DB_URL", connection)
+        self.assertIn("AI00_LOCAL_RUNTIME_DB_URL", connection)
+        self.assertNotIn('os.getenv("AI00_DEVICE_DB_URL"', connection)
         self.assertIn("owner_user_gid=%s", device)
 
 

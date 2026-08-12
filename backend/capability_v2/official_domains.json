@@ -139,12 +139,11 @@
         "plugin_id": "official.local-runtime",
         "module": "device_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:30bc10e6c978dad6b8dd895224f68a24e92a7f47be9d9cb4d9b734a893e7b7ed"
+        "artifact_hash": "sha256:0e3db6315b87dcacd4ca2155c1692ee5e5d098ecc8019dfc2e44014b92229ed1"
       },
       "artifact_path": "plugins/device/device_backend",
       "allowed_owners": [
-        "local_runtime",
-        "local_integration"
+        "local_runtime"
       ],
       "database": {
         "database_name": "ai00_local_runtime",

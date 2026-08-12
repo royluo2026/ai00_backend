@@ -18,8 +18,8 @@ from .contracts import (
 
 _OWNER_ALIASES = {
     "plugin": "base",
-    "runtime": "local_integration",
-    "vismockup": "local_integration",
+    "runtime": "local_runtime",
+    "vismockup": "local_runtime",
 }
 
 

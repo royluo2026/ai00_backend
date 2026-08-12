@@ -104,6 +104,7 @@
 /plugins/device/** @ai00/local-runtime-maintainers
 /local-runtime/** @ai00/local-runtime-maintainers
 /backend/domain_ports/local_integration.py @ai00/local-runtime-maintainers
+/backend/db/migrations/domains/local_runtime/** @ai00/local-runtime-maintainers
 /backend/db/migrations/202608030004_device_control_plane.sql @ai00/local-runtime-maintainers
 /backend/db/migrations/202608100011_device_operation_protocol_v2.sql @ai00/local-runtime-maintainers
 

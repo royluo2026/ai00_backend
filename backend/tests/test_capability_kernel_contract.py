@@ -18,6 +18,8 @@ class CapabilityKernelContractTests(unittest.TestCase):
             "system": "base",
             "craft": "craft",
             "digital_model": "digital_model",
+            "factory": "factory",
+            "integration": "integration",
             "knowledge": "knowledge",
             "ontology": "ontology",
             "identity": "base",
@@ -25,9 +27,9 @@ class CapabilityKernelContractTests(unittest.TestCase):
             "base": "base",
             "plugin": "base",
             "project": "project_management",
-            "local": "local_integration",
+            "local": "local_runtime",
             "simulation": "simulation",
-            "vismockup": "local_integration",
+            "vismockup": "local_runtime",
         }
         repository_root = Path(__file__).resolve().parents[2]
         registry = build_capability_registry(

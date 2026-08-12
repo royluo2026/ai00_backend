@@ -44,9 +44,9 @@ def get_command(payload: dict[str, Any], context: CapabilityContext) -> Capabili
 
 
 def specs() -> tuple[tuple[CapabilitySpec, Any], ...]:
-    common = {"owner": "local_integration", "plugin_callable": True, "permissions": ("agent.run",), "execution": "local", "tags": ("local-integration", "vismockup")}
+    common = {"owner": "local_runtime", "plugin_callable": True, "permissions": ("agent.run",), "execution": "local", "tags": ("local-runtime", "vismockup")}
     local = tuple((CapabilitySpec(id=capability_id, description=description, risk=risk, confirmation=confirmation, idempotent=False, **common), _enqueue(capability_id)) for capability_id, description, risk, confirmation in LOCAL_CAPABILITIES)
-    query = CapabilitySpec(owner="local_integration", id="local.command.get", description="Read an owned local operation outcome.", plugin_callable=True, permissions=("agent.run",), tags=("local-integration", "read"))
+    query = CapabilitySpec(owner="local_runtime", id="local.command.get", description="Read an owned local operation outcome.", plugin_callable=True, permissions=("agent.run",), tags=("local-runtime", "read"))
     return (*local, (query, get_command))
 
 

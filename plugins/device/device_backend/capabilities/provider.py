@@ -1,4 +1,4 @@
-"""Native Capability V2 policy boundary owned by Local Integration."""
+"""Native Capability V2 policy boundary owned by Local Runtime."""
 from __future__ import annotations
 
 from typing import Any
@@ -34,7 +34,7 @@ def descriptor_for(spec: Any):
         "lifecycle_status": LifecycleStatus.STABLE,
         "exposure": ExposurePolicy(web=True, api=True, plugin=True, agent=True, mcp=True, local_runtime=is_local),
         "automation_level": AutomationLevel.A1 if is_write else AutomationLevel.A2,
-        "authorization_policy": "local-integration.v2:agent.run",
+        "authorization_policy": "local-runtime.v2:agent.run",
         "resource_selectors": tuple(selectors), "data_classification": "confidential",
         "delegation_policy": "scoped", "agent_output_schema": descriptor.output_schema,
         "execution_mode": ExecutionMode.LOCAL if is_local else ExecutionMode.CLOUD_SYNC,
