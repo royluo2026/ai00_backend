@@ -116,7 +116,7 @@ def bootstrap_statements(sql: str) -> list[str]:
     """Return baseline statements scoped to the database selected by the URL."""
     result: list[str] = []
     for statement in split_sql(sql):
-        normalized = " ".join(_without_comments(statement).split()).upper()
+        normalized = " ".join(strip_sql_comments(statement).split()).upper()
         if not normalized:
             continue
         if normalized.startswith("CREATE DATABASE ") or normalized.startswith("USE "):
@@ -187,13 +187,13 @@ def discover_migrations(directory: Path) -> list[Migration]:
     return migrations
 
 
-def _without_comments(statement: str) -> str:
+def strip_sql_comments(statement: str) -> str:
     return re.sub(r"/\*.*?\*/|--[^\n]*|#[^\n]*", " ", statement, flags=re.DOTALL).strip()
 
 
-def _is_resumable_ddl(statement: str) -> bool:
+def is_resumable_ddl(statement: str) -> bool:
     """Return whether an OceanBase implicit-commit DDL is safe to replay."""
-    normalized = " ".join(_without_comments(statement).split()).upper()
+    normalized = " ".join(strip_sql_comments(statement).split()).upper()
     return bool(
         re.match(r"^CREATE TABLE IF NOT EXISTS\b", normalized)
         or re.match(r"^CREATE (?:UNIQUE )?INDEX IF NOT EXISTS\b", normalized)
@@ -204,7 +204,7 @@ def _is_resumable_ddl(statement: str) -> bool:
     )
 
 
-def _prepare_resumable_statement(conn, statement: str) -> str | None:
+def prepare_resumable_statement(conn, statement: str) -> str | None:
     """Translate declarative IF NOT EXISTS DDL for OceanBase 4.3.5."""
     add_column = re.search(
         r"\bALTER\s+TABLE\s+`?([A-Za-z0-9_]+)`?\s+ADD\s+COLUMN\s+"
@@ -246,30 +246,31 @@ def _prepare_resumable_statement(conn, statement: str) -> str | None:
 
     return statement
 
-def _assert_oceanbase_ddl_policy(migration: Migration, statements: list[str]) -> None:
+def assert_oceanbase_ddl_policy(path: Path, sql: str) -> None:
     """Reject SQL that cannot safely resume after OceanBase implicit commits."""
     from backend.db.oceanbase_compat import text_columns_with_defaults
 
-    text_defaults = text_columns_with_defaults(migration.sql)
+    statements = split_sql(sql)
+    text_defaults = text_columns_with_defaults(sql)
     if text_defaults:
         columns = ", ".join(sorted(set(text_defaults)))
         raise MigrationError(
-            f"{migration.path.name} uses unsupported TEXT/BLOB defaults: {columns}"
+            f"{path.name} uses unsupported TEXT/BLOB defaults: {columns}"
         )
     for statement in statements:
-        normalized = _without_comments(statement)
+        normalized = strip_sql_comments(statement)
         if not normalized:
             continue
-        if not _is_resumable_ddl(normalized):
+        if not is_resumable_ddl(normalized):
             head = " ".join(normalized.split())[:120]
             raise MigrationError(
-                f"{migration.path.name} contains non-resumable migration SQL: {head}"
+                f"{path.name} contains non-resumable migration SQL: {head}"
             )
 
 
 def validate_migration(migration: Migration, registry: DomainRegistry) -> None:
     statements = split_sql(migration.sql)
-    meaningful = [statement for statement in statements if _without_comments(statement)]
+    meaningful = [statement for statement in statements if strip_sql_comments(statement)]
     if not meaningful:
         raise MigrationError(f"empty migration: {migration.path.name}")
     tables = registry.tables_in(migration.sql)
@@ -286,7 +287,7 @@ def validate_migration(migration: Migration, registry: DomainRegistry) -> None:
         raise OwnershipError(
             f"{migration.path.name} is owned by {effective_owner} but accesses {wrong_owner}"
         )
-    _assert_oceanbase_ddl_policy(migration, meaningful)
+    assert_oceanbase_ddl_policy(migration.path, migration.sql)
 
 def _scalar(row):
     if isinstance(row, dict):
@@ -346,7 +347,7 @@ def apply_migrations(conn, directory: Path | None = None, registry: DomainRegist
                 # OceanBase commits before and after DDL. Each statement is deliberately
                 # replay-safe and committed independently so retries can resume safely.
                 for statement in split_sql(migration.sql):
-                    prepared = _prepare_resumable_statement(conn, statement)
+                    prepared = prepare_resumable_statement(conn, statement)
                     if prepared is None:
                         continue
                     with conn.cursor() as cur:

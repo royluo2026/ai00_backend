@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping
+from typing import Literal, Mapping
 from urllib.parse import unquote, urlparse
 
 from .domain_manifest import DomainManifest
@@ -87,16 +87,8 @@ def load_domain_database_config(
             "missing_domain_database_url: " + ", ".join(missing)
         )
 
-    runtime_url = _parse_url(
-        runtime_value,
-        env_name=runtime_env,
-        database_name=manifest.database.database_name,
-    )
-    ddl_url = _parse_url(
-        ddl_value,
-        env_name=ddl_env,
-        database_name=manifest.database.database_name,
-    )
+    runtime_url = load_domain_database_url(manifest, environ, role="runtime")
+    ddl_url = load_domain_database_url(manifest, environ, role="ddl")
     if runtime_url.username == ddl_url.username:
         raise DomainDatabaseConfigurationError(
             f"credential_separation_required: {runtime_env} and {ddl_env}"
@@ -109,7 +101,28 @@ def load_domain_database_config(
     )
 
 
-def _connect(url: DomainDatabaseUrl):
+def load_domain_database_url(
+    manifest: DomainManifest,
+    environ: Mapping[str, str],
+    *,
+    role: Literal["runtime", "ddl"],
+) -> DomainDatabaseUrl:
+    env_name = (
+        manifest.database.runtime_url_env
+        if role == "runtime"
+        else manifest.database.ddl_url_env
+    )
+    value = str(environ.get(env_name, "")).strip()
+    if not value:
+        raise DomainDatabaseConfigurationError(f"missing_domain_database_url: {env_name}")
+    return _parse_url(
+        value,
+        env_name=env_name,
+        database_name=manifest.database.database_name,
+    )
+
+
+def connect_domain_database(url: DomainDatabaseUrl):
     import pymysql
 
     return pymysql.connect(
@@ -124,18 +137,20 @@ def _connect(url: DomainDatabaseUrl):
 
 
 def connect_runtime(config: DomainDatabaseConfig):
-    return _connect(config.runtime_url)
+    return connect_domain_database(config.runtime_url)
 
 
 def connect_ddl(config: DomainDatabaseConfig):
-    return _connect(config.ddl_url)
+    return connect_domain_database(config.ddl_url)
 
 
 __all__ = [
     "DomainDatabaseConfig",
     "DomainDatabaseConfigurationError",
     "DomainDatabaseUrl",
+    "connect_domain_database",
     "connect_ddl",
     "connect_runtime",
     "load_domain_database_config",
+    "load_domain_database_url",
 ]

@@ -120,7 +120,9 @@
   "migration_paths": [
     "backend/db/migrations",
     "backend/db/versioned_migrations.py",
-    "backend/scripts/run_migrations.py"
+    "backend/scripts/run_migrations.py",
+    "backend/capability_v2/domain_migrations.py",
+    "backend/scripts/run_domain_migrations.py"
   ],
   "non_runtime_paths": [
     "backend/db/pg_to_mysql_migrate.py",

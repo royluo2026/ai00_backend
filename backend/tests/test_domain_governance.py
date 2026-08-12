@@ -75,6 +75,15 @@ class DomainGovernanceTests(unittest.TestCase):
         self.assertTrue(registry.is_non_runtime_path("backend/db/pg_to_mysql_migrate.py"))
         self.assertFalse(registry.is_non_runtime_path("backend/routers/ontology.py"))
 
+    def test_domain_migration_runner_is_deployment_only_migration_tooling(self):
+        registry = load_registry()
+        self.assertTrue(
+            registry.is_migration_path("backend/capability_v2/domain_migrations.py")
+        )
+        self.assertTrue(
+            registry.is_migration_path("backend/scripts/run_domain_migrations.py")
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
