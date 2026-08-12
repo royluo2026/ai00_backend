@@ -8,7 +8,7 @@ Execute base.notification.read_state.set in the Base collaboration service.
 - 不适用：Use a governed Capability V2 contract when one is available.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_0d13b058da7bf7eed9efb688470df27f`
+- Catalog Release：`rel_743ca47bacc80f7fdd97ae5654d0f6fc`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Execute base.notification.read_state.set in the Base collaboration service.
 ```json
 {
   "capability_id": "base.notification.read_state.set",
-  "catalog_release": "rel_0d13b058da7bf7eed9efb688470df27f",
+  "catalog_release": "rel_743ca47bacc80f7fdd97ae5654d0f6fc",
   "major_version": 1,
   "payload": {
     "notification_id": "example",

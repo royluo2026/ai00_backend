@@ -1227,22 +1227,6 @@
     },
     {
       "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/change_logs.py",
-      "scope": "list_change_logs",
-      "target": "workmanship_work_item_change_logs",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_item_change_logs",
-      "fingerprint": "8418ebcff4978c5f61d4"
-    },
-    {
-      "category": "cross_domain_sql",
-      "path": "plugins/craft/craft_backend/routers/change_logs.py",
-      "scope": "list_change_logs",
-      "target": "workmanship_work_lists",
-      "detail": "craft SQL accesses project_management-owned table workmanship_work_lists",
-      "fingerprint": "ca309574cffffe61bfb8"
-    },
-    {
-      "category": "cross_domain_sql",
       "path": "plugins/craft/craft_backend/routers/collab.py",
       "scope": "create_session",
       "target": "workmanship_proj_collab_sessions",

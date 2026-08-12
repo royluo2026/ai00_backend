@@ -99,7 +99,7 @@ def test_generated_report_validates_against_checked_in_schema():
 
     assert validate_report_schema(report) == []
     assert report["completion"]["complete"] is False
-    assert report["completion"]["cross_domain_sql"] == 329
+    assert report["completion"]["cross_domain_sql"] == 327
 
 
 def test_only_release_candidate_is_blocked_by_incomplete_program():
@@ -108,7 +108,7 @@ def test_only_release_candidate_is_blocked_by_incomplete_program():
 
     assert completion_blockers("offline", completion) == []
     blockers = completion_blockers("release-candidate", completion)
-    assert "capability completion: cross_domain_sql:329" in blockers
+    assert "capability completion: cross_domain_sql:327" in blockers
     assert "capability completion: missing_domain:agent" in blockers
 
 

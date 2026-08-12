@@ -114,5 +114,6 @@
 /backend/domain_ports/ontology.py @ai00/ontology-maintainers
 /backend/capability_v2/revision/ontology_adapter.py @ai00/ontology-maintainers
 /backend/domain_ports/project_management.py @ai00/project-management-maintainers
+/plugins/craft/craft_backend/routers/change_logs.py @ai00/project-management-maintainers
 /plugins/craft/craft_backend/routers/item_entries.py @ai00/project-management-maintainers
 /backend/domain_ports/knowledge.py @ai00/knowledge-maintainers
