@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:5cd8862223b71c97f07fb9b2040431d7a2298f68ab8f112609bda360072b9235",
+  "schema_sha256": "sha256:901d426828de54b3b9e0f13b432846663a7a604ea686a86dabd81dd1c85bb87e",
   "schema_version": 1,
   "tables": [
     {
@@ -17335,9 +17335,59 @@
         },
         {
           "data_type": "VARCHAR(255)",
-          "default": "(' canvas_x DOUBLE NOT NULL DEFAULT 0, canvas_y DOUBLE NOT NULL DEFAULT 0, canvas_w DOUBLE NOT NULL DEFAULT 400, canvas_h DOUBLE NOT NULL DEFAULT 300, created_at DATETIME(6)",
+          "default": "('#7287fd')",
           "extra": "",
           "name": "color",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "DOUBLE",
+          "default": "0",
+          "extra": "",
+          "name": "canvas_x",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "DOUBLE",
+          "default": "0",
+          "extra": "",
+          "name": "canvas_y",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "DOUBLE",
+          "default": "400",
+          "extra": "",
+          "name": "canvas_w",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "DOUBLE",
+          "default": "300",
+          "extra": "",
+          "name": "canvas_h",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
           "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
@@ -30817,7 +30867,7 @@
         },
         {
           "data_type": "VARCHAR(255)",
-          "default": "(' storage_scope VARCHAR(255)",
+          "default": "('#5b8dee')",
           "extra": "",
           "name": "color",
           "nullable": false,
@@ -30826,13 +30876,133 @@
           ]
         },
         {
+          "data_type": "VARCHAR(255)",
+          "default": "('cloud')",
+          "extra": "",
+          "name": "storage_scope",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "('user')",
+          "extra": "",
+          "name": "owner_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "('')",
+          "extra": "",
+          "name": "owner_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "('')",
+          "extra": "",
+          "name": "creator_gid",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "('task')",
+          "extra": "",
+          "name": "item_type",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "INT",
+          "default": "0",
+          "extra": "",
+          "name": "sort_order",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(255)",
+          "default": "('team')",
+          "extra": "",
+          "name": "visibility",
+          "nullable": false,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
           "data_type": "CHAR(36)",
-          "default": null,
+          "default": "NULL",
+          "extra": "",
+          "name": "project_gid",
+          "nullable": true,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(36)",
+          "default": "NULL",
           "extra": "",
           "name": "shared_team_gid",
           "nullable": true,
           "sources": [
-            "backend/db/migrations/202608050003_craft_list_team_visibility.sql"
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "read_scope",
+          "nullable": true,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "write_scope",
+          "nullable": true,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "NULL",
+          "extra": "",
+          "name": "deleted_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/mysql_schema.sql"
+          ]
+        },
+        {
+          "data_type": "DATETIME(6)",
+          "default": "CURRENT_TIMESTAMP(6)",
+          "extra": "",
+          "name": "created_at",
+          "nullable": true,
+          "sources": [
+            "backend/db/mysql_schema.sql"
           ]
         }
       ],

@@ -161,3 +161,14 @@ def test_real_repository_uses_authoritative_runtime_ledger_contract():
         ("status", "VARCHAR(16)"), ("duration_ms", "BIGINT"),
         ("error", "TEXT"), ("applied_at", "DATETIME(6)"),
     ]
+
+
+def test_real_repository_preserves_hash_color_defaults_and_following_columns():
+    schema = compile_expected_schema(ROOT)
+    sections = schema.require_table("workmanship_factory_factory_sections")
+    assert sections.require_column("color").default == "('#7287fd')"
+    assert sections.require_column("canvas_x").default == "0"
+    assert sections.require_column("canvas_h").default == "300"
+    work_lists = schema.require_table("workmanship_work_lists")
+    assert work_lists.require_column("color").default == "('#5b8dee')"
+    assert work_lists.require_column("storage_scope").default == "('cloud')"

@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:5cd8862223b71c97f07fb9b2040431d7a2298f68ab8f112609bda360072b9235",
+  "schema_sha256": "sha256:901d426828de54b3b9e0f13b432846663a7a604ea686a86dabd81dd1c85bb87e",
   "schema_version": 1,
   "tables": [
     {
@@ -5837,7 +5837,22 @@
     },
     {
       "columns": {
+        "canvas_h": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "canvas_w": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "canvas_x": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "canvas_y": [
+          "backend/db/mysql_schema.sql"
+        ],
         "color": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "created_at": [
           "backend/db/mysql_schema.sql"
         ],
         "factory_gid": [
@@ -10406,14 +10421,50 @@
         "color": [
           "backend/db/mysql_schema.sql"
         ],
+        "created_at": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "creator_gid": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "deleted_at": [
+          "backend/db/mysql_schema.sql"
+        ],
         "gid": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "item_type": [
           "backend/db/mysql_schema.sql"
         ],
         "name": [
           "backend/db/mysql_schema.sql"
         ],
+        "owner_gid": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "owner_type": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "project_gid": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "read_scope": [
+          "backend/db/mysql_schema.sql"
+        ],
         "shared_team_gid": [
-          "backend/db/migrations/202608050003_craft_list_team_visibility.sql"
+          "backend/db/mysql_schema.sql"
+        ],
+        "sort_order": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "storage_scope": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "visibility": [
+          "backend/db/mysql_schema.sql"
+        ],
+        "write_scope": [
+          "backend/db/mysql_schema.sql"
         ]
       },
       "constraints": {},

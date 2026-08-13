@@ -6,6 +6,7 @@ from backend.db.versioned_migrations import (
     canonicalize_migration_sql,
     discover_migrations,
     normalize_oceanbase_sql,
+    strip_sql_comments,
     validate_migration,
 )
 from backend.governance import load_registry
@@ -32,6 +33,19 @@ class VersionedMigrationFileTests(unittest.TestCase):
         normalized = normalize_oceanbase_sql(sql)
         self.assertIn("payload JSON NOT NULL", normalized)
         self.assertNotIn("JSON_OBJECT", normalized)
+
+    def test_comment_stripping_preserves_comment_markers_inside_strings(self):
+        sql = """CREATE TABLE x (
+          color VARCHAR(16) DEFAULT ('#5b8dee'),
+          note VARCHAR(32) DEFAULT ('--not-a-comment')
+        ); # real comment
+        -- another real comment
+        SELECT 1 /* block comment */;
+        """
+        stripped = strip_sql_comments(sql)
+        self.assertIn("'#5b8dee'", stripped)
+        self.assertIn("'--not-a-comment'", stripped)
+        self.assertNotIn("real comment", stripped)
     def test_all_committed_migrations_are_named_and_domain_safe(self):
         root = Path(__file__).resolve().parents[2]
         migrations = discover_migrations(root / "backend/db/migrations")

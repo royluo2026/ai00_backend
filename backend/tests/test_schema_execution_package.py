@@ -68,6 +68,30 @@ def test_preflight_accepts_database_scoped_ddl_privileges(tmp_path):
     assert "TABLE_SCHEMA = 'ai00_test'" in preflight
 
 
+def test_generated_sql_unwraps_parenthesized_scalar_defaults(tmp_path):
+    expected = ExpectedSchema((TableSpec(
+        "workmanship_factory_assets", "factory", "factory", False,
+        columns=(
+            ColumnSpec("gid", "CHAR(36)", False),
+            ColumnSpec("status", "VARCHAR(255)", False, "('in_use')"),
+            ColumnSpec("version", "BIGINT", False, "(1)"),
+            ColumnSpec("snapshot_date", "DATE", False, "(CURRENT_DATE)"),
+        ),
+        indexes=(IndexSpec("PRIMARY", ("gid",), True, True),),
+    ),), database_name="ai00_test")
+    diff = SchemaDiff("ai00_test", expected.schema_sha256, (
+        SchemaDifference("missing_table", "workmanship_factory_assets", expected_object=expected.tables[0]),
+    ), ())
+    build_execution_package(expected=expected, diff=diff, output=tmp_path)
+    ddl = (tmp_path / "10-create-missing-tables.sql").read_text(encoding="utf-8")
+    assert "DEFAULT 'in_use'" in ddl
+    assert "DEFAULT 1" in ddl
+    assert "DEFAULT CURRENT_DATE" in ddl
+    assert "DEFAULT ('in_use')" not in ddl
+    assert "DEFAULT (1)" not in ddl
+    assert "DEFAULT (CURRENT_DATE)" not in ddl
+
+
 def test_manual_diff_blocks_ddl_generation(tmp_path):
     expected = _expected()
     diff = SchemaDiff("ai00_test", expected.schema_sha256, (), (

@@ -188,7 +188,52 @@ def discover_migrations(directory: Path) -> list[Migration]:
 
 
 def strip_sql_comments(statement: str) -> str:
-    return re.sub(r"/\*.*?\*/|--[^\n]*|#[^\n]*", " ", statement, flags=re.DOTALL).strip()
+    result: list[str] = []
+    quote: str | None = None
+    line_comment = False
+    block_comment = False
+    index = 0
+    while index < len(statement):
+        char = statement[index]
+        following = statement[index + 1] if index + 1 < len(statement) else ""
+        if line_comment:
+            if char in "\r\n":
+                line_comment = False
+                result.append(char)
+        elif block_comment:
+            if char == "*" and following == "/":
+                block_comment = False
+                result.append(" ")
+                index += 1
+        elif quote:
+            result.append(char)
+            if char == "\\" and following:
+                index += 1
+                result.append(following)
+            elif char == quote:
+                if following == quote:
+                    index += 1
+                    result.append(following)
+                else:
+                    quote = None
+        elif char in "'\"`":
+            quote = char
+            result.append(char)
+        elif char == "-" and following == "-":
+            line_comment = True
+            result.append(" ")
+            index += 1
+        elif char == "#":
+            line_comment = True
+            result.append(" ")
+        elif char == "/" and following == "*":
+            block_comment = True
+            result.append(" ")
+            index += 1
+        else:
+            result.append(char)
+        index += 1
+    return "".join(result).strip()
 
 
 def is_resumable_ddl(statement: str) -> bool:

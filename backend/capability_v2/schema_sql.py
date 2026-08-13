@@ -67,6 +67,16 @@ def _quote(value: str) -> str:
     return "`" + value + "`"
 
 
+def _default(value: str) -> str:
+    scalar = re.fullmatch(
+        r"\(\s*((?:'(?:''|[^'])*')|(?:[-+]?\d+(?:\.\d+)?)|NULL|TRUE|FALSE|"
+        r"CURRENT_(?:DATE|TIME|TIMESTAMP)(?:\(\d*\))?)\s*\)",
+        value,
+        re.I,
+    )
+    return scalar.group(1) if scalar else value
+
+
 def _index_column(value: str) -> str:
     match = re.fullmatch(r"([^()]+)\((\d+)\)", value)
     return _quote(match.group(1) if match else value) + (f"({match.group(2)})" if match else "")
@@ -74,7 +84,7 @@ def _index_column(value: str) -> str:
 
 def _column(column: ColumnSpec) -> str:
     result = f"{_quote(column.name)} {column.data_type} {'NULL' if column.nullable else 'NOT NULL'}"
-    if column.default is not None: result += f" DEFAULT {column.default}"
+    if column.default is not None: result += f" DEFAULT {_default(column.default)}"
     if column.extra: result += " " + column.extra
     return result
 
