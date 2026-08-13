@@ -18,6 +18,21 @@ IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9_$]+$")
 ACCOUNT_RE = re.compile(r"^[A-Za-z0-9_$.-]+$")
 HOST_RE = re.compile(r"^[A-Za-z0-9_$%.:-]+$")
 
+DEVELOPER_GROUPS = {
+    "craft": ("craft",),
+    "model_simulation": ("digital_model", "simulation"),
+    "device": ("device",),
+    "shared": (
+        "base",
+        "project_management",
+        "factory",
+        "knowledge",
+        "ontology",
+        "agent",
+        "integration",
+    ),
+}
+
 
 def checked(value: str, regex: re.Pattern, label: str) -> str:
     if not regex.fullmatch(value):
@@ -40,23 +55,104 @@ def parse_accounts(values: list[str], required: set[str]) -> dict[str, str]:
     return result
 
 
+def _grant_line(database: str, table: str, account: str, host: str) -> str:
+    return (
+        f"GRANT SELECT, INSERT, UPDATE, DELETE ON `{database}`.`{table}` "
+        f"TO '{account}'@'{host}';"
+    )
+
+
+def render_grouped_grants(
+    inventory: dict,
+    *,
+    database: str,
+    host: str,
+    accounts: dict[str, str],
+    include_revokes: bool = False,
+) -> str:
+    database = checked(database, IDENTIFIER_RE, "database")
+    host = checked(host, HOST_RE, "host")
+    required = set(DEVELOPER_GROUPS) | {"runtime"}
+    if set(accounts) != required:
+        raise ValueError(f"account groups must be exactly: {sorted(required)}")
+    validated_accounts = {
+        group: checked(account, ACCOUNT_RE, "account")
+        for group, account in accounts.items()
+    }
+    if len(set(validated_accounts.values())) != len(validated_accounts):
+        raise ValueError("account groups require distinct accounts")
+
+    tables = inventory.get("tables", [])
+    if any(not item.get("owner") or not item.get("runtime_domain") for item in tables):
+        raise ValueError("inventory contains unowned tables")
+    all_tables = sorted(str(item["table"]) for item in tables)
+    for table in all_tables:
+        checked(table, IDENTIFIER_RE, "table")
+
+    lines = [
+        "-- Generated desired DML grants. Review before execution.",
+        "-- Schema changes require the external migration identity.",
+    ]
+    group_domains = {**DEVELOPER_GROUPS, "runtime": tuple(sorted({
+        str(item["runtime_domain"]) for item in tables
+    }))}
+    for group in (*DEVELOPER_GROUPS, "runtime"):
+        account = validated_accounts[group]
+        domains = set(group_domains[group])
+        allowed = sorted(
+            str(item["table"])
+            for item in tables
+            if str(item["runtime_domain"]) in domains
+        )
+        lines.extend(("", f"-- account-group:{group}"))
+        lines.extend(_grant_line(database, table, account, host) for table in allowed)
+        if include_revokes:
+            foreign = sorted(set(all_tables) - set(allowed))
+            lines.extend(
+                f"REVOKE ALL PRIVILEGES ON `{database}`.`{table}` "
+                f"FROM '{account}'@'{host}';"
+                for table in foreign
+            )
+    return "\n".join(lines) + "\n"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--inventory", type=Path, default=REPO_ROOT / "backend/governance/table_inventory.json")
     parser.add_argument("--database", required=True)
     parser.add_argument("--host", default="%")
     parser.add_argument("--account", action="append", default=[], metavar="DOMAIN=USER")
+    parser.add_argument("--account-group", action="append", default=[], metavar="GROUP=USER")
     parser.add_argument("--include-revokes", action="store_true")
     args = parser.parse_args()
 
     database = checked(args.database, IDENTIFIER_RE, "database")
     host = checked(args.host, HOST_RE, "host")
-    registry = load_registry()
-    runtime_domains = set(registry.product_domains)
-    accounts = parse_accounts(args.account, runtime_domains)
     inventory = json.loads(args.inventory.read_text(encoding="utf-8"))
+    registry = load_registry()
     if inventory.get("registry_version") != registry.version:
         raise ValueError("inventory registry version is stale")
+    if args.account_group:
+        if args.account:
+            raise ValueError("choose --account-group or --account, not both")
+        accounts = parse_accounts(
+            args.account_group,
+            set(DEVELOPER_GROUPS) | {"runtime"},
+        )
+        print(
+            render_grouped_grants(
+                inventory,
+                database=database,
+                host=host,
+                accounts=accounts,
+                include_revokes=args.include_revokes,
+            ),
+            end="",
+        )
+        return 0
+
+    runtime_domains = set(registry.product_domains)
+    accounts = parse_accounts(args.account, runtime_domains)
     tables = inventory.get("tables", [])
     if any(not item.get("owner") or not item.get("runtime_domain") for item in tables):
         raise ValueError("inventory contains unowned tables")

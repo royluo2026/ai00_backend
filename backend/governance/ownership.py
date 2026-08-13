@@ -18,10 +18,11 @@ class TableOwnership:
     table: str
     owner: str
     runtime_domain: str
+    legacy_name: bool
 
 
 class DomainRegistry:
-    def __init__(self, data: dict):
+    def __init__(self, data: dict, table_ownership: dict):
         self.data = data
         self.version = int(data["version"])
         self.product_domains = tuple(data["product_domains"])
@@ -36,6 +37,17 @@ class DomainRegistry:
         self.table_overrides = data.get("table_overrides", {})
         self.migration_owner_overrides = data.get("migration_owner_overrides", {})
         self.migration_table_exceptions = data.get("migration_table_exceptions", {})
+        self.table_ownership_version = int(table_ownership["schema_version"])
+        self._exact_table_owners = {
+            str(item["table"]).lower(): TableOwnership(
+                table=str(item["table"]).lower(),
+                owner=str(item["owner"]),
+                runtime_domain=str(item["runtime_domain"]),
+                legacy_name=bool(item["legacy_name"]),
+            )
+            for item in table_ownership.get("tables", ())
+        }
+        self._table_ownership_document = table_ownership
         self._validate()
 
     def _validate(self) -> None:
@@ -46,6 +58,21 @@ class DomainRegistry:
         for owner, config in self.data_owners.items():
             if config["runtime_domain"] not in self.product_domains:
                 raise OwnershipError(f"{owner} has invalid runtime_domain")
+        ownership_rows = self._table_ownership_document.get("tables", ())
+        if self.table_ownership_version != 1:
+            raise OwnershipError("unsupported exact table ownership schema")
+        if self._table_ownership_document.get("registry_version") != self.version:
+            raise OwnershipError("exact table ownership registry version is stale")
+        if self._table_ownership_document.get("table_count") != len(ownership_rows):
+            raise OwnershipError("exact table ownership count mismatch")
+        if len(self._exact_table_owners) != len(ownership_rows):
+            raise OwnershipError("duplicate exact table ownership")
+        for table, ownership in self._exact_table_owners.items():
+            if not TABLE_RE.fullmatch(table) or ownership.owner not in known:
+                raise OwnershipError(f"invalid exact table ownership: {table}")
+            expected_runtime = self.data_owners[ownership.owner]["runtime_domain"]
+            if ownership.runtime_domain != expected_runtime:
+                raise OwnershipError(f"invalid exact runtime domain: {table}")
         for rule in self.source_overrides:
             if rule.get("domain") not in self.product_domains or not rule.get("path"):
                 raise OwnershipError(f"invalid source override: {rule}")
@@ -83,15 +110,7 @@ class DomainRegistry:
         table = table.lower()
         if table in self.ignored_identifiers:
             return None
-        owner = self.table_overrides.get(table)
-        if owner is None:
-            matches = [r["owner"] for r in self.table_prefix_owners if table.startswith(r["prefix"])]
-            if len(matches) > 1 and len(set(matches)) > 1:
-                raise OwnershipError(f"ambiguous owner for {table}: {matches}")
-            owner = matches[0] if matches else None
-        if owner is None:
-            return None
-        return TableOwnership(table, owner, self.data_owners[owner]["runtime_domain"])
+        return self._exact_table_owners.get(table)
 
     def tables_in(self, text: str) -> set[str]:
         return {match.lower() for match in TABLE_RE.findall(text) if match.lower() not in self.ignored_identifiers}
@@ -119,6 +138,19 @@ class DomainRegistry:
         return any(module == prefix or module.startswith(prefix + ".") for prefix in self.public_import_prefixes)
 
 
-def load_registry(path: str | Path | None = None) -> DomainRegistry:
+def load_registry(
+    path: str | Path | None = None,
+    table_ownership_path: str | Path | None = None,
+) -> DomainRegistry:
     registry_path = Path(path) if path else Path(__file__).with_name("domain_boundaries.json")
-    return DomainRegistry(json.loads(registry_path.read_text(encoding="utf-8")))
+    ownership_path = (
+        Path(table_ownership_path)
+        if table_ownership_path
+        else registry_path.with_name("domain_table_ownership.json")
+    )
+    if not ownership_path.exists():
+        raise OwnershipError(f"exact table ownership file is required: {ownership_path}")
+    return DomainRegistry(
+        json.loads(registry_path.read_text(encoding="utf-8")),
+        json.loads(ownership_path.read_text(encoding="utf-8")),
+    )

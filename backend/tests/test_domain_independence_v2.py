@@ -122,7 +122,7 @@ def test_runtime_database_governance_uses_the_same_first_class_domains():
     assert set(registry.product_domains) == set(DOMAIN_SLUGS.values())
     assert registry.data_owners["knowledge"]["runtime_domain"] == "knowledge"
     assert registry.table_owner("workmanship_proj_tasks").owner == "project_management"
-    assert registry.table_owner("workmanship_onto_concepts").owner == "ontology"
+    assert registry.table_owner("workmanship_onto_classes").owner == "ontology"
     assert registry.table_owner("workmanship_know_documents").owner == "knowledge"
     assert registry.migration_owner("202608050002", "craft") == "project_management"
     assert registry.migration_owner("202608050003", "craft") == "project_management"

@@ -24,6 +24,7 @@ from backend.governance import DomainRegistry, load_registry
 DDL_RE = re.compile(r"\b(?:CREATE|ALTER|DROP|RENAME|TRUNCATE)\s+(?:TABLE|INDEX)\b", re.IGNORECASE)
 REFERENCE_RE = re.compile(r"\bREFERENCES\s+(workmanship_[a-z0-9_]+)", re.IGNORECASE)
 CREATE_TABLE_RE = re.compile(r"\bCREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+(workmanship_[a-z0-9_]+)", re.IGNORECASE)
+DOMAIN_MIGRATION_RE = re.compile(r"(?:^|/)backend/db/migrations/domains/([a-z][a-z0-9_]*)/")
 
 
 @dataclass(frozen=True)
@@ -103,17 +104,12 @@ class PythonAudit(ast.NodeVisitor):
         if DDL_RE.search(text) and not self.registry.is_migration_path(self.relative):
             for target in sorted(tables) or ["<unknown>"]:
                 self._add("runtime_ddl", target, "DDL is only allowed in versioned migration files")
-        source_match = CREATE_TABLE_RE.search(text)
-        if source_match:
-            source_owner = self.registry.table_owner(source_match.group(1))
-            for target in REFERENCE_RE.findall(text):
-                target_owner = self.registry.table_owner(target)
-                if source_owner and target_owner and source_owner.owner != target_owner.owner:
-                    self._add(
-                        "cross_domain_foreign_key",
-                        f"{source_match.group(1)}->{target.lower()}",
-                        "cross-domain foreign keys are forbidden",
-                    )
+        for violation in audit_sql_text(
+            text,
+            path=self.relative,
+            registry=self.registry,
+        ):
+            self._add(violation.category, violation.target, violation.detail)
 
 
     def visit_Expr(self, node: ast.Expr) -> None:
@@ -121,6 +117,44 @@ class PythonAudit(ast.NodeVisitor):
         if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
             return
         self.generic_visit(node)
+
+
+def audit_sql_text(
+    text: str,
+    *,
+    path: str,
+    registry: DomainRegistry,
+) -> tuple[Violation, ...]:
+    """Audit ownership-sensitive SQL constructs without executing SQL."""
+    normalized = Path(path).as_posix().lstrip("./")
+    migration_match = DOMAIN_MIGRATION_RE.search("/" + normalized)
+    declared_domain = (
+        migration_match.group(1)
+        if migration_match
+        else registry.source_domain(normalized)
+    )
+    violations: list[Violation] = []
+    for statement in text.split(";"):
+        source_match = CREATE_TABLE_RE.search(statement)
+        if source_match is None:
+            continue
+        source_table = source_match.group(1)
+        source = registry.table_owner(source_table)
+        source_domain = source.runtime_domain if source else declared_domain
+        for target_table in REFERENCE_RE.findall(statement):
+            target = registry.table_owner(target_table)
+            if source_domain and target and source_domain != target.runtime_domain:
+                violations.append(
+                    Violation(
+                        "cross_domain_foreign_key",
+                        normalized,
+                        "<sql>",
+                        f"{source_table.lower()}->{target_table.lower()}",
+                        "cross-domain foreign keys are forbidden",
+                    )
+                )
+    unique = {item.fingerprint: item for item in violations}
+    return tuple(sorted(unique.values(), key=lambda item: (item.category, item.target)))
 
 def audit_repository(root: Path, registry: DomainRegistry) -> tuple[list[Violation], list[str]]:
     violations: list[Violation] = []
@@ -157,6 +191,10 @@ def audit_repository(root: Path, registry: DomainRegistry) -> tuple[list[Violati
         text = path.read_text(encoding="utf-8", errors="replace")
         found = registry.tables_in(text)
         tables.update(found)
+        if registry.is_migration_path(relative):
+            violations.extend(
+                audit_sql_text(text, path=relative, registry=registry)
+            )
         for table in sorted(found):
             if registry.table_owner(table) is None:
                 violations.append(Violation("unowned_table", relative, "<sql>", table, "no owner registered"))
@@ -194,6 +232,7 @@ def main() -> int:
     parser.add_argument("--baseline", type=Path, default=REPO_ROOT / "backend/governance/boundary_baseline.json")
     parser.add_argument("--write-baseline", action="store_true")
     parser.add_argument("--inventory", type=Path)
+    parser.add_argument("--ownership", type=Path)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
@@ -217,6 +256,32 @@ def main() -> int:
         args.inventory.parent.mkdir(parents=True, exist_ok=True)
         inventory = {k: payload[k] for k in ("registry_version", "table_count", "tables")}
         args.inventory.write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.ownership:
+        exact_rows = []
+        for table in tables:
+            ownership = registry.table_owner(table)
+            if ownership is None:
+                continue
+            prefix = registry.data_owners[ownership.owner]["new_table_prefix"]
+            exact_rows.append(
+                {
+                    "table": table,
+                    "owner": ownership.owner,
+                    "runtime_domain": ownership.runtime_domain,
+                    "legacy_name": not table.startswith(prefix),
+                }
+            )
+        ownership_document = {
+            "schema_version": 1,
+            "registry_version": registry.version,
+            "table_count": len(exact_rows),
+            "tables": exact_rows,
+        }
+        args.ownership.parent.mkdir(parents=True, exist_ok=True)
+        args.ownership.write_text(
+            json.dumps(ownership_document, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     if args.write_baseline:
         args.baseline.parent.mkdir(parents=True, exist_ok=True)
         baseline = {"registry_version": registry.version, "violations": payload["violations"]}

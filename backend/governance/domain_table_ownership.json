@@ -1,0 +1,1231 @@
+{
+  "schema_version": 1,
+  "registry_version": 1,
+  "table_count": 204,
+  "tables": [
+    {
+      "table": "workmanship_agent_capability_resources",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_agent_run_approvals",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_agent_run_participants",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_agent_run_tool_results",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_agent_runs",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_agent_schema_migrations",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_app_ai_audit_logs",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_ai_memory",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_ai_sessions",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_ai_turns",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_bug_tracker_snapshots",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_capability_audit",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_export_templates",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_feishu_search_cache",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_flow_runs",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_flows",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_operational_alerts",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_skills",
+      "owner": "agent",
+      "runtime_domain": "agent",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_system_config",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_view_configs",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_wb_annotations",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_wfc_canvases",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_workbench_configs",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_workbench_member_overrides",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_app_worker_heartbeats",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_auth_auth_pending",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_auth_bid_sections",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_auth_permission_grants",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_auth_project_members",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_auth_section_owners",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_auth_teams",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_auth_users",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_base_approvals",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_artifact_upload_sessions",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_artifacts",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_capability_approvals",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_capability_audit_ledger",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_capability_audit_outbox",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_capability_catalog_releases",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_capability_operations",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_capability_outcomes",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_capability_rate_windows",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_consumer_delegations",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_domain_inbox",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_notification_preferences",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_notifications",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_ontology_active_refs",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_base_ontology_change_proposals",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_base_ontology_proposal_reviews",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_base_ontology_proposal_revisions",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_base_ontology_release_objects",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_base_ontology_releases",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_base_plugin_invocation_audit",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_revision_branches",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_revision_changesets",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_revision_commit_parents",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_revision_commits",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_revision_diffs",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_revision_lineage_edges",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_revision_repositories",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_revision_snapshots",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_schema_migrations",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_search_projection",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_self_annotations",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_workspace_templates",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_bop_asm_steps",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_control_plan",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_entries",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_entry_links",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_equipments",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_fixtures",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_floor_height",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_fork_presets",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_jack_pos",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_lifecycle_history",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_lifecycle_stats",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_line",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_line_checkpoints",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_line_history_state",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_line_operation_log",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_operator",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_pbom_diff_queue",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_process",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_process_charts",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_staging",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_station",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_steps",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_tools",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_version_families",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_bop_versions",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_cad_model_instances",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_canvas_bop_layers",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_gbop_match_staging",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_gbop_nav_bindings",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_pbom",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_pbom_versions",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_project_roles",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_bop_vpps_operations",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_craft_bop_change_previews",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_import_previews",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_bop_write_idempotency",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_pbom_change_previews",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_schema_migrations",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_validation_policies",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_craft_validation_policy_checks",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_display_id_counters",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_factory_assets",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_factories",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_factory_equipments",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_factory_fixtures",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_factory_layout_templates",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_factory_lines",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_factory_sections",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_factory_stations",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_factory_tools",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_resource_catalog",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_schema_migrations",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_factory_structures",
+      "owner": "factory",
+      "runtime_domain": "factory",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_int_ext_datasources",
+      "owner": "integration",
+      "runtime_domain": "integration",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_int_ext_field_mappings",
+      "owner": "integration",
+      "runtime_domain": "integration",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_int_ext_mappings",
+      "owner": "integration",
+      "runtime_domain": "integration",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_int_schema_migrations",
+      "owner": "integration",
+      "runtime_domain": "integration",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_int_sync_runs",
+      "owner": "integration",
+      "runtime_domain": "integration",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_know_craft_rules",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_display_counters",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_document_acl",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_documents",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_domain_outbox",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_entries",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_favorites",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_folders",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_item_history",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_items",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_migration_items",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_migration_runs",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_proposals",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_publish_outbox",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_recent",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_reference_datasets",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_reference_versions",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_revisions",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_know_spaces",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_knowledge_schema_migrations",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_model_components",
+      "owner": "digital_model",
+      "runtime_domain": "digital_model",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_model_models",
+      "owner": "digital_model",
+      "runtime_domain": "digital_model",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_model_schema_migrations",
+      "owner": "digital_model",
+      "runtime_domain": "digital_model",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_model_versions",
+      "owner": "digital_model",
+      "runtime_domain": "digital_model",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_onto_axioms",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_onto_classes",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_onto_properties",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_onto_relations",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_ontology_schema_migrations",
+      "owner": "ontology",
+      "runtime_domain": "ontology",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_plugin_installations",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_plugin_lifecycle_events",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_plugin_mount_sessions",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_plugin_namespace_kv",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_plugin_publishers",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_plugin_releases",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_plugin_usage_events",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_plugin_usage_month_closures",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_plugin_usage_monthly",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_approval_orders",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_collab_sessions",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_issues",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_projects",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_task_dependencies",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_tasks",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_proj_vehicle_models",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_project_management_schema_migrations",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_runtime_commands",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_runtime_devices",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_runtime_enrollments",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_runtime_schema_migrations",
+      "owner": "device",
+      "runtime_domain": "device",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_sim_environments",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_parameter_sets",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_profiles",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_runs",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_sim_schema_migrations",
+      "owner": "simulation",
+      "runtime_domain": "simulation",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_tpl_fastener_spec",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_gbop_entries",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_gbop_entry_links",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_gbop_operations",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_gbop_processes",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_gbop_versions",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_vpps_equipments",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_vpps_fixtures",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_vpps_parts",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_tpl_vpps_tools",
+      "owner": "craft",
+      "runtime_domain": "craft",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_follows",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_issues",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_item_change_logs",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_item_entries",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_item_shares",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_list_bitable_bindings",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_list_bitable_record_map",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_list_shares",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_lists",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_notifications",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_permission_requests",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_share_links",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_task_dependencies",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_task_template_items",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_task_templates",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    },
+    {
+      "table": "workmanship_work_tasks",
+      "owner": "project_management",
+      "runtime_domain": "project_management",
+      "legacy_name": true
+    }
+  ]
+}
