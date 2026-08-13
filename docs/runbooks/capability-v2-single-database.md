@@ -18,6 +18,19 @@
 6. 执行 `90-verify-schema.sql`，重新导出三份 CSV，再运行规划器。
 7. 只有缺失表、字段、索引和不兼容差异全部为零，才继续创建领域账号并启动 Backend、Agent、MCP 和 Local Runtime 联调。
 
+## 五个运行账号的授权验收
+
+DBA 创建四个开发组账号（Craft、Digital Model + Simulation、Device、其余七域）和一个共享 Runtime 账号。生成器只输出逐表 `SELECT/INSERT/UPDATE/DELETE`，DDL 始终由外部迁移身份执行：
+
+```powershell
+python backend/scripts/generate_domain_grants.py --database ai00_test `
+  --account-group craft=USER_CRAFT --account-group model_simulation=USER_MODEL_SIM `
+  --account-group device=USER_DEVICE --account-group shared=USER_SHARED `
+  --account-group runtime=USER_RUNTIME
+```
+
+分别执行 `SHOW GRANTS FOR 'USER'@'HOST'`，将结果按 `craft`、`model_simulation`、`device`、`shared`、`runtime` 五个键保存为 JSON 数组，再运行 `verify_single_database_grants.py --input FILE`。输出只含组标签、表数量、缺失/多余表名和失败代码；任一通配授权、DDL、`ALL PRIVILEGES` 或 `GRANT OPTION` 都不通过。
+
 首次只生成导出文件可执行：
 
 ```powershell

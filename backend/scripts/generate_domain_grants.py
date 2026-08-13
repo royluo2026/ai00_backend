@@ -6,6 +6,7 @@ import argparse
 import json
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -32,6 +33,49 @@ DEVELOPER_GROUPS = {
         "integration",
     ),
 }
+
+DML_PRIVILEGES = ("SELECT", "INSERT", "UPDATE", "DELETE")
+
+
+class GrantPolicyError(ValueError):
+    pass
+
+
+@dataclass(frozen=True)
+class AccountGrantPlan:
+    label: str
+    account: str
+    tables: tuple[str, ...]
+    privileges: tuple[str, ...] = DML_PRIVILEGES
+
+
+@dataclass(frozen=True)
+class GroupedGrantPlan:
+    accounts: tuple[AccountGrantPlan, ...]
+
+    def require(self, label: str) -> AccountGrantPlan:
+        return next(item for item in self.accounts if item.label == label)
+
+
+def build_grouped_grant_plan(accounts: dict[str, str], inventory: dict) -> GroupedGrantPlan:
+    required = set(DEVELOPER_GROUPS) | {"runtime"}
+    if set(accounts) != required:
+        raise GrantPolicyError(f"account groups must be exactly: {sorted(required)}")
+    validated_accounts = {label: checked(value, ACCOUNT_RE, "account") for label, value in accounts.items()}
+    if len(set(validated_accounts.values())) != len(accounts):
+        raise GrantPolicyError("account groups require distinct accounts")
+    domain_groups = {domain: group for group, domains in DEVELOPER_GROUPS.items() for domain in domains}
+    tables = inventory.get("tables", [])
+    for row in tables:
+        owner, runtime = row.get("owner"), row.get("runtime_domain")
+        if owner not in domain_groups or runtime != owner:
+            raise GrantPolicyError(f"group_scope_violation:{row.get('table')}")
+    plans = []
+    for label in (*DEVELOPER_GROUPS, "runtime"):
+        domains = set(DEVELOPER_GROUPS.get(label, domain_groups))
+        selected = tuple(sorted(row["table"] for row in tables if label == "runtime" or row["owner"] in domains))
+        plans.append(AccountGrantPlan(label, validated_accounts[label], selected))
+    return GroupedGrantPlan(tuple(plans))
 
 
 def checked(value: str, regex: re.Pattern, label: str) -> str:
@@ -72,16 +116,6 @@ def render_grouped_grants(
 ) -> str:
     database = checked(database, IDENTIFIER_RE, "database")
     host = checked(host, HOST_RE, "host")
-    required = set(DEVELOPER_GROUPS) | {"runtime"}
-    if set(accounts) != required:
-        raise ValueError(f"account groups must be exactly: {sorted(required)}")
-    validated_accounts = {
-        group: checked(account, ACCOUNT_RE, "account")
-        for group, account in accounts.items()
-    }
-    if len(set(validated_accounts.values())) != len(validated_accounts):
-        raise ValueError("account groups require distinct accounts")
-
     tables = inventory.get("tables", [])
     if any(not item.get("owner") or not item.get("runtime_domain") for item in tables):
         raise ValueError("inventory contains unowned tables")
@@ -93,17 +127,10 @@ def render_grouped_grants(
         "-- Generated desired DML grants. Review before execution.",
         "-- Schema changes require the external migration identity.",
     ]
-    group_domains = {**DEVELOPER_GROUPS, "runtime": tuple(sorted({
-        str(item["runtime_domain"]) for item in tables
-    }))}
+    plan = build_grouped_grant_plan(accounts, inventory)
     for group in (*DEVELOPER_GROUPS, "runtime"):
-        account = validated_accounts[group]
-        domains = set(group_domains[group])
-        allowed = sorted(
-            str(item["table"])
-            for item in tables
-            if str(item["runtime_domain"]) in domains
-        )
+        account_plan = plan.require(group)
+        account, allowed = account_plan.account, account_plan.tables
         lines.extend(("", f"-- account-group:{group}"))
         lines.extend(_grant_line(database, table, account, host) for table in allowed)
         if include_revokes:
