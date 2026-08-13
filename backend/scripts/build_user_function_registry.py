@@ -31,7 +31,7 @@ DOMAINS = (
     "Ontology",
     "Knowledge",
     "Integration",
-    "Local Runtime",
+    "Device",
     "Factory",
 )
 VALID_EXCLUSIONS = {
@@ -100,7 +100,7 @@ def _domain(value: str, path: str = "") -> str:
             if capability_id.startswith(prefix):
                 return domain
     if "vismockup" in subject or "local" in subject or "device" in subject:
-        return "Local Runtime"
+        return "Device"
     if "simulation" in subject:
         return "Simulation"
     if "digital" in subject:
@@ -126,7 +126,7 @@ def _domain(value: str, path: str = "") -> str:
     ):
         return "Craft"
     if value.lower() == "agent_tool:open_in_container":
-        return "Local Runtime"
+        return "Device"
     if value.lower() in {"agent_tool:global_search", "agent_tool:search"}:
         return "Base Platform"
     if value.lower() in {
@@ -387,7 +387,7 @@ def scan_local_runtime_commands(root: Path) -> dict[str, dict]:
         return found
     content = path.read_text(encoding="utf-8")
     for command in re.findall(r"\(\s*[\"']((?:vismockup|local)\.[a-z0-9_.]+)[\"']", content):
-        _add(found, f"local_command:{command}", consumer="Local Runtime", source_path=_relative(path), domain="Local Runtime")
+        _add(found, f"local_command:{command}", consumer="Local Runtime", source_path=_relative(path), domain="Device")
     return found
 
 
@@ -595,18 +595,34 @@ def registry_errors(
 def _owner_key(domain: str) -> str:
     return {
         "Base Platform": "base",
-        "Local Runtime": "local_runtime",
+        "Device": "device",
     }.get(domain, domain.lower().replace(" ", "_"))
 
 
 def load_coverage_reviews(path: Path = REVIEW_PATH) -> list[dict]:
     if not path.exists():
         return []
-    return [
+    reviews = [
         json.loads(review_path.read_text(encoding="utf-8"))
         for review_path in sorted(path.glob("*.json"))
         if review_path.name != "manifest.json"
     ]
+    for review in reviews:
+        _promote_device_review_fields(review)
+    return reviews
+
+
+def _promote_device_review_fields(value: object) -> None:
+    owner_keys = {"domain", "owner", "owner_domain", "current_owner", "target_owner"}
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key in owner_keys and child == "Local Runtime":
+                value[key] = "Device"
+            else:
+                _promote_device_review_fields(child)
+    elif isinstance(value, list):
+        for child in value:
+            _promote_device_review_fields(child)
 
 
 def load_catalog_owners(path: Path = CATALOG_PATH) -> dict[str, str]:
@@ -799,7 +815,13 @@ def validate_registry_document(document: object, schema: dict) -> list[str]:
 def load_registry(path: Path = REGISTRY_PATH) -> dict[str, dict]:
     if not path.exists():
         return {}
-    return json.loads(path.read_text(encoding="utf-8")).get("functions", {})
+    functions = json.loads(path.read_text(encoding="utf-8")).get("functions", {})
+    for row in functions.values():
+        if row.get("domain") == "Local Runtime":
+            row["domain"] = "Device"
+        if row.get("owner") == "Local Runtime":
+            row["owner"] = "Device"
+    return functions
 
 
 def write_registry(records: Iterable[dict], path: Path = REGISTRY_PATH) -> None:

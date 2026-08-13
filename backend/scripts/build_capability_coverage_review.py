@@ -30,10 +30,11 @@ TABLE_INVENTORY_PATH = REPOSITORY_ROOT / "backend" / "governance" / "table_inven
 RUNTIME_OWNERSHIP_PATH = REPOSITORY_ROOT / "backend" / "governance" / "domain_boundaries.json"
 DOMAINS = (
     "Base Platform", "Project Management", "Factory", "Craft", "Knowledge",
-    "Ontology", "Agent", "Integration", "Local Runtime", "Digital Model",
+    "Ontology", "Agent", "Integration", "Device", "Digital Model",
     "Simulation",
 )
 DOMAIN_FILES = {domain: domain.lower().replace(" ", "-") + ".json" for domain in DOMAINS}
+DOMAIN_FILES["Device"] = "local-runtime.json"
 CONSUMERS = ("web", "rest", "plugin", "agent", "mcp", "local_runtime")
 BOOTSTRAP_REVIEWER = "existing-user-function-registry"
 BOOTSTRAP_DATE = "2026-08-11"
@@ -75,8 +76,8 @@ RUNTIME_TO_DOMAIN = {
     "factory": "Factory", "integration": "Integration",
     "digital_model": "Digital Model", "project_management": "Project Management",
     "simulation": "Simulation", "ontology": "Ontology", "knowledge": "Knowledge",
-    "device": "Local Runtime", "local_integration": "Local Runtime",
-    "local_runtime": "Local Runtime",
+    "device": "Device", "local_integration": "Device",
+    "local_runtime": "Device",
 }
 
 
@@ -505,8 +506,8 @@ def _module_debt(row: dict) -> dict:
 def _owner_slug(domain: str) -> str:
     if domain == "Base Platform":
         return "base"
-    if domain == "Local Runtime":
-        return "local_runtime"
+    if domain == "Device":
+        return "device"
     return domain.lower().replace(" ", "_")
 
 
@@ -767,18 +768,34 @@ def _load_documents() -> dict[str, dict]:
     result = {}
     for domain, filename in DOMAIN_FILES.items():
         path = REVIEW_ROOT / filename
-        if domain == "Local Runtime" and not path.exists():
+        if domain == "Device" and not path.exists():
             legacy_path = REVIEW_ROOT / "local-integration.json"
             if legacy_path.exists():
                 legacy = legacy_path.read_text(encoding="utf-8").replace(
                     "Local Integration",
-                    "Local Runtime",
+                    "Device",
                 )
                 result[domain] = json.loads(legacy)
                 continue
         if path.exists():
-            result[domain] = _json(path)
+            document = _json(path)
+            _promote_device_owner_fields(document)
+            result[domain] = document
     return result
+
+
+def _promote_device_owner_fields(value: object, key: str | None = None) -> None:
+    """Promote ownership labels while preserving Local Runtime consumer evidence."""
+    owner_keys = {"domain", "owner", "owner_domain", "current_owner", "target_owner"}
+    if isinstance(value, dict):
+        for child_key, child in value.items():
+            if child_key in owner_keys and child == "Local Runtime":
+                value[child_key] = "Device"
+            else:
+                _promote_device_owner_fields(child, child_key)
+    elif isinstance(value, list):
+        for child in value:
+            _promote_device_owner_fields(child, key)
 
 
 def _manifest(sources: AuditSources, documents: list[dict]) -> dict:

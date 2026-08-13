@@ -1,6 +1,6 @@
 {
-  "plugin_id": "official.local-runtime",
-  "name": "本地集成",
+  "plugin_id": "official.device",
+  "name": "设备",
   "backend": {
     "capabilities_module": "device_backend.capabilities",
     "provider_version": "1.0.0",

@@ -200,14 +200,14 @@
       "test_paths": ["plugins/knowledge/tests/**", "backend/tests/test_knowledge_*.py"],
       "documentation_paths": ["docs/capabilities/knowledge/**"]
     },
-    "Local Runtime": {
+    "Device": {
       "maintainers": ["@ai00/local-runtime-maintainers"],
-      "artifact": "ai00-local-runtime",
+      "artifact": "ai00-device",
       "module_prefixes": ["plugins.device"],
       "code_paths": ["plugins/device/**", "local-runtime/**", "backend/domain_ports/local_integration.py"],
       "provider_paths": ["plugins/device/device_backend/capabilities/**", "local-runtime/src/**"],
       "migration_paths": [
-        "backend/db/migrations/domains/local_runtime/**",
+        "backend/db/migrations/domains/device/**",
         "backend/db/migrations/202608030004_device_control_plane.sql",
         "backend/db/migrations/202608100011_device_operation_protocol_v2.sql"
       ],

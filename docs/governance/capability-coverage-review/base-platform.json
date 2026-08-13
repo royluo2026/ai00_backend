@@ -3,9 +3,9 @@
   "domain": "Base Platform",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:814df82d0f6fa097a47a84c951ec9c1510b1db71e3492cc4c62ce8e92aecded4",
-    "catalog_release": "rel_8dea1627eea0dfd29059f7b863901656",
-    "catalog_sha256": "sha256:74ef08fd9c52147e3a801bde67f9f77739068d69a8c3e02f434476f199d716bc"
+    "registry_sha256": "sha256:0181bd94bf35d3627f344727490f22045ade8ed95e657ff8f0c0f39f5701815a",
+    "catalog_release": "rel_1b4737d4cf8146d287101f7403dc69fd",
+    "catalog_sha256": "sha256:81a832b41f955474322c7d8ca55ea95f3e1b5519e39074f108b13073cd7f0674"
   },
   "unreviewed_functions": {},
   "excluded_functions": {
@@ -3182,6 +3182,13 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_approvals",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_artifact_upload_sessions",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
@@ -3252,6 +3259,34 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_domain_inbox",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_notification_preferences",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_notifications",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_plugin_invocation_audit",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_revision_branches",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
@@ -3315,7 +3350,21 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_search_projection",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_self_annotations",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_workspace_templates",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",

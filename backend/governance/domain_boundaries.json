@@ -9,7 +9,7 @@
     "integration",
     "simulation",
     "agent",
-    "local_runtime",
+    "device",
     "ontology",
     "knowledge"
   ],
@@ -46,8 +46,8 @@
       "runtime_domain": "agent",
       "new_table_prefix": "workmanship_agent_"
     },
-    "local_runtime": {
-      "runtime_domain": "local_runtime",
+    "device": {
+      "runtime_domain": "device",
       "new_table_prefix": "workmanship_device_"
     },
     "knowledge": {
@@ -82,7 +82,7 @@
     },
     {
       "path": "plugins/device",
-      "domain": "local_runtime"
+      "domain": "device"
     },
     {
       "path": "plugins/simulation",
@@ -191,7 +191,7 @@
     },
     {
       "prefix": "workmanship_device_",
-      "owner": "local_runtime"
+      "owner": "device"
     },
     {
       "prefix": "workmanship_knowledge_",
@@ -219,7 +219,7 @@
     },
     {
       "prefix": "workmanship_runtime_",
-      "owner": "local_runtime"
+      "owner": "device"
     },
     {
       "prefix": "workmanship_bop_",
@@ -286,11 +286,11 @@
     "workmanship_work_notifications": "project_management"
   },
   "migration_owner_overrides": {
-    "202608030004": "local_runtime",
+    "202608030004": "device",
     "202608050002": "project_management",
     "202608050003": "project_management",
     "202608060003": "ontology",
-    "202608100011": "local_runtime"
+    "202608100011": "device"
   },
   "migration_table_exceptions": {
     "202608030005": {

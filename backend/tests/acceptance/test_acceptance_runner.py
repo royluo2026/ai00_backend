@@ -126,7 +126,7 @@ def test_release_bindings_cover_manifest_and_every_domain_migration():
         ("knowledge", "0001_knowledge.sql"),
         ("knowledge", "0002_domain_outbox_delivery.sql"),
         ("knowledge", "0003_display_counters.sql"),
-        ("local_runtime", "0001_local_runtime.sql"),
+        ("device", "0001_device.sql"),
         ("ontology", "0001_ontology.sql"),
         ("project_management", "0001_project_management.sql"),
         ("simulation", "0001_simulation.sql"),

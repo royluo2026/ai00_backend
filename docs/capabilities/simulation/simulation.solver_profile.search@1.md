@@ -8,7 +8,7 @@ Search immutable solver profiles.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`simulation`
-- Catalog Release：`rel_8dea1627eea0dfd29059f7b863901656`
+- Catalog Release：`rel_1b4737d4cf8146d287101f7403dc69fd`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -77,7 +77,7 @@ Search immutable solver profiles.
 ```json
 {
   "capability_id": "simulation.solver_profile.search",
-  "catalog_release": "rel_8dea1627eea0dfd29059f7b863901656",
+  "catalog_release": "rel_1b4737d4cf8146d287101f7403dc69fd",
   "major_version": 1,
   "payload": {}
 }

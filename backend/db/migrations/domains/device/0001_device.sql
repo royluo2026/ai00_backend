@@ -1,4 +1,4 @@
--- Independent Local Runtime database; apply only through AI00_LOCAL_RUNTIME_DDL_DB_URL.
+-- Device-owned runtime tables; apply only through AI00_DEVICE_DDL_DB_URL.
 CREATE TABLE IF NOT EXISTS workmanship_runtime_schema_migrations (
     version VARCHAR(128) PRIMARY KEY, checksum CHAR(64) NOT NULL,
     applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

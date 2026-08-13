@@ -27,9 +27,9 @@ class CapabilityKernelContractTests(unittest.TestCase):
             "base": "base",
             "plugin": "base",
             "project": "project_management",
-            "local": "local_runtime",
+            "local": "device",
             "simulation": "simulation",
-            "vismockup": "local_runtime",
+            "vismockup": "device",
             "agent": "agent",
         }
         repository_root = Path(__file__).resolve().parents[2]

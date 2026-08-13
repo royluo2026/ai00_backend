@@ -116,6 +116,16 @@
 | Craft | `craft.rule.waiver.create` | none |
 | Craft | `craft.rule.waiver.revoke` | none |
 | Craft | `craft.rule.waiver.search` | none |
+| Device | `local.command.get` | none |
+| Device | `local.device.change.apply` | rest |
+| Device | `local.device.read` | rest |
+| Device | `vismockup.capture` | none |
+| Device | `vismockup.highlight` | none |
+| Device | `vismockup.launch` | agent, local_runtime |
+| Device | `vismockup.model.open` | none |
+| Device | `vismockup.status` | none |
+| Device | `vismockup.tree` | none |
+| Device | `vismockup.visibility` | none |
 | Digital Model | `digital_model.component.search` | none |
 | Digital Model | `digital_model.model.create` | none |
 | Digital Model | `digital_model.model.get` | none |
@@ -188,16 +198,6 @@
 | Knowledge | `knowledge.space.create` | rest |
 | Knowledge | `knowledge.space.list` | rest |
 | Knowledge | `knowledge.space.search` | none |
-| Local Runtime | `local.command.get` | none |
-| Local Runtime | `local.device.change.apply` | rest |
-| Local Runtime | `local.device.read` | rest |
-| Local Runtime | `vismockup.capture` | none |
-| Local Runtime | `vismockup.highlight` | none |
-| Local Runtime | `vismockup.launch` | agent, local_runtime |
-| Local Runtime | `vismockup.model.open` | none |
-| Local Runtime | `vismockup.status` | none |
-| Local Runtime | `vismockup.tree` | none |
-| Local Runtime | `vismockup.visibility` | none |
 | Ontology | `ontology.change.proposal.create` | none |
 | Ontology | `ontology.change.proposal.get` | none |
 | Ontology | `ontology.change.proposal.review.submit` | none |

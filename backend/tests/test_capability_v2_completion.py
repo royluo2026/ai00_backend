@@ -18,11 +18,11 @@ DOMAIN_IDS = (
     "agent",
     "base",
     "craft",
+    "device",
     "digital_model",
     "factory",
     "integration",
     "knowledge",
-    "local_runtime",
     "ontology",
     "project_management",
     "simulation",
@@ -373,7 +373,7 @@ def test_current_repository_reports_three_goal_completion() -> None:
     assert "missing_domain:agent" not in report.failed
     assert "missing_domain:factory" not in report.failed
     assert "missing_domain:integration" not in report.failed
-    assert "domain_not_independent:local_runtime:migration_path" not in report.failed
+    assert "domain_not_independent:device:migration_path" not in report.failed
     assert "missing_domain:project_management" not in report.failed
     assert "domain_not_independent:base:migration_path" not in report.failed
 

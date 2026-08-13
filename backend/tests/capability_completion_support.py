@@ -18,7 +18,7 @@ DOMAIN_REVIEW_FILES = {
     "factory": "factory.json",
     "integration": "integration.json",
     "knowledge": "knowledge.json",
-    "local_runtime": "local-runtime.json",
+    "device": "local-runtime.json",
     "ontology": "ontology.json",
     "project_management": "project-management.json",
     "simulation": "simulation.json",

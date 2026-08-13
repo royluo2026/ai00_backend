@@ -28,7 +28,7 @@ def register_reviewed_capabilities(registry: Any) -> None:
             registry,
             CapabilitySpec(
                 id=capability_id,
-                owner="local_runtime",
+                owner="device",
                 description=f"Execute the reviewed {capability_id} device outcome.",
                 use_when="A governed consumer manages its Local Runtime devices.",
                 do_not_use_when="The request executes a VisMockup workstation action.",

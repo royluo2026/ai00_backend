@@ -29,6 +29,12 @@
       "excluded": 6,
       "unreviewed": 0
     },
+    "Device": {
+      "existing_capability": 21,
+      "new_capability": 0,
+      "excluded": 6,
+      "unreviewed": 0
+    },
     "Digital Model": {
       "existing_capability": 8,
       "new_capability": 0,
@@ -51,12 +57,6 @@
       "existing_capability": 37,
       "new_capability": 0,
       "excluded": 0,
-      "unreviewed": 0
-    },
-    "Local Runtime": {
-      "existing_capability": 21,
-      "new_capability": 0,
-      "excluded": 6,
       "unreviewed": 0
     },
     "Ontology": {
@@ -101,7 +101,7 @@
     "boundary_violations": 0,
     "cross_domain_sql": 0,
     "internal_import": 0,
-    "tables": 182,
+    "tables": 204,
     "migrations": 35
   }
 }

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_8dea1627eea0dfd29059f7b863901656",
-  "catalog_hash": "sha256:8dea1627eea0dfd29059f7b86390165684d00fc1915c6af6ac51c891ecef8b03",
+  "release_id": "rel_1b4737d4cf8146d287101f7403dc69fd",
+  "catalog_hash": "sha256:1b4737d4cf8146d287101f7403dc69fd48a47aa2fe55ed733a4bc535f55ba196",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -38107,7 +38107,7 @@
     {
       "id": "local.command.get",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "local.command.get",
@@ -38692,7 +38692,7 @@
     {
       "id": "local.device.change.apply",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "local.device.change.apply",
@@ -38813,7 +38813,7 @@
     {
       "id": "local.device.read",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "local.device.read",
@@ -55656,7 +55656,7 @@
     {
       "id": "vismockup.capture",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.capture",
@@ -55809,7 +55809,7 @@
     {
       "id": "vismockup.highlight",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.highlight",
@@ -55972,7 +55972,7 @@
     {
       "id": "vismockup.launch",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.launch",
@@ -56125,7 +56125,7 @@
     {
       "id": "vismockup.model.open",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.model.open",
@@ -56323,7 +56323,7 @@
     {
       "id": "vismockup.status",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.status",
@@ -56476,7 +56476,7 @@
     {
       "id": "vismockup.tree",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.tree",
@@ -56637,7 +56637,7 @@
     {
       "id": "vismockup.visibility",
       "major_version": 1,
-      "owner_domain": "local_runtime",
+      "owner_domain": "device",
       "lifecycle_status": "stable",
       "catalog_release": null,
       "title": "vismockup.visibility",
@@ -56817,6 +56817,12 @@
       "artifact_hash": "sha256:43b9223b744daae673efb301473d74bd4b71dd0f2864db9e2caf040ac4d93825"
     },
     {
+      "plugin_id": "official.device",
+      "module": "device_backend.capabilities",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:ded303429b6479741349dd6cfa88b745aa8ee719cb6c51ad74910f4ab85d8067"
+    },
+    {
       "plugin_id": "official.digital-model",
       "module": "digital_model_backend.capabilities",
       "version": "1.1.0",
@@ -56841,12 +56847,6 @@
       "artifact_hash": "sha256:1995514665a872fa7cd2fb1e101bf973792e30bcbff3b5ca6000e34a5cd36261"
     },
     {
-      "plugin_id": "official.local-runtime",
-      "module": "device_backend.capabilities",
-      "version": "1.0.0",
-      "artifact_hash": "sha256:85bfa19e8a7052c37bd04f0fedfbc7636c73162e1c524163569aa16c59a70765"
-    },
-    {
       "plugin_id": "official.ontology",
       "module": "ontology_backend.capabilities",
       "version": "2.0.0",
@@ -56865,5 +56865,5 @@
       "artifact_hash": "sha256:2a1508a1a247c946261071aab86ff56a3e0b64bc58a91a17474e695eb5762d4d"
     }
   ],
-  "created_at": "2026-08-12T10:54:20.515387Z"
+  "created_at": "2026-08-13T07:21:18.538585Z"
 }

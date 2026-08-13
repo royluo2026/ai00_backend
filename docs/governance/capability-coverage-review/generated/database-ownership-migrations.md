@@ -3,10 +3,12 @@
 | Domain | Table | Owner | Migration stream |
 |---|---|---|---|
 
+| Agent | `workmanship_agent_capability_resources` | Agent | agent |
 | Agent | `workmanship_agent_run_approvals` | Agent | agent |
 | Agent | `workmanship_agent_run_participants` | Agent | agent |
 | Agent | `workmanship_agent_run_tool_results` | Agent | agent |
 | Agent | `workmanship_agent_runs` | Agent | agent |
+| Agent | `workmanship_agent_schema_migrations` | Agent | agent |
 | Agent | `workmanship_app_ai_audit_logs` | Agent | agent |
 | Agent | `workmanship_app_ai_memory` | Agent | agent |
 | Agent | `workmanship_app_ai_sessions` | Agent | agent |
@@ -28,6 +30,7 @@
 | Base Platform | `workmanship_auth_section_owners` | Base Platform | base |
 | Base Platform | `workmanship_auth_teams` | Base Platform | base |
 | Base Platform | `workmanship_auth_users` | Base Platform | base |
+| Base Platform | `workmanship_base_approvals` | Base Platform | base |
 | Base Platform | `workmanship_base_artifact_upload_sessions` | Base Platform | base |
 | Base Platform | `workmanship_base_artifacts` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_approvals` | Base Platform | base |
@@ -38,6 +41,10 @@
 | Base Platform | `workmanship_base_capability_outcomes` | Base Platform | base |
 | Base Platform | `workmanship_base_capability_rate_windows` | Base Platform | base |
 | Base Platform | `workmanship_base_consumer_delegations` | Base Platform | base |
+| Base Platform | `workmanship_base_domain_inbox` | Base Platform | base |
+| Base Platform | `workmanship_base_notification_preferences` | Base Platform | base |
+| Base Platform | `workmanship_base_notifications` | Base Platform | base |
+| Base Platform | `workmanship_base_plugin_invocation_audit` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_branches` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_changesets` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_commit_parents` | Base Platform | base |
@@ -47,7 +54,9 @@
 | Base Platform | `workmanship_base_revision_repositories` | Base Platform | base |
 | Base Platform | `workmanship_base_revision_snapshots` | Base Platform | base |
 | Base Platform | `workmanship_base_schema_migrations` | Base Platform | base |
+| Base Platform | `workmanship_base_search_projection` | Base Platform | base |
 | Base Platform | `workmanship_base_self_annotations` | Base Platform | base |
+| Base Platform | `workmanship_base_workspace_templates` | Base Platform | base |
 | Base Platform | `workmanship_display_id_counters` | Base Platform | base |
 | Base Platform | `workmanship_plugin_installations` | Base Platform | base |
 | Base Platform | `workmanship_plugin_lifecycle_events` | Base Platform | base |
@@ -96,6 +105,8 @@
 | Craft | `workmanship_craft_bop_change_previews` | Craft | craft |
 | Craft | `workmanship_craft_bop_import_previews` | Craft | craft |
 | Craft | `workmanship_craft_bop_write_idempotency` | Craft | craft |
+| Craft | `workmanship_craft_pbom_change_previews` | Craft | craft |
+| Craft | `workmanship_craft_schema_migrations` | Craft | craft |
 | Craft | `workmanship_craft_validation_policies` | Craft | craft |
 | Craft | `workmanship_craft_validation_policy_checks` | Craft | craft |
 | Craft | `workmanship_know_craft_rules` | Craft | craft |
@@ -109,8 +120,13 @@
 | Craft | `workmanship_tpl_vpps_fixtures` | Craft | craft |
 | Craft | `workmanship_tpl_vpps_parts` | Craft | craft |
 | Craft | `workmanship_tpl_vpps_tools` | Craft | craft |
+| Device | `workmanship_runtime_commands` | Device | local_integration |
+| Device | `workmanship_runtime_devices` | Device | local_integration |
+| Device | `workmanship_runtime_enrollments` | Device | local_integration |
+| Device | `workmanship_runtime_schema_migrations` | Device | device |
 | Digital Model | `workmanship_model_components` | Digital Model | digital_model |
 | Digital Model | `workmanship_model_models` | Digital Model | digital_model |
+| Digital Model | `workmanship_model_schema_migrations` | Digital Model | digital_model |
 | Digital Model | `workmanship_model_versions` | Digital Model | digital_model |
 | Factory | `workmanship_factory_assets` | Factory | factory |
 | Factory | `workmanship_factory_factories` | Factory | factory |
@@ -122,16 +138,21 @@
 | Factory | `workmanship_factory_factory_stations` | Factory | factory |
 | Factory | `workmanship_factory_factory_tools` | Factory | factory |
 | Factory | `workmanship_factory_resource_catalog` | Factory | factory |
+| Factory | `workmanship_factory_schema_migrations` | Factory | factory |
 | Factory | `workmanship_factory_structures` | Factory | factory |
 | Integration | `workmanship_int_ext_datasources` | Integration | integration |
 | Integration | `workmanship_int_ext_field_mappings` | Integration | integration |
 | Integration | `workmanship_int_ext_mappings` | Integration | integration |
+| Integration | `workmanship_int_schema_migrations` | Integration | integration |
+| Integration | `workmanship_int_sync_runs` | Integration | integration |
+| Knowledge | `workmanship_know_display_counters` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_document_acl` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_documents` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_domain_outbox` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_entries` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_favorites` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_folders` | Knowledge | knowledge |
+| Knowledge | `workmanship_know_item_history` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_items` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_migration_items` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_migration_runs` | Knowledge | knowledge |
@@ -142,9 +163,7 @@
 | Knowledge | `workmanship_know_reference_versions` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_revisions` | Knowledge | knowledge |
 | Knowledge | `workmanship_know_spaces` | Knowledge | knowledge |
-| Local Runtime | `workmanship_runtime_commands` | Local Runtime | local_integration |
-| Local Runtime | `workmanship_runtime_devices` | Local Runtime | local_integration |
-| Local Runtime | `workmanship_runtime_enrollments` | Local Runtime | local_integration |
+| Knowledge | `workmanship_knowledge_schema_migrations` | Knowledge | knowledge |
 | Ontology | `workmanship_base_ontology_active_refs` | Ontology | ontology |
 | Ontology | `workmanship_base_ontology_change_proposals` | Ontology | ontology |
 | Ontology | `workmanship_base_ontology_proposal_reviews` | Ontology | ontology |
@@ -155,6 +174,7 @@
 | Ontology | `workmanship_onto_classes` | Ontology | ontology |
 | Ontology | `workmanship_onto_properties` | Ontology | ontology |
 | Ontology | `workmanship_onto_relations` | Ontology | ontology |
+| Ontology | `workmanship_ontology_schema_migrations` | Ontology | ontology |
 | Project Management | `workmanship_app_wb_annotations` | Project Management | project_management |
 | Project Management | `workmanship_app_workbench_configs` | Project Management | project_management |
 | Project Management | `workmanship_app_workbench_member_overrides` | Project Management | project_management |
@@ -165,6 +185,7 @@
 | Project Management | `workmanship_proj_task_dependencies` | Project Management | project_management |
 | Project Management | `workmanship_proj_tasks` | Project Management | project_management |
 | Project Management | `workmanship_proj_vehicle_models` | Project Management | project_management |
+| Project Management | `workmanship_project_management_schema_migrations` | Project Management | project_management |
 | Project Management | `workmanship_work_follows` | Project Management | project_management |
 | Project Management | `workmanship_work_issues` | Project Management | project_management |
 | Project Management | `workmanship_work_item_change_logs` | Project Management | project_management |
@@ -185,10 +206,11 @@
 | Simulation | `workmanship_sim_parameter_sets` | Simulation | simulation |
 | Simulation | `workmanship_sim_profiles` | Simulation | simulation |
 | Simulation | `workmanship_sim_runs` | Simulation | simulation |
+| Simulation | `workmanship_sim_schema_migrations` | Simulation | simulation |
 | Agent | `backend/db/migrations/202608030001_agent_private_sessions.sql` | migration | agent |
 | Agent | `backend/db/migrations/202608030002_agent_memory_skills_audit.sql` | migration | agent |
 | Agent | `backend/db/migrations/202608030003_agent_private_flows.sql` | migration | agent |
-| Local Runtime | `backend/db/migrations/202608030004_device_control_plane.sql` | migration | local_runtime |
+| Device | `backend/db/migrations/202608030004_device_control_plane.sql` | migration | device |
 | Craft | `backend/db/migrations/202608030005_craft_legacy_auxiliary_tables.sql` | migration | craft |
 | Base Platform | `backend/db/migrations/202608030006_base_platform_runtime_tables.sql` | migration | base |
 | Knowledge | `backend/db/migrations/202608030007_knowledge_proposal_outbox.sql` | migration | knowledge |
@@ -219,4 +241,4 @@
 | Ontology | `backend/db/migrations/202608100008_ontology_revision_refs.sql` | migration | ontology |
 | Digital Model | `backend/db/migrations/202608100009_digital_model_snapshots.sql` | migration | digital_model |
 | Simulation | `backend/db/migrations/202608100010_simulation_reproducibility.sql` | migration | simulation |
-| Local Runtime | `backend/db/migrations/202608100011_device_operation_protocol_v2.sql` | migration | local_runtime |
+| Device | `backend/db/migrations/202608100011_device_operation_protocol_v2.sql` | migration | device |

@@ -971,7 +971,7 @@
     },
     "agent_tool:open_in_container": {
       "function_id": "agent_tool:open_in_container",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Agent"
@@ -985,7 +985,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "candidate",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/agent/agent_backend/ai_assistant/tool_registry.py"
@@ -4769,7 +4769,7 @@
     },
     "capability:local.command.get": {
       "function_id": "capability:local.command.get",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -4783,7 +4783,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -4794,7 +4794,7 @@
     },
     "capability:local.device.change.apply": {
       "function_id": "capability:local.device.change.apply",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -4808,7 +4808,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -4818,7 +4818,7 @@
     },
     "capability:local.device.read": {
       "function_id": "capability:local.device.read",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -4832,7 +4832,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6682,7 +6682,7 @@
     },
     "capability:vismockup.capture": {
       "function_id": "capability:vismockup.capture",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6696,7 +6696,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6707,7 +6707,7 @@
     },
     "capability:vismockup.highlight": {
       "function_id": "capability:vismockup.highlight",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6721,7 +6721,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6731,7 +6731,7 @@
     },
     "capability:vismockup.launch": {
       "function_id": "capability:vismockup.launch",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6745,7 +6745,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6755,7 +6755,7 @@
     },
     "capability:vismockup.model.open": {
       "function_id": "capability:vismockup.model.open",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6769,7 +6769,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6780,7 +6780,7 @@
     },
     "capability:vismockup.status": {
       "function_id": "capability:vismockup.status",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6794,7 +6794,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6804,7 +6804,7 @@
     },
     "capability:vismockup.tree": {
       "function_id": "capability:vismockup.tree",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6818,7 +6818,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6828,7 +6828,7 @@
     },
     "capability:vismockup.visibility": {
       "function_id": "capability:vismockup.visibility",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Capability Registry"
@@ -6842,7 +6842,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "registered",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
@@ -6852,7 +6852,7 @@
     },
     "local_command:vismockup.capture": {
       "function_id": "local_command:vismockup.capture",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6866,7 +6866,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6874,7 +6874,7 @@
     },
     "local_command:vismockup.highlight": {
       "function_id": "local_command:vismockup.highlight",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6888,7 +6888,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6896,7 +6896,7 @@
     },
     "local_command:vismockup.launch": {
       "function_id": "local_command:vismockup.launch",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6910,7 +6910,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6918,7 +6918,7 @@
     },
     "local_command:vismockup.model.open": {
       "function_id": "local_command:vismockup.model.open",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6932,7 +6932,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6940,7 +6940,7 @@
     },
     "local_command:vismockup.status": {
       "function_id": "local_command:vismockup.status",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6954,7 +6954,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6962,7 +6962,7 @@
     },
     "local_command:vismockup.tree": {
       "function_id": "local_command:vismockup.tree",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6976,7 +6976,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -6984,7 +6984,7 @@
     },
     "local_command:vismockup.visibility": {
       "function_id": "local_command:vismockup.visibility",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "Local Runtime"
@@ -6998,7 +6998,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "mapped",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "plugins/device/device_backend/capabilities/runtime.py"
@@ -8358,7 +8358,7 @@
     },
     "rest:DELETE:/api/v1/devices/{device_gid}": {
       "function_id": "rest:DELETE:/api/v1/devices/{device_gid}",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -8372,7 +8372,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "proposed",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -12242,7 +12242,7 @@
     },
     "rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}": {
       "function_id": "rest:GET:/api/v1/device-runtime/commands/{command_gid}/artifacts/{artifact_id}",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -12256,7 +12256,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": "Device-authenticated artifact materialization transport; callers use vismockup.model.open instead.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -12264,7 +12264,7 @@
     },
     "rest:GET:/api/v1/devices": {
       "function_id": "rest:GET:/api/v1/devices",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -12278,7 +12278,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "proposed",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18715,7 +18715,7 @@
     },
     "rest:POST:/api/v1/device-runtime/activate": {
       "function_id": "rest:POST:/api/v1/device-runtime/activate",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18729,7 +18729,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": "Device bootstrap transport authenticated by a one-time enrollment token; it is not a user business capability.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18737,7 +18737,7 @@
     },
     "rest:POST:/api/v1/device-runtime/commands/lease": {
       "function_id": "rest:POST:/api/v1/device-runtime/commands/lease",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18751,7 +18751,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": "Device-authenticated signed-operation lease transport; users invoke the corresponding governed capability.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18759,7 +18759,7 @@
     },
     "rest:POST:/api/v1/device-runtime/commands/{command_gid}/complete": {
       "function_id": "rest:POST:/api/v1/device-runtime/commands/{command_gid}/complete",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18773,7 +18773,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": "Device-authenticated signed-outcome reconciliation transport; users poll OperationRef or local.command.get.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18781,7 +18781,7 @@
     },
     "rest:POST:/api/v1/device-runtime/heartbeat": {
       "function_id": "rest:POST:/api/v1/device-runtime/heartbeat",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18795,7 +18795,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": "Device liveness protocol used only by enrolled Local Runtime instances, not by plugins or agents.",
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -18803,7 +18803,7 @@
     },
     "rest:POST:/api/v1/devices/enrollments": {
       "function_id": "rest:POST:/api/v1/devices/enrollments",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -18817,7 +18817,7 @@
       "data_classification": "internal",
       "classification": "mapped",
       "migration_status": "proposed",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": null,
       "source_paths": [
         "backend/routers/device_runtime.py"
@@ -19811,7 +19811,7 @@
     },
     "rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact": {
       "function_id": "rest:PUT:/api/v1/device-runtime/commands/{command_gid}/result-artifact",
-      "domain": "Local Runtime",
+      "domain": "Device",
       "stability": "stable",
       "current_consumers": [
         "REST"
@@ -19825,7 +19825,7 @@
       "data_classification": "internal",
       "classification": "internal",
       "migration_status": "internal_protocol",
-      "owner": "Local Runtime",
+      "owner": "Device",
       "exclusion_reason": "Device-authenticated capture upload transport; consumers receive the resulting ArtifactRef through the operation outcome.",
       "source_paths": [
         "backend/routers/device_runtime.py"

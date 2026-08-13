@@ -7,8 +7,8 @@ Launch or connect to VisMockup.
 - 适用：Launch or connect to VisMockup.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
-- 所属领域：`local_runtime`
-- Catalog Release：`rel_8dea1627eea0dfd29059f7b863901656`
+- 所属领域：`device`
+- Catalog Release：`rel_1b4737d4cf8146d287101f7403dc69fd`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -76,7 +76,7 @@ Launch or connect to VisMockup.
 ```json
 {
   "capability_id": "vismockup.launch",
-  "catalog_release": "rel_8dea1627eea0dfd29059f7b863901656",
+  "catalog_release": "rel_1b4737d4cf8146d287101f7403dc69fd",
   "major_version": 1,
   "payload": {
     "device_id": "example"

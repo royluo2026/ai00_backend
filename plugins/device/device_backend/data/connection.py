@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import warnings
 from contextlib import contextmanager
 from threading import Lock
 from urllib.parse import unquote, urlparse
@@ -10,12 +11,20 @@ _lock = Lock()
 
 
 def _params():
-    raw = os.getenv("AI00_LOCAL_RUNTIME_DB_URL", "")
+    raw = os.getenv("AI00_DEVICE_DB_URL", "")
     if not raw:
-        raise RuntimeError("AI00_LOCAL_RUNTIME_DB_URL is required; legacy Device/Base credentials are not a fallback")
+        raw = os.getenv("AI00_LOCAL_RUNTIME_DB_URL", "")
+        if raw:
+            warnings.warn(
+                "AI00_LOCAL_RUNTIME_DB_URL is deprecated; use AI00_DEVICE_DB_URL",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+    if not raw:
+        raise RuntimeError("AI00_DEVICE_DB_URL is required; Base credentials are not a fallback")
     parsed = urlparse(raw)
     if parsed.scheme not in {"mysql", "mysql+pymysql"} or not parsed.hostname or not parsed.path.strip("/"):
-        raise RuntimeError("AI00_LOCAL_RUNTIME_DB_URL must be an explicit mysql:// database URL")
+        raise RuntimeError("AI00_DEVICE_DB_URL must be an explicit mysql:// database URL")
     return {
         "host": parsed.hostname, "port": parsed.port or 3306,
         "user": unquote(parsed.username or ""), "password": unquote(parsed.password or ""),

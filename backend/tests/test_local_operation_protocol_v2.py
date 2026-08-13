@@ -109,7 +109,7 @@ def test_native_local_provider_is_stable_and_exposed_to_plugins_and_agents():
     assert set(registrations) == set(INPUT_SCHEMAS)
     for capability_id, registration in registrations.items():
         descriptor = registration.descriptor
-        assert descriptor.owner_domain == "local_runtime"
+        assert descriptor.owner_domain == "device"
         assert descriptor.lifecycle_status.value == "stable"
         assert descriptor.exposure.plugin and descriptor.exposure.agent and descriptor.exposure.mcp
         expected_operation_policy = (

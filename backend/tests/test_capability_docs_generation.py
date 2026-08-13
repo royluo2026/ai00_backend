@@ -58,7 +58,7 @@ def test_machine_catalog_contains_release_bound_agent_mcp_and_openapi_views():
     assert "operation_ref" in response_schema["properties"]
     assert {item["owner_domain"] for item in machine["capabilities"]} <= {
         "base", "agent", "craft", "digital_model", "factory", "project_management",
-        "simulation", "ontology", "knowledge", "integration", "local_runtime",
+        "simulation", "ontology", "knowledge", "integration", "device",
     }
 
 

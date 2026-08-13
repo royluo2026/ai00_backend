@@ -2,8 +2,8 @@
 
 本目录由不可变 Catalog Release 自动生成，不接受手工修改。
 
-- Catalog Release：`rel_8dea1627eea0dfd29059f7b863901656`
-- Catalog Hash：`sha256:8dea1627eea0dfd29059f7b86390165684d00fc1915c6af6ac51c891ecef8b03`
+- Catalog Release：`rel_1b4737d4cf8146d287101f7403dc69fd`
+- Catalog Hash：`sha256:1b4737d4cf8146d287101f7403dc69fd48a47aa2fe55ed733a4bc535f55ba196`
 - 描述符数量：267
 
 ## 重要边界
@@ -19,11 +19,11 @@
 | `agent` | 13 |
 | `base` | 47 |
 | `craft` | 64 |
+| `device` | 10 |
 | `digital_model` | 8 |
 | `factory` | 19 |
 | `integration` | 13 |
 | `knowledge` | 32 |
-| `local_runtime` | 10 |
 | `ontology` | 14 |
 | `project_management` | 32 |
 | `simulation` | 15 |

@@ -1,7 +1,12 @@
 {
   "registry_version": 1,
-  "table_count": 182,
+  "table_count": 204,
   "tables": [
+    {
+      "table": "workmanship_agent_capability_resources",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
     {
       "table": "workmanship_agent_run_approvals",
       "owner": "agent",
@@ -19,6 +24,11 @@
     },
     {
       "table": "workmanship_agent_runs",
+      "owner": "agent",
+      "runtime_domain": "agent"
+    },
+    {
+      "table": "workmanship_agent_schema_migrations",
       "owner": "agent",
       "runtime_domain": "agent"
     },
@@ -153,6 +163,11 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_approvals",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_artifact_upload_sessions",
       "owner": "base",
       "runtime_domain": "base"
@@ -203,6 +218,21 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_domain_inbox",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_notification_preferences",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_notifications",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_ontology_active_refs",
       "owner": "ontology",
       "runtime_domain": "ontology"
@@ -231,6 +261,11 @@
       "table": "workmanship_base_ontology_releases",
       "owner": "ontology",
       "runtime_domain": "ontology"
+    },
+    {
+      "table": "workmanship_base_plugin_invocation_audit",
+      "owner": "base",
+      "runtime_domain": "base"
     },
     {
       "table": "workmanship_base_revision_branches",
@@ -278,7 +313,17 @@
       "runtime_domain": "base"
     },
     {
+      "table": "workmanship_base_search_projection",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
       "table": "workmanship_base_self_annotations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_workspace_templates",
       "owner": "base",
       "runtime_domain": "base"
     },
@@ -463,6 +508,16 @@
       "runtime_domain": "craft"
     },
     {
+      "table": "workmanship_craft_pbom_change_previews",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_craft_schema_migrations",
+      "owner": "craft",
+      "runtime_domain": "craft"
+    },
+    {
       "table": "workmanship_craft_validation_policies",
       "owner": "craft",
       "runtime_domain": "craft"
@@ -528,6 +583,11 @@
       "runtime_domain": "factory"
     },
     {
+      "table": "workmanship_factory_schema_migrations",
+      "owner": "factory",
+      "runtime_domain": "factory"
+    },
+    {
       "table": "workmanship_factory_structures",
       "owner": "factory",
       "runtime_domain": "factory"
@@ -548,9 +608,24 @@
       "runtime_domain": "integration"
     },
     {
+      "table": "workmanship_int_schema_migrations",
+      "owner": "integration",
+      "runtime_domain": "integration"
+    },
+    {
+      "table": "workmanship_int_sync_runs",
+      "owner": "integration",
+      "runtime_domain": "integration"
+    },
+    {
       "table": "workmanship_know_craft_rules",
       "owner": "craft",
       "runtime_domain": "craft"
+    },
+    {
+      "table": "workmanship_know_display_counters",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge"
     },
     {
       "table": "workmanship_know_document_acl",
@@ -558,12 +633,12 @@
       "runtime_domain": "knowledge"
     },
     {
-      "table": "workmanship_know_domain_outbox",
+      "table": "workmanship_know_documents",
       "owner": "knowledge",
       "runtime_domain": "knowledge"
     },
     {
-      "table": "workmanship_know_documents",
+      "table": "workmanship_know_domain_outbox",
       "owner": "knowledge",
       "runtime_domain": "knowledge"
     },
@@ -579,6 +654,11 @@
     },
     {
       "table": "workmanship_know_folders",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge"
+    },
+    {
+      "table": "workmanship_know_item_history",
       "owner": "knowledge",
       "runtime_domain": "knowledge"
     },
@@ -633,12 +713,22 @@
       "runtime_domain": "knowledge"
     },
     {
+      "table": "workmanship_knowledge_schema_migrations",
+      "owner": "knowledge",
+      "runtime_domain": "knowledge"
+    },
+    {
       "table": "workmanship_model_components",
       "owner": "digital_model",
       "runtime_domain": "digital_model"
     },
     {
       "table": "workmanship_model_models",
+      "owner": "digital_model",
+      "runtime_domain": "digital_model"
+    },
+    {
+      "table": "workmanship_model_schema_migrations",
       "owner": "digital_model",
       "runtime_domain": "digital_model"
     },
@@ -664,6 +754,11 @@
     },
     {
       "table": "workmanship_onto_relations",
+      "owner": "ontology",
+      "runtime_domain": "ontology"
+    },
+    {
+      "table": "workmanship_ontology_schema_migrations",
       "owner": "ontology",
       "runtime_domain": "ontology"
     },
@@ -748,19 +843,29 @@
       "runtime_domain": "project_management"
     },
     {
+      "table": "workmanship_project_management_schema_migrations",
+      "owner": "project_management",
+      "runtime_domain": "project_management"
+    },
+    {
       "table": "workmanship_runtime_commands",
-      "owner": "local_runtime",
-      "runtime_domain": "local_runtime"
+      "owner": "device",
+      "runtime_domain": "device"
     },
     {
       "table": "workmanship_runtime_devices",
-      "owner": "local_runtime",
-      "runtime_domain": "local_runtime"
+      "owner": "device",
+      "runtime_domain": "device"
     },
     {
       "table": "workmanship_runtime_enrollments",
-      "owner": "local_runtime",
-      "runtime_domain": "local_runtime"
+      "owner": "device",
+      "runtime_domain": "device"
+    },
+    {
+      "table": "workmanship_runtime_schema_migrations",
+      "owner": "device",
+      "runtime_domain": "device"
     },
     {
       "table": "workmanship_sim_environments",
@@ -779,6 +884,11 @@
     },
     {
       "table": "workmanship_sim_runs",
+      "owner": "simulation",
+      "runtime_domain": "simulation"
+    },
+    {
+      "table": "workmanship_sim_schema_migrations",
       "owner": "simulation",
       "runtime_domain": "simulation"
     },

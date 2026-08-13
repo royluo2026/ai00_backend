@@ -26,7 +26,7 @@ EXPECTED_DOMAINS = {
     "Simulation",
     "Ontology",
     "Knowledge",
-    "Local Runtime",
+    "Device",
 }
 DOMAIN_SLUGS = {
     "Base Platform": "base",
@@ -39,7 +39,7 @@ DOMAIN_SLUGS = {
     "Simulation": "simulation",
     "Ontology": "ontology",
     "Knowledge": "knowledge",
-    "Local Runtime": "local_runtime",
+    "Device": "device",
 }
 
 

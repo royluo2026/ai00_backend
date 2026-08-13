@@ -8,7 +8,7 @@ from typing import Any, Mapping
 from backend.capabilities.models_next import CapabilityExecution, CapabilityRisk, CapabilitySpec
 from .contracts import AutomationLevel, CapabilityDescriptorV2, ExecutionMode, ExposurePolicy, SideEffectLevel
 
-_OWNER_ALIASES = {"plugin": "base", "runtime": "local_runtime", "vismockup": "local_runtime"}
+_OWNER_ALIASES = {"plugin": "base", "runtime": "device", "vismockup": "device"}
 
 
 def _closed_schema(value: Mapping[str, Any] | None) -> dict[str, Any]:

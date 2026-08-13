@@ -76,6 +76,27 @@
       "event_subscriptions": []
     },
     {
+      "domain_id": "device",
+      "artifact": {
+        "plugin_id": "official.device",
+        "module": "device_backend.capabilities",
+        "version": "1.0.0",
+        "artifact_hash": "sha256:ded303429b6479741349dd6cfa88b745aa8ee719cb6c51ad74910f4ab85d8067"
+      },
+      "artifact_path": "plugins/device/device_backend",
+      "allowed_owners": [
+        "device"
+      ],
+      "database": {
+        "database_name": "ai00_device",
+        "runtime_url_env": "AI00_DEVICE_DB_URL",
+        "ddl_url_env": "AI00_DEVICE_DDL_DB_URL",
+        "migration_path": "backend/db/migrations/domains/device"
+      },
+      "search_export": null,
+      "event_subscriptions": []
+    },
+    {
       "domain_id": "digital_model",
       "artifact": {
         "plugin_id": "official.digital-model",
@@ -158,27 +179,6 @@
         "runtime_url_env": "AI00_KNOWLEDGE_DB_URL",
         "ddl_url_env": "AI00_KNOWLEDGE_DDL_DB_URL",
         "migration_path": "backend/db/migrations/domains/knowledge"
-      },
-      "search_export": null,
-      "event_subscriptions": []
-    },
-    {
-      "domain_id": "local_runtime",
-      "artifact": {
-        "plugin_id": "official.local-runtime",
-        "module": "device_backend.capabilities",
-        "version": "1.0.0",
-        "artifact_hash": "sha256:85bfa19e8a7052c37bd04f0fedfbc7636c73162e1c524163569aa16c59a70765"
-      },
-      "artifact_path": "plugins/device/device_backend",
-      "allowed_owners": [
-        "local_runtime"
-      ],
-      "database": {
-        "database_name": "ai00_local_runtime",
-        "runtime_url_env": "AI00_LOCAL_RUNTIME_DB_URL",
-        "ddl_url_env": "AI00_LOCAL_RUNTIME_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/local_runtime"
       },
       "search_export": null,
       "event_subscriptions": []

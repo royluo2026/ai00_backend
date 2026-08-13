@@ -101,11 +101,11 @@
 /backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql @ai00/knowledge-maintainers
 /backend/db/migrations/202608060002_knowledge_revision_attribution.sql @ai00/knowledge-maintainers
 
-# Local Runtime
+# Device (Local Runtime is a Device component)
 /plugins/device/** @ai00/local-runtime-maintainers
 /local-runtime/** @ai00/local-runtime-maintainers
 /backend/domain_ports/local_integration.py @ai00/local-runtime-maintainers
-/backend/db/migrations/domains/local_runtime/** @ai00/local-runtime-maintainers
+/backend/db/migrations/domains/device/** @ai00/local-runtime-maintainers
 /backend/db/migrations/202608030004_device_control_plane.sql @ai00/local-runtime-maintainers
 /backend/db/migrations/202608100011_device_operation_protocol_v2.sql @ai00/local-runtime-maintainers
 
