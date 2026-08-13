@@ -38,7 +38,7 @@ ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX;
 """
 
 PREFLIGHT_SQL = """-- STOP unless every result below matches the checklist. Target: `ai00_test`.
-SELECT DATABASE() AS current_database, CURRENT_USER() AS current_user,
+SELECT DATABASE() AS current_database, CURRENT_USER() AS connected_principal,
        VERSION() AS server_version, @@version_comment AS version_comment,
        @@sql_mode AS sql_mode;
 SELECT DATABASE() = 'ai00_test' AS database_ok,
