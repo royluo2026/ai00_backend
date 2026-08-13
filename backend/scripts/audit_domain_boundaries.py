@@ -159,9 +159,16 @@ def audit_sql_text(
 def audit_repository(root: Path, registry: DomainRegistry) -> tuple[list[Violation], list[str]]:
     violations: list[Violation] = []
     tables: set[str] = set()
-    ignored_dirs = {".git", "dist", "node_modules", "__pycache__", ".venv", "venv"}
+    ignored_dirs = {".git", "dist", "node_modules", "__pycache__", ".venv", "venv", ".test-tmp", ".test-runs"}
+
+    def ignored(path: Path) -> bool:
+        return any(
+            part in ignored_dirs or part.startswith("pytest-cache-files-") or part.startswith(".tmp-schema-")
+            for part in path.parts
+        )
+
     for path in root.rglob("*.py"):
-        if any(part in ignored_dirs for part in path.parts):
+        if ignored(path):
             continue
         relative = path.relative_to(root).as_posix()
         if "/tests/" in f"/{relative}":
@@ -183,7 +190,7 @@ def audit_repository(root: Path, registry: DomainRegistry) -> tuple[list[Violati
         violations.extend(visitor.violations)
 
     for path in root.rglob("*.sql"):
-        if any(part in ignored_dirs for part in path.parts):
+        if ignored(path):
             continue
         relative = path.relative_to(root).as_posix()
         if "/tests/" in f"/{relative}":

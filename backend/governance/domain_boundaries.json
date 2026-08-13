@@ -157,6 +157,7 @@
     "backend/db/check_schema_diff.py",
     "backend/db/run_diff.py",
     "backend/capability_v2/database_isolation.py",
+    "backend/capability_v2/schema_sql.py",
     "backend/scripts/verify_domain_db_isolation.py"
   ],
   "ignored_identifiers": [

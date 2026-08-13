@@ -174,7 +174,9 @@
         "runtime_url_env": "AI00_FACTORY_DB_URL",
         "ddl_url_env": "AI00_FACTORY_DDL_DB_URL",
         "migration_path": "backend/db/migrations/domains/factory",
-        "schema_paths": ["backend/db/migrations/domains/factory"]
+        "schema_paths": [
+          "backend/db/migrations/domains/factory"
+        ]
       },
       "search_export": {
         "capability_id": "factory.structure.search",
@@ -199,7 +201,9 @@
         "runtime_url_env": "AI00_INTEGRATION_DB_URL",
         "ddl_url_env": "AI00_INTEGRATION_DDL_DB_URL",
         "migration_path": "backend/db/migrations/domains/integration",
-        "schema_paths": ["backend/db/migrations/domains/integration"]
+        "schema_paths": [
+          "backend/db/migrations/domains/integration"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []

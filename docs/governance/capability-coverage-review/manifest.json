@@ -32,7 +32,7 @@
   "table_inventory_sha256": "sha256:c54e15aaca379ddc5b485f82846e8153945641a726f48be790c0ef13cdd4171b",
   "dependency_baseline_sha256": "sha256:ace08005807e63d7184e942f6b61f069ad8700f3ba9b7c245c3c15ce7c7e2514",
   "boundary_baseline_sha256": "sha256:c3455d713d20121a5863c79027c704d4472061764eb522235cf0873c67082330",
-  "runtime_ownership_sha256": "sha256:6e45e426d44f1660e7e756011b8884eb873cdb0e3d370747416355872ea5c5e1",
+  "runtime_ownership_sha256": "sha256:3fa488f35110a9dec2d859b65516a8fa6bb5e14f1484b1c7817492505ab42c41",
   "domains": [
     "Base Platform",
     "Project Management",

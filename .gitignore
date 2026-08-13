@@ -50,3 +50,7 @@ htmlcov/
 
 # Local schema snapshots and DBeaver execution packages
 /.runtime/schema-audit/
+/.test-tmp/
+/.test-runs/
+/.tmp-schema-*/
+/pytest-cache-files-*/

@@ -80,6 +80,7 @@ class DomainGovernanceTests(unittest.TestCase):
                 "backend/capability_v2/database_isolation.py"
             )
         )
+        self.assertTrue(registry.is_non_runtime_path("backend/capability_v2/schema_sql.py"))
         self.assertFalse(registry.is_non_runtime_path("backend/routers/ontology.py"))
 
     def test_domain_migration_runner_is_deployment_only_migration_tooling(self):
