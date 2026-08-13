@@ -27,6 +27,7 @@ def manifests():
 
 def test_single_database_profile_maps_every_domain_to_ai00_test(manifests):
     profile = load_database_profile(SINGLE_DATABASE_PROFILE, manifests)
+    assert profile.baseline_schema_path == "backend/db/mysql_schema.sql"
 
     assert profile.isolation_profile == "single_database_domain_tables"
     assert profile.database_name == "ai00_test"

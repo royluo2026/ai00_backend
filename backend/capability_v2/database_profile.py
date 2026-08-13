@@ -23,6 +23,7 @@ class DatabaseDeploymentProfile(FrozenModel):
     isolation_profile: IsolationProfile
     database_name: str = Field(pattern=r"^ai00_[a-z][a-z0-9_]{1,62}$")
     runtime_url_env: str = Field(pattern=r"^AI00_[A-Z0-9_]+_DB_URL$")
+    baseline_schema_path: str
     domains: tuple[str, ...]
 
     @model_validator(mode="after")
@@ -31,6 +32,9 @@ class DatabaseDeploymentProfile(FrozenModel):
             raise ValueError("duplicate profile domain")
         if tuple(sorted(self.domains)) != self.domains:
             raise ValueError("profile domains must be sorted")
+        path = Path(self.baseline_schema_path)
+        if path.is_absolute() or "\\" in self.baseline_schema_path or ".." in path.parts:
+            raise ValueError("baseline_schema_path must be a repository-relative POSIX path")
         return self
 
 

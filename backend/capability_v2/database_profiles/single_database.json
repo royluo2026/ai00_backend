@@ -3,6 +3,7 @@
   "profile_id": "company-test-single-db",
   "isolation_profile": "single_database_domain_tables",
   "database_name": "ai00_test",
+  "baseline_schema_path": "backend/db/mysql_schema.sql",
   "runtime_url_env": "AI00_SHARED_RUNTIME_DB_URL",
   "domains": [
     "agent",
