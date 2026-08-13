@@ -1,10 +1,12 @@
 # AI00 Capability V2、插件与 AI Agent 架构设计
 
 > 日期：2026-08-10  
-> 状态：设计已确认，实施中
-> 适用范围：Base Platform、Agent、Craft、Digital Model、Project Management、Simulation、Ontology、Knowledge、Revision、Plugin、MCP、Local Runtime
+> 状态：核心架构已实施；公司单库部署配置已落地工具链，待现场验收
+> 适用范围：Base Platform、Project Management、Factory、Craft、Knowledge、Ontology、Agent、Integration、Device、Digital Model、Simulation、Plugin、MCP；Local Runtime 作为 Device 技术组件
 > 决策级别：目标架构与迁移约束  
 > 取代关系：与 `2026-08-05-capability-consensus-round-1-design.md` 冲突时以本文为准；本体治理细节继续兼容 `2026-08-05-ontology-capabilities-design.md`
+
+> **2026-08-13 实施更新：** 领域数据所有权不再等同于必须部署十一套物理数据库。公司测试/生产环境采用 `single_database_domain_tables`：一个 OceanBase 业务数据库、十一组逐表 Owner、独立领域 Migration/Provider/测试，以及 Gateway-only 跨域调用。十一数据库、每域 Runtime/DDL 双账号仅保留为强化隔离配置。最新事实快照为 844 项稳定用户功能全部处置、267 个 Descriptor（264 个稳定 Capability），单库 Schema 编译为 204 张表、2307 个字段、535 个索引且零不支持 DDL。真实单库 RC 尚未完成，因此这些数字不代表生产就绪。
 
 ## 1. 背景与结论
 
@@ -18,7 +20,7 @@ AI00 已经具备 Capability Registry、Catalog、部分 Provider、插件沙箱
 
 ### 2.1 目标
 
-1. Base Platform、Agent、Craft、Digital Model、Project Management、Simulation、Ontology、Knowledge 和 Local Integration 的全部稳定用户业务功能都有正式 Capability。
+1. 十一个一级领域的全部稳定用户业务功能都有正式 Capability；Local Runtime 作为 Device 技术组件，不拥有独立业务结果。
 2. 插件和 AI Agent 能发现这些能力；是否执行由消费者、租户、资源、数据范围和自动化策略决定。
 3. Web 迁移到相同 Capability，旧 REST 业务实现最终退役。
 4. 版本、差异、谱系和本体成为跨领域一级能力。

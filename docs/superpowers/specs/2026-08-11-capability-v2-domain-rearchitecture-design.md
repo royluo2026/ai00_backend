@@ -2,15 +2,17 @@
 
 **日期：** 2026-08-11
 
-**状态：** 已完成业务语义评审与两轮独立复核，待最终书面确认
+**状态：** 业务语义与代码边界已实施；数据库部署模型由 2026-08-13 单库设计修订，待现场验收
 
-**适用范围：** Base、Project Management、Factory、Craft、Knowledge、Ontology、Agent、Integration、Local Runtime、Digital Model、Simulation、Plugin Platform
+**适用范围：** Base、Project Management、Factory、Craft、Knowledge、Ontology、Agent、Integration、Device、Digital Model、Simulation、Plugin Platform；Local Runtime 作为 Device 技术组件
 
 **实现约束：** 本文仅定义目标设计，不授权立即修改业务代码
 
 ## 1. 文档目的
 
-本文把 Capability V2 覆盖审计中已经确认的业务边界转化为可实施的代码与数据库重构设计。目标不是把现有每个路由包装成 Capability，也不是追求某个 Capability 数量，而是建立一套长期可维护的系统：同一个业务结果在 Web、REST、Plugin、Agent、MCP 和 Local Runtime 中使用同一个 Capability ID、同一个 Descriptor、同一个 Provider 和同一条 Gateway 治理链；每个领域独立维护代码、数据库、迁移、测试和发布边界。
+本文把 Capability V2 覆盖审计中已经确认的业务边界转化为可实施的代码与数据库重构设计。目标不是把现有每个路由包装成 Capability，也不是追求某个 Capability 数量，而是建立一套长期可维护的系统：同一个业务结果在 Web、REST、Plugin、Agent、MCP 和 Local Runtime 中使用同一个 Capability ID、同一个 Descriptor、同一个 Provider 和同一条 Gateway 治理链；每个领域独立维护代码、表所有权、迁移、测试和发布边界。
+
+2026-08-13 起，公司环境采用 `single_database_domain_tables`。领域独立性表示独立的代码、Provider、Repository、逐表 Owner、Migration Ledger、测试和发布责任，不表示必须拥有独立 OceanBase database。十一数据库及每域 Runtime/DDL 双账号仍可作为强化隔离部署配置，但不再是公司环境的默认完成条件。单库下禁止把逻辑隔离描述成物理隔离。
 
 当前业务数据为空，因此本次重构不设计旧业务数据搬迁、回填、双写或旧状态兼容。现有表结构只作为识别业务意图的证据，不约束目标模型。为完成前端和调用方切换，可以短期保留薄 REST 兼容适配器，但适配器不得包含业务逻辑、直接访问数据库或形成第二套实现。
 
@@ -19,7 +21,7 @@
 1. Web、REST、Plugin、Agent、MCP、Local Runtime 共用一套 Capability 体系，不维护消费者专属业务实现。
 2. Capability 表达稳定业务结果，不与路由、按钮、页面或内部函数一一对应。
 3. 能力是否存在由业务语义决定，不以总数为设计目标，也不为了减少数量而合并权限、风险或状态机不同的动作。
-4. 每个一级领域独立拥有代码、数据库、数据库用户、迁移流、Provider、测试和发布单元。
+4. 每个一级领域独立拥有代码、表所有权、迁移流、Provider、测试和发布单元；物理数据库和账号隔离强度由部署配置决定。
 5. 禁止跨域 SQL、跨域 JOIN、跨域外键以及导入其他领域的 Router、Repository、ORM、数据库连接或具体 Service。
 6. 跨域业务同步调用统一通过 Capability Gateway；Public Port 只定义稳定类型契约、领域内部依赖倒置接口或平台基础设施适配，不得成为绕过 Gateway 的第二条业务执行路径。异步协作通过带 Outbox 的版本化领域事件。
 7. 跨域只保存不透明 ResourceRef、ArtifactRef、OperationRef 和不可变版本引用。
@@ -37,7 +39,7 @@
 
 ### 3.2 采用：干净领域包并行建设，逐域切换
 
-为每个目标领域建立统一结构和独立数据库，按领域完成完整垂直切片：领域模型、应用服务、Provider、Capability、Repository、迁移、适配器、测试和文档同时交付。一个领域切换完成后，旧实现停止承担业务职责并被删除。
+为每个目标领域建立统一结构和独立数据所有权，按领域完成完整垂直切片：领域模型、应用服务、Provider、Capability、Repository、表清单、迁移、适配器、测试和文档同时交付。强化隔离配置可以使用独立数据库；公司配置在单数据库中通过逐表 Owner、独立 Migration Ledger、数据访问端口和边界审计实现逻辑隔离。一个领域切换完成后，旧实现停止承担业务职责并被删除。
 
 该方案允许逐步交付，又避免长期双写。由于现有数据为空，新旧实现不做数据同步；切换点只决定请求由旧 Router 还是新 Gateway 路径处理。
 
@@ -722,7 +724,7 @@ Installation install、enable、disable、upgrade、rollback、uninstall 保持�
 ### 阶段 3：Project Management 与 Factory
 
 - 从 Craft 物理迁出 Project/Collaboration 与 Factory。
-- 建立独立数据库和 Provider。
+- 建立独立 Provider、表所有权和 Migration；部署时按选定的数据库隔离配置执行。
 - Web 兼容路由切换到 Gateway。
 
 退出条件：Craft 不再拥有项目表、物理工厂表或相关业务代码。

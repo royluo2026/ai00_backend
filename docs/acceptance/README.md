@@ -1,5 +1,18 @@
 # Capability V2 Acceptance Gates
 
+> **Deployment-profile status (2026-08-13):** The checked-in
+> `release-candidate` database evidence contract and Gitea RC workflow currently
+> implement the eleven-database/twenty-two-principal strengthened-isolation
+> profile. The company test/production target is now
+> `single_database_domain_tables`. Offline contract acceptance remains valid for
+> both profiles, but a passing strengthened-isolation RC report must not be used
+> as proof that the company single-database profile is production-ready. That
+> profile additionally requires the live Schema diff, five grant-group checks,
+> shared Runtime DDL denial and current-run consumer/Provider evidence described
+> in `docs/runbooks/capability-v2-single-database.md`. Until a profile-bound RC
+> schema and workflow are implemented, the single-database runtime conclusion is
+> `environment acceptance pending`.
+
 The acceptance system has two deliberately different scopes.
 
 - `offline` and `nightly` produce `validation_scope: contract`. Every stable

@@ -1,6 +1,15 @@
-# Capability V2 Gitea RC 运维手册
+# Capability V2 Gitea RC 运维手册（多库强化隔离配置）
 
 本文用于在专用、隔离的 OceanBase test/rc 租户与受保护 Windows runner 上执行 Capability V2 的完整 RC 验收。它不会创建生产租户，也不会接受静态或模拟证据。
+
+> **适用范围更新（2026-08-13）：** 本手册及当前
+> `.gitea/workflows/capability-v2-release.yml` 只适用于十一数据库、二十二账号的
+> `per_domain_databases` 强化隔离配置。公司测试/生产环境采用
+> `single_database_domain_tables`，应执行
+> `docs/runbooks/capability-v2-single-database.md` 中的 Schema、DBeaver 和五组授权流程。
+> 当前仓库尚未提供与本手册同等强度、绑定单库 profile 的 Gitea RC 工作流，因此不得用
+> 本手册的多库 RC 报告宣称公司单库配置已经生产就绪。两种配置共享 Capability、Provider、
+> Catalog 和消费者验收，但数据库证据不可互相替代。
 
 ## 必要前置条件
 

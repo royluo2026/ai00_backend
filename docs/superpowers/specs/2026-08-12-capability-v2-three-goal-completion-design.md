@@ -2,13 +2,15 @@
 
 **日期：** 2026-08-12
 
-**状态：** 已完成设计确认，待文档审核
+**状态：** 三目标代码与治理基线已实施；数据库完成定义由 2026-08-13 单库设计修订，待现场验收
 
 **上位设计：** `docs/superpowers/specs/2026-08-11-capability-v2-domain-rearchitecture-design.md`
 
 **实施路线图：** `docs/superpowers/plans/2026-08-11-capability-v2-domain-rearchitecture-roadmap.md`
 
 **已完成基础计划：** `docs/superpowers/plans/2026-08-11-capability-v2-domain-foundation-implementation.md`
+
+**后续修订：** 公司环境采用 `single_database_domain_tables`。本文中“独立数据库、十一域 Runtime/DDL 双账号”的表述是强化隔离配置，不再是公司环境唯一完成条件。公司配置以逐表唯一 Owner、独立领域 Migration、共享 Runtime 最小 DML、无 DDL、Gateway-only 跨域访问和静态边界审计作为完成证据。
 
 ## 1. 文档目的
 
@@ -37,16 +39,16 @@
 - `backend/governance/boundary_baseline.json`
 - `backend/capability_v2/official_domains.json`
 
-当前冻结快照记录：
+当前治理快照记录：
 
 - 11 个一级领域；
-- 752 个稳定用户功能，0 个未评审项；
-- 257 个功能处置到既有 Capability，397 个功能处置到 87 个已评审候选 Capability，98 个功能明确排除；
-- 当前 Catalog 有 102 个 Descriptor、86 个 Capability，完成候选后预计为 173 个 Capability；
+- 844 个稳定用户功能，0 个未评审项；
+- 743 个功能处置到既有 Capability，101 个功能明确排除，无待新增候选；
+- 当前 Catalog 有 267 个 Descriptor，其中 264 个为稳定 Capability；
 - 58 项代码归属迁移；
-- 边界基线共 338 项违规，其中 332 项跨领域 SQL、6 项内部实现导入。
+- 当前生成证据中的跨领域 SQL、内部实现导入和边界违规均为 0；单库 Schema 为 204 张表、2307 个字段和 535 个索引。
 
-上述数字是可追溯的起始快照，不是用来限制正确实现的配额。计划执行中不得为了降低数量而合并权限、风险、状态机或业务结果不同的 Capability，也不得把一个 Capability 拆成路由形状的伪能力。
+上述数字是当前生成产物中的可追溯快照，不是用来限制正确实现的配额。后续实施不得为了降低数量而合并权限、风险、状态机或业务结果不同的 Capability，也不得把一个 Capability 拆成路由形状的伪能力。
 
 ### 2.2 冻结语义
 
@@ -132,7 +134,7 @@ Agent 执行工具时必须通过 Gateway，并携带 Agent、Run、Session、�
 
 错误响应不得泄露 Provider 堆栈、内部模块、数据库名、表名、SQL 或凭据。所有拒绝和失败都必须与审计记录、Trace ID 和调用关联 ID 对应。
 
-## 5. 目标二：领域代码和数据库独立
+## 5. 目标二：领域代码和数据所有权独立
 
 ### 5.1 独立交付单元
 
@@ -141,17 +143,17 @@ Agent 执行工具时必须通过 Gateway，并携带 Agent、Run、Session、�
 - 明确且可扫描的代码根目录及 ownership；
 - 可加载的正式 Provider 和 DomainManifest；
 - 领域模型、应用服务、Repository、Provider Adapter 和领域内测试；
-- 独立数据库配置、runtime credential、DDL credential 和 migration ledger；
+- 独立表所有权、migration 目录和 ledger；数据库与账号隔离由部署配置提供；
 - 独立构建、领域测试、部署、升级和回滚步骤；
 - 对外版本化 Capability 契约及领域事件契约。
 
-领域可以在不修改其他领域内部代码和数据库的情况下开发、测试和发布。共享平台库只能提供无业务归属的基础类型、协议和基础设施适配，不能承载跨领域业务规则。
+领域可以在不修改其他领域内部代码和表定义的情况下开发、测试和发布。共享平台库只能提供无业务归属的基础类型、协议和基础设施适配，不能承载跨领域业务规则。
 
 ### 5.2 数据库所有权
 
-一张业务表只能归属一个一级领域。只有 owner 领域的 runtime credential 能读写该表，只有 owner 领域的 DDL credential 能执行其 migration。其他领域账号对该表必须没有权限。
+一张业务表只能归属一个一级领域。所有代码路径必须通过绑定领域身份的数据访问端口访问 Owner 表；Migration 只能修改所属领域表。强化隔离配置使用每域 Runtime/DDL 账号；公司单库配置使用四个开发组账号、一个共享 Runtime 账号和外部 DBA/临时迁移身份。
 
-独立数据库允许采用独立实例或满足同等隔离强度的独立数据库，但必须同时具备：
+强化隔离配置允许采用独立实例或独立数据库，并应同时具备：
 
 - 独立连接配置和凭据；
 - 数据库侧权限隔离，而非仅依赖代码约定；
@@ -159,7 +161,7 @@ Agent 执行工具时必须通过 Gateway，并携带 Agent、Run、Session、�
 - 禁止跨库 JOIN、外键和事务；
 - 可独立升级与回滚。
 
-共享实例中的同账号、多 schema 但可相互读写，或同一 migration 流修改多个领域，均不算数据库独立。
+公司单库配置不声称数据库账号级领域隔离。其完成条件改为：逐表唯一 Owner、跨域 SQL/外键/Repository 导入为零、Runtime 无 DDL、开发组授权与职责矩阵一致、Migration 由外部身份执行，并在报告中明确 `isolation_profile=single_database_domain_tables`。共享 Runtime 凭据泄露的影响面覆盖整个业务数据库，是必须保留在风险登记中的剩余风险。
 
 ### 5.3 依赖边界
 
@@ -307,7 +309,7 @@ Outbox 投递和 Inbox 消费均保留可审计状态。Consumer 失败不得回
 Capability V2 Program 只有在以下条件全部满足时完成：
 
 1. Plan 02–15 全部完成并各自通过领域门禁；
-2. 十一个正式领域均有可加载 Provider、独立代码 ownership、独立数据库权限和 migration 流；
+2. 十一个正式领域均有可加载 Provider、独立代码 ownership、逐表唯一 ownership 和独立 migration 流；数据库权限与选定 isolation profile 一致；
 3. Plugin 和 Agent 的全部已声明业务 Capability 只通过 Catalog + Gateway 执行；
 4. 至少一条真实同步跨领域链路和一条真实异步跨领域链路通过 RC；
 5. `backend/governance/boundary_baseline.json` 中跨领域 SQL 和内部导入均为零；
