@@ -59,6 +59,15 @@ def test_preflight_does_not_use_oceanbase_reserved_keyword_as_alias(tmp_path):
     assert "CURRENT_USER() AS current_user" not in preflight
 
 
+def test_preflight_accepts_database_scoped_ddl_privileges(tmp_path):
+    expected = _expected()
+    build_execution_package(expected=expected, diff=_safe_diff(expected), output=tmp_path)
+    preflight = (tmp_path / "01-preflight.sql").read_text(encoding="utf-8")
+    assert "information_schema.USER_PRIVILEGES" in preflight
+    assert "information_schema.SCHEMA_PRIVILEGES" in preflight
+    assert "TABLE_SCHEMA = 'ai00_test'" in preflight
+
+
 def test_manual_diff_blocks_ddl_generation(tmp_path):
     expected = _expected()
     diff = SchemaDiff("ai00_test", expected.schema_sha256, (), (
