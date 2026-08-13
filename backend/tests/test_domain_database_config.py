@@ -9,6 +9,7 @@ from backend.capability_v2.domain_database import (
     connect_ddl,
     connect_runtime,
     load_domain_database_config,
+    load_runtime_database_url,
 )
 from backend.capability_v2.domain_manifest import load_domain_manifests
 
@@ -93,3 +94,14 @@ def test_domain_database_connectors_use_separate_validated_credentials(craft_man
     ]
     assert "runtime+secret" not in repr(config)
     assert "ddl+secret" not in repr(config)
+
+
+def test_legacy_per_domain_runtime_loader_remains_available(craft_manifest):
+    env = {
+        "AI00_CRAFT_DB_URL": "mysql://craft_runtime:runtime-secret@db/ai00_craft",
+    }
+
+    url = load_runtime_database_url(craft_manifest, env)
+
+    assert url.database == "ai00_craft"
+    assert url.username == "craft_runtime"

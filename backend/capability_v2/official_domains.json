@@ -17,7 +17,15 @@
         "database_name": "ai00_agent",
         "runtime_url_env": "AI00_AGENT_DB_URL",
         "ddl_url_env": "AI00_AGENT_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/agent"
+        "migration_path": "backend/db/migrations/domains/agent",
+        "schema_paths": [
+          "backend/db/migrations/domains/agent",
+          "backend/db/migrations/202608030001_agent_private_sessions.sql",
+          "backend/db/migrations/202608030002_agent_memory_skills_audit.sql",
+          "backend/db/migrations/202608030003_agent_private_flows.sql",
+          "backend/db/migrations/202608050005_agent_audit_updated_at.sql",
+          "backend/db/migrations/202608100006_agent_runs.sql"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []
@@ -38,7 +46,21 @@
         "database_name": "ai00_base",
         "runtime_url_env": "AI00_BASE_DB_URL",
         "ddl_url_env": "AI00_BASE_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/base"
+        "migration_path": "backend/db/migrations/domains/base",
+        "schema_paths": [
+          "backend/db/migrations/domains/base",
+          "backend/db/migrations/202608030006_base_platform_runtime_tables.sql",
+          "backend/db/migrations/202608030010_base_self_annotations.sql",
+          "backend/db/migrations/202608040001_base_plugin_namespace_storage.sql",
+          "backend/db/migrations/202608040002_base_plugin_usage_metrics.sql",
+          "backend/db/migrations/202608050001_base_permission_grants.sql",
+          "backend/db/migrations/202608100001_base_capability_catalog_releases.sql",
+          "backend/db/migrations/202608100002_base_consumer_delegations.sql",
+          "backend/db/migrations/202608100003_base_capability_outcomes_and_approvals.sql",
+          "backend/db/migrations/202608100004_base_artifacts_and_operations.sql",
+          "backend/db/migrations/202608100005_base_plugin_mount_sessions.sql",
+          "backend/db/migrations/202608100007_base_revision_lineage.sql"
+        ]
       },
       "search_export": {
         "capability_id": "system.search",
@@ -70,7 +92,16 @@
         "database_name": "ai00_craft",
         "runtime_url_env": "AI00_CRAFT_DB_URL",
         "ddl_url_env": "AI00_CRAFT_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/craft"
+        "migration_path": "backend/db/migrations/domains/craft",
+        "schema_paths": [
+          "backend/db/migrations/domains/craft",
+          "backend/db/migrations/202608030005_craft_legacy_auxiliary_tables.sql",
+          "backend/db/migrations/202608030008_craft_runtime_schema.sql",
+          "backend/db/migrations/202608050004_craft_bop_version_contract.sql",
+          "backend/db/migrations/202608060001_craft_bop_revision.sql",
+          "backend/db/migrations/202608060004_craft_validation_policies.sql",
+          "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []
@@ -91,7 +122,12 @@
         "database_name": "ai00_device",
         "runtime_url_env": "AI00_DEVICE_DB_URL",
         "ddl_url_env": "AI00_DEVICE_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/device"
+        "migration_path": "backend/db/migrations/domains/device",
+        "schema_paths": [
+          "backend/db/migrations/domains/device",
+          "backend/db/migrations/202608030004_device_control_plane.sql",
+          "backend/db/migrations/202608100011_device_operation_protocol_v2.sql"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []
@@ -112,7 +148,11 @@
         "database_name": "ai00_digital_model",
         "runtime_url_env": "AI00_DIGITAL_MODEL_DB_URL",
         "ddl_url_env": "AI00_DIGITAL_MODEL_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/digital_model"
+        "migration_path": "backend/db/migrations/domains/digital_model",
+        "schema_paths": [
+          "backend/db/migrations/domains/digital_model",
+          "backend/db/migrations/202608100009_digital_model_snapshots.sql"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []
@@ -133,7 +173,8 @@
         "database_name": "ai00_factory",
         "runtime_url_env": "AI00_FACTORY_DB_URL",
         "ddl_url_env": "AI00_FACTORY_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/factory"
+        "migration_path": "backend/db/migrations/domains/factory",
+        "schema_paths": ["backend/db/migrations/domains/factory"]
       },
       "search_export": {
         "capability_id": "factory.structure.search",
@@ -157,7 +198,8 @@
         "database_name": "ai00_integration",
         "runtime_url_env": "AI00_INTEGRATION_DB_URL",
         "ddl_url_env": "AI00_INTEGRATION_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/integration"
+        "migration_path": "backend/db/migrations/domains/integration",
+        "schema_paths": ["backend/db/migrations/domains/integration"]
       },
       "search_export": null,
       "event_subscriptions": []
@@ -178,7 +220,14 @@
         "database_name": "ai00_knowledge",
         "runtime_url_env": "AI00_KNOWLEDGE_DB_URL",
         "ddl_url_env": "AI00_KNOWLEDGE_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/knowledge"
+        "migration_path": "backend/db/migrations/domains/knowledge",
+        "schema_paths": [
+          "backend/db/migrations/domains/knowledge",
+          "backend/db/migrations/202608030007_knowledge_proposal_outbox.sql",
+          "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql",
+          "backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql",
+          "backend/db/migrations/202608060002_knowledge_revision_attribution.sql"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []
@@ -199,7 +248,12 @@
         "database_name": "ai00_ontology",
         "runtime_url_env": "AI00_ONTOLOGY_DB_URL",
         "ddl_url_env": "AI00_ONTOLOGY_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/ontology"
+        "migration_path": "backend/db/migrations/domains/ontology",
+        "schema_paths": [
+          "backend/db/migrations/domains/ontology",
+          "backend/db/migrations/202608060003_base_ontology_release_governance.sql",
+          "backend/db/migrations/202608100008_ontology_revision_refs.sql"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []
@@ -220,7 +274,12 @@
         "database_name": "ai00_project_management",
         "runtime_url_env": "AI00_PROJECT_MANAGEMENT_DB_URL",
         "ddl_url_env": "AI00_PROJECT_MANAGEMENT_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/project_management"
+        "migration_path": "backend/db/migrations/domains/project_management",
+        "schema_paths": [
+          "backend/db/migrations/domains/project_management",
+          "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql",
+          "backend/db/migrations/202608050003_craft_list_team_visibility.sql"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []
@@ -241,7 +300,12 @@
         "database_name": "ai00_simulation",
         "runtime_url_env": "AI00_SIMULATION_DB_URL",
         "ddl_url_env": "AI00_SIMULATION_DDL_DB_URL",
-        "migration_path": "backend/db/migrations/domains/simulation"
+        "migration_path": "backend/db/migrations/domains/simulation",
+        "schema_paths": [
+          "backend/db/migrations/domains/simulation",
+          "backend/db/migrations/202608030009_simulation_environments.sql",
+          "backend/db/migrations/202608100010_simulation_reproducibility.sql"
+        ]
       },
       "search_export": null,
       "event_subscriptions": []

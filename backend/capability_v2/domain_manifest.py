@@ -32,6 +32,7 @@ class DomainDatabaseManifest(FrozenModel):
     runtime_url_env: str = Field(pattern=r"^AI00_[A-Z0-9_]+_DB_URL$")
     ddl_url_env: str = Field(pattern=r"^AI00_[A-Z0-9_]+_DDL_DB_URL$")
     migration_path: str
+    schema_paths: tuple[str, ...]
 
     @model_validator(mode="after")
     def validate_migration_path(self) -> "DomainDatabaseManifest":
@@ -39,6 +40,14 @@ class DomainDatabaseManifest(FrozenModel):
             self.migration_path,
             field_name="migration_path",
         )
+        if not self.schema_paths:
+            raise ValueError("schema_paths must not be empty")
+        for path in self.schema_paths:
+            _require_repository_relative_posix_path(path, field_name="schema_paths")
+        if len(self.schema_paths) != len(set(self.schema_paths)):
+            raise ValueError("duplicate schema_paths")
+        if self.migration_path not in self.schema_paths:
+            raise ValueError("schema_paths must include migration_path")
         return self
 
 
@@ -103,6 +112,10 @@ class DomainManifestSet(FrozenModel):
         self._require_unique(
             [item.database.database_name for item in self.domains],
             resource_name="database_name",
+        )
+        self._require_unique(
+            [path for item in self.domains for path in item.database.schema_paths],
+            resource_name="schema_path",
         )
         return self
 

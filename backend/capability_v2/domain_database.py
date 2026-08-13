@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal, Mapping
+from typing import TYPE_CHECKING, Literal, Mapping
 from urllib.parse import unquote, urlparse
 
 from .domain_manifest import DomainManifest
+
+if TYPE_CHECKING:
+    from .database_profile import DatabaseDeploymentProfile
 
 
 class DomainDatabaseConfigurationError(ValueError):
@@ -122,6 +125,30 @@ def load_domain_database_url(
     )
 
 
+def load_runtime_database_url(
+    manifest: DomainManifest,
+    environ: Mapping[str, str],
+    profile: "DatabaseDeploymentProfile | None" = None,
+) -> DomainDatabaseUrl:
+    if profile is None or profile.isolation_profile == "database_per_domain":
+        return load_domain_database_url(manifest, environ, role="runtime")
+    env_name = profile.runtime_url_env
+    value = str(environ.get(env_name, "")).strip()
+    if not value:
+        raise DomainDatabaseConfigurationError(f"missing_domain_database_url: {env_name}")
+    return _parse_url(value, env_name=env_name, database_name=profile.database_name)
+
+
+def load_ddl_database_url(
+    manifest: DomainManifest,
+    environ: Mapping[str, str],
+    profile: "DatabaseDeploymentProfile | None" = None,
+) -> DomainDatabaseUrl:
+    if profile is not None and profile.isolation_profile == "single_database_domain_tables":
+        raise DomainDatabaseConfigurationError("ddl_identity_external")
+    return load_domain_database_url(manifest, environ, role="ddl")
+
+
 def connect_domain_database(url: DomainDatabaseUrl):
     import pymysql
 
@@ -153,4 +180,6 @@ __all__ = [
     "connect_runtime",
     "load_domain_database_config",
     "load_domain_database_url",
+    "load_ddl_database_url",
+    "load_runtime_database_url",
 ]

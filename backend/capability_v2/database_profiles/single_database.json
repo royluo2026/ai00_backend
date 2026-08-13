@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "profile_id": "company-test-single-db",
+  "isolation_profile": "single_database_domain_tables",
+  "database_name": "ai00_test",
+  "runtime_url_env": "AI00_SHARED_RUNTIME_DB_URL",
+  "domains": [
+    "agent",
+    "base",
+    "craft",
+    "device",
+    "digital_model",
+    "factory",
+    "integration",
+    "knowledge",
+    "ontology",
+    "project_management",
+    "simulation"
+  ]
+}

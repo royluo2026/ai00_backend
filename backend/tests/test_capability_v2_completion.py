@@ -122,6 +122,7 @@ def _complete_repository(tmp_path: Path) -> Path:
                     "runtime_url_env": f"AI00_{domain_id.upper()}_DB_URL",
                     "ddl_url_env": f"AI00_{domain_id.upper()}_DDL_DB_URL",
                     "migration_path": migration_path,
+                    "schema_paths": [migration_path],
                 },
                 "search_export": None,
                 "event_subscriptions": [],

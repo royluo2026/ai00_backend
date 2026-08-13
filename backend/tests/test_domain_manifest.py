@@ -29,6 +29,7 @@ def _manifest_document() -> dict[str, object]:
                     "runtime_url_env": "AI00_CRAFT_DB_URL",
                     "ddl_url_env": "AI00_CRAFT_DDL_DB_URL",
                     "migration_path": "backend/db/migrations/domains/craft",
+                    "schema_paths": ["backend/db/migrations/domains/craft"],
                 },
                 "search_export": {
                     "capability_id": "craft.object.search",
