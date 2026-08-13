@@ -49,6 +49,7 @@ def test_generated_sql_is_non_destructive_and_targets_ai00_test(tmp_path):
     assert "`ai00_test`" in sql
     assert not re.search(r"\b(DROP|TRUNCATE|DELETE|RENAME)\b", sql, re.I)
     assert "ADD COLUMN" in sql and "ADD INDEX" in sql
+    assert "ENGINE=InnoDB" not in sql
 
 
 def test_preflight_does_not_use_oceanbase_reserved_keyword_as_alias(tmp_path):

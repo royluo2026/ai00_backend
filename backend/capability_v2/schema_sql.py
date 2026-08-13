@@ -108,7 +108,7 @@ def _table(table: TableSpec) -> str:
         elif constraint.kind == "check":
             definitions.append(f"CONSTRAINT {_quote(constraint.name)} CHECK ({constraint.expression})")
     body = ",\n  ".join(definitions)
-    return f"CREATE TABLE IF NOT EXISTS {_quote(table.name)} (\n  {body}\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+    return f"CREATE TABLE IF NOT EXISTS {_quote(table.name)} (\n  {body}\n) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 
 
 def _json(value: object) -> bytes:
