@@ -236,6 +236,29 @@ def test_ois_upload_uses_public_base_url_when_configured(monkeypatch):
     assert url == 'https://cdn.example.com/files/vb-prefix/uploads/abc123.png'
 
 
+def test_ois_is_enabled_only_with_complete_client_configuration(monkeypatch):
+    import backend.core.ois_storage as ois_storage
+
+    monkeypatch.setattr(ois_storage, '_get_ois_config', lambda: {
+        'identify': 'configured-bucket',
+        'ois3_url': 'https://ois.example',
+    })
+    assert ois_storage.is_enabled() is False
+
+    monkeypatch.setattr(ois_storage, '_get_ois_config', lambda: {
+        'identify': 'configured-bucket',
+        'env': 'ontest',
+        'ois3_url': 'https://ois.example',
+        'region': 'cnhb01',
+        'licloud_appid': 'app-id',
+        'idaas_url': 'https://idaas.example',
+        'idaas_client_id': 'client-id',
+        'idaas_client_secret': 'client-secret',
+        'idaas_service_id': 'service-id',
+    })
+    assert ois_storage.is_enabled() is True
+
+
 def test_ois_upload_returns_none_when_public_base_url_missing(monkeypatch):
     import backend.core.ois_storage as ois_storage
 

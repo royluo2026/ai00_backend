@@ -66,7 +66,14 @@ def _get_ois_config() -> dict:
 
 def is_enabled() -> bool:
     cfg = _get_ois_config()
-    return bool(cfg.get("identify") and (cfg.get("ois3_url") or cfg.get("api_base")))
+    required = (
+        "identify", "env", "region", "licloud_appid", "idaas_url",
+        "idaas_client_id", "idaas_client_secret", "idaas_service_id",
+    )
+    return bool(
+        all(str(cfg.get(name, "")).strip() for name in required)
+        and str(cfg.get("ois3_url") or cfg.get("api_base", "")).strip()
+    )
 
 
 def _make_client():
