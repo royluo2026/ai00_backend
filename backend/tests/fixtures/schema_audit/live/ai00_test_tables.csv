@@ -1,0 +1,2 @@
+TABLE_SCHEMA,TABLE_NAME,ENGINE,TABLE_COLLATION,TABLE_TYPE
+ai00_test,workmanship_device_assets,InnoDB,utf8mb4_unicode_ci,BASE TABLE
