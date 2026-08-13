@@ -98,3 +98,25 @@ def test_mysql_display_width_boolean_and_timestamp_renderings_are_equivalent():
     diff = diff_schema(expected, actual)
     assert diff.safe == ()
     assert diff.manual == ()
+
+
+def test_column_order_is_not_a_schema_contract_difference():
+    expected = ExpectedSchema((TableSpec(
+        "workmanship_device_assets", "device", "device", False,
+        columns=(
+            ColumnSpec("gid", "CHAR(36)", False),
+            ColumnSpec("status", "VARCHAR(32)", False),
+        ),
+    ),), database_name="ai00_test")
+    actual = SchemaSnapshot("ai00_test", (SnapshotTable(
+        "workmanship_device_assets", "InnoDB", "utf8mb4_general_ci", "BASE TABLE",
+        columns=(
+            SnapshotColumn("status", 1, None, False, "VARCHAR", "VARCHAR(32)", "", "", "utf8mb4", "utf8mb4_general_ci", ""),
+            SnapshotColumn("gid", 2, None, False, "CHAR", "CHAR(36)", "", "", "utf8mb4", "utf8mb4_general_ci", ""),
+        ), indexes=(),
+    ),))
+
+    diff = diff_schema(expected, actual)
+
+    assert diff.safe == ()
+    assert diff.manual == ()

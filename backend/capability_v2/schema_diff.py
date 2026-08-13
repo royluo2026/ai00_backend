@@ -127,9 +127,6 @@ def diff_schema(expected: ExpectedSchema, actual: SchemaSnapshot) -> SchemaDiff:
                 manual.append(SchemaDifference("default_mismatch", name, column_name, expected_default, actual_default))
             if _extra(column.extra) != _extra(live.extra):
                 manual.append(SchemaDifference("extra_mismatch", name, column_name, _extra(column.extra), _extra(live.extra)))
-            expected_ordinal = next(index for index, item in enumerate(expected_table.columns, 1) if item.name == column_name)
-            if expected_ordinal != live.ordinal:
-                manual.append(SchemaDifference("ordinal_mismatch", name, column_name, expected_ordinal, live.ordinal))
             if live.generation_expression:
                 manual.append(SchemaDifference("generated_expression", name, column_name))
         for column_name in sorted(actual_columns.keys() - expected_columns.keys()):
