@@ -110,7 +110,7 @@ def load_schema_snapshot(directory: Path, expected_database: str = "ai00_test") 
         if key in seen_columns: raise SnapshotError(f"duplicate_column_row:{name}:{ordinal}")
         seen_columns.add(key)
         if row["IS_NULLABLE"] not in {"YES", "NO"}: raise SnapshotError(f"invalid_nullability:{name}.{column}")
-        default = None if row["COLUMN_DEFAULT"] == "NULL" else row["COLUMN_DEFAULT"]
+        default = None if row["COLUMN_DEFAULT"] == "<SQL_NULL>" else row["COLUMN_DEFAULT"]
         table_data[name]["columns"].append(SnapshotColumn(
             column, ordinal, default, row["IS_NULLABLE"] == "YES", row["DATA_TYPE"].upper(),
             row["COLUMN_TYPE"].upper(), row["COLUMN_KEY"].upper(), row["EXTRA"].upper(),
@@ -128,7 +128,7 @@ def load_schema_snapshot(directory: Path, expected_database: str = "ai00_test") 
         if key in seen_indexes: raise SnapshotError(f"duplicate_index_row:{name}.{index_name}:{sequence}")
         seen_indexes.add(key)
         if row["NON_UNIQUE"] not in {"0", "1"}: raise SnapshotError(f"invalid_non_unique:{name}.{index_name}")
-        part = None if row["SUB_PART"] in {"", "NULL"} else int(row["SUB_PART"])
+        part = None if row["SUB_PART"] in {"", "NULL", "<SQL_NULL>"} else int(row["SUB_PART"])
         bucket = table_data[name]["indexes"].setdefault(index_name, [])
         bucket.append((sequence, row["COLUMN_NAME"], part, row["NON_UNIQUE"], row["INDEX_TYPE"].upper()))
     tables = []

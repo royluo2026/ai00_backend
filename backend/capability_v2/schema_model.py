@@ -117,3 +117,34 @@ class ExpectedSchema:
             "schema_sha256": self.schema_sha256,
             "tables": [table.to_dict() for table in self.tables],
         }
+
+
+def expected_schema_from_dict(document: dict[str, object]) -> ExpectedSchema:
+    tables = []
+    for raw_table in document["tables"]:
+        columns = tuple(ColumnSpec(
+            item["name"], item["data_type"], item["nullable"], item.get("default"),
+            item.get("extra", ""), tuple(item.get("sources", ())),
+        ) for item in raw_table.get("columns", ()))
+        indexes = tuple(IndexSpec(
+            item["name"], tuple(item["columns"]), item.get("unique", False),
+            item.get("primary", False), tuple(item.get("sources", ())),
+        ) for item in raw_table.get("indexes", ()))
+        constraints = tuple(ConstraintSpec(
+            item["name"], item["kind"], tuple(item.get("columns", ())),
+            item.get("referenced_table"), tuple(item.get("referenced_columns", ())),
+            item.get("expression"), tuple(item.get("sources", ())),
+        ) for item in raw_table.get("constraints", ()))
+        tables.append(TableSpec(
+            raw_table["name"], raw_table["owner"], raw_table["runtime_domain"],
+            raw_table["legacy_name"], columns, indexes, constraints,
+            tuple(raw_table.get("sources", ())),
+        ))
+    schema = ExpectedSchema(
+        tuple(tables), document.get("schema_version", 1),
+        document.get("isolation_profile", "single_database_domain_tables"),
+        document["database_name"],
+    )
+    if document.get("schema_sha256") != schema.schema_sha256:
+        raise ValueError("expected_schema_hash_mismatch")
+    return schema

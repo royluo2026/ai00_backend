@@ -1,4 +1,4 @@
 TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,COLUMN_DEFAULT,IS_NULLABLE,DATA_TYPE,COLUMN_TYPE,COLUMN_KEY,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,GENERATION_EXPRESSION
-ai00_test,workmanship_device_assets,gid,1,NULL,NO,char,char(36),PRI,,,utf8mb4_unicode_ci,
-ai00_test,workmanship_device_assets,asset_no,2,NULL,NO,varchar,varchar(255),,,utf8mb4,utf8mb4_unicode_ci,
+ai00_test,workmanship_device_assets,gid,1,<SQL_NULL>,NO,char,char(36),PRI,,,utf8mb4_unicode_ci,
+ai00_test,workmanship_device_assets,asset_no,2,<SQL_NULL>,NO,varchar,varchar(255),,,utf8mb4,utf8mb4_unicode_ci,
 ai00_test,workmanship_device_assets,old_column,3,,YES,varchar,varchar(32),,,utf8mb4,utf8mb4_unicode_ci,
