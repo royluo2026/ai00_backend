@@ -172,3 +172,11 @@ def test_real_repository_preserves_hash_color_defaults_and_following_columns():
     work_lists = schema.require_table("workmanship_work_lists")
     assert work_lists.require_column("color").default == "('#5b8dee')"
     assert work_lists.require_column("storage_scope").default == "('cloud')"
+
+
+def test_lifecycle_stats_date_is_required_without_unsupported_database_default():
+    table = compile_expected_schema(ROOT).require_table("workmanship_bop_bop_lifecycle_stats")
+    snapshot_date = table.require_column("stats_snapshot_date")
+    assert snapshot_date.data_type == "DATE"
+    assert snapshot_date.nullable is False
+    assert snapshot_date.default is None

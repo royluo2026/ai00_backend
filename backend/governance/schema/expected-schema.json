@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:901d426828de54b3b9e0f13b432846663a7a604ea686a86dabd81dd1c85bb87e",
+  "schema_sha256": "sha256:6b67c4f25ee618fe17d00ede342eb0337dd54742b2c19815e45a6f764410b8b4",
   "schema_version": 1,
   "tables": [
     {
@@ -10834,7 +10834,7 @@
         },
         {
           "data_type": "DATE",
-          "default": "(CURRENT_DATE)",
+          "default": null,
           "extra": "",
           "name": "stats_snapshot_date",
           "nullable": false,

@@ -1283,7 +1283,7 @@ CREATE TABLE IF NOT EXISTS workmanship_bop_bop_lifecycle_stats (
     gid                 CHAR(36) PRIMARY KEY,
     version_gid         CHAR(36) NOT NULL REFERENCES workmanship_bop_bop_versions(gid) ON DELETE CASCADE,
     line_gid            CHAR(36) DEFAULT NULL,
-    stats_snapshot_date DATE NOT NULL DEFAULT (CURRENT_DATE),
+    stats_snapshot_date DATE NOT NULL,
     nok_vpps            INT NOT NULL DEFAULT 0,
     nok_unbound_parts   INT NOT NULL DEFAULT 0,
     nok_unbound_ops     INT NOT NULL DEFAULT 0,
