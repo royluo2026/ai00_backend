@@ -118,8 +118,23 @@ class BopLifecyclePanel {
     this._data         = null;
     this._viewPhase    = 'init';
     this._selectedItem = null;
-    if (this._actionEl) this._actionEl.innerHTML = '';
+    if (this._actionEl) {
+      // lvLifecycleAction starts with display:none in HTML. When the page is
+      // already in layout mode, entering creation mode does not run
+      // _syncLayoutUI again, so make the creation area visible explicitly.
+      this._actionEl.style.display = '';
+      this._actionEl.innerHTML =
+        '<div class="lv-cpanel-empty">请在上方选择一种新建路线</div>';
+    }
+    const historyPanel = document.getElementById('lvHistorySidePanel');
+    if (historyPanel) {
+      this._historyDisplayBeforeCreation = historyPanel.style.display;
+      historyPanel.style.display = 'none';
+    }
     this._renderCreationMode();
+    // 工具栏“新建”的主路径就是创建空白版本：右侧栏打开后立即展示
+    // 可填写表单；上方路线按钮仍可切换到模板、现有版本或 TC 导入。
+    void this._handleRouteSelect('blank');
   }
 
   _renderCreationMode() {
@@ -178,6 +193,11 @@ class BopLifecyclePanel {
     this._selectedItem = null;
     this._activeEntryGid = null;
     this._lastRefresh  = 0;
+    const historyPanel = document.getElementById('lvHistorySidePanel');
+    if (historyPanel && this._historyDisplayBeforeCreation !== undefined) {
+      historyPanel.style.display = this._historyDisplayBeforeCreation;
+      this._historyDisplayBeforeCreation = undefined;
+    }
     this._renderSideHistoryPanel();
     if (gid) {
       this.init();
@@ -637,15 +657,23 @@ class BopLifecyclePanel {
   }
 
   // 路线选择按钮处理
-  _handleRouteSelect(routeId) {
-    if (routeId === 'blank') {
-      this._showBlankCreationForm();
-    } else if (routeId === 'from_template') {
-      this._showFromTemplateFlow();
-    } else if (routeId === 'from_existing') {
-      this._showFromExistingFlow();
-    } else if (routeId === 'tc_import') {
-      this._showTcImportFlow();
+  async _handleRouteSelect(routeId) {
+    const flows = {
+      blank:         () => this._showBlankCreationForm(),
+      from_template: () => this._showFromTemplateFlow(),
+      from_existing: () => this._showFromExistingFlow(),
+      tc_import:     () => this._showTcImportFlow(),
+    };
+    const openFlow = flows[routeId];
+    if (!openFlow) return;
+    try {
+      await openFlow();
+    } catch (e) {
+      if (this._actionEl) {
+        this._actionEl.innerHTML =
+          '<div class="lv-cpanel-empty">新建内容加载失败，请重试</div>';
+      }
+      this._toast?.('新建内容加载失败: ' + e.message, 'error');
     }
   }
 
@@ -2758,6 +2786,9 @@ class BopLifecyclePanel {
   // ── PM 确认阶段 ────────────────────────────────────────────────────────────
 
   _appendConfirmBtn(frag, phase) {
+    // 创建模式尚无版本和生命周期数据，不能参与“阶段推进”判断。
+    // 否则管理员会看到误导性的“请先完成前置阶段”锁定按钮。
+    if (this._creationMode || !this._versionGid || !this._data) return;
     const authUser = window.parent?._authUser || window._authUser;
     const role     = authUser?.org_role || authUser?.system_role || authUser?.role || 'member';
     const canConfirm = ['project_admin','team_admin','super_admin'].includes(role);

@@ -301,11 +301,73 @@
     },
     onPluginRegistryUpdated() {},   // 静默：网页版靠轮询
 
-    // ── 插件注册表（从后端 /admin/plugin-registry 获取）──────────────────
-    getPluginRegistry() {
-      return _backendUrl('/admin/plugin-registry').then(url => fetch(url))
-        .then(r => r.ok ? r.json() : null)
-        .catch(() => null);
+    // 合并仓库内置 official registry 与当前租户已启用、已签名的 Web Plugin。
+    async getPluginRegistry() {
+      const token = localStorage.getItem('ai00_token') || '';
+      const official = await _backendUrl('/admin/plugin-registry').then(url => fetch(url))
+        .then(r => r.ok ? r.json() : null).catch(() => null);
+      const result = official || { tabDefs: {}, navItems: [] };
+      if (!result.tabDefs) result.tabDefs = {};
+      if (!result.navItems) result.navItems = [];
+      if (!token) return result;
+      const tenant = await _backendUrl('/api/v1/plugin-marketplace/registry').then(url =>
+        fetch(url, { headers: { 'X-AI00-Token': token } })
+      ).then(r => r.ok ? r.json() : null).catch(() => null);
+      for (const plugin of tenant?.data || []) {
+        if (!plugin.mount_url || !plugin.mount_session_id) continue;
+        const id = `plugin:${plugin.plugin_id}`;
+        result.tabDefs[id] = {
+          title: plugin.name || plugin.plugin_id, src: plugin.mount_url,
+          requiresAuth: true, minPerm: null, sandbox: 'allow-scripts',
+          plugin: {
+            pluginId: plugin.plugin_id,
+            version: plugin.version,
+            mountSessionId: plugin.mount_session_id,
+            catalogRelease: plugin.catalog_release,
+            capabilityVersions: plugin.capability_versions || {},
+            grantedCapabilities: Object.keys(plugin.capability_versions || {}),
+          },
+          _pluginId: plugin.plugin_id,
+        };
+        result.navItems.push({ id, title: plugin.name || plugin.plugin_id, icon: 'icon-plugin', requiresAuth: true, _pluginId: plugin.plugin_id });
+      }
+      return result;
+    },
+
+    async invokePluginCapability(capabilityId, payload, mountSessionId, majorVersion) {
+      const token = localStorage.getItem('ai00_token') || '';
+      if (!mountSessionId || !Number.isInteger(majorVersion)) {
+        throw Object.assign(new Error('Plugin mount session is incomplete'), { code: 'plugin_mount_invalid' });
+      }
+      const prefix = `/api/v1/plugin-marketplace/mounts/${encodeURIComponent(mountSessionId)}/capabilities/${encodeURIComponent(capabilityId)}`;
+      const idempotencyKey = crypto.randomUUID();
+      const requestBody = {
+        payload: payload || {}, major_version: majorVersion,
+        idempotency_key: idempotencyKey,
+      };
+      const post = async (suffix, requestPayload) => {
+        const url = await _backendUrl(prefix + suffix);
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-AI00-Token': token, 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestPayload),
+        });
+        const responseBody = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const detail = responseBody?.detail || {};
+          const error = new Error(detail.message || detail.code || `Capability failed (${response.status})`);
+          error.code = detail.code || 'capability_failed';
+          throw error;
+        }
+        return responseBody;
+      };
+      let result = await post(':invoke', requestBody);
+      if (result?.error?.code === 'confirmation_required') {
+        if (!window.confirm(`插件请求执行 ${capabilityId}，是否允许本次操作？`)) return result;
+        const approval = await post(':confirm', requestBody);
+        result = await post(':invoke', { ...requestBody, approval_reference: approval.approval_reference });
+      }
+      return result;
     },
 
     // ── 自动更新（网页版无需，静默）───────────────────────────────────────

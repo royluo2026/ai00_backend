@@ -1058,6 +1058,32 @@ window._showCaptureProgress = function(msg) {
   }
 };
 
+function _acceptWebTokenRefresh(refreshedToken, previousToken) {
+  if (!refreshedToken || refreshedToken === previousToken || window.electronAPI?._isElectron !== false) return;
+  localStorage.setItem('ai00_token', refreshedToken);
+  let previousUser = null;
+  try { previousUser = JSON.parse(localStorage.getItem('ai00_user') || 'null'); } catch (_) {}
+  let payload = {};
+  try {
+    const encoded = refreshedToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = encoded.padEnd(Math.ceil(encoded.length / 4) * 4, '=');
+    const bytes = Uint8Array.from(atob(padded), ch => ch.charCodeAt(0));
+    payload = JSON.parse(new TextDecoder().decode(bytes));
+  } catch (_) {}
+  const user = {
+    ...(previousUser || {}),
+    gid: payload.sub || previousUser?.gid || '',
+    system_role: payload.system_role || previousUser?.system_role,
+    org_role: payload.org_role || previousUser?.org_role,
+    team_id: payload.team_id || previousUser?.team_id || '',
+    name: payload.name || previousUser?.name || '',
+    email: payload.email || previousUser?.email || '',
+  };
+  localStorage.setItem('ai00_user', JSON.stringify(user));
+  window.dispatchEvent(new CustomEvent('ai00:auth-changed', {
+    detail: { mode: 'feishu', token: refreshedToken, user },
+  }));
+}
 window._cloudFetch = async function(path, opts = {}) {
   const config = (await window.electronAPI?.getConfig?.()) || {};
   const state  = (await window.electronAPI?.authGetState?.()) || {};
@@ -1085,6 +1111,7 @@ window._cloudFetch = async function(path, opts = {}) {
     _netPush({ reqId, method, path, status: 0, ms, ok: false, err: networkErr.message });
     throw networkErr;
   }
+  _acceptWebTokenRefresh(res.headers.get('X-New-Token'), token);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     const detail = err.detail;

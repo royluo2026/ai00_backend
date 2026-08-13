@@ -226,17 +226,10 @@ async function _refreshSidebar() {
 }
 
 // ── BOP 版本侧边栏（自定义分组渲染）────────────────────────────
-async function _fetchBopVersions() {
-  const json = await ListShell._cf('/api/v1/capabilities/craft.bop.version.list:invoke', {
-    method: 'POST',
-    body: JSON.stringify({ version: 1, payload: { include_archived: true, page_size: 100 } }),
-  });
-  return json?.data?.data?.items || [];
-}
-
 async function _loadBopVersions() {
   try {
-    _bopVersions = await _fetchBopVersions();
+    const json = await ListShell._cf('/api/bop/versions?include_archived=true');
+    _bopVersions = json.data || [];
   } catch (e) {
     console.warn('[BOP] 加载版本列表失败:', e);
   }
@@ -1148,7 +1141,8 @@ async function _openForkModal() {
   document.getElementById('btn-fork-delete-preset').style.display = 'none';
 
   try {
-    const vers = await _fetchBopVersions();
+    const json = await ListShell._cf('/api/bop/versions');
+    const vers = json.data || [];
     vers.forEach(v => {
       const opt = document.createElement('option');
       opt.value = v.gid;
@@ -1363,8 +1357,8 @@ async function _openImportGbopModal() {
   const sel = document.getElementById('inp-copy-gbop-version');
   sel.innerHTML = '<option value="">-- 选择 GBOP 版本 --</option>';
   try {
-    const versions = await _fetchBopVersions();
-    versions.forEach(v => {
+    const json = await ListShell._cf('/api/bop/versions');
+    (json.data || []).forEach(v => {
       if (v.gid === _currentVersion) return;
       const opt = document.createElement('option');
       opt.value = v.gid;

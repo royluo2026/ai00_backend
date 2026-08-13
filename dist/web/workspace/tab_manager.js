@@ -203,7 +203,7 @@ const TabManager = (() => {
     // 带参数时用唯一 tabId（避免同时打开多个同类 tab 时冲突）
     const tabId = hasParams ? `${viewId}_${Date.now()}` : viewId;
     const isPermanent = viewId === 'workbench' || viewId === 'craft_hub';
-    WorkspaceEngine.addTab(tabId, def.title, src, { html, closeable: !isPermanent });
+    WorkspaceEngine.addTab(tabId, def.title, src, { html, closeable: !isPermanent, sandbox: def.sandbox || null, plugin: def.plugin || null });
     window.dbg?.log(`[Tab] 打开: ${def.title}${hasParams ? ' (带参数)' : ''}`);
 
     // container_card：通过 postMessage 传递完整 params（避免 URL 长度限制）

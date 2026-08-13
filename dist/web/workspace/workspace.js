@@ -27,6 +27,7 @@ const WorkspaceEngine = (() => {
   let _root         = null;       // LayoutNode 树根
   let _panels       = new Map();  // panelId → PanelState
   let _tabs         = new Map();  // tabId   → TabState
+  const _pluginBridgeCleanups = new Map();
   let _focusedId    = null;       // 当前聚焦面板 id
   let _nextPanelIdx = 1;
   let _dragging     = null;       // { tabId, sourcePanelId } | null
@@ -402,8 +403,54 @@ const WorkspaceEngine = (() => {
    *   opts.closeable  boolean  是否可关闭，默认 true
    *   opts.html       string   内联 HTML（与 src 二选一，welcome 页面用）
    */
+  function _attachPluginBridge(tabId, iframe, plugin) {
+    _pluginBridgeCleanups.get(tabId)?.();
+    const instanceId = crypto.randomUUID();
+    const channelToken = crypto.randomUUID() + crypto.randomUUID();
+    const granted = new Set(plugin.grantedCapabilities || []);
+    const capabilityVersions = Object.freeze({ ...(plugin.capabilityVersions || {}) });
+    const rejected = (capabilityId, requestId, code, message) => ({
+      ok: false, status: 'rejected', capability_id: capabilityId,
+      major_version: capabilityVersions[capabilityId] || 1, data: null,
+      operation_ref: null, artifact_refs: [],
+      error: { code, message, retryable: false, details: {} },
+      evidence: [], warnings: [],
+      correlation: { request_id: requestId, trace_id: null },
+    });
+    const send = message => iframe.contentWindow?.postMessage(message, '*');
+    const onMessage = async event => {
+      if (event.source !== iframe.contentWindow || !event.data || typeof event.data !== 'object') return;
+      const message = event.data;
+      if (message.instanceId !== instanceId || message.channelToken !== channelToken) return;
+      if (message.type === 'ai00.plugin.ready') return;
+      if (message.type !== 'ai00.plugin.invoke' || message.protocol !== 1 || typeof message.requestId !== 'string') return;
+      if (!granted.has(message.capabilityId)) {
+        send({ type: 'ai00.plugin.response', requestId: message.requestId, channelToken, result: rejected(message.capabilityId, message.requestId, 'capability_not_granted', 'Capability was not approved for this mount session') });
+        return;
+      }
+      try {
+        const result = await window.electronAPI.invokePluginCapability(
+          message.capabilityId, message.payload || {}, plugin.mountSessionId,
+          capabilityVersions[message.capabilityId],
+        );
+        send({ type: 'ai00.plugin.response', requestId: message.requestId, channelToken, result });
+      } catch (error) {
+        send({ type: 'ai00.plugin.response', requestId: message.requestId, channelToken, result: rejected(message.capabilityId, message.requestId, error?.code || 'host_bridge_failed', error?.message || 'Capability host bridge failed') });
+      }
+    };
+    const initialize = () => send({
+      type: 'ai00.plugin.init', protocol: 1, instanceId, channelToken,
+      catalogRelease: plugin.catalogRelease,
+      capabilityVersions,
+      grantedCapabilities: [...granted],
+    });
+    window.addEventListener('message', onMessage);
+    iframe.addEventListener('load', initialize);
+    _pluginBridgeCleanups.set(tabId, () => { window.removeEventListener('message', onMessage); iframe.removeEventListener('load', initialize); });
+  }
+
   function addTab(tabId, title, src, opts = {}) {
-    const { closeable = true, html = null } = opts;
+    const { closeable = true, html = null, sandbox = null, plugin = null } = opts;
     const pid = _activePid();
     const ps  = _panels.get(pid);
     if (!ps) { console.error('[WS] no active panel'); return; }
@@ -483,9 +530,11 @@ const WorkspaceEngine = (() => {
         src = src + sep + '_cb=' + (window._WS_SESSION_TS = window._WS_SESSION_TS || Date.now());
       }
       const iframe = document.createElement('iframe');
+      if (sandbox) iframe.setAttribute('sandbox', sandbox);
       iframe.src   = src;
       iframe.title = title;
-      iframe.allow = 'clipboard-read; clipboard-write';
+      iframe.referrerPolicy = plugin ? 'no-referrer' : '';
+      iframe.allow = plugin ? '' : 'clipboard-read; clipboard-write';
 
       // 遮罩：与主题背景同色，防止首次加载时白色闪烁
       iframe.addEventListener('load', () => {
@@ -509,6 +558,7 @@ const WorkspaceEngine = (() => {
         }
       });
 
+      if (plugin) _attachPluginBridge(tabId, iframe, plugin);
       paneEl.appendChild(iframe);
     }
 
@@ -532,6 +582,8 @@ const WorkspaceEngine = (() => {
     const pid = ts.panelId;
     const ps  = _panels.get(pid);
 
+    _pluginBridgeCleanups.get(tabId)?.();
+    _pluginBridgeCleanups.delete(tabId);
     ts.tabEl.remove();
     ts.paneEl.remove();
     _tabs.delete(tabId);

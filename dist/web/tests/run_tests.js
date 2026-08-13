@@ -185,6 +185,7 @@ function makeLayoutDetailPanelEnv() {
       <div id="llDpProps"><div id="llDpPropsBody"></div></div>
       <div id="llDpRels"><div id="llDpRelsBody"></div></div>
       <div id="llDpDetail"><div id="llDpDetailBody"></div></div>
+      <div id="llDetDrawer"><div id="llDetDrawerBody"></div></div>
       <div id="llDpKnow"><div id="llDpKnowBody"></div></div>
       <button id="llDpKnowAdd"></button>
     </div>
@@ -301,7 +302,7 @@ function makeSettingsEnv() {
 }
 
 function makeLifecyclePanelEnv() {
-  const dom = new JSDOM('<!DOCTYPE html><html><body><div id="mount"></div><div id="action"></div><input id="lv-tc-ver-name"><input id="lv-inp-tc-file"><div id="lv-tc-s1-status"></div><button id="lv-tc-next"></button><button id="lv-tc-confirm"></button><div id="lv-modal-import-tc" class="hidden"></div></body></html>', {
+  const dom = new JSDOM('<!DOCTYPE html><html><body><div id="mount"></div><div id="action" style="display:none"></div><div id="lvHistorySidePanel"></div><div id="lvActionHistoryBody"></div><input id="lv-tc-ver-name"><input id="lv-inp-tc-file"><div id="lv-tc-s1-status"></div><button id="lv-tc-next"></button><button id="lv-tc-confirm"></button><div id="lv-modal-import-tc" class="hidden"></div></body></html>', {
     runScripts: 'dangerously',
     resources: 'usable',
     url: 'http://localhost',
@@ -954,13 +955,51 @@ async function runTests() {
     const projSel = panel._actionEl.querySelector('select');
     projSel.value = 'proj-1';
     projSel.dispatchEvent(new w.Event('change'));
-    const stageSel = panel._actionEl.querySelectorAll('select')[2];
+    const stageSel = panel._actionEl.querySelectorAll('select')[1];
     stageSel.value = 'TG0';
     stageSel.dispatchEvent(new w.Event('change'));
     const createBtn = [...panel._actionEl.querySelectorAll('button')].find(btn => btn.textContent.includes('创建版本并开始导入'));
     await createBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
     if (opened !== 1) throw new Error('未自动打开 Excel 导入步骤');
+  });
+
+  await _assertAsync('生命周期新建模式显示表单区且不渲染阶段锁定按钮', async () => {
+    const w = makeLifecyclePanelEnv();
+    w._authUser = { system_role: 'super_admin' };
+    const panel = new w.BopLifecyclePanel({
+      cf: async () => ({ data: [] }),
+      toast() {},
+      versionGid: 'old-version',
+      mountEl: w.document.getElementById('mount'),
+      actionEl: w.document.getElementById('action'),
+    });
+    panel._projectsCache = [];
+    panel._factoriesCache = [];
+    panel._allVersionsCache = [];
+
+    panel.enterCreationMode();
+    if (panel._actionEl.style.display === 'none') throw new Error('新建操作区仍处于隐藏状态');
+    if (panel._mountEl.textContent.includes('请先完成前置阶段')) throw new Error('新建模式错误渲染了阶段锁定按钮');
+    if (w.document.getElementById('lvHistorySidePanel').style.display !== 'none') throw new Error('新建模式仍显示操作历史');
+    await new Promise(resolve => setTimeout(resolve, 0));
+    if (!panel._actionEl.textContent.includes('新建空白 BOP 版本')) throw new Error('点击工具栏新建后未自动显示新建表单');
+
+    const blankBtn = [...panel._mountEl.querySelectorAll('button')]
+      .find(btn => btn.textContent.includes('新建空白'));
+    if (!blankBtn) throw new Error('未找到新建空白入口');
+    blankBtn.click();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    if (!panel._actionEl.textContent.includes('新建空白 BOP 版本')) throw new Error('点击路线后未显示新建表单');
+  });
+
+  await _assertAsync('lineage 无 BOP 版本时仍先初始化生命周期新建面板', async () => {
+    const src = readLineageSource();
+    const panelInit = src.indexOf('_lifecyclePanel = new BopLifecyclePanel');
+    const noVersionGuard = src.indexOf('// 无任何 BOP 版本 → 画布内提示');
+    if (panelInit < 0) throw new Error('未找到生命周期面板初始化');
+    if (noVersionGuard < 0) throw new Error('未找到无版本提前返回分支');
+    if (panelInit > noVersionGuard) throw new Error('无版本分支仍在生命周期面板初始化之前提前返回');
   });
 
   await _assertAsync('lineage 新建节点配置不再包含序号字段', async () => {
@@ -1073,14 +1112,16 @@ async function runTests() {
     if (relText.includes('关联问题')) throw new Error('show_in_detail=false 的关系不应显示');
   });
 
-  await _assertAsync('layout_detail_panel schema resource relation loads factory candidates', async () => {
+  await _assertAsync('layout_detail_panel schema resource relation loads bop need candidates', async () => {
     const w = makeLayoutDetailPanelEnv();
     const calls = [];
     const panel = new w.LayoutDetailPanel({
       containerEl: w.document.getElementById('llDetailPanel'),
       cf: async (url, opts = {}) => {
         calls.push({ url, opts });
-        if (url === '/api/bop/factory/tools?limit=20') return { data: [{ gid: 'tool-1', title: '扭力扳手' }] };
+        if (url === '/api/bop/entries/search?node_types=tool_need&limit=20') {
+          return { data: [{ gid: 'tool-need-1', title: '扭力扳手需求' }] };
+        }
         if (url.startsWith('/api/bop/entry-links?')) return { data: [] };
         throw new Error('unexpected path ' + url);
       },
@@ -1099,11 +1140,14 @@ async function runTests() {
     });
     panel._currentRow = { gid: 'gid-1', node_type: 'process', parent_gid: 'line-1' };
     await panel._openAddDetail('link:needsTool', 'gid-1', 'needsTool', '需求工具');
-    if (!calls.some(c => c.url === '/api/bop/factory/tools?limit=20')) {
-      throw new Error('needsTool 未走工具库候选加载');
+    if (!calls.some(c => c.url === '/api/bop/entries/search?node_types=tool_need&limit=20')) {
+      throw new Error('needsTool 未走 BOP 工具需求候选加载');
     }
-    const text = w.document.getElementById('llDpDetailBody').textContent || '';
-    if (!text.includes('扭力扳手')) throw new Error('工具候选未渲染');
+    if (calls.some(c => c.url === '/api/bop/factory/tools?limit=20')) {
+      throw new Error('needsTool 不应走工厂实物工具候选');
+    }
+    const text = w.document.getElementById('llDetDrawerBody').textContent || '';
+    if (!text.includes('扭力扳手需求')) throw new Error('BOP 工具需求候选未渲染');
   });
 
   await _assertAsync('layout_detail_panel 缺少规则列容器时跳过规则渲染', async () => {

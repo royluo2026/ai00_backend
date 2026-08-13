@@ -34,6 +34,27 @@ function _fmt(ts) {
   } catch (_) { return ''; }
 }
 
+async function _invokeCapability(capabilityId, payload, confirmationToken) {
+  const cf = _cf();
+  if (!cf) throw new Error('能力网关不可用');
+  const body = { payload: payload || {} };
+  if (confirmationToken) body.confirmation_token = confirmationToken;
+  const response = await cf(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke`, {
+    method: 'POST', body: JSON.stringify(body), headers: { 'X-AI00-Source': 'web' },
+  });
+  return response?.data || { data: null, evidence: [] };
+}
+
+async function _confirmAndInvokeCapability(capabilityId, payload) {
+  const cf = _cf();
+  if (!cf) throw new Error('能力网关不可用');
+  const confirmed = await cf(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm`, {
+    method: 'POST', body: JSON.stringify({ payload: payload || {} }), headers: { 'X-AI00-Source': 'web' },
+  });
+  const token = confirmed?.data?.confirmation_token;
+  if (!token) throw new Error('未取得操作确认令牌');
+  return _invokeCapability(capabilityId, payload, token);
+}
 // 调用云端 API（替代本地 bridge）
 async function _bridge(method, ...args) {
   const cf = _cf();
@@ -111,6 +132,7 @@ let _sortBy           = 'updated';    // updated | created | title
 let _openGroups       = {};           // 导航组折叠状态
 let _activeNodeKey    = '';           // 当前激活节点 key
 let _thread           = null;         // EntryThread 实例
+let _migrationSnapshot = null;       // 当前团队的遗留迁移只读状态
 
 // ── DOM 引用 ─────────────────────────────────────────────────────────────────
 let _navScroll, _listScroll, _centerBody, _rightBody, _centerTitle;
@@ -373,6 +395,8 @@ function _renderLeft1() {
   _navScroll.appendChild(_makeSpecialNode('recent', ICONS.clock, '最近文件'));
   // 已标注
   _navScroll.appendChild(_makeSpecialNode('annotated', '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 00-1.11-1.79l-1.78-.9A2 2 0 0115 10.76V6h1a2 2 0 000-4H8a2 2 0 000 4h1v4.76a2 2 0 01-1.11 1.79l-1.78.9A2 2 0 005 15.24z"/></svg>', '已标注'));
+  _navScroll.appendChild(_makeSpecialNode('workspace', ICONS.team, '团队共创'));
+  if (_isCloud() && _canEdit('public')) _navScroll.appendChild(_makeSpecialNode('migration', ICONS.clock, '迁移状态'));
 
   // 公共知识库
   const pubGroup = _makeNavGroup('public', ICONS.globe, '公共知识库', null,
@@ -480,6 +504,8 @@ async function _selectNode(scope, folderGid, teamGid) {
   // 更新激活状态
   if (scope === 'favorites') _activeNodeKey = 'favorites';
   else if (scope === 'recent') _activeNodeKey = 'recent';
+  else if (scope === 'workspace') _activeNodeKey = 'workspace';
+  else if (scope === 'migration') _activeNodeKey = 'migration';
   else if (folderGid) _activeNodeKey = `folder:${folderGid}`;
   else _activeNodeKey = scope;
 
@@ -494,6 +520,21 @@ async function _selectNode(scope, folderGid, teamGid) {
 async function _loadItems() {
   _items = [];
   try {
+    if (_currentScope === 'migration') {
+      const result = await _invokeCapability('knowledge.migration.status', { scan_limit: 10000 });
+      _migrationSnapshot = result?.data || null;
+      _items = (_migrationSnapshot?.runs || []).map(run => ({ ...run, gid: run.gid, title: 迁移 , _migrationRun: true }));
+      return;
+    }
+    if (_currentScope === 'workspace') {
+      if (!_isCloud()) return;
+      const result = await _invokeCapability('knowledge.document.search', { query: '', limit: 50 });
+      _items = (result?.data?.items || []).map(doc => ({
+        ...doc, gid: doc.document_gid, item_type: 'markdown', scope_type: 'team',
+        status: doc.state || 'published', updated_at: '', _revisionDocument: true,
+      }));
+      return;
+    }
     if (_currentScope === 'annotated') {
       const cf = _cf();
       if (cf) {
@@ -549,6 +590,11 @@ async function _loadItems() {
 
 function _renderLeft2() {
   _listScroll.innerHTML = '';
+  if (_currentScope === 'migration') {
+    _renderMigrationRunList();
+    _renderMigrationStatus();
+    return;
+  }
 
   let items = _items;
 
@@ -690,6 +736,7 @@ function _makeFileRow(item, scopeKey, teamGid) {
   }
 
   el.addEventListener('click', () => _openItem(item));
+  if (item._revisionDocument) return el;
   // 右键菜单
   el.addEventListener('contextmenu', e => {
     e.preventDefault();
@@ -876,12 +923,407 @@ function _debounce(fn, ms) {
   return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
 }
 
+function _renderMigrationRunList() {
+  const runs = _migrationSnapshot?.runs || [];
+  if (!runs.length) {
+    _listScroll.innerHTML = '<div class="kh-empty-hint">暂无迁移执行记录</div>';
+    return;
+  }
+  runs.forEach(run => {
+    const row = document.createElement('button');
+    row.className = 'kh-migration-run-row';
+    row.innerHTML = `<strong>${_esc(run.status || 'unknown')}</strong>` +
+      `<span>${_esc(_fmt(run.created_at))} · ${Number(run.copied_count || 0)} 已复制 · ${Number(run.failed_count || 0)} 失败</span>`;
+    row.addEventListener('click', () => _renderMigrationStatus(run.gid));
+    _listScroll.appendChild(row);
+  });
+}
+
+async function _renderMigrationStatus(runGid = '') {
+  try {
+    if (runGid) {
+      const result = await _invokeCapability('knowledge.migration.status', { scan_limit: 10000, run_gid: runGid });
+      _migrationSnapshot = result?.data || _migrationSnapshot;
+    }
+    const snapshot = _migrationSnapshot;
+    if (!snapshot) return;
+    const inv = snapshot.inventory || {};
+    _centerTitle.textContent = '遗留知识迁移状态';
+    _centerBody.style.cssText = 'overflow:auto;padding:20px;';
+    _centerBody.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'kh-migration-header';
+    header.innerHTML = `<div><h2>迁移盘点</h2><p>这里只展示状态。实际迁移由部署作业执行，不在网页请求中运行。</p></div>`;
+    const refresh = document.createElement('button');
+    refresh.className = 'kh-revision-btn';
+    refresh.textContent = '刷新';
+    refresh.addEventListener('click', async () => {
+      const result = await _invokeCapability('knowledge.migration.status', { scan_limit: 10000, ...(runGid ? { run_gid: runGid } : {}) });
+      _migrationSnapshot = result?.data || null;
+      _listScroll.innerHTML = '';
+      _renderMigrationRunList();
+      _renderMigrationStatus(runGid);
+    });
+    header.appendChild(refresh);
+    _centerBody.appendChild(header);
+    const cards = document.createElement('div');
+    cards.className = 'kh-migration-cards';
+    const metrics = [
+      ['本团队可迁移', inv.eligible], ['已迁移', inv.migrated], ['待迁移', inv.pending],
+      ['需人工归属', inv.quarantined], ['其他团队（已排除）', inv.other_tenant], ['已扫描', inv.scanned],
+    ];
+    metrics.forEach(([label, value]) => {
+      const card = document.createElement('div');
+      card.innerHTML = `<strong>${Number(value || 0)}</strong><span>${_esc(label)}</span>`;
+      cards.appendChild(card);
+    });
+    _centerBody.appendChild(cards);
+    const notice = document.createElement('div');
+    notice.className = 'kh-migration-notice';
+    notice.textContent = inv.source_retained
+      ? '源 content_md 保留；无法确定团队归属的条目不会自动迁移。'
+      : '警告：未确认源数据保留策略。';
+    _centerBody.appendChild(notice);
+    if (inv.scan_truncated) {
+      const truncated = document.createElement('div');
+      truncated.className = 'kh-migration-warning';
+      truncated.textContent = `盘点达到 ${Number(inv.scan_limit || 0)} 条上限，当前数字不是全量结果。`;
+      _centerBody.appendChild(truncated);
+    }
+    if (runGid) {
+      const title = document.createElement('h3');
+      title.className = 'kh-migration-items-title';
+      title.textContent = `作业明细 ${runGid}`;
+      _centerBody.appendChild(title);
+      const table = document.createElement('div');
+      table.className = 'kh-migration-items';
+      for (const item of (snapshot.items || [])) {
+        const row = document.createElement('div');
+        row.innerHTML = `<code>${_esc(item.entry_gid)}</code><strong>${_esc(item.status)}</strong>` +
+          `<span>${_esc(item.error_message || String(item.content_sha256 || '').slice(0, 12))}</span>`;
+        table.appendChild(row);
+      }
+      if (!(snapshot.items || []).length) table.innerHTML = '<div class="kh-empty-hint">该作业暂无条目明细</div>';
+      _centerBody.appendChild(table);
+    }
+  } catch (error) {
+    _centerBody.innerHTML = `<div style="padding:20px;color:#f38ba8">迁移状态读取失败：${_esc(error?.message || error)}</div>`;
+  }
+}
+async function _createWorkspaceDocument() {
+  const title = await _promptText('新建团队共创文档', '标题', '');
+  if (!title) return;
+  try {
+    let spaces = (await _invokeCapability('knowledge.space.list', {}))?.data?.items || [];
+    if (!spaces.length) {
+      if (!(await _confirmDialog('当前团队还没有共创空间，是否创建默认的“团队知识”空间？'))) return;
+      const created = await _confirmAndInvokeCapability('knowledge.space.create', { name: '团队知识', visibility: 'team' });
+      spaces = [created.data];
+    }
+    let space = spaces[0];
+    if (spaces.length > 1) {
+      const selected = await _promptForm('选择共创空间', [{
+        key: 'space_gid', label: '空间', type: 'select',
+        options: spaces.map(row => ({ value: row.gid, label: row.name })),
+      }]);
+      if (!selected) return;
+      space = spaces.find(row => String(row.gid) === String(selected.space_gid));
+    }
+    if (!space) throw new Error('没有可写入的共创空间');
+    if (!(await _confirmDialog(`发布团队文档“${title}”的第 1 个版本？`))) return;
+    const result = await _confirmAndInvokeCapability('knowledge.document.create', {
+      space_gid: space.gid,
+      title,
+      slug: `doc-${Date.now().toString(36)}`,
+      markdown: `# ${title}\n`,
+      visibility: 'team',
+    });
+    await _loadItems();
+    _renderLeft2();
+    const created = result.data || {};
+    const item = {
+      ...created, gid: created.document_gid, document_gid: created.document_gid,
+      title, item_type: 'markdown', scope_type: 'team', status: 'published',
+      _revisionDocument: true,
+    };
+    await _openItem(item);
+    _showToast('团队文档已创建');
+  } catch (error) {
+    _showToast('创建失败：' + (error?.message || error));
+  }
+}
+
+async function _renderWorkspaceDocument(item, revisionGid = '') {
+  _centerBody.innerHTML = '<div class="kh-empty-hint">正在读取已发布版本…</div>';
+  _centerBody.style.cssText = 'display:flex;flex-direction:column;height:100%;overflow:hidden;';
+  try {
+    const result = await _invokeCapability('knowledge.document.get', {
+      document_gid: item.document_gid || item.gid,
+      ...(revisionGid ? { revision_gid: revisionGid } : {}),
+    });
+    const doc = result.data || {};
+    const isHistorical = !!revisionGid && String(revisionGid) !== String(item.revision_gid || '');
+    let content = doc.markdown || '';
+    let editing = false;
+    _centerTitle.textContent = doc.title || item.title || '未命名';
+    _centerBody.innerHTML = '';
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'kh-revision-toolbar';
+    const primary = document.createElement('button');
+    primary.className = 'kh-revision-btn primary';
+    primary.textContent = isHistorical ? '恢复为新版本' : '编辑';
+    const history = document.createElement('button');
+    history.className = 'kh-revision-btn';
+    history.textContent = '版本历史';
+    const access = document.createElement('button');
+    access.className = 'kh-revision-btn';
+    access.textContent = '访问权限';
+    const back = document.createElement('button');
+    back.className = 'kh-revision-btn';
+    back.textContent = '返回当前版本';
+    back.style.display = isHistorical ? '' : 'none';
+    const status = document.createElement('span');
+    status.className = 'kh-revision-status';
+    status.textContent = `版本 ${doc.revision_no || '-'} · ${String(doc.content_sha256 || '').slice(0, 12)}`;
+    toolbar.append(primary, history, access, back, status);
+
+    const preview = document.createElement('div');
+    preview.className = 'kh-revision-preview';
+    const editor = document.createElement('textarea');
+    editor.className = 'kh-revision-editor';
+    editor.style.display = 'none';
+    const renderPreview = () => {
+      preview.innerHTML = window.marked ? marked.parse(content) : `<pre>${_esc(content)}</pre>`;
+    };
+    renderPreview();
+    _centerBody.append(toolbar, preview, editor);
+
+    history.addEventListener('click', () => _loadWorkspaceHistory(item));
+    access.addEventListener('click', () => _showWorkspaceAcl(item));
+    back.addEventListener('click', () => _renderWorkspaceDocument(item));
+    primary.addEventListener('click', async () => {
+      if (isHistorical) {
+        if (!(await _confirmDialog(`把版本 ${doc.revision_no} 的内容恢复为一个新版本？历史不会被覆盖。`))) return;
+        try {
+          const restored = await _confirmAndInvokeCapability('knowledge.document.rollback', {
+            document_gid: item.document_gid || item.gid,
+            target_revision_gid: doc.revision_gid,
+          });
+          item.revision_gid = restored.data?.revision_gid;
+          await _renderWorkspaceDocument(item);
+          await _loadWorkspaceHistory(item);
+          _showToast('已恢复并发布为新版本');
+        } catch (error) { _showToast('恢复失败：' + (error?.message || error)); }
+        return;
+      }
+      if (!editing) {
+        editing = true;
+        editor.value = content;
+        preview.style.display = 'none';
+        editor.style.display = 'block';
+        primary.textContent = '发布新版本';
+        editor.focus();
+        return;
+      }
+      const next = editor.value;
+      if (!(await _confirmDialog('确认发布新版本？发布后旧版本仍会保留。'))) return;
+      status.textContent = '正在发布…';
+      try {
+        const revised = await _confirmAndInvokeCapability('knowledge.document.revise', {
+          document_gid: item.document_gid || item.gid,
+          title: doc.title || item.title,
+          markdown: next,
+        });
+        content = next;
+        item.revision_gid = revised.data?.revision_gid;
+        item.revision_no = revised.data?.revision_no;
+        editing = false;
+        editor.style.display = 'none';
+        preview.style.display = '';
+        primary.textContent = '编辑';
+        renderPreview();
+        status.textContent = `版本 ${revised.data?.revision_no || '-'} · ${String(revised.data?.content_sha256 || '').slice(0, 12)}`;
+        _showToast('新版本已发布');
+      } catch (error) {
+        status.textContent = '发布失败';
+        _showToast('发布失败：' + (error?.message || error));
+      }
+    });
+    await _loadWorkspaceHistory(item);
+  } catch (error) {
+    _centerBody.innerHTML = `<div style="padding:20px;color:#f38ba8">读取失败：${_esc(error?.message || error)}</div>`;
+  }
+}
+
+async function _loadWorkspaceHistory(item) {
+  try {
+    const result = await _invokeCapability('knowledge.document.revisions', {
+      document_gid: item.document_gid || item.gid, limit: 100,
+    });
+    const revisions = result.data?.items || [];
+    _rightBody.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'kh-revision-history-title';
+    header.textContent = `不可变版本历史（${revisions.length}）`;
+    _rightBody.appendChild(header);
+    revisions.forEach(revision => {
+      const row = document.createElement('div');
+      row.className = 'kh-revision-history-row';
+      const main = document.createElement('button');
+      main.className = 'kh-revision-history-main';
+      const restored = revision.restored_from_revision_gid ? ' · 恢复版本' : '';
+      main.innerHTML = `<strong>版本 ${Number(revision.revision_no) || '-'}</strong>` +
+        `<span>${_esc(_fmt(revision.created_at))}${restored}</span>` +
+        `<code>${_esc(String(revision.content_sha256 || '').slice(0, 12))}</code>`;
+      main.addEventListener('click', () => _renderWorkspaceDocument(item, revision.revision_gid));
+      row.appendChild(main);
+      if (String(revision.revision_gid) !== String(item.revision_gid || '')) {
+        const compare = document.createElement('button');
+        compare.className = 'kh-revision-compare';
+        compare.textContent = '与当前比较';
+        compare.addEventListener('click', () => _showWorkspaceDiff(item, revision.revision_gid));
+        row.appendChild(compare);
+      }
+      _rightBody.appendChild(row);
+    });
+  } catch (error) {
+    _rightBody.innerHTML = `<div class="kh-right-placeholder">版本历史读取失败：${_esc(error?.message || error)}</div>`;
+  }
+}
+async function _showWorkspaceAcl(item) {
+  const documentGid = item.document_gid || item.gid;
+  try {
+    const aclResult = await _invokeCapability('knowledge.document.acl.list', { document_gid: documentGid });
+    const authUser = window.parent?._authUser || window._authUser || {};
+    const teamGid = authUser.team_id || authUser.team_gid || '';
+    const cf = _cf();
+    const memberResponse = teamGid && cf ? await cf(`/api/teams/${encodeURIComponent(teamGid)}/members`) : null;
+    const members = memberResponse?.data || [];
+    const memberMap = new Map(members.map(member => [String(member.gid), member]));
+    const overlay = document.createElement('div');
+    overlay.className = 'kh-modal-overlay';
+    const modal = document.createElement('div');
+    modal.className = 'kh-modal kh-acl-modal';
+    modal.innerHTML = '<h3>文档访问权限</h3>';
+    const list = document.createElement('div');
+    list.className = 'kh-acl-list';
+    const permissions = { view: '查看', edit: '编辑', admin: '管理' };
+    for (const entry of (aclResult.data?.items || [])) {
+      const row = document.createElement('div');
+      row.className = 'kh-acl-row';
+      const member = memberMap.get(String(entry.subject_gid));
+      const name = entry.subject_type === 'team' ? '当前团队' : (member?.name || member?.email || entry.subject_gid);
+      const label = document.createElement('span');
+      label.innerHTML = `<strong>${_esc(name)}</strong><small>${_esc(permissions[entry.permission] || entry.permission)}</small>`;
+      row.appendChild(label);
+      if (!(entry.subject_type === 'user' && String(entry.subject_gid) === String(authUser.gid || authUser.user_gid || ''))) {
+        const remove = document.createElement('button');
+        remove.className = 'kh-revision-compare';
+        remove.textContent = '撤销';
+        remove.addEventListener('click', async () => {
+          if (!(await _confirmDialog(`撤销“${name}”的文档权限？`))) return;
+          try {
+            await _confirmAndInvokeCapability('knowledge.document.acl.revoke', {
+              document_gid: documentGid,
+              subject_type: entry.subject_type,
+              subject_gid: entry.subject_gid,
+            });
+            row.remove();
+            _showToast('权限已撤销');
+          } catch (error) { _showToast('撤销失败：' + (error?.message || error)); }
+        });
+        row.appendChild(remove);
+      }
+      list.appendChild(row);
+    }
+    modal.appendChild(list);
+    const footer = document.createElement('div');
+    footer.className = 'kh-modal-footer';
+    const add = document.createElement('button');
+    add.className = 'kh-btn-primary';
+    add.textContent = '添加成员';
+    const close = document.createElement('button');
+    close.className = 'kh-btn-ghost';
+    close.textContent = '关闭';
+    close.addEventListener('click', () => overlay.remove());
+    add.addEventListener('click', async () => {
+      const existing = new Set((aclResult.data?.items || []).filter(row => row.subject_type === 'user').map(row => String(row.subject_gid)));
+      const choices = members.filter(member => !existing.has(String(member.gid)));
+      if (!choices.length) { _showToast('没有可添加的团队成员'); return; }
+      const selected = await _promptForm('添加文档成员', [
+        { key: 'subject_gid', label: '成员', type: 'select', options: choices.map(member => ({ value: member.gid, label: member.name || member.email || member.gid })) },
+        { key: 'permission', label: '权限', type: 'select', options: [
+          { value: 'view', label: '查看' }, { value: 'edit', label: '编辑' }, { value: 'admin', label: '管理' },
+        ] },
+      ]);
+      if (!selected) return;
+      const member = memberMap.get(String(selected.subject_gid));
+      if (!(await _confirmDialog(`授予“${member?.name || selected.subject_gid}”${permissions[selected.permission]}权限？`))) return;
+      try {
+        await _confirmAndInvokeCapability('knowledge.document.acl.grant', {
+          document_gid: documentGid,
+          subject_type: 'user',
+          subject_gid: selected.subject_gid,
+          permission: selected.permission,
+        });
+        overlay.remove();
+        await _showWorkspaceAcl(item);
+        _showToast('权限已授予');
+      } catch (error) { _showToast('授权失败：' + (error?.message || error)); }
+    });
+    footer.append(close, add);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+    overlay.addEventListener('click', event => { if (event.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+  } catch (error) {
+    _showToast('权限读取失败：' + (error?.message || error));
+  }
+}
+async function _showWorkspaceDiff(item, fromRevisionGid) {
+  const currentRevisionGid = item.revision_gid;
+  if (!currentRevisionGid) {
+    _showToast('当前版本标识缺失，请刷新文档列表');
+    return;
+  }
+  _centerBody.innerHTML = '<div class="kh-empty-hint">正在计算版本差异…</div>';
+  try {
+    const result = await _invokeCapability('knowledge.document.diff', {
+      document_gid: item.document_gid || item.gid,
+      from_revision_gid: fromRevisionGid,
+      to_revision_gid: currentRevisionGid,
+    });
+    _centerBody.innerHTML = '';
+    _centerBody.style.cssText = 'display:flex;flex-direction:column;height:100%;overflow:hidden;';
+    const toolbar = document.createElement('div');
+    toolbar.className = 'kh-revision-toolbar';
+    const back = document.createElement('button');
+    back.className = 'kh-revision-btn';
+    back.textContent = '返回当前版本';
+    back.addEventListener('click', () => _renderWorkspaceDocument(item));
+    const label = document.createElement('span');
+    label.className = 'kh-revision-status';
+    label.textContent = '历史版本 → 当前版本';
+    toolbar.append(back, label);
+    const diff = document.createElement('pre');
+    diff.className = 'kh-revision-diff';
+    diff.textContent = result.data?.diff || '两个版本内容相同';
+    _centerBody.append(toolbar, diff);
+  } catch (error) {
+    _centerBody.innerHTML = `<div style="padding:20px;color:#f38ba8">差异读取失败：${_esc(error?.message || error)}</div>`;
+  }
+}
 // ── Center 内容渲染 ────────────────────────────────────────────────────────────
 async function _openItem(item) {
   _currentItem = item;
   _centerTitle.textContent = item.title || '未命名';
 
   _renderLeft2();
+  if (item._revisionDocument) {
+    await _renderWorkspaceDocument(item);
+    return;
+  }
   _recordRecent(item);
 
   // 清空 center，重置样式
@@ -1291,6 +1733,18 @@ async function _deleteFolder(folder, scopeKey, teamGid) {
 
 // ── 添加文件菜单 ──────────────────────────────────────────────────────────────
 function _showAddMenu(anchor) {
+  if (_currentScope === 'migration') {
+    _showToast('迁移只能由部署作业执行');
+    return;
+  }
+  if (_currentScope === 'workspace') {
+    _showDropdown(anchor, [
+      { label: '当前区域：团队共创', disabled: true },
+      { sep: true },
+      { icon: ICONS.markdown, label: '新建团队 Markdown 文档', action: () => _createWorkspaceDocument() },
+    ]);
+    return;
+  }
   const isAdmin = _getAuthRole() === 'super_admin' || _getAuthRole() === 'knowledge_admin';
   const scopeLabel = { personal: '个人（仅自己可见）', public: '公共资料（所有人可见）', team: '团队', favorites: '收藏', recent: '最近', annotated: '标注' }[_currentScope] || _currentScope;
   const items = [

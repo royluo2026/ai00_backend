@@ -4600,6 +4600,18 @@ async function init() {
   await _verMgr.loadVersions();
   _verMgr.initPicker(_versionGid, _versionTag);
 
+  // 初始化生命周期面板
+  _lifecyclePanel = new BopLifecyclePanel({
+    cf:         _cf,
+    toast:      _toast,
+    versionGid: _versionGid,
+    mountEl:    document.getElementById('lvLifecycleTop'),
+    actionEl:   document.getElementById('lvLifecycleAction'),
+    onBopTreeChange: () => {
+      if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
+      _reload();
+    },
+  });
   // 无任何 BOP 版本 → 画布内提示
   if ((!_versionGid || _versionGid === '') && (!_verMgr.allVersions || _verMgr.allVersions.length === 0)) {
     _versionGid = '';
@@ -4631,18 +4643,6 @@ async function init() {
   }];
   _initCompareBtn();
 
-  // 初始化生命周期面板
-  _lifecyclePanel = new BopLifecyclePanel({
-    cf:         _cf,
-    toast:      _toast,
-    versionGid: _versionGid,
-    mountEl:    document.getElementById('lvLifecycleTop'),
-    actionEl:   document.getElementById('lvLifecycleAction'),
-    onBopTreeChange: () => {
-      if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
-      _reload();
-    },
-  });
   if (_viewMode === 'layout' && _versionGid) await _lifecyclePanel.init();
 
   // 初始化 PBOM 导入 modal

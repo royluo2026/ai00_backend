@@ -2128,6 +2128,18 @@ select.wb-detail-inp { cursor: pointer; }
   color: var(--text-normal);
 }
 
+.wb-fc-evidence {
+  width: 100%;
+  margin-top: 3px;
+  padding: 6px 8px;
+  border-left: 2px solid var(--color-accent);
+  background: color-mix(in srgb, var(--bg-tertiary) 75%, transparent);
+  border-radius: 3px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.wb-fc-evidence-title { color: var(--text-normal); font-weight: 600; margin-bottom: 3px; }
+.wb-fc-evidence-item { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .wb-fc-input-row {
   display: flex;
   gap: 6px;
