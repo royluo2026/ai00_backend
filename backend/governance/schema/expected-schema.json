@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:6b67c4f25ee618fe17d00ede342eb0337dd54742b2c19815e45a6f764410b8b4",
+  "schema_sha256": "sha256:d3b1ab1322b5b28ad480039756ea4f70f7aa25e8d90e3a774ee9e96327516d23",
   "schema_version": 1,
   "tables": [
     {
@@ -16579,7 +16579,7 @@
           ]
         },
         {
-          "data_type": "ENUM('EQUIPMENT','TOOL','FIXTURE')",
+          "data_type": "ENUM('equipment','tool','fixture')",
           "default": null,
           "extra": "",
           "name": "asset_type",
@@ -16599,7 +16599,7 @@
           ]
         },
         {
-          "data_type": "ENUM('IN_USE','MAINTENANCE','SCRAPPED')",
+          "data_type": "ENUM('in_use','maintenance','scrapped')",
           "default": "'in_use'",
           "extra": "",
           "name": "status",
@@ -17725,7 +17725,7 @@
           ]
         },
         {
-          "data_type": "ENUM('EQUIPMENT','TOOL','FIXTURE')",
+          "data_type": "ENUM('equipment','tool','fixture')",
           "default": null,
           "extra": "",
           "name": "resource_type",
@@ -17755,7 +17755,7 @@
           ]
         },
         {
-          "data_type": "ENUM('DRAFT','PUBLISHED','DEPRECATED')",
+          "data_type": "ENUM('draft','published','deprecated')",
           "default": "'draft'",
           "extra": "",
           "name": "status",
@@ -17909,7 +17909,7 @@
           ]
         },
         {
-          "data_type": "ENUM('FACTORY','SECTION','LINE','STATION')",
+          "data_type": "ENUM('factory','section','line','station')",
           "default": null,
           "extra": "",
           "name": "kind",

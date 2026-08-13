@@ -139,6 +139,25 @@ def test_primary_key_is_compiled_as_not_nullable(tmp_path):
     assert table.require_column("gid").nullable is False
 
 
+def test_compiler_preserves_enum_literal_case(tmp_path):
+    _repository(
+        tmp_path,
+        ("schema/01.sql", """
+          CREATE TABLE workmanship_device_assets (
+            gid CHAR(36) PRIMARY KEY,
+            status ENUM('in_use','MAINTENANCE') NOT NULL DEFAULT 'in_use'
+          );
+        """),
+    )
+
+    status = compile_expected_schema(tmp_path).require_table(
+        "workmanship_device_assets"
+    ).require_column("status")
+
+    assert status.data_type == "ENUM('in_use','MAINTENANCE')"
+    assert status.default == "'in_use'"
+
+
 def test_compiler_uses_oceanbase_normalized_json_defaults(tmp_path):
     _repository(
         tmp_path,

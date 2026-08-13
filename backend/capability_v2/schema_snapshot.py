@@ -113,7 +113,7 @@ def load_schema_snapshot(directory: Path, expected_database: str = "ai00_test") 
         default = None if row["COLUMN_DEFAULT"] == "<SQL_NULL>" else row["COLUMN_DEFAULT"]
         table_data[name]["columns"].append(SnapshotColumn(
             column, ordinal, default, row["IS_NULLABLE"] == "YES", row["DATA_TYPE"].upper(),
-            row["COLUMN_TYPE"].upper(), row["COLUMN_KEY"].upper(), row["EXTRA"].upper(),
+            row["COLUMN_TYPE"].strip(), row["COLUMN_KEY"].upper(), row["EXTRA"].upper(),
             row["CHARACTER_SET_NAME"] or None, row["COLLATION_NAME"] or None,
             row["GENERATION_EXPRESSION"],
         ))

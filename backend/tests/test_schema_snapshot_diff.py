@@ -120,3 +120,20 @@ def test_column_order_is_not_a_schema_contract_difference():
 
     assert diff.safe == ()
     assert diff.manual == ()
+
+
+def test_enum_literal_case_is_a_schema_contract_difference():
+    expected = ExpectedSchema((TableSpec(
+        "workmanship_device_assets", "device", "device", False,
+        columns=(ColumnSpec("status", "ENUM('in_use','maintenance')", False, "'in_use'"),),
+    ),), database_name="ai00_test")
+    actual = SchemaSnapshot("ai00_test", (SnapshotTable(
+        "workmanship_device_assets", "InnoDB", "utf8mb4_general_ci", "BASE TABLE",
+        columns=(
+            SnapshotColumn("status", 1, "IN_USE", False, "ENUM", "ENUM('IN_USE','MAINTENANCE')", "", "", "utf8mb4", "utf8mb4_general_ci", ""),
+        ), indexes=(),
+    ),))
+
+    diff = diff_schema(expected, actual)
+
+    assert [item.kind for item in diff.manual] == ["type_mismatch", "default_mismatch"]

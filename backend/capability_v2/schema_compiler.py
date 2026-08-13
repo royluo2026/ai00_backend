@@ -69,6 +69,29 @@ def _index_columns(raw: str) -> tuple[str, ...]:
                  for item in _parts(raw))
 
 
+def _normalize_data_type(value: str) -> str:
+    result: list[str] = []
+    quote: str | None = None
+    index = 0
+    while index < len(value):
+        char = value[index]
+        result.append(char if quote else char.upper())
+        if quote:
+            if char == "\\" and index + 1 < len(value):
+                index += 1
+                result.append(value[index])
+            elif char == quote:
+                if index + 1 < len(value) and value[index + 1] == quote:
+                    index += 1
+                    result.append(value[index])
+                else:
+                    quote = None
+        elif char in "'\"":
+            quote = char
+        index += 1
+    return "".join(result)
+
+
 def _column(definition: str, source: str) -> ColumnSpec:
     match = re.match(rf"^\s*{IDENT}\s+(.+)$", definition, re.S)
     if not match:
@@ -78,7 +101,7 @@ def _column(definition: str, source: str) -> ColumnSpec:
         r"\s+(?=NOT\s+NULL|NULL\b|DEFAULT\b|AUTO_INCREMENT\b|PRIMARY\s+KEY|UNIQUE\b|COMMENT\b|COLLATE\b|CHARACTER\s+SET|ON\s+UPDATE|GENERATED\b|REFERENCES\b|AFTER\b|FIRST\b)",
         tail, re.I,
     )
-    data_type = (tail[:keyword.start()] if keyword else tail).strip().upper()
+    data_type = _normalize_data_type((tail[:keyword.start()] if keyword else tail).strip())
     attrs = tail[keyword.start():].strip() if keyword else ""
     nullable = not bool(re.search(r"\bNOT\s+NULL\b", attrs, re.I))
     default = None

@@ -41,9 +41,33 @@ class SchemaDiff:
         }
 
 
+def _uppercase_type_syntax(value: str) -> str:
+    result: list[str] = []
+    quote: str | None = None
+    index = 0
+    while index < len(value):
+        char = value[index]
+        result.append(char if quote else char.upper())
+        if quote:
+            if char == "\\" and index + 1 < len(value):
+                index += 1
+                result.append(value[index])
+            elif char == quote:
+                if index + 1 < len(value) and value[index + 1] == quote:
+                    index += 1
+                    result.append(value[index])
+                else:
+                    quote = None
+        elif char in "'\"":
+            quote = char
+        index += 1
+    return "".join(result)
+
+
 def _type(value: str) -> str:
-    result = re.sub(r"\s+", " ", value.strip()).upper().replace("INTEGER", "INT")
-    result = re.sub(r"\b(TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT)\(\d+\)", r"\1", result)
+    result = _uppercase_type_syntax(re.sub(r"\s+", " ", value.strip()))
+    result = re.sub(r"^INTEGER\b", "INT", result)
+    result = re.sub(r"^(TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT)\(\d+\)", r"\1", result)
     if result == "BOOLEAN":
         result = "TINYINT"
     return result
