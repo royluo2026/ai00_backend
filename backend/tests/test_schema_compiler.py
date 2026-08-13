@@ -6,6 +6,9 @@ import pytest
 from backend.capability_v2.schema_compiler import SchemaCompileError, compile_expected_schema
 
 
+ROOT = Path(__file__).resolve().parents[2]
+
+
 def _repository(tmp_path: Path, *sql_files: tuple[str, str]):
     manifest = {
         "schema_version": 1,
@@ -125,3 +128,36 @@ def test_rejects_cross_domain_foreign_key(tmp_path):
     ownership_path.write_text(json.dumps(ownership), encoding="utf-8")
     with pytest.raises(SchemaCompileError, match="cross_domain_foreign_key"):
         compile_expected_schema(tmp_path)
+
+
+def test_primary_key_is_compiled_as_not_nullable(tmp_path):
+    _repository(
+        tmp_path,
+        ("schema/01.sql", "CREATE TABLE workmanship_device_assets (gid CHAR(36) PRIMARY KEY);"),
+    )
+    table = compile_expected_schema(tmp_path).require_table("workmanship_device_assets")
+    assert table.require_column("gid").nullable is False
+
+
+def test_compiler_uses_oceanbase_normalized_json_defaults(tmp_path):
+    _repository(
+        tmp_path,
+        ("schema/01.sql", """
+          CREATE TABLE workmanship_device_assets (
+            gid CHAR(36) PRIMARY KEY,
+            payload JSON NOT NULL DEFAULT (JSON_OBJECT())
+          );
+        """),
+    )
+    table = compile_expected_schema(tmp_path).require_table("workmanship_device_assets")
+    assert table.require_column("payload").default is None
+
+
+def test_real_repository_uses_authoritative_runtime_ledger_contract():
+    table = compile_expected_schema(ROOT).require_table("workmanship_base_schema_migrations")
+    assert [(column.name, column.data_type) for column in table.columns] == [
+        ("migration_id", "VARCHAR(12)"), ("domain", "VARCHAR(32)"),
+        ("name", "VARCHAR(191)"), ("checksum", "CHAR(64)"),
+        ("status", "VARCHAR(16)"), ("duration_ms", "BIGINT"),
+        ("error", "TEXT"), ("applied_at", "DATETIME(6)"),
+    ]

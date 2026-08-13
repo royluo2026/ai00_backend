@@ -5,6 +5,7 @@ import pytest
 from backend.capability_v2.schema_diff import diff_schema
 from backend.capability_v2.schema_model import ColumnSpec, ExpectedSchema, IndexSpec, TableSpec
 from backend.capability_v2.schema_snapshot import SnapshotError, load_schema_snapshot
+from backend.capability_v2.schema_snapshot import SchemaSnapshot, SnapshotColumn, SnapshotTable
 
 
 FIXTURE = Path(__file__).parent / "fixtures/schema_audit/live"
@@ -69,3 +70,31 @@ def test_not_null_column_without_deterministic_default_is_manual():
     diff = diff_schema(expected, load_schema_snapshot(FIXTURE, expected_database="ai00_test"))
     assert not any(item.kind == "missing_nullable_column" for item in diff.safe)
     assert any(item.kind == "missing_required_column_without_backfill" for item in diff.manual)
+
+
+def test_mysql_display_width_boolean_and_timestamp_renderings_are_equivalent():
+    expected = ExpectedSchema((TableSpec(
+        "workmanship_device_assets", "device", "device", False,
+        columns=(
+            ColumnSpec("count", "INT", False),
+            ColumnSpec("enabled", "BOOLEAN", False, "1"),
+            ColumnSpec("updated_at", "DATETIME(6)", False, "CURRENT_TIMESTAMP(6)"),
+            ColumnSpec("optional", "VARCHAR(32)", True, "NULL"),
+            ColumnSpec("disabled", "BOOLEAN", False, "FALSE"),
+            ColumnSpec("success_rate", "DECIMAL(5,4)", False, "0"),
+        ),
+    ),), database_name="ai00_test")
+    actual = SchemaSnapshot("ai00_test", (SnapshotTable(
+        "workmanship_device_assets", "InnoDB", "utf8mb4_general_ci", "BASE TABLE",
+        columns=(
+            SnapshotColumn("count", 1, None, False, "INT", "INT(11)", "", "", None, None, ""),
+            SnapshotColumn("enabled", 2, "1", False, "TINYINT", "TINYINT(1)", "", "", None, None, ""),
+            SnapshotColumn("updated_at", 3, "CURRENT_TIMESTAMP", False, "DATETIME", "DATETIME(6)", "", "DEFAULT_GENERATED", None, None, ""),
+            SnapshotColumn("optional", 4, None, True, "VARCHAR", "VARCHAR(32)", "", "", "utf8mb4", "utf8mb4_general_ci", ""),
+            SnapshotColumn("disabled", 5, "0", False, "TINYINT", "TINYINT(1)", "", "", None, None, ""),
+            SnapshotColumn("success_rate", 6, "0.0000", False, "DECIMAL", "DECIMAL(5,4)", "", "", None, None, ""),
+        ), indexes=(),
+    ),))
+    diff = diff_schema(expected, actual)
+    assert diff.safe == ()
+    assert diff.manual == ()

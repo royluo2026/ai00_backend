@@ -1,5 +1,11 @@
 CREATE TABLE IF NOT EXISTS workmanship_base_schema_migrations (
-    migration_id VARCHAR(64) PRIMARY KEY,
+    migration_id VARCHAR(12) PRIMARY KEY,
+    domain VARCHAR(32) NOT NULL,
+    name VARCHAR(191) NOT NULL,
+    checksum CHAR(64) NOT NULL,
+    status VARCHAR(16) NOT NULL,
+    duration_ms BIGINT NOT NULL DEFAULT 0,
+    error TEXT NULL,
     applied_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

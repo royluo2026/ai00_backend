@@ -1,5 +1,5 @@
 {
-  "schema_sha256": "sha256:747ad729f44ad1bfa659663633d90b4e4cfb0ae86492859fbb63da50a2b8246a",
+  "schema_sha256": "sha256:5cd8862223b71c97f07fb9b2040431d7a2298f68ab8f112609bda360072b9235",
   "schema_version": 1,
   "tables": [
     {
@@ -2793,7 +2793,25 @@
         "applied_at": [
           "backend/db/migrations/domains/base/0001_base_platform.sql"
         ],
+        "checksum": [
+          "backend/db/migrations/domains/base/0001_base_platform.sql"
+        ],
+        "domain": [
+          "backend/db/migrations/domains/base/0001_base_platform.sql"
+        ],
+        "duration_ms": [
+          "backend/db/migrations/domains/base/0001_base_platform.sql"
+        ],
+        "error": [
+          "backend/db/migrations/domains/base/0001_base_platform.sql"
+        ],
         "migration_id": [
+          "backend/db/migrations/domains/base/0001_base_platform.sql"
+        ],
+        "name": [
+          "backend/db/migrations/domains/base/0001_base_platform.sql"
+        ],
+        "status": [
           "backend/db/migrations/domains/base/0001_base_platform.sql"
         ]
       },

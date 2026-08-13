@@ -8,7 +8,7 @@ from pathlib import Path
 from backend.capability_v2.schema_model import (
     ColumnSpec, ConstraintSpec, ExpectedSchema, IndexSpec, TableSpec,
 )
-from backend.db.versioned_migrations import split_sql, strip_sql_comments
+from backend.db.versioned_migrations import normalize_oceanbase_sql, split_sql, strip_sql_comments
 
 
 class SchemaCompileError(RuntimeError):
@@ -172,7 +172,8 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
         source = path.relative_to(root).as_posix()
         claimed = next((domain for prefix, domain in path_domains.items()
                         if path == root / prefix or (root / prefix).is_dir() and path.is_relative_to(root / prefix)), None)
-        for raw in split_sql(path.read_text(encoding="utf-8")):
+        sql = normalize_oceanbase_sql(path.read_text(encoding="utf-8"))
+        for raw in split_sql(sql):
             statement = strip_sql_comments(raw).strip()
             if not statement: continue
             if baseline and path == root / baseline and re.match(
@@ -229,6 +230,13 @@ def compile_expected_schema(root: Path) -> ExpectedSchema:
             else:
                 raise SchemaCompileError(f"unsupported_ddl:{source}:1:{statement[:40]}")
     for table in tables.values():
+        primary = table.indexes.get("PRIMARY")
+        if primary:
+            primary_columns = set(primary.columns)
+            table.columns = [
+                replace(column, nullable=False) if column.name in primary_columns else column
+                for column in table.columns
+            ]
         for constraint in table.constraints.values():
             if constraint.referenced_table and constraint.referenced_table in ownership:
                 if ownership[constraint.referenced_table]["owner"] != table.owner:

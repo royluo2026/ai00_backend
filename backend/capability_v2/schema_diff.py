@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 
 from backend.capability_v2.schema_model import ColumnSpec, ExpectedSchema, IndexSpec, TableSpec
 from backend.capability_v2.schema_snapshot import SchemaSnapshot, SnapshotColumn, SnapshotIndex
@@ -41,16 +42,33 @@ class SchemaDiff:
 
 
 def _type(value: str) -> str:
-    return re.sub(r"\s+", " ", value.strip()).upper().replace("INTEGER", "INT")
+    result = re.sub(r"\s+", " ", value.strip()).upper().replace("INTEGER", "INT")
+    result = re.sub(r"\b(TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT)\(\d+\)", r"\1", result)
+    if result == "BOOLEAN":
+        result = "TINYINT"
+    return result
 
 
-def _default(value: str | None) -> str | None:
+def _default(value: str | None, data_type: str | None = None) -> str | None:
     if value is None: return None
     result = value.strip()
+    if result.upper() == "NULL": return None
     while result.startswith("(") and result.endswith(")"):
         result = result[1:-1].strip()
     if len(result) >= 2 and result[0] == result[-1] and result[0] in {"'", '"'}:
         result = result[1:-1]
+    result = re.sub(r"^CURRENT_TIMESTAMP(?:\(\d+\))?$", "CURRENT_TIMESTAMP", result, flags=re.I)
+    normalized_type = _type(data_type or "")
+    if normalized_type in {"BOOLEAN", "TINYINT"}:
+        if result.upper() == "FALSE": result = "0"
+        if result.upper() == "TRUE": result = "1"
+    if normalized_type.startswith(("DECIMAL", "NUMERIC", "FLOAT", "DOUBLE")):
+        try:
+            result = format(Decimal(result), "f")
+            if "." in result:
+                result = result.rstrip("0").rstrip(".") or "0"
+        except InvalidOperation:
+            pass
     return result
 
 
@@ -103,8 +121,10 @@ def diff_schema(expected: ExpectedSchema, actual: SchemaSnapshot) -> SchemaDiff:
                 manual.append(SchemaDifference("type_mismatch", name, column_name, _type(column.data_type), _type(live.column_type)))
             if column.nullable != live.nullable:
                 manual.append(SchemaDifference("nullability_mismatch", name, column_name, column.nullable, live.nullable))
-            if _default(column.default) != _default(live.default):
-                manual.append(SchemaDifference("default_mismatch", name, column_name, _default(column.default), _default(live.default)))
+            expected_default = _default(column.default, column.data_type)
+            actual_default = _default(live.default, column.data_type)
+            if expected_default != actual_default:
+                manual.append(SchemaDifference("default_mismatch", name, column_name, expected_default, actual_default))
             if _extra(column.extra) != _extra(live.extra):
                 manual.append(SchemaDifference("extra_mismatch", name, column_name, _extra(column.extra), _extra(live.extra)))
             expected_ordinal = next(index for index, item in enumerate(expected_table.columns, 1) if item.name == column_name)

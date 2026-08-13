@@ -1,7 +1,7 @@
 {
   "database_name": "ai00_test",
   "isolation_profile": "single_database_domain_tables",
-  "schema_sha256": "sha256:747ad729f44ad1bfa659663633d90b4e4cfb0ae86492859fbb63da50a2b8246a",
+  "schema_sha256": "sha256:5cd8862223b71c97f07fb9b2040431d7a2298f68ab8f112609bda360072b9235",
   "schema_version": 1,
   "tables": [
     {
@@ -11,7 +11,7 @@
           "default": null,
           "extra": "",
           "name": "resource_gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/agent/0001_agent.sql"
           ]
@@ -754,7 +754,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/agent/0001_agent.sql"
           ]
@@ -809,7 +809,7 @@
           "default": null,
           "extra": "AUTO_INCREMENT",
           "name": "id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -1020,7 +1020,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030002_agent_memory_skills_audit.sql"
           ]
@@ -1159,7 +1159,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030001_agent_private_sessions.sql"
           ]
@@ -1246,7 +1246,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030001_agent_private_sessions.sql"
           ]
@@ -1283,7 +1283,7 @@
         },
         {
           "data_type": "JSON",
-          "default": "(JSON_ARRAY()",
+          "default": null,
           "extra": "",
           "name": "tool_calls",
           "nullable": false,
@@ -1353,7 +1353,7 @@
           "default": null,
           "extra": "",
           "name": "id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -1598,7 +1598,7 @@
           "default": null,
           "extra": "AUTO_INCREMENT",
           "name": "id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030006_base_platform_runtime_tables.sql"
           ]
@@ -1769,7 +1769,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -1943,7 +1943,7 @@
         },
         {
           "data_type": "JSON",
-          "default": "(JSON_OBJECT()",
+          "default": null,
           "extra": "",
           "name": "data",
           "nullable": false,
@@ -2019,7 +2019,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -2145,7 +2145,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -2294,7 +2294,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030006_base_platform_runtime_tables.sql"
           ]
@@ -2423,7 +2423,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -2653,7 +2653,7 @@
           "default": null,
           "extra": "",
           "name": "key",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -2718,7 +2718,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -2866,7 +2866,7 @@
           "default": null,
           "extra": "",
           "name": "key",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -2922,7 +2922,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030008_craft_runtime_schema.sql"
           ]
@@ -2949,7 +2949,7 @@
         },
         {
           "data_type": "JSON",
-          "default": "(JSON_OBJECT()",
+          "default": null,
           "extra": "",
           "name": "data",
           "nullable": false,
@@ -3028,7 +3028,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -3146,7 +3146,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -3266,7 +3266,7 @@
           "default": null,
           "extra": "",
           "name": "worker_name",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030006_base_platform_runtime_tables.sql"
           ]
@@ -3351,7 +3351,7 @@
           "default": null,
           "extra": "",
           "name": "state",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -3426,7 +3426,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -3502,7 +3502,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608050001_base_permission_grants.sql"
           ]
@@ -3643,7 +3643,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -3797,7 +3797,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -3904,7 +3904,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -4010,7 +4010,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -6328,7 +6328,7 @@
           "default": null,
           "extra": "",
           "name": "ref_name",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608060003_base_ontology_release_governance.sql"
           ]
@@ -6415,7 +6415,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608060003_base_ontology_release_governance.sql"
           ]
@@ -6524,7 +6524,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608060003_base_ontology_release_governance.sql"
           ]
@@ -6654,7 +6654,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608060003_base_ontology_release_governance.sql"
           ]
@@ -6885,7 +6885,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608060003_base_ontology_release_governance.sql"
           ]
@@ -8149,10 +8149,70 @@
     {
       "columns": [
         {
-          "data_type": "VARCHAR(64)",
+          "data_type": "VARCHAR(12)",
           "default": null,
           "extra": "",
           "name": "migration_id",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/base/0001_base_platform.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(32)",
+          "default": null,
+          "extra": "",
+          "name": "domain",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/base/0001_base_platform.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(191)",
+          "default": null,
+          "extra": "",
+          "name": "name",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/base/0001_base_platform.sql"
+          ]
+        },
+        {
+          "data_type": "CHAR(64)",
+          "default": null,
+          "extra": "",
+          "name": "checksum",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/base/0001_base_platform.sql"
+          ]
+        },
+        {
+          "data_type": "VARCHAR(16)",
+          "default": null,
+          "extra": "",
+          "name": "status",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/base/0001_base_platform.sql"
+          ]
+        },
+        {
+          "data_type": "BIGINT",
+          "default": "0",
+          "extra": "",
+          "name": "duration_ms",
+          "nullable": false,
+          "sources": [
+            "backend/db/migrations/domains/base/0001_base_platform.sql"
+          ]
+        },
+        {
+          "data_type": "TEXT",
+          "default": null,
+          "extra": "",
+          "name": "error",
           "nullable": true,
           "sources": [
             "backend/db/migrations/domains/base/0001_base_platform.sql"
@@ -8351,7 +8411,7 @@
         },
         {
           "data_type": "JSON",
-          "default": "(JSON_ARRAY()",
+          "default": null,
           "extra": "",
           "name": "self_attachments",
           "nullable": false,
@@ -8512,7 +8572,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -8680,7 +8740,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -8907,7 +8967,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -9320,7 +9380,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -9565,7 +9625,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -9792,7 +9852,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -10019,7 +10079,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -10246,7 +10306,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -10382,7 +10442,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -10619,7 +10679,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -10747,7 +10807,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -11017,7 +11077,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -11204,7 +11264,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -11398,7 +11458,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -11668,7 +11728,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -11875,7 +11935,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -12053,7 +12113,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -12320,7 +12380,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -12547,7 +12607,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -12753,7 +12813,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -12940,7 +13000,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -13268,7 +13328,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -13495,7 +13555,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -13591,7 +13651,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -14022,7 +14082,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -14107,7 +14167,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -14246,7 +14306,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030008_craft_runtime_schema.sql"
           ]
@@ -14303,7 +14363,7 @@
         },
         {
           "data_type": "JSON",
-          "default": "(JSON_ARRAY()",
+          "default": null,
           "extra": "",
           "name": "extra_entry_gids",
           "nullable": false,
@@ -14414,7 +14474,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030008_craft_runtime_schema.sql"
           ]
@@ -14543,7 +14603,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -15071,7 +15131,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -15269,7 +15329,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -15446,7 +15506,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030005_craft_legacy_auxiliary_tables.sql"
           ]
@@ -15653,7 +15713,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
           ]
@@ -15821,7 +15881,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
           ]
@@ -15927,7 +15987,7 @@
           "default": null,
           "extra": "",
           "name": "idempotency_key",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608070001_craft_bop_write_governance.sql"
           ]
@@ -16012,7 +16072,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/craft/0001_pbom.sql"
           ]
@@ -16129,7 +16189,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/craft/0001_pbom.sql"
           ]
@@ -16184,7 +16244,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608060004_craft_validation_policies.sql"
           ]
@@ -16458,7 +16518,7 @@
           "default": null,
           "extra": "",
           "name": "seq_name",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -16503,7 +16563,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/factory/0001_factory.sql"
           ]
@@ -16654,7 +16714,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -16730,7 +16790,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -16857,7 +16917,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -16984,7 +17044,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -17091,7 +17151,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -17238,7 +17298,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -17314,7 +17374,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -17482,7 +17542,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -17609,7 +17669,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/factory/0001_factory.sql"
           ]
@@ -17738,7 +17798,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/factory/0001_factory.sql"
           ]
@@ -17793,7 +17853,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/factory/0001_factory.sql"
           ]
@@ -17946,7 +18006,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -18112,7 +18172,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -18249,7 +18309,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -18386,7 +18446,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/integration/0001_integration.sql"
           ]
@@ -18441,7 +18501,7 @@
           "default": null,
           "extra": "",
           "name": "run_id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/integration/0001_integration.sql"
           ]
@@ -18587,7 +18647,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -18846,7 +18906,7 @@
           "default": null,
           "extra": "",
           "name": "seq_name",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/knowledge/0003_display_counters.sql"
           ]
@@ -18992,7 +19052,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
           ]
@@ -19174,7 +19234,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/knowledge/0001_knowledge.sql"
           ]
@@ -19312,7 +19372,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -19701,7 +19761,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -19829,7 +19889,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/knowledge/0003_display_counters.sql"
           ]
@@ -19947,7 +20007,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -20356,7 +20416,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608040004_knowledge_legacy_migration_runs.sql"
           ]
@@ -20566,7 +20626,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030007_knowledge_proposal_outbox.sql"
           ]
@@ -20785,7 +20845,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030007_knowledge_proposal_outbox.sql"
           ]
@@ -20970,7 +21030,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/knowledge/0001_knowledge.sql"
           ]
@@ -21087,7 +21147,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/knowledge/0001_knowledge.sql"
           ]
@@ -21194,7 +21254,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
           ]
@@ -21507,7 +21567,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608040003_knowledge_markdown_revisions.sql"
           ]
@@ -21627,7 +21687,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/knowledge/0001_knowledge.sql"
           ]
@@ -21793,7 +21853,7 @@
           "default": null,
           "extra": "",
           "name": "model_id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608100009_digital_model_snapshots.sql"
           ]
@@ -21935,7 +21995,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/digital_model/0001_digital_model.sql"
           ]
@@ -21990,7 +22050,7 @@
           "default": null,
           "extra": "",
           "name": "version_id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608100009_digital_model_snapshots.sql"
           ]
@@ -22182,7 +22242,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -22288,7 +22348,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -22558,7 +22618,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -22815,7 +22875,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -22991,7 +23051,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/ontology/0001_ontology.sql"
           ]
@@ -23215,7 +23275,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030006_base_platform_runtime_tables.sql"
           ]
@@ -23716,7 +23776,7 @@
           "default": null,
           "extra": "",
           "name": "publisher_id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030006_base_platform_runtime_tables.sql"
           ]
@@ -23999,7 +24059,7 @@
           "default": null,
           "extra": "",
           "name": "dedupe_key",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608040002_base_plugin_usage_metrics.sql"
           ]
@@ -24316,7 +24376,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -24515,7 +24575,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -24632,7 +24692,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -25011,7 +25071,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -25269,7 +25329,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -25397,7 +25457,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -25918,7 +25978,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -26024,7 +26084,7 @@
           "default": null,
           "extra": "",
           "name": "migration_id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/project_management/0001_project_management.sql"
           ]
@@ -26069,7 +26129,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030004_device_control_plane.sql"
           ]
@@ -26292,7 +26352,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030004_device_control_plane.sql"
           ]
@@ -26450,7 +26510,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030004_device_control_plane.sql"
           ]
@@ -26567,7 +26627,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/device/0001_device.sql"
           ]
@@ -26622,7 +26682,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030009_simulation_environments.sql"
           ]
@@ -27132,7 +27192,7 @@
           "default": null,
           "extra": "",
           "name": "run_id",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608100010_simulation_reproducibility.sql"
           ]
@@ -27406,7 +27466,7 @@
           "default": null,
           "extra": "",
           "name": "version",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/domains/simulation/0001_simulation.sql"
           ]
@@ -27461,7 +27521,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -27656,7 +27716,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -27944,7 +28004,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -28074,7 +28134,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -28352,7 +28412,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -28609,7 +28669,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -28934,7 +28994,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -29141,7 +29201,7 @@
         },
         {
           "data_type": "JSON",
-          "default": "(JSON_ARRAY()",
+          "default": null,
           "extra": "",
           "name": "alias",
           "nullable": false,
@@ -29457,7 +29517,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -29589,7 +29649,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -29898,7 +29958,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql"
           ]
@@ -30037,7 +30097,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -30246,7 +30306,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql"
           ]
@@ -30366,7 +30426,7 @@
           "default": null,
           "extra": "",
           "name": "list_gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql"
           ]
@@ -30631,7 +30691,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql"
           ]
@@ -30740,7 +30800,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -30842,7 +30902,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -30970,7 +31030,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql"
           ]
@@ -31119,7 +31179,7 @@
           "default": null,
           "extra": "",
           "name": "token",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608050002_craft_work_collaboration_tables.sql"
           ]
@@ -31237,7 +31297,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/migrations/202608030005_craft_legacy_auxiliary_tables.sql"
           ]
@@ -31365,7 +31425,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -31492,7 +31552,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
@@ -31618,7 +31678,7 @@
           "default": null,
           "extra": "",
           "name": "gid",
-          "nullable": true,
+          "nullable": false,
           "sources": [
             "backend/db/mysql_schema.sql"
           ]
