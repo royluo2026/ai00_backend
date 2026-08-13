@@ -7,7 +7,7 @@ import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from backend.plugin_platform.artifacts import ArtifactError, validate_package
+from backend.plugin_platform.artifacts import ArtifactError, read_web_asset, upload_to_ois, validate_package
 from backend.plugin_platform.compatibility import satisfies
 from backend.plugin_platform.lifecycle import LifecycleError, begin_upgrade, require_transition, rollback
 from backend.plugin_platform.manifest import ManifestError, parse_manifest
@@ -80,3 +80,24 @@ def test_compatibility_ranges():
     assert satisfies("1.4.2", ">=1.0.0 <2.0.0")
     assert satisfies("0.1.9", "^0.1.0")
     assert not satisfies("2.0.0", ">=1.0.0 <2.0.0")
+
+
+def test_plugin_artifact_upload_uses_configured_storage_fallback(monkeypatch):
+    package = package_bytes()
+    manifest = parse_manifest(release(package))
+    calls = []
+
+    def put_immutable(key, data, media_type):
+        calls.append((key, data, media_type))
+        return {"object_key": key, "sha256": manifest.artifact.sha256}
+
+    monkeypatch.setattr("backend.core.storage.put_immutable", put_immutable)
+
+    assert upload_to_ois(package, manifest) == manifest.artifact.object_key
+    assert calls == [(manifest.artifact.object_key, package, "application/zip")]
+
+
+def test_plugin_asset_read_uses_configured_storage_fallback(monkeypatch):
+    monkeypatch.setattr("backend.core.storage.get_immutable", lambda key: b"<html>ok</html>")
+
+    assert read_web_asset("plugin-assets/acme/example/index.html") == b"<html>ok</html>"

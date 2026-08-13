@@ -64,33 +64,38 @@ def upload_to_ois(data: bytes, manifest: PluginManifestV2) -> str:
     expected_key = f"plugins/{manifest.publisher_id}/{manifest.plugin_id}/{manifest.version}/{manifest.artifact.sha256}.zip"
     if manifest.artifact.object_key != expected_key:
         raise ArtifactError(f"artifact.object_key must be {expected_key}")
-    from backend.core import ois_storage
-    cfg = ois_storage._get_ois_config()
-    identify = cfg.get("identify", "")
-    client, error = ois_storage._make_client()
-    if not identify or not client:
-        raise ArtifactError(f"OIS is unavailable: {error or 'missing identify'}")
-    response = client.put_object(identify, expected_key, io.BytesIO(data))
-    if not (hasattr(response, "is_succeed") and response.is_succeed()):
-        raise ArtifactError("OIS rejected plugin artifact upload")
+    from backend.core import storage
+    stored = storage.put_immutable(expected_key, data, "application/zip")
+    if not stored or stored.get("object_key") != expected_key:
+        raise ArtifactError("plugin object storage rejected artifact upload")
+    if stored.get("sha256") != manifest.artifact.sha256:
+        raise ArtifactError("plugin object storage returned an artifact digest mismatch")
     return expected_key
 
 
 def publish_web_assets(data: bytes, manifest: PluginManifestV2) -> dict:
     """Expand validated files to immutable OIS keys for the sandbox asset gateway."""
-    from backend.core import ois_storage
-    cfg = ois_storage._get_ois_config()
-    identify = cfg.get("identify", "")
-    client, error = ois_storage._make_client()
-    if not identify or not client: raise ArtifactError(f"OIS is unavailable: {error or 'missing identify'}")
+    from backend.core import storage
     prefix = f"plugin-assets/{manifest.publisher_id}/{manifest.plugin_id}/{manifest.version}/{manifest.artifact.sha256}"
     uploaded = 0
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
         for item in archive.infolist():
             path = item.filename.replace("\\", "/").rstrip("/")
             if not path or item.is_dir(): continue
-            response = client.put_object(identify, f"{prefix}/{path}", io.BytesIO(archive.read(item)))
-            if not (hasattr(response, "is_succeed") and response.is_succeed()):
-                raise ArtifactError(f"OIS rejected plugin asset: {path}")
+            key = f"{prefix}/{path}"
+            content = archive.read(item)
+            stored = storage.put_immutable(key, content, "application/octet-stream")
+            if not stored or stored.get("object_key") != key:
+                raise ArtifactError(f"plugin object storage rejected asset: {path}")
             uploaded += 1
     return {"prefix": prefix, "uploaded_files": uploaded}
+
+
+def read_web_asset(object_key: str) -> bytes:
+    from backend.core import storage
+    content = storage.get_immutable(object_key)
+    if content is None:
+        raise ArtifactError("plugin asset is unavailable")
+    if len(content) > 25 * 1024 * 1024:
+        raise ArtifactError("plugin asset exceeds response limit")
+    return content

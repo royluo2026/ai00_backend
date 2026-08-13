@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 import mimetypes
-import requests
 import uuid
 from pathlib import Path
 
@@ -11,7 +10,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Upload
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-from backend.plugin_platform.artifacts import ArtifactError, publish_web_assets, upload_to_ois, validate_package
+from backend.plugin_platform.artifacts import ArtifactError, publish_web_assets, read_web_asset, upload_to_ois, validate_package
 from backend.plugin_platform.manifest import ManifestError, parse_manifest
 from backend.plugin_platform.metrics import close_month, monthly_ranking
 from backend.plugin_platform.mounts import (
@@ -350,35 +349,17 @@ def revoke(plugin_id: str, version: str, body: ReviewRequest, user: dict = Depen
 
 @router.get("/assets/{token}/{plugin_id}/{version}/{asset_path:path}", include_in_schema=False)
 def plugin_asset(token: str, plugin_id: str, version: str, asset_path: str):
-    upstream = None
     try:
         claims = _mount_service().resolve_asset_token(
             token, expected_plugin_id=plugin_id, expected_version=version
         )
         object_key = resolve_asset_object_key(claims, asset_path)
-        from backend.core import ois_storage
-        access_url = ois_storage.generate_access_url(object_key, 60)
-        if not access_url: raise ArtifactError("OIS asset is unavailable")
-        upstream = requests.get(access_url, stream=True, timeout=(5, 30))
-        if upstream.status_code != 200: raise ArtifactError(f"OIS asset returned {upstream.status_code}")
-        length = int(upstream.headers.get("Content-Length") or 0)
-        if length > 25 * 1024 * 1024: raise ArtifactError("plugin asset exceeds response limit")
-        chunks, total = [], 0
-        for chunk in upstream.iter_content(64 * 1024):
-            if not chunk: continue
-            total += len(chunk)
-            if total > 25 * 1024 * 1024: raise ArtifactError("plugin asset exceeds response limit")
-            chunks.append(chunk)
-        content = b"".join(chunks)
-        upstream.close(); upstream = None
+        content = read_web_asset(object_key)
     except (MountTokenError, MountSessionError) as exc:
-        if upstream: upstream.close()
         raise HTTPException(403, detail={"code": "invalid_plugin_mount", "message": str(exc)}) from exc
     except PermissionError as exc:
-        if upstream: upstream.close()
         raise HTTPException(410, detail={"code": "plugin_mount_revoked", "message": str(exc)}) from exc
-    except (ArtifactError, requests.RequestException) as exc:
-        if upstream: upstream.close()
+    except ArtifactError as exc:
         raise HTTPException(502, detail={"code": "plugin_asset_unavailable", "message": str(exc)}) from exc
     headers = {
         "Content-Security-Policy": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'",

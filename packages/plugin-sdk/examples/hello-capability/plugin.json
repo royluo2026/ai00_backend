@@ -18,7 +18,7 @@
   "permissions": [
     "plugin.storage.get",
     "plugin.storage.put",
-    "system.echo"
+    "craft.bop.version.list"
   ],
   "data": {
     "stores_personal_data": false,

@@ -6,8 +6,12 @@ import unittest
 import zipfile
 from pathlib import Path
 
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
 from backend.plugin_platform.artifacts import validate_package
 from backend.plugin_platform.manifest import parse_manifest
+from backend.plugin_platform.signing import canonical_release
+from backend.scripts.plugin_platform_acceptance import Client
 from backend.scripts.plugin_platform_preflight import evaluate
 from backend.scripts.verify_domain_db_isolation import URLS, verify
 
@@ -41,6 +45,19 @@ class PluginAcceptanceToolingTests(unittest.TestCase):
         manifest = parse_manifest(json.loads(release1.read_text(encoding="utf-8")))
         self.assertEqual(validate_package(zip1.read_bytes(), manifest), value1["artifact"]["sha256"])
 
+    def test_reference_release_signs_the_same_canonical_document_the_server_verifies(self):
+        root = Path(__file__).resolve().parents[2]
+        source = root / "packages/plugin-sdk/examples/hello-capability"
+        builder = _load_builder()
+        _package, _release, value = builder.build(source, source / "dist")
+        normalized = parse_manifest(value).model_dump(mode="json")
+        private_key = Ed25519PrivateKey.generate()
+        publisher_message = canonical_release(value, value["artifact"]["sha256"])
+        server_message = canonical_release(normalized, normalized["artifact"]["sha256"])
+
+        signature = private_key.sign(publisher_message)
+        private_key.public_key().verify(signature, server_message)
+
     def test_template_package_contains_sdk_and_is_platform_valid(self):
         root = Path(__file__).resolve().parents[2]
         source = root / "packages/plugin-sdk/templates/web-capability"
@@ -53,6 +70,37 @@ class PluginAcceptanceToolingTests(unittest.TestCase):
             self.assertIn("ai00-plugin-sdk.js", names)
             self.assertIn('from "./ai00-plugin-sdk.js"', archive.read("app.js").decode("utf-8"))
             self.assertIn("export class Ai00PluginClient", archive.read("ai00-plugin-sdk.js").decode("utf-8"))
+
+    def test_sdk_example_and_template_only_request_current_plugin_capabilities(self):
+        root = Path(__file__).resolve().parents[2]
+        catalog = json.loads(
+            (root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+        )
+        plugin_capabilities = {
+            item["id"] for item in catalog["descriptors"] if item["exposure"]["plugin"]
+        }
+        for source in (
+            root / "packages/plugin-sdk/examples/hello-capability/plugin.json",
+            root / "packages/plugin-sdk/templates/web-capability/plugin.json",
+        ):
+            descriptor = json.loads(source.read_text(encoding="utf-8"))
+            self.assertLessEqual(set(descriptor["permissions"]), plugin_capabilities)
+
+    def test_lifecycle_acceptance_pins_capability_major_version(self):
+        client = Client("http://localhost", "token")
+        calls = []
+
+        def request(method, path, **kwargs):
+            calls.append((method, path, kwargs))
+            if path.endswith(":confirm"):
+                return {"data": {"confirmation_token": "confirm-1"}}
+            return {"success": True}
+
+        client.request = request
+        client.lifecycle("plugin.install", {"plugin_id": "acme.ai00.hello"})
+
+        self.assertEqual(calls[0][2]["json"]["version"], 1)
+        self.assertEqual(calls[1][2]["json"]["version"], 1)
     def test_preflight_fails_closed_without_echoing_secrets(self):
         secret = "do-not-print-this-secret-value-123456789"
         checks = evaluate({"AI00_PLUGIN_MOUNT_SECRET": secret})

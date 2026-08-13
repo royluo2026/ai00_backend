@@ -3,7 +3,7 @@
 这是一个可直接打包、安装的最小模板，演示三件核心事情：
 
 1. 等待 AI00 宿主完成安全握手；
-2. 通过 Capability Kernel 调用 `system.echo`；
+2. 通过 Capability Kernel 调用 `craft.bop.version.list`；
 3. 使用按租户和插件隔离、带乐观版本控制的命名空间存储。
 
 ## 改成自己的插件

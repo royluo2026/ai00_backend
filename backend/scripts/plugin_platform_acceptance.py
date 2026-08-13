@@ -37,9 +37,9 @@ class Client:
 
     def lifecycle(self, capability: str, payload: dict):
         path = f"/api/v1/capabilities/{capability}"
-        confirmed = self.request("POST", path + ":confirm", json={"payload":payload}, headers={"X-AI00-Source":"web"})
+        confirmed = self.request("POST", path + ":confirm", json={"payload":payload,"version":1}, headers={"X-AI00-Source":"web"})
         token = confirmed["data"]["confirmation_token"]
-        return self.request("POST", path + ":invoke", json={"payload":payload,"confirmation_token":token}, headers={"X-AI00-Source":"web"})
+        return self.request("POST", path + ":invoke", json={"payload":payload,"version":1,"confirmation_token":token}, headers={"X-AI00-Source":"web"})
 
 
 def run(args) -> list[str]:
@@ -74,10 +74,11 @@ def run(args) -> list[str]:
     if not asset.ok or b"<html" not in asset.content.lower(): raise AcceptanceError("sandbox entry asset could not be mounted")
     steps.append("sandbox entry mounted from OIS")
 
-    major = int(mounted.get("capability_versions", {}).get("system.echo") or 0)
+    smoke_capability = "craft.bop.version.list"
+    major = int(mounted.get("capability_versions", {}).get(smoke_capability) or 0)
     if major:
         invoke_path=(f"/api/v1/plugin-marketplace/mounts/{mounted['mount_session_id']}"
-                     f"/capabilities/system.echo:invoke")
+                     f"/capabilities/{smoke_capability}:invoke")
         result=client.request("POST",invoke_path,json={"major_version":major,"payload":{}})
         if not result.get("ok"): raise AcceptanceError("mount-scoped plugin capability failed")
         steps.append("mount-scoped web plugin capability invoked")

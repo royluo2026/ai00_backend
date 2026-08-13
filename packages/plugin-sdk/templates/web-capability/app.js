@@ -8,7 +8,6 @@ const count = document.querySelector("#count");
 const output = document.querySelector("#output");
 const runButton = document.querySelector("#run");
 const resetButton = document.querySelector("#reset");
-const message = document.querySelector("#message");
 
 function requireSuccess(result, operation) {
   if (!result?.success) throw new Error(result?.error?.message || `${operation}失败`);
@@ -53,12 +52,12 @@ runButton.addEventListener("click", async () => {
       await client.storagePut(counterKey, current.value + 1, current.version),
       "保存计数",
     );
-    const echoed = requireSuccess(
-      await client.invoke("system.echo", { message: message.value, invocation_count: current.value + 1 }),
-      "调用 system.echo",
+    const versions = requireSuccess(
+      await client.invoke("craft.bop.version.list", {}),
+      "调用 craft.bop.version.list",
     );
     count.textContent = String(current.value + 1);
-    output.textContent = JSON.stringify({ stored, echoed }, null, 2);
+    output.textContent = JSON.stringify({ stored, versions }, null, 2);
   } catch (error) {
     output.textContent = `失败：${error instanceof Error ? error.message : String(error)}`;
   } finally {

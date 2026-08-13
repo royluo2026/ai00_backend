@@ -19,6 +19,7 @@ boto3 MinIO（S3-compatible）封装。
 from __future__ import annotations
 
 import io
+import hashlib
 import json
 import logging
 import uuid
@@ -246,4 +247,72 @@ def update(url: str, data: bytes, mime: str) -> str | None:
         return url
     except Exception as e:
         _log.error("MinIO update 失败 (url=%s): %s", url, e)
+        return None
+
+
+def _normalized_immutable_key(object_key: str) -> str:
+    normalized = str(object_key or "").strip().lstrip("/")
+    if not normalized or ".." in normalized.split("/") or "//" in normalized:
+        raise ValueError("object_key must be a normalized relative object key")
+    return normalized
+
+
+def put_immutable(object_key: str, data: bytes, media_type: str) -> dict | None:
+    """Store bytes under an exact immutable key, preferring OIS then MinIO."""
+    normalized = _normalized_immutable_key(object_key)
+    if not isinstance(data, bytes):
+        raise TypeError("data must be bytes")
+    digest = hashlib.sha256(data).hexdigest()
+    try:
+        from backend.core import ois_storage
+        stored = ois_storage.put_immutable(normalized, data, media_type)
+        if stored:
+            return stored
+    except Exception as exc:
+        _log.warning("OIS immutable upload failed, falling back to MinIO: %s", exc)
+
+    if not _is_ready():
+        init_storage()
+    if not _is_ready():
+        return None
+    try:
+        _s3.put_object(
+            Bucket=_bucket, Key=normalized, Body=io.BytesIO(data),
+            ContentType=media_type, ContentLength=len(data),
+        )
+        return {
+            "object_key": normalized, "sha256": digest,
+            "byte_size": len(data), "media_type": media_type,
+        }
+    except Exception as exc:
+        _log.error("MinIO immutable upload failed (key=%s): %s", normalized, exc)
+        return None
+
+
+def get_immutable(object_key: str, expected_sha256: str = "") -> bytes | None:
+    """Read exact immutable bytes, preferring OIS then MinIO."""
+    normalized = _normalized_immutable_key(object_key)
+    try:
+        from backend.core import ois_storage
+        data = ois_storage.get_immutable(normalized, expected_sha256)
+        if data is not None:
+            return data
+    except Exception as exc:
+        _log.warning("OIS immutable read failed, falling back to MinIO: %s", exc)
+
+    if not _is_ready():
+        init_storage()
+    if not _is_ready():
+        return None
+    try:
+        response = _s3.get_object(Bucket=_bucket, Key=normalized)
+        body = response.get("Body")
+        data = body.read() if hasattr(body, "read") else body
+        if not isinstance(data, bytes):
+            raise RuntimeError("MinIO returned no byte payload")
+        if expected_sha256 and hashlib.sha256(data).hexdigest() != expected_sha256:
+            raise RuntimeError("immutable object digest mismatch")
+        return data
+    except Exception as exc:
+        _log.error("MinIO immutable read failed (key=%s): %s", normalized, exc)
         return None

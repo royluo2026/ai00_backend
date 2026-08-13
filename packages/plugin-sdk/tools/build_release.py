@@ -34,6 +34,14 @@ def descriptor(source: Path, version_override: str | None = None) -> dict:
         raise ValueError("plugin version must be SemVer")
     if not str(value["plugin_id"]).startswith(str(value["publisher_id"]) + "."):
         raise ValueError("plugin_id must belong to publisher_id")
+    permissions = value.get("permissions", [])
+    if not isinstance(permissions, list) or len(permissions) != len(set(permissions)):
+        raise ValueError("permissions must be a unique list")
+    value["permissions"] = sorted(permissions)
+    # Emit optional fields with their canonical server defaults before signing.
+    # Otherwise the server's strict Manifest model adds them after upload and
+    # verifies a different byte sequence than the publisher signed.
+    value.setdefault("capabilities", {"required": [], "optional": []})
     web = value.get("runtimes", {}).get("web", {})
     entry = PurePosixPath(str(web.get("entry", "")))
     if not str(entry) or entry.is_absolute() or ".." in entry.parts or not (source / entry).is_file():
