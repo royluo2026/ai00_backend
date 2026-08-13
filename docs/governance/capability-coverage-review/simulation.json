@@ -4,8 +4,8 @@
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
     "registry_sha256": "sha256:0181bd94bf35d3627f344727490f22045ade8ed95e657ff8f0c0f39f5701815a",
-    "catalog_release": "rel_1b4737d4cf8146d287101f7403dc69fd",
-    "catalog_sha256": "sha256:81a832b41f955474322c7d8ca55ea95f3e1b5519e39074f108b13073cd7f0674"
+    "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
+    "catalog_sha256": "sha256:d5e111c90046f756d2a908ca040eef4c9fc9a940451a8846808df378cc6b6acb"
   },
   "unreviewed_functions": {},
   "excluded_functions": {},

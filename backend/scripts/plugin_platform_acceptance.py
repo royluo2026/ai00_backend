@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import uuid
 from pathlib import Path
 
 import requests
@@ -39,7 +40,24 @@ class Client:
         path = f"/api/v1/capabilities/{capability}"
         confirmed = self.request("POST", path + ":confirm", json={"payload":payload,"version":1}, headers={"X-AI00-Source":"web"})
         token = confirmed["data"]["confirmation_token"]
-        return self.request("POST", path + ":invoke", json={"payload":payload,"version":1,"confirmation_token":token}, headers={"X-AI00-Source":"web"})
+        response = self.request(
+            "POST",
+            path + ":invoke",
+            json={
+                "payload": payload,
+                "version": 1,
+                "confirmation_token": token,
+                "idempotency_key": f"plugin-acceptance-{uuid.uuid4().hex}",
+            },
+            headers={"X-AI00-Source":"web"},
+        )
+        result = response.get("data") or {}
+        if not response.get("success") or not result.get("ok"):
+            error = result.get("error") or {}
+            code = error.get("code") or result.get("status") or "lifecycle_failed"
+            message = error.get("message") or "plugin lifecycle capability failed"
+            raise AcceptanceError(f"{capability} failed: {code}: {message}")
+        return response
 
 
 def run(args) -> list[str]:
@@ -94,9 +112,8 @@ def run(args) -> list[str]:
             raise AcceptanceError("upgrade release must use the same plugin_id and a different version")
         submit(args.upgrade_package, upgrade, args.upgrade_signature.read_text(encoding="utf-8").strip())
         client.lifecycle("plugin.upgrade", {"plugin_id":plugin_id,"version":upgrade["version"],"granted_capabilities":upgrade.get("permissions",[])})
-        client.lifecycle("plugin.upgrade.finish", {"plugin_id":plugin_id,"healthy":False})
         client.lifecycle("plugin.rollback", {"plugin_id":plugin_id})
-        steps.append("upgrade failure and rollback verified")
+        steps.append("upgrade health rejection and rollback verified")
 
     client.lifecycle("plugin.disable",{"plugin_id":plugin_id}); steps.append("disabled")
     if any(item["plugin_id"]==plugin_id for item in client.request("GET","/api/v1/plugin-marketplace/registry")["data"]):

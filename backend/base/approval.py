@@ -20,8 +20,9 @@ from backend.capability_v2.provider_contracts import (
 from .provider import register_capability
 from backend.capability_v2.domain_database import (
     connect_domain_database,
-    load_domain_database_url,
+    load_runtime_database_url,
 )
+from backend.capability_v2.database_profile import load_database_profile
 from backend.capability_v2.domain_manifest import load_domain_manifests
 
 
@@ -314,8 +315,12 @@ def _base_runtime_connection():
     manifests = load_domain_manifests(
         root / "backend/capability_v2/official_domains.json"
     )
+    profile = load_database_profile(
+        root / "backend/capability_v2/database_profiles/single_database.json",
+        manifests,
+    )
     manifest = manifests.require("base")
-    url = load_domain_database_url(manifest, os.environ, role="runtime")
+    url = load_runtime_database_url(manifest, os.environ, profile)
     return connect_domain_database(url)
 
 

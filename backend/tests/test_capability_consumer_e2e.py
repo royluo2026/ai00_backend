@@ -7,6 +7,17 @@ from backend.capability_v2.contracts import CapabilityResultV2, CapabilityStatus
 from backend.capability_v2.reliability import ApprovalChallenge, IssuedApproval
 from backend.main import app
 from backend.routers.deps import get_authenticated_principal, get_current_user
+from backend.routers.capabilities import _web_identity
+
+
+def test_personal_web_identity_uses_same_tenant_key_as_personal_plugin_registry():
+    principal = AuthenticatedPrincipal(
+        user_id="u1", authentication_method="test-jwt", authenticated_at=datetime.now(UTC)
+    )
+
+    identity = _web_identity({"gid": "u1", "team_id": None}, principal)
+
+    assert identity.tenant.tenant_id == "user:u1"
 
 
 def test_agent_catalog_is_server_filtered_by_permissions_and_deprecation():

@@ -176,6 +176,58 @@ def test_sql_mount_store_persists_only_asset_token_hash(monkeypatch):
     assert issued.asset_token_hash in params
 
 
+def test_sql_mount_store_normalizes_join_collations_for_oceanbase():
+    row = {
+        "mount_session_id": "mount_" + "a" * 32,
+        "asset_token_hash": "b" * 64,
+        "user_id": "user-1",
+        "tenant_id": "tenant-1",
+        "installation_id": "installation_" + "c" * 32,
+        "plugin_id": "acme.ai00.example",
+        "plugin_version": "1.0.0",
+        "artifact_sha256": "d" * 64,
+        "catalog_release": "rel_" + "e" * 32,
+        "capability_grants_json": "[]",
+        "resource_scopes_json": "[]",
+        "data_scopes_json": "[]",
+        "revocation_version": 1,
+        "authenticated_at": NOW.replace(tzinfo=None),
+        "created_at": NOW.replace(tzinfo=None),
+        "expires_at": (NOW + timedelta(minutes=5)).replace(tzinfo=None),
+        "revoked_at": None,
+    }
+
+    class Cursor:
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def execute(self, sql, _params=()):
+            normalized = " ".join(sql.split())
+            required = (
+                "s.tenant_id COLLATE utf8mb4_general_ci=i.tenant_gid",
+                "s.plugin_id COLLATE utf8mb4_general_ci=i.plugin_id",
+                "s.installation_id COLLATE utf8mb4_general_ci=i.installation_id",
+                "s.plugin_id COLLATE utf8mb4_general_ci=r.plugin_id",
+                "s.plugin_version COLLATE utf8mb4_general_ci=r.version",
+                "s.plugin_version COLLATE utf8mb4_general_ci=i.current_version",
+                "s.artifact_sha256 COLLATE utf8mb4_general_ci=r.artifact_sha256",
+                "s.expires_at>UTC_TIMESTAMP(6)",
+            )
+            if not all(clause in normalized for clause in required):
+                raise RuntimeError("OceanBase 1267: illegal mix of collations")
+        def fetchone(self): return row
+
+    class Connection:
+        def cursor(self): return Cursor()
+
+    @contextmanager
+    def connections():
+        yield Connection()
+
+    session = SqlMountSessionStore(connections, clock=lambda: NOW).get_live_by_token_hash("b" * 64)
+
+    assert session.plugin_id == "acme.ai00.example"
+
+
 def test_plugin_mount_invoke_constructs_trusted_identity_and_returns_full_result(monkeypatch):
     from backend.routers import plugin_marketplace as router_module
 
@@ -241,6 +293,22 @@ def test_mount_catalog_discovery_returns_only_the_exact_granted_subset():
         ("base.notification.preference.update", 1),
     }
     assert all(item["exposure"]["plugin"] is True for item in discovered)
+
+
+def test_mount_data_scopes_are_derived_from_exact_granted_capabilities():
+    from backend.capability_v2.catalog import CatalogRelease
+    from backend.routers import plugin_marketplace as router_module
+
+    resolver = getattr(router_module, "_mount_data_scopes", None)
+    assert resolver is not None
+    root = Path(__file__).resolve().parents[2]
+    release = CatalogRelease.model_validate_json(
+        (root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+
+    scopes = resolver(("craft.bop.version.list@1",), release)
+
+    assert scopes == ("confidential",)
 
 
 def test_mount_invocation_audits_permitted_and_ungranted_results(monkeypatch):

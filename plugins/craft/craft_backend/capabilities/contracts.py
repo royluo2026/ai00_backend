@@ -122,9 +122,32 @@ _VERSION_DETAIL = (
     "lifecycle", "content_hash", "created_at",
 )
 
+_NULLABLE_STRING = {"anyOf": [{"type": "string"}, {"type": "null"}]}
+_VERSION_SUMMARY_PROPERTIES = {
+    "version_gid": {"type": "string", "minLength": 1},
+    "version_tag": _NULLABLE_STRING,
+    "bop_name": _NULLABLE_STRING,
+    "family_gid": _NULLABLE_STRING,
+    "project_gid": _NULLABLE_STRING,
+    "status": _NULLABLE_STRING,
+    "lifecycle_phase": _NULLABLE_STRING,
+    "revision": {"anyOf": [
+        {"type": "string"}, {"type": "integer"}, {"type": "number"}, {"type": "null"},
+    ]},
+    "updated_at": _NULLABLE_STRING,
+    "archived": {"type": "boolean"},
+}
+_VERSION_SUMMARY = _object(
+    _VERSION_SUMMARY_PROPERTIES,
+    required=tuple(_VERSION_SUMMARY_PROPERTIES),
+)
+
 OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
     "craft.bop.version.get": _object(_fields(*_VERSION_DETAIL), required=("version_gid", "revision", "lifecycle")),
-    "craft.bop.version.list": _object({"items": ARRAY, "next_cursor": {}}, required=("items", "next_cursor")),
+    "craft.bop.version.list": _object({
+        "items": {"type": "array", "items": _VERSION_SUMMARY},
+        "next_cursor": _NULLABLE_STRING,
+    }, required=("items", "next_cursor")),
     "craft.bop.execution_structure.get": _object(
         _fields("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
         required=("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),

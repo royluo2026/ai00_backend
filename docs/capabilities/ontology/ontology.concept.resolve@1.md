@@ -8,7 +8,7 @@ Resolve a term without guessing across an immutable release.
 - 不适用：The stable object identity is already known.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_1b4737d4cf8146d287101f7403dc69fd`
+- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -78,7 +78,7 @@ Resolve a term without guessing across an immutable release.
 ```json
 {
   "capability_id": "ontology.concept.resolve",
-  "catalog_release": "rel_1b4737d4cf8146d287101f7403dc69fd",
+  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
   "major_version": 1,
   "payload": {
     "term": "example"

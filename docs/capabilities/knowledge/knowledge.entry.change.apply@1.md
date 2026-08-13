@@ -8,7 +8,7 @@ Execute knowledge.entry.change.apply.
 - 不适用：The resource belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_1b4737d4cf8146d287101f7403dc69fd`
+- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -81,7 +81,7 @@ Execute knowledge.entry.change.apply.
 ```json
 {
   "capability_id": "knowledge.entry.change.apply",
-  "catalog_release": "rel_1b4737d4cf8146d287101f7403dc69fd",
+  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
   "major_version": 1,
   "payload": {
     "arguments": {},

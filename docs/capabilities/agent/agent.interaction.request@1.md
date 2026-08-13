@@ -8,7 +8,7 @@ Execute the governed agent.interaction.request Agent outcome.
 - 不适用：The outcome belongs to another business domain; invoke that domain Capability instead.
 - 生命周期：`stable`
 - 所属领域：`agent`
-- Catalog Release：`rel_1b4737d4cf8146d287101f7403dc69fd`
+- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -95,7 +95,7 @@ Execute the governed agent.interaction.request Agent outcome.
 ```json
 {
   "capability_id": "agent.interaction.request",
-  "catalog_release": "rel_1b4737d4cf8146d287101f7403dc69fd",
+  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
   "major_version": 1,
   "payload": {}
 }

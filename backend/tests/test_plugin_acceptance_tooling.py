@@ -5,13 +5,15 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from backend.plugin_platform.artifacts import validate_package
 from backend.plugin_platform.manifest import parse_manifest
 from backend.plugin_platform.signing import canonical_release
-from backend.scripts.plugin_platform_acceptance import Client
+from backend.scripts.plugin_platform_acceptance import AcceptanceError, Client, run
 from backend.scripts.plugin_platform_preflight import evaluate
 from backend.scripts.verify_domain_db_isolation import URLS, verify
 
@@ -94,13 +96,109 @@ class PluginAcceptanceToolingTests(unittest.TestCase):
             calls.append((method, path, kwargs))
             if path.endswith(":confirm"):
                 return {"data": {"confirmation_token": "confirm-1"}}
-            return {"success": True}
+            return {"success": True, "data": {"ok": True, "status": "completed"}}
 
         client.request = request
         client.lifecycle("plugin.install", {"plugin_id": "acme.ai00.hello"})
 
         self.assertEqual(calls[0][2]["json"]["version"], 1)
         self.assertEqual(calls[1][2]["json"]["version"], 1)
+
+    def test_lifecycle_acceptance_rejects_business_failure_in_http_200_response(self):
+        client = Client("http://localhost", "token")
+
+        def request(method, path, **kwargs):
+            if path.endswith(":confirm"):
+                return {"data": {"confirmation_token": "confirm-1"}}
+            return {
+                "success": False,
+                "data": {
+                    "ok": False,
+                    "status": "rejected",
+                    "error": {"code": "idempotency_required", "message": "required"},
+                },
+            }
+
+        client.request = request
+        with self.assertRaisesRegex(AcceptanceError, "idempotency_required"):
+            client.lifecycle("plugin.install", {"plugin_id": "acme.ai00.hello"})
+
+    def test_lifecycle_acceptance_supplies_a_unique_idempotency_key(self):
+        client = Client("http://localhost", "token")
+        calls = []
+
+        def request(method, path, **kwargs):
+            calls.append((path, kwargs))
+            if path.endswith(":confirm"):
+                return {"data": {"confirmation_token": "confirm-1"}}
+            return {"success": True, "data": {"ok": True, "status": "completed"}}
+
+        client.request = request
+        client.lifecycle("plugin.install", {"plugin_id": "acme.ai00.hello"})
+        first_key = calls[1][1]["json"]["idempotency_key"]
+        client.lifecycle("plugin.install", {"plugin_id": "acme.ai00.hello"})
+        second_key = calls[3][1]["json"]["idempotency_key"]
+
+        self.assertTrue(first_key.startswith("plugin-acceptance-"))
+        self.assertNotEqual(first_key, second_key)
+
+    def test_failed_upgrade_rolls_back_without_calling_internal_callback(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            package = root / "plugin.zip"
+            upgrade_package = root / "plugin-upgrade.zip"
+            package.write_bytes(b"zip")
+            upgrade_package.write_bytes(b"upgrade")
+            release = root / "release.json"
+            upgrade_release = root / "upgrade-release.json"
+            release.write_text(json.dumps({
+                "plugin_id": "acme.ai00.hello", "publisher_id": "acme",
+                "version": "1.0.0", "permissions": [],
+            }), encoding="utf-8")
+            upgrade_release.write_text(json.dumps({
+                "plugin_id": "acme.ai00.hello", "publisher_id": "acme",
+                "version": "1.1.0", "permissions": [],
+            }), encoding="utf-8")
+            signature = root / "signature.txt"
+            upgrade_signature = root / "upgrade-signature.txt"
+            public_key = root / "public.pem"
+            for path in (signature, upgrade_signature, public_key):
+                path.write_text("fixture", encoding="utf-8")
+            lifecycle_calls = []
+            state = {"active": True}
+
+            class FakeClient:
+                def __init__(self, base, _token): self.base = base
+                def request(self, method, path, **_kwargs):
+                    if path == "/api/v1/plugin-marketplace/registry":
+                        return {"data": ([{
+                            "plugin_id": "acme.ai00.hello", "mount_url": "/asset",
+                            "capability_versions": {},
+                        }] if state["active"] else [])}
+                    return {}
+                def lifecycle(self, capability, payload):
+                    lifecycle_calls.append((capability, payload))
+                    if capability == "plugin.disable":
+                        state["active"] = False
+                    return {}
+
+            args = SimpleNamespace(
+                api_url="http://localhost", token="token", package=package,
+                release=release, signature=signature,
+                upgrade_package=upgrade_package, upgrade_release=upgrade_release,
+                upgrade_signature=upgrade_signature, publisher_public_key=public_key,
+                publisher_name="fixture", publisher_exists=True,
+            )
+            with patch("backend.scripts.plugin_platform_acceptance.Client", FakeClient), patch(
+                "backend.scripts.plugin_platform_acceptance.requests.get",
+                return_value=SimpleNamespace(ok=True, content=b"<html>"),
+            ):
+                run(args)
+
+        names = [name for name, _payload in lifecycle_calls]
+        self.assertIn("plugin.rollback", names)
+        self.assertNotIn("plugin.upgrade.finish", names)
+
     def test_preflight_fails_closed_without_echoing_secrets(self):
         secret = "do-not-print-this-secret-value-123456789"
         checks = evaluate({"AI00_PLUGIN_MOUNT_SECRET": secret})

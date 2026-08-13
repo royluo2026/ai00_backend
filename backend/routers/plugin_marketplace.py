@@ -108,6 +108,17 @@ def _mount_catalog(session, release: CatalogRelease) -> list[dict]:
     ]
 
 
+def _mount_data_scopes(grants: tuple[str, ...], release: CatalogRelease) -> tuple[str, ...]:
+    granted = {
+        (value.rsplit("@", 1)[0], int(value.rsplit("@", 1)[1])) for value in grants
+    }
+    return tuple(sorted({
+        descriptor.data_classification
+        for descriptor in release.descriptors
+        if (descriptor.id, descriptor.major_version) in granted
+    }))
+
+
 def _plugin_identity(session, user: dict, principal) -> ConsumerIdentity:
     return ConsumerIdentity(
         actor=ActorIdentity(**principal.model_dump()),
@@ -196,7 +207,8 @@ def registry(
                 installation_id=str(installation_id), plugin_id=item["plugin_id"],
                 plugin_version=item["version"], artifact_sha256=item["artifact"]["sha256"],
                 catalog_release=release.release_id, capability_grants=grants,
-                resource_scopes=(f"tenant:{tenant}",), data_scopes=("internal",),
+                resource_scopes=(f"tenant:{tenant}",),
+                data_scopes=_mount_data_scopes(grants, release),
                 revocation_version=revocation_version,
                 authenticated_at=principal.authenticated_at,
             )

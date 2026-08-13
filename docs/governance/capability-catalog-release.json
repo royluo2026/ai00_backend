@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_1b4737d4cf8146d287101f7403dc69fd",
-  "catalog_hash": "sha256:1b4737d4cf8146d287101f7403dc69fd48a47aa2fe55ed733a4bc535f55ba196",
+  "release_id": "rel_96d6bb1a9160216038ee602417611b71",
+  "catalog_hash": "sha256:96d6bb1a9160216038ee602417611b710145e4b22ee59af34ff2700842db656b",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -11372,14 +11372,125 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {},
-              "additionalProperties": false
+              "properties": {
+                "version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version_tag": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bop_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "family_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "project_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "status": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "lifecycle_phase": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "revision": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "updated_at": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "archived": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "version_gid",
+                "version_tag",
+                "bop_name",
+                "family_gid",
+                "project_gid",
+                "status",
+                "lifecycle_phase",
+                "revision",
+                "updated_at",
+                "archived"
+              ]
             }
           },
           "next_cursor": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -11395,14 +11506,125 @@
             "type": "array",
             "items": {
               "type": "object",
-              "properties": {},
-              "additionalProperties": false
+              "properties": {
+                "version_gid": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version_tag": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bop_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "family_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "project_gid": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "status": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "lifecycle_phase": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "revision": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "updated_at": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "archived": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "version_gid",
+                "version_tag",
+                "bop_name",
+                "family_gid",
+                "project_gid",
+                "status",
+                "lifecycle_phase",
+                "revision",
+                "updated_at",
+                "archived"
+              ]
             }
           },
           "next_cursor": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -11411,7 +11633,7 @@
           "next_cursor"
         ]
       },
-      "schema_hash": "sha256:fa6fd4904f6999300aa229a0a1829784c3aa87d9809320c03a288edb2f00d6f9",
+      "schema_hash": "sha256:2cecbd29172f8581d767f926a0642240750e161a68a6e3d4b7d10c7d742eaca4",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -56808,13 +57030,13 @@
       "plugin_id": "official.base",
       "module": "backend.base.official_provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:91c02b53ada1fe4a6f1057f542879de71996791b4604eae489384c92927a8384"
+      "artifact_hash": "sha256:068b91e116d70b57c714f64612a022026ceaaf2448d30f551be3567cb08dab69"
     },
     {
       "plugin_id": "official.craft",
       "module": "craft_backend.capabilities",
       "version": "1.2.0",
-      "artifact_hash": "sha256:43b9223b744daae673efb301473d74bd4b71dd0f2864db9e2caf040ac4d93825"
+      "artifact_hash": "sha256:0e59f5e30b4f37ba0d90daa88be6138d8fe5f7ba27734b536cbc5293846c3ee5"
     },
     {
       "plugin_id": "official.device",
@@ -56865,5 +57087,5 @@
       "artifact_hash": "sha256:2a1508a1a247c946261071aab86ff56a3e0b64bc58a91a17474e695eb5762d4d"
     }
   ],
-  "created_at": "2026-08-13T07:21:18.538585Z"
+  "created_at": "2026-08-13T13:58:25.516388Z"
 }

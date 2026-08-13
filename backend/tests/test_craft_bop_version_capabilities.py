@@ -5,6 +5,7 @@ import pytest
 
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext
 from backend.capabilities.registry_next import CapabilityRegistry
+from backend.capabilities.validation_next import validate_payload
 from plugins.craft.craft_backend.capabilities import register_capabilities
 from plugins.craft.craft_backend.capabilities.bop_versions import (
     BopVersionQuery,
@@ -36,6 +37,30 @@ def test_get_and_list_have_different_output_contracts():
     assert "items" not in get_required
     assert "items" in list_required
     assert "revision" not in list_required
+
+
+def test_list_output_contract_accepts_empty_cursor_and_version_summaries():
+    descriptor = _registry().get("craft.bop.version.list").descriptor
+
+    validate_payload(
+        dict(descriptor.output_schema),
+        {
+            "items": [{
+                "version_gid": "v1",
+                "version_tag": "V1",
+                "bop_name": "Assembly BOP",
+                "family_gid": None,
+                "project_gid": "project-1",
+                "status": "draft",
+                "lifecycle_phase": None,
+                "revision": 1,
+                "updated_at": "2026-08-13T13:00:00",
+                "archived": False,
+            }],
+            "next_cursor": None,
+        },
+        label="output",
+    )
 
 
 def test_list_query_is_bounded_and_cursor_is_validated():

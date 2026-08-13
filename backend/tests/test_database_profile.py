@@ -53,6 +53,28 @@ def test_single_database_profile_has_no_runtime_ddl_path(manifests):
         load_ddl_database_url(manifests.require("craft"), {}, profile)
 
 
+def test_base_runtime_connection_uses_single_database_profile(monkeypatch):
+    from backend.base import approval
+
+    monkeypatch.delenv("AI00_BASE_DB_URL", raising=False)
+    monkeypatch.setenv(
+        "AI00_SHARED_RUNTIME_DB_URL",
+        "mysql://runtime:runtime-secret@db.example:2881/ai00_test",
+    )
+    captured = []
+    monkeypatch.setattr(
+        approval,
+        "connect_domain_database",
+        lambda url: captured.append(url) or "connection",
+    )
+
+    connection = approval._base_runtime_connection()
+
+    assert connection == "connection"
+    assert captured[0].database == "ai00_test"
+    assert captured[0].username == "runtime"
+
+
 def test_profile_rejects_incomplete_domain_coverage(tmp_path: Path, manifests):
     document = json.loads(SINGLE_DATABASE_PROFILE.read_text(encoding="utf-8"))
     document["domains"].remove("device")

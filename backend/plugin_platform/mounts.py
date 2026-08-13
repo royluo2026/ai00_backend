@@ -210,14 +210,18 @@ class SqlMountSessionStore:
                 cursor.execute(
                     f"SELECT s.* FROM {self.TABLE} s "
                     "JOIN workmanship_plugin_installations i "
-                    "ON i.tenant_gid=s.tenant_id AND i.plugin_id=s.plugin_id "
-                    "AND i.installation_id=s.installation_id "
+                    "ON s.tenant_id COLLATE utf8mb4_general_ci=i.tenant_gid "
+                    "AND s.plugin_id COLLATE utf8mb4_general_ci=i.plugin_id "
+                    "AND s.installation_id COLLATE utf8mb4_general_ci=i.installation_id "
                     "JOIN workmanship_plugin_releases r "
-                    "ON r.plugin_id=s.plugin_id AND r.version=s.plugin_version "
+                    "ON s.plugin_id COLLATE utf8mb4_general_ci=r.plugin_id "
+                    "AND s.plugin_version COLLATE utf8mb4_general_ci=r.version "
                     f"WHERE {predicate} AND s.status='active' AND s.revoked_at IS NULL "
-                    "AND s.expires_at>NOW() AND i.mount_revocation_version=s.revocation_version "
-                    "AND i.state IN ('enabled','rolled_back') AND i.current_version=s.plugin_version "
-                    "AND r.status='published' AND r.artifact_sha256=s.artifact_sha256",
+                    "AND s.expires_at>UTC_TIMESTAMP(6) AND i.mount_revocation_version=s.revocation_version "
+                    "AND i.state IN ('enabled','rolled_back') "
+                    "AND s.plugin_version COLLATE utf8mb4_general_ci=i.current_version "
+                    "AND r.status='published' "
+                    "AND s.artifact_sha256 COLLATE utf8mb4_general_ci=r.artifact_sha256",
                     (value,),
                 )
                 row = cursor.fetchone()

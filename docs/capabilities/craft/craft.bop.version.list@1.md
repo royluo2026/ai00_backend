@@ -8,7 +8,7 @@ Discover BOP version summaries with bounded cursor pagination.
 - 不适用：The caller already has one exact version GID.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_1b4737d4cf8146d287101f7403dc69fd`
+- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Discover BOP version summaries with bounded cursor pagination.
 ```json
 {
   "capability_id": "craft.bop.version.list",
-  "catalog_release": "rel_1b4737d4cf8146d287101f7403dc69fd",
+  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
   "major_version": 1,
   "payload": {}
 }
@@ -109,15 +109,126 @@ Discover BOP version summaries with bounded cursor pagination.
     "items": {
       "items": {
         "additionalProperties": false,
-        "properties": {},
+        "properties": {
+          "archived": {
+            "type": "boolean"
+          },
+          "bop_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "family_gid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lifecycle_phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "project_gid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version_gid": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "version_tag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "version_gid",
+          "version_tag",
+          "bop_name",
+          "family_gid",
+          "project_gid",
+          "status",
+          "lifecycle_phase",
+          "revision",
+          "updated_at",
+          "archived"
+        ],
         "type": "object"
       },
       "type": "array"
     },
     "next_cursor": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "required": [

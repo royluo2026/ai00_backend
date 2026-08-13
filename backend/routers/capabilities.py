@@ -40,7 +40,7 @@ def _web_identity(current_user: dict, principal) -> ConsumerIdentity:
     return ConsumerIdentity(
         actor=ActorIdentity(**principal.model_dump()),
         tenant=TenantIdentity(
-            tenant_id=str(current_user.get("team_id") or "default"),
+            tenant_id=str(current_user.get("team_id") or f"user:{current_user['gid']}"),
             membership="member",
             active_roles=tuple(filter(None, (
                 current_user.get("org_role"), current_user.get("system_role"),
