@@ -2,8 +2,8 @@
 
 本目录由不可变 Catalog Release 自动生成，不接受手工修改。
 
-- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
-- Catalog Hash：`sha256:96d6bb1a9160216038ee602417611b710145e4b22ee59af34ff2700842db656b`
+- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
+- Catalog Hash：`sha256:54121d00931bc3886ff0b6e74f61c3149507c4fc75d02f8f535183221d045cfd`
 - 描述符数量：267
 
 ## 重要边界

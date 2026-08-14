@@ -11,6 +11,7 @@
   const DEFAULT_LOCAL_BACKEND = 'http://127.0.0.1:8080';
   const _BACKEND_ENV_CONFIG_URL = '/web/runtime-env.json';
   let _backendEnvMapPromise = null;
+  let _pluginRegistryPromise = null;
 
   function _normalizeBaseUrl(value, fallback = '') {
     const raw = String(value || '').trim();
@@ -303,35 +304,40 @@
 
     // 合并仓库内置 official registry 与当前租户已启用、已签名的 Web Plugin。
     async getPluginRegistry() {
-      const token = localStorage.getItem('ai00_token') || '';
-      const official = await _backendUrl('/admin/plugin-registry').then(url => fetch(url))
-        .then(r => r.ok ? r.json() : null).catch(() => null);
-      const result = official || { tabDefs: {}, navItems: [] };
-      if (!result.tabDefs) result.tabDefs = {};
-      if (!result.navItems) result.navItems = [];
-      if (!token) return result;
-      const tenant = await _backendUrl('/api/v1/plugin-marketplace/registry').then(url =>
-        fetch(url, { headers: { 'X-AI00-Token': token } })
-      ).then(r => r.ok ? r.json() : null).catch(() => null);
-      for (const plugin of tenant?.data || []) {
-        if (!plugin.mount_url || !plugin.mount_session_id) continue;
-        const id = `plugin:${plugin.plugin_id}`;
-        result.tabDefs[id] = {
-          title: plugin.name || plugin.plugin_id, src: plugin.mount_url,
-          requiresAuth: true, minPerm: null, sandbox: 'allow-scripts',
-          plugin: {
-            pluginId: plugin.plugin_id,
-            version: plugin.version,
-            mountSessionId: plugin.mount_session_id,
-            catalogRelease: plugin.catalog_release,
-            capabilityVersions: plugin.capability_versions || {},
-            grantedCapabilities: Object.keys(plugin.capability_versions || {}),
-          },
-          _pluginId: plugin.plugin_id,
-        };
-        result.navItems.push({ id, title: plugin.name || plugin.plugin_id, icon: 'icon-plugin', requiresAuth: true, _pluginId: plugin.plugin_id });
+      if (!_pluginRegistryPromise) {
+        _pluginRegistryPromise = (async () => {
+          const token = localStorage.getItem('ai00_token') || '';
+          const official = await _backendUrl('/admin/plugin-registry').then(url => fetch(url))
+            .then(r => r.ok ? r.json() : null).catch(() => null);
+          const result = official || { tabDefs: {}, navItems: [] };
+          if (!result.tabDefs) result.tabDefs = {};
+          if (!result.navItems) result.navItems = [];
+          if (!token) return result;
+          const tenant = await _backendUrl('/api/v1/plugin-marketplace/registry').then(url =>
+            fetch(url, { headers: { 'X-AI00-Token': token } })
+          ).then(r => r.ok ? r.json() : null).catch(() => null);
+          for (const plugin of tenant?.data || []) {
+            if (!plugin.mount_url || !plugin.mount_session_id) continue;
+            const id = `plugin:${plugin.plugin_id}`;
+            result.tabDefs[id] = {
+              title: plugin.name || plugin.plugin_id, src: plugin.mount_url,
+              requiresAuth: true, minPerm: null, sandbox: 'allow-scripts',
+              plugin: {
+                pluginId: plugin.plugin_id,
+                version: plugin.version,
+                mountSessionId: plugin.mount_session_id,
+                catalogRelease: plugin.catalog_release,
+                capabilityVersions: plugin.capability_versions || {},
+                grantedCapabilities: Object.keys(plugin.capability_versions || {}),
+              },
+              _pluginId: plugin.plugin_id,
+            };
+            result.navItems.push({ id, title: plugin.name || plugin.plugin_id, icon: 'icon-plugin', requiresAuth: true, _pluginId: plugin.plugin_id });
+          }
+          return result;
+        })();
       }
-      return result;
+      return _pluginRegistryPromise;
     },
 
     async invokePluginCapability(capabilityId, payload, mountSessionId, majorVersion) {

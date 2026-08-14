@@ -5,6 +5,7 @@ import json
 import mimetypes
 import uuid
 from pathlib import Path
+from types import SimpleNamespace
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import Response
@@ -17,7 +18,7 @@ from backend.plugin_platform.mounts import (
     MountSessionError, MountSessionService, MountTokenError, SqlMountSessionStore, mount_url,
 )
 from backend.plugin_platform.invocation_audit import mount_invocation_audit
-from backend.plugin_platform.service import list_catalog, list_installations, list_lifecycle_events, list_releases, register_publisher, resolve_asset_object_key, review_release, revoke_release, submit_release, tenant_registry, verify_submission_signature
+from backend.plugin_platform.service import finish_upgrade as finish_plugin_upgrade, list_catalog, list_installations, list_lifecycle_events, list_releases, register_publisher, resolve_asset_object_key, review_release, revoke_release, submit_release, tenant_registry, verify_submission_signature
 from backend.plugin_platform.signing import SignatureError
 from backend.routers.deps import build_profile, get_authenticated_principal, get_current_user
 from backend.capability_v2.catalog import CatalogRelease
@@ -46,6 +47,10 @@ class PublisherRequest(BaseModel):
 class ReviewRequest(BaseModel):
     approved: bool
     note: str = Field(default="", max_length=4000)
+
+
+class UpgradeHealthRequest(BaseModel):
+    healthy: bool
 
 
 class MountInvokeRequest(BaseModel):
@@ -176,6 +181,26 @@ def installations(user: dict = Depends(get_current_user)):
 @router.get("/installations/{plugin_id}/events")
 def installation_events(plugin_id: str, limit: int = Query(default=100, ge=1, le=500), user: dict = Depends(_manager)):
     return {"success": True, "data": list_lifecycle_events(user, plugin_id, limit)}
+
+
+@router.post("/installations/{plugin_id}/upgrade-health")
+def complete_installation_upgrade(
+    plugin_id: str,
+    body: UpgradeHealthRequest,
+    user: dict = Depends(_manager),
+):
+    """Trusted manager callback after the staged release health check."""
+    context = SimpleNamespace(user_gid=str(user["gid"]), team_gid=user.get("team_id"))
+    try:
+        data = finish_plugin_upgrade(
+            {"plugin_id": plugin_id, "healthy": body.healthy}, context
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            409,
+            detail={"code": "plugin_upgrade_state_conflict", "message": str(exc)},
+        ) from exc
+    return {"success": True, "data": data}
 
 
 @router.get("/registry")

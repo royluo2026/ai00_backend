@@ -78,10 +78,10 @@ _SETTINGS_VISIBILITY = {
                        "file-store","feishu","plugin-market","user-management"],
     "team_admin":     ["appearance","shortcuts","general",
                        "file-store","feishu","plugin-market","user-management"],
-    "project_admin":  ["appearance","shortcuts","general","feishu"],
-    "rule_admin":     ["appearance","shortcuts","general","feishu"],
-    "knowledge_admin":["appearance","shortcuts","general","feishu"],
-    "member":         ["appearance","shortcuts","general","feishu"],
+    "project_admin":  ["appearance","shortcuts","general","feishu","plugin-market"],
+    "rule_admin":     ["appearance","shortcuts","general","feishu","plugin-market"],
+    "knowledge_admin":["appearance","shortcuts","general","feishu","plugin-market"],
+    "member":         ["appearance","shortcuts","general","feishu","plugin-market"],
     "external":       ["appearance"],
 }
 
@@ -315,6 +315,16 @@ def build_profile(user: dict) -> dict:
         grant_perms |= set(_GRANT_PERMISSIONS.get(g["grant_type"], set()))
 
     perms = list(base_perms | grant_perms)
+    # Capability V2 domain permissions are projected from the reviewed legacy
+    # role model while the UI permission names remain backward compatible.
+    v2_perms = set()
+    if "craft.view" in perms:
+        v2_perms.add("craft.read")
+    if "craft.write_direct" in perms:
+        v2_perms.add("craft.write")
+    if org_role != "external":
+        v2_perms.update({"digital_model.use", "simulation.use"})
+    perms = list(set(perms) | v2_perms)
 
     return {
         **{k: v for k, v in user.items() if k != "feishu_open_id"},
@@ -374,6 +384,8 @@ def build_capability_authorization_grants(
         "craft.view", "craft.write_direct", "knowledge.view", "knowledge.manage"
     }:
         data_scopes.add("confidential")
+    if "system.plugin.manage" in set(profile.get("permissions", ())):
+        data_scopes.add("restricted")
     if profile.get("org_role") == "super_admin":
         resource_scopes.add("*")
         data_scopes.add("*")

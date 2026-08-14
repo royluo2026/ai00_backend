@@ -5,7 +5,9 @@ import json
 from typing import Any
 
 from backend.capability_v2.provider_contracts import CapabilityRisk, CapabilitySpec
+from backend.capability_v2.contracts import ConsumerType
 from backend.base.provider import register_capability
+from backend.domain_ports.resource_authorization import resource_authorizers
 
 MAX_VALUE_BYTES = 256 * 1024
 MAX_LIST_LIMIT = 200
@@ -23,6 +25,26 @@ def _key(payload: dict) -> str:
     if not value or len(value) > 512 or value.startswith("/") or ".." in value.split("/"):
         raise ValueError("storage key must be a safe relative key up to 512 characters")
     return value
+
+
+def _authorize_storage_key(resource_id, identity) -> bool:
+    """Authorize only a server-derived plugin or agent namespace key."""
+    consumer = identity.consumer
+    if not identity.actor.user_id or not consumer.consumer_id:
+        return False
+    if consumer.type is ConsumerType.PLUGIN:
+        if not consumer.installation_id or not consumer.mount_session_id:
+            return False
+    elif consumer.type is ConsumerType.AGENT:
+        if not consumer.agent_run_id:
+            return False
+    else:
+        return False
+    try:
+        _key({"key": resource_id})
+    except (TypeError, ValueError):
+        return False
+    return True
 
 
 def _encoded(value: Any) -> str:
@@ -129,6 +151,7 @@ def delete_value(payload: dict, context) -> dict:
 
 
 def register_plugin_storage_capabilities(registry) -> None:
+    resource_authorizers.register("plugin-storage-key", _authorize_storage_key)
     key_schema = {"type": "object", "required": ["key"], "properties": {"key": {"type": "string"}}, "additionalProperties": False}
     list_schema = {"type": "object", "properties": {"prefix": {"type": "string"}, "limit": {"type": "integer"}}, "additionalProperties": False}
     put_schema = {"type": "object", "required": ["key", "value"], "properties": {"key": {"type": "string"}, "value": {}, "expected_version": {"type": "integer"}}, "additionalProperties": False}

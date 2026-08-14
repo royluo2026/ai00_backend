@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import inspect
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,9 @@ from .reliability import (
     InvocationLease, ReliabilityCoordinator, ReliabilityError, TransactionalCapabilityOutput,
 )
 from .reliability import IssuedApproval
+
+
+_log = logging.getLogger(__name__)
 
 
 class CapabilityGatewayService:
@@ -289,6 +293,12 @@ class CapabilityGatewayService:
             if transaction is not None:
                 self._rollback_and_close(transaction)
                 transaction = None
+            _log.exception(
+                "Capability provider failed: %s@%s request_id=%s",
+                envelope.capability_id,
+                envelope.major_version,
+                envelope.request_id,
+            )
             result = self._failed(envelope, "provider_failed", "Capability provider failed.")
         else:
             if async_operation is not None:
@@ -404,7 +414,7 @@ class CapabilityGatewayService:
         if descriptor.concurrency_policy != "expected_version":
             return None
         expected = envelope.expected_resource_version
-        if not expected:
+        if expected is None:
             return "expected_resource_version_required"
         current: Any = envelope.payload
         path = descriptor.expected_version_payload_path or ""

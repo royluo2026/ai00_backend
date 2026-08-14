@@ -52,7 +52,9 @@ OPERATION_INPUT_SCHEMA = {
         "operation": {"type": "string", "minLength": 1, "maxLength": 128},
         # Each operation validates its own bounded argument contract in the
         # Project application layer; the outer Gateway envelope stays closed.
-        "arguments": {},
+        "arguments": {
+            "description": "Operation-specific object validated by the Project application layer."
+        },
     },
 }
 
@@ -77,12 +79,16 @@ def register_reviewed_capabilities(registry: Any) -> None:
                 do_not_use_when="The operation belongs to another domain.",
                 risk=CapabilityRisk.WRITE if is_write else CapabilityRisk.READ,
                 confirmation="user" if is_write else "none",
-                permissions=("project.write",) if is_write else ("project.read",),
+                permissions=("project.manage_any",) if is_write else ("project.view",),
                 input_schema=OPERATION_INPUT_SCHEMA,
                 output_schema={
                     "type": "object",
                     "required": ["data"],
-                    "properties": {"data": {}},
+                    "properties": {
+                        "data": {
+                            "description": "Operation-specific result validated by the Project application layer."
+                        }
+                    },
                 },
                 tags=("project_management", "write" if is_write else "read"),
             ),

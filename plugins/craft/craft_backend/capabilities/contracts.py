@@ -22,13 +22,19 @@ def _object(
 def _fields(*names: str) -> dict[str, Any]:
     # Nullable legacy database columns deliberately use unconstrained leaf values;
     # the public object shape itself remains closed and versioned.
-    return {name: {} for name in names}
+    return {
+        name: {"description": "Provider-validated transport value."}
+        for name in names
+    }
 
 
 STRING = {"type": "string", "minLength": 1}
 INTEGER = {"type": "integer"}
 BOOLEAN = {"type": "boolean"}
-ARRAY = {"type": "array", "items": {}}
+ARRAY = {
+    "type": "array",
+    "items": {"description": "Provider-validated transport value."},
+}
 
 
 INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
@@ -149,12 +155,12 @@ OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "next_cursor": _NULLABLE_STRING,
     }, required=("items", "next_cursor")),
     "craft.bop.execution_structure.get": _object(
-        _fields("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
-        required=("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
+        _fields("contract_id", "contract_version", "official", "source", "published_at", "nodes", "operations", "dependencies", "conditions", "content_hash"),
+        required=("contract_id", "contract_version", "official", "source", "published_at", "nodes", "operations", "dependencies", "conditions", "content_hash"),
     ),
     "craft.bop.execution_structure.preview": _object(
-        _fields("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
-        required=("contract_id", "contract_version", "official", "source", "nodes", "operations", "dependencies", "conditions", "content_hash"),
+        _fields("contract_id", "contract_version", "official", "source", "published_at", "nodes", "operations", "dependencies", "conditions", "content_hash"),
+        required=("contract_id", "contract_version", "official", "source", "published_at", "nodes", "operations", "dependencies", "conditions", "content_hash"),
     ),
     "craft.bop.linked_parts.get": _object(_fields("version_gid", "revision", "items"), required=("version_gid", "revision", "items")),
     "craft.bop.work_package.get": _object(

@@ -3,12 +3,41 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import secrets
 from typing import Any
+
+from backend.capability_v2.contracts import ConsumerIdentity, ConsumerType
+from backend.domain_ports.resource_authorization import resource_authorizers
 
 from .lifecycle import begin_upgrade, require_transition, rollback as plan_rollback
 from .manifest import parse_manifest
 from .signing import SignatureError, canonical_release, fingerprint, sign, verify
+
+
+_PLUGIN_ID_PATTERN = re.compile(r"[a-z0-9][a-z0-9.-]{2,127}")
+
+
+def _authorize_plugin_installation(
+    plugin_id: str, identity: ConsumerIdentity
+) -> bool:
+    """Bridge a managed Web lifecycle call to its tenant-scoped installation.
+
+    The Gateway has already enforced ``system.plugin.manage`` before consulting
+    this resource authorizer.  Lifecycle services derive the target tenant from
+    the authenticated actor context, so accepting the plugin identifier here
+    cannot select another tenant's installation.
+    """
+    return bool(
+        identity.consumer.type is ConsumerType.WEB
+        and identity.actor.user_id
+        and identity.tenant.tenant_id
+        and _PLUGIN_ID_PATTERN.fullmatch(plugin_id)
+        and ".." not in plugin_id
+    )
+
+
+resource_authorizers.register("plugin-installation", _authorize_plugin_installation)
 
 
 def _json(value: Any) -> str:

@@ -12,11 +12,19 @@ from .bop_writes import register_bop_write_capabilities
 from .provider import NativeContractRegistry
 from .reviewed import register_reviewed_capabilities
 from backend.domain_ports.versioned_resources import versioned_resource_resolvers
+from backend.domain_ports.resource_authorization import resource_authorizers
 from .bop_structure import resolve_execution_plan_reference
+
+
+def _authorize_bop_version(resource_id, identity) -> bool:
+    # Craft's existing BOP list/get contract is intentionally authenticated-read;
+    # capability permissions still govern every write operation.
+    return bool(resource_id and identity.actor.user_id)
 
 
 def register_capabilities(registry: Any) -> None:
     """Register Craft-owned handlers; never mount routers or start workers."""
+    resource_authorizers.register("craft-bop-version", _authorize_bop_version)
     native = NativeContractRegistry(registry)
     register_bop_version_capabilities(native)
     register_bop_structure_capabilities(native)

@@ -19,10 +19,18 @@ def check(base_url: str) -> dict[str, object]:
         "/health": ("application/json", '"status"'),
         "/ready": ("application/json", '"status"'),
         "/": ("text/html", "AI00"),
-        "/web/settings/index.html": ("text/html", "plugin_center.js"),
+        "/web/settings/index.html": ("text/html", "plugin_center_model.js"),
+        "/web/settings/plugin_center_model.js": (
+            "text/javascript",
+            "AI00PluginCenterModel",
+        ),
+        "/web/settings/plugin_center_api.js": (
+            "text/javascript",
+            "createPluginCenterApi",
+        ),
         "/web/settings/plugin_center.js": (
             "text/javascript",
-            "/api/v1/plugin-marketplace/catalog",
+            "Server-backed Capability V2 plugin center controller",
         ),
     }
     results: list[dict[str, object]] = []

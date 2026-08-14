@@ -244,7 +244,8 @@ def create_profile(payload: dict[str, Any], context: CapabilityContext) -> Capab
     if solver_coordinate not in _ALLOWED_SOLVERS:
         raise CapabilityBusinessError("solver_not_allowed", "Solver and version are not present in the Simulation allowlist")
     settings = sorted((dict(item) for item in payload["settings"]), key=lambda item: item["name"])
-    content_hash, settings_json = _canonical({"solver": payload["solver"], "solver_version": payload["solver_version"], "settings": settings})
+    content_hash, _ = _canonical({"solver": payload["solver"], "solver_version": payload["solver_version"], "settings": settings})
+    settings_json = json.dumps(settings, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     row = {"profile_id": "spf_" + secrets.token_hex(16), "version": 1, "name": str(payload["name"]).strip(), "solver": str(payload["solver"]), "solver_version": str(payload["solver_version"]), "content_hash": content_hash, "settings": settings, "settings_json": settings_json, "owner_gid": context.user_gid, "team_gid": context.team_gid}
     repository.create_profile(row)
     data = _profile(row)

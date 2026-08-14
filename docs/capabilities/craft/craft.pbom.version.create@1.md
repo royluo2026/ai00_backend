@@ -8,7 +8,7 @@ craft.pbom.version.create
 - 不适用：The subject is BOP or GBOP.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
+- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -60,29 +60,19 @@ craft.pbom.version.create
   "additionalProperties": false,
   "properties": {
     "knowledge_revision_ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "ontology_release_ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "project_ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "revision_commit_ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "version_tag": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     }
   },
   "required": [
@@ -98,11 +88,11 @@ craft.pbom.version.create
 ```json
 {
   "capability_id": "craft.pbom.version.create",
-  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
+  "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
   "major_version": 1,
   "payload": {
-    "project_ref": {},
-    "version_tag": {}
+    "project_ref": "example",
+    "version_tag": "example"
   }
 }
 ```
@@ -116,29 +106,19 @@ craft.pbom.version.create
   "additionalProperties": false,
   "properties": {
     "gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "project_ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "revision": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "status": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "version_tag": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     }
   },
   "required": [

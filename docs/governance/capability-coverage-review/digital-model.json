@@ -3,9 +3,9 @@
   "domain": "Digital Model",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:0181bd94bf35d3627f344727490f22045ade8ed95e657ff8f0c0f39f5701815a",
-    "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
-    "catalog_sha256": "sha256:d5e111c90046f756d2a908ca040eef4c9fc9a940451a8846808df378cc6b6acb"
+    "registry_sha256": "sha256:b32333613ddfb3072556390a57ef3a45a559f7d81a95180e1e4a5d1bc66d27c0",
+    "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
+    "catalog_sha256": "sha256:961d45686def2178ec15fbb8fa6a837ab298137e105c573e189246cfe925ade9"
   },
   "unreviewed_functions": {},
   "excluded_functions": {},

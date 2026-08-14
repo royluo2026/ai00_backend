@@ -107,6 +107,14 @@ def test_provider_publishes_native_stable_plugin_agent_and_mcp_contracts():
     assert retryable_errors == {"source_resolver_unavailable", "simulation_result_not_ready"}
 
 
+@pytest.mark.parametrize("value", [1, 1.5, "fixed", True])
+def test_parameter_contract_accepts_json_schema_union_types(value):
+    validate_payload(
+        INPUT_SCHEMAS["simulation.parameter_set.create"],
+        {"name": "Acceptance", "parameters": [{"name": "load", "value": value}]},
+    )
+
+
 def test_environment_creation_rejects_caller_plan_json_paths_and_unpinned_refs():
     valid = {"name": "Line balance", **_refs()}
     validate_payload(INPUT_SCHEMAS["simulation.environment.create"], valid)
@@ -269,6 +277,8 @@ def test_parameter_profile_and_result_capabilities_preserve_versions_and_artifac
         "settings": [{"name": "precision", "value": "high"}],
     }, context).data
     assert profile["simulation_profile_ref"]["version"] == 1
+    assert profile["settings"] == [{"name": "precision", "value": "high"}]
+    assert json.loads(repository.profile["settings_json"]) == profile["settings"]
     assert simulation_capabilities.get_profile({
         "simulation_profile_ref": profile["simulation_profile_ref"],
     }, context).data == profile

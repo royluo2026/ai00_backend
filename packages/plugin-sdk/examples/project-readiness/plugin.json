@@ -1,0 +1,46 @@
+{
+  "schema_version": "2.0",
+  "plugin_id": "devteam.ai00.project-readiness",
+  "publisher_id": "devteam",
+  "name": "跨域项目体检",
+  "description": "通过受控能力检查项目、工艺、数模与仿真输入的一致性，并保存最近 20 次体检摘要。",
+  "version": "1.0.0",
+  "compatibility": {
+    "platform_api": ">=1.0.0 <2.0.0",
+    "web_sdk": ">=0.1.0 <1.0.0"
+  },
+  "runtimes": {
+    "web": {
+      "entry": "index.html",
+      "sandbox": "allow-scripts"
+    }
+  },
+  "permissions": [
+    "base.project.search",
+    "craft.bop.version.list",
+    "craft.bop.execution_structure.get",
+    "digital_model.model.search",
+    "digital_model.version.get",
+    "simulation.run.search",
+    "plugin.storage.get",
+    "plugin.storage.put"
+  ],
+  "capabilities": {
+    "required": [
+      { "id": "base.project.search", "major": 1 },
+      { "id": "craft.bop.version.list", "major": 1 },
+      { "id": "craft.bop.execution_structure.get", "major": 1 },
+      { "id": "digital_model.model.search", "major": 1 },
+      { "id": "digital_model.version.get", "major": 1 },
+      { "id": "simulation.run.search", "major": 1 },
+      { "id": "plugin.storage.get", "major": 1 },
+      { "id": "plugin.storage.put", "major": 1 }
+    ],
+    "optional": []
+  },
+  "data": {
+    "stores_personal_data": false,
+    "retention": "while-installed",
+    "uninstall": "delete"
+  }
+}

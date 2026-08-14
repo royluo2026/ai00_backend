@@ -8,7 +8,7 @@ Compute a semantic stable-identity release diff.
 - 不适用：Raw JSON text differences are expected.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
+- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -79,7 +79,7 @@ Compute a semantic stable-identity release diff.
 ```json
 {
   "capability_id": "ontology.release.diff",
-  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
+  "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
   "major_version": 1,
   "payload": {
     "from_release_gid": "example",

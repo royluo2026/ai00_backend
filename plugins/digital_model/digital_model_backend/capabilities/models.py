@@ -151,6 +151,29 @@ repository = DigitalModelRepository()
 adapter = DigitalModelRevisionAdapter()
 
 
+def authorize_resource(resource_id: str, identity, *, version: bool = False) -> bool:
+    """Apply the same owner/team visibility predicate as model handlers."""
+    user_id = identity.actor.user_id
+    team_id = identity.tenant.tenant_id
+    if not resource_id or not user_id:
+        return False
+    if version:
+        sql = (
+            "SELECT 1 AS allowed FROM workmanship_model_versions v "
+            "JOIN workmanship_model_models m ON m.model_id=v.model_id "
+            "WHERE v.version_id=%s AND (m.owner_gid=%s OR (%s IS NOT NULL AND m.team_gid=%s)) LIMIT 1"
+        )
+    else:
+        sql = (
+            "SELECT 1 AS allowed FROM workmanship_model_models "
+            "WHERE model_id=%s AND (owner_gid=%s OR (%s IS NOT NULL AND team_gid=%s)) LIMIT 1"
+        )
+    with get_digital_model_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, (resource_id, user_id, team_id, team_id))
+            return bool(cur.fetchone())
+
+
 def _model(row: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "model_id": str(row["model_id"]), "object_ref": f"model:{row['model_id']}",

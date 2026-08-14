@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "domains": 11,
-  "stable_functions": 844,
+  "stable_functions": 845,
   "resolutions": {
     "existing_capability": 743,
     "new_capability": 0,
-    "excluded": 101,
+    "excluded": 102,
     "unreviewed": 0
   },
   "candidate_capabilities": 0,
@@ -20,7 +20,7 @@
     "Base Platform": {
       "existing_capability": 67,
       "new_capability": 0,
-      "excluded": 78,
+      "excluded": 79,
       "unreviewed": 0
     },
     "Craft": {

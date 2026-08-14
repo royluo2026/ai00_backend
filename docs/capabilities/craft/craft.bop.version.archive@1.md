@@ -8,7 +8,7 @@ Archive a BOP version without deleting its snapshot or references.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
+- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -81,7 +81,7 @@ Archive a BOP version without deleting its snapshot or references.
 ```json
 {
   "capability_id": "craft.bop.version.archive",
-  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
+  "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,
@@ -99,29 +99,19 @@ Archive a BOP version without deleting its snapshot or references.
   "additionalProperties": false,
   "properties": {
     "after_hash": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "before_hash": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "revision": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "status": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "version_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     }
   },
   "required": [

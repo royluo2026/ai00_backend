@@ -125,6 +125,7 @@
 | Base Platform | `rest:POST:/api/file-store/test` | excluded | — |
 | Base Platform | `rest:POST:/api/uploads` | excluded | — |
 | Base Platform | `rest:POST:/api/uploads/ois/resolve` | excluded | — |
+| Base Platform | `rest:POST:/api/v1/plugin-marketplace/installations/{plugin_id}/upgrade-health` | excluded | — |
 | Base Platform | `rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:confirm` | excluded | — |
 | Base Platform | `rest:POST:/api/v1/plugin-marketplace/mounts/{mount_session_id}/capabilities/{capability_id}:invoke` | excluded | — |
 | Base Platform | `rest:POST:/api/v1/plugin-marketplace/usage/months/{month}/close` | excluded | — |

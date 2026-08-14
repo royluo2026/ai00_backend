@@ -8,7 +8,7 @@ Parse and hash a BOP import document without mutating Craft state.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
+- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -69,9 +69,7 @@ Parse and hash a BOP import document without mutating Craft state.
         },
         "entries": {
           "items": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "description": "Provider-validated transport value."
           },
           "type": "array"
         },
@@ -96,7 +94,7 @@ Parse and hash a BOP import document without mutating Craft state.
 ```json
 {
   "capability_id": "craft.bop.import.preview",
-  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
+  "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
   "major_version": 1,
   "payload": {
     "document": {}
@@ -113,24 +111,16 @@ Parse and hash a BOP import document without mutating Craft state.
   "additionalProperties": false,
   "properties": {
     "content_hash": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "entry_count": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "expires_at": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "import_preview_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     }
   },
   "required": [

@@ -8,7 +8,7 @@ craft.bop.validation.get
 - 不适用：Rules are unreviewed or inputs are mutable.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
+- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -60,39 +60,25 @@ craft.bop.validation.get
   "additionalProperties": false,
   "properties": {
     "evidence": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "item_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "limit": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "lineage_refs": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "query": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "release_ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     }
   },
   "type": "object"
@@ -104,7 +90,7 @@ craft.bop.validation.get
 ```json
 {
   "capability_id": "craft.bop.validation.get",
-  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
+  "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
   "major_version": 1,
   "payload": {}
 }
@@ -119,49 +105,31 @@ craft.bop.validation.get
   "additionalProperties": false,
   "properties": {
     "active_release_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "capability_id": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "evidence": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "item_gid": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "items": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "lineage_refs": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "release_ref": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     },
     "status": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Provider-validated transport value."
     }
   },
   "required": [

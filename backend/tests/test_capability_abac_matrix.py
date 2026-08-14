@@ -172,3 +172,21 @@ def test_legacy_role_bridge_derives_exact_resource_scopes_without_global_widenin
         deps.build_capability_authorization_grants(
             {"gid": "user_1"}, "tenant_1", "plugin"
         )
+
+
+def test_team_plugin_manager_receives_restricted_data_scope_without_global_scope(monkeypatch):
+    from backend.routers import deps
+
+    monkeypatch.setattr(deps, "build_profile", lambda _user: {
+        "permissions": ["system.plugin.manage"],
+        "org_role": "member",
+        "grants": [{"grant_type": "team_admin", "scope_gid": "team_1"}],
+    })
+    grants = deps.build_capability_authorization_grants(
+        {"gid": "user_1"}, "team_1"
+    )
+
+    assert grants.resource_scopes == ("team:team_1", "tenant:team_1")
+    assert grants.data_scopes == ("internal", "restricted")
+    assert "*" not in grants.resource_scopes
+    assert "*" not in grants.data_scopes

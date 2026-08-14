@@ -44,7 +44,9 @@ def descriptor_for(spec: Any) -> CapabilityDescriptorV2:
             "agent_output_schema": descriptor.output_schema,
             "operation_policy": "optional" if is_write else "none",
             "idempotency_policy": "required" if is_write else "none",
-            "consistency_policy": "strong",
+            # The domain commits its own OceanBase transaction and cannot
+            # enlist the platform outcome store in that same connection.
+            "consistency_policy": "external" if is_write else "strong",
             "evidence_policy": "optional",
             "audit_policy": "standard",
             "domain_errors": DOMAIN_ERRORS,

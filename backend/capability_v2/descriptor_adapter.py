@@ -11,13 +11,18 @@ from .contracts import AutomationLevel, CapabilityDescriptorV2, ExecutionMode, E
 _OWNER_ALIASES = {"plugin": "base", "runtime": "device", "vismockup": "device"}
 
 
-def _closed_schema(value: Mapping[str, Any] | None) -> dict[str, Any]:
+def _closed_schema(
+    value: Mapping[str, Any] | None,
+) -> dict[str, Any]:
     schema = dict(value or {})
     if not schema:
         schema = {"type": "object", "properties": {}}
     properties = schema.get("properties")
     if isinstance(properties, Mapping):
-        schema["properties"] = {name: _closed_schema(child) if isinstance(child, Mapping) else child for name, child in properties.items()}
+        schema["properties"] = {
+            name: _closed_schema(child) if isinstance(child, Mapping) else child
+            for name, child in properties.items()
+        }
     items = schema.get("items")
     if isinstance(items, Mapping):
         schema["items"] = _closed_schema(items)

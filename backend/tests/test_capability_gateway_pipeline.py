@@ -287,11 +287,17 @@ def test_gateway_enforces_expected_resource_version_against_declared_payload_pat
         "request_id": "request_3", "idempotency_key": "idem_3",
         "expected_resource_version": "rev_2",
     })))
+    initial = asyncio.run(gateway.invoke(base.model_copy(update={
+        "request_id": "request_4", "idempotency_key": "idem_4",
+        "payload": {"base_revision_gid": ""},
+        "expected_resource_version": "",
+    })))
 
     assert missing.error.code == "expected_resource_version_required"
     assert mismatch.error.code == "expected_resource_version_mismatch"
     assert matched.ok is True
-    assert dispatched == [True]
+    assert initial.ok is True
+    assert dispatched == [True, True]
 
 
 @pytest.mark.parametrize("error,code", [

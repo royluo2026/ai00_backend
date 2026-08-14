@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>跨域项目体检</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div><p class="eyebrow">Capability V2 · Cross-domain readiness</p><h1>跨域项目体检</h1><p>核对项目、BOP、数模快照和仿真输入是否来自同一组受控版本。</p></div>
+    <div id="connection" class="connection">连接平台中…</div>
+  </header>
+  <main>
+    <section class="search-panel">
+      <label for="project-query">项目名称或编码</label>
+      <div class="search-row"><input id="project-query" placeholder="输入至少一个字符"><button id="project-search">搜索项目</button></div>
+      <div id="project-results" class="project-results"></div>
+    </section>
+
+    <section id="selected-project" class="selected" hidden>
+      <div><span>当前项目</span><strong id="selected-title"></strong><small id="selected-ref"></small></div>
+      <button id="run-check">开始体检</button>
+    </section>
+
+    <section id="report" hidden>
+      <div id="overall" class="overall"></div>
+      <div id="domains" class="domain-grid"></div>
+      <div class="evidence"><h2>关联证据</h2><dl id="evidence-list"></dl></div>
+      <div class="evidence"><h2>问题建议</h2><ul id="recommendations"></ul></div>
+    </section>
+
+    <section class="history"><div class="section-head"><h2>最近体检</h2><button id="history-refresh" class="secondary">刷新</button></div><div id="history-list" class="history-list"><div class="empty">暂无记录</div></div></section>
+  </main>
+  <div id="toast" class="toast" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

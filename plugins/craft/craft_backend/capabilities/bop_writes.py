@@ -128,16 +128,18 @@ class MysqlBopWriteRepository(BopWriteRepository):
         for entry in version.get("entries", []):
             cur.execute(
                 "INSERT INTO workmanship_bop_bop_entries "
-                "(gid,version_gid,parent_gid,node_type,sort_order,title,vpps,vpps_desc,parent_bop_title,meta,is_deleted,deleted_at) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,0,NULL) "
+                "(gid,version_gid,parent_gid,node_type,sort_order,title,vpps,vpps_desc,parent_bop_title,child_vpps,meta,is_deleted,deleted_at) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,0,NULL) "
                 "ON DUPLICATE KEY UPDATE parent_gid=VALUES(parent_gid),node_type=VALUES(node_type),"
                 "sort_order=VALUES(sort_order),title=VALUES(title),vpps=VALUES(vpps),"
                 "vpps_desc=VALUES(vpps_desc),parent_bop_title=VALUES(parent_bop_title),"
+                "child_vpps=VALUES(child_vpps),"
                 "meta=VALUES(meta),is_deleted=0,deleted_at=NULL,updated_at=NOW(6)",
                 (
                     entry["gid"], version_gid, entry.get("parent_gid"), entry["node_type"],
                     entry.get("sort_order", 0), entry.get("title"), entry.get("vpps"),
                     entry.get("vpps_desc"), entry.get("parent_bop_title"),
+                    json.dumps(entry.get("child_vpps") or [], ensure_ascii=False),
                     json.dumps(entry.get("meta") or {}, ensure_ascii=False),
                 ),
             )

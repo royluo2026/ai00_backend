@@ -270,6 +270,9 @@ def test_mysql_write_repository_commits_revision_entries_and_links_atomically():
     assert connection.rollbacks == 0
     assert any("revision=revision+1" in sql and "revision=%s" in sql for sql in statements)
     assert any("INSERT INTO workmanship_bop_bop_entries" in sql for sql in statements)
+    entry_call = next(call for call in cursor.calls if "INSERT INTO workmanship_bop_bop_entries" in call[0])
+    assert "child_vpps" in entry_call[0]
+    assert "[]" in entry_call[1]
     assert any("INSERT INTO workmanship_bop_bop_entry_links" in sql for sql in statements)
 
 

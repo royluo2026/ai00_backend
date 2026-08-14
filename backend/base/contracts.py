@@ -12,12 +12,13 @@ def _object(properties: dict, required: tuple[str, ...] = ()) -> dict:
 STRING = {"type": "string"}
 INTEGER = {"type": "integer"}
 BOOLEAN = {"type": "boolean"}
-ANY_ARRAY = {"type": "array", "items": {}}
+ANY_JSON = {"type": ["object", "array", "string", "number", "boolean", "null"]}
+ANY_ARRAY = {"type": "array", "items": ANY_JSON}
 REVIEWED_INPUT = _object(
-    {"operation": STRING, "resource": {}, "expected_version": INTEGER},
+    {"operation": STRING, "resource": ANY_JSON, "expected_version": INTEGER},
     ("operation",),
 )
-REVIEWED_OUTPUT = _object({"result": {}}, ("result",))
+REVIEWED_OUTPUT = _object({"result": ANY_JSON}, ("result",))
 APPROVAL_ITEM = _object(
     {
         "approval_id": STRING,
@@ -42,15 +43,15 @@ APPROVAL_ITEM = _object(
 )
 NOTIFICATION_ITEM = _object(
     {
-        "notification_id": STRING, "subject_ref": STRING, "payload": {},
+        "notification_id": STRING, "subject_ref": STRING, "payload": ANY_JSON,
         "read_at": {"anyOf": [STRING, {"type": "null"}]}, "created_at": STRING,
     },
     ("notification_id", "subject_ref", "payload", "read_at", "created_at"),
 )
-PREFERENCES = _object({"version": INTEGER, "preferences": {}}, ("version", "preferences"))
+PREFERENCES = _object({"version": INTEGER, "preferences": ANY_JSON}, ("version", "preferences"))
 WORKSPACE_TEMPLATE = _object(
     {
-        "template_id": STRING, "version": INTEGER, "template": {},
+        "template_id": STRING, "version": INTEGER, "template": ANY_JSON,
         "publisher_gid": STRING, "published_at": STRING,
     },
     ("template_id", "version", "template", "publisher_gid", "published_at"),
@@ -92,10 +93,10 @@ PLUGIN_UPGRADE_STATE = _object(
 
 STORAGE_KEY = _object({"key": STRING}, ("key",))
 STORAGE_LIST = _object({"prefix": STRING, "limit": INTEGER})
-STORAGE_MUTATION = _object({"key": STRING, "value": {}, "expected_version": INTEGER}, ("key", "value"))
+STORAGE_MUTATION = _object({"key": STRING, "value": ANY_JSON, "expected_version": INTEGER}, ("key", "value"))
 STORAGE_DELETE = _object({"key": STRING, "expected_version": INTEGER}, ("key",))
 STORAGE_VALUE = _object(
-    {"key": STRING, "value": {}, "version": INTEGER, "updated_at": STRING},
+    {"key": STRING, "value": ANY_JSON, "version": INTEGER, "updated_at": STRING},
     ("key", "value", "version", "updated_at"),
 )
 STORAGE_ITEM = _object({"key": STRING, "version": INTEGER, "updated_at": STRING}, ("key", "version", "updated_at"))
@@ -106,7 +107,7 @@ STABLE_REF = _object({
 }, ("object_ref", "owner"))
 
 INPUT_SCHEMAS = {
-    "system.echo": _object({"echo": {}}),
+    "system.echo": _object({"echo": ANY_JSON}),
     "plugin.install": PLUGIN_RELEASE,
     "plugin.enable": PLUGIN_ID,
     "plugin.disable": PLUGIN_ID,
@@ -171,20 +172,20 @@ INPUT_SCHEMAS = {
     ),
     "base.notification.preference.get": _object({}),
     "base.notification.preference.update": _object(
-        {"expected_version": INTEGER, "preferences": {}},
+        {"expected_version": INTEGER, "preferences": ANY_JSON},
         ("expected_version", "preferences"),
     ),
     "base.workspace.template.read": _object(
         {"template_id": STRING, "version": INTEGER}, ("template_id",)
     ),
     "base.workspace.template.publish": _object(
-        {"template_id": STRING, "expected_version": INTEGER, "template": {}},
+        {"template_id": STRING, "expected_version": INTEGER, "template": ANY_JSON},
         ("template_id", "expected_version", "template"),
     ),
 }
 
 OUTPUT_SCHEMAS = {
-    "system.echo": _object({"echo": {}}),
+    "system.echo": _object({"echo": ANY_JSON}),
     **{capability_id: PLUGIN_STATE for capability_id in (
         "plugin.install", "plugin.enable", "plugin.disable", "plugin.upgrade.finish",
         "plugin.rollback", "plugin.revoke", "plugin.uninstall",
@@ -207,7 +208,7 @@ OUTPUT_SCHEMAS = {
             {"type": "null"},
             _object({
                 "worker_name": STRING, "worker_id": STRING, "status": STRING,
-                "details": {}, "heartbeat_at": STRING, "started_at": STRING,
+                "details": ANY_JSON, "heartbeat_at": STRING, "started_at": STRING,
             }, ("worker_name", "worker_id", "status", "heartbeat_at", "started_at")),
         ]},
         "outbox_counts": _object({

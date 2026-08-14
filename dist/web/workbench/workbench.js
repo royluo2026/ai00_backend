@@ -5289,6 +5289,25 @@
 
   function _getAppItem(id) { return _ALL_APP_ITEMS.find(i => i.id === id); }
 
+  async function _loadRegistryAppItems() {
+    try {
+      const registry = await window.parent?.electronAPI?.getPluginRegistry?.();
+      const items = window.PluginRegistryModel?.appItems(registry) || [];
+      let added = 0;
+      for (const item of items) {
+        if (_ALL_APP_ITEMS.some(existing => existing.id === item.id)) continue;
+        _ALL_APP_ITEMS.push(item);
+        added++;
+      }
+      if (added) {
+        _appState = _loadAppState();
+        _renderAppPanel();
+      }
+    } catch (error) {
+      console.warn('[Workbench] plugin registry App items unavailable:', error);
+    }
+  }
+
   function _appItemAllowed(item) {
     const authMode = window.parent?._authMode || window._authMode || 'none';
     if (authMode !== 'feishu' && item.requiresAuth) return false;
@@ -5768,6 +5787,7 @@
 
     // App 面板
     _renderAppPanel();
+    void _loadRegistryAppItems();
 
     // AI 球
     _initAiBall();

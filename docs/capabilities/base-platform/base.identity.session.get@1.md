@@ -8,7 +8,7 @@ Execute the reviewed base.identity.session.get Base outcome.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
+- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -66,9 +66,14 @@ Execute the reviewed base.identity.session.get Base outcome.
       "type": "string"
     },
     "resource": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "object",
+        "array",
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
     }
   },
   "required": [
@@ -83,7 +88,7 @@ Execute the reviewed base.identity.session.get Base outcome.
 ```json
 {
   "capability_id": "base.identity.session.get",
-  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
+  "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
   "major_version": 1,
   "payload": {
     "operation": "example"
@@ -100,9 +105,14 @@ Execute the reviewed base.identity.session.get Base outcome.
   "additionalProperties": false,
   "properties": {
     "result": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "type": [
+        "object",
+        "array",
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
     }
   },
   "required": [

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>系统设置</title>
   
-  <link rel="stylesheet" href="/assets/index-41a913f3.css">
+  <link rel="stylesheet" href="/assets/index-d67a20f2.css">
 </head>
 <body>
   <script src="/web/core/web_compat.js"></script>
@@ -466,8 +466,22 @@
               <strong id="pm-month-label">月度使用情况</strong>
               <div class="pm-hint">核心指标：本月、上月、月增量、成功率</div>
             </div>
-            <button class="btn-secondary" id="pm-btn-refresh">刷新</button>
+            <div class="pm-toolbar-actions">
+              <input id="pm-search" class="setting-input pm-search" type="search" placeholder="搜索名称或插件 ID" autocomplete="off">
+              <select id="pm-state-filter" class="setting-select pm-state-filter" aria-label="安装状态筛选">
+                <option value="">全部状态</option>
+                <option value="available">未安装</option>
+                <option value="disabled">已停用</option>
+                <option value="enabled">已启用</option>
+                <option value="upgrading">更新中</option>
+                <option value="failed">失败</option>
+                <option value="rolled_back">已回滚</option>
+                <option value="revoked">已撤销</option>
+              </select>
+              <button class="btn-secondary" id="pm-btn-refresh">刷新</button>
+            </div>
           </div>
+          <div id="pm-load-error" class="pm-load-error" hidden></div>
           <div id="pm-available-list" class="pm-list"><div class="empty-state">加载中...</div></div>
         </div>
 
@@ -492,6 +506,22 @@
           </div>
         </div>
       </div>
+
+      <aside id="pm-detail-drawer" class="pm-drawer" aria-hidden="true">
+        <div class="pm-drawer-head"><strong id="pm-detail-title">插件详情</strong><button id="pm-detail-close" class="pm-icon-btn" aria-label="关闭详情">×</button></div>
+        <div id="pm-detail-body" class="pm-drawer-body"></div>
+      </aside>
+      <div id="pm-drawer-mask" class="pm-drawer-mask" hidden></div>
+
+      <div id="pm-dialog" class="pm-dialog-mask" hidden>
+        <div class="pm-dialog" role="dialog" aria-modal="true" aria-labelledby="pm-dialog-title">
+          <strong id="pm-dialog-title"></strong>
+          <div id="pm-dialog-message" class="pm-dialog-message"></div>
+          <textarea id="pm-dialog-input" class="setting-input pm-dialog-input" rows="3" hidden></textarea>
+          <div class="pm-dialog-actions"><button id="pm-dialog-cancel" class="btn-secondary">取消</button><button id="pm-dialog-confirm" class="btn-primary">确认</button></div>
+        </div>
+      </div>
+      <div id="pm-toast-region" class="pm-toast-region" aria-live="polite"></div>
       <!-- 关注清理 -->
       <div class="settings-panel" id="panel-follows-cleanup">
         <div class="panel-title">关注清理</div>
@@ -759,6 +789,8 @@
 
   <script src="/web/event_bus.js"></script>
   <script src="settings.js?v=9"></script>
-  <script src="plugin_center.js?v=1"></script>
+  <script src="plugin_center_model.js?v=1"></script>
+  <script src="plugin_center_api.js?v=1"></script>
+  <script src="plugin_center.js?v=2"></script>
 </body>
 </html>

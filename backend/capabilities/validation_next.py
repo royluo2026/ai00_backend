@@ -73,7 +73,9 @@ def _matching_branches(branches: list[dict[str, Any]], payload: Any, label: str)
     return matches
 
 
-def _is_type(value: Any, expected: str) -> bool:
+def _is_type(value: Any, expected: str | list[str]) -> bool:
+    if isinstance(expected, list):
+        return any(_is_type(value, item) for item in expected)
     return {
         "object": lambda: isinstance(value, dict),
         "array": lambda: isinstance(value, list),
@@ -85,6 +87,8 @@ def _is_type(value: Any, expected: str) -> bool:
     }.get(expected, lambda: False)()
 
 
-def _type_label(expected: str) -> str:
+def _type_label(expected: str | list[str]) -> str:
+    if isinstance(expected, list):
+        return "one of " + ", ".join(expected)
     article = "an" if expected in {"object", "array", "integer"} else "a"
     return f"{article} {expected}"

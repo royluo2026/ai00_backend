@@ -8,7 +8,7 @@ Execute the reviewed project.issue.change.apply project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_96d6bb1a9160216038ee602417611b71`
+- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -28,7 +28,7 @@ Execute the reviewed project.issue.change.apply project outcome.
 
 ## 授权与数据边界
 
-- 授权策略：`project_management.v2:project.write`
+- 授权策略：`project_management.v2:project.manage_any`
 - 自动化等级：`A1`
 - 数据分类：`confidential`
 - Delegation：`scoped`
@@ -46,7 +46,7 @@ Execute the reviewed project.issue.change.apply project outcome.
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
+- 一致性：`external`
 - Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
@@ -60,9 +60,7 @@ Execute the reviewed project.issue.change.apply project outcome.
   "additionalProperties": false,
   "properties": {
     "arguments": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Operation-specific object validated by the Project application layer."
     },
     "operation": {
       "maxLength": 128,
@@ -83,10 +81,10 @@ Execute the reviewed project.issue.change.apply project outcome.
 ```json
 {
   "capability_id": "project.issue.change.apply",
-  "catalog_release": "rel_96d6bb1a9160216038ee602417611b71",
+  "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
   "major_version": 1,
   "payload": {
-    "arguments": {},
+    "arguments": "example",
     "operation": "example"
   }
 }
@@ -101,9 +99,7 @@ Execute the reviewed project.issue.change.apply project outcome.
   "additionalProperties": false,
   "properties": {
     "data": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
+      "description": "Operation-specific result validated by the Project application layer."
     }
   },
   "required": [
