@@ -1,265 +1,265 @@
-标准分类	复核状态
-service_facade	needs_review
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_facade	needs_review
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
-service_operation	provisional
+标准分类	复核状态	单一业务效果
+service_facade	needs_review	按指定操作变更批注。
+service_facade	needs_review	按指定读取方式取得批注的信息。
+service_operation	provisional	取消指定审批申请。
+service_operation	provisional	创建新的审批申请。
+service_operation	provisional	记录对指定审批申请作出的审批决定。
+service_operation	provisional	取得指定审批申请的信息。
+service_operation	provisional	按条件检索审批申请。
+service_facade	needs_review	按指定操作变更授权记录。
+service_facade	needs_review	按指定读取方式取得授权记录的信息。
+service_facade	needs_review	按指定操作变更导出模板。
+service_facade	needs_review	按指定读取方式取得导出模板的信息。
+service_facade	needs_review	同步身份目录中的主体和组织关系。
+service_facade	needs_review	为指定身份主体分配角色。
+service_facade	needs_review	取得当前登录会话及身份状态。
+service_operation	provisional	取得指定通知偏好的信息。
+service_operation	provisional	更新指定通知偏好。
+service_operation	provisional	设置指定通知的已读状态。
+service_operation	provisional	按条件检索通知。
+service_facade	needs_review	登记新的插件发布者。
+service_facade	needs_review	按指定操作变更插件发布版本。
+service_facade	needs_review	按条件检索插件市场中的发布版本。
+service_facade	needs_review	按指定操作变更保存视图。
+service_facade	needs_review	按指定读取方式取得保存视图的信息。
+service_facade	needs_review	按指定操作变更团队。
+service_facade	needs_review	按指定操作变更团队成员关系。
+service_facade	needs_review	按指定读取方式取得团队的信息。
+service_operation	provisional	发布指定工作区模板供后续实例化。
+service_operation	provisional	按指定读取方式取得工作区模板的信息。
+service_operation	provisional	按条件检索可授权的身份主体。
+service_operation	provisional	将指定已安装插件置为停用状态。
+service_operation	provisional	将指定已安装插件置为启用状态。
+service_operation	provisional	安装指定插件发布版本。
+service_operation	provisional	立即撤销指定插件的已安装状态。
+service_operation	provisional	将指定已安装插件回退到历史版本。
+service_operation	provisional	删除指定插件隔离存储项。
+service_operation	provisional	取得指定插件隔离存储项的信息。
+service_operation	provisional	列出当前范围内的插件隔离存储项。
+service_operation	provisional	写入指定插件隔离存储项及其值。
+service_operation	provisional	卸载指定插件及其安装状态。
+service_operation	provisional	将指定已安装插件升级到目标版本。
+service_operation	provisional	取得指定命名视图范围内的语义上下文。
+service_operation	provisional	按条件检索系统活动。
+service_operation	provisional	返回拟议变更对现有对象和消费者的影响预览。
+service_operation	provisional	取消指定系统任务。
+service_operation	provisional	取得指定系统任务的信息。
+service_operation	provisional	取得指定业务对象的可追溯关系和断点信息。
+service_operation	provisional	按条件检索跨系统资源。
+service_operation	provisional	按条件检索项目。
+service_facade	needs_review	汇总指定项目范围内的活动信息。
+service_facade	needs_review	按指定操作变更项目审批。
+service_facade	needs_review	按指定读取方式取得项目审批的信息。
+service_facade	needs_review	按指定操作变更项目多维表格绑定。
+service_facade	needs_review	按指定读取方式取得项目多维表格绑定的信息。
+service_facade	needs_review	按指定读取方式取得项目变更记录。
+service_facade	needs_review	按指定操作变更项目协作关系。
+service_facade	needs_review	按指定读取方式取得项目协作关系的信息。
+service_facade	needs_review	按指定读取方式取得项目工艺范围的信息。
+service_facade	needs_review	按指定操作变更项目关注关系。
+service_facade	needs_review	按指定读取方式取得项目关注关系的信息。
+service_facade	needs_review	按指定操作变更项目问题。
+service_facade	needs_review	按指定读取方式取得项目问题的信息。
+service_facade	needs_review	按指定操作变更项目清单。
+service_facade	needs_review	按指定读取方式取得项目清单的信息。
+service_facade	needs_review	按指定操作变更项目成员。
+service_facade	needs_review	按指定读取方式取得项目成员的信息。
+service_facade	needs_review	按指定操作变更项目通知。
+service_facade	needs_review	按指定读取方式取得项目通知的信息。
+service_facade	needs_review	按指定操作变更项目权限申请。
+service_facade	needs_review	按指定读取方式取得项目权限申请的信息。
+service_facade	needs_review	按指定操作变更项目。
+service_facade	needs_review	按指定读取方式取得项目的信息。
+service_facade	needs_review	按指定操作变更项目共享设置。
+service_facade	needs_review	按指定读取方式取得项目共享设置的信息。
+service_facade	needs_review	按指定操作变更项目任务模板。
+service_facade	needs_review	按指定读取方式取得项目任务模板的信息。
+service_facade	needs_review	按指定操作变更项目任务。
+service_facade	needs_review	按指定读取方式取得项目任务的信息。
+service_facade	needs_review	按指定操作变更项目工作台。
+service_facade	needs_review	按指定读取方式取得项目工作台的信息。
+service_operation	provisional	取得指定设备资产的信息。
+service_operation	provisional	将指定设备资产维护任务置为已完成状态。
+service_operation	provisional	将指定设备资产维护任务置为执行中状态。
+service_operation	provisional	登记新的设备资产。
+service_operation	provisional	将指定设备资产置为报废状态。
+service_operation	provisional	按条件检索设备资产。
+service_operation	provisional	更新指定设备资产。
+service_operation	provisional	创建新的工厂资源目录。
+service_operation	provisional	将指定工厂资源目录置为停用状态。
+service_operation	provisional	取得指定工厂资源目录的信息。
+service_operation	provisional	发布指定工厂资源目录。
+service_operation	provisional	基于指定工厂资源目录形成新的修订。
+service_operation	provisional	按条件检索工厂资源目录。
+service_operation	provisional	按指定读取方式取得工厂资源的信息。
+service_operation	provisional	将指定工厂结构置为归档状态。
+service_operation	provisional	创建新的工厂结构。
+service_operation	provisional	取得指定工厂结构的信息。
+service_operation	provisional	按条件检索工厂结构。
+service_operation	provisional	更新指定工厂结构。
+service_operation	provisional	按指定操作变更 BOP 草稿。
+service_operation	provisional	返回 BOP 草稿拟议变更的预览结果。
+service_operation	provisional	取得指定 BOP 版本的受控执行结构。
+service_operation	provisional	返回 BOP 执行结构拟议变更的预览结果。
+service_operation	provisional	返回 BOP 导入内容将产生的变更预览。
+service_operation	provisional	取得指定 BOP 关联的零件清单。
+service_operation	provisional	取得指定 BOP 最近一次校验结果。
+service_operation	provisional	校验指定 BOP 并返回确定性问题清单。
+service_operation	provisional	将指定 BOP 版本置为归档状态。
+service_operation	provisional	比较两个 BOP 版本并返回差异。
+service_operation	provisional	为指定 BOP 创建一个新的可编辑版本。
+service_operation	provisional	取得指定 BOP 版本的信息。
+service_operation	provisional	列出当前范围内的 BOP 版本。
+service_operation	provisional	取得指定 BOP 的工作包信息。
+service_facade	needs_review	按指定操作变更工艺画布。
+service_facade	needs_review	按指定读取方式取得工艺画布的信息。
+service_facade	needs_review	生成指定工艺对象的数据导出结果。
+service_facade	needs_review	按指定操作变更 EBOM。
+service_facade	needs_review	按指定读取方式取得 EBOM 信息。
+service_facade	needs_review	按指定操作变更 GBOP。
+service_operation	provisional	按指定操作变更 GBOP 草稿。
+service_operation	provisional	返回 GBOP 草稿拟议变更的预览结果。
+service_operation	provisional	创建新的 GBOP 草稿。
+service_operation	provisional	取得指定 GBOP 草稿的信息。
+service_operation	provisional	按条件检索 GBOP 草稿。
+service_operation	provisional	提交指定 GBOP 草稿进入后续审核。
+service_operation	provisional	列出指定 GBOP 项关联的知识条目。
+service_operation	provisional	按条件检索 GBOP 项。
+service_operation	provisional	取得指定 GBOP 项的引用和使用情况。
+service_facade	needs_review	按指定读取方式取得 GBOP 信息。
+service_operation	provisional	将指定 GBOP 发布版本置为生效状态。
+service_operation	provisional	将指定 GBOP 发布版本置为归档状态。
+service_operation	provisional	比较两个 GBOP 发布版本并返回差异。
+service_operation	provisional	取得指定 GBOP 发布版本的信息。
+service_operation	provisional	发布指定 GBOP 发布版本。
+service_operation	provisional	按条件检索 GBOP 发布版本。
+service_facade	needs_review	按指定操作变更制造资源。
+service_facade	needs_review	按指定读取方式取得制造资源的信息。
+service_operation	provisional	按指定操作变更 PBOM 草稿。
+service_operation	provisional	返回 PBOM 草稿拟议变更的预览结果。
+service_operation	provisional	返回 PBOM 导入内容将产生的变更预览。
+service_operation	provisional	按条件检索 PBOM 零件。
+service_operation	provisional	将指定 PBOM 版本置为归档状态。
+service_operation	provisional	比较两个 PBOM 版本并返回差异。
+service_operation	provisional	创建新的 PBOM 版本。
+service_operation	provisional	取得指定 PBOM 版本的信息。
+service_operation	provisional	发布指定 PBOM 版本。
+service_operation	provisional	按条件检索 PBOM 版本。
+service_operation	provisional	提交指定 PBOM 版本进入后续审核。
+service_facade	needs_review	按指定操作变更工艺规则。
+service_operation	provisional	创建新的工艺规则草稿。
+service_operation	provisional	取得指定工艺规则草稿的信息。
+service_operation	provisional	基于指定工艺规则草稿形成新的修订。
+service_operation	provisional	按条件检索工艺规则草稿。
+service_operation	provisional	提交指定工艺规则草稿进入后续审核。
+service_operation	provisional	依据指定工艺规则计算判定结果。
+service_facade	needs_review	按指定读取方式取得工艺规则的信息。
+service_operation	provisional	将指定工艺规则发布版本置为生效状态。
+service_operation	provisional	取得指定工艺规则发布版本的信息。
+service_operation	provisional	发布指定工艺规则发布版本。
+service_operation	provisional	按条件检索工艺规则发布版本。
+service_operation	provisional	创建新的工艺规则豁免。
+service_operation	provisional	撤销指定工艺规则豁免。
+service_operation	provisional	按条件检索工艺规则豁免。
+service_operation	provisional	取得与指定业务上下文相关的知识材料。
+service_operation	provisional	授予指定主体知识文档访问授权。
+service_operation	provisional	列出当前范围内的知识文档访问授权。
+service_operation	provisional	撤销指定知识文档访问授权。
+service_facade	needs_review	将指定知识文档置为归档状态。
+service_operation	provisional	创建新的知识文档。
+service_operation	provisional	比较两个知识文档版本并返回内容差异。
+service_operation	provisional	取得指定知识文档的信息。
+service_operation	provisional	取得指定知识文档的版本历史。
+service_operation	provisional	将指定知识文档恢复为有效状态。
+service_operation	provisional	基于指定知识文档形成新的修订。
+service_operation	provisional	按条件检索知识文档。
+service_facade	needs_review	按指定操作变更知识条目。
+service_operation	provisional	取得当前主体有权访问的指定知识条目。
+service_operation	provisional	取得知识迁移任务的当前状态和处理结果。
+service_facade	needs_review	按指定操作变更知识个性化设置。
+service_facade	needs_review	按指定读取方式取得知识个性化设置的信息。
+service_operation	provisional	取得指定知识提案的信息。
+service_operation	provisional	列出当前范围内的知识提案。
+service_operation	provisional	列出当前范围内的知识提案发布任务。
+service_operation	provisional	重新投递指定知识提案发布任务。
+service_operation	provisional	记录对指定知识提案作出的评审结论。
+service_operation	provisional	创建一份不直接修改正式知识库的待评审知识提案。
+service_operation	provisional	按指定操作变更参考数据集。
+service_operation	provisional	按指定读取方式取得参考数据集的信息。
+service_operation	provisional	按条件检索知识条目。
+service_facade	needs_review	按指定操作变更知识空间。
+service_operation	provisional	创建新的知识空间。
+service_operation	provisional	按条件检索知识空间。
+service_operation	provisional	创建新的本体变更提案。
+service_operation	provisional	取得指定本体变更提案的信息。
+service_operation	provisional	提交对指定本体变更提案的评审结论。
+service_operation	provisional	按条件检索本体变更提案。
+service_operation	provisional	取得指定本体概念的信息。
+service_operation	provisional	解析指定术语对应的受控本体概念。
+service_operation	provisional	评估两个本体对象建立映射关系的适合度。
+service_operation	provisional	按指定操作变更本体映射。
+service_operation	provisional	将指定本体发布版本置为生效状态。
+service_operation	provisional	比较两个本体发布版本并返回差异。
+service_operation	provisional	取得指定本体发布版本的信息。
+service_operation	provisional	发布指定本体发布版本。
+service_operation	provisional	按条件检索本体发布版本。
+service_operation	provisional	按指定操作变更本体 Schema。
+service_operation	provisional	按指定读取方式取得 Agent 审计记录 信息。
+service_operation	provisional	记录新的 Agent 审计记录。
+service_operation	provisional	按指定操作变更 Agent 流程。
+service_operation	provisional	按指定读取方式取得 Agent 流程 信息。
+service_operation	provisional	创建或查询一次受治理的 Agent 交互。
+service_operation	provisional	按指定操作变更 Agent 记忆。
+service_operation	provisional	按指定读取方式取得 Agent 记忆 信息。
+service_operation	provisional	按指定操作变更 Agent 运行。
+service_operation	provisional	按指定读取方式取得 Agent 运行 信息。
+service_operation	provisional	按指定操作变更 Agent 会话。
+service_operation	provisional	按指定读取方式取得 Agent 会话 信息。
+service_operation	provisional	按指定操作变更 Agent Skill。
+service_operation	provisional	按指定读取方式取得 Agent Skill 信息。
+service_operation	provisional	将指定外部连接器置为归档状态。
+service_operation	provisional	验证指定外部连接器能否建立有效连接。
+service_operation	provisional	创建新的外部连接器。
+service_operation	provisional	发现指定外部连接器可访问的数据 Schema。
+service_operation	provisional	按条件检索外部连接器。
+service_operation	provisional	更新指定外部连接器。
+service_operation	provisional	将指定外部数据映射置为归档状态。
+service_operation	provisional	创建新的外部数据映射。
+service_operation	provisional	取得指定外部数据映射的信息。
+service_operation	provisional	返回外部数据映射将产生的字段转换预览。
+service_operation	provisional	按条件检索外部数据映射。
+service_operation	provisional	更新指定外部数据映射。
+service_operation	provisional	创建并启动一次外部数据同步任务。
+service_operation	provisional	取得指定设备命令的执行状态和结果。
+service_facade	needs_review	按指定操作变更本地设备。
+service_facade	needs_review	按指定读取方式取得本地设备的信息。
+service_operation	provisional	生成当前 VisMockup 视图的受控截图产物。
+service_operation	provisional	在 VisMockup 中高亮指定对象。
+service_operation	provisional	启动受控的 VisMockup 会话。
+service_operation	provisional	在 VisMockup 中打开指定数模。
+service_operation	provisional	取得 VisMockup 的当前连接状态。
+service_operation	provisional	取得 VisMockup 当前数模的产品结构树。
+service_facade	needs_review	按指定动作变更 VisMockup 对象的可见状态。
+service_operation	provisional	按条件检索数模组件。
+service_operation	provisional	创建一个新的数模对象。
+service_operation	provisional	取得指定数模的信息。
+service_operation	provisional	按条件检索数模。
+service_operation	provisional	比较两个数模版本并返回差异。
+service_operation	provisional	创建新的数模版本。
+service_operation	provisional	取得指定数模版本及其受控快照信息。
+service_operation	provisional	按条件检索数模版本。
+service_operation	provisional	将指定仿真环境置为归档状态。
+service_operation	provisional	创建新的仿真环境。
+service_operation	provisional	取得指定仿真环境的信息。
+service_operation	provisional	按条件检索仿真环境。
+service_operation	provisional	创建新的仿真参数集。
+service_operation	provisional	取得指定仿真参数集的信息。
+service_operation	provisional	按条件检索仿真参数集。
+service_operation	provisional	比较两份仿真结果并返回差异。
+service_operation	provisional	取得指定仿真结果的信息。
+service_operation	provisional	取得指定仿真运行的信息。
+service_operation	provisional	按条件检索仿真运行。
+service_operation	provisional	将已配置完成的仿真运行置为启动状态。
+service_operation	provisional	创建新的求解器配置。
+service_operation	provisional	取得指定求解器配置的信息。
+service_operation	provisional	按条件检索求解器配置。
