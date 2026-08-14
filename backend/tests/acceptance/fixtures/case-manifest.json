@@ -2377,7 +2377,7 @@
       "version_pin": "backend/tests/acceptance/test_mandatory_cases.py::test_version_pin_case[vismockup.visibility@1]"
     }
   },
-  "catalog_release": "rel_77442b29fae1c422375e938737f7658a",
+  "catalog_release": "rel_f8c607b268b65dbf5e0889e1577ef684",
   "mandatory_cases": [
     "success",
     "invalid_input",

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_77442b29fae1c422375e938737f7658a",
-  "catalog_hash": "sha256:77442b29fae1c422375e938737f7658a939d9ca8f3d1fa8fee30a3639d657c92",
+  "release_id": "rel_f8c607b268b65dbf5e0889e1577ef684",
+  "catalog_hash": "sha256:f8c607b268b65dbf5e0889e1577ef6848fe034cd7b9fcbf5ec224c16cc0efe38",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -24609,7 +24609,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -24822,7 +24822,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -25035,7 +25035,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -25248,7 +25248,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -25674,7 +25674,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -26100,7 +26100,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -26313,7 +26313,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -26739,7 +26739,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -26952,7 +26952,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -27378,7 +27378,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -27591,7 +27591,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -28230,7 +28230,7 @@
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
       "idempotency_policy": "required",
-      "consistency_policy": "strong",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "confirmation_policy": "user",
@@ -57103,7 +57103,7 @@
       "plugin_id": "official.factory",
       "module": "factory_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:6902060a38ba4e66e2f81f26ea527ef26641d02b0c9281cc6d9c33a53a237fa7"
+      "artifact_hash": "sha256:1f12d71b6e626c0e015e67686d55b784c6822dbc5fe156416126d9d48fecafd1"
     },
     {
       "plugin_id": "official.integration",
@@ -57136,5 +57136,5 @@
       "artifact_hash": "sha256:6cf65dcdff94e8dc0cea45e79a598872b5b1c8998cfb380828610d7ffb69f750"
     }
   ],
-  "created_at": "2026-08-14T05:17:13.932632Z"
+  "created_at": "2026-08-14T05:25:45.391727Z"
 }

@@ -8,7 +8,7 @@ Execute the governed factory.asset.update Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_77442b29fae1c422375e938737f7658a`
+- Catalog Release：`rel_f8c607b268b65dbf5e0889e1577ef684`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -46,7 +46,7 @@ Execute the governed factory.asset.update Factory outcome.
 - 幂等：`required`
 - 并发：`none`
 - 无预期版本信封要求。
-- 一致性：`strong`
+- 一致性：`external`
 - Operation：`optional`
 - Artifact：`none`
 - 审计：`standard`
@@ -164,7 +164,7 @@ Execute the governed factory.asset.update Factory outcome.
 ```json
 {
   "capability_id": "factory.asset.update",
-  "catalog_release": "rel_77442b29fae1c422375e938737f7658a",
+  "catalog_release": "rel_f8c607b268b65dbf5e0889e1577ef684",
   "major_version": 1,
   "payload": {}
 }

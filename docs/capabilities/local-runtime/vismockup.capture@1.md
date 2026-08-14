@@ -8,7 +8,7 @@ Capture the active VisMockup view as an ArtifactRef.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`device`
-- Catalog Release：`rel_77442b29fae1c422375e938737f7658a`
+- Catalog Release：`rel_f8c607b268b65dbf5e0889e1577ef684`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -76,7 +76,7 @@ Capture the active VisMockup view as an ArtifactRef.
 ```json
 {
   "capability_id": "vismockup.capture",
-  "catalog_release": "rel_77442b29fae1c422375e938737f7658a",
+  "catalog_release": "rel_f8c607b268b65dbf5e0889e1577ef684",
   "major_version": 1,
   "payload": {
     "device_id": "example"
