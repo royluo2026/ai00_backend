@@ -8,7 +8,7 @@ Assess deterministic mapping compatibility without persisting a mapping.
 - 不适用：Only names are available and an automatic decision is expected.
 - 生命周期：`stable`
 - 所属领域：`ontology`
-- Catalog Release：`rel_f8c607b268b65dbf5e0889e1577ef684`
+- Catalog Release：`rel_d1655f738a5f4a7fd066f17bcca620d0`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -119,7 +119,7 @@ Assess deterministic mapping compatibility without persisting a mapping.
 ```json
 {
   "capability_id": "ontology.mapping.assess",
-  "catalog_release": "rel_f8c607b268b65dbf5e0889e1577ef684",
+  "catalog_release": "rel_d1655f738a5f4a7fd066f17bcca620d0",
   "major_version": 1,
   "payload": {
     "source": {},

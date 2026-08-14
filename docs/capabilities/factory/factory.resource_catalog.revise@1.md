@@ -8,7 +8,7 @@ Execute the governed factory.resource_catalog.revise Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_f8c607b268b65dbf5e0889e1577ef684`
+- Catalog Release：`rel_d1655f738a5f4a7fd066f17bcca620d0`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -164,7 +164,7 @@ Execute the governed factory.resource_catalog.revise Factory outcome.
 ```json
 {
   "capability_id": "factory.resource_catalog.revise",
-  "catalog_release": "rel_f8c607b268b65dbf5e0889e1577ef684",
+  "catalog_release": "rel_d1655f738a5f4a7fd066f17bcca620d0",
   "major_version": 1,
   "payload": {}
 }

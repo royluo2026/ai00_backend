@@ -8,7 +8,7 @@ Read an allowlisted bounded semantic named view.
 - 不适用：A domain-specific stable ref is already known.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_f8c607b268b65dbf5e0889e1577ef684`
+- Catalog Release：`rel_d1655f738a5f4a7fd066f17bcca620d0`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -81,7 +81,7 @@ Read an allowlisted bounded semantic named view.
 ```json
 {
   "capability_id": "semantic.context.get",
-  "catalog_release": "rel_f8c607b268b65dbf5e0889e1577ef684",
+  "catalog_release": "rel_d1655f738a5f4a7fd066f17bcca620d0",
   "major_version": 1,
   "payload": {
     "named_view": "example"
