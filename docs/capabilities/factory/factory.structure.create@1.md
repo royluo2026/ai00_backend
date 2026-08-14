@@ -8,7 +8,7 @@ Execute the governed factory.structure.create Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_54121d00931bc3886ff0b6e74f61c314`
+- Catalog Release：`rel_a9e1a98beae41a98be2a5ac03bad2b68`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -59,6 +59,29 @@ Execute the governed factory.structure.create Factory outcome.
 {
   "additionalProperties": false,
   "properties": {
+    "asset_no": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "asset_type": {
+      "enum": [
+        "equipment",
+        "tool",
+        "fixture"
+      ],
+      "type": "string"
+    },
+    "attributes": {
+      "type": [
+        "object"
+      ]
+    },
+    "catalog_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "expected_revision": {
       "minimum": 1,
       "type": "integer"
@@ -70,8 +93,66 @@ Execute the governed factory.structure.create Factory outcome.
     "gid": {
       "type": "string"
     },
+    "kind": {
+      "enum": [
+        "factory",
+        "section",
+        "line",
+        "station"
+      ],
+      "type": "string"
+    },
+    "limit": {
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "meta": {
+      "type": [
+        "object"
+      ]
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "parent_gid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "resource_ref": {
       "type": "string"
+    },
+    "resource_type": {
+      "enum": [
+        "equipment",
+        "tool",
+        "fixture"
+      ],
+      "type": "string"
+    },
+    "specification": {
+      "type": [
+        "object"
+      ]
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "published",
+        "deprecated",
+        "in_use",
+        "maintenance",
+        "scrapped"
+      ],
+      "type": "string"
+    },
+    "updates": {
+      "type": [
+        "object"
+      ]
     }
   },
   "type": "object"
@@ -83,7 +164,7 @@ Execute the governed factory.structure.create Factory outcome.
 ```json
 {
   "capability_id": "factory.structure.create",
-  "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
+  "catalog_release": "rel_a9e1a98beae41a98be2a5ac03bad2b68",
   "major_version": 1,
   "payload": {}
 }

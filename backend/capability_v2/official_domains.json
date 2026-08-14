@@ -163,7 +163,7 @@
         "plugin_id": "official.factory",
         "module": "factory_backend.capabilities",
         "version": "1.0.0",
-        "artifact_hash": "sha256:50db2601d1f68c1f788db285d3bc5e25e667782b5647842d162a6d721fd83aea"
+        "artifact_hash": "sha256:a9d3cffc66377510620cc3085d63421f9fa027d7b4106e3a6cf135fff8a87687"
       },
       "artifact_path": "plugins/factory/factory_backend",
       "allowed_owners": [

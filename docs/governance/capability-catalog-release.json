@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_54121d00931bc3886ff0b6e74f61c314",
-  "catalog_hash": "sha256:54121d00931bc3886ff0b6e74f61c3149507c4fc75d02f8f535183221d045cfd",
+  "release_id": "rel_a9e1a98beae41a98be2a5ac03bad2b68",
+  "catalog_hash": "sha256:a9e1a98beae41a98be2a5ac03bad2b684c2be409cb9d53f6bdff6fc1bc731123",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -24268,6 +24268,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -24299,7 +24380,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -24390,6 +24471,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -24421,7 +24583,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24512,6 +24674,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -24543,7 +24786,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24634,6 +24877,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -24665,7 +24989,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24756,6 +25080,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -24787,7 +25192,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
@@ -24878,6 +25283,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -24909,7 +25395,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25000,6 +25486,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -25031,7 +25598,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25122,6 +25689,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -25153,7 +25801,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25244,6 +25892,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -25275,7 +26004,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25366,6 +26095,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -25397,7 +26207,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25488,6 +26298,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -25519,7 +26410,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25610,6 +26501,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -25641,7 +26613,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25732,6 +26704,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -25763,7 +26816,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25854,6 +26907,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -25885,7 +27019,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25976,6 +27110,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -26007,7 +27222,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -26098,6 +27313,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -26129,7 +27425,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -26220,6 +27516,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -26251,7 +27628,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -26342,6 +27719,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -26373,7 +27831,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -26464,6 +27922,87 @@
           "expected_revision": {
             "type": "integer",
             "minimum": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "factory",
+              "section",
+              "line",
+              "station"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "attributes": {
+            "type": [
+              "object"
+            ]
+          },
+          "updates": {
+            "type": [
+              "object"
+            ]
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "deprecated",
+              "in_use",
+              "maintenance",
+              "scrapped"
+            ]
+          },
+          "specification": {
+            "type": [
+              "object"
+            ]
+          },
+          "asset_no": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "equipment",
+              "tool",
+              "fixture"
+            ]
+          },
+          "catalog_gid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta": {
+            "type": [
+              "object"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         }
       },
@@ -26495,7 +28034,7 @@
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:6d1cb5e41beb86bb2ba58c7716f40e98713b0133eb50ce36e496ebf46fa8a853",
+      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -55374,7 +56913,7 @@
       "plugin_id": "official.factory",
       "module": "factory_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:50db2601d1f68c1f788db285d3bc5e25e667782b5647842d162a6d721fd83aea"
+      "artifact_hash": "sha256:a9d3cffc66377510620cc3085d63421f9fa027d7b4106e3a6cf135fff8a87687"
     },
     {
       "plugin_id": "official.integration",
@@ -55407,5 +56946,5 @@
       "artifact_hash": "sha256:6cf65dcdff94e8dc0cea45e79a598872b5b1c8998cfb380828610d7ffb69f750"
     }
   ],
-  "created_at": "2026-08-14T02:16:17.030426Z"
+  "created_at": "2026-08-14T05:15:05.843119Z"
 }
