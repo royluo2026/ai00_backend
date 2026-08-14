@@ -9,6 +9,16 @@ export function isCapabilityResultV2(value) {
     && !!value.correlation;
 }
 
+export function createRequestId(cryptoSource = globalThis.crypto) {
+  if (typeof cryptoSource?.randomUUID === "function") return cryptoSource.randomUUID();
+  if (typeof cryptoSource?.getRandomValues !== "function") throw new Error("Secure random generation is unavailable");
+  const bytes = cryptoSource.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (value) => value.toString(16).padStart(2, "0"));
+  return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10).join("")}`;
+}
+
 export class Ai00PluginClient {
   #init; #pending = new Map(); #readyResolve;
   #ready = new Promise((resolve) => { this.#readyResolve = resolve; });
@@ -46,7 +56,7 @@ export class Ai00PluginClient {
   async invoke(capabilityId, payload, timeoutMs = 30_000) {
     if (!this.#init) throw new Error("AI00 host handshake is not complete");
     if (!this.#init.grantedCapabilities.includes(capabilityId)) throw new Error(`Capability not granted: ${capabilityId}`);
-    const requestId = crypto.randomUUID();
+    const requestId = createRequestId();
     const promise = new Promise((resolve, reject) => {
       const timer = setTimeout(() => { this.#pending.delete(requestId); reject(new Error(`Capability request timed out: ${capabilityId}`)); }, Math.max(1_000, Math.min(timeoutMs, 120_000)));
       this.#pending.set(requestId, { resolve, reject, timer });

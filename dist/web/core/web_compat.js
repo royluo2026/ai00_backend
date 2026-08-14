@@ -346,7 +346,7 @@
         throw Object.assign(new Error('Plugin mount session is incomplete'), { code: 'plugin_mount_invalid' });
       }
       const prefix = `/api/v1/plugin-marketplace/mounts/${encodeURIComponent(mountSessionId)}/capabilities/${encodeURIComponent(capabilityId)}`;
-      const idempotencyKey = crypto.randomUUID();
+      const idempotencyKey = window.AI00RandomId.create();
       const requestBody = {
         payload: payload || {}, major_version: majorVersion,
         idempotency_key: idempotencyKey,

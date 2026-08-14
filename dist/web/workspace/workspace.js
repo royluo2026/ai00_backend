@@ -405,8 +405,8 @@ const WorkspaceEngine = (() => {
    */
   function _attachPluginBridge(tabId, iframe, plugin) {
     _pluginBridgeCleanups.get(tabId)?.();
-    const instanceId = crypto.randomUUID();
-    const channelToken = crypto.randomUUID() + crypto.randomUUID();
+    const instanceId = window.AI00RandomId.create();
+    const channelToken = window.AI00RandomId.create() + window.AI00RandomId.create();
     const granted = new Set(plugin.grantedCapabilities || []);
     const capabilityVersions = Object.freeze({ ...(plugin.capabilityVersions || {}) });
     const rejected = (capabilityId, requestId, code, message) => ({
