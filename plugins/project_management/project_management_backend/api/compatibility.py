@@ -11,6 +11,7 @@ from backend.capability_v2.contracts import (
     InvocationEnvelope,
     TenantIdentity,
 )
+from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
 
 
 def build_web_compatibility_envelope(
@@ -62,7 +63,7 @@ async def invoke_compatibility(
     gateway: Any, envelope: InvocationEnvelope
 ) -> Any:
     """Forward an already authenticated server-derived envelope to Gateway."""
-    return await gateway.invoke(envelope)
+    return await invoke_trusted_web_compatibility(gateway, envelope)
 
 
 __all__ = ["build_web_compatibility_envelope", "invoke_compatibility"]

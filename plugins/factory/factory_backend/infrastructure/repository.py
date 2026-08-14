@@ -12,6 +12,16 @@ def _json(value) -> str:
     return json.dumps(value or {}, ensure_ascii=False)
 
 
+def _decode_json_fields(row: dict) -> dict:
+    """Normalize OceanBase JSON columns before crossing the Provider boundary."""
+    result = dict(row)
+    for field in ("attributes", "specification", "meta"):
+        value = result.get(field)
+        if isinstance(value, str):
+            result[field] = json.loads(value)
+    return result
+
+
 class FactoryRepository:
     def structure_create(self, data: dict) -> dict:
         gid = str(next_gid())
@@ -30,7 +40,7 @@ class FactoryRepository:
             with conn.cursor() as cur:
                 cur.execute("SELECT * FROM workmanship_factory_structures WHERE gid=%s AND tenant_gid=%s", (gid, tenant_gid))
                 row = cur.fetchone()
-        return dict(row) if row else None
+        return _decode_json_fields(row) if row else None
 
     def structure_search(self, data: dict) -> list[dict]:
         clauses, params = ["tenant_gid=%s", "archived=FALSE"], [data["tenant_gid"]]
@@ -41,7 +51,7 @@ class FactoryRepository:
         with get_factory_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(f"SELECT * FROM workmanship_factory_structures WHERE {' AND '.join(clauses)} ORDER BY name LIMIT %s", (*params, min(int(data.get("limit", 200)), 500)))
-                return [dict(row) for row in cur.fetchall()]
+                return [_decode_json_fields(row) for row in cur.fetchall()]
 
     def structure_update(self, gid: str, expected_version: int, updates: dict, tenant_gid: str) -> dict | None:
         allowed = {key: value for key, value in updates.items() if key in {"name", "parent_gid", "attributes"}}
@@ -70,7 +80,7 @@ class FactoryRepository:
         with get_factory_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT * FROM workmanship_factory_resource_catalog WHERE gid=%s AND tenant_gid=%s", (gid, tenant_gid)); row = cur.fetchone()
-        return dict(row) if row else None
+        return _decode_json_fields(row) if row else None
 
     def catalog_search(self, data: dict) -> list[dict]:
         clauses, params = ["tenant_gid=%s"], [data["tenant_gid"]]
@@ -81,7 +91,7 @@ class FactoryRepository:
         with get_factory_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(f"SELECT * FROM workmanship_factory_resource_catalog WHERE {' AND '.join(clauses)} ORDER BY name,revision DESC LIMIT %s", (*params, min(int(data.get("limit", 200)), 500)))
-                return [dict(row) for row in cur.fetchall()]
+                return [_decode_json_fields(row) for row in cur.fetchall()]
 
     def catalog_create(self, data: dict) -> dict:
         gid = str(next_gid())
@@ -111,7 +121,7 @@ class FactoryRepository:
         with get_factory_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT * FROM workmanship_factory_assets WHERE gid=%s AND tenant_gid=%s", (gid, tenant_gid)); row = cur.fetchone()
-        return dict(row) if row else None
+        return _decode_json_fields(row) if row else None
 
     def asset_search(self, data: dict) -> list[dict]:
         clauses, params = ["tenant_gid=%s"], [data["tenant_gid"]]
@@ -120,7 +130,7 @@ class FactoryRepository:
         with get_factory_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(f"SELECT * FROM workmanship_factory_assets WHERE {' AND '.join(clauses)} ORDER BY asset_no LIMIT %s", (*params, min(int(data.get("limit", 200)), 500)))
-                return [dict(row) for row in cur.fetchall()]
+                return [_decode_json_fields(row) for row in cur.fetchall()]
 
     def asset_register(self, data: dict) -> dict:
         gid = str(next_gid())
@@ -149,4 +159,3 @@ class FactoryRepository:
                 cur.execute(f"UPDATE workmanship_factory_assets SET status=%s,version=version+1 WHERE gid=%s AND tenant_gid=%s AND version=%s AND status IN ({placeholders})", (target, gid, tenant_gid, expected_version, *source)); changed = cur.rowcount == 1
             conn.commit()
         return changed
-

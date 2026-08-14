@@ -21,6 +21,7 @@ from backend.capability_v2.contracts import (
     TenantIdentity,
 )
 from backend.capability_v2.gateway import get_default_gateway
+from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
 
 
@@ -56,7 +57,8 @@ async def _invoke(
 ) -> Any:
     gateway = get_default_gateway()
     request_id = f"onto_compat_{uuid.uuid4().hex}"
-    result = await gateway.invoke(
+    result = await invoke_trusted_web_compatibility(
+        gateway,
         InvocationEnvelope(
             capability_id=capability_id,
             major_version=1,
@@ -66,7 +68,7 @@ async def _invoke(
             idempotency_key=request_id if write else None,
             request_id=request_id,
             trace_id=request_id,
-        )
+        ),
     )
     if not result.ok:
         detail = result.error.model_dump(mode="json") if result.error else {"code": "capability_failed"}

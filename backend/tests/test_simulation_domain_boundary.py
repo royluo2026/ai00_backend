@@ -33,7 +33,8 @@ class SimulationDomainBoundaryTests(unittest.TestCase):
     def test_simulation_rest_adapter_invokes_only_the_governed_gateway(self):
         source = (SIM_ROOT / "simulation_backend" / "routers" / "environments.py").read_text(encoding="utf-8")
         self.assertIn("get_default_gateway", source)
-        self.assertIn("gateway.invoke", source)
+        self.assertIn("invoke_trusted_web_compatibility", source)
+        self.assertNotIn("gateway.invoke", source)
         self.assertNotIn("from ..public import", source)
 
 

@@ -28,6 +28,23 @@ def test_factory_model_excludes_bop_plan_nodes():
     assert "station_process" not in PhysicalStructure.model_fields
 
 
+def test_factory_repository_decodes_json_columns_for_provider_consumers():
+    from plugins.factory.factory_backend.infrastructure.repository import _decode_json_fields
+
+    row = _decode_json_fields(
+        {
+            "gid": "factory-1",
+            "attributes": '{"team_id":"team-1"}',
+            "specification": '{"stations":[]}',
+            "meta": '{"source":"e2e"}',
+        }
+    )
+
+    assert row["attributes"] == {"team_id": "team-1"}
+    assert row["specification"] == {"stations": []}
+    assert row["meta"] == {"source": "e2e"}
+
+
 def test_factory_compatibility_uses_user_tenant_when_team_is_missing():
     from plugins.factory.factory_backend.api.compatibility import (
         build_web_compatibility_envelope,

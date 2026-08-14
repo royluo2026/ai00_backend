@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from backend.capability_v2.contracts import ActorIdentity, ConsumerDescriptor, ConsumerIdentity, ConsumerType, IDENTITY_PATTERN, InvocationEnvelope, TenantIdentity
 from backend.capability_v2.gateway import get_default_gateway
+from backend.capability_v2.web_compatibility import invoke_trusted_web_compatibility
 from backend.domain_ports.digital_model import ModelSnapshotRef
 from backend.domain_ports.simulation import ExecutionPlanRef, ParameterSetRef, SimulationProfileRef
 from backend.platform_sdk.auth import get_authenticated_principal, get_current_user
@@ -46,7 +47,7 @@ def _correlation(value: str | None, fallback: str) -> str:
 async def _invoke(capability_id: str, payload: dict, request: Request, user: dict, principal, *, confirmation_token: str | None = None):
     gateway = get_default_gateway()
     request_id = _correlation(request.headers.get("X-Request-ID"), "cap_" + uuid.uuid4().hex)
-    result = await gateway.invoke(InvocationEnvelope(
+    result = await invoke_trusted_web_compatibility(gateway, InvocationEnvelope(
         capability_id=capability_id, major_version=1, catalog_release=gateway.catalog_release,
         payload=payload, identity=_identity(user, principal),
         idempotency_key=request.headers.get("Idempotency-Key"),

@@ -25,8 +25,8 @@
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
     "registry_sha256": "sha256:6d29aad333f2d31e3dc47de4ce06f9f56f80615436d4e5065a05d804b2d8eeb4",
-    "catalog_release": "rel_d1655f738a5f4a7fd066f17bcca620d0",
-    "catalog_sha256": "sha256:488a94ac63bd8338f1db48084b1d1e631003e6941432b2e71d1dbefe120154c5"
+    "catalog_release": "rel_ff6093704bd2b3500496c5731300b7a7",
+    "catalog_sha256": "sha256:1b7f8ceba633d2f91416df82d64c6b7610634fc908309270a0f27d07b4d0d3a7"
   },
   "ownership_sha256": "sha256:70f53de2e819f0ba49690d2230161270c24a7e26fb5faa2e62c2060e46b67975",
   "table_inventory_sha256": "sha256:c54e15aaca379ddc5b485f82846e8153945641a726f48be790c0ef13cdd4171b",

@@ -8,7 +8,7 @@ Execute knowledge.personalization.change.apply.
 - 不适用：The resource belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_d1655f738a5f4a7fd066f17bcca620d0`
+- Catalog Release：`rel_ff6093704bd2b3500496c5731300b7a7`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -81,7 +81,7 @@ Execute knowledge.personalization.change.apply.
 ```json
 {
   "capability_id": "knowledge.personalization.change.apply",
-  "catalog_release": "rel_d1655f738a5f4a7fd066f17bcca620d0",
+  "catalog_release": "rel_ff6093704bd2b3500496c5731300b7a7",
   "major_version": 1,
   "payload": {
     "arguments": {},
