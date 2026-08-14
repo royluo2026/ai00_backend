@@ -3,6 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+from jsonschema import validate
+
 from plugins.factory.factory_backend.domain.models import PhysicalStructure
 
 
@@ -41,3 +44,42 @@ def test_factory_provider_registers_only_factory_owned_stable_descriptors():
     assert {descriptor.owner_domain for _, _, descriptor in registry.items} == {"factory"}
     assert all(descriptor.lifecycle_status == "stable" for _, _, descriptor in registry.items)
     assert all(spec.confirmation == ("none" if spec.risk.value == "read" else "user") for spec, _, _ in registry.items)
+
+
+@pytest.mark.parametrize(
+    ("capability_id", "payload"),
+    [
+        ("factory.structure.search", {"kind": "factory", "limit": 200}),
+        (
+            "factory.structure.create",
+            {"kind": "factory", "name": "Assembly", "attributes": {"team_id": "team-1"}},
+        ),
+        (
+            "factory.resource_catalog.search",
+            {"resource_type": "fixture", "status": "published", "limit": 20},
+        ),
+        (
+            "factory.asset.register",
+            {"asset_no": "EQ-1", "asset_type": "equipment", "meta": {}},
+        ),
+    ],
+)
+def test_factory_descriptor_accepts_supported_provider_payloads(capability_id, payload):
+    from plugins.factory.factory_backend.capabilities import register_capabilities
+
+    class Registry:
+        def __init__(self):
+            self.items = []
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.items.append((spec, handler, descriptor))
+
+    registry = Registry()
+    register_capabilities(registry)
+    descriptor = next(
+        descriptor
+        for spec, _, descriptor in registry.items
+        if spec.id == capability_id
+    )
+
+    validate(instance=payload, schema=descriptor.input_schema)
