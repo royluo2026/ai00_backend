@@ -13,7 +13,7 @@ def build_web_compatibility_envelope(gateway, *, capability_id, payload, current
         identity=ConsumerIdentity(
             actor=ActorIdentity(**principal.model_dump()),
             tenant=TenantIdentity(
-                tenant_id=str(current_user.get("team_id") or "default"),
+                tenant_id=str(current_user.get("team_id") or f"user:{current_user['gid']}"),
                 membership="member",
                 active_roles=tuple(filter(None, (current_user.get("org_role"), current_user.get("system_role")))),
             ),
@@ -28,4 +28,3 @@ def build_web_compatibility_envelope(gateway, *, capability_id, payload, current
 
 async def invoke_compatibility(gateway, envelope):
     return await gateway.invoke(envelope)
-

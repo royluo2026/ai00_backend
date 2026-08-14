@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from jsonschema import validate
@@ -25,6 +26,35 @@ def test_factory_has_one_official_provider():
 def test_factory_model_excludes_bop_plan_nodes():
     assert "line_process" not in PhysicalStructure.model_fields
     assert "station_process" not in PhysicalStructure.model_fields
+
+
+def test_factory_compatibility_uses_user_tenant_when_team_is_missing():
+    from plugins.factory.factory_backend.api.compatibility import (
+        build_web_compatibility_envelope,
+    )
+
+    envelope = build_web_compatibility_envelope(
+        SimpleNamespace(catalog_release="rel-test"),
+        capability_id="factory.structure.search",
+        payload={"kind": "factory"},
+        current_user={
+            "gid": "user-1",
+            "team_id": None,
+            "org_role": "member",
+            "system_role": "member",
+        },
+        principal=SimpleNamespace(
+            model_dump=lambda: {
+                "user_id": "user-1",
+                "authentication_method": "jwt",
+                "authenticated_at": "2026-08-14T00:00:00Z",
+            }
+        ),
+        request_id="request-1",
+        trace_id="trace-1",
+    )
+
+    assert envelope.identity.tenant.tenant_id == "user:user-1"
 
 
 def test_factory_provider_registers_only_factory_owned_stable_descriptors():
