@@ -8,7 +8,7 @@ Execute the reviewed base.team.change.apply Base outcome.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_a9e1a98beae41a98be2a5ac03bad2b68`
+- Catalog Release：`rel_77442b29fae1c422375e938737f7658a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -88,7 +88,7 @@ Execute the reviewed base.team.change.apply Base outcome.
 ```json
 {
   "capability_id": "base.team.change.apply",
-  "catalog_release": "rel_a9e1a98beae41a98be2a5ac03bad2b68",
+  "catalog_release": "rel_77442b29fae1c422375e938737f7658a",
   "major_version": 1,
   "payload": {
     "operation": "example"

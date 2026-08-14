@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_a9e1a98beae41a98be2a5ac03bad2b68",
-  "catalog_hash": "sha256:a9e1a98beae41a98be2a5ac03bad2b684c2be409cb9d53f6bdff6fc1bc731123",
+  "release_id": "rel_77442b29fae1c422375e938737f7658a",
+  "catalog_hash": "sha256:77442b29fae1c422375e938737f7658a939d9ca8f3d1fa8fee30a3639d657c92",
   "descriptors": [
     {
       "id": "agent.audit.read",
@@ -24359,9 +24359,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -24373,14 +24378,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -24562,9 +24572,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -24576,14 +24591,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24765,9 +24785,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -24779,14 +24804,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -24968,9 +24998,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -24982,14 +25017,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25171,9 +25211,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -25185,14 +25230,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "required",
       "concurrency_policy": "none",
@@ -25374,9 +25424,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -25388,14 +25443,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25577,9 +25637,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -25591,14 +25656,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -25780,9 +25850,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -25794,14 +25869,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -25983,9 +26063,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -25997,14 +26082,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -26186,9 +26276,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -26200,14 +26295,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -26389,9 +26489,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -26403,14 +26508,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -26592,9 +26702,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -26606,14 +26721,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -26795,9 +26915,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -26809,14 +26934,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -26998,9 +27128,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -27012,14 +27147,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -27201,9 +27341,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -27215,14 +27360,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -27404,9 +27554,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -27418,14 +27573,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -27607,9 +27767,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -27621,14 +27786,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -27810,9 +27980,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -27824,14 +27999,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -28013,9 +28193,14 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
@@ -28027,14 +28212,19 @@
         ],
         "properties": {
           "data": {
-            "type": "object",
-            "properties": {},
-            "additionalProperties": false
+            "type": [
+              "object",
+              "array",
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
           }
         },
         "additionalProperties": false
       },
-      "schema_hash": "sha256:691f694e0d90dde8572a0374ba14bbe6d58868c4fec29a3db4d6dd7df9f175ed",
+      "schema_hash": "sha256:306c3697fcec383b472ed3f41658e34a3ba78ffe42c493b3ac47a8aa689c8f69",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -56913,7 +57103,7 @@
       "plugin_id": "official.factory",
       "module": "factory_backend.capabilities",
       "version": "1.0.0",
-      "artifact_hash": "sha256:a9d3cffc66377510620cc3085d63421f9fa027d7b4106e3a6cf135fff8a87687"
+      "artifact_hash": "sha256:6902060a38ba4e66e2f81f26ea527ef26641d02b0c9281cc6d9c33a53a237fa7"
     },
     {
       "plugin_id": "official.integration",
@@ -56946,5 +57136,5 @@
       "artifact_hash": "sha256:6cf65dcdff94e8dc0cea45e79a598872b5b1c8998cfb380828610d7ffb69f750"
     }
   ],
-  "created_at": "2026-08-14T05:15:05.843119Z"
+  "created_at": "2026-08-14T05:17:13.932632Z"
 }

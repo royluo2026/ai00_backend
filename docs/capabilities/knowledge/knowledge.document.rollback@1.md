@@ -8,7 +8,7 @@ Deprecated compatibility alias for knowledge.document.restore.
 - 不适用：New callers must use knowledge.document.restore.
 - 生命周期：`deprecated`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_a9e1a98beae41a98be2a5ac03bad2b68`
+- Catalog Release：`rel_77442b29fae1c422375e938737f7658a`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -83,7 +83,7 @@ Deprecated compatibility alias for knowledge.document.restore.
 ```json
 {
   "capability_id": "knowledge.document.rollback",
-  "catalog_release": "rel_a9e1a98beae41a98be2a5ac03bad2b68",
+  "catalog_release": "rel_77442b29fae1c422375e938737f7658a",
   "major_version": 1,
   "payload": {
     "base_revision_gid": "example",
