@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 import importlib.util
 import copy
@@ -146,6 +147,17 @@ def test_new_stable_discovery_remains_an_unreviewed_candidate():
     assert builder.registry_errors({merged[0]["function_id"]: merged[0]}, discovered) == [
         "stable function lacks capability or valid exclusion: rest:GET:/api/example"
     ]
+
+
+def test_fastapi_route_scanner_preserves_deprecated_transport_metadata():
+    builder = _builder_module()
+    tree = ast.parse(
+        "@router.get('/items', deprecated=True)\n"
+        "def items(): return []\n"
+    )
+    decorator = tree.body[0].decorator_list[0]
+
+    assert builder._route_stability(decorator) == "deprecated"
 
 
 def test_schema_validates_baseline_and_rejects_unknown_missing_and_invalid_exclusions(registry_document):

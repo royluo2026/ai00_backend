@@ -12596,7 +12596,9 @@
       "function_id": "rest:GET:/api/workbench/home",
       "domain": "Project Management",
       "stability": "deprecated",
-      "current_consumers": [],
+      "current_consumers": [
+        "REST"
+      ],
       "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -12609,14 +12611,16 @@
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
-        "plugins/craft/craft_backend/routers/workbench_home.py"
+        "backend/routers/workbench_home.py"
       ]
     },
     "rest:GET:/api/workbench/panel1": {
       "function_id": "rest:GET:/api/workbench/panel1",
       "domain": "Project Management",
       "stability": "deprecated",
-      "current_consumers": [],
+      "current_consumers": [
+        "REST"
+      ],
       "target_capability": "project.workbench.read",
       "exposure": "Web/REST",
       "automation_level": "interactive",
@@ -12629,7 +12633,7 @@
       "owner": "Project Management",
       "exclusion_reason": null,
       "source_paths": [
-        "plugins/craft/craft_backend/routers/workbench_home.py"
+        "backend/routers/workbench_home.py"
       ]
     },
     "rest:GET:/api/workbenches": {
@@ -18837,10 +18841,10 @@
         "system"
       ],
       "data_classification": "internal",
-      "classification": "unreviewed",
-      "migration_status": "candidate",
+      "classification": "operations",
+      "migration_status": "excluded",
       "owner": "Base Platform",
-      "exclusion_reason": null,
+      "exclusion_reason": "Plugin upgrade health completion is control-plane infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/plugin_marketplace.py"
       ]
@@ -20975,8 +20979,8 @@
         "dist/web/core/notification_manager.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:167": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:167",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:168": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:168",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -20997,8 +21001,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:197": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:197",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:198": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:198",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21019,8 +21023,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:236": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:236",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:237": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:237",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21041,8 +21045,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:278": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:278",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:279": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:279",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21063,8 +21067,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:286": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:286",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:287": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:287",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21085,8 +21089,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:296": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:296",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:297": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:297",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21107,8 +21111,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:307": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:307",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:310": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:310",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21129,8 +21133,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:314": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:314",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:317": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:317",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21151,8 +21155,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:33": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:33",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:34": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:34",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21173,8 +21177,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:350": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:350",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:356": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:356",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21195,8 +21199,8 @@
         "dist/web/core/web_compat.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:423": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:423",
+    "web_gap:dynamic_fetch:dist/web/core/web_compat.js:429": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/core/web_compat.js:429",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [
@@ -21459,8 +21463,8 @@
         "dist/web/team_space/team_space.js"
       ]
     },
-    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5634": {
-      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5634",
+    "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5653": {
+      "function_id": "web_gap:dynamic_fetch:dist/web/workbench/workbench.js:5653",
       "domain": "Base Platform",
       "stability": "experimental",
       "current_consumers": [

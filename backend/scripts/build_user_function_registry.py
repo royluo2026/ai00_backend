@@ -198,6 +198,16 @@ def _router_prefix(tree: ast.AST) -> str:
     return ""
 
 
+def _route_stability(decorator: ast.Call) -> str:
+    deprecated = any(
+        keyword.arg == "deprecated"
+        and isinstance(keyword.value, ast.Constant)
+        and keyword.value.value is True
+        for keyword in decorator.keywords
+    )
+    return "deprecated" if deprecated else "stable"
+
+
 def _add(found: dict[str, dict], function_id: str, *, consumer: str, source_path: str,
          domain: str | None = None, stability: str = "stable") -> None:
     row = found.setdefault(function_id, {
@@ -259,7 +269,13 @@ def scan_fastapi_routes(root: Path) -> dict[str, dict]:
                     if route is None:
                         continue
                     endpoint = _join_route(prefix, route)
-                    _add(found, f"rest:{method.upper()}:{endpoint}", consumer="REST", source_path=_relative(path))
+                    _add(
+                        found,
+                        f"rest:{method.upper()}:{endpoint}",
+                        consumer="REST",
+                        source_path=_relative(path),
+                        stability=_route_stability(decorator),
+                    )
     return found
 
 

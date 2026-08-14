@@ -52,6 +52,8 @@ _CRITICAL_ROUTE_SPECS: list[tuple[str, str]] = [
     ("GET", "/api/lists"),
     ("GET", "/api/notifications/unread_count"),
     ("GET", "/api/workbenches"),
+    ("GET", "/api/workbench/home"),
+    ("GET", "/api/workbench/panel1"),
     ("GET", "/feishu/calendar/today"),
     ("GET", "/api/tasks"),
     ("GET", "/api/projects"),

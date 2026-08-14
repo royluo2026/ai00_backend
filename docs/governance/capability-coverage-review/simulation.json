@@ -3,7 +3,7 @@
   "domain": "Simulation",
   "reviewed_against": {
     "git_commit": "c0db9def09f35e92e06cc09a200bc63a082a233e",
-    "registry_sha256": "sha256:b32333613ddfb3072556390a57ef3a45a559f7d81a95180e1e4a5d1bc66d27c0",
+    "registry_sha256": "sha256:6d29aad333f2d31e3dc47de4ce06f9f56f80615436d4e5065a05d804b2d8eeb4",
     "catalog_release": "rel_54121d00931bc3886ff0b6e74f61c314",
     "catalog_sha256": "sha256:961d45686def2178ec15fbb8fa6a837ab298137e105c573e189246cfe925ade9"
   },
