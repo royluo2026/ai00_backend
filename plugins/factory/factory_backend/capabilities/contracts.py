@@ -39,5 +39,9 @@ INPUT_SCHEMA = {
 OUTPUT_SCHEMA = {
     "type": "object",
     "required": ["data"],
-    "properties": {"data": {}},
+    "properties": {
+        "data": {
+            "type": ["object", "array", "string", "number", "boolean", "null"],
+        },
+    },
 }

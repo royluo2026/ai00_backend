@@ -83,3 +83,31 @@ def test_factory_descriptor_accepts_supported_provider_payloads(capability_id, p
     )
 
     validate(instance=payload, schema=descriptor.input_schema)
+
+
+@pytest.mark.parametrize(
+    ("capability_id", "data"),
+    [
+        ("factory.structure.search", []),
+        ("factory.structure.create", {"gid": "factory-1", "version": 1}),
+    ],
+)
+def test_factory_descriptor_accepts_supported_provider_outputs(capability_id, data):
+    from plugins.factory.factory_backend.capabilities import register_capabilities
+
+    class Registry:
+        def __init__(self):
+            self.items = []
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.items.append((spec, handler, descriptor))
+
+    registry = Registry()
+    register_capabilities(registry)
+    descriptor = next(
+        descriptor
+        for spec, _, descriptor in registry.items
+        if spec.id == capability_id
+    )
+
+    validate(instance={"data": data}, schema=descriptor.output_schema)
