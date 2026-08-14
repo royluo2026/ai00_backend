@@ -238,16 +238,16 @@ function _toast(msg, ms = 2500) {
 }
 function _val(id) { return document.getElementById(id)?.value ?? ''; }
 
-function _factoryMutationId(capabilityId) {
+function _capabilityMutationId(capabilityId) {
   const random = globalThis.crypto?.randomUUID?.()
     || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-  return `web-factory:${capabilityId}:${random}`;
+  return `web-capability:${capabilityId}:${random}`;
 }
 
-async function _confirmFactoryMutation(capabilityId, payload) {
+async function _confirmCapabilityMutation(capabilityId, payload) {
   const cf = _cf();
   if (!cf) throw new Error('能力网关不可用');
-  const idempotencyKey = _factoryMutationId(capabilityId);
+  const idempotencyKey = _capabilityMutationId(capabilityId);
   const requestBody = { version: 1, payload, idempotency_key: idempotencyKey };
   const confirmed = await cf(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm`, {
     method: 'POST',
@@ -400,9 +400,21 @@ const SECTIONS = {
       };
     },
 
-    async create(cf, body) { return cf('/api/projects', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/projects/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/projects/${gid}`, { method:'DELETE' }); },
+    async create(_cf, body) {
+      return _confirmCapabilityMutation('project.project.change.apply', {
+        operation: 'projects.create', arguments: body,
+      });
+    },
+    async update(_cf, gid, body) {
+      return _confirmCapabilityMutation('project.project.change.apply', {
+        operation: 'projects.update', arguments: { gid, updates: body },
+      });
+    },
+    async remove(_cf, gid) {
+      return _confirmCapabilityMutation('project.project.change.apply', {
+        operation: 'projects.delete', arguments: { gid },
+      });
+    },
 
     searchFn(r, q) {
       return (r.name||'').toLowerCase().includes(q)
@@ -464,9 +476,21 @@ const SECTIONS = {
       return { name, brand: _val('fVmBrand').trim(), platform: _val('fVmPlatform').trim(), vehicle_type: _val('fVmType').trim() };
     },
 
-    async create(cf, body) { return cf('/api/projects/vehicle_models', { method:'POST', body: JSON.stringify(body) }); },
-    async update(cf, gid, body) { return cf(`/api/projects/vehicle_models/${gid}`, { method:'PATCH', body: JSON.stringify(body) }); },
-    async remove(cf, gid) { return cf(`/api/projects/vehicle_models/${gid}`, { method:'DELETE' }); },
+    async create(_cf, body) {
+      return _confirmCapabilityMutation('project.project.change.apply', {
+        operation: 'vehicle_models.create', arguments: body,
+      });
+    },
+    async update(_cf, gid, body) {
+      return _confirmCapabilityMutation('project.project.change.apply', {
+        operation: 'vehicle_models.update', arguments: { gid, ...body },
+      });
+    },
+    async remove(_cf, gid) {
+      return _confirmCapabilityMutation('project.project.change.apply', {
+        operation: 'vehicle_models.delete', arguments: { gid },
+      });
+    },
 
     searchFn(r, q) {
       return (r.name||'').toLowerCase().includes(q)
@@ -512,21 +536,21 @@ const SECTIONS = {
     },
 
     async create(_cf, body) {
-      return _confirmFactoryMutation('factory.structure.create', {
+      return _confirmCapabilityMutation('factory.structure.create', {
         kind: 'factory', name: body.name, attributes: {},
       });
     },
     async update(_cf, gid, body) {
       const current = _rows.find(row => row.gid === gid);
       if (!current?.version) throw new Error('工厂版本信息缺失，请刷新后重试');
-      return _confirmFactoryMutation('factory.structure.update', {
+      return _confirmCapabilityMutation('factory.structure.update', {
         gid, expected_version: current.version, updates: { name: body.name },
       });
     },
     async remove(_cf, gid) {
       const current = _rows.find(row => row.gid === gid);
       if (!current?.version) throw new Error('工厂版本信息缺失，请刷新后重试');
-      return _confirmFactoryMutation('factory.structure.archive', {
+      return _confirmCapabilityMutation('factory.structure.archive', {
         gid, expected_version: current.version,
       });
     },
