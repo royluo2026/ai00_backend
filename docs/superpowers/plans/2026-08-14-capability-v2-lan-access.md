@@ -4,7 +4,7 @@
 
 **Goal:** Expose the Capability V2 test service to the local development team at `http://pc-pc2l7vve:8094/web/` and make Feishu OAuth return to that same service.
 
-**Architecture:** Uvicorn listens on all IPv4 interfaces at port 8094, while a Windows Firewall rule restricts inbound access to the private-profile local subnet. The frontend and API remain same-origin. Feishu OAuth uses the hostname-based 8094 callback, and only the Capability V2 Windows service is restarted.
+**Architecture:** Uvicorn listens on all IPv4 interfaces at port 8094, while a Windows Firewall rule restricts inbound access to the domain-authenticated local subnet. The frontend and API remain same-origin. Feishu OAuth uses the hostname-based 8094 callback, and only the Capability V2 Windows service is restarted.
 
 **Tech Stack:** PowerShell, NSSM Windows service, Uvicorn/FastAPI, Windows Defender Firewall, Feishu OAuth.
 
@@ -13,7 +13,7 @@
 - Do not use subagents or create worktrees.
 - Modify only `AI00Backend-CapabilityV2`; do not modify the old service.
 - Keep port `8094`; change the Uvicorn listener from `127.0.0.1` to `0.0.0.0`.
-- Restrict the inbound rule to TCP 8094, the Private profile, and `LocalSubnet`.
+- Restrict the inbound rule to TCP 8094, the Domain profile, and `LocalSubnet`.
 - Do not expose database, MinIO, or other internal service ports.
 - Set `FEISHU_REDIRECT_URI` exactly to `http://pc-pc2l7vve:8094/auth/feishu/callback`.
 - Back up runtime files before editing. Do not commit backups, secrets, tokens, or passwords.
@@ -37,7 +37,7 @@
 
 Run a PowerShell assertion that checks the startup script contains
 `--host 0.0.0.0`, the environment contains the exact 8094 callback, and the
-firewall rule is present with `Profile=Private`, `RemoteAddress=LocalSubnet`,
+firewall rule is present with `Profile=Domain`, `RemoteAddress=LocalSubnet`,
 and `LocalPort=8094`.
 
 - [ ] **Step 2: Verify the assertion fails for the diagnosed reasons**
@@ -80,12 +80,12 @@ Expected: listener and callback assertions pass. No secret values are printed.
 
 **Interfaces:**
 - Consumes: Updated runtime configuration from Task 2.
-- Produces: A running service listening on all IPv4 interfaces, reachable only from the local subnet under the Private profile.
+- Produces: A running service listening on all IPv4 interfaces, reachable only from the local subnet under the Domain profile.
 
 - [ ] **Step 1: Create or normalize the firewall rule**
 
 Create one enabled inbound allow rule with protocol TCP, local port 8094,
-profile Private, and remote address `LocalSubnet`. If a rule with the exact
+profile Domain, and remote address `LocalSubnet`. If a rule with the exact
 display name exists, validate and update that rule rather than creating a
 duplicate.
 
