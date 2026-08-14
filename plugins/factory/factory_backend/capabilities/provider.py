@@ -29,7 +29,7 @@ def descriptor_for(spec) -> CapabilityDescriptorV2:
         "agent_output_schema": base.output_schema,
         "operation_policy": "required" if spec.id == "factory.asset.scrap" else ("optional" if write else "none"),
         "idempotency_policy": "required" if write else "none",
-        "consistency_policy": "strong", "evidence_policy": "required" if spec.id == "factory.asset.scrap" else "optional",
+        "consistency_policy": "external" if write else "strong", "evidence_policy": "required" if spec.id == "factory.asset.scrap" else "optional",
         "audit_policy": "high_risk" if spec.id == "factory.asset.scrap" else "standard",
         "domain_errors": ERRORS, "domain_errors_complete": True,
     })

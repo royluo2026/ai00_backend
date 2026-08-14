@@ -46,6 +46,24 @@ def test_factory_provider_registers_only_factory_owned_stable_descriptors():
     assert all(spec.confirmation == ("none" if spec.risk.value == "read" else "user") for spec, _, _ in registry.items)
 
 
+def test_factory_writes_use_domain_transactions_without_platform_enlistment():
+    from plugins.factory.factory_backend.capabilities import register_capabilities
+
+    class Registry:
+        def __init__(self):
+            self.items = []
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.items.append((spec, handler, descriptor))
+
+    registry = Registry()
+    register_capabilities(registry)
+
+    for spec, _, descriptor in registry.items:
+        expected = "strong" if spec.risk.value == "read" else "external"
+        assert descriptor.consistency_policy == expected, spec.id
+
+
 @pytest.mark.parametrize(
     ("capability_id", "payload"),
     [
