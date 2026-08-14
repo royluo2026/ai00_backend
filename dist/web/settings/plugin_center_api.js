@@ -58,11 +58,11 @@
       async invokeLifecycle(capabilityId, payload) {
         const headers = { 'X-AI00-Source': 'web' };
         const confirmed = await request(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm`, {
-          method: 'POST', headers, body: JSON.stringify({ payload }),
+          method: 'POST', headers, body: JSON.stringify({ version: 1, payload }),
         });
         return request(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke`, {
           method: 'POST', headers,
-          body: JSON.stringify({ payload, confirmation_token: confirmed?.confirmation_token }),
+          body: JSON.stringify({ version: 1, payload, confirmation_token: confirmed?.confirmation_token }),
         });
       },
     };
