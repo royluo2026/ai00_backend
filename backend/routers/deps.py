@@ -322,6 +322,21 @@ def build_profile(user: dict) -> dict:
         v2_perms.add("craft.read")
     if "craft.write_direct" in perms:
         v2_perms.add("craft.write")
+    # Physical factory topology is an independent Capability V2 domain.  The
+    # legacy UI exposed its read routes to every role that could view craft,
+    # so project that existing entitlement instead of making the Factory
+    # provider depend on a craft-domain permission.
+    if "craft.view" in perms:
+        v2_perms.add("factory.read")
+    factory_writer_roles = {
+        "super_admin", "team_admin", "project_admin", "knowledge_admin",
+    }
+    if (
+        org_role == "super_admin"
+        or role in factory_writer_roles
+        or any(g.get("grant_type") == "team_admin" for g in grants)
+    ):
+        v2_perms.add("factory.write")
     if org_role != "external":
         v2_perms.update({"digital_model.use", "simulation.use"})
     perms = list(set(perms) | v2_perms)

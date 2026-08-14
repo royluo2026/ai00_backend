@@ -16,7 +16,14 @@ def test_member_can_see_plugin_market_without_manage_permission():
 
     assert "plugin-market" in profile["visible_panels"]
     assert "system.plugin.manage" not in profile["permissions"]
-    assert {"craft.read", "craft.write", "digital_model.use", "simulation.use"} <= set(profile["permissions"])
+    assert {
+        "craft.read",
+        "craft.write",
+        "factory.read",
+        "digital_model.use",
+        "simulation.use",
+    } <= set(profile["permissions"])
+    assert "factory.write" not in profile["permissions"]
 
 
 def test_super_admin_keeps_plugin_management_permission():
@@ -31,6 +38,21 @@ def test_super_admin_keeps_plugin_management_permission():
 
     assert "plugin-market" in profile["visible_panels"]
     assert "system.plugin.manage" in profile["permissions"]
+    assert {"factory.read", "factory.write"} <= set(profile["permissions"])
+
+
+def test_external_user_does_not_receive_factory_capabilities():
+    user = {
+        "gid": "external-1",
+        "system_role": "external",
+        "org_role": "external",
+        "is_active": True,
+    }
+    with patch("backend.routers.deps._get_user_grants", return_value=[]):
+        profile = build_profile(user)
+
+    assert "factory.read" not in profile["permissions"]
+    assert "factory.write" not in profile["permissions"]
 
 
 def test_upgrade_health_uses_trusted_control_plane_callback(monkeypatch):
