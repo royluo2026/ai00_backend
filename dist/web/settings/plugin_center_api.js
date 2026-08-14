@@ -6,7 +6,7 @@
   'use strict';
 
   function errorText(result, fallback = '操作失败') {
-    const detail = result?.detail || result?.error || result?.msg;
+    const detail = result?.detail || result?.error || result?.data?.error || result?.msg;
     if (typeof detail === 'string') return detail;
     return detail?.message || detail?.code || fallback;
   }
@@ -57,12 +57,21 @@
       },
       async invokeLifecycle(capabilityId, payload) {
         const headers = { 'X-AI00-Source': 'web' };
+        const nonce = globalThis.crypto?.randomUUID?.()
+          || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+        const idempotencyKey = `web-plugin-lifecycle:${capabilityId}:${nonce}`;
         const confirmed = await request(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:confirm`, {
-          method: 'POST', headers, body: JSON.stringify({ version: 1, payload }),
+          method: 'POST', headers,
+          body: JSON.stringify({ version: 1, payload, idempotency_key: idempotencyKey }),
         });
         return request(`/api/v1/capabilities/${encodeURIComponent(capabilityId)}:invoke`, {
           method: 'POST', headers,
-          body: JSON.stringify({ version: 1, payload, confirmation_token: confirmed?.confirmation_token }),
+          body: JSON.stringify({
+            version: 1,
+            payload,
+            confirmation_token: confirmed?.confirmation_token,
+            idempotency_key: idempotencyKey,
+          }),
         });
       },
     };
