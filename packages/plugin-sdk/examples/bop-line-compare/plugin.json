@@ -1,0 +1,40 @@
+{
+  "schema_version": "2.0",
+  "plugin_id": "devteam.ai00.bop-line-compare",
+  "publisher_id": "devteam",
+  "name": "BOP 线体对比",
+  "description": "对比两个车型 BOP 的指定线体，并展示工艺、零件、工具及 Capability 编排过程。",
+  "version": "1.0.0",
+  "compatibility": {
+    "platform_api": ">=1.0.0 <2.0.0",
+    "web_sdk": ">=0.1.0 <1.0.0"
+  },
+  "runtimes": {
+    "web": {
+      "entry": "index.html",
+      "sandbox": "allow-scripts"
+    }
+  },
+  "permissions": [
+    "base.project.search",
+    "craft.bop.version.list",
+    "craft.bop.execution_structure.get",
+    "craft.bop.work_package.get",
+    "craft.bop.linked_parts.get"
+  ],
+  "capabilities": {
+    "required": [
+      { "id": "base.project.search", "major": 1 },
+      { "id": "craft.bop.version.list", "major": 1 },
+      { "id": "craft.bop.execution_structure.get", "major": 1 },
+      { "id": "craft.bop.work_package.get", "major": 1 },
+      { "id": "craft.bop.linked_parts.get", "major": 1 }
+    ],
+    "optional": []
+  },
+  "data": {
+    "stores_personal_data": false,
+    "retention": "none",
+    "uninstall": "delete"
+  }
+}
