@@ -40,8 +40,9 @@
       <label for="operation-query">手工输入模糊匹配</label>
       <input id="operation-query" placeholder="例如：副车架拧紧" disabled>
       <div class="candidate-grid">
-        <div><h3>左侧候选</h3><div id="left-candidates" class="candidate-list"><p class="empty">暂无候选</p></div></div>
-        <div><h3>右侧候选</h3><div id="right-candidates" class="candidate-list"><p class="empty">暂无候选</p></div></div>
+        <div><div class="candidate-heading"><h3>左侧候选</h3><span id="left-candidate-project" class="project-marker">尚未选择项目</span></div><div id="left-candidates" class="candidate-list"><p class="empty">暂无候选</p></div></div>
+        <div><div class="candidate-heading"><h3>右侧候选</h3><span id="right-candidate-project" class="project-marker">尚未选择项目</span></div><div id="right-candidates" class="candidate-list"><p class="empty">暂无候选</p></div></div>
+        <div id="aligned-candidate-pairs" class="aligned-candidate-pairs" hidden></div>
       </div>
     </section>
 

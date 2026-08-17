@@ -1,5 +1,6 @@
 import { Ai00PluginClient } from './ai00-plugin-sdk.js';
 import { compareRefs, searchOperationCandidates } from './compare-engine.js';
+import { formatProjectIdentity, renderAlignedCandidateRows } from './candidate-view.js';
 import {
   buildComparison, createTrace, loadBopChoices, loadBopStructure,
   loadLineContext, partsForOperation, searchProjects, toolsForOperation,
@@ -77,7 +78,9 @@ async function searchSide(side) {
 }
 
 async function selectProject(side, project) {
-  state[side].project = project; resetAfterProject(side); setStatus(side, `已选择 ${project.title}，加载 BOP…`);
+  state[side].project = project;
+  $(`#${side}-candidate-project`).textContent = formatProjectIdentity(project);
+  resetAfterProject(side); setStatus(side, `已选择 ${project.title}，加载 BOP…`);
   const bops = await runSide(side, () => loadBopChoices(client, project.object_ref, trace));
   if (!bops) return;
   state[side].bops = bops;
@@ -128,17 +131,20 @@ function choosePair(left, right, method, score = 1, reasons = []) {
 function renderAligned(vppsOnly) {
   if (!state.comparison) return;
   const matches = vppsOnly ? state.comparison.alignment.exact : [...state.comparison.alignment.exact, ...state.comparison.alignment.fuzzy];
-  $('#left-candidates').innerHTML = matches.length ? matches.map((match, index) => `<button class="candidate" data-index="${index}"><span><strong>${esc(operationLabel(match.left))}</strong><small>${esc(match.method === 'vpps' ? 'VPPS 精确' : `描述相似 ${Math.round(match.score * 100)}%`)}</small></span></button>`).join('') : '<p class="empty">没有匹配结果</p>';
-  $('#right-candidates').innerHTML = matches.length ? matches.map(match => `<div class="candidate"><span><strong>${esc(operationLabel(match.right))}</strong><small>${esc(match.reasons.join('、'))}</small></span></div>`).join('') : '<p class="empty">没有匹配结果</p>';
-  $('#left-candidates').querySelectorAll('button').forEach(button => button.addEventListener('click', () => { const match = matches[Number(button.dataset.index)]; choosePair(match.left, match.right, match.method, match.score, match.reasons); }));
+  $('#left-candidates').hidden = true; $('#right-candidates').hidden = true;
+  const paired = $('#aligned-candidate-pairs'); paired.hidden = false;
+  paired.innerHTML = matches.length ? renderAlignedCandidateRows(matches, esc) : '<p class="empty">没有匹配结果</p>';
+  paired.querySelectorAll('button[data-side="left"]').forEach(button => button.addEventListener('click', () => { const match = matches[Number(button.dataset.index)]; choosePair(match.left, match.right, match.method, match.score, match.reasons); }));
   if (matches.length) choosePair(matches[0].left, matches[0].right, matches[0].method, matches[0].score, matches[0].reasons);
 }
 
 function renderManualCandidates(query) {
   if (!query || !state.left.context || !state.right.context) return;
+  $('#aligned-candidate-pairs').hidden = true;
   for (const side of ['left','right']) {
     const items = searchOperationCandidates(query, state[side].context.operations, 8);
     const root = $(`#${side}-candidates`);
+    root.hidden = false;
     root.innerHTML = items.length ? items.map((item, index) => `<button class="candidate ${state[side].candidate?.operation_id === item.operation.operation_id ? 'selected' : ''}" data-index="${index}"><span><strong>${esc(item.operation.name)}</strong><small>${esc(item.operation.parameters?.vpps || '无 VPPS')} · ${Math.round(item.score * 100)}%</small></span></button>`).join('') : '<p class="empty">没有候选</p>';
     root.querySelectorAll('button').forEach(button => button.addEventListener('click', () => {
       state[side].candidate = items[Number(button.dataset.index)].operation;

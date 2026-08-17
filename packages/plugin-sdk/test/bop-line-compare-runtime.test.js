@@ -5,8 +5,10 @@ import { fileURLToPath } from 'node:url';
 
 const exampleUrl = new URL('../examples/bop-line-compare/', import.meta.url);
 const runtimeUrl = new URL('bop-runtime.js', exampleUrl);
+const candidateViewUrl = new URL('candidate-view.js', exampleUrl);
 const manifestUrl = new URL('plugin.json', exampleUrl);
 const runtime = fs.existsSync(fileURLToPath(runtimeUrl)) ? await import(runtimeUrl) : {};
+const candidateView = fs.existsSync(fileURLToPath(candidateViewUrl)) ? await import(candidateViewUrl) : {};
 const manifest = fs.existsSync(fileURLToPath(manifestUrl))
   ? JSON.parse(fs.readFileSync(fileURLToPath(manifestUrl), 'utf8'))
   : {};
@@ -109,11 +111,34 @@ test('plugin page exposes the complete two-column comparison workflow', () => {
   for (const id of [
     'left-project-query', 'right-project-query', 'left-bop', 'right-bop',
     'left-line', 'right-line', 'operation-query', 'auto-align', 'vpps-only',
-    'left-candidates', 'right-candidates', 'process-view', 'parts-view',
+    'left-candidate-project', 'right-candidate-project',
+    'left-candidates', 'right-candidates', 'aligned-candidate-pairs', 'process-view', 'parts-view',
     'tools-view', 'trace-list',
   ]) {
     assert.match(html, new RegExp(`id=["']${id}["']`), `missing UI region ${id}`);
   }
+});
+
+test('aligned candidates use paired cards with the same row box on both sides', () => {
+  assert.equal(typeof candidateView.renderAlignedCandidateRows, 'function');
+  const html = candidateView.renderAlignedCandidateRows([{
+    left: { operation_id: 'left-1', name: '左侧操作', parameters: { vpps: 'VPPS-1' } },
+    right: { operation_id: 'right-1', name: '右侧操作', parameters: { vpps: 'VPPS-1' } },
+    method: 'vpps', score: 1, reasons: ['VPPS 一致'],
+  }], value => String(value));
+
+  assert.match(html, /^<div class="candidate-pair" data-index="0">/);
+  assert.equal((html.match(/class="candidate/g) || []).length, 3);
+  assert.match(html, /data-side="left"/);
+  assert.match(html, /data-side="right"/);
+});
+
+test('candidate project marker identifies the selected project by name and reference', () => {
+  assert.equal(typeof candidateView.formatProjectIdentity, 'function');
+  assert.equal(
+    candidateView.formatProjectIdentity({ title: 'Atlas X1', object_ref: 'project:atlas-x1' }),
+    'Atlas X1 · project:atlas-x1',
+  );
 });
 
 test('plugin controller stays inside the SDK Mount and sandbox boundary', () => {
