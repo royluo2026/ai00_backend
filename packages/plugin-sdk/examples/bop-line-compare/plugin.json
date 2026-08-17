@@ -18,7 +18,7 @@
   "permissions": [
     "base.project.search",
     "craft.bop.version.list",
-    "craft.bop.execution_structure.preview",
+    "craft.bop.execution_structure.get",
     "craft.bop.work_package.get",
     "craft.bop.linked_parts.get"
   ],
@@ -26,7 +26,7 @@
     "required": [
       { "id": "base.project.search", "major": 1 },
       { "id": "craft.bop.version.list", "major": 1 },
-      { "id": "craft.bop.execution_structure.preview", "major": 1 },
+      { "id": "craft.bop.execution_structure.get", "major": 1 },
       { "id": "craft.bop.work_package.get", "major": 1 },
       { "id": "craft.bop.linked_parts.get", "major": 1 }
     ],
