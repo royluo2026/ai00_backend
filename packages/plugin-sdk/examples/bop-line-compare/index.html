@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BOP 线体对比</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div><p class="eyebrow">Capability V2 Demo Plugin</p><h1>BOP 线体对比</h1><p>选择两个车型的 BOP 线体，对齐操作并比较工艺、零件和工具。</p></div>
+    <div id="connection" class="connection">连接平台中…</div>
+  </header>
+
+  <main>
+    <section class="selection-grid" aria-label="左右 BOP 选择">
+      <article class="selector left" data-side="left">
+        <h2>左侧车型</h2>
+        <label for="left-project-query">项目名称或编码</label>
+        <div class="search-row"><input id="left-project-query" placeholder="例如 Atlas X1"><button id="left-project-search">搜索</button></div>
+        <div id="left-project-results" class="project-results"></div>
+        <label for="left-bop">BOP 版本</label><select id="left-bop" disabled><option value="">请先选择项目</option></select>
+        <label for="left-line">线体</label><select id="left-line" disabled><option value="">请先选择 BOP</option></select>
+        <div id="left-status" class="side-status">等待选择</div>
+      </article>
+      <article class="selector right" data-side="right">
+        <h2>右侧车型</h2>
+        <label for="right-project-query">项目名称或编码</label>
+        <div class="search-row"><input id="right-project-query" placeholder="例如 Atlas X2"><button id="right-project-search">搜索</button></div>
+        <div id="right-project-results" class="project-results"></div>
+        <label for="right-bop">BOP 版本</label><select id="right-bop" disabled><option value="">请先选择项目</option></select>
+        <label for="right-line">线体</label><select id="right-line" disabled><option value="">请先选择 BOP</option></select>
+        <div id="right-status" class="side-status">等待选择</div>
+      </article>
+    </section>
+
+    <section class="match-panel">
+      <div class="section-head"><div><p class="eyebrow">Operation matching</p><h2>同操作匹配</h2></div><span id="match-summary">请先加载左右线体</span></div>
+      <div class="mode-row"><button id="auto-align" class="primary">自动对齐</button><button id="vpps-only">仅看 VPPS</button></div>
+      <label for="operation-query">手工输入模糊匹配</label>
+      <input id="operation-query" placeholder="例如：副车架拧紧" disabled>
+      <div class="candidate-grid">
+        <div><h3>左侧候选</h3><div id="left-candidates" class="candidate-list"><p class="empty">暂无候选</p></div></div>
+        <div><h3>右侧候选</h3><div id="right-candidates" class="candidate-list"><p class="empty">暂无候选</p></div></div>
+      </div>
+    </section>
+
+    <section class="result-panel">
+      <div class="tabs" role="tablist" aria-label="对比维度">
+        <button class="tab active" data-view="process" aria-selected="true">工艺</button>
+        <button class="tab" data-view="parts" aria-selected="false">零件</button>
+        <button class="tab" data-view="tools" aria-selected="false">工具</button>
+      </div>
+      <div id="pair-banner" class="pair-banner">请从自动对齐结果或左右搜索候选中选择一对操作。</div>
+      <div class="compare-grid">
+        <article id="process-view" class="compare-side left"><h3>左侧操作</h3><div id="left-process" class="detail-list"></div></article>
+        <article id="parts-view" class="compare-side left" hidden><h3>左侧零件</h3><div id="left-parts" class="detail-list"></div></article>
+        <article id="tools-view" class="compare-side left" hidden><h3>左侧工具</h3><div id="left-tools" class="detail-list"></div></article>
+        <article id="right-process-view" class="compare-side right"><h3>右侧操作</h3><div id="right-process" class="detail-list"></div></article>
+        <article id="right-parts-view" class="compare-side right" hidden><h3>右侧零件</h3><div id="right-parts" class="detail-list"></div></article>
+        <article id="right-tools-view" class="compare-side right" hidden><h3>右侧工具</h3><div id="right-tools" class="detail-list"></div></article>
+      </div>
+    </section>
+
+    <details class="trace-panel" open>
+      <summary><span>本次 Capability 编排</span><small>插件通过 Mount 获取业务材料，再在沙箱内完成对齐。</small></summary>
+      <div id="trace-list" class="trace-list"><p class="empty">尚未调用 Capability</p></div>
+    </details>
+  </main>
+  <div id="toast" class="toast" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

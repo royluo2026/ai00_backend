@@ -102,3 +102,23 @@ test('failed capability exposes a typed public error and trace omits raw details
   const serialized = JSON.stringify(trace.items);
   assert.doesNotMatch(serialized, /DO_NOT_LEAK|token|details/i);
 });
+
+test('plugin page exposes the complete two-column comparison workflow', () => {
+  const htmlPath = fileURLToPath(new URL('index.html', exampleUrl));
+  const html = fs.existsSync(htmlPath) ? fs.readFileSync(htmlPath, 'utf8') : '';
+  for (const id of [
+    'left-project-query', 'right-project-query', 'left-bop', 'right-bop',
+    'left-line', 'right-line', 'operation-query', 'auto-align', 'vpps-only',
+    'left-candidates', 'right-candidates', 'process-view', 'parts-view',
+    'tools-view', 'trace-list',
+  ]) {
+    assert.match(html, new RegExp(`id=["']${id}["']`), `missing UI region ${id}`);
+  }
+});
+
+test('plugin controller stays inside the SDK Mount and sandbox boundary', () => {
+  const appPath = fileURLToPath(new URL('app.js', exampleUrl));
+  const app = fs.existsSync(appPath) ? fs.readFileSync(appPath, 'utf8') : '';
+  assert.match(app, /Ai00PluginClient/);
+  assert.doesNotMatch(app, /\bfetch\s*\(|XMLHttpRequest|document\.cookie|contentDocument|parent\.document|randomUUID/);
+});
