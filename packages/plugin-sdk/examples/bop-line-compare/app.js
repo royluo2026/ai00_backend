@@ -89,13 +89,14 @@ async function selectProject(side, project) {
 async function selectBop(side, versionGid) {
   state[side].context = null; state[side].candidate = null; clearComparison();
   if (!versionGid) return;
-  setStatus(side, '读取正式执行结构…');
-  const value = await runSide(side, () => loadBopStructure(client, versionGid, trace));
+  const selected = state[side].bops.find(item => item.version_gid === versionGid);
+  setStatus(side, '读取指定修订版执行结构…');
+  const value = await runSide(side, () => loadBopStructure(client, versionGid, Number(selected?.revision), trace));
   if (!value) return;
   state[side].structure = value.structure; state[side].lines = value.lines;
   const select = $(`#${side}-line`); select.disabled = false;
   select.innerHTML = '<option value="">选择线体</option>' + value.lines.map(line => `<option value="${esc(line.node_id)}">${esc(line.name || line.node_id)}</option>`).join('');
-  setStatus(side, `执行结构已受控发布，发现 ${value.lines.length} 条线体`);
+  setStatus(side, `修订版 ${selected?.revision} 已加载，发现 ${value.lines.length} 条线体`);
 }
 
 async function selectLine(side, lineGid) {

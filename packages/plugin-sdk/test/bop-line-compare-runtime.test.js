@@ -14,7 +14,7 @@ const manifest = fs.existsSync(fileURLToPath(manifestUrl))
 const capabilityIds = [
   'base.project.search',
   'craft.bop.version.list',
-  'craft.bop.execution_structure.get',
+  'craft.bop.execution_structure.preview',
   'craft.bop.work_package.get',
   'craft.bop.linked_parts.get',
 ];
@@ -30,8 +30,8 @@ function fixtureClient({ failWorkPackage = false } = {}) {
       this.calls.push({ id, payload });
       if (id === 'base.project.search') return completed({ query: payload.query, total: 1, items: [{ object_ref: 'project:p1', title: 'Atlas X1', owner: 'project_management' }] });
       if (id === 'craft.bop.version.list') return completed({ items: [{ version_gid: 'bop-1', version_tag: 'V1', bop_name: '总装 BOP', family_gid: null, project_gid: payload.project_gid, status: 'baseline', lifecycle_phase: 'published', revision: 4, updated_at: '2026-08-17T00:00:00Z', archived: false }], next_cursor: null });
-      if (id === 'craft.bop.execution_structure.get') return completed({
-        contract_id: 'craft.execution_structure', contract_version: 1, official: true,
+      if (id === 'craft.bop.execution_structure.preview') return completed({
+        contract_id: 'craft.execution_structure', contract_version: 1, official: false,
         source: { bop_version_gid: payload.version_gid, project_gid: 'p1', revision: 4 },
         published_at: '2026-08-17T00:00:00Z', content_hash: 'sha256:demo', dependencies: [], conditions: [],
         nodes: [{ node_id: 'line-1', parent_id: null, kind: 'line_process', sequence: 10, name: '底盘一线', vpps: null, part_refs: [], tool_refs: [], fixture_refs: [], equipment_refs: [], knowledge_refs: [], rule_refs: [] }],
@@ -66,7 +66,7 @@ test('runtime discovers a project, BOP, line, and bounded line context through d
   const trace = runtime.createTrace();
   const projects = await runtime.searchProjects(client, 'Atlas', trace);
   const bops = await runtime.loadBopChoices(client, projects[0].object_ref, trace);
-  const structure = await runtime.loadBopStructure(client, bops[0].version_gid, trace);
+  const structure = await runtime.loadBopStructure(client, bops[0].version_gid, bops[0].revision, trace);
   const context = await runtime.loadLineContext(client, bops[0].version_gid, structure.lines[0].node_id, trace);
 
   assert.equal(context.operations[0].parameters.vpps, 'TA-340');
@@ -74,6 +74,30 @@ test('runtime discovers a project, BOP, line, and bounded line context through d
   assert.deepEqual(client.calls.map(call => call.id), capabilityIds);
   assert.ok(client.calls.every(call => capabilityIds.includes(call.id)));
   assert.deepEqual(trace.items.map(item => item.status), ['completed', 'completed', 'completed', 'completed', 'completed']);
+});
+
+test('unpublished BOP loads an exact revision through preview', async () => {
+  const client = fixtureClient();
+  const trace = runtime.createTrace();
+
+  await runtime.loadBopStructure(client, 'draft-bop', 7, trace);
+
+  assert.deepEqual(client.calls.at(-1), {
+    id: 'craft.bop.execution_structure.preview',
+    payload: { version_gid: 'draft-bop', expected_revision: 7 },
+  });
+  assert.equal(trace.items.at(-1).capability_id, 'craft.bop.execution_structure.preview');
+});
+
+test('structure preview rejects a missing or invalid revision before Mount invocation', async () => {
+  for (const revision of [null, 0, 1.5, '7']) {
+    const client = fixtureClient();
+    await assert.rejects(
+      runtime.loadBopStructure(client, 'draft-bop', revision, runtime.createTrace()),
+      error => error.code === 'revision_required',
+    );
+    assert.equal(client.calls.length, 0);
+  }
 });
 
 test('buildComparison keeps process, part, and tool material non-empty', () => {

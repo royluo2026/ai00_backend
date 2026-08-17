@@ -3,7 +3,7 @@ import { alignOperations, compareRefs } from './compare-engine.js';
 const PURPOSES = {
   'base.project.search': '搜索车型项目',
   'craft.bop.version.list': '发现项目 BOP 版本',
-  'craft.bop.execution_structure.get': '读取 BOP 层级和线体',
+  'craft.bop.execution_structure.preview': '读取指定 BOP 修订版的层级和线体',
   'craft.bop.work_package.get': '投影线体工艺与资源',
   'craft.bop.linked_parts.get': '补充关联零件详情',
 };
@@ -69,8 +69,17 @@ export async function loadBopChoices(client, projectRef, trace = createTrace()) 
   return (data.items || []).filter(item => !item.archived);
 }
 
-export async function loadBopStructure(client, versionGid, trace = createTrace()) {
-  const structure = await invoke(client, 'craft.bop.execution_structure.get', { version_gid: versionGid }, trace);
+export async function loadBopStructure(client, versionGid, expectedRevision, trace = createTrace()) {
+  if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
+    const error = new Error('BOP version does not provide a valid revision');
+    error.code = 'revision_required';
+    error.retryable = false;
+    throw error;
+  }
+  const structure = await invoke(client, 'craft.bop.execution_structure.preview', {
+    version_gid: versionGid,
+    expected_revision: expectedRevision,
+  }, trace);
   const lines = (structure.nodes || []).filter(node => String(node.kind || '').toLowerCase().includes('line'));
   return { structure, lines };
 }

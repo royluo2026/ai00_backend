@@ -6,7 +6,7 @@
 
 1. `base.project.search@1` 搜索车型项目。
 2. `craft.bop.version.list@1` 发现项目 BOP。
-3. `craft.bop.execution_structure.get@1` 读取正式层级并选择线体。
+3. `craft.bop.execution_structure.preview@1` 按版本列表返回的精确修订号读取层级并选择线体，BOP 无须预先发布。
 4. `craft.bop.work_package.get@1` 投影线体的操作和资源。
 5. `craft.bop.linked_parts.get@1` 补充零件名称、编号和使用位置。
 
