@@ -1,0 +1,4 @@
+{
+  "schema_version": 1,
+  "domains": [{"domain_id": "craft", "artifact_path": "plugins/craft/craft_backend", "artifact": {"plugin_id": "official.craft", "module": "craft_backend.capabilities", "version": "1.0.0", "artifact_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"}, "allowed_owners": ["craft"], "database": {"database_name": "ai00_craft", "runtime_url_env": "AI00_CRAFT_DB_URL", "ddl_url_env": "AI00_CRAFT_DDL_DB_URL", "migration_path": "plugins/craft/migrations", "schema_paths": ["plugins/craft/migrations"]}}]
+}
