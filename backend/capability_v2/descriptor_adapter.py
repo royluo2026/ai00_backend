@@ -6,7 +6,7 @@ import json
 from typing import Any, Mapping
 
 from backend.capabilities.models_next import CapabilityExecution, CapabilityRisk, CapabilitySpec
-from .contracts import AutomationLevel, CapabilityDescriptorV2, ExecutionMode, ExposurePolicy, SideEffectLevel
+from .contracts import AutomationLevel, CapabilityDescriptorV2, ExecutionBudget, ExecutionMode, ExposurePolicy, SideEffectLevel
 
 _OWNER_ALIASES = {"plugin": "base", "runtime": "device", "vismockup": "device"}
 
@@ -46,6 +46,9 @@ def descriptor_from_provider_spec(spec: CapabilitySpec) -> CapabilityDescriptorV
     execution_mode = ExecutionMode.LOCAL if spec.execution is CapabilityExecution.LOCAL else ExecutionMode.CLOUD_SYNC
     description = spec.description.strip() or f"Capability {spec.id}."
     permissions = ",".join(spec.permissions) or "authenticated"
+    execution_budget = ExecutionBudget.model_validate(
+        spec.execution_budget.model_dump(mode="json") if spec.execution_budget is not None else {}
+    )
     return CapabilityDescriptorV2(
         id=spec.id, major_version=spec.version, owner_domain=_OWNER_ALIASES.get(spec.owner, spec.owner),
         lifecycle_status="experimental", title=spec.id, description=description,
@@ -59,6 +62,7 @@ def descriptor_from_provider_spec(spec: CapabilitySpec) -> CapabilityDescriptorV
         agent_output_schema=output_schema if is_read and execution_mode is not ExecutionMode.LOCAL else None,
         schema_hash=_schema_hash(input_schema, output_schema),
         operation_policy="required" if execution_mode is ExecutionMode.LOCAL else "none",
+        execution_budget=execution_budget,
         idempotency_policy="optional" if not is_read and spec.idempotent else "none",
         confirmation_policy=spec.confirmation,
         audit_policy="high_risk" if spec.risk is CapabilityRisk.DESTRUCTIVE else "standard",

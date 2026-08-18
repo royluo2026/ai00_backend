@@ -55,6 +55,43 @@ class SideEffectLevel(str, Enum):
     DESTRUCTIVE = "destructive"
 
 
+class MemoryClass(str, Enum):
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+
+
+class CollectionPolicy(str, Enum):
+    BOUNDED = "bounded"
+    PAGED = "paged"
+    ARTIFACT = "artifact"
+
+
+class OverloadPolicy(str, Enum):
+    REJECT = "reject"
+    DEGRADE = "degrade"
+    ASYNC_ARTIFACT = "async_artifact"
+
+
+class ExecutionBudget(FrozenModel):
+    memory_class: MemoryClass = MemoryClass.SMALL
+    max_input_bytes: int = Field(default=1024 * 1024, gt=0)
+    max_output_bytes: int = Field(default=4 * 1024 * 1024, gt=0)
+    collection_policy: CollectionPolicy = CollectionPolicy.BOUNDED
+    max_page_size: int | None = Field(default=None, gt=0)
+    max_parallel_per_consumer: int = Field(default=4, gt=0)
+    max_parallel_per_tenant: int = Field(default=32, gt=0)
+    overload_policy: OverloadPolicy = OverloadPolicy.REJECT
+
+    @model_validator(mode="after")
+    def page_size_matches_collection_policy(self) -> "ExecutionBudget":
+        if self.collection_policy is CollectionPolicy.PAGED and self.max_page_size is None:
+            raise ValueError("paged collection policy requires max_page_size")
+        if self.collection_policy is not CollectionPolicy.PAGED and self.max_page_size is not None:
+            raise ValueError("max_page_size is only valid for paged collection policy")
+        return self
+
+
 class CapabilityStatus(str, Enum):
     COMPLETED = "completed"
     ACCEPTED = "accepted"
@@ -290,6 +327,7 @@ class CapabilityDescriptorV2(FrozenModel):
     consistency_policy: Literal["strong", "eventual", "external"] = "strong"
     timeout_seconds: int = Field(default=30, ge=1, le=86400)
     rate_limit_cost: int = Field(default=1, ge=1, le=10000)
+    execution_budget: ExecutionBudget = Field(default_factory=ExecutionBudget)
     confirmation_policy: Literal["none", "user", "admin", "dual"] = "none"
     evidence_policy: Literal["none", "optional", "required"] = "optional"
     audit_policy: Literal["standard", "high_risk"] = "standard"

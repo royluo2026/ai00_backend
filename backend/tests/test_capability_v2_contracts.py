@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from backend.capabilities.models_next import CapabilityRisk, CapabilitySpec
+from backend.capabilities.models_next import CapabilityExecutionBudget, CapabilityRisk, CapabilitySpec
 from backend.capability_v2.contracts import (
     ActorIdentity,
     AutomationLevel,
@@ -13,6 +13,7 @@ from backend.capability_v2.contracts import (
     ConsumerDescriptor,
     ConsumerIdentity,
     ConsumerType,
+    ExecutionBudget,
     ExposurePolicy,
     InvocationEnvelope,
     OperationRef,
@@ -188,3 +189,67 @@ def test_v1_adapter_is_experimental_and_never_infers_plugin_or_agent_write_acces
     assert descriptor.automation_level is AutomationLevel.A1
     assert descriptor.input_schema["additionalProperties"] is False
     assert descriptor.output_schema["additionalProperties"] is False
+
+
+def test_v1_adapter_preserves_explicit_execution_budget():
+    budget = CapabilityExecutionBudget(
+        memory_class="medium",
+        max_input_bytes=64 * 1024,
+        max_output_bytes=1024 * 1024,
+        collection_policy="paged",
+        max_page_size=200,
+        max_parallel_per_consumer=1,
+        max_parallel_per_tenant=4,
+        overload_policy="reject",
+    )
+    descriptor = adapt_v1_spec(CapabilitySpec(
+        id="craft.bop.work-package.get",
+        owner="craft",
+        description="Read one bounded BOP work-package page.",
+        execution_budget=budget,
+    ))
+
+    assert descriptor.execution_budget == ExecutionBudget.model_validate(budget.model_dump())
+    assert descriptor.execution_budget.max_page_size == 200
+
+
+def test_descriptor_always_contains_a_frozen_conservative_execution_budget():
+    descriptor = adapt_v1_spec(CapabilitySpec(
+        id="craft.routing.get",
+        owner="craft",
+        description="Read one routing.",
+    ))
+
+    assert descriptor.execution_budget.collection_policy == "bounded"
+    assert descriptor.execution_budget.max_input_bytes == 1024 * 1024
+    assert descriptor.execution_budget.max_output_bytes == 4 * 1024 * 1024
+    with pytest.raises(ValidationError, match="frozen"):
+        descriptor.execution_budget.max_output_bytes = 1
+
+
+@pytest.mark.parametrize(
+    ("updates", "message"),
+    [
+        ({"max_input_bytes": 0}, "greater than 0"),
+        ({"max_output_bytes": 0}, "greater than 0"),
+        ({"max_parallel_per_consumer": 0}, "greater than 0"),
+        ({"max_parallel_per_tenant": 0}, "greater than 0"),
+        ({"collection_policy": "paged", "max_page_size": None}, "max_page_size"),
+        ({"collection_policy": "bounded", "max_page_size": 10}, "paged"),
+    ],
+)
+def test_execution_budget_rejects_invalid_limits(updates, message):
+    values = {
+        "memory_class": "small",
+        "max_input_bytes": 1024,
+        "max_output_bytes": 4096,
+        "collection_policy": "bounded",
+        "max_page_size": None,
+        "max_parallel_per_consumer": 1,
+        "max_parallel_per_tenant": 1,
+        "overload_policy": "reject",
+        **updates,
+    }
+
+    with pytest.raises(ValidationError, match=message):
+        ExecutionBudget(**values)

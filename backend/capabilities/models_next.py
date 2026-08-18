@@ -2,7 +2,7 @@
 from __future__ import annotations
 from enum import Enum
 from typing import Any, Awaitable, Callable, Mapping
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 class CapabilityExecution(str, Enum):
     CLOUD = "cloud"
@@ -12,6 +12,44 @@ class CapabilityRisk(str, Enum):
     READ = "read"
     WRITE = "write"
     DESTRUCTIVE = "destructive"
+
+
+class CapabilityMemoryClass(str, Enum):
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+
+
+class CapabilityCollectionPolicy(str, Enum):
+    BOUNDED = "bounded"
+    PAGED = "paged"
+    ARTIFACT = "artifact"
+
+
+class CapabilityOverloadPolicy(str, Enum):
+    REJECT = "reject"
+    DEGRADE = "degrade"
+    ASYNC_ARTIFACT = "async_artifact"
+
+
+class CapabilityExecutionBudget(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    memory_class: CapabilityMemoryClass = CapabilityMemoryClass.SMALL
+    max_input_bytes: int = Field(default=1024 * 1024, gt=0)
+    max_output_bytes: int = Field(default=4 * 1024 * 1024, gt=0)
+    collection_policy: CapabilityCollectionPolicy = CapabilityCollectionPolicy.BOUNDED
+    max_page_size: int | None = Field(default=None, gt=0)
+    max_parallel_per_consumer: int = Field(default=4, gt=0)
+    max_parallel_per_tenant: int = Field(default=32, gt=0)
+    overload_policy: CapabilityOverloadPolicy = CapabilityOverloadPolicy.REJECT
+
+    @model_validator(mode="after")
+    def page_size_matches_collection_policy(self) -> "CapabilityExecutionBudget":
+        if self.collection_policy is CapabilityCollectionPolicy.PAGED and self.max_page_size is None:
+            raise ValueError("paged collection policy requires max_page_size")
+        if self.collection_policy is not CapabilityCollectionPolicy.PAGED and self.max_page_size is not None:
+            raise ValueError("max_page_size is only valid for paged collection policy")
+        return self
 
 class CapabilitySpec(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -35,6 +73,7 @@ class CapabilitySpec(BaseModel):
     output_schema: Mapping[str, Any] = Field(default_factory=dict)
     device_capability: str | None = None
     tags: tuple[str, ...] = ()
+    execution_budget: CapabilityExecutionBudget | None = None
 
 class CapabilityContext(BaseModel):
     model_config = ConfigDict(extra="allow")
