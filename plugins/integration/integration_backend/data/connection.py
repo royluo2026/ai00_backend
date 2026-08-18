@@ -4,6 +4,7 @@ import os
 from contextlib import contextmanager
 from threading import Lock
 from urllib.parse import unquote, urlparse
+from backend.capability_v2.domain_resource_config import pool_limits
 
 _pool = None
 _lock = Lock()
@@ -27,7 +28,8 @@ def _get_pool():
                 import pymysql
                 import pymysql.cursors
                 from dbutils.pooled_db import PooledDB
-                _pool = PooledDB(creator=pymysql, maxconnections=10, mincached=1, blocking=True, charset="utf8mb4", cursorclass=pymysql.cursors.DictCursor, autocommit=False, connect_timeout=3, **_params())
+                limits = pool_limits("integration")
+                _pool = PooledDB(creator=pymysql, maxconnections=limits.maximum, mincached=limits.minimum, blocking=True, charset="utf8mb4", cursorclass=pymysql.cursors.DictCursor, autocommit=False, connect_timeout=3, **_params())
     return _pool
 
 
@@ -42,4 +44,3 @@ def get_integration_conn():
         raise
     finally:
         conn.close()
-

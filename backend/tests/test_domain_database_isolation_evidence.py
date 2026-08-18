@@ -130,7 +130,7 @@ def test_probe_targets_bind_each_ddl_credential_and_all_frozen_migrations():
     targets = load_probe_targets(ROOT)
 
     assert all(target.ddl_url_env.startswith("AI00_") for target in targets)
-    assert sum(len(target.migrations) for target in targets) == 14
+    assert sum(len(target.migrations) for target in targets) == 15
     assert {
         (target.domain_id, migration.migration_id, migration.filename)
         for target in targets

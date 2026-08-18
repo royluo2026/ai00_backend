@@ -19,6 +19,7 @@ import pymysql.cursors
 from dbutils.pooled_db import PooledDB
 
 from backend.config import get_settings
+from backend.capability_v2.domain_resource_config import pool_limits
 
 _pool: Optional[PooledDB] = None
 _log = logging.getLogger("backend.db")
@@ -35,12 +36,13 @@ def init_pool() -> None:
         return
     s = get_settings()
     params = s.get_db_params()
+    limits = pool_limits("base")
     _log.info(f"🔌 尝试连接数据库: mysql://{params['host']}:{params['port']}/{params['db']}")
     try:
         _pool = PooledDB(
             creator=pymysql,
-            maxconnections=20,
-            mincached=2,
+            maxconnections=limits.maximum,
+            mincached=limits.minimum,
             blocking=True,
             host=params["host"],
             port=params["port"],
