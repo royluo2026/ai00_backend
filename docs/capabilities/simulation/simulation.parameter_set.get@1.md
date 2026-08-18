@@ -53,6 +53,17 @@ Read an immutable Simulation parameter set.
 - Evidence：`required`
 - 配额成本：1
 
+资源预算：
+
+- `memory_class`：`small`
+- `max_input_bytes`：1048576
+- `max_output_bytes`：4194304
+- `collection_policy`：`bounded`
+- `max_page_size`：None
+- `max_parallel_per_consumer`：4
+- `max_parallel_per_tenant`：32
+- `overload_policy`：`reject`
+
 ## 输入 Schema
 
 ```json

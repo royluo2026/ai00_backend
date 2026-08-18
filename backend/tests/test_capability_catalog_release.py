@@ -21,6 +21,7 @@ from backend.capability_v2.contracts import (
     AutomationLevel,
     CapabilityDescriptorV2,
     ExposurePolicy,
+    ExecutionBudget,
     LifecycleStatus,
 )
 from backend.capability_v2.provider_loader import hash_domain_artifact
@@ -64,6 +65,89 @@ def test_catalog_hash_is_order_independent_and_binds_provider_artifacts():
     assert forward.catalog_hash == reverse.catalog_hash
     assert forward.release_id == reverse.release_id
     assert forward.catalog_hash != changed_provider.catalog_hash
+
+
+def test_catalog_hash_binds_execution_budget():
+    descriptor = _descriptor("craft.routing.get")
+    paged = descriptor.model_copy(update={
+        "execution_budget": ExecutionBudget(
+            collection_policy="paged",
+            max_page_size=100,
+        ),
+    })
+
+    assert build_release([descriptor]).catalog_hash != build_release([paged]).catalog_hash
+
+
+def test_catalog_rejects_new_stable_unbounded_collection_with_json_path():
+    unbounded = _descriptor("craft.routing.search").model_copy(update={
+        "lifecycle_status": LifecycleStatus.STABLE,
+        "output_schema": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "items": {"type": "array", "items": {"type": "string"}},
+                    },
+                    "additionalProperties": False,
+                },
+            },
+            "additionalProperties": False,
+        },
+    })
+
+    with pytest.raises(ValueError, match=r"craft\.routing\.search@1.*output_schema\.data\.items"):
+        build_release([unbounded])
+
+    bounded_schema = unbounded.model_copy(update={
+        "output_schema": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "items": {
+                            "type": "array", "maxItems": 100,
+                            "items": {"type": "string"},
+                        },
+                    },
+                    "additionalProperties": False,
+                },
+            },
+            "additionalProperties": False,
+        },
+    })
+    assert build_release([bounded_schema]).descriptor("craft.routing.search", 1)
+
+    paged = unbounded.model_copy(update={
+        "execution_budget": ExecutionBudget(collection_policy="paged", max_page_size=100),
+    })
+    artifact = unbounded.model_copy(update={
+        "execution_budget": ExecutionBudget(collection_policy="artifact"),
+    })
+    assert build_release([paged]).descriptor("craft.routing.search", 1)
+    assert build_release([artifact]).descriptor("craft.routing.search", 1)
+
+
+def test_catalog_requires_explicit_grandfathering_for_existing_unbounded_stable_path():
+    legacy = _descriptor("craft.routing.search").model_copy(update={
+        "lifecycle_status": LifecycleStatus.STABLE,
+        "output_schema": {
+            "type": "object",
+            "properties": {"items": {"type": "array", "items": {"type": "string"}}},
+            "additionalProperties": False,
+        },
+    })
+
+    release = build_release(
+        [legacy],
+        grandfathered_unbounded_paths={
+            ("craft.routing.search", 1, "output_schema.items"),
+        },
+    )
+
+    assert release.descriptor("craft.routing.search", 1) == legacy
 
 
 def test_catalog_rejects_duplicate_capability_major_and_is_immutable():
@@ -173,6 +257,19 @@ def test_compatibility_scanner_binds_agent_projection_schema_to_stable_major():
 
     assert compatibility_errors(build_release([stable]), build_release([changed])) == [
         "stable capability agent projection changed without major version bump: craft.routing.get@1"
+    ]
+
+
+def test_compatibility_scanner_freezes_stable_execution_budget():
+    stable = _descriptor("craft.routing.get").model_copy(update={
+        "lifecycle_status": LifecycleStatus.STABLE,
+    })
+    changed = stable.model_copy(update={
+        "execution_budget": ExecutionBudget(max_output_bytes=512 * 1024),
+    })
+
+    assert compatibility_errors(build_release([stable]), build_release([changed])) == [
+        "stable capability execution budget changed without major version bump: craft.routing.get@1"
     ]
 
 

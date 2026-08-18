@@ -417,6 +417,17 @@ def _capability_page(item: dict[str, Any]) -> str:
 - Evidence：`{item['evidence_policy']}`
 - 配额成本：{item['rate_limit_cost']}
 
+资源预算：
+
+- `memory_class`：`{item['execution_budget']['memory_class']}`
+- `max_input_bytes`：{item['execution_budget']['max_input_bytes']}
+- `max_output_bytes`：{item['execution_budget']['max_output_bytes']}
+- `collection_policy`：`{item['execution_budget']['collection_policy']}`
+- `max_page_size`：{item['execution_budget']['max_page_size']}
+- `max_parallel_per_consumer`：{item['execution_budget']['max_parallel_per_consumer']}
+- `max_parallel_per_tenant`：{item['execution_budget']['max_parallel_per_tenant']}
+- `overload_policy`：`{item['execution_budget']['overload_policy']}`
+
 ## 输入 Schema
 
 ```json

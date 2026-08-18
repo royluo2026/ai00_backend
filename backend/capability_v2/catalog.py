@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Iterable, Mapping, Protocol
 
 from pydantic import Field, model_validator
 
-from .contracts import CapabilityDescriptorV2, FrozenModel, LifecycleStatus
+from .contracts import CapabilityDescriptorV2, ExecutionBudget, FrozenModel, LifecycleStatus
 
 if TYPE_CHECKING:
     from backend.capabilities.registry_next import CapabilityRegistry, RegisteredCapability
@@ -89,7 +89,60 @@ def _descriptor_document(item: CapabilityDescriptorV2) -> dict:
         document.pop("domain_errors_complete", None)
     if document.get("expected_version_payload_path") is None:
         document.pop("expected_version_payload_path", None)
+    # Releases produced before execution budgets were added remain verifiable.
+    # A non-default budget is still part of the content-addressed document.
+    if item.execution_budget == ExecutionBudget():
+        document.pop("execution_budget", None)
     return document
+
+
+def unbounded_collection_paths(
+    schema: Mapping[str, object], path: str = "output_schema",
+) -> tuple[str, ...]:
+    paths: list[str] = []
+    if schema.get("type") == "array":
+        if "maxItems" not in schema:
+            paths.append(path)
+        items = schema.get("items")
+        if isinstance(items, Mapping):
+            paths.extend(unbounded_collection_paths(items, f"{path}[]"))
+    properties = schema.get("properties")
+    if isinstance(properties, Mapping):
+        for name, child in properties.items():
+            if isinstance(child, Mapping):
+                paths.extend(unbounded_collection_paths(child, f"{path}.{name}"))
+    definitions = schema.get("$defs")
+    if isinstance(definitions, Mapping):
+        for name, child in definitions.items():
+            if isinstance(child, Mapping):
+                paths.extend(unbounded_collection_paths(child, f"{path}.$defs.{name}"))
+    for keyword in ("anyOf", "oneOf", "allOf"):
+        alternatives = schema.get(keyword)
+        if isinstance(alternatives, (list, tuple)):
+            for index, child in enumerate(alternatives):
+                if isinstance(child, Mapping):
+                    paths.extend(unbounded_collection_paths(child, f"{path}.{keyword}[{index}]"))
+    return tuple(paths)
+
+
+def _validate_collection_boundaries(
+    descriptors: Iterable[CapabilityDescriptorV2],
+    grandfathered_paths: set[tuple[str, int, str]],
+) -> None:
+    errors: list[str] = []
+    for descriptor in descriptors:
+        if descriptor.lifecycle_status is not LifecycleStatus.STABLE:
+            continue
+        if descriptor.execution_budget.collection_policy.value in {"paged", "artifact"}:
+            continue
+        for path in unbounded_collection_paths(descriptor.output_schema):
+            key = (descriptor.id, descriptor.major_version, path)
+            if key not in grandfathered_paths:
+                errors.append(
+                    f"unbounded stable collection: {descriptor.id}@{descriptor.major_version} {path}"
+                )
+    if errors:
+        raise ValueError("; ".join(sorted(errors)))
 
 
 def build_release(
@@ -97,6 +150,7 @@ def build_release(
     provider_artifacts: Iterable[ProviderArtifact] = (),
     *,
     created_at: datetime | None = None,
+    grandfathered_unbounded_paths: set[tuple[str, int, str]] | None = None,
 ) -> CatalogRelease:
     ordered_descriptors = tuple(sorted(descriptors, key=lambda item: (item.id, item.major_version)))
     ordered_providers = tuple(sorted(
@@ -109,6 +163,9 @@ def build_release(
     provider_ids = [item.plugin_id for item in ordered_providers]
     if len(provider_ids) != len(set(provider_ids)):
         raise ValueError("duplicate provider in catalog release")
+    _validate_collection_boundaries(
+        ordered_descriptors, set(grandfathered_unbounded_paths or ()),
+    )
     digest = hashlib.sha256(canonical_catalog_bytes(ordered_descriptors, ordered_providers)).hexdigest()
     return CatalogRelease(
         release_id=f"rel_{digest[:32]}",
@@ -138,6 +195,11 @@ def compatibility_errors(previous: CatalogRelease, candidate: CatalogRelease) ->
         if new.agent_output_schema != old.agent_output_schema:
             errors.append(
                 f"stable capability agent projection changed without major version bump: {label}"
+            )
+            continue
+        if new.execution_budget != old.execution_budget:
+            errors.append(
+                f"stable capability execution budget changed without major version bump: {label}"
             )
             continue
         if new.owner_domain != old.owner_domain:
@@ -208,4 +270,5 @@ __all__ = [
     "build_release",
     "canonical_catalog_bytes",
     "compatibility_errors",
+    "unbounded_collection_paths",
 ]

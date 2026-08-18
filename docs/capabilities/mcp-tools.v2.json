@@ -127,6 +127,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -455,6 +465,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -783,6 +803,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -1111,6 +1141,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -1439,6 +1479,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_async",
       "expected_version_payload_path": null,
       "exposure": {
@@ -1767,6 +1817,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -2095,6 +2155,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -2423,6 +2493,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -2751,6 +2831,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -3079,6 +3169,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -3407,6 +3507,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -3735,6 +3845,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -4063,6 +4183,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -4342,6 +4472,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -4557,6 +4697,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -4830,6 +4980,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -5145,6 +5305,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -5506,6 +5676,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -5841,6 +6021,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -6158,6 +6348,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -6413,6 +6613,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -6628,6 +6838,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -6843,6 +7063,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -7058,6 +7288,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -7273,6 +7513,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -7488,6 +7738,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -7703,6 +7963,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -7922,6 +8192,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -8101,6 +8381,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -8341,6 +8631,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -8598,6 +8898,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -8804,6 +9114,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -9019,6 +9339,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -9234,6 +9564,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -9449,6 +9789,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -9664,6 +10014,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -9879,6 +10239,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -10094,6 +10464,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -10309,6 +10689,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -10540,6 +10930,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -10795,6 +11195,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -11013,6 +11423,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -11216,6 +11636,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -11413,6 +11843,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -11610,6 +12050,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -11833,6 +12283,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -12030,6 +12490,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -12223,6 +12693,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -12433,6 +12913,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -12657,6 +13147,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -12856,6 +13356,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -13079,6 +13589,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -13286,6 +13806,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -13529,6 +14059,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -13748,6 +14288,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -13955,6 +14505,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -14170,6 +14730,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -14385,6 +14955,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -14620,6 +15200,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -14860,6 +15450,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -15144,6 +15744,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -15440,6 +16050,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": "expected_revision",
       "exposure": {
@@ -15780,6 +16400,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -16085,6 +16715,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": "expected_revision",
       "exposure": {
@@ -16378,6 +17018,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -16661,6 +17311,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -16926,6 +17586,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -17225,6 +17895,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -17516,6 +18196,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": "expected_revision",
       "exposure": {
@@ -17801,6 +18491,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -18091,6 +18791,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -18459,6 +19169,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -18885,6 +19605,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -19298,6 +20028,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -19623,6 +20363,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -19874,6 +20624,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -20125,6 +20885,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -20376,6 +21146,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -20627,6 +21407,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -20878,6 +21668,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -21151,6 +21951,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -21450,6 +22260,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -21749,6 +22569,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -22048,6 +22878,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -22347,6 +23187,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -22646,6 +23496,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -22929,6 +23789,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -23174,6 +24044,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -23411,6 +24291,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -23654,6 +24544,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -23927,6 +24827,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -24226,6 +25136,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -24525,6 +25445,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -24824,6 +25754,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -25123,6 +26063,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -25422,6 +26372,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -25699,6 +26659,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -25950,6 +26920,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -26207,6 +27187,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -26474,6 +27464,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -26731,6 +27731,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -26972,6 +27982,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -27227,6 +28247,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -27476,6 +28506,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -27748,6 +28788,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -28029,6 +29079,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -28284,6 +29344,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -28528,6 +29598,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -28760,6 +29840,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -29003,6 +30093,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -29276,6 +30376,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -29575,6 +30685,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -29874,6 +30994,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -30173,6 +31303,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -30472,6 +31612,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -30771,6 +31921,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -31048,6 +32208,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -31321,6 +32491,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -31620,6 +32800,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -31919,6 +33109,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -32218,6 +33418,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -32517,6 +33727,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -32816,6 +34036,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -33115,6 +34345,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -33564,6 +34804,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -33973,6 +35223,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -34158,6 +35418,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -34359,6 +35629,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "local",
       "expected_version_payload_path": null,
       "exposure": {
@@ -34568,6 +35848,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "local",
       "expected_version_payload_path": null,
       "exposure": {
@@ -34803,6 +36093,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "local",
       "expected_version_payload_path": null,
       "exposure": {
@@ -35012,6 +36312,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "local",
       "expected_version_payload_path": null,
       "exposure": {
@@ -35320,6 +36630,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "local",
       "expected_version_payload_path": null,
       "exposure": {
@@ -35529,6 +36849,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "local",
       "expected_version_payload_path": null,
       "exposure": {
@@ -35754,6 +37084,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "local",
       "expected_version_payload_path": null,
       "exposure": {
@@ -36025,6 +37365,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -36306,6 +37656,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -36533,6 +37893,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -36770,6 +38140,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -37001,6 +38381,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -37281,6 +38671,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": "expected_head_version_id",
       "exposure": {
@@ -37818,6 +39218,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -38115,6 +39525,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -38298,6 +39718,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -38651,6 +40081,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -39004,6 +40444,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -39357,6 +40807,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -39710,6 +41170,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -40063,6 +41533,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -40416,6 +41896,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -40769,6 +42259,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -41122,6 +42622,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -41475,6 +42985,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -41828,6 +43348,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -42181,6 +43711,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -42534,6 +44074,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -42887,6 +44437,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -43240,6 +44800,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -43593,6 +45163,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -43946,6 +45526,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -44299,6 +45889,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -44652,6 +46252,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -45013,6 +46623,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -45210,6 +46830,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -45401,6 +47031,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -45668,6 +47308,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -45855,6 +47505,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -46047,6 +47707,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -46267,6 +47937,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -46472,6 +48152,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -46819,6 +48509,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -47042,6 +48742,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -47243,6 +48953,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -47435,6 +49155,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -47711,6 +49441,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_async",
       "expected_version_payload_path": null,
       "exposure": {
@@ -47953,6 +49693,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -48260,6 +50010,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -48570,6 +50330,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -48832,6 +50602,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -49061,6 +50841,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -49285,6 +51075,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -49582,6 +51382,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -49844,6 +51654,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -50164,6 +51984,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -50485,6 +52315,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": "base_revision_gid",
       "exposure": {
@@ -50762,6 +52602,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": "base_revision_gid",
       "exposure": {
@@ -51076,6 +52926,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -51305,6 +53165,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -51605,6 +53475,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -52170,6 +54050,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -52612,6 +54502,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -52795,6 +54695,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -53115,6 +55025,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -53586,6 +55506,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -54022,6 +55952,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -54387,6 +56327,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -54793,6 +56743,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -55268,6 +57228,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -55610,6 +57580,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -55761,6 +57741,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -56051,6 +58041,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -56365,6 +58365,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -56578,6 +58588,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -56840,6 +58860,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -57184,6 +59214,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -57787,6 +59827,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -58126,6 +60176,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -58369,6 +60429,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -58604,6 +60674,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -58992,6 +61072,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -59276,6 +61366,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -59541,6 +61641,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -59796,6 +61906,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -60715,6 +62835,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -61604,6 +63734,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -61997,6 +64137,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -62449,6 +64599,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -62733,6 +64893,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -62953,6 +65123,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -63165,6 +65345,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -63339,6 +65529,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -63513,6 +65713,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -63687,6 +65897,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -63861,6 +66081,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -64035,6 +66265,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -64209,6 +66449,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -64383,6 +66633,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -64557,6 +66817,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -64731,6 +67001,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -64905,6 +67185,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -65079,6 +67369,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -65253,6 +67553,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -65427,6 +67737,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -65601,6 +67921,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -65775,6 +68105,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -65949,6 +68289,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -66123,6 +68473,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -66297,6 +68657,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -66471,6 +68841,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -66645,6 +69025,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -66819,6 +69209,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -66993,6 +69393,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -67167,6 +69577,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -67341,6 +69761,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -67515,6 +69945,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -67689,6 +70129,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -67863,6 +70313,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -68037,6 +70497,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -68211,6 +70681,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -68385,6 +70865,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "optional",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -68795,6 +71285,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -69413,6 +71913,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -70361,6 +72871,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -70995,6 +73515,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -71453,6 +73983,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -71795,6 +74335,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -72153,6 +74703,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -72502,6 +75062,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -72971,6 +75541,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -73290,6 +75870,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -73616,6 +76206,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -73936,6 +76536,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_async",
       "expected_version_payload_path": null,
       "exposure": {
@@ -74241,6 +76851,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -74607,6 +77227,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {
@@ -74975,6 +77605,16 @@
       ],
       "domain_errors_complete": true,
       "evidence_policy": "required",
+      "execution_budget": {
+        "collection_policy": "bounded",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "memory_class": "small",
+        "overload_policy": "reject"
+      },
       "execution_mode": "cloud_sync",
       "expected_version_payload_path": null,
       "exposure": {

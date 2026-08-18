@@ -16,6 +16,7 @@ from backend.capability_v2.catalog import (
     ProviderArtifact,
     build_release,
     compatibility_errors,
+    unbounded_collection_paths,
 )
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
@@ -38,7 +39,19 @@ def current_release() -> CatalogRelease:
         registrations[key].descriptor or descriptor_from_provider_spec(registrations[key].spec)
         for key in sorted(registrations)
     ]
-    return build_release(descriptors, _providers())
+    grandfathered: set[tuple[str, int, str]] = set()
+    if DEFAULT_OUTPUT.is_file():
+        previous_document = json.loads(DEFAULT_OUTPUT.read_text(encoding="utf-8"))
+        for item in previous_document.get("descriptors", []):
+            if item.get("lifecycle_status") != "stable":
+                continue
+            for path in unbounded_collection_paths(item.get("output_schema") or {}):
+                grandfathered.add((item["id"], int(item["major_version"]), path))
+    return build_release(
+        descriptors,
+        _providers(),
+        grandfathered_unbounded_paths=grandfathered,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:

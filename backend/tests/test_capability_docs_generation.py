@@ -67,6 +67,7 @@ def test_machine_catalog_contains_release_bound_agent_mcp_and_openapi_views():
     assert len(machine["capabilities"]) == len(_catalog().descriptors)
     assert all(item["catalog_release"] == machine["release_id"] for item in machine["capabilities"])
     assert all("schema_precision" in item and "exposure_blockers" in item for item in machine["capabilities"])
+    assert all("execution_budget" in item for item in machine["capabilities"])
     assert all(item["exposure"]["agent"] for item in machine["agent_tools"])
     assert all(item["exposure"]["mcp"] for item in machine["mcp_tools"])
     assert machine["openapi_fragment"]["openapi"] == "3.1.0"
@@ -77,6 +78,21 @@ def test_machine_catalog_contains_release_bound_agent_mcp_and_openapi_views():
         "base", "agent", "craft", "digital_model", "factory", "project_management",
         "simulation", "ontology", "knowledge", "integration", "device",
     }
+
+
+def test_capability_page_documents_every_execution_budget_field():
+    catalog = _catalog()
+    descriptor = catalog.descriptors[0]
+    page = generated_files(catalog)[
+        f"{DOMAIN_DOC_PATHS[descriptor.owner_domain]}/{descriptor.id}@{descriptor.major_version}.md"
+    ]
+
+    for label in (
+        "memory_class", "max_input_bytes", "max_output_bytes", "collection_policy",
+        "max_page_size", "max_parallel_per_consumer", "max_parallel_per_tenant",
+        "overload_policy",
+    ):
+        assert label in page
 
 
 def test_checked_in_manual_has_no_generation_drift():
