@@ -33,4 +33,11 @@ def descriptor_fingerprint(descriptor: Mapping[str, Any]) -> str:
     return canonical_fingerprint(descriptor)
 
 
-__all__ = ["canonical_fingerprint", "canonical_json", "descriptor_fingerprint"]
+def snapshot_fingerprint(document: Any) -> str:
+    """Hash every immutable input to a snapshot, excluding its declared hash."""
+    payload = document.to_json()
+    payload.pop("snapshot_hash", None)
+    return canonical_fingerprint(payload)
+
+
+__all__ = ["canonical_fingerprint", "canonical_json", "descriptor_fingerprint", "snapshot_fingerprint"]

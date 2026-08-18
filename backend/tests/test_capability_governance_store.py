@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from backend.capability_governance_test.identity_projection import project_snapshot
@@ -131,6 +133,23 @@ def test_sql_repeat_import_reuses_existing_immutable_snapshot_without_inserts():
     assert record.entries[0].capability_gid == 703
     assert connection.commits == 0
     assert not any(query.startswith("INSERT INTO") for query, _ in connection.calls)
+
+
+def test_sql_existing_snapshot_rejects_changed_document_with_reused_hash():
+    document = snapshot("craft.bop.version.list", 1)
+    changed = replace(document, extension_release_id="governance-2.0")
+    connection = _Connection(
+        snapshot_rows=({"snapshot_gid": 700, "scan_run_gid": 701, "snapshot_hash": document.snapshot_hash,
+                        "code_revision": document.code_revision, "catalog_release_id": document.product_release_id,
+                        "descriptor_count": 1},),
+        snapshot_entry_rows=({"snapshot_entry_gid": 702, "capability_gid": 703, "capability_version_gid": 704,
+                              "capability_id": "craft.bop.version.list", "major_version": 1, "owner_domain": "craft",
+                              "semantic_class": "query", "business_effect": "Lists governed versions.",
+                              "lifecycle_status": "active", "descriptor_hash": "sha256:" + "a" * 64},),
+    )
+
+    with pytest.raises(ImmutableRecordError, match="snapshot_hash_mismatch"):
+        project_snapshot(SqlGovernanceStore(connection), changed)
 
 
 def test_sql_snapshot_duplicate_race_rolls_back_provisional_scan_and_reuses_winner():

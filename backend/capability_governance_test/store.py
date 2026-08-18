@@ -59,6 +59,9 @@ class MemoryGovernanceStore(GovernanceStore):
 
     def import_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         with self._lock:
+            from .fingerprint import snapshot_fingerprint
+            if snapshot_fingerprint(document) != document.snapshot_hash:
+                raise ImmutableRecordError("snapshot_hash_mismatch")
             existing = self._snapshots_by_hash.get(document.snapshot_hash)
             if existing is not None:
                 if existing.document != document:
@@ -120,6 +123,9 @@ class SqlGovernanceStore(GovernanceStore):
     def import_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         cursor = self._connection.cursor()
         try:
+            from .fingerprint import snapshot_fingerprint
+            if snapshot_fingerprint(document) != document.snapshot_hash:
+                raise ImmutableRecordError("snapshot_hash_mismatch")
             existing = self._select_snapshot(cursor, document.snapshot_hash)
             if existing is not None:
                 return self._load_existing_snapshot(cursor, existing, document)

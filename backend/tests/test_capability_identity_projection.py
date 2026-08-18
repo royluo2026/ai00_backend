@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 
 import pytest
 
-from backend.capability_governance_test.fingerprint import canonical_fingerprint
+from backend.capability_governance_test.fingerprint import canonical_fingerprint, snapshot_fingerprint
 from backend.capability_governance_test.identity_projection import project_snapshot
 from backend.capability_governance_test.models import (
     CapabilityBinding,
@@ -39,16 +39,17 @@ def snapshot(capability_id: str, major_version: int) -> SnapshotDocument:
         source_path="plugins/craft/provider.py",
         artifact_hash="sha256:" + "1" * 64,
     )
-    return SnapshotDocument(
+    document = SnapshotDocument(
         product_release_id="product-2026.08",
         extension_release_id="governance-1.0",
         code_revision="abc123",
-        snapshot_hash="sha256:" + f"{major_version:064x}",
+        snapshot_hash="",
         capabilities=(capability,),
         nodes=(node,),
         bindings=(CapabilityBinding(capability_id, major_version, node.canonical_key, "provider", "sha256:" + "3" * 64),),
         relations=(ImplementationRelation(node.canonical_key, node.canonical_key, "contains", "sha256:" + "4" * 64),),
     )
+    return replace(document, snapshot_hash=snapshot_fingerprint(document))
 
 
 def test_repeat_projection_reuses_logical_and_major_gid():
