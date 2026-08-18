@@ -10,14 +10,14 @@ def test_check_covers_productized_plugin_center_assets(monkeypatch):
         "/web/settings/plugin_center_model.js": "AI00PluginCenterModel",
         "/web/settings/plugin_center_api.js": "createPluginCenterApi",
         "/web/settings/plugin_center.js": "Server-backed Capability V2 plugin center controller",
-        "/web/admin/capability_governance/index.html": "",
+        "/web/admin/capability_governance/index.html": "governance_controller.js",
     }
 
     def fake_get(_base_url, path):
         content_type = "application/json" if path in {"/health", "/ready"} else (
-            "text/html" if path in {"/", "/web/settings/index.html"} else "text/javascript"
+                "text/html" if path in {"/", "/web/settings/index.html", "/web/admin/capability_governance/index.html"} else "text/javascript"
         )
-        return (404 if path.endswith("capability_governance/index.html") else 200), content_type, bodies[path]
+        return 200, content_type, bodies[path]
 
     monkeypatch.setattr(deployment, "_get", fake_get)
     report = deployment.check("http://example.test")

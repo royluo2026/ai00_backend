@@ -38,7 +38,7 @@ def check(base_url: str) -> dict[str, object]:
             "text/javascript",
             "Server-backed Capability V2 plugin center controller",
         ),
-        "/web/admin/capability_governance/index.html": (404, None, None),
+        "/web/admin/capability_governance/index.html": (200, "text/html", "governance_controller.js"),
     }
     results: list[dict[str, object]] = []
     errors: list[str] = []

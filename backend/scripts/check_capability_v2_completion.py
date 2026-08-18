@@ -15,22 +15,57 @@ if str(ROOT) not in sys.path:
 from backend.capability_v2.completion import evaluate_completion
 
 
+GOVERNANCE_ACCEPTANCE_SECTIONS = frozenset({
+    "identity", "catalog_separation", "migration", "snapshot", "graph",
+    "deterministic_findings", "permissions", "agent_delegation", "health",
+    "workflow", "release_gate", "ai_redaction", "ui", "production_exclusion",
+})
+
+
+def _governance_acceptance(path: Path) -> dict[str, object]:
+    """Validate only the machine-readable completion predicates, never secrets."""
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return {"status": "failed", "error_code": "acceptance_report_invalid"}
+    if not isinstance(document, dict):
+        return {"status": "failed", "error_code": "acceptance_report_invalid"}
+    sections = document.get("sections")
+    names = set(sections) if isinstance(sections, dict) else set()
+    passed = (
+        document.get("status") == "passed"
+        and document.get("failed") == 0
+        and document.get("skipped") == 0
+        and set(document.get("mandatory_sections", ())) == GOVERNANCE_ACCEPTANCE_SECTIONS
+        and names == GOVERNANCE_ACCEPTANCE_SECTIONS
+        and all(isinstance(value, dict) and value.get("status") == "passed" for value in (sections or {}).values())
+    )
+    return {"status": "passed" if passed else "failed", "report_path": path.name}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("progress", "strict"), required=True)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--governance-acceptance-report", type=Path)
     args = parser.parse_args()
     report = evaluate_completion(args.root, mode=args.mode)
+    rendered_report = report.serialized()
+    governance_acceptance = None
+    if args.governance_acceptance_report:
+        governance_acceptance = _governance_acceptance(args.governance_acceptance_report)
+        rendered_report["governance_acceptance"] = governance_acceptance
     rendered = json.dumps(
-        report.serialized(), ensure_ascii=False, indent=2, sort_keys=True
+        rendered_report, ensure_ascii=False, indent=2, sort_keys=True
     ) + "\n"
     if args.report:
         target = args.report if args.report.is_absolute() else args.root / args.report
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(rendered, encoding="utf-8", newline="\n")
     print(rendered, end="")
-    return 1 if args.mode == "strict" and not report.complete else 0
+    failed = not report.complete or (governance_acceptance is not None and governance_acceptance["status"] != "passed")
+    return 1 if args.mode == "strict" and failed else 0
 
 
 if __name__ == "__main__":
