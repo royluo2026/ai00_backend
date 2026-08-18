@@ -105,6 +105,28 @@ def _bindings(snapshot: SnapshotDocument, capability: ScannedCapability, binding
     )))
 
 
+def _provider_bindings(snapshot: SnapshotDocument, capability: ScannedCapability) -> tuple[str, ...]:
+    """Return only typed provider evidence that resolves in this snapshot."""
+    nodes = {node.canonical_key: node for node in snapshot.nodes}
+    return tuple(key for key in _bindings(snapshot, capability, "implemented_by")
+                 if nodes.get(key) is not None and nodes[key].node_type == "provider")
+
+
+def _typed_capability_bindings(
+    snapshot: SnapshotDocument, binding_type: str, node_types: set[str],
+) -> set[str]:
+    """Return node keys backed by a declared capability and expected node type."""
+    declared = {(capability.capability_id, capability.major_version) for capability in snapshot.capabilities}
+    nodes = {node.canonical_key: node for node in snapshot.nodes}
+    return {
+        binding.node_canonical_key for binding in snapshot.bindings
+        if binding.binding_type == binding_type
+        and (binding.capability_id, binding.major_version) in declared
+        and binding.node_canonical_key in nodes
+        and nodes[binding.node_canonical_key].node_type in node_types
+    }
+
+
 def _policy(value: object) -> str:
     return canonical_fingerprint(value) if value is not None else ""
 
@@ -118,13 +140,12 @@ def descriptor_without_provider(snapshot: SnapshotDocument, graph: Implementatio
     """Every declared capability needs exact provider binding evidence."""
     return tuple(FindingCandidate("provider_missing", "blocking", (_capability_subject(capability),),
         (_capability_key(capability),), "provider_registration_boundary") for capability in snapshot.capabilities
-        if not _bindings(snapshot, capability, "implemented_by"))
+        if not _provider_bindings(snapshot, capability))
 
 
 def provider_without_descriptor(snapshot: SnapshotDocument, graph: ImplementationGraph | None = None) -> tuple[FindingCandidate, ...]:
     """A provider node cannot become a release capability without a descriptor."""
-    _, bound, _, _ = _index(snapshot)
-    linked = {node.canonical_key for nodes in bound.values() for node in nodes}
+    linked = _typed_capability_bindings(snapshot, "implemented_by", {"provider"})
     return tuple(FindingCandidate("provider_without_descriptor", "warning", (_node_subject(node, "provider"),),
         (node.canonical_key,), "catalog_descriptor_boundary") for node in snapshot.nodes
         if node.node_type == "provider" and node.canonical_key not in linked)
@@ -133,7 +154,7 @@ def provider_without_descriptor(snapshot: SnapshotDocument, graph: Implementatio
 def exposure_without_capability(snapshot: SnapshotDocument, graph: ImplementationGraph | None = None) -> tuple[FindingCandidate, ...]:
     """Public entrypoints require a capability exposure binding."""
     exposure_types = {"gateway", "rest_route", "legacy_api", "mount_binding", "agent_tool", "mcp_tool"}
-    linked = {binding.node_canonical_key for binding in snapshot.bindings if binding.binding_type == "exposed_by"}
+    linked = _typed_capability_bindings(snapshot, "exposed_by", exposure_types)
     return tuple(FindingCandidate("exposure_without_capability", "blocking", (_node_subject(node, "exposure"),),
         (node.canonical_key,), "capability_exposure_boundary") for node in snapshot.nodes
         if node.node_type in exposure_types and node.canonical_key not in linked)
@@ -146,8 +167,8 @@ def strong_write_without_transactional_provider(snapshot: SnapshotDocument, grap
     for capability in snapshot.capabilities:
         if not _is_strong_write(capability):
             continue
-        providers = [nodes[key] for key in _bindings(snapshot, capability, "implemented_by") if key in nodes]
-        if providers and not any(bool(provider.metadata.get("transactional") or provider.metadata.get("transaction_participant")) for provider in providers):
+        providers = [nodes[key] for key in _provider_bindings(snapshot, capability) if key in nodes]
+        if not providers or not any(bool(provider.metadata.get("transactional") or provider.metadata.get("transaction_participant")) for provider in providers):
             findings.append(FindingCandidate("transaction_participant_missing", "blocking", (_capability_subject(capability),),
                 tuple([_capability_key(capability), *(provider.canonical_key for provider in providers)]),
                 "provider_transaction_boundary"))
@@ -175,7 +196,7 @@ def _provider_policy_mismatches(snapshot: SnapshotDocument, descriptor_key: str,
         expected = capability.descriptor.get(descriptor_key)
         if expected is None:
             continue
-        for key in _bindings(snapshot, capability, "implemented_by"):
+        for key in _provider_bindings(snapshot, capability):
             provider = nodes.get(key)
             actual = provider.metadata.get(metadata_key) if provider else None
             if actual is not None and _policy(actual) != _policy(expected):
@@ -198,9 +219,13 @@ def catalog_schema_drift(snapshot: SnapshotDocument, graph: ImplementationGraph 
     fields = {"input_schema_hash": "input_schema_hash", "output_schema_hash": "output_schema_hash", "error_schema_hash": "error_schema_hash"}
     findings: list[FindingCandidate] = []
     for capability in snapshot.capabilities:
-        for key in _bindings(snapshot, capability, "implemented_by"):
+        for key in _provider_bindings(snapshot, capability):
             provider = nodes.get(key)
-            if provider and any(str(provider.metadata.get(metadata)) not in {"", str(getattr(capability, field))} for metadata, field in fields.items()):
+            if provider and any(
+                metadata in provider.metadata
+                and str(provider.metadata[metadata]) != str(getattr(capability, field))
+                for metadata, field in fields.items()
+            ):
                 findings.append(FindingCandidate("catalog_schema_drift", "blocking", (_capability_subject(capability), _node_subject(provider, "provider")),
                     (_capability_key(capability), provider.canonical_key), "catalog_schema_boundary"))
     return tuple(findings)
@@ -209,7 +234,10 @@ def catalog_schema_drift(snapshot: SnapshotDocument, graph: ImplementationGraph 
 def required_test_missing(snapshot: SnapshotDocument, graph: ImplementationGraph | None = None) -> tuple[FindingCandidate, ...]:
     return tuple(FindingCandidate("required_test_missing", "blocking", (_capability_subject(capability),),
         (_capability_key(capability),), "release_evidence_boundary") for capability in snapshot.capabilities
-        if not _bindings(snapshot, capability, "tested_by"))
+        if not any(
+            key in _typed_capability_bindings(snapshot, "tested_by", {"test_case"})
+            for key in _bindings(snapshot, capability, "tested_by")
+        ))
 
 
 def stale_evidence(snapshot: SnapshotDocument, graph: ImplementationGraph | None = None) -> tuple[FindingCandidate, ...]:
@@ -221,7 +249,7 @@ def lifecycle_incompatibility(snapshot: SnapshotDocument, graph: ImplementationG
     nodes = {node.canonical_key: node for node in snapshot.nodes}
     findings: list[FindingCandidate] = []
     for capability in snapshot.capabilities:
-        for key in _bindings(snapshot, capability, "implemented_by"):
+        for key in _provider_bindings(snapshot, capability):
             provider = nodes.get(key)
             actual = str(provider.metadata.get("lifecycle_status", "")) if provider else ""
             if actual and actual != capability.lifecycle_status:

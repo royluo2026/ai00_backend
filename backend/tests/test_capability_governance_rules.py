@@ -108,3 +108,43 @@ def test_finding_fingerprint_is_stable_when_input_order_changes() -> None:
     second = run_deterministic_analysis(_snapshot(capability, nodes=(test_case, provider), bindings=tuple(reversed(bindings))), AnalysisRequest())
 
     assert [(item.code, item.fingerprint) for item in first.findings] == [(item.code, item.fingerprint) for item in second.findings]
+
+
+def test_provider_without_schema_metadata_does_not_imply_catalog_schema_drift() -> None:
+    capability = _capability()
+    provider = ImplementationNode(
+        "provider:craft:create", "craft", "provider", "craft/provider.py", "sha256:" + "1" * 64,
+        metadata={"transactional": True},
+    )
+    test_case = ImplementationNode("test_case:craft:create", "craft", "test_case", "craft/test_provider.py", "sha256:" + "2" * 64)
+    snapshot = _snapshot(capability, nodes=(provider, test_case), bindings=(
+        CapabilityBinding(capability.capability_id, 1, provider.canonical_key, "implemented_by", "sha256:" + "3" * 64),
+        CapabilityBinding(capability.capability_id, 1, test_case.canonical_key, "tested_by", "sha256:" + "4" * 64),
+    ))
+
+    codes = {finding.code for finding in run_deterministic_analysis(snapshot, AnalysisRequest()).findings}
+
+    assert "catalog_schema_drift" not in codes
+
+
+def test_strong_write_without_any_provider_has_transaction_participant_finding() -> None:
+    result = run_deterministic_analysis(_snapshot(_capability()), AnalysisRequest())
+
+    finding = _find(result, "transaction_participant_missing")
+
+    assert finding.severity == "blocking"
+
+
+def test_invalid_provider_bindings_do_not_count_as_provider_evidence() -> None:
+    capability = _capability()
+    worker = ImplementationNode("worker:craft:create", "craft", "worker", "craft/worker.py", "sha256:" + "1" * 64)
+    provider = ImplementationNode("provider:craft:orphan", "craft", "provider", "craft/provider.py", "sha256:" + "2" * 64)
+    snapshot = _snapshot(capability, nodes=(worker, provider), bindings=(
+        CapabilityBinding(capability.capability_id, 1, worker.canonical_key, "implemented_by", "sha256:" + "3" * 64),
+        CapabilityBinding("missing.descriptor", 1, provider.canonical_key, "implemented_by", "sha256:" + "4" * 64),
+    ))
+
+    codes = {finding.code for finding in run_deterministic_analysis(snapshot, AnalysisRequest()).findings}
+
+    assert "provider_missing" in codes
+    assert "provider_without_descriptor" in codes
