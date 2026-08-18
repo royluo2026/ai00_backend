@@ -467,6 +467,24 @@ The subject table is required because a cross-domain duplicate or conflict may i
 
 Waivers are always bounded, owned, expiring, and auditable. Permanent waiver is not supported.
 
+#### `workmanship_base_capability_release_reports`
+
+- `release_report_gid` PK
+- `code_revision`
+- `product_catalog_release_id`
+- `snapshot_gid` FK
+- `test_run_gid` FK
+- `conclusion`
+- `blockers_json`
+- `report_hash`
+- `signing_key_id`
+- `signature`
+- `evaluated_by_gid`
+- `evaluated_at`
+- `expired_at`
+
+Release reports are immutable and signed over their canonical payload. A changed pinned input does not update a prior report; it marks the prior conclusion expired and requires a new report GID.
+
 ### 8.8 Audit
 
 #### `workmanship_base_capability_audit_events`
