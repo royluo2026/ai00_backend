@@ -103,7 +103,7 @@ async function runGovernanceControllerTests() {
   let repairPayload;
   let reviewPayload;
   const governed = makeController({
-    state: createState({ selectedSnapshotGid: '1953048035824070880', proposals: [{ gid: '1953048035824070881', rowVersion: 'rv-3' }], permissions: ['system.capability.read', 'system.capability.analyze', 'system.capability.govern', 'system.capability.release'] }),
+    state: createState({ selectedSnapshotGid: '1953048035824070880', proposals: [{ gid: '1953048035824070881', rowVersion: 'rv-3', confirmationToken: 'untrusted-row-token' }], permissions: ['system.capability.read', 'system.capability.analyze', 'system.capability.govern', 'system.capability.release'] }),
     api: { loadDashboard: async () => dashboard([]), generateRepairPrompt: async (payload) => { repairPayload = payload; }, decideReview: async (payload, options) => { reviewPayload = { payload, options }; } },
   });
   await governed.controller.dispatchAction('generate-repair-prompt', '1953048035824070881');
@@ -111,6 +111,7 @@ async function runGovernanceControllerTests() {
   await governed.controller.dispatchAction('decide-review', '1953048035824070881');
   assert.deepEqual(reviewPayload.payload, { targetGid: '1953048035824070881', rowVersion: 'rv-3' }, 'review dispatch carries target and current row version');
   assert.equal(reviewPayload.options.idempotencyKey, 'decide-review-1953048035824070881');
+  assert.equal(Object.hasOwn(reviewPayload.options, 'confirmationToken'), false, 'controller leaves confirmation acquisition to the Gateway-backed API');
 
   let nativeDialogs = 0;
   dom.window.alert = dom.window.confirm = dom.window.prompt = () => { nativeDialogs += 1; };

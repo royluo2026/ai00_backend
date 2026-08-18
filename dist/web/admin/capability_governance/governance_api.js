@@ -48,6 +48,18 @@
     });
   }
 
+  async function confirm(capabilityId, payload, options = {}) {
+    return gateway()(`/api/v1/capabilities/${capabilityId}:confirm`, {
+      method: 'POST',
+      body: JSON.stringify({
+        version: 1,
+        payload,
+        idempotency_key: options.idempotencyKey,
+        expected_resource_version: options.expectedResourceVersion,
+      }),
+    });
+  }
+
   function searchRegistry({ query = '', limit } = {}) {
     return invoke('base.capability_registry.search', { query: String(query), limit: boundedInteger(limit, COLLECTION_LIMIT, COLLECTION_MAX) });
   }
@@ -62,9 +74,13 @@
   const getAnalysis = ({ targetGid }) => invoke('base.capability_analysis.get', { target_gid: gid(targetGid) });
   const getGraph = (targetGid, { maxDepth, maxNodes } = {}) => invoke('base.capability_graph.get', { target_gid: gid(targetGid), max_depth: boundedInteger(maxDepth, 2, GRAPH_DEPTH_MAX), max_nodes: boundedInteger(maxNodes, 100, GRAPH_NODES_MAX) });
 
-  function write(capabilityId, payload, options) {
+  async function write(capabilityId, payload, options) {
     const request = writeOptions(options, payload);
-    return invoke(capabilityId, request.payload, request.options);
+    const confirmation = await confirm(capabilityId, request.payload, request.options);
+    const confirmed = confirmation && confirmation.data ? confirmation.data : confirmation;
+    const confirmationToken = confirmed && confirmed.confirmation_token;
+    if (!confirmationToken) throw new Error('Gateway confirmation token is required');
+    return invoke(capabilityId, request.payload, Object.assign({}, request.options, { confirmationToken }));
   }
 
   const runAnalysis = ({ targetGid }, options) => write('base.capability_analysis.run', { target_gid: gid(targetGid) }, options);
@@ -119,5 +135,5 @@
     };
   }
 
-  return { COLLECTION_LIMIT, COLLECTION_MAX, invoke, searchRegistry, getCapability, getGraph, searchFindings, runAnalysis, getAnalysis, runScan, runTest, submitProposal, decideReview, grantWaiver, revokeWaiver, generateRepairPrompt, evaluateReleaseGate, loadDashboard };
+  return { COLLECTION_LIMIT, COLLECTION_MAX, invoke, confirm, searchRegistry, getCapability, getGraph, searchFindings, runAnalysis, getAnalysis, runScan, runTest, submitProposal, decideReview, grantWaiver, revokeWaiver, generateRepairPrompt, evaluateReleaseGate, loadDashboard };
 });
