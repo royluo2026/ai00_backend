@@ -119,30 +119,27 @@ def compile_governance_migrations(root: Path = REPOSITORY_ROOT) -> CompiledGover
             checksum=hashlib.sha256(canonical_sql.encode("utf-8")).hexdigest(),
         ))
     tables = set().union(*(_created_tables(item.sql) for item in migrations)) if migrations else set()
+    entity_tables = tables - {LEDGER_TABLE}
     expected = set(GOVERNANCE_TABLES)
-    if tables != expected:
+    if entity_tables != expected:
         raise MigrationError(
-            f"governance table contract mismatch: missing={sorted(expected - tables)}, extra={sorted(tables - expected)}"
+            f"governance table contract mismatch: missing={sorted(expected - entity_tables)}, extra={sorted(entity_tables - expected)}"
         )
     return CompiledGovernanceMigrations(
         migrations=tuple(migrations),
-        tables=tuple(sorted(tables)),
+        tables=tuple(sorted(entity_tables)),
         normalized_sql="\n".join(item.sql for item in migrations),
     )
 
 
-def _ensure_ledger(connection) -> None:
+def _ledger_exists(connection) -> bool:
     with connection.cursor() as cursor:
         cursor.execute(
-            f"""CREATE TABLE IF NOT EXISTS {LEDGER_TABLE} (
-                migration_id CHAR(4) NOT NULL,
-                name VARCHAR(191) NOT NULL,
-                checksum CHAR(64) NOT NULL,
-                applied_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-                PRIMARY KEY (migration_id)
-            )"""
+            "SELECT COUNT(*) FROM information_schema.TABLES "
+            "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s",
+            (LEDGER_TABLE,),
         )
-    connection.commit()
+        return int(_scalar(cursor.fetchone())) > 0
 
 
 def migrate(connection) -> tuple[str, ...]:
@@ -154,14 +151,15 @@ def migrate(connection) -> tuple[str, ...]:
             raise MigrationError("could not acquire capability governance migration lock")
     applied: list[str] = []
     try:
-        _ensure_ledger(connection)
-        with connection.cursor() as cursor:
-            cursor.execute(f"SELECT migration_id, checksum FROM {LEDGER_TABLE}")
-            rows = cursor.fetchall()
-        existing = {
-            row["migration_id"] if isinstance(row, dict) else row[0]: row
-            for row in rows
-        }
+        existing = {}
+        if _ledger_exists(connection):
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT migration_id, checksum FROM {LEDGER_TABLE}")
+                rows = cursor.fetchall()
+            existing = {
+                row["migration_id"] if isinstance(row, dict) else row[0]: row
+                for row in rows
+            }
         for migration in compiled.migrations:
             row = existing.get(migration.migration_id)
             if row is not None:
@@ -260,6 +258,13 @@ def main(
     return 0
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+def _run_cli() -> int:
+    try:
+        return main()
+    except Exception:
+        print("capability governance migration command failed", file=sys.stderr)
+        return 1
 
+
+if __name__ == "__main__":
+    raise SystemExit(_run_cli())

@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS workmanship_base_capability_governance_migrations (
+  migration_id CHAR(4) NOT NULL,
+  name VARCHAR(191) NOT NULL,
+  checksum CHAR(64) NOT NULL,
+  applied_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (migration_id)
+);
+
 CREATE TABLE IF NOT EXISTS workmanship_base_capability_entries (
   capability_gid BIGINT NOT NULL,
   capability_id VARCHAR(128) NOT NULL,

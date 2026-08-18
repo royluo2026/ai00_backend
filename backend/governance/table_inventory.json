@@ -1,6 +1,6 @@
 {
   "registry_version": 1,
-  "table_count": 204,
+  "table_count": 225,
   "tables": [
     {
       "table": "workmanship_agent_capability_resources",
@@ -194,6 +194,111 @@
     },
     {
       "table": "workmanship_base_capability_catalog_releases",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_analysis_runs",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_audit_events",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_bindings",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_change_proposals",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_entries",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_evidence",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_finding_subjects",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_findings",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_governance_migrations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_health_rollups",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_implementation_nodes",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_implementation_relations",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_release_reports",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_reviews",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_scan_runs",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_snapshot_entries",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_snapshots",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_test_results",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_test_runs",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_versions",
+      "owner": "base",
+      "runtime_domain": "base"
+    },
+    {
+      "table": "workmanship_base_capability_waivers",
       "owner": "base",
       "runtime_domain": "base"
     },

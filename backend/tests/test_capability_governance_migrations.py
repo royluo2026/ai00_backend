@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 from backend.scripts.migrate_capability_governance_test import (
@@ -49,3 +53,37 @@ def test_test_governance_migrations_are_separate_from_product_schema_compilation
     compiled = compile_governance_migrations(ROOT)
 
     assert all("test_governance" in str(migration.path) for migration in compiled.migrations)
+
+
+def test_test_governance_migration_ledger_has_authoritative_ownership():
+    ledger = "workmanship_base_capability_governance_migrations"
+    ownership = json.loads(
+        (ROOT / "backend/governance/domain_table_ownership.json").read_text(encoding="utf-8")
+    )
+    inventory = json.loads(
+        (ROOT / "backend/governance/table_inventory.json").read_text(encoding="utf-8")
+    )
+
+    assert ledger in {item["table"] for item in ownership["tables"]}
+    assert ledger in {item["table"] for item in inventory["tables"]}
+
+
+def test_cli_failure_redacts_configuration_and_traceback():
+    environment = os.environ.copy()
+    environment["AI00_DEPLOYMENT_PROFILE"] = "test-governance"
+    environment["AI00_BASE_DDL_DB_URL"] = "mysql://migration:topsecret@db/ai00_test"
+
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "backend/scripts/migrate_capability_governance_test.py"), "--apply"],
+        cwd=ROOT,
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode != 0
+    assert completed.stdout == ""
+    assert completed.stderr == "capability governance migration command failed\n"
+    assert "topsecret" not in completed.stderr
+    assert "Traceback" not in completed.stderr
