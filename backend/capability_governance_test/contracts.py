@@ -1,7 +1,10 @@
 """Closed, test-only contracts for the Capability Governance Center extension."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from backend.capability_v2.catalog import ProviderArtifact
+from backend.capability_v2.provider_loader import hash_domain_artifact
 
 
 READ_IDS = (
@@ -65,15 +68,17 @@ OUTPUT_SCHEMAS = {
     capability_id: _closed({"capability_id": STRING_SCHEMA, "status": STATUS_SCHEMA}, ("capability_id", "status"))
     for capability_id in ALL_IDS
 }
-PROVIDER_ARTIFACT = ProviderArtifact(
-    plugin_id="test.governance",
-    module="backend.capability_governance_test.provider",
-    version="1.0.0",
-    artifact_hash="sha256:5f57bb31a5b099578974b43e75dd6f644e9501e4d8fd8b0bba49dbb2cb9d8c4f",
-)
+def provider_artifact(repository_root: Path) -> ProviderArtifact:
+    """Bind the test extension to its canonical source artifact at build time."""
+    return ProviderArtifact(
+        plugin_id="test.governance",
+        module="backend.capability_governance_test.provider",
+        version="1.0.0",
+        artifact_hash=hash_domain_artifact(repository_root, "backend/capability_governance_test"),
+    )
 
 
 __all__ = [
     "ALL_IDS", "ANALYZE_IDS", "GID_SCHEMA", "GOVERN_IDS", "INPUT_SCHEMAS",
-    "OUTPUT_SCHEMAS", "PROVIDER_ARTIFACT", "READ_IDS", "RELEASE_IDS", "WRITE_IDS",
+    "OUTPUT_SCHEMAS", "READ_IDS", "RELEASE_IDS", "WRITE_IDS", "provider_artifact",
 ]

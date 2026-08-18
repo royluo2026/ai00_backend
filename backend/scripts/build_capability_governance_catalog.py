@@ -9,7 +9,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-from backend.capability_governance_test.contracts import ALL_IDS, PROVIDER_ARTIFACT
+from backend.capability_governance_test.contracts import ALL_IDS, provider_artifact
 from backend.capability_v2.bootstrap import build_capability_registry
 from backend.capability_v2.catalog import CatalogRelease, build_release
 
@@ -20,7 +20,11 @@ DEFAULT_OUTPUT = REPOSITORY_ROOT / "docs" / "governance" / "test-extension" / "c
 def current_release() -> CatalogRelease:
     registry = build_capability_registry(REPOSITORY_ROOT, include_test_governance=True)
     descriptors = [registry.get(capability_id, 1).descriptor for capability_id in ALL_IDS]
-    return build_release(descriptors, (PROVIDER_ARTIFACT,), enforce_collection_boundaries=True)
+    return build_release(
+        descriptors,
+        (provider_artifact(REPOSITORY_ROOT),),
+        enforce_collection_boundaries=True,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
