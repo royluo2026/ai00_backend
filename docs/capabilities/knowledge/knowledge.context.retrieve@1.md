@@ -8,7 +8,7 @@ Retrieve bounded immutable Knowledge revision references for one task.
 - 不适用：The caller already knows an exact document revision.
 - 生命周期：`stable`
 - 所属领域：`knowledge`
-- Catalog Release：`rel_a91d6898ffa84d355720e7be705dfa69`
+- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -121,7 +121,7 @@ Retrieve bounded immutable Knowledge revision references for one task.
 ```json
 {
   "capability_id": "knowledge.context.retrieve",
-  "catalog_release": "rel_a91d6898ffa84d355720e7be705dfa69",
+  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
   "major_version": 1,
   "payload": {}
 }

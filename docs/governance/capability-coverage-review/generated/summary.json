@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "domains": 11,
-  "stable_functions": 845,
+  "stable_functions": 848,
   "resolutions": {
-    "existing_capability": 743,
+    "existing_capability": 745,
     "new_capability": 0,
-    "excluded": 102,
+    "excluded": 103,
     "unreviewed": 0
   },
   "candidate_capabilities": 0,
@@ -20,11 +20,11 @@
     "Base Platform": {
       "existing_capability": 67,
       "new_capability": 0,
-      "excluded": 79,
+      "excluded": 80,
       "unreviewed": 0
     },
     "Craft": {
-      "existing_capability": 317,
+      "existing_capability": 319,
       "new_capability": 0,
       "excluded": 6,
       "unreviewed": 0
@@ -93,9 +93,9 @@
   },
   "code_extractions": 58,
   "debt_backlog": {},
-  "catalog_descriptors": 267,
-  "current_catalog_capabilities": 264,
-  "proposed_final_catalog_capabilities": 264,
+  "catalog_descriptors": 270,
+  "current_catalog_capabilities": 267,
+  "proposed_final_catalog_capabilities": 267,
   "evidence": {
     "module_dependencies": 0,
     "boundary_violations": 0,

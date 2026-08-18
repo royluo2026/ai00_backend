@@ -54,10 +54,12 @@
 | Base Platform | `system.search` | agent |
 | Craft | `craft.bop.draft.change.apply` | rest |
 | Craft | `craft.bop.draft.change.preview` | rest, agent |
+| Craft | `craft.bop.entry.detail.get` | none |
 | Craft | `craft.bop.execution_structure.get` | rest, agent |
 | Craft | `craft.bop.execution_structure.preview` | none |
 | Craft | `craft.bop.import.preview` | rest |
 | Craft | `craft.bop.linked_parts.get` | rest |
+| Craft | `craft.bop.structure.outline.get` | none |
 | Craft | `craft.bop.validation.get` | none |
 | Craft | `craft.bop.validation.run` | none |
 | Craft | `craft.bop.version.archive` | rest |

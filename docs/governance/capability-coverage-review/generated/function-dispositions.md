@@ -79,6 +79,7 @@
 | Base Platform | `rest:GET:/admin/config/{key}` | excluded | — |
 | Base Platform | `rest:GET:/admin/debug-logs` | excluded | — |
 | Base Platform | `rest:GET:/admin/plugin-registry` | excluded | — |
+| Base Platform | `rest:GET:/admin/runtime-diagnostics` | excluded | — |
 | Base Platform | `rest:GET:/api/deploy` | excluded | — |
 | Base Platform | `rest:GET:/api/deploy/current` | excluded | — |
 | Base Platform | `rest:GET:/api/deploy/history` | excluded | — |
@@ -289,6 +290,7 @@
 | Craft | `rest:GET:/api/vpps-operations/rule4-ignores` | existing_capability | `craft.bop.draft.change.preview` |
 | Craft | `rest:POST:/api/rule-engine/audit/bop-version/{version_gid}` | existing_capability | `craft.bop.draft.change.preview` |
 | Craft | `rest:POST:/api/rule-engine/check` | existing_capability | `craft.bop.draft.change.preview` |
+| Craft | `capability:craft.bop.entry.detail.get` | existing_capability | `craft.bop.entry.detail.get` |
 | Craft | `agent_tool:get_entry_relations` | existing_capability | `craft.bop.execution_structure.get` |
 | Craft | `capability:craft.bop.execution_structure.get` | existing_capability | `craft.bop.execution_structure.get` |
 | Craft | `rest:GET:/api/bop/entity-detail` | existing_capability | `craft.bop.execution_structure.get` |
@@ -319,6 +321,7 @@
 | Craft | `rest:GET:/api/bop/versions/{version_gid}/line-op-catia-parts` | existing_capability | `craft.bop.linked_parts.get` |
 | Craft | `rest:GET:/api/bop/versions/{version_gid}/linked-parts` | existing_capability | `craft.bop.linked_parts.get` |
 | Craft | `rest:GET:/api/bop/versions/{version_gid}/pbom` | existing_capability | `craft.bop.linked_parts.get` |
+| Craft | `capability:craft.bop.structure.outline.get` | existing_capability | `craft.bop.structure.outline.get` |
 | Craft | `capability:craft.bop.validation.get` | existing_capability | `craft.bop.validation.get` |
 | Craft | `capability:craft.bop.validation.run` | existing_capability | `craft.bop.validation.run` |
 | Craft | `capability:craft.bop.version.archive` | existing_capability | `craft.bop.version.archive` |

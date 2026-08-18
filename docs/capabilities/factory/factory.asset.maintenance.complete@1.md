@@ -8,7 +8,7 @@ Execute the governed factory.asset.maintenance.complete Factory outcome.
 - 不适用：The resource is a BOP plan node or production schedule.
 - 生命周期：`stable`
 - 所属领域：`factory`
-- Catalog Release：`rel_a91d6898ffa84d355720e7be705dfa69`
+- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -175,7 +175,7 @@ Execute the governed factory.asset.maintenance.complete Factory outcome.
 ```json
 {
   "capability_id": "factory.asset.maintenance.complete",
-  "catalog_release": "rel_a91d6898ffa84d355720e7be705dfa69",
+  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
   "major_version": 1,
   "payload": {}
 }

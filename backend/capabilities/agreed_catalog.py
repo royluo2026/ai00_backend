@@ -104,6 +104,7 @@ APPROVED_CAPABILITY_IDS = frozenset({
     "vismockup.status", "vismockup.tree", "vismockup.visibility",
     "craft.bop.execution_structure.get", "craft.bop.execution_structure.preview",
     "craft.bop.linked_parts.get", "craft.bop.version.compare", "craft.bop.version.get",
+    "craft.bop.entry.detail.get", "craft.bop.structure.outline.get",
     "craft.bop.version.list", "craft.bop.work_package.get", "craft.gbop.item.knowledge.list",
     "craft.gbop.item.search", "craft.gbop.item.usage.get", "craft.pbom.part.search",
     "craft.bop.draft.change.preview", "craft.bop.draft.change.apply", "craft.bop.version.create", "craft.bop.version.archive", "craft.bop.import.preview",

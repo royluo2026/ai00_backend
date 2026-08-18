@@ -8,7 +8,7 @@ Delete a value using optional optimistic versioning.
 - 不适用：Use the owning domain's governed Capability.
 - 生命周期：`stable`
 - 所属领域：`base`
-- Catalog Release：`rel_a91d6898ffa84d355720e7be705dfa69`
+- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -89,7 +89,7 @@ Delete a value using optional optimistic versioning.
 ```json
 {
   "capability_id": "plugin.storage.delete",
-  "catalog_release": "rel_a91d6898ffa84d355720e7be705dfa69",
+  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
   "major_version": 1,
   "payload": {
     "key": "example"

@@ -1562,6 +1562,31 @@
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
     },
+    "capability:craft.bop.entry.detail.get": {
+      "function_id": "capability:craft.bop.entry.detail.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.entry.detail.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/craft/craft_backend/capabilities/bop_navigation.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
     "capability:craft.bop.execution_structure.get": {
       "function_id": "capability:craft.bop.execution_structure.get",
       "domain": "Craft",
@@ -1657,6 +1682,31 @@
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
         "plugins/craft/craft_backend/capabilities/bop_structure.py",
+        "plugins/craft/craft_backend/capabilities/contracts.py",
+        "plugins/craft/craft_backend/capabilities/provider.py"
+      ]
+    },
+    "capability:craft.bop.structure.outline.get": {
+      "function_id": "capability:craft.bop.structure.outline.get",
+      "domain": "Craft",
+      "stability": "stable",
+      "current_consumers": [
+        "Capability Registry"
+      ],
+      "target_capability": "craft.bop.structure.outline.get",
+      "exposure": "Capability",
+      "automation_level": "automated",
+      "resource_types": [
+        "bop"
+      ],
+      "data_classification": "internal",
+      "classification": "mapped",
+      "migration_status": "registered",
+      "owner": "Craft",
+      "exclusion_reason": null,
+      "source_paths": [
+        "backend/capabilities/agreed_catalog.py",
+        "plugins/craft/craft_backend/capabilities/bop_navigation.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
       ]
@@ -1850,6 +1900,7 @@
       "exclusion_reason": null,
       "source_paths": [
         "backend/capabilities/agreed_catalog.py",
+        "plugins/craft/craft_backend/capabilities/bop_navigation.py",
         "plugins/craft/craft_backend/capabilities/bop_structure.py",
         "plugins/craft/craft_backend/capabilities/contracts.py",
         "plugins/craft/craft_backend/capabilities/provider.py"
@@ -8618,6 +8669,28 @@
       "exclusion_reason": "rest:GET:/admin/plugin-registry is a health, deployment, or administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
       "source_paths": [
         "backend/routers/admin.py"
+      ]
+    },
+    "rest:GET:/admin/runtime-diagnostics": {
+      "function_id": "rest:GET:/admin/runtime-diagnostics",
+      "domain": "Base Platform",
+      "stability": "stable",
+      "current_consumers": [
+        "REST"
+      ],
+      "target_capability": null,
+      "exposure": "Web/REST",
+      "automation_level": "interactive",
+      "resource_types": [
+        "system"
+      ],
+      "data_classification": "internal",
+      "classification": "operations",
+      "migration_status": "excluded",
+      "owner": "Base Platform",
+      "exclusion_reason": "rest:GET:/admin/runtime-diagnostics is a payload-free administrator control-plane endpoint; it is retained as operations infrastructure and must not become an independently invokable business Capability.",
+      "source_paths": [
+        "backend/routers/runtime_diagnostics.py"
       ]
     },
     "rest:GET:/api/ai/admin-config": {

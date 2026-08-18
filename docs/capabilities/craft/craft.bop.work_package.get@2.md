@@ -8,7 +8,7 @@ Read one bounded page of a line or station BOP work package.
 - 不适用：A consumer needs the complete BOP or a role projection from version 1.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_a91d6898ffa84d355720e7be705dfa69`
+- Catalog Release：`rel_118d91d38b08fcecd96ddea0005a02b5`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -114,7 +114,7 @@ Read one bounded page of a line or station BOP work package.
 ```json
 {
   "capability_id": "craft.bop.work_package.get",
-  "catalog_release": "rel_a91d6898ffa84d355720e7be705dfa69",
+  "catalog_release": "rel_118d91d38b08fcecd96ddea0005a02b5",
   "major_version": 2,
   "payload": {
     "revision": 1,
