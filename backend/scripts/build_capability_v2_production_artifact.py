@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from fnmatch import fnmatch
+import hashlib
 import json
 from pathlib import Path
 from shutil import copy2, rmtree
@@ -20,7 +21,12 @@ from backend.plugin_platform.signing import SignatureError, verify
 
 
 DEFAULT_ALLOWLIST = Path("docs/governance/test-extension/production-artifact-allowlist.json")
-RELEASE_REPORT_FIELDS = frozenset({"conclusion", "report_hash", "signature", "signing_key_id"})
+RELEASE_REPORT_FIELDS = frozenset({
+    "report_gid", "code_revision", "product_catalog_release_id", "snapshot_gid",
+    "test_run_gid", "conclusion", "blockers", "report_hash", "signing_key_id",
+    "signature",
+})
+SIGNED_RELEASE_REPORT_FIELDS = RELEASE_REPORT_FIELDS - {"report_hash", "signature"}
 
 
 @dataclass(frozen=True)
@@ -49,17 +55,33 @@ def validate_release_report(
     errors: set[str] = set()
     if set(document) - RELEASE_REPORT_FIELDS:
         errors.add("release_report_unknown_fields")
+    if RELEASE_REPORT_FIELDS - set(document):
+        errors.add("release_report_missing_fields")
     if document.get("conclusion") != "pass":
         errors.add("release_report_not_passed")
+    if not all(str(document.get(field, "")).strip() for field in (
+        "report_gid", "code_revision", "product_catalog_release_id", "snapshot_gid", "test_run_gid",
+    )) or not isinstance(document.get("blockers"), list):
+        errors.add("release_report_invalid")
     if not str(document.get("signing_key_id", "")).strip():
         errors.add("release_report_signing_key_missing")
     if not str(document.get("signature", "")).strip():
         errors.add("release_report_signature_missing")
+    if not errors.intersection({"release_report_unknown_fields", "release_report_missing_fields", "release_report_invalid"}):
+        canonical = _canonical_release_report(document)
+        expected_hash = "sha256:" + hashlib.sha256(canonical).hexdigest()
+        if document.get("report_hash") != expected_hash:
+            errors.add("release_report_hash_invalid")
     key_id = str(document.get("signing_key_id", "")).strip()
     public_key = str((trusted_release_keys or {}).get(key_id, "")).strip()
     if not public_key:
         errors.add("release_report_untrusted_signing_key")
-    elif "release_report_signature_missing" not in errors:
+    elif not errors.intersection({
+        "release_report_unknown_fields",
+        "release_report_missing_fields",
+        "release_report_invalid",
+        "release_report_signature_missing",
+    }):
         try:
             verify(public_key, _canonical_release_report(document), str(document["signature"]))
         except SignatureError:
@@ -68,12 +90,8 @@ def validate_release_report(
 
 
 def _canonical_release_report(document: dict[str, object]) -> bytes:
-    signed = {
-        key: value
-        for key, value in document.items()
-        if key != "signature"
-    }
-    return json.dumps(signed, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    signed = {key: document[key] for key in sorted(SIGNED_RELEASE_REPORT_FIELDS)}
+    return json.dumps(signed, ensure_ascii=True, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
 def build_production_artifact(

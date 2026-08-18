@@ -1,5 +1,6 @@
 from importlib.util import find_spec
 from pathlib import Path
+import hashlib
 import json
 import subprocess
 import sys
@@ -42,8 +43,18 @@ def signing_material() -> tuple[Ed25519PrivateKey, str]:
 
 
 def signed_release_report(private_key: Ed25519PrivateKey, signing_key_id: str = "release-test") -> dict[str, str]:
-    report = {"conclusion": "pass", "signing_key_id": signing_key_id}
-    canonical = json.dumps(report, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    report = {
+        "report_gid": "501",
+        "code_revision": "rev-a",
+        "product_catalog_release_id": "catalog-a",
+        "snapshot_gid": "101",
+        "test_run_gid": "201",
+        "conclusion": "pass",
+        "blockers": [],
+        "signing_key_id": signing_key_id,
+    }
+    canonical = artifact_builder._canonical_release_report(report)
+    report["report_hash"] = "sha256:" + hashlib.sha256(canonical).hexdigest()
     report["signature"] = base64.b64encode(private_key.sign(canonical)).decode("ascii")
     return report
 
@@ -157,6 +168,18 @@ def test_production_artifact_builder_rejects_unsigned_or_secret_report(tmp_path)
     errors = artifact_builder.validate_release_report(report_path, {})
 
     assert {"release_report_signature_missing", "release_report_unknown_fields"} <= set(errors)
+
+
+def test_production_artifact_builder_rejects_missing_pinned_field_before_signature_verification(tmp_path):
+    private_key, public_key = signing_material()
+    report = signed_release_report(private_key)
+    del report["code_revision"]
+    report_path = tmp_path / "release-report.json"
+    write(report_path, json.dumps(report))
+
+    errors = artifact_builder.validate_release_report(report_path, {"release-test": public_key})
+
+    assert "release_report_missing_fields" in errors
 
 
 def test_production_artifact_builder_rejects_tampered_signed_report(tmp_path):

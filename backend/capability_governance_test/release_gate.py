@@ -37,9 +37,33 @@ class ReleaseReport:
     signing_key_id: str
     signature: str
 
+    def to_document(self) -> dict[str, Any]:
+        """Return the portable, signed release-attestation document."""
+        return {
+            "report_gid": str(self.release_report_gid),
+            "code_revision": self.candidate.code_revision,
+            "product_catalog_release_id": self.candidate.product_catalog_release_id,
+            "snapshot_gid": str(self.candidate.snapshot_gid),
+            "test_run_gid": str(self.candidate.test_run_gid),
+            "conclusion": self.conclusion,
+            "blockers": list(self.blockers),
+            "report_hash": self.report_hash,
+            "signing_key_id": self.signing_key_id,
+            "signature": self.signature,
+        }
 
-def _canonical(candidate: ReleaseCandidate, conclusion: str, blockers: Iterable[str]) -> bytes:
-    payload = {"candidate": {"code_revision": candidate.code_revision, "product_catalog_release_id": candidate.product_catalog_release_id, "snapshot_gid": candidate.snapshot_gid, "test_run_gid": candidate.test_run_gid}, "conclusion": conclusion, "blockers": sorted(set(str(value) for value in blockers))}
+
+def _canonical(candidate: ReleaseCandidate, report_gid: int, conclusion: str, blockers: Iterable[str], signing_key_id: str) -> bytes:
+    payload = {
+        "report_gid": str(report_gid),
+        "code_revision": candidate.code_revision,
+        "product_catalog_release_id": candidate.product_catalog_release_id,
+        "snapshot_gid": str(candidate.snapshot_gid),
+        "test_run_gid": str(candidate.test_run_gid),
+        "conclusion": conclusion,
+        "blockers": sorted(set(str(value) for value in blockers)),
+        "signing_key_id": signing_key_id,
+    }
     return json.dumps(payload, ensure_ascii=True, separators=(",", ":"), sort_keys=True).encode("utf-8")
 
 
@@ -90,13 +114,14 @@ class ReleaseGate:
 
     def _expired_report(self, report: ReleaseReport) -> ReleaseReport:
         """Append a separately signed expiry report without touching prior evidence."""
-        canonical = _canonical(report.candidate, "expired", report.blockers)
+        report_gid = self._next_gid()
+        canonical = _canonical(report.candidate, report_gid, "expired", report.blockers, report.signing_key_id)
         digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
         try:
             signature = self._signer(canonical)
         except Exception:
             signature = ""
-        return ReleaseReport(self._next_gid(), report.candidate, "expired", report.blockers, digest, report.signing_key_id, signature)
+        return ReleaseReport(report_gid, report.candidate, "expired", report.blockers, digest, report.signing_key_id, signature)
 
     def _append_expiry(self, report: ReleaseReport) -> int:
         if report.release_report_gid in self._expiry_reports:
@@ -188,20 +213,21 @@ class ReleaseGate:
         if unknown:
             blockers.add("missing_required_data")
         conclusion: Literal["pass", "fail", "expired"] = "fail" if blockers else "pass"
-        canonical = _canonical(candidate, conclusion, blockers)
+        report_gid = self._next_gid()
+        key_id = self._signing_key_id
+        if not key_id:
+            key_id = "configured-release-key"
+        canonical = _canonical(candidate, report_gid, conclusion, blockers, key_id)
         digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
         signature = ""
-        key_id = self._signing_key_id
         try:
             signature = self._signer(canonical)
-            if not key_id:
-                key_id = "configured-release-key"
         except Exception:
             blockers.add("release_signing_key_unavailable")
             conclusion = "fail"
-            canonical = _canonical(candidate, conclusion, blockers)
+            canonical = _canonical(candidate, report_gid, conclusion, blockers, key_id)
             digest = "sha256:" + hashlib.sha256(canonical).hexdigest()
-        report = ReleaseReport(self._next_gid(), candidate, conclusion, tuple(sorted(blockers)), digest, key_id, signature)
+        report = ReleaseReport(report_gid, candidate, conclusion, tuple(sorted(blockers)), digest, key_id, signature)
         report = self._store(report, key)
         self._audit(report, idempotency_key=key, actor_gid=str(evaluated_by_gid))
         return report

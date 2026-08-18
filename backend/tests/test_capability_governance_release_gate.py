@@ -1,9 +1,14 @@
 import hashlib
+import base64
+import json
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from backend.capability_governance_test.release_gate import ReleaseCandidate, ReleaseGate, ReleaseGateError
+from backend.scripts.build_capability_v2_production_artifact import validate_release_report
 
 
 def _candidate() -> ReleaseCandidate:
@@ -55,6 +60,25 @@ def test_passing_report_is_immutable_signed_and_expires_when_pinned_input_change
     assert expired_report.report_hash != report.report_hash
     assert gate.resolve(report.release_report_gid) == expired_report
     assert gate.resolve(report.release_report_gid).conclusion == "expired"
+
+
+def test_passing_release_gate_report_verifies_in_production_artifact_checker(tmp_path):
+    private_key = Ed25519PrivateKey.generate()
+    public_key = private_key.public_key().public_bytes(
+        serialization.Encoding.PEM,
+        serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode("utf-8")
+    gate = ReleaseGate(
+        next_gid=iter(range(501, 510)).__next__,
+        signer=lambda payload: base64.b64encode(private_key.sign(payload)).decode("ascii"),
+        signing_key_id="release-test",
+    )
+
+    report = gate.evaluate(_candidate(), **_passing_inputs())
+    report_path = tmp_path / "release-report.json"
+    report_path.write_text(json.dumps(report.to_document()), encoding="utf-8")
+
+    assert validate_release_report(report_path, {"release-test": public_key}) == ()
 
 
 def test_release_gate_requires_idempotency_key_and_fails_active_waiver_after_expiry():
