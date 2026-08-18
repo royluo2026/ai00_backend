@@ -106,13 +106,15 @@ class AcceptanceReport:
 class FakeEnvironment:
     root: Path
     environ: Mapping[str, str]
+    production_artifact_root: Path | None = None
 
     @classmethod
     def healthy(cls, root: Path = ROOT) -> "FakeEnvironment":
-        return cls(Path(root), {
+        root = Path(root)
+        return cls(root, {
             "AI00_DEPLOYMENT_PROFILE": "test-governance",
             "AI00_GID_MACHINE_ID": "41",
-        })
+        }, root / "backend/tests/fixtures/capability_governance_production_artifact")
 
 
 def _section(run) -> AcceptanceSection:
@@ -191,7 +193,9 @@ def run_acceptance(environment: FakeEnvironment) -> AcceptanceReport:
     sections["release_gate"] = _section(_release_evidence)
     sections["ai_redaction"] = _section(_redaction_evidence)
     sections["ui"] = _section(lambda: _ui_evidence(root))
-    sections["production_exclusion"] = _section(lambda: _production_evidence(root))
+    sections["production_exclusion"] = _section(
+        lambda: _production_evidence(environment.production_artifact_root)
+    )
     if set(sections) != MANDATORY_SECTIONS:
         raise RuntimeError("mandatory_section_contract_broken")
     hashes = {
@@ -256,14 +260,67 @@ def _finding_evidence(path: Path) -> dict[str, Any]:
     )
     if first.status != "ok" or first.findings != second.findings:
         raise RuntimeError("findings_not_deterministic")
+    fixture_codes = _controlled_fixture_codes()
+    expected = {
+        "transaction_provider": "transaction_participant_missing",
+        "drift": "catalog_schema_drift",
+        "cross_domain_conflict": "cross_domain_conflict",
+        "gap": "provider_missing",
+    }
+    if fixture_codes != expected:
+        raise RuntimeError("controlled_fixtures_not_exercised")
     return {"finding_hash": canonical_fingerprint([item.fingerprint for item in first.findings]),
-            "controlled_fixtures": ("transaction_provider", "drift", "cross_domain_conflict", "gap")}
+            "controlled_fixtures": expected}
+
+
+def _controlled_fixture_codes() -> dict[str, str]:
+    """Execute each release-critical finding against a minimal immutable snapshot."""
+    from backend.capability_governance_test.models import CapabilityBinding, ImplementationNode, ScannedCapability, SnapshotDocument
+
+    digest = lambda value: "sha256:" + value * 64
+    def capability(identifier: str, owner: str, *, strong: bool = False, policy: str = "a") -> ScannedCapability:
+        return ScannedCapability(
+            identifier, 1, owner, "strong_write" if strong else "read", "effect", "stable",
+            digest("a"), digest("b"), digest("c"), digest("d"), digest(policy), digest("e"),
+            {"business_object": "order", "operation_family": "submit", "side_effect_level": "strong_write" if strong else "read", "authorization_policy": {"family": "shared", "scope": policy}},
+        )
+    def snapshot(capabilities, nodes=(), bindings=()):
+        return SnapshotDocument("rel_product", "rel_extension", "fixture", digest("f"), tuple(capabilities), tuple(nodes), tuple(bindings), ())
+    def codes(document: SnapshotDocument) -> set[str]:
+        return {finding.code for finding in run_deterministic_analysis(document, AnalysisRequest()).findings}
+
+    transaction = codes(snapshot((capability("craft.order.submit", "craft", strong=True),)))
+    drift_capability = capability("craft.order.read", "craft")
+    provider = ImplementationNode("provider:craft", "craft", "provider", "provider.py", digest("e"), metadata={"input_schema_hash": digest("9")})
+    drift = codes(snapshot((drift_capability,), (provider,), (CapabilityBinding(drift_capability.capability_id, 1, provider.canonical_key, "implemented_by", digest("1")),)))
+    conflict = codes(snapshot((capability("craft.order.submit", "craft", policy="a"), capability("integration.order.submit", "integration", policy="b"))))
+    gap = codes(snapshot((capability("craft.order.search", "craft"),)))
+    required = {
+        "transaction_provider": ("transaction_participant_missing", transaction),
+        "drift": ("catalog_schema_drift", drift),
+        "cross_domain_conflict": ("cross_domain_conflict", conflict),
+        "gap": ("provider_missing", gap),
+    }
+    return {name: code for name, (code, values) in required.items() if code in values}
 
 
 def _permission_evidence() -> dict[str, Any]:
-    if not READ_IDS or not ANALYZE_IDS or not GOVERN_IDS or not RELEASE_IDS:
-        raise RuntimeError("permission_contract_missing")
-    return {"read": len(READ_IDS), "analyze": len(ANALYZE_IDS), "govern": len(GOVERN_IDS), "release": len(RELEASE_IDS)}
+    from backend.capabilities.registry_next import CapabilityRegistry
+    from backend.capability_governance_test.provider import register_governance_capabilities
+    from backend.capability_governance_test.service import CapabilityGovernanceService
+
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry, CapabilityGovernanceService())
+    expected = {
+        **{identifier: ("system.capability.read",) for identifier in READ_IDS},
+        **{identifier: ("system.capability.read", "system.capability.analyze") for identifier in ANALYZE_IDS},
+        **{identifier: ("system.capability.read", "system.capability.analyze", "system.capability.govern") for identifier in GOVERN_IDS},
+        **{identifier: ("system.capability.read", "system.capability.analyze", "system.capability.govern", "system.capability.release") for identifier in RELEASE_IDS},
+    }
+    actual = {identifier: tuple(registry.get(identifier).spec.permissions) for identifier in expected}
+    if actual != expected:
+        raise RuntimeError("permission_boundary_not_exercised")
+    return {"permission_contract_hash": canonical_fingerprint(actual), "capability_count": len(actual)}
 
 
 def _health_evidence() -> dict[str, Any]:
@@ -289,9 +346,16 @@ def _delegation_evidence() -> dict[str, Any]:
     now = datetime.now(UTC)
     grant = DelegationGrant(delegation_id="delegation-1", delegated_by="admin", user_id="analyst", tenant_id="tenant", consumer_type=ConsumerType.AGENT, consumer_id="governance-agent", agent_run_id="run-1", catalog_release="rel_" + "a" * 32, capability_scopes=("base.capability_registry.search", "base.capability_analysis.run"), maximum_automation_level=AutomationLevel.A1, authentication_method="test", authenticated_at=now, expires_at=now + timedelta(minutes=5))
     issued = issue_delegation(InMemoryDelegationStore(), grant)
-    if not issued.token or "base.capability_release_gate.evaluate" in grant.capability_scopes:
+    if not issued.token or set(grant.capability_scopes) != {
+        "base.capability_registry.search", "base.capability_analysis.run",
+    }:
         raise RuntimeError("delegation_scope_invalid")
-    return {"delegated_identity": grant.user_id, "allowed": ("read", "analyze"), "denied": ("govern", "release")}
+    active = InMemoryDelegationStore()
+    issued = issue_delegation(active, grant.model_copy(update={"delegation_id": "delegation-2"}))
+    if active.consume_active(issued.token).capability_scopes != grant.capability_scopes:
+        raise RuntimeError("delegation_not_exercised")
+    return {"delegated_identity": grant.user_id, "allowed_capabilities": grant.capability_scopes,
+            "denied_capabilities": ("base.capability_proposal.submit", "base.capability_release_gate.evaluate")}
 
 
 def _redaction_evidence() -> dict[str, Any]:
@@ -320,15 +384,17 @@ def _ui_evidence(root: Path) -> dict[str, Any]:
     }
 
 
-def _production_evidence(root: Path) -> dict[str, Any]:
-    artifact = root / ".runtime" / "capability-v2-production-artifact"
-    if artifact.is_dir():
-        report = check_production_artifact(artifact)
-        # Existing developer artifacts are not release candidates.  A live run
-        # records their outcome; the fake acceptance validates the checker is
-        # available and leaves production publication to its authorised path.
-        return {"production_artifact_checked": True, "governance_physical_exclusion": report.status == "passed"}
-    return {"production_artifact_checked": False, "governance_physical_exclusion": True}
+def _production_evidence(artifact: Path | None) -> dict[str, Any]:
+    if artifact is None or not artifact.is_dir():
+        raise RuntimeError("production_artifact_missing")
+    report = check_production_artifact(artifact)
+    if report.status != "passed":
+        raise RuntimeError("production_governance_exclusion_failed")
+    return {
+        "production_artifact_checked": True,
+        "governance_physical_exclusion": True,
+        "checked_paths": len(report.checked_paths),
+    }
 
 
 def _live_prerequisite(environ: Mapping[str, str]) -> str | None:
@@ -349,15 +415,18 @@ def run_real_acceptance(base_url: str, environ: Mapping[str, str] | None = None)
         generator = SnowflakeGID(1)
         failed = {name: AcceptanceSection("failed", {"error_code": "external_prerequisite_required"}) for name in MANDATORY_SECTIONS}
         return AcceptanceReport(gid_to_json(generator.next_id()), failed, {}, "live", prerequisite)
-    report = run_acceptance(FakeEnvironment(ROOT, environment))
-    frontend = check_frontend_deployment(base_url)
-    sections = dict(report.sections)
-    sections["ui"] = AcceptanceSection("passed" if frontend["status"] == "passed" else "failed", {"http_status": frontend["status"]})
-    production = check_production_artifact(Path(environment["AI00_PRODUCTION_ARTIFACT_ROOT"]))
-    sections["production_exclusion"] = AcceptanceSection(
-        production.status, {"checked_paths": len(production.checked_paths), "error_count": len(production.errors)},
+    # There is intentionally no fallback from strict live acceptance to the
+    # synthetic FakeEnvironment.  A future adapter must execute and attest the
+    # authorised DB/Gateway/browser checks before it is allowed to return pass.
+    generator = SnowflakeGID(machine_id_from_environment(environment))
+    failed = {
+        name: AcceptanceSection("failed", {"error_code": "live_adapter_unavailable"})
+        for name in MANDATORY_SECTIONS
+    }
+    return AcceptanceReport(
+        gid_to_json(generator.next_id()), failed, {}, "live",
+        "verifiable_live_acceptance_adapter_required",
     )
-    return AcceptanceReport(report.report_gid, sections, report.hashes, "live")
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -13,6 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.capability_v2.completion import evaluate_completion
+from backend.capability_governance_test.fingerprint import canonical_fingerprint
 
 
 GOVERNANCE_ACCEPTANCE_SECTIONS = frozenset({
@@ -20,6 +22,14 @@ GOVERNANCE_ACCEPTANCE_SECTIONS = frozenset({
     "deterministic_findings", "permissions", "agent_delegation", "health",
     "workflow", "release_gate", "ai_redaction", "ui", "production_exclusion",
 })
+_SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
+_GID = re.compile(r"^[0-9]{1,19}$")
+_REQUIRED_HASHES = frozenset({"product_catalog", "governance_extension", "snapshot"})
+_REQUIRED_EVIDENCE_GIDS = {
+    "snapshot": "snapshot_gid",
+    "health": "test_run_gid",
+    "release_gate": "release_report_gid",
+}
 
 
 def _governance_acceptance(path: Path) -> dict[str, object]:
@@ -32,10 +42,39 @@ def _governance_acceptance(path: Path) -> dict[str, object]:
         return {"status": "failed", "error_code": "acceptance_report_invalid"}
     sections = document.get("sections")
     names = set(sections) if isinstance(sections, dict) else set()
+    hashes = document.get("hashes")
+    report_hash = document.get("report_hash")
+    canonical = dict(document)
+    canonical.pop("report_hash", None)
+    provenance = document.get("provenance")
+    section_values = sections if isinstance(sections, dict) else {}
+    evidence_gids = {
+        name: section_values.get(section, {}).get("evidence", {}).get(field)
+        for section, (name, field) in {
+            "snapshot": ("snapshot", "snapshot_gid"),
+            "test_run": ("health", "test_run_gid"),
+            "release_report": ("release_gate", "release_report_gid"),
+        }.items()
+    }
     passed = (
-        document.get("status") == "passed"
+        document.get("execution_mode") == "live"
+        and document.get("status") == "passed"
         and document.get("failed") == 0
         and document.get("skipped") == 0
+        and "external_prerequisite" not in document
+        and isinstance(document.get("report_gid"), str)
+        and _GID.fullmatch(document["report_gid"]) is not None
+        and isinstance(hashes, dict)
+        and set(hashes) >= _REQUIRED_HASHES
+        and all(isinstance(hashes.get(name), str) and _SHA256.fullmatch(hashes[name]) for name in _REQUIRED_HASHES)
+        and isinstance(report_hash, str)
+        and _SHA256.fullmatch(report_hash) is not None
+        and report_hash == canonical_fingerprint(canonical)
+        and isinstance(provenance, dict)
+        and provenance.get("adapter") == "AI00Backend-CapabilityV2"
+        and isinstance(provenance.get("signature"), str)
+        and len(provenance["signature"]) >= 32
+        and all(isinstance(value, str) and _GID.fullmatch(value) for value in evidence_gids.values())
         and set(document.get("mandatory_sections", ())) == GOVERNANCE_ACCEPTANCE_SECTIONS
         and names == GOVERNANCE_ACCEPTANCE_SECTIONS
         and all(isinstance(value, dict) and value.get("status") == "passed" for value in (sections or {}).values())

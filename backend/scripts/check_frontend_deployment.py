@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -42,6 +43,7 @@ def check(base_url: str) -> dict[str, object]:
     }
     results: list[dict[str, object]] = []
     errors: list[str] = []
+    governance_html = ""
     for path, (expected_status, expected_type, marker) in checks.items():
         try:
             status, content_type, body = _get(base_url, path)
@@ -58,10 +60,50 @@ def check(base_url: str) -> dict[str, object]:
                 errors.append(f"{path}: expected {expected_type}, got {content_type}")
             if marker is not None and marker not in body:
                 errors.append(f"{path}: missing marker {marker!r}")
+            if path == "/web/admin/capability_governance/index.html":
+                governance_html = body
         except (HTTPError, URLError, TimeoutError) as exc:
             results.append({"path": path, "error": str(exc)})
             errors.append(f"{path}: {exc}")
+    if governance_html:
+        _check_governance_assets(base_url, governance_html, results, errors)
     return {"status": "passed" if not errors else "failed", "checks": results, "errors": errors}
+
+
+def _check_governance_assets(base_url: str, html: str, results: list[dict[str, object]], errors: list[str]) -> None:
+    scripts = {
+        "governance_model.js": "CapabilityGovernanceModel",
+        "governance_api.js": "CapabilityGovernanceApi",
+        "governance_controller.js": "CapabilityGovernanceController",
+    }
+    linked_scripts = set(re.findall(r'<script[^>]+src="([^"/]+)"', html))
+    stylesheets = set(re.findall(r'<link[^>]+href="(/assets/[^"?#]+\.css)"', html))
+    for filename, marker in scripts.items():
+        if filename not in linked_scripts:
+            errors.append(f"governance_html: missing script {filename}")
+            continue
+        _asset_result(base_url, f"/web/admin/capability_governance/{filename}", "text/javascript", marker, results, errors)
+    if not stylesheets:
+        errors.append("governance_html: missing stylesheet")
+    for path in sorted(stylesheets):
+        _asset_result(base_url, path, "text/css", ".governance-shell", results, errors)
+
+
+def _asset_result(base_url: str, path: str, expected_type: str, marker: str, results: list[dict[str, object]], errors: list[str]) -> None:
+    try:
+        status, content_type, body = _get(base_url, path)
+    except (HTTPError, URLError, TimeoutError) as exc:
+        results.append({"path": path, "error": str(exc)})
+        errors.append(f"{path}: {exc}")
+        return
+    present = marker in body
+    results.append({"path": path, "status": status, "content_type": content_type, "marker_present": present})
+    if status != 200:
+        errors.append(f"{path}: expected HTTP 200, got {status}")
+    if content_type != expected_type:
+        errors.append(f"{path}: expected {expected_type}, got {content_type}")
+    if not present:
+        errors.append(f"{path}: missing marker {marker!r}")
 
 
 def main() -> int:

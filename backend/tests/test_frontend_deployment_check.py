@@ -10,12 +10,22 @@ def test_check_covers_productized_plugin_center_assets(monkeypatch):
         "/web/settings/plugin_center_model.js": "AI00PluginCenterModel",
         "/web/settings/plugin_center_api.js": "createPluginCenterApi",
         "/web/settings/plugin_center.js": "Server-backed Capability V2 plugin center controller",
-        "/web/admin/capability_governance/index.html": "governance_controller.js",
+        "/web/admin/capability_governance/index.html": (
+            '<link rel="stylesheet" href="/assets/governance.css">'
+            '<script src="governance_model.js"></script>'
+            '<script src="governance_api.js"></script>'
+            '<script src="governance_controller.js"></script>'
+        ),
+        "/web/admin/capability_governance/governance_model.js": "CapabilityGovernanceModel",
+        "/web/admin/capability_governance/governance_api.js": "CapabilityGovernanceApi",
+        "/web/admin/capability_governance/governance_controller.js": "CapabilityGovernanceController",
+        "/assets/governance.css": ".governance-shell",
     }
 
     def fake_get(_base_url, path):
         content_type = "application/json" if path in {"/health", "/ready"} else (
-                "text/html" if path in {"/", "/web/settings/index.html", "/web/admin/capability_governance/index.html"} else "text/javascript"
+            "text/html" if path in {"/", "/web/settings/index.html", "/web/admin/capability_governance/index.html"}
+            else "text/css" if path.endswith(".css") else "text/javascript"
         )
         return 200, content_type, bodies[path]
 
