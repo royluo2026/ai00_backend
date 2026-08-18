@@ -44,12 +44,15 @@ def test_release_e2e_profile_fails_closed_without_authorization_or_cleanup(kwarg
 
 def test_release_e2e_records_exceptions_and_skips_as_failures() -> None:
     failing = RegisteredTestCase("case-failing", operation="write", runner=lambda: (_ for _ in ()).throw(RuntimeError("boom")), fixture_ids=("E2E-42-run-1",))
-    skipped = RegisteredTestCase("case-skipped", operation="write", runner=lambda: {"status": " SKIPPED "}, fixture_ids=("E2E-42-run-1",))
+    skipped = RegisteredTestCase("case-skipped", operation="write", runner=lambda: {"status": " SKIPPED "}, fixture_ids=("E2E-42-run-2",))
 
     result = run_release_e2e_profile(
         [failing, skipped], release_candidate_gid="42",
-        caller_permissions={"system.capability.release"}, fixture_ids=("E2E-42-run-1",),
-        cleanup_plan={"E2E-42-run-1": "DELETE FROM test_resources WHERE id = 'E2E-42-run-1'"},
+        caller_permissions={"system.capability.release"}, fixture_ids=("E2E-42-run-1", "E2E-42-run-2"),
+        cleanup_plan={
+            "E2E-42-run-1": "DELETE FROM test_resources WHERE id = 'E2E-42-run-1'",
+            "E2E-42-run-2": "DELETE FROM test_resources WHERE id = 'E2E-42-run-2'",
+        },
     )
 
     assert [item.status for item in result.results] == ["failed", "failed"]
@@ -81,3 +84,29 @@ def test_release_e2e_rejects_unplanned_case_fixtures_and_forbidden_operations() 
         run_release_e2e_profile([unplanned], **arguments)
     with pytest.raises(TestPolicyError, match="release_operation_forbidden"):
         run_release_e2e_profile([forbidden], **arguments)
+
+
+def test_release_e2e_rejects_fixture_ids_shared_by_multiple_cases() -> None:
+    first = RegisteredTestCase("case-first", operation="write", runner=lambda: {"status": "passed"}, fixture_ids=("E2E-42-run-1",))
+    second = RegisteredTestCase("case-second", operation="write", runner=lambda: {"status": "passed"}, fixture_ids=("E2E-42-run-1",))
+
+    with pytest.raises(TestPolicyError, match="case_fixture_ids_overlap"):
+        run_release_e2e_profile(
+            [first, second], release_candidate_gid="42", caller_permissions={"system.capability.release"},
+            fixture_ids=("E2E-42-run-1",),
+            cleanup_plan={"E2E-42-run-1": "DELETE FROM test_resources WHERE id = 'E2E-42-run-1'"},
+        )
+
+
+def test_release_e2e_rejects_request_fixtures_not_owned_by_a_case() -> None:
+    case = RegisteredTestCase("case-write", operation="write", runner=lambda: {"status": "passed"}, fixture_ids=("E2E-42-run-1",))
+
+    with pytest.raises(TestPolicyError, match="case_fixture_coverage_mismatch"):
+        run_release_e2e_profile(
+            [case], release_candidate_gid="42", caller_permissions={"system.capability.release"},
+            fixture_ids=("E2E-42-run-1", "E2E-42-unused"),
+            cleanup_plan={
+                "E2E-42-run-1": "DELETE FROM test_resources WHERE id = 'E2E-42-run-1'",
+                "E2E-42-unused": "DELETE FROM test_resources WHERE id = 'E2E-42-unused'",
+            },
+        )

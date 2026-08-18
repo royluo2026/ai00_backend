@@ -91,6 +91,7 @@ def _validate_release_cases(
     cases: tuple[RegisteredTestCase, ...], *, candidate: str, fixture_ids: tuple[str, ...], cleanup_plan: Mapping[str, str],
 ) -> None:
     planned = set(fixture_ids)
+    owned_by_case: set[str] = set()
     for case in cases:
         if str(case.operation).strip().lower() not in _RELEASE_E2E_PROFILE.allowed_operations:
             raise TestPolicyError("release_operation_forbidden")
@@ -99,6 +100,11 @@ def _validate_release_cases(
             raise TestPolicyError("case_fixture_ids_required")
         if not set(owned).issubset(planned) or any(value not in cleanup_plan for value in owned):
             raise TestPolicyError("case_fixture_cleanup_mismatch")
+        if owned_by_case.intersection(owned):
+            raise TestPolicyError("case_fixture_ids_overlap")
+        owned_by_case.update(owned)
+    if owned_by_case != planned:
+        raise TestPolicyError("case_fixture_coverage_mismatch")
 
 
 def run_release_e2e_profile(
