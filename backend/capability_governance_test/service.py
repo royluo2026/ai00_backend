@@ -851,7 +851,10 @@ class CapabilityGovernanceService:
             return ()
         entries_loader = getattr(self._store, "list_entries", None)
         if callable(entries_loader):
-            return tuple(entries_loader())
+            try:
+                return tuple(entries_loader())
+            except Exception:
+                return ()
         # Compatibility for legacy unit-test doubles.  Production stores are
         # required to implement GovernanceStore.list_entries and therefore do
         # not expose or depend on a private snapshot dictionary.
@@ -865,7 +868,10 @@ class CapabilityGovernanceService:
             return None
         loader = getattr(self._store, "latest_snapshot", None)
         if callable(loader):
-            return loader()
+            try:
+                return loader()
+            except Exception:
+                return None
         # Compatibility for legacy unit-test doubles; never used by the
         # Memory/SQL GovernanceStore implementations.
         snapshots = getattr(self._store, "_snapshots", None)

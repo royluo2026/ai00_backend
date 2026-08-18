@@ -4,7 +4,7 @@ from __future__ import annotations
 import sys
 import threading
 import os
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any
 
@@ -93,6 +93,8 @@ def get_capability_registry() -> CapabilityRegistry:
             # an accidental environment variable cannot alter the artifact
             # because the extension itself is test-only and separately built.
             profile = os.environ.get("AI00_DEPLOYMENT_PROFILE", "").strip()
+            if profile == "test-governance" and _test_governance_store_factory is None:
+                _install_default_test_governance_runtime()
             complete_registry = (
                 build_test_governance_capability_registry(
                     store_factory=_test_governance_store_factory,
@@ -104,12 +106,71 @@ def get_capability_registry() -> CapabilityRegistry:
     return _registry
 
 
+def _install_default_test_governance_runtime() -> None:
+    """Install bounded scanner/worker ports for the explicit test profile."""
+    from backend.capability_governance_test.analysis import AnalysisRequest, run_deterministic_analysis
+    from backend.capability_governance_test.scanner import GovernanceScanner
+    from backend.capability_governance_test.service import CapabilityGovernanceService
+    from backend.capability_governance_test.store import MemoryGovernanceStore, SqlGovernanceStore
+    from backend.capability_governance_test.worker import InMemoryRunLeaseStore, LeasedGovernanceWorker, SqlRunLeaseStore
+    from backend.domain_ports.capability_governance_config import GovernanceSettings
+    from backend.capability_v2.catalog import CatalogRelease
+
+    repository_root = Path(__file__).resolve().parents[2]
+    product = CatalogRelease.model_validate_json(
+        (repository_root / "docs/governance/capability-catalog-release.json").read_text(encoding="utf-8")
+    )
+    extension = CatalogRelease.model_validate_json(
+        (repository_root / "docs/governance/test-extension/capability-governance-catalog-release.json").read_text(encoding="utf-8")
+    )
+    manifests = load_domain_manifests(repository_root / "backend/capability_v2/official_domains.json")
+
+    def store_factory() -> Any:
+        try:
+            from backend.db.connection import acquire_connection
+            return SqlGovernanceStore(acquire_connection())
+        except Exception:
+            return MemoryGovernanceStore()
+
+    def service_factory(store: Any) -> Any:
+        scanner = GovernanceScanner(
+            GovernanceSettings("test-governance", repository_root),
+            product_catalog=product,
+            extension_catalog=extension,
+            domain_manifests=manifests,
+        )
+        if getattr(store, "persistent", False):
+            from backend.db.connection import acquire_connection
+            leases = SqlRunLeaseStore(acquire_connection, worker_id="capability-governance")
+        else:
+            leases = InMemoryRunLeaseStore()
+        worker = LeasedGovernanceWorker(leases, worker_id="capability-governance")
+
+        def test_runner(snapshot: Any, payload: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
+            result = run_deterministic_analysis(snapshot, AnalysisRequest())
+            return {"status": "passed" if result.status == "ok" else "failed", "findings": result.findings}
+
+        return CapabilityGovernanceService(
+            store=store,
+            scanner=scanner,
+            analysis_runner=run_deterministic_analysis,
+            test_runner=test_runner,
+            worker=worker,
+        )
+
+    global _test_governance_store_factory, _test_governance_service_factory
+    _test_governance_store_factory = store_factory
+    _test_governance_service_factory = service_factory
+
+
 def reset_capability_registry_for_tests() -> None:
     if "pytest" not in sys.modules:
         raise RuntimeError("capability registry reset is test-only")
-    global _registry
+    global _registry, _test_governance_store_factory, _test_governance_service_factory
     with _registry_lock:
         _registry = None
+        _test_governance_store_factory = None
+        _test_governance_service_factory = None
 
 
 def configure_test_governance_runtime(

@@ -6,6 +6,8 @@ from backend.base import provider as base_provider
 from backend.capability_v2.bootstrap import (
     build_capability_registry,
     build_test_governance_capability_registry,
+    get_capability_registry,
+    reset_capability_registry_for_tests,
 )
 from backend.capability_governance_test.contracts import ALL_IDS, provider_artifact
 from backend.capability_v2.provider_loader import hash_domain_artifact
@@ -92,3 +94,24 @@ def test_http_gateway_overlays_governance_catalog_only_for_explicit_test_profile
     product_gateway = configure_default_gateway(build_capability_registry(ROOT))
     assert product_gateway.catalog().descriptor("base.capability_registry.search", 1) is None
     assert product_gateway.catalog().descriptor("craft.bop.version.list", 1) is not None
+
+
+def test_default_test_governance_bootstrap_wires_scan_and_projection_runtime(monkeypatch):
+    """The explicit local profile must expose a usable service, not placeholders."""
+    monkeypatch.setenv("AI00_DEPLOYMENT_PROFILE", "test-governance")
+    monkeypatch.setenv("AI00_GID_MACHINE_ID", "41")
+    monkeypatch.setenv("AI00_PYTEST_OFFLINE", "1")
+    reset_capability_registry_for_tests()
+    try:
+        registry = get_capability_registry()
+        scan = registry.get("base.capability_scan.run").handler(
+            {"code_revision": "test-bootstrap", "idempotency_key": "bootstrap-scan"}, object()
+        )
+        assert scan["status"] == "completed"
+        search = registry.get("base.capability_registry.search").handler(
+            {"query": "base.", "limit": 2}, object()
+        )
+        assert search["status"] == "completed"
+        assert len(search["items"]) == 2
+    finally:
+        reset_capability_registry_for_tests()
