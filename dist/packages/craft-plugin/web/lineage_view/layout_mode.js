@@ -203,6 +203,45 @@ class LayoutMode {
   }
 
   /**
+   * Release version-scoped DOM, projection and interaction state before a
+   * version switch or refresh. The LayoutMode instance and its event wiring
+   * remain reusable for the next bounded projection.
+   */
+  destroyHeavyState() {
+    if (this._vrTimer !== null) clearTimeout(this._vrTimer);
+    this._vrTimer = null;
+    if (this._edgeScrollRaf !== null && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(this._edgeScrollRaf);
+    }
+    this._edgeScrollRaf = null;
+    if (this._world) this._world.innerHTML = '';
+    if (this._minimapBody) this._minimapBody.innerHTML = '';
+
+    this._data = null;
+    this._allLines = [];
+    this._filteredLines = [];
+    this._linePositions.clear();
+    this._stationPositions.clear();
+    this._lineCarAreas.clear();
+    this._stationDirection.clear();
+    this._renderedLineGids.clear();
+    this._mergeData = null;
+    this._multiMode = false;
+    this._activeGid = null;
+    this._activePosition = null;
+    this._activePositionLine = null;
+    this._dragState = null;
+    this._reparentPending = null;
+    this._reparentDrag = null;
+    this._demotePending = null;
+    this._demoteDrag = null;
+    this._html5DragHovered = null;
+    this._stagingDrag = null;
+    this._edgeMouseClient = { x: 0, y: 0 };
+    this._preserveView = false;
+  }
+
+  /**
    * 切换编辑模式
    */
   setEditMode(enabled) {

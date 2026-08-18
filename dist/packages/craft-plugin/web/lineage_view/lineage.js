@@ -3,7 +3,7 @@
  * lineage.js  —  BOP Lineage Miller Columns 树形视图
  *
  * 依赖：无外部库（纯 vanilla JS）
- * 数据来源：GET /api/bop/versions/{gid}/entries
+ * 数据来源：Capability V2 有界大纲、工作包与条目详情投影
  * 列分组依据：树深度（根据 parent_gid 链计算，非固定 ai00_level）
  */
 
@@ -166,6 +166,50 @@ let _rootPickerEl    = null;        // the floating version picker DOM element
 let _activeGid       = null;
 let _dragGid         = null;
 let _miller         = null;
+let _currentRevision = null;
+const _outlineRowsByVersion = new Map();
+const _scopeRowsByKey = new Map();
+const _scopeLinksByKey = new Map();
+const _comparisonLoaders = new Map();
+const _projectionStore = new LineageProjectionStore({ maxScopes: 3, maxNodes: 12_000, maxBytes: 16 * 1024 * 1024 });
+const _loadCoordinator = new LineageLoadCoordinator();
+
+async function _invokeCapability(id, version, payload, options = {}) {
+  const response = await _cf(`/api/v1/capabilities/${id}:invoke`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version, payload }),
+    signal: options.signal,
+  });
+  const result = response?.data;
+  if (response?.success !== true || result?.ok !== true) {
+    const detail = result?.error || response?.error || {};
+    const error = new Error(detail.message || `能力调用失败：${id}@${version}`);
+    error.code = detail.code || 'capability_invocation_failed';
+    error.retryable = detail.retryable === true;
+    throw error;
+  }
+  return result.data;
+}
+
+const _progressiveLoader = new LineageProgressiveLoader({
+  invokeCapability: _invokeCapability,
+  coordinator: _loadCoordinator,
+  store: _projectionStore,
+});
+
+function _scopeKey(scope) {
+  return [scope.version_gid, scope.revision, scope.scope_kind, scope.scope_gid].join(':');
+}
+
+function _rebuildProjectionRows() {
+  const byGid = new Map();
+  for (const rows of _outlineRowsByVersion.values()) for (const row of rows) byGid.set(row.gid, row);
+  for (const rows of _scopeRowsByKey.values()) for (const row of rows) byGid.set(row.gid, row);
+  _rows = _flattenMeta([...byGid.values()]);
+  _buildIndexes(_rows);
+  _buildStats();
+}
 
 // 视图设置（从 localStorage 恢复）
 let _typeFilter   = null;    // null = 全部显示, [] = 全不选, ['type1',...] = 筛选
@@ -457,13 +501,11 @@ function _updateVersionStatusUI() {
 
 // ── 数据层 ────────────────────────────────────────────────────────────
 
-async function _loadLineGrants() {
+async function _loadLineGrants(projectGid = '') {
   _lineGrantSet.clear();
   _lineReadOnly = false;
   try {
     const me = await _cf('/api/users/me');
-    const verJson = await _cf(`/api/bop/versions/${_versionGid}`);
-    const projectGid = verJson?.data?.project_gid || '';
     const orgRole = me?.data?.org_role || me?.data?.system_role || me?.org_role || me?.system_role || '';
     // 所有组织成员均可编辑全部线体，不再加载线体范围限制。
     if (orgRole === 'super_admin' || orgRole === 'member' || orgRole === 'team_admin' || orgRole === 'project_admin') return;
@@ -602,33 +644,42 @@ async function _load() {
   $columns.innerHTML = '<div class="lv-loading"><div class="lv-spinner"></div>加载中…</div>';
 
   try {
-    await _loadLineGrants();
+    if (_layoutMode && typeof _layoutMode.destroyHeavyState === 'function') _layoutMode.destroyHeavyState();
+    _progressiveLoader.clearHeavyData();
+    for (const loader of _comparisonLoaders.values()) loader.dispose();
+    _comparisonLoaders.clear();
+    _outlineRowsByVersion.clear();
+    _scopeRowsByKey.clear();
+    _scopeLinksByKey.clear();
     _loadedVersionGids = new Set([_versionGid]);
     _versionTagMap.set(_versionGid, _versionTag);
-
-    // 并行加载版本信息和条目数据
-    const [verJson, entryJson] = await Promise.all([
-      _cf(`/api/bop/versions/${_versionGid}`),
-      _cf(`/api/bop/versions/${_versionGid}/entries`),
-    ]);
-
-    // 设置版本状态
-    if (verJson.data) {
-      _versionStatus = verJson.data.status || 'active';
-      if (_verMgr) _verMgr.currentVersionStatus = _versionStatus;
-    }
-    _updateVersionStatusUI();
-
-    _rows = _flattenMeta(entryJson.data || []);
-    _buildIndexes(_rows);
-    _buildStats();
-    _initCollapsed();   // 初始化 _selectedRoots（默认只选第一个树深度=0 根节点）
-    _restoreView();     // 从 localStorage 恢复视图（可覆盖 _selectedRoots）
-    _render();
+    let firstCommit = true;
+    const loaded = await _progressiveLoader.loadVersion(_versionGid, {
+      onCommit: snapshot => {
+        _currentRevision = snapshot.revision;
+        _versionStatus = snapshot.version?.lifecycle?.status || snapshot.version?.status || 'active';
+        if (_verMgr) _verMgr.currentVersionStatus = _versionStatus;
+        _updateVersionStatusUI();
+        _outlineRowsByVersion.set(_versionGid, snapshot.rows.map(row => ({ ...row, version_gid: _versionGid })));
+        _rebuildProjectionRows();
+        if (firstCommit) {
+          _initCollapsed();
+          _restoreView();
+          firstCommit = false;
+        }
+        _render();
+      },
+    });
+    if (loaded?.cancelled) return;
+    _loadLineGrants(loaded.version?.project_gid || '').then(() => {
+      _updateVersionStatusUI();
+      if (_viewMode === 'layout') _render();
+    });
     _loadCloudConfig(); // 异步拉取云端共享布局配置（覆盖本地，team 共享）
   } catch (e) {
-    $columns.innerHTML = `<div class="lv-empty">加载失败：${e.message}</div>`;
-    _toast('加载失败: ' + e.message, 'error');
+    const hint = _capabilityLoadErrorMessage(e);
+    $columns.innerHTML = `<div class="lv-empty">加载失败：${hint}</div>`;
+    _toast('加载失败: ' + hint, 'error');
     _syncLayoutUI();
     document.getElementById('lvLoadingOverlay')?.classList.add('hidden');
     // 若是从 localStorage 恢复的版本加载失败，清除记录避免下次重复失败
@@ -636,6 +687,15 @@ async function _load() {
       localStorage.removeItem(_lsk('lv:lastVersionGid'));
     }
   }
+}
+
+function _capabilityLoadErrorMessage(error) {
+  const messages = {
+    revision_conflict: '版本已发生变化，请重新加载',
+    resource_pressure: '服务器当前资源紧张，请稍后重试或缩小加载范围',
+    capacity_unavailable: '服务器容量暂不可用，请稍后重试',
+  };
+  return messages[error?.code] || error?.message || '未知错误';
 }
 
 // ── 渲染层 ────────────────────────────────────────────────────────────
@@ -771,18 +831,26 @@ function _closeRootPicker() {
 /** 加载指定版本的条目并合并到当前视图 */
 async function _addVersionRoots(versionGid, versionTag) {
   try {
-    const json = await _cf(`/api/bop/versions/${versionGid}/entries`);
-    const newRows = _flattenMeta(json.data || []);
+    let loader = _comparisonLoaders.get(versionGid);
+    if (!loader) {
+      loader = new LineageProgressiveLoader({
+        invokeCapability: _invokeCapability,
+        store: new LineageProjectionStore({ maxScopes: 1, maxNodes: 12_000, maxBytes: 16 * 1024 * 1024 }),
+      });
+      _comparisonLoaders.set(versionGid, loader);
+    }
+    const loaded = await loader.loadVersion(versionGid, {
+      onCommit: snapshot => {
+        _outlineRowsByVersion.set(versionGid, snapshot.rows.map(row => ({ ...row, version_gid: versionGid })));
+        _rebuildProjectionRows();
+      },
+    });
+    if (loaded?.cancelled) return;
+    const newRows = _outlineRowsByVersion.get(versionGid) || [];
     if (newRows.length === 0) { _toast('该版本暂无条目', 'warn'); return; }
-
-    // 合并去重（按 gid）
-    const existingGids = new Set(_rows.map(r => r.gid));
-    for (const r of newRows) { if (!existingGids.has(r.gid)) _rows.push(r); }
 
     _loadedVersionGids.add(versionGid);
     _versionTagMap.set(versionGid, versionTag);
-    _buildIndexes(_rows);
-    _buildStats();
 
     // 把新版本中树深度=0 的根节点加入已选集合
     for (const r of newRows) {
@@ -793,6 +861,54 @@ async function _addVersionRoots(versionGid, versionTag) {
     _toast(`已添加「${versionTag}」`, 'ok');
   } catch (e) {
     _toast('添加失败: ' + e.message, 'error');
+  }
+}
+
+function _lineScopeForRow(row) {
+  let current = row;
+  while (current && current.node_type !== 'line_process') current = _rowByGid.get(current.parent_gid);
+  if (!current) return null;
+  const versionGid = current.version_gid || row.version_gid || _versionGid;
+  const revision = versionGid === _versionGid
+    ? _currentRevision
+    : _comparisonLoaders.get(versionGid)?.revisionFor(versionGid);
+  if (!revision) return null;
+  return { version_gid: versionGid, revision, scope_kind: 'line', scope_gid: current.gid };
+}
+
+async function _ensureScopeLoaded(row) {
+  const scope = _lineScopeForRow(row);
+  if (!scope) return;
+  const loader = scope.version_gid === _versionGid ? _progressiveLoader : _comparisonLoaders.get(scope.version_gid);
+  if (!loader || loader.hasLoadedScope(scope)) return;
+  const key = _scopeKey(scope);
+  try {
+    await loader.loadScope(scope, {
+      onPage: page => {
+        const links = _scopeLinksByKey.get(key) || [];
+        links.push(...page.links);
+        _scopeLinksByKey.set(key, links);
+        const byEntry = new Map();
+        for (const link of links) {
+          const bucket = byEntry.get(link.entry_gid) || [];
+          bucket.push(link);
+          byEntry.set(link.entry_gid, bucket);
+        }
+        _scopeRowsByKey.set(key, page.rows.map(item => ({
+          ...item,
+          version_gid: scope.version_gid,
+          __governed_links: byEntry.get(item.gid) || [],
+        })));
+        _rebuildProjectionRows();
+        _render();
+        if (_activeGid) {
+          if (_viewMode === 'layout' && _layoutMode) _layoutMode.highlightNode(_activeGid);
+          else _applyActiveState(_activeGid);
+        }
+      },
+    });
+  } catch (error) {
+    _toast('加载线体失败: ' + _capabilityLoadErrorMessage(error), 'error');
   }
 }
 
@@ -2035,6 +2151,7 @@ function _applyActiveState(activeGid) {
   _activeGid = activeGid;
   const activeRow = _rowByGid.get(activeGid);
   if (!activeRow) return;
+  void _ensureScopeLoaded(activeRow);
 
   // collect ancestors
   const ancestors = new Set();
@@ -3973,35 +4090,21 @@ async function _addBlankLine() {
 async function _reload() {
   _closeOverlayPanel();
   try {
-    // 刷新版本状态
-    if (_versionGid) {
-      try {
-        const verJson = await _cf(`/api/bop/versions/${_versionGid}`);
-        if (verJson.data) {
-          _versionStatus = verJson.data.status || 'active';
-          if (_verMgr) _verMgr.currentVersionStatus = _versionStatus;
-          _updateVersionStatusUI();
-        }
-      } catch { /* ignore version fetch failure */ }
-    }
-
-    let allRows = [];
-    for (const vGid of _loadedVersionGids) {
-      const json = await _cf(`/api/bop/versions/${vGid}/entries`);
-      allRows = allRows.concat(_flattenMeta(json.data || []));
-    }
-    _rows = allRows;
-    _buildIndexes(_rows);
-    _buildStats();
-    _render();
+    const comparisons = [..._loadedVersionGids]
+      .filter(gid => gid !== _versionGid)
+      .map(gid => ({ gid, tag: _versionTagMap.get(gid) || gid.slice(-6) }));
+    const activeGid = _activeGid;
+    await _load();
+    for (const comparison of comparisons) await _addVersionRoots(comparison.gid, comparison.tag);
     _renderLinkAlerts(_collectLinkAlerts());
     // 刷新后更新底部详情面板数据
     if (_layoutDetailPanel) _layoutDetailPanel.updateData(_buildLineageData());
-    if (_activeGid) {
+    if (activeGid) {
+      _activeGid = activeGid;
       if (_viewMode === 'layout' && _layoutMode) {
-        _layoutMode.highlightNode(_activeGid);
+        _layoutMode.highlightNode(activeGid);
       } else {
-        _applyActiveState(_activeGid);
+        _applyActiveState(activeGid);
       }
     }
   } catch (e) {
@@ -4517,6 +4620,21 @@ async function init() {
       toast: _toast,
       patchEntry: _patchEntry,
       reloadData: _reload,
+      loadEntryDetail: async (gid, row) => {
+        await _ensureScopeLoaded(row);
+        const scope = _lineScopeForRow(_rowByGid.get(gid) || row);
+        if (!scope) throw new Error('无法确定条目所属线体范围');
+        const loader = scope.version_gid === _versionGid
+          ? _progressiveLoader
+          : _comparisonLoaders.get(scope.version_gid);
+        if (!loader) throw new Error('条目版本加载上下文不存在');
+        return loader.loadDetail(scope, gid);
+      },
+      loadVersionProjection: async (gid) => {
+        const version = _verMgr?.allVersions?.find(item => item.gid === gid);
+        await _addVersionRoots(gid, version?.version_tag || gid.slice(-6));
+        return { rows: (_outlineRowsByVersion.get(gid) || []).map(row => ({ ...row })) };
+      },
       preserveLayoutView: () => { if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true; },
       getLineageData: () => _buildLineageData ? _buildLineageData() : null,
       getVersionInfo: () => {
@@ -4600,18 +4718,6 @@ async function init() {
   await _verMgr.loadVersions();
   _verMgr.initPicker(_versionGid, _versionTag);
 
-  // 初始化生命周期面板
-  _lifecyclePanel = new BopLifecyclePanel({
-    cf:         _cf,
-    toast:      _toast,
-    versionGid: _versionGid,
-    mountEl:    document.getElementById('lvLifecycleTop'),
-    actionEl:   document.getElementById('lvLifecycleAction'),
-    onBopTreeChange: () => {
-      if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
-      _reload();
-    },
-  });
   // 无任何 BOP 版本 → 画布内提示
   if ((!_versionGid || _versionGid === '') && (!_verMgr.allVersions || _verMgr.allVersions.length === 0)) {
     _versionGid = '';
@@ -4643,6 +4749,18 @@ async function init() {
   }];
   _initCompareBtn();
 
+  // 初始化生命周期面板
+  _lifecyclePanel = new BopLifecyclePanel({
+    cf:         _cf,
+    toast:      _toast,
+    versionGid: _versionGid,
+    mountEl:    document.getElementById('lvLifecycleTop'),
+    actionEl:   document.getElementById('lvLifecycleAction'),
+    onBopTreeChange: () => {
+      if (_viewMode === 'layout' && _layoutMode) _layoutMode._preserveView = true;
+      _reload();
+    },
+  });
   if (_viewMode === 'layout' && _versionGid) await _lifecyclePanel.init();
 
   // 初始化 PBOM 导入 modal

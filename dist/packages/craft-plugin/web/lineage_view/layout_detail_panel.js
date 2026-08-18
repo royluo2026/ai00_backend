@@ -204,7 +204,7 @@ class LayoutDetailPanel {
    * @param {Function}    opts.getLineageData - () => { rowByGid, childMap, statsMap, versionGid }
    * @param {Function}    opts.onNodeActivate - (gid) => void  节点树点击时通知主视图高亮定位
    */
-  constructor({ containerEl, cf, toast, patchEntry, reloadData, preserveLayoutView, getLineageData, onNodeActivate, getVersionInfo, onVersionChange }) {
+  constructor({ containerEl, cf, toast, patchEntry, reloadData, preserveLayoutView, getLineageData, onNodeActivate, getVersionInfo, onVersionChange, loadEntryDetail, loadVersionProjection }) {
     this._el = containerEl;
     this._cf = cf;
     this._toast = toast;
@@ -215,6 +215,9 @@ class LayoutDetailPanel {
     this._onNodeActivate  = onNodeActivate  || null;
     this._getVersionInfo  = getVersionInfo  || null;
     this._onVersionChange = onVersionChange || null;
+    this._loadEntryDetail = loadEntryDetail || null;
+    this._loadVersionProjection = loadVersionProjection || null;
+    this._detailGeneration = 0;
 
     this._isOpen = false;
     this._userClosed = false;
@@ -354,6 +357,24 @@ class LayoutDetailPanel {
       return;
     }
     this._renderAll(gid, row);
+    void this._hydrateEntryDetail(gid, row);
+  }
+
+  async _hydrateEntryDetail(gid, row) {
+    if (!this._loadEntryDetail) return;
+    const generation = ++this._detailGeneration;
+    try {
+      const detail = await this._loadEntryDetail(gid, row);
+      if (generation !== this._detailGeneration || this._currentGid !== gid || detail?.cancelled) return;
+      Object.assign(row, detail?.entry || {});
+      row.__governed_links = Array.isArray(detail?.links) ? detail.links : [];
+      this._currentRow = row;
+      this._renderAll(gid, row);
+    } catch (error) {
+      if (generation === this._detailGeneration && this._currentGid === gid) {
+        this._toast?.(`详情加载失败：${error?.message || '未知错误'}`, 'error');
+      }
+    }
   }
 
   /** 判断一行是否匹配搜索词（检查 title/vpps/bom_row_id 和 entity_data 里的关键字段） */
@@ -834,10 +855,10 @@ class LayoutDetailPanel {
 
   _openDetDrawer() {
     this._detDrawer?.classList.add('open');
-    const saveButton = document.getElementById('llDetDrawerSave');
-    const unlinkButton = document.getElementById('llDetDrawerUnlink');
-    if (saveButton) saveButton.style.display = '';
-    if (unlinkButton) unlinkButton.style.display = '';
+    const save = document.getElementById('llDetDrawerSave');
+    const unlink = document.getElementById('llDetDrawerUnlink');
+    if (save) save.style.display = '';
+    if (unlink) unlink.style.display = '';
   }
 
   _closeDetDrawer(force) {
@@ -1451,12 +1472,16 @@ class LayoutDetailPanel {
     const hasChildren = data ? (data.childMap.get(gid) || []).filter(r => !r.is_deleted).length > 0 : false;
 
     let links = [];
-    try {
-      const resp = await this._cf(
-        `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}${hasChildren ? '&recursive=true' : ''}`
-      );
-      links = resp?.data || [];
-    } catch {}
+    if (Array.isArray(row?.__governed_links)) {
+      links = row.__governed_links;
+    } else if (!this._loadEntryDetail) {
+      try {
+        const resp = await this._cf(
+          `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}${hasChildren ? '&recursive=true' : ''}`
+        );
+        links = resp?.data || [];
+      } catch {}
+    }
     this._relLinks = links;
 
     // 子节点从 childMap 取
@@ -3802,8 +3827,11 @@ class LayoutDetailPanel {
     for (const gid of versionGids) {
       if (this._extraVersionData.has(gid)) continue;
       try {
-        const resp = await this._cf(`/api/bop/versions/${encodeURIComponent(gid)}/entries`);
-        const rawRows = resp?.data || [];
+        if (!this._loadVersionProjection) continue;
+        // The parent owns the bounded Capability projection.  Never fall back to
+        // the legacy full-version entries endpoint from this secondary panel.
+        const projection = await this._loadVersionProjection(gid);
+        const rawRows = Array.isArray(projection) ? projection : (projection?.rows || []);
         const rowByGid = new Map(rawRows.map(r => [r.gid, r]));
         const childMap = new Map();
         rawRows.forEach(r => {
@@ -3955,8 +3983,18 @@ class LayoutDetailPanel {
       // ── 2. 关联实体：从 entry-links recursive 拿 ─────────────────────────
       const catMap = LayoutDetailPanel._STATS_CATEGORY_MAP;
       try {
-        const resp = await this._cf(`/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}&recursive=true`);
-        for (const l of (resp?.data || [])) {
+        let governedLinks = [];
+        const collectGoverned = entryGid => {
+          const entry = data?.rowByGid?.get(entryGid);
+          if (Array.isArray(entry?.__governed_links)) governedLinks.push(...entry.__governed_links);
+          for (const child of (data?.childMap?.get(entryGid) || [])) collectGoverned(child.gid);
+        };
+        collectGoverned(gid);
+        if (!this._loadEntryDetail && !governedLinks.length) {
+          const resp = await this._cf(`/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}&recursive=true`);
+          governedLinks = resp?.data || [];
+        }
+        for (const l of governedLinks) {
           const cat = catMap[l.link_type];
           if (!cat) continue;
           if (!groups[cat.label]) groups[cat.label] = { ntType: cat.ntType, items: [], isStruct: false };
@@ -4043,12 +4081,16 @@ class LayoutDetailPanel {
     const hasChildren = data ? (data.childMap.get(gid) || []).filter(r => !r.is_deleted).length > 0 : false;
 
     let links = [];
-    try {
-      const resp = await this._cf(
-        `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}${hasChildren ? '&recursive=true' : ''}`
-      );
-      links = resp?.data || [];
-    } catch {}
+    if (Array.isArray(row?.__governed_links)) {
+      links = row.__governed_links;
+    } else if (!this._loadEntryDetail) {
+      try {
+        const resp = await this._cf(
+          `/api/bop/entry-links?entry_gid=${encodeURIComponent(gid)}${hasChildren ? '&recursive=true' : ''}`
+        );
+        links = resp?.data || [];
+      } catch {}
+    }
     this._relLinks = links;
 
     const childRows = data ? (data.childMap.get(gid) || []).filter(r => !r.is_deleted) : [];
@@ -4074,17 +4116,14 @@ class LayoutDetailPanel {
       .filter(r => r.link_type_binding && r.show_in_detail !== false)
       .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99) || String(a.label_zh || a.name || '').localeCompare(String(b.label_zh || b.name || '')));
 
-    const groups = (relationConfigs.length
-      ? relationConfigs.map(r => ({
-          key: `link:${r.link_type_binding}`,
-          name: r.label_zh || r.name || r.link_type_binding,
-          ntType: r.range_node_type || 'process',
-          linkTypes: [r.link_type_binding],
-          linkType: r.link_type_binding,
-          relation: r,
-        }))
-      : REL_GROUPS.map(r => ({ ...r, linkType: r.linkTypes?.[0] || null, relation: null }))
-    );
+    const groups = (relationConfigs.length ? relationConfigs.map(r => ({
+      key: `link:${r.link_type_binding}`,
+      name: r.label_zh || r.name || r.link_type_binding,
+      ntType: r.range_node_type || 'process',
+      linkTypes: [r.link_type_binding],
+      linkType: r.link_type_binding,
+      relation: r,
+    })) : REL_GROUPS.map(group => ({ ...group, linkType: group.linkTypes[0] })));
     this._currentRelGroups = groups;
 
     let html = '';
