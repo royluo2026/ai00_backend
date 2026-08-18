@@ -23,22 +23,10 @@ def check(base_url: str) -> dict[str, object]:
         "/health": (200, "application/json", '"status"'),
         "/ready": (200, "application/json", '"status"'),
         "/": (200, "text/html", "AI00"),
-        "/web/settings/index.html": (200, "text/html", "plugin_center_model.js"),
-        "/web/settings/plugin_center_model.js": (
-            200,
-            "text/javascript",
-            "AI00PluginCenterModel",
-        ),
-        "/web/settings/plugin_center_api.js": (
-            200,
-            "text/javascript",
-            "createPluginCenterApi",
-        ),
-        "/web/settings/plugin_center.js": (
-            200,
-            "text/javascript",
-            "Server-backed Capability V2 plugin center controller",
-        ),
+        # The current settings page owns the plugin center panel in
+        # ``settings.js``.  Older deployments used three standalone assets;
+        # both shapes are accepted so a rolling deployment remains checkable.
+        "/web/settings/index.html": (200, "text/html", None),
         "/web/admin/capability_governance/index.html": (200, "text/html", "governance_controller.js"),
     }
     results: list[dict[str, object]] = []
@@ -60,6 +48,8 @@ def check(base_url: str) -> dict[str, object]:
                 errors.append(f"{path}: expected {expected_type}, got {content_type}")
             if marker is not None and marker not in body:
                 errors.append(f"{path}: missing marker {marker!r}")
+            if path == "/web/settings/index.html":
+                _check_plugin_center_entry(base_url, body, results, errors)
             if path == "/web/admin/capability_governance/index.html":
                 governance_html = body
         except (HTTPError, URLError, TimeoutError) as exc:
@@ -68,6 +58,31 @@ def check(base_url: str) -> dict[str, object]:
     if governance_html:
         _check_governance_assets(base_url, governance_html, results, errors)
     return {"status": "passed" if not errors else "failed", "checks": results, "errors": errors}
+
+
+def _check_plugin_center_entry(base_url: str, html: str, results: list[dict[str, object]], errors: list[str]) -> None:
+    """Validate the plugin-center entry for both supported bundle layouts."""
+    legacy = all(marker in html for marker in ("plugin_center_model.js", "plugin_center_api.js", "plugin_center.js"))
+    if legacy:
+        for path, marker in (
+            ("/web/settings/plugin_center_model.js", "AI00PluginCenterModel"),
+            ("/web/settings/plugin_center_api.js", "createPluginCenterApi"),
+            ("/web/settings/plugin_center.js", "Server-backed Capability V2 plugin center controller"),
+        ):
+            _asset_result(base_url, path, "text/javascript", marker, results, errors)
+        return
+    current = 'id="panel-plugin-market"' in html and 'src="settings.js' in html
+    if not current:
+        errors.append("/web/settings/index.html: missing plugin-center entry")
+        return
+    _asset_result(
+        base_url,
+        "/web/settings/settings.js",
+        "text/javascript",
+        "panel-plugin-market",
+        results,
+        errors,
+    )
 
 
 def _check_governance_assets(base_url: str, html: str, results: list[dict[str, object]], errors: list[str]) -> None:
