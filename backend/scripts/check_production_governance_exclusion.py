@@ -14,6 +14,7 @@ FORBIDDEN_MARKERS = (
     "test.governance",
     "capability-governance-catalog-release",
 )
+FORBIDDEN_UI_REFERENCES = ("capability_governance", "admin_capability_governance")
 
 
 @dataclass(frozen=True)
@@ -75,6 +76,8 @@ def _check_markers(path: Path, errors: set[str]) -> None:
         return
     if any(marker in content for marker in FORBIDDEN_MARKERS):
         errors.add("governance_marker_present")
+    if any(marker in content for marker in FORBIDDEN_UI_REFERENCES):
+        errors.add("governance_ui_reference_present")
     if "test-governance" in content or "test.governance" in content:
         errors.add("governance_temporary_identity_present")
 

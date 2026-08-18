@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import base64
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -31,15 +32,19 @@ def write(path: Path, content: str = "safe production content") -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def signed_release_report() -> dict[str, str]:
+def signing_material() -> tuple[Ed25519PrivateKey, str]:
     private_key = Ed25519PrivateKey.generate()
-    report = {"conclusion": "pass", "signing_key_id": "release-test"}
-    canonical = json.dumps(report, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    report["public_key"] = private_key.public_key().public_bytes(
+    public_key = private_key.public_key().public_bytes(
         serialization.Encoding.PEM,
         serialization.PublicFormat.SubjectPublicKeyInfo,
     ).decode("utf-8")
-    report["signature"] = __import__("base64").b64encode(private_key.sign(canonical)).decode("ascii")
+    return private_key, public_key
+
+
+def signed_release_report(private_key: Ed25519PrivateKey, signing_key_id: str = "release-test") -> dict[str, str]:
+    report = {"conclusion": "pass", "signing_key_id": signing_key_id}
+    canonical = json.dumps(report, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    report["signature"] = base64.b64encode(private_key.sign(canonical)).decode("ascii")
     return report
 
 
@@ -87,7 +92,9 @@ def test_production_artifact_builder_copies_only_allowlisted_files(tmp_path):
     write(source / "docs/governance/capability-catalog-release.json", "{}")
     write(source / "docs/governance/test-extension/capability-governance-catalog-release.json", "{}")
     write(frontend / "web/index.html")
+    write(frontend / "web/tests/run_tests.js", "load('/web/admin/capability_governance/index.html')")
     write(frontend / "web/admin/capability_governance/index.html", "TEST_GOVERNANCE_START")
+    private_key, public_key = signing_material()
     write(
         allowlist,
         json.dumps(
@@ -96,13 +103,15 @@ def test_production_artifact_builder_copies_only_allowlisted_files(tmp_path):
                 "backend_top_level_packages": ["capabilities"],
                 "migrations": ["backend/db/migrations/*.sql"],
                 "frontend_prefixes": ["web/**"],
+                "frontend_excluded_prefixes": ["web/tests/**"],
                 "catalog_files": ["docs/governance/capability-catalog-release.json"],
                 "provider_modules": [],
+                "trusted_release_keys": {"release-test": public_key},
             }
         ),
     )
     report_path = tmp_path / "release-report.json"
-    write(report_path, json.dumps(signed_release_report()))
+    write(report_path, json.dumps(signed_release_report(private_key)))
 
     report = artifact_builder.build_production_artifact(
         source, frontend, report_path, output, allowlist_path=allowlist
@@ -114,33 +123,118 @@ def test_production_artifact_builder_copies_only_allowlisted_files(tmp_path):
     assert (output / "backend/db/migrations/202608010001_base.sql").is_file()
     assert (output / "docs/governance/capability-catalog-release.json").is_file()
     assert (output / "web/index.html").is_file()
+    assert not (output / "web/tests/run_tests.js").exists()
     assert not (output / "backend/capability_governance_test/provider.py").exists()
     assert not (output / "backend/db/migrations/test_governance/0001.sql").exists()
     assert not (output / "docs/governance/test-extension").exists()
     assert not (output / "web/admin/capability_governance").exists()
+    assert not any(
+        "capability_governance" in path.read_text(encoding="utf-8", errors="ignore")
+        for path in output.rglob("*") if path.is_file()
+    )
+
+
+def test_production_artifact_checker_rejects_residual_governance_ui_reference(tmp_path):
+    write(
+        tmp_path / "web/tests/run_tests.js",
+        "load('/web/admin/capability_governance/index.html')",
+    )
+
+    report = exclusion.check_production_artifact(tmp_path)
+
+    assert report.status == "failed"
+    assert "governance_ui_reference_present" in report.errors
 
 
 def test_production_artifact_builder_rejects_unsigned_or_secret_report(tmp_path):
     report_path = tmp_path / "release-report.json"
-    report = signed_release_report()
+    private_key, _public_key = signing_material()
+    report = signed_release_report(private_key)
     report["signature"] = ""
     report["secret"] = "leak"
     write(report_path, json.dumps(report))
 
-    errors = artifact_builder.validate_release_report(report_path)
+    errors = artifact_builder.validate_release_report(report_path, {})
 
-    assert {"release_report_signature_missing", "release_report_secret_present"} <= set(errors)
+    assert {"release_report_signature_missing", "release_report_unknown_fields"} <= set(errors)
 
 
 def test_production_artifact_builder_rejects_tampered_signed_report(tmp_path):
     report_path = tmp_path / "release-report.json"
-    report = signed_release_report()
+    private_key, public_key = signing_material()
+    report = signed_release_report(private_key)
     report["conclusion"] = "fail"
     write(report_path, json.dumps(report))
 
-    errors = artifact_builder.validate_release_report(report_path)
+    errors = artifact_builder.validate_release_report(report_path, {"release-test": public_key})
 
     assert "release_report_signature_invalid" in errors
+
+
+def test_production_artifact_builder_rejects_self_signed_replacement_key(tmp_path):
+    report_path = tmp_path / "release-report.json"
+    trusted_key, trusted_public_key = signing_material()
+    attacker_key, _attacker_public_key = signing_material()
+    write(report_path, json.dumps(signed_release_report(attacker_key, "attacker")))
+
+    errors = artifact_builder.validate_release_report(report_path, {"release-test": trusted_public_key})
+
+    assert "release_report_untrusted_signing_key" in errors
+
+
+def test_production_artifact_builder_discards_failed_temp_output_and_allows_retry(tmp_path):
+    source = tmp_path / "source"
+    frontend = tmp_path / "frontend"
+    output = tmp_path / "artifact"
+    private_key, public_key = signing_material()
+    allowlist = source / "docs/governance/test-extension/production-artifact-allowlist.json"
+    write(source / "backend/capabilities/registry_next.py", "capability_governance")
+    write(frontend / "web/index.html")
+    write(
+        allowlist,
+        json.dumps(
+            {
+                "schema_version": 1,
+                "backend_top_level_packages": ["capabilities"],
+                "migrations": [],
+                "frontend_prefixes": ["web/**"],
+                "frontend_excluded_prefixes": ["web/tests/**"],
+                "catalog_files": [],
+                "provider_modules": [],
+                "trusted_release_keys": {"release-test": public_key},
+            }
+        ),
+    )
+    release_report = tmp_path / "release-report.json"
+    write(release_report, json.dumps(signed_release_report(private_key)))
+
+    failed = artifact_builder.build_production_artifact(
+        source, frontend, release_report, output, allowlist_path=allowlist
+    )
+
+    assert failed.status == "failed"
+    assert not output.exists()
+    assert not list(tmp_path.glob(".artifact.tmp-*"))
+
+    write(source / "backend/capabilities/registry_next.py")
+    retried = artifact_builder.build_production_artifact(
+        source, frontend, release_report, output, allowlist_path=allowlist
+    )
+
+    assert retried.status == "passed"
+    assert (output / "backend/capabilities/registry_next.py").is_file()
+
+
+def test_production_artifact_builder_rejects_unapproved_release_report_fields(tmp_path):
+    private_key, public_key = signing_material()
+    report = signed_release_report(private_key)
+    report["api_key"] = "not-allowed"
+    report_path = tmp_path / "release-report.json"
+    write(report_path, json.dumps(report))
+
+    errors = artifact_builder.validate_release_report(report_path, {"release-test": public_key})
+
+    assert "release_report_unknown_fields" in errors
 
 
 def test_production_artifact_builder_runs_as_a_direct_script():

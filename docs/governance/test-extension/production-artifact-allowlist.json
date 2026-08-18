@@ -8,13 +8,19 @@
   "excluded_files": [
     "backend/capability_v2/bootstrap.py",
     "backend/routers/deps.py",
-    "backend/utils/gid.py"
+    "backend/utils/gid.py",
+    "backend/governance/domain_table_ownership.json",
+    "backend/governance/table_inventory.json"
   ],
+  "trusted_release_keys": {
+    "capability-governance-test-release": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEARV4EZ6cCbJvRwZ9YtuJ90OL/d2+SaYkRO7G9bB6/WQY=\n-----END PUBLIC KEY-----\n"
+  },
   "migrations": [
     "backend/db/migrations/*.sql",
     "backend/db/migrations/domains/**"
   ],
   "frontend_prefixes": ["assets/**", "packages/**", "web/**"],
+  "frontend_excluded_prefixes": ["web/tests/**"],
   "catalog_files": [
     "backend/capability_v2/official_domains.json",
     "docs/governance/capability-catalog-release.json"
