@@ -9,6 +9,7 @@ from backend.capability_v2.bootstrap import (
 )
 from backend.capability_governance_test.contracts import ALL_IDS, provider_artifact
 from backend.capability_v2.provider_loader import hash_domain_artifact
+from backend.capability_v2.gateway import configure_default_gateway
 from backend.scripts.build_capability_governance_catalog import current_release
 
 
@@ -77,3 +78,17 @@ def test_test_governance_registration_restores_base_schema_maps():
 
     assert dict(base_provider.INPUT_SCHEMAS) == inputs_before
     assert dict(base_provider.OUTPUT_SCHEMAS) == outputs_before
+
+
+def test_http_gateway_overlays_governance_catalog_only_for_explicit_test_profile(monkeypatch):
+    monkeypatch.setenv("AI00_GID_MACHINE_ID", "41")
+    monkeypatch.setenv("AI00_DEPLOYMENT_PROFILE", "test-governance")
+    test_gateway = configure_default_gateway(build_capability_registry(ROOT, include_test_governance=True))
+
+    assert test_gateway.catalog().descriptor("base.capability_registry.search", 1) is not None
+    assert test_gateway.catalog().descriptor("craft.bop.version.list", 1) is not None
+
+    monkeypatch.delenv("AI00_DEPLOYMENT_PROFILE")
+    product_gateway = configure_default_gateway(build_capability_registry(ROOT))
+    assert product_gateway.catalog().descriptor("base.capability_registry.search", 1) is None
+    assert product_gateway.catalog().descriptor("craft.bop.version.list", 1) is not None

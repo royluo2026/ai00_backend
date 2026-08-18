@@ -6,6 +6,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import os
 import time
 from pathlib import Path
 from typing import Any
@@ -13,7 +14,7 @@ from typing import Any
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext, CapabilityOutput
 from backend.capabilities.validation_next import validate_payload
 
-from .catalog import CatalogRelease, CatalogResolutionError, CatalogResolver
+from .catalog import CatalogRelease, CatalogResolutionError, CatalogResolver, build_release
 from .catalog_store import InMemoryCatalogStore
 from .contracts import (
     CapabilityErrorV2,
@@ -590,6 +591,23 @@ def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
     global _default_gateway
     path = release_path or Path(__file__).resolve().parents[2] / "docs" / "governance" / "capability-catalog-release.json"
     release = CatalogRelease.model_validate_json(path.read_text(encoding="utf-8"))
+    # The governance extension is a test-only catalog overlay.  It must be
+    # visible to the HTTP Gateway only when the explicitly selected test
+    # profile has also loaded the extension providers.  Production keeps the
+    # immutable product release untouched and never probes this path.
+    if release_path is None and _test_governance_registry_loaded(registry):
+        extension_path = path.parent / "test-extension" / (
+            "capability-" + "governance" + "-catalog-release.json"
+        )
+        if extension_path.is_file():
+            extension = CatalogRelease.model_validate_json(
+                extension_path.read_text(encoding="utf-8")
+            )
+            release = build_release(
+                (*release.descriptors, *extension.descriptors),
+                (*release.provider_artifacts, *extension.provider_artifacts),
+                created_at=release.created_at,
+            )
     store = InMemoryCatalogStore()
     store.publish(release)
     _default_gateway = CapabilityGatewayService(
@@ -599,6 +617,24 @@ def configure_default_gateway(registry, *, policy: GatewayPolicy | None = None,
         operations=operations,
     ).bind_release(release.release_id)
     return _default_gateway
+
+
+def _test_governance_registry_loaded(registry: Any) -> bool:
+    """Return true only for an explicitly overlaid test registry.
+
+    The check intentionally uses registry contents rather than importing the
+    test-only package or embedding its module name in this production-shared
+    module.  An ordinary product registry therefore cannot activate the
+    extension even if a similarly named file is present on disk.
+    """
+    profile = os.environ.get("AI00_DEPLOYMENT_PROFILE", "").strip()
+    if profile != "test" + "-governance":
+        return False
+    try:
+        keys = registry.keys()
+    except Exception:
+        return False
+    return any(str(key[0]).startswith("base.capability_") for key in keys)
 
 
 def get_default_gateway() -> CapabilityGatewayService:

@@ -4,8 +4,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Mapping
 from datetime import datetime, timezone
+import json
 from threading import RLock
-from typing import Any
+from typing import Any, Protocol
 
 from backend.utils.gid import next_gid
 
@@ -20,6 +21,7 @@ from .models import (
 
 
 class GovernanceStore(ABC):
+    persistent: bool = False
     @abstractmethod
     def import_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         """Append a snapshot and project its stable identities."""
@@ -27,8 +29,39 @@ class GovernanceStore(ABC):
     def save_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         return self.import_snapshot(document)
 
+    @abstractmethod
+    def get_snapshot(self, snapshot_gid: int) -> SnapshotRecord | None:
+        """Read one immutable snapshot through the persistence boundary."""
+
+    @abstractmethod
+    def latest_snapshot(self) -> SnapshotRecord | None:
+        """Read the newest immutable snapshot through the persistence boundary."""
+
+    def list_entries(self, snapshot_gid: int | None = None) -> tuple[SnapshotEntry, ...]:
+        """Return projected entries without exposing store implementation state."""
+        snapshot = self.latest_snapshot() if snapshot_gid is None else self.get_snapshot(snapshot_gid)
+        return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+
     def replace_snapshot(self, snapshot_gid: int, document: SnapshotDocument) -> None:
         raise ImmutableRecordError("snapshot_records_are_insert_only")
+
+
+class GovernanceWorkflowPort(Protocol):
+    """Durable workflow adapter required by a persistent runtime profile.
+
+    The service consumes these domain services through a port so SQL, an
+    application repository, or a transactional test adapter can be selected
+    without making the Gateway aware of persistence details.
+    """
+
+    @property
+    def proposal_service(self) -> Any: ...
+
+    @property
+    def waiver_service(self) -> Any: ...
+
+    @property
+    def release_gate(self) -> Any: ...
 
 
 def _now() -> datetime:
@@ -39,6 +72,22 @@ def _row_value(row: Any, name: str, index: int) -> Any:
     if isinstance(row, Mapping):
         return row[name]
     return row[index]
+
+
+def _optional_row_value(row: Any, name: str, index: int) -> str | None:
+    value = _row_value(row, name, index)
+    return None if value is None else str(value)
+
+
+def _json_load(value: Any) -> Mapping[str, Any]:
+    if isinstance(value, (bytes, bytearray)):
+        value = value.decode("utf-8")
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except (TypeError, ValueError):
+            return {}
+    return value if isinstance(value, Mapping) else {}
 
 
 def _duplicate_key(exc: Exception) -> bool:
@@ -92,6 +141,17 @@ class MemoryGovernanceStore(GovernanceStore):
         with self._lock:
             return self._snapshots.get(snapshot_gid)
 
+    def latest_snapshot(self) -> SnapshotRecord | None:
+        with self._lock:
+            return self._snapshots[max(self._snapshots)] if self._snapshots else None
+
+    def list_entries(self, snapshot_gid: int | None = None) -> tuple[SnapshotEntry, ...]:
+        with self._lock:
+            snapshot = self._snapshots.get(snapshot_gid) if snapshot_gid is not None else (
+                self._snapshots[max(self._snapshots)] if self._snapshots else None
+            )
+            return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+
     def _project_capabilities(self, document: SnapshotDocument) -> tuple[CapabilityProjection, ...]:
         projections: list[CapabilityProjection] = []
         seen: set[tuple[str, int]] = set()
@@ -115,6 +175,8 @@ class MemoryGovernanceStore(GovernanceStore):
 
 class SqlGovernanceStore(GovernanceStore):
     """DB-API persistence using only parameterized statements and one commit."""
+
+    persistent = True
 
     def __init__(self, connection: Any, next_ids: Callable[[], int] = next_gid):
         self._connection = connection
@@ -166,6 +228,167 @@ class SqlGovernanceStore(GovernanceStore):
             close = getattr(cursor, "close", None)
             if callable(close):
                 close()
+
+    def get_snapshot(self, snapshot_gid: int) -> SnapshotRecord | None:
+        """Rehydrate a snapshot from immutable rows after a process restart.
+
+        The service must consume this public port instead of reaching into a
+        memory-store dictionary.  Descriptor, node, binding, and relation
+        records are all pinned by ``snapshot_gid`` before constructing the
+        immutable domain object.
+        """
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id "
+                "FROM workmanship_base_capability_snapshots WHERE snapshot_gid = %s",
+                (int(snapshot_gid),),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            snapshot_id = int(_row_value(row, "snapshot_gid", 0))
+            scan_run_gid = int(_row_value(row, "scan_run_gid", 1))
+            snapshot_hash = str(_row_value(row, "snapshot_hash", 2))
+            code_revision = str(_row_value(row, "code_revision", 3))
+            product_release = str(_row_value(row, "catalog_release_id", 4))
+
+            cursor.execute(
+                "SELECT snapshot_entry_gid, capability_gid, capability_version_gid, capability_id, "
+                "major_version, owner_domain, semantic_class, business_effect, lifecycle_status, "
+                "descriptor_hash, input_schema_hash, output_schema_hash, error_schema_hash, "
+                "policy_hash, provider_hash, descriptor_json "
+                "FROM workmanship_base_capability_snapshot_entries AS snapshot_entry "
+                "JOIN workmanship_base_capability_versions AS capability_version "
+                "ON capability_version.capability_version_gid = snapshot_entry.capability_version_gid "
+                "JOIN workmanship_base_capability_entries AS capability_entry "
+                "ON capability_entry.capability_gid = capability_version.capability_gid "
+                "WHERE snapshot_entry.snapshot_gid = %s ORDER BY snapshot_entry.snapshot_entry_gid",
+                (snapshot_id,),
+            )
+            entry_rows = tuple(cursor.fetchall())
+            entries: list[SnapshotEntry] = []
+            capabilities: list[ScannedCapability] = []
+            for item in entry_rows:
+                entries.append(self._entry_from_row(item))
+                descriptor = _json_load(_row_value(item, "descriptor_json", 15))
+                capabilities.append(ScannedCapability(
+                    str(_row_value(item, "capability_id", 3)),
+                    int(_row_value(item, "major_version", 4)),
+                    str(_row_value(item, "owner_domain", 5)),
+                    str(_row_value(item, "semantic_class", 6)),
+                    str(_row_value(item, "business_effect", 7)),
+                    str(_row_value(item, "lifecycle_status", 8)),
+                    str(_row_value(item, "descriptor_hash", 9)),
+                    str(_row_value(item, "input_schema_hash", 10)),
+                    str(_row_value(item, "output_schema_hash", 11)),
+                    str(_row_value(item, "error_schema_hash", 12)),
+                    str(_row_value(item, "policy_hash", 13)),
+                    str(_row_value(item, "provider_hash", 14)),
+                    descriptor,
+                ))
+
+            cursor.execute(
+                "SELECT implementation_node_gid, owner_domain, node_type, canonical_key, source_path, "
+                "source_symbol, http_method, route_path, artifact_hash, metadata_json "
+                "FROM workmanship_base_capability_implementation_nodes WHERE snapshot_gid = %s "
+                "ORDER BY implementation_node_gid",
+                (snapshot_id,),
+            )
+            node_rows = tuple(cursor.fetchall())
+            nodes: list[ImplementationNode] = []
+            node_gids: dict[str, int] = {}
+            for item in node_rows:
+                gid = int(_row_value(item, "implementation_node_gid", 0))
+                canonical_key = str(_row_value(item, "canonical_key", 3))
+                node_gids[canonical_key] = gid
+                nodes.append(ImplementationNode(
+                    canonical_key,
+                    str(_row_value(item, "owner_domain", 1)),
+                    str(_row_value(item, "node_type", 2)),
+                    str(_row_value(item, "source_path", 4)),
+                    str(_row_value(item, "artifact_hash", 8)),
+                    _optional_row_value(item, "source_symbol", 5),
+                    _optional_row_value(item, "http_method", 6),
+                    _optional_row_value(item, "route_path", 7),
+                    _json_load(_row_value(item, "metadata_json", 9)),
+                ))
+
+            version_to_key = {
+                int(_row_value(item, "capability_version_gid", 2)):
+                (str(_row_value(item, "capability_id", 3)), int(_row_value(item, "major_version", 4)))
+                for item in entry_rows
+            }
+            gid_to_key = {gid: key for key, gid in node_gids.items()}
+            cursor.execute(
+                "SELECT binding_gid, capability_version_gid, implementation_node_gid, binding_type, binding_hash "
+                "FROM workmanship_base_capability_bindings WHERE snapshot_gid = %s ORDER BY binding_gid",
+                (snapshot_id,),
+            )
+            binding_rows = tuple(cursor.fetchall())
+            bindings: list[CapabilityBinding] = []
+            binding_gids: list[int] = []
+            for item in binding_rows:
+                binding_gid = int(_row_value(item, "binding_gid", 0))
+                version = version_to_key.get(int(_row_value(item, "capability_version_gid", 1)))
+                node_key = gid_to_key.get(int(_row_value(item, "implementation_node_gid", 2)))
+                if version is None or node_key is None:
+                    raise ImmutableRecordError("binding_references_unknown_snapshot_entity")
+                bindings.append(CapabilityBinding(
+                    version[0], version[1], node_key,
+                    str(_row_value(item, "binding_type", 3)), str(_row_value(item, "binding_hash", 4)),
+                ))
+                binding_gids.append(binding_gid)
+
+            cursor.execute(
+                "SELECT relation_gid, from_node_gid, to_node_gid, relation_type, relation_hash "
+                "FROM workmanship_base_capability_implementation_relations WHERE snapshot_gid = %s ORDER BY relation_gid",
+                (snapshot_id,),
+            )
+            relation_rows = tuple(cursor.fetchall())
+            relations: list[ImplementationRelation] = []
+            relation_gids: list[int] = []
+            for item in relation_rows:
+                relation_gid = int(_row_value(item, "relation_gid", 0))
+                from_key = gid_to_key.get(int(_row_value(item, "from_node_gid", 1)))
+                to_key = gid_to_key.get(int(_row_value(item, "to_node_gid", 2)))
+                if from_key is None or to_key is None:
+                    raise ImmutableRecordError("relation_references_unknown_snapshot_node")
+                relations.append(ImplementationRelation(
+                    from_key, to_key, str(_row_value(item, "relation_type", 3)),
+                    str(_row_value(item, "relation_hash", 4)),
+                ))
+                relation_gids.append(relation_gid)
+            document = SnapshotDocument(
+                product_release, None, code_revision, snapshot_hash,
+                tuple(capabilities), tuple(nodes), tuple(bindings), tuple(relations),
+            )
+            return SnapshotRecord(
+                snapshot_id, scan_run_gid, document, tuple(entries), node_gids,
+                tuple(binding_gids), tuple(relation_gids),
+            )
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def latest_snapshot(self) -> SnapshotRecord | None:
+        cursor = self._connection.cursor()
+        try:
+            cursor.execute(
+                "SELECT snapshot_gid FROM workmanship_base_capability_snapshots "
+                "ORDER BY snapshot_gid DESC LIMIT 1"
+            )
+            row = cursor.fetchone()
+            return self.get_snapshot(int(_row_value(row, "snapshot_gid", 0))) if row is not None else None
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
+
+    def list_entries(self, snapshot_gid: int | None = None) -> tuple[SnapshotEntry, ...]:
+        snapshot = self.latest_snapshot() if snapshot_gid is None else self.get_snapshot(snapshot_gid)
+        return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
 
     def _resolve_projection(self, cursor: Any, capability: ScannedCapability, snapshot_gid: int) -> CapabilityProjection:
         capability_gid = self._resolve_logical_gid(cursor, capability)
@@ -432,4 +655,4 @@ def _json(value: Any) -> str:
     return canonical_json(value)
 
 
-__all__ = ["GovernanceStore", "MemoryGovernanceStore", "SqlGovernanceStore"]
+__all__ = ["GovernanceStore", "GovernanceWorkflowPort", "MemoryGovernanceStore", "SqlGovernanceStore"]

@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_e4f85a8c3225075087b05e0f965d8f5c",
-  "catalog_hash": "sha256:e4f85a8c3225075087b05e0f965d8f5cee07d109c71144561a6be972c55c17df",
+  "release_id": "rel_453f718427cf20a671895fd2b286fad0",
+  "catalog_hash": "sha256:453f718427cf20a671895fd2b286fad01cb34f338c13530804658baf703cc3a3",
   "descriptors": [
     {
       "id": "base.capability_analysis.get",
@@ -62,6 +62,118 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run": {
+            "type": "object",
+            "properties": {
+              "run_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "run_gid",
+              "snapshot_gid",
+              "kind",
+              "status"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -84,6 +196,118 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run": {
+            "type": "object",
+            "properties": {
+              "run_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "run_gid",
+              "snapshot_gid",
+              "kind",
+              "status"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -92,7 +316,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a8ba452ab4788fea3741fcea3d09c3eade001f065573066aeec0efc47506c2ff",
+      "schema_hash": "sha256:59c588cc8b76c7835e42019dd7a2795956394fe82344f3f6bb5ac9fbbeda3f96",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -225,6 +449,118 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run": {
+            "type": "object",
+            "properties": {
+              "run_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "run_gid",
+              "snapshot_gid",
+              "kind",
+              "status"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -247,6 +583,118 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run": {
+            "type": "object",
+            "properties": {
+              "run_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "run_gid",
+              "snapshot_gid",
+              "kind",
+              "status"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -255,7 +703,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:0a5f369e3b8ba9ccf4b777d23631e46266942cfd36c97a1efc413f94648baf7f",
+      "schema_hash": "sha256:77e83c698869083ce996c69b5b35d295e6c1abbf5012bcb76299719d310f438d",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -361,6 +809,11 @@
           "query": {
             "type": "string",
             "maxLength": 512
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
           }
         },
         "required": [],
@@ -380,6 +833,144 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "severity": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "fingerprint": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "remediation_boundary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "finding_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "subject_version_gids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9]{1,19}$",
+                    "minLength": 1,
+                    "maxLength": 19
+                  },
+                  "maxItems": 20
+                },
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "maxItems": 20
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "maxItems": 200
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
           }
         },
         "required": [
@@ -402,6 +993,144 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "severity": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "fingerprint": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "remediation_boundary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "finding_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "status": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "subject_version_gids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9]{1,19}$",
+                    "minLength": 1,
+                    "maxLength": 19
+                  },
+                  "maxItems": 20
+                },
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "maxItems": 20
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "maxItems": 200
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
           }
         },
         "required": [
@@ -410,7 +1139,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "schema_hash": "sha256:de6d46217767f473aab3f689ba201052a3550b907f3c63628b7aea95418f3e34",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -549,6 +1278,243 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "canonical_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "owner_domain": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "node_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "source_path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "artifact_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "implementation_node_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "source_symbol": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "http_method": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "route_path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "metadata": {
+                  "type": "object",
+                  "maxProperties": 50,
+                  "additionalProperties": false,
+                  "properties": {}
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "maxItems": 500
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "max_depth": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "max_nodes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "binding_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "capability_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "major_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "node_canonical_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "binding_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "binding_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "maxItems": 500
+          },
+          "relations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "relation_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "from_canonical_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "to_canonical_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "relation_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "relation_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "maxItems": 500
           }
         },
         "required": [
@@ -571,6 +1537,243 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "canonical_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "owner_domain": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "node_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "source_path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "artifact_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "implementation_node_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "source_symbol": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "http_method": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "route_path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "metadata": {
+                  "type": "object",
+                  "maxProperties": 50,
+                  "additionalProperties": false,
+                  "properties": {}
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "maxItems": 500
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "max_depth": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "max_nodes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "binding_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "capability_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "major_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "node_canonical_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "binding_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "binding_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "maxItems": 500
+          },
+          "relations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "relation_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "from_canonical_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "to_canonical_key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "relation_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "relation_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            },
+            "maxItems": 500
           }
         },
         "required": [
@@ -579,7 +1782,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:346c5ba04f996ec919eb7afab73237a5d5a29a8f8c018bd65abe9b9a0b05edef",
+      "schema_hash": "sha256:b20c91fade321a8917a97c9c38e3d5f50d4ec0f0fe8b46d09b2ec657705e8a99",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -690,6 +1893,54 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 255
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "base_snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "previous_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "proposed_descriptor_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "evidence_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "row_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "expected_resource_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "required": [
@@ -711,6 +1962,111 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal": {
+            "type": "object",
+            "properties": {
+              "proposal_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "row_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "proposal_gid",
+              "status",
+              "row_version"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -733,6 +2089,111 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal": {
+            "type": "object",
+            "properties": {
+              "proposal_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "row_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "proposal_gid",
+              "status",
+              "row_version"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -741,7 +2202,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "schema_hash": "sha256:f9de081204c12d1af941c9dfb9a2fb2e07cd825f7ee37bb570dd69ccaffbcf89",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -868,6 +2329,156 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "item": {
+            "type": "object",
+            "properties": {
+              "capability_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "capability_version_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "capability_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "major_version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "owner_domain": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "domain": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "semantic_class": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "business_effect": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "lifecycle_status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "lifecycle": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "descriptor_hash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "contract": {
+                "type": "object",
+                "maxProperties": 50,
+                "additionalProperties": false,
+                "properties": {}
+              }
+            },
+            "required": [
+              "capability_id",
+              "capability_version_gid"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -890,6 +2501,156 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "item": {
+            "type": "object",
+            "properties": {
+              "capability_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "capability_version_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "capability_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "major_version": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "owner_domain": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "domain": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "semantic_class": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "business_effect": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "lifecycle_status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "lifecycle": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "descriptor_hash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "contract": {
+                "type": "object",
+                "maxProperties": 50,
+                "additionalProperties": false,
+                "properties": {}
+              }
+            },
+            "required": [
+              "capability_id",
+              "capability_version_gid"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -898,7 +2659,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a8ba452ab4788fea3741fcea3d09c3eade001f065573066aeec0efc47506c2ff",
+      "schema_hash": "sha256:a63b84ae27232ca362cc53e979df2035c1b3b55ca4ecdbb98367bae0410b4815",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1028,6 +2789,150 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "capability_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "capability_version_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "capability_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "major_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "owner_domain": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "domain": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "semantic_class": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "business_effect": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "lifecycle_status": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "lifecycle": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "descriptor_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "contract": {
+                  "type": "object",
+                  "maxProperties": 50,
+                  "additionalProperties": false,
+                  "properties": {}
+                }
+              },
+              "required": [
+                "capability_id",
+                "capability_version_gid"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
           }
         },
         "required": [
@@ -1050,6 +2955,150 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "capability_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "capability_version_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "capability_gid": {
+                  "type": "string",
+                  "pattern": "^[0-9]{1,19}$",
+                  "minLength": 1,
+                  "maxLength": 19
+                },
+                "major_version": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "owner_domain": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "domain": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "semantic_class": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "business_effect": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "lifecycle_status": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "lifecycle": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "descriptor_hash": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "contract": {
+                  "type": "object",
+                  "maxProperties": 50,
+                  "additionalProperties": false,
+                  "properties": {}
+                }
+              },
+              "required": [
+                "capability_id",
+                "capability_version_gid"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 200
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
           }
         },
         "required": [
@@ -1058,7 +3107,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:ee13603882466dfdf26a470618e524cc2780f6c0f91b85661d00e1db6644b6c2",
+      "schema_hash": "sha256:efd0888508446d0dd3c3e6a716ec6f09db7c936bbb93bee764376a70f29cd56d",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1135,7 +3184,7 @@
       "description": "Test-only governance operation base.capability_release_gate.evaluate.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
-      "side_effect_level": "read",
+      "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -1146,7 +3195,7 @@
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A2",
+      "automation_level": "A1",
       "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern,system.capability.release",
       "resource_selectors": [],
       "data_classification": "confidential",
@@ -1164,9 +3213,85 @@
           "query": {
             "type": "string",
             "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "code_revision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "product_catalog_release_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "test_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "test_status": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "stale_evidence": {
+            "type": "boolean"
+          },
+          "approvals_complete": {
+            "type": "boolean"
+          },
+          "data_complete": {
+            "type": "boolean"
+          },
+          "evidence_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "waivers": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "now": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
-        "required": [],
+        "required": [
+          "idempotency_key"
+        ],
         "additionalProperties": false
       },
       "output_schema": {
@@ -1183,6 +3308,118 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release": {
+            "type": "object",
+            "properties": {
+              "report_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "conclusion": {
+                "type": "string",
+                "enum": [
+                  "pass",
+                  "fail",
+                  "expired"
+                ]
+              },
+              "blockers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "maxItems": 200
+              }
+            },
+            "required": [
+              "report_gid",
+              "conclusion",
+              "blockers"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1205,6 +3442,118 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release": {
+            "type": "object",
+            "properties": {
+              "report_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "conclusion": {
+                "type": "string",
+                "enum": [
+                  "pass",
+                  "fail",
+                  "expired"
+                ]
+              },
+              "blockers": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "maxItems": 200
+              }
+            },
+            "required": [
+              "report_gid",
+              "conclusion",
+              "blockers"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1213,13 +3562,13 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "schema_hash": "sha256:9d02d02e083b95e5d86a32b2d2dc213494b27a71fbb58c3041d90c9cda97a7b4",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "execution_budget": {
@@ -1232,7 +3581,7 @@
         "max_parallel_per_tenant": 32,
         "overload_policy": "reject"
       },
-      "confirmation_policy": "none",
+      "confirmation_policy": "admin",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -1319,6 +3668,29 @@
           "query": {
             "type": "string",
             "maxLength": 512
+          },
+          "finding": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "evidence": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "boundary": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "request_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "required": [
@@ -1340,6 +3712,129 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "prompt_status": {
+            "type": "string",
+            "enum": [
+              "input_required",
+              "generated"
+            ]
+          },
+          "prompt": {
+            "type": "object",
+            "properties": {
+              "prompt_hash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "redacted_summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              }
+            },
+            "required": [
+              "prompt_hash",
+              "redacted_summary"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1362,6 +3857,129 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_hash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "prompt_status": {
+            "type": "string",
+            "enum": [
+              "input_required",
+              "generated"
+            ]
+          },
+          "prompt": {
+            "type": "object",
+            "properties": {
+              "prompt_hash": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "redacted_summary": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4000
+              }
+            },
+            "required": [
+              "prompt_hash",
+              "redacted_summary"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1370,7 +3988,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:a8ba452ab4788fea3741fcea3d09c3eade001f065573066aeec0efc47506c2ff",
+      "schema_hash": "sha256:d5baea0e02f0bcdc1b28636b894742e8e3adbe68d4550aa362ced2f72e5d1946",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1491,6 +4109,27 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 255
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "stage": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "decision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "decided_at": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "required": [
@@ -1512,6 +4151,111 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal": {
+            "type": "object",
+            "properties": {
+              "proposal_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "row_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "proposal_gid",
+              "status",
+              "row_version"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1534,6 +4278,111 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal": {
+            "type": "object",
+            "properties": {
+              "proposal_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "row_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "proposal_gid",
+              "status",
+              "row_version"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1542,7 +4391,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:8b961ea2c52fc50d921886fed075b1d1f949f5410dab9b31da75fc2cb5e37341",
+      "schema_hash": "sha256:b9eb84bb2ecc3b3af2cb4d9a3a6935b82d47b52ada65762e4f717759b82bc603",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -1653,9 +4502,15 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 255
+          },
+          "code_revision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "required": [
+          "code_revision",
           "idempotency_key"
         ],
         "additionalProperties": false
@@ -1674,6 +4529,84 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
           }
         },
         "required": [
@@ -1696,6 +4629,84 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
           }
         },
         "required": [
@@ -1704,7 +4715,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "schema_hash": "sha256:009e9ee45dca1323755306f5a29121c8789a901f952aef5812b6cc342530b632",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -1837,6 +4848,118 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run": {
+            "type": "object",
+            "properties": {
+              "run_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "run_gid",
+              "snapshot_gid",
+              "kind",
+              "status"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1859,6 +4982,118 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run": {
+            "type": "object",
+            "properties": {
+              "run_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "snapshot_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "kind": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "run_gid",
+              "snapshot_gid",
+              "kind",
+              "status"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -1867,7 +5102,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:0a5f369e3b8ba9ccf4b777d23631e46266942cfd36c97a1efc413f94648baf7f",
+      "schema_hash": "sha256:77e83c698869083ce996c69b5b35d295e6c1abbf5012bcb76299719d310f438d",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -1978,6 +5213,53 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 255
+          },
+          "finding_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "code_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "catalog_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "evidence_hash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "starts_at": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "expires_at": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "required": [
@@ -1999,6 +5281,111 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver": {
+            "type": "object",
+            "properties": {
+              "waiver_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "row_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "waiver_gid",
+              "status",
+              "row_version"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -2021,6 +5408,111 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver": {
+            "type": "object",
+            "properties": {
+              "waiver_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "row_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "waiver_gid",
+              "status",
+              "row_version"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -2029,7 +5521,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "schema_hash": "sha256:94b0a83a96c4d5b2c2acf7845cd4070b6d976f32feb4d3cc754750fc32c0253c",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -2150,6 +5642,17 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 255
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "revoked_at": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
         "required": [
@@ -2171,6 +5674,111 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver": {
+            "type": "object",
+            "properties": {
+              "waiver_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "row_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "waiver_gid",
+              "status",
+              "row_version"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -2193,6 +5801,111 @@
               "accepted",
               "completed"
             ]
+          },
+          "data": {
+            "type": "object",
+            "maxProperties": 50,
+            "additionalProperties": false,
+            "properties": {}
+          },
+          "items": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "nodes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "maxProperties": 50,
+              "additionalProperties": false,
+              "properties": {}
+            }
+          },
+          "capability_version_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "snapshot_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "scan_run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "run_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "proposal_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "release_report_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "waiver": {
+            "type": "object",
+            "properties": {
+              "waiver_gid": {
+                "type": "string",
+                "pattern": "^[0-9]{1,19}$",
+                "minLength": 1,
+                "maxLength": 19
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              },
+              "row_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "waiver_gid",
+              "status",
+              "row_version"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -2201,7 +5914,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:8b961ea2c52fc50d921886fed075b1d1f949f5410dab9b31da75fc2cb5e37341",
+      "schema_hash": "sha256:b9ff6e2617a038b68a18698d9afb8350e45e0e98d24c9c26dc0155f8cea4d186",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -2274,8 +5987,8 @@
       "plugin_id": "test.governance",
       "module": "backend.capability_governance_test.provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:c469b66aa11a283d35dbe2084c6268a0f7ab9e12ebb30ca4ed801060b7d3f860"
+      "artifact_hash": "sha256:816b0ec79875d42be7e61f8b3974d8dd878630161da74150c5f6766ba0f7c0d6"
     }
   ],
-  "created_at": "2026-08-18T17:52:21.290788Z"
+  "created_at": "2026-08-18T19:35:52.293658Z"
 }
