@@ -9,7 +9,7 @@ from backend.capabilities.models_next import CapabilityBusinessError
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .analysis import AnalysisRequest, run_deterministic_analysis
-from .prompting import PromptAuthorizationError, RedactedPrompt, build_repair_prompt
+from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
 
 
 _MAX_SEARCH = 200
@@ -70,6 +70,7 @@ class CapabilityGovernanceService:
         self._runs: dict[tuple[str, str, str], GovernedRun] = {}
         self._mutations: dict[tuple[str, str], dict[str, str]] = {}
         self._prompt_records: dict[str, dict[str, str]] = {}
+        self._prompt_texts: dict[str, str] = {}
         self._next_run_gid = 1
 
     def base_capability_registry_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -185,19 +186,23 @@ class CapabilityGovernanceService:
         request_id: str,
     ) -> RedactedPrompt:
         """Create a prompt without persisting text; callers must authorize each read."""
-        prompt = build_repair_prompt(finding, evidence, boundary)
+        prompt, prompt_text = _render_repair_prompt(finding, evidence, boundary)
         self._prompt_records[prompt.prompt_hash] = prompt.store_record()
+        self._prompt_texts[prompt.prompt_hash] = prompt_text
         self._audit(
             operation="prompt_generation", request_id=request_id, context=context,
             detail=prompt.store_record(),
         )
         return prompt
 
-    def read_repair_prompt(self, prompt: RedactedPrompt, *, context: object) -> str:
+    def read_repair_prompt(self, prompt_hash: str, *, context: object) -> str:
         """Return ephemeral text only after service-owned governance authorization."""
         if not self._can_read_repair_prompt(context):
             raise PromptAuthorizationError("prompt_access_denied")
-        return prompt._text_for_governance_service()
+        prompt_text = self._prompt_texts.get(str(prompt_hash))
+        if prompt_text is None:
+            raise _business_error("resource_not_found")
+        return prompt_text
 
     @property
     def prompt_records(self) -> Mapping[str, Mapping[str, str]]:

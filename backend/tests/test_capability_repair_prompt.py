@@ -29,8 +29,8 @@ def test_repair_prompt_has_required_sections_and_only_authorized_callers_can_rea
     assert prompt.prompt_hash.startswith("sha256:")
     assert "user:pass" not in repr(prompt.store_record())
     with pytest.raises(PromptAuthorizationError, match="prompt_access_denied"):
-        service.read_repair_prompt(prompt, context=type("Context", (), {"user_gid": "actor-1"})())
-    text = service.read_repair_prompt(prompt, context=type("Context", (), {
+        service.read_repair_prompt(prompt.prompt_hash, context=type("Context", (), {"user_gid": "actor-1"})())
+    text = service.read_repair_prompt(prompt.prompt_hash, context=type("Context", (), {
         "user_gid": "actor-1", "governance_permissions": ("base.capability_repair_prompt.read",),
     })())
     for section in (
@@ -76,8 +76,8 @@ def test_service_authorizes_prompt_read_and_drops_benign_business_evidence_and_b
     })()
 
     with pytest.raises(PromptAuthorizationError, match="prompt_access_denied"):
-        service.read_repair_prompt(prompt, context=unauthorized)
-    text = service.read_repair_prompt(prompt, context=authorized)
+        service.read_repair_prompt(prompt.prompt_hash, context=unauthorized)
+    text = service.read_repair_prompt(prompt.prompt_hash, context=authorized)
     assert "Alice" not in text
     assert "source code text" not in text
 
@@ -86,3 +86,5 @@ def test_prompt_holder_cannot_self_authorize_text_access():
     prompt = build_repair_prompt(_finding(), {"evidence_keys": ["evidence:7"]}, {"snapshot_gid": "9"})
 
     assert not hasattr(prompt, "text_for")
+    assert "text" not in repr(vars(prompt)).lower()
+    assert not hasattr(prompt, "_text_for_governance_service")

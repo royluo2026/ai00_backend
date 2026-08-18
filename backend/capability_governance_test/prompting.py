@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import hashlib
 import json
 from typing import Any
@@ -27,11 +27,6 @@ def _summary(value: Any) -> str:
 class RedactedPrompt:
     prompt_hash: str
     redacted_summary: str
-    _prompt_text: str = field(repr=False, compare=False)
-
-    def _text_for_governance_service(self) -> str:
-        """Service-only retrieval; callers cannot supply their own authorization decision."""
-        return self._prompt_text
 
     def store_record(self) -> dict[str, str]:
         """The only persistence representation; it deliberately omits prompt text."""
@@ -49,6 +44,15 @@ def build_repair_prompt(
     evidence: Mapping[str, Any],
     boundary: Mapping[str, Any],
 ) -> RedactedPrompt:
+    """Return only prompt metadata; text is never held by this public value object."""
+    return _render_repair_prompt(finding, evidence, boundary)[0]
+
+
+def _render_repair_prompt(
+    finding: AdvisoryFinding | Mapping[str, Any],
+    evidence: Mapping[str, Any],
+    boundary: Mapping[str, Any],
+) -> tuple[RedactedPrompt, str]:
     """Build all nine sections from only fixed, reviewable governance metadata."""
     safe_finding = _finding(finding)
     safe_evidence = sanitize_evidence(evidence)
@@ -79,7 +83,7 @@ def build_repair_prompt(
     prompt_hash = "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
     return RedactedPrompt(prompt_hash=prompt_hash, redacted_summary=_summary({
         "finding": finding_summary, "evidence": safe_evidence, "boundary": safe_boundary,
-    }), _prompt_text=text)
+    })), text
 
 
 __all__ = ["PromptAuthorizationError", "RedactedPrompt", "build_repair_prompt"]

@@ -51,6 +51,18 @@ def test_ai_result_rejects_non_contract_findings(finding):
         validate_advisory({"findings": [finding]})
 
 
+@pytest.mark.parametrize("evidence_keys", [
+    ["customer Alice source excerpt"],
+    [f"evidence:{index}" for index in range(21)],
+])
+def test_ai_result_rejects_unbounded_or_non_identifier_evidence_keys(evidence_keys):
+    with pytest.raises(AdvisoryContractError, match="candidate_only"):
+        validate_advisory({"findings": [{
+            "finding_type": "gap", "subject_version_gids": ["7"], "confidence": 0.5,
+            "evidence_keys": evidence_keys, "recommendation": "review", "status": "candidate",
+        }]})
+
+
 def test_advisor_uses_only_governed_agent_client_with_bounded_redacted_package_and_deadline():
     client = RecordingDomainClient({"findings": [{
         "finding_type": "gap", "subject_version_gids": ["7"], "confidence": 0.75,

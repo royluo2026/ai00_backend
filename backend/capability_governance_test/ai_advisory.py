@@ -22,6 +22,8 @@ _MAX_OUTPUT_BYTES = 64 * 1024
 _MAX_TIMEOUT_SECONDS = 30
 _MAX_OPERATION_POLLS = 4
 _DECIMAL_GID = re.compile(r"^[0-9]{1,19}$")
+_EVIDENCE_KEY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:@/-]{0,255}$")
+_MAX_EVIDENCE_KEYS = 20
 
 
 class AdvisoryContractError(ValueError):
@@ -47,8 +49,18 @@ class AdvisoryFinding(FrozenModel):
             raise AdvisoryContractError("candidate_only: subject_version_gids must be decimal strings")
         return value
 
+    @classmethod
+    def _validate_evidence_keys(cls, value: Any) -> Any:
+        if not isinstance(value, (tuple, list)) or len(value) > _MAX_EVIDENCE_KEYS or any(
+            not isinstance(item, str) or _EVIDENCE_KEY.fullmatch(item) is None
+            for item in value
+        ):
+            raise AdvisoryContractError("candidate_only: evidence_keys must be bounded identifiers")
+        return value
+
     def __init__(self, **data: Any) -> None:
         data["subject_version_gids"] = self._validate_gids(data.get("subject_version_gids"))
+        data["evidence_keys"] = self._validate_evidence_keys(data.get("evidence_keys"))
         super().__init__(**data)
 
 
