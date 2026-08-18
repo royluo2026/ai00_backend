@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "backend_top_level_packages": [
+    "base", "capabilities", "capability_v2", "contracts", "domain", "governance",
+    "infra", "knowledge", "ontology", "platform_sdk", "plugin_platform", "routers",
+    "rule_engine", "services", "system_capabilities", "utils"
+  ],
+  "excluded_files": [
+    "backend/capability_v2/bootstrap.py",
+    "backend/routers/deps.py",
+    "backend/utils/gid.py"
+  ],
+  "migrations": [
+    "backend/db/migrations/*.sql",
+    "backend/db/migrations/domains/**"
+  ],
+  "frontend_prefixes": ["assets/**", "packages/**", "web/**"],
+  "catalog_files": [
+    "backend/capability_v2/official_domains.json",
+    "docs/governance/capability-catalog-release.json"
+  ],
+  "provider_modules": [
+    {"module": "backend.base.official_provider", "path": "backend/base"},
+    {"module": "agent_backend.capabilities", "path": "plugins/agent/agent_backend"},
+    {"module": "craft_backend.capabilities", "path": "plugins/craft/craft_backend"},
+    {"module": "device_backend.capabilities", "path": "plugins/device/device_backend"},
+    {"module": "digital_model_backend.capabilities", "path": "plugins/digital_model/digital_model_backend"},
+    {"module": "factory_backend.capabilities", "path": "plugins/factory/factory_backend"},
+    {"module": "integration_backend.capabilities", "path": "plugins/integration/integration_backend"},
+    {"module": "knowledge_backend.capabilities", "path": "plugins/knowledge/knowledge_backend"},
+    {"module": "ontology_backend.capabilities", "path": "plugins/ontology/ontology_backend"},
+    {"module": "project_management_backend.capabilities", "path": "plugins/project_management/project_management_backend"},
+    {"module": "simulation_backend.capabilities", "path": "plugins/simulation/simulation_backend"}
+  ]
+}
