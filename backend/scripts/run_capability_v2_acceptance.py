@@ -549,6 +549,13 @@ def main() -> int:
     blockers.extend(catalog_integrity_errors(catalog))
     current_env = dict(os.environ)
     blockers.extend(environment_errors(args.mode, current_env))
+    if args.mode == "offline" and args.strict:
+        from backend.scripts.run_bop_large_version_acceptance import run_size
+        large_run_id = "capability-offline-large-bop"
+        for size in (1000, 5000, 10000):
+            large_result = run_size(size, large_run_id)
+            for failure in large_result["evaluation"]["failures"]:
+                blockers.append(f"large BOP {size}: {failure}")
     runtime_evidence_hash = None
     component_results = None
     completion = evaluate_completion(
