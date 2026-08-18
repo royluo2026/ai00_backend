@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import socket
 import subprocess
 import sys
@@ -396,13 +397,29 @@ def acceptance_temp_root(root: Path = ROOT) -> Path:
         if root.parent.name == ".worktrees"
         else root.parent / ".runtime"
     )
-    path = (
-        shared_runtime / "capability-v2-acceptance"
+    # Worktree runs must stay inside the active worktree.  The shared runtime
+    # belongs to the desktop service and may be ACL-locked by another process.
+    preferred = (
+        root / ".capability-acceptance.tmp"
+        if root.parent.name == ".worktrees"
+        else shared_runtime / "capability-v2-acceptance"
         if shared_runtime.is_dir()
         else root / ".capability-acceptance.tmp"
     )
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+    try:
+        preferred.mkdir(parents=True, exist_ok=True)
+        probe_dir = preferred / ".cleanup-probe"
+        probe_dir.mkdir(exist_ok=True)
+        (probe_dir / "probe").write_text("ok", encoding="utf-8")
+        shutil.rmtree(probe_dir)
+        return preferred
+    except OSError:
+        # A locked shared runtime must not make a deterministic offline run
+        # fail.  Fall back to a worktree-local directory while preserving the
+        # same cleanup and path-boundary guarantees.
+        fallback = root / ".capability-acceptance.tmp"
+        fallback.mkdir(parents=True, exist_ok=True)
+        return fallback
 
 
 def completion_blockers(mode: str, completion: CompletionReport) -> list[str]:
