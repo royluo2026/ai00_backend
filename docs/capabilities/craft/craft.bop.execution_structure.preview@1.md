@@ -8,7 +8,7 @@ Preview a draft BOP execution structure at an exact revision.
 - 不适用：The caller needs an official execution source.
 - 生命周期：`stable`
 - 所属领域：`craft`
-- Catalog Release：`rel_ff6093704bd2b3500496c5731300b7a7`
+- Catalog Release：`rel_a91d6898ffa84d355720e7be705dfa69`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Preview a draft BOP execution structure at an exact revision.
 ```json
 {
   "capability_id": "craft.bop.execution_structure.preview",
-  "catalog_release": "rel_ff6093704bd2b3500496c5731300b7a7",
+  "catalog_release": "rel_a91d6898ffa84d355720e7be705dfa69",
   "major_version": 1,
   "payload": {
     "expected_revision": 1,
@@ -206,6 +206,12 @@ Preview a draft BOP execution structure at an exact revision.
 - `multiple_active_gbop_releases`：More than one active GBOP release exists.（retryable=false）
 - `active_gbop_item_not_found`：The GBOP item is not in the active release.（retryable=false）
 - `provider_unavailable`：The Craft application provider is unavailable.（retryable=false）
+- `invalid_cursor`：The pagination cursor is invalid.（retryable=false）
+- `invalid_page_size`：The requested page size is outside the capability limit.（retryable=false）
+- `invalid_scope_kind`：The requested BOP scope kind is invalid.（retryable=false）
+- `scope_not_found`：The requested BOP scope does not exist in the version.（retryable=false）
+- `entry_not_found`：The requested BOP entry does not exist in the version.（retryable=false）
+- `entry_detail_too_large`：The BOP entry has too many links for bounded detail output.（retryable=false）
 
 `domain_errors_complete=true`。为 `false` 时，能力不得扩大插件或 Agent 暴露。
 

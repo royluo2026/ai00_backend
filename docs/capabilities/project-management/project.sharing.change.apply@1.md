@@ -8,7 +8,7 @@ Execute the reviewed project.sharing.change.apply project outcome.
 - 不适用：The operation belongs to another domain.
 - 生命周期：`stable`
 - 所属领域：`project_management`
-- Catalog Release：`rel_ff6093704bd2b3500496c5731300b7a7`
+- Catalog Release：`rel_a91d6898ffa84d355720e7be705dfa69`
 - Schema 精度：`typed`
 - 暂未开放原因：无
 
@@ -92,7 +92,7 @@ Execute the reviewed project.sharing.change.apply project outcome.
 ```json
 {
   "capability_id": "project.sharing.change.apply",
-  "catalog_release": "rel_ff6093704bd2b3500496c5731300b7a7",
+  "catalog_release": "rel_a91d6898ffa84d355720e7be705dfa69",
   "major_version": 1,
   "payload": {
     "arguments": "example",

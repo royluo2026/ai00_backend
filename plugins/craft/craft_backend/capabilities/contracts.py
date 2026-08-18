@@ -37,7 +37,8 @@ ARRAY = {
 }
 
 
-INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
+SchemaKey = str | tuple[str, int]
+INPUT_SCHEMAS: dict[SchemaKey, dict[str, Any]] = {
     "craft.bop.version.get": _object({"version_gid": STRING}, required=("version_gid",)),
     "craft.bop.version.list": _object({
         "project_gid": STRING,
@@ -148,7 +149,7 @@ _VERSION_SUMMARY = _object(
     required=tuple(_VERSION_SUMMARY_PROPERTIES),
 )
 
-OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
+OUTPUT_SCHEMAS: dict[SchemaKey, dict[str, Any]] = {
     "craft.bop.version.get": _object(_fields(*_VERSION_DETAIL), required=("version_gid", "revision", "lifecycle")),
     "craft.bop.version.list": _object({
         "items": {"type": "array", "items": _VERSION_SUMMARY},
@@ -246,4 +247,96 @@ for _capability_id in CRAFT_REVIEWED_CAPABILITIES:
     )
 
 
-__all__ = ["INPUT_SCHEMAS", "OUTPUT_SCHEMAS"]
+_NULLABLE_CURSOR = {"anyOf": [STRING, {"type": "null"}]}
+_COUNT_PROPERTIES = {
+    name: {"type": "integer", "minimum": 0}
+    for name in ("stations", "roles", "processes", "operations", "parts", "resources")
+}
+_COUNT_SCHEMA = _object(_COUNT_PROPERTIES, required=tuple(_COUNT_PROPERTIES))
+_OUTLINE_NODE = _object({
+    "gid": STRING,
+    "parent_gid": _NULLABLE_STRING,
+    "node_type": STRING,
+    "sort_order": {"type": "number"},
+    "title": _NULLABLE_STRING,
+})
+_OUTLINE_LINE = _object({
+    **_OUTLINE_NODE["properties"],
+    "counts": _COUNT_SCHEMA,
+}, required=("gid", "parent_gid", "node_type", "sort_order", "title", "counts"))
+_REF_ARRAY = {"type": "array", "items": STRING}
+_WORK_NODE = _object({
+    "gid": STRING, "parent_gid": _NULLABLE_STRING, "node_type": STRING,
+    "sort_order": {"type": "number"}, "title": _NULLABLE_STRING,
+    "vpps": _NULLABLE_STRING,
+    **{name: _REF_ARRAY for name in (
+        "part_refs", "tool_refs", "fixture_refs", "equipment_refs",
+        "knowledge_refs", "rule_refs",
+    )},
+}, required=(
+    "gid", "parent_gid", "node_type", "sort_order", "title", "vpps",
+    "part_refs", "tool_refs", "fixture_refs", "equipment_refs", "knowledge_refs", "rule_refs",
+))
+_LINK = _object({
+    "entry_gid": STRING, "link_type": STRING, "entity_gid": _NULLABLE_STRING,
+    "is_primary": {"anyOf": [{"type": "boolean"}, {"type": "integer"}]},
+}, required=("entry_gid", "link_type", "entity_gid", "is_primary"))
+_ANY_JSON = {"type": ["object", "array", "string", "number", "boolean", "null"]}
+
+INPUT_SCHEMAS.update({
+    ("craft.bop.structure.outline.get", 1): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "cursor": STRING, "page_size": {"type": "integer", "minimum": 1, "maximum": 100},
+    }, required=("version_gid", "revision")),
+    ("craft.bop.work_package.get", 2): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "scope_kind": {"type": "string", "enum": ["line", "station"]},
+        "scope_gid": STRING, "cursor": STRING,
+        "page_size": {"type": "integer", "minimum": 1, "maximum": 200},
+    }, required=("version_gid", "revision", "scope_kind", "scope_gid")),
+    ("craft.bop.entry.detail.get", 1): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "entry_gid": STRING,
+    }, required=("version_gid", "revision", "entry_gid")),
+})
+OUTPUT_SCHEMAS.update({
+    ("craft.bop.structure.outline.get", 1): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "root": {"anyOf": [_OUTLINE_NODE, {"type": "null"}]},
+        "lines": {"type": "array", "maxItems": 100, "items": _OUTLINE_LINE},
+        "total_lines": {"type": "integer", "minimum": 0}, "next_cursor": _NULLABLE_CURSOR,
+    }, required=("version_gid", "revision", "root", "lines", "total_lines", "next_cursor")),
+    ("craft.bop.work_package.get", 2): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "scope": _object({"kind": STRING, "gid": STRING}, required=("kind", "gid")),
+        "nodes": {"type": "array", "maxItems": 200, "items": _WORK_NODE},
+        "links": {"type": "array", "items": _LINK},
+        "total_count": {"type": "integer", "minimum": 0}, "next_cursor": _NULLABLE_CURSOR,
+    }, required=("version_gid", "revision", "scope", "nodes", "links", "total_count", "next_cursor")),
+    ("craft.bop.entry.detail.get", 1): _object({
+        "version_gid": STRING, "revision": {"type": "integer", "minimum": 1},
+        "entry": _object({
+            **_fields(
+                "gid", "version_gid", "parent_gid", "node_type", "sort_order", "level",
+                "ai00_level", "title", "vpps", "vpps_desc", "owner_gid", "created_at", "updated_at",
+            ),
+            "meta": _ANY_JSON, "process_flow_pic": _ANY_JSON, "process_chart_pic": _ANY_JSON,
+        }, required=("gid", "version_gid", "node_type", "sort_order", "meta")),
+        "links": {"type": "array", "maxItems": 500, "items": _object({
+            **_LINK["properties"], "snapshot_data": _ANY_JSON,
+        }, required=("entry_gid", "link_type", "entity_gid", "is_primary", "snapshot_data"))},
+    }, required=("version_gid", "revision", "entry", "links")),
+})
+
+
+def input_schema_for(capability_id: str, major_version: int) -> dict[str, Any]:
+    return INPUT_SCHEMAS.get((capability_id, major_version)) or INPUT_SCHEMAS[capability_id]
+
+
+def output_schema_for(capability_id: str, major_version: int) -> dict[str, Any]:
+    return OUTPUT_SCHEMAS.get((capability_id, major_version)) or OUTPUT_SCHEMAS[capability_id]
+
+
+__all__ = [
+    "INPUT_SCHEMAS", "OUTPUT_SCHEMAS", "input_schema_for", "output_schema_for",
+]

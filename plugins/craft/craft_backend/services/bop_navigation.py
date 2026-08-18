@@ -5,6 +5,7 @@ import base64
 import binascii
 import json
 from collections.abc import Callable, Mapping
+from datetime import date, datetime
 from typing import Any
 
 from backend.capability_v2.provider_contracts import CapabilityBusinessError
@@ -32,6 +33,25 @@ _REF_FIELDS = {
     "rule_custom": ("rule_refs", "rule"),
 }
 _REF_NAMES = tuple(sorted({value[0] for value in _REF_FIELDS.values()}))
+_COUNT_NAMES = ("stations", "roles", "processes", "operations", "parts", "resources")
+_COUNT_GROUP = {
+    "station_process": "stations",
+    "operator_process": "roles",
+    "process": "processes",
+    "bop_process": "processes",
+    "operation": "operations",
+    "bop_steps": "operations",
+    "part": "parts",
+    "non_standard_part": "parts",
+    "standard_part": "parts",
+    "support_material": "parts",
+    "equipment_factory": "resources",
+    "tool_factory": "resources",
+    "fixture_factory": "resources",
+    "equipment_need": "resources",
+    "tool_need": "resources",
+    "fixture_need": "resources",
+}
 
 
 def _error(code: str, message: str, **details: Any) -> CapabilityBusinessError:
@@ -73,6 +93,10 @@ def _json_value(value: Any, fallback: Any) -> Any:
         except (TypeError, ValueError):
             return fallback
     return fallback
+
+
+def _transport(value: Any) -> Any:
+    return value.isoformat() if isinstance(value, (datetime, date)) else value
 
 
 class BopNavigationRepository:
@@ -134,7 +158,9 @@ class BopNavigationRepository:
                 )
                 total_row = db.fetchone() or {}
                 page = raw_lines[:size]
-                counts: dict[str, dict[str, int]] = {str(row["gid"]): {} for row in page}
+                counts: dict[str, dict[str, int]] = {
+                    str(row["gid"]): {name: 0 for name in _COUNT_NAMES} for row in page
+                }
                 if page:
                     placeholders = ",".join("%s" for _ in page)
                     db.execute(
@@ -149,7 +175,9 @@ class BopNavigationRepository:
                         (version_gid, *(row["gid"] for row in page), version_gid),
                     )
                     for row in db.fetchall():
-                        counts[str(row["root_gid"])][str(row["node_type"])] = int(row["node_count"])
+                        group = _COUNT_GROUP.get(str(row["node_type"]))
+                        if group:
+                            counts[str(row["root_gid"])][group] += int(row["node_count"])
                 self._assert_revision(db, version_gid, revision)
         lines = [{**row, "counts": counts[str(row["gid"])]} for row in page]
         next_cursor = (
@@ -263,12 +291,19 @@ class BopNavigationRepository:
                 db.execute(
                     "SELECT entry_gid,link_type,entity_gid,is_primary,snapshot_data "
                     "FROM workmanship_bop_bop_entry_links WHERE version_gid=%s "
-                    "AND entry_gid=%s AND is_deleted=0 ORDER BY link_type,entity_gid",
-                    (version_gid, entry_gid),
+                    "AND entry_gid=%s AND is_deleted=0 ORDER BY link_type,entity_gid LIMIT %s",
+                    (version_gid, entry_gid, 501),
                 )
                 links = [dict(item) for item in db.fetchall()]
+                if len(links) > 500:
+                    raise _error(
+                        "entry_detail_too_large",
+                        "BOP entry has more than 500 links; use a bounded relation capability",
+                        entry_gid=entry_gid,
+                    )
                 self._assert_revision(db, version_gid, revision)
         detail = dict(row)
+        detail = {key: _transport(value) for key, value in detail.items()}
         detail["meta"] = _json_value(detail.get("meta"), {})
         detail["process_flow_pic"] = _json_value(detail.get("process_flow_pic"), [])
         detail["process_chart_pic"] = _json_value(detail.get("process_chart_pic"), [])

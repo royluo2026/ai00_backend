@@ -7,6 +7,7 @@ legacy module remains an internal compatibility detail.
 from backend.capabilities.models_next import (
     CapabilityBusinessError,
     CapabilityContext,
+    CapabilityExecutionBudget,
     CapabilityOutput,
     CapabilityRisk,
     CapabilitySpec,
@@ -16,6 +17,7 @@ from backend.capabilities.models_next import (
 __all__ = [
     "CapabilityBusinessError",
     "CapabilityContext",
+    "CapabilityExecutionBudget",
     "CapabilityOutput",
     "CapabilityRisk",
     "CapabilitySpec",

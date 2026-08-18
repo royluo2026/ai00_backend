@@ -14,7 +14,7 @@ from backend.capability_v2.contracts import (
 )
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec
 
-from .contracts import INPUT_SCHEMAS, OUTPUT_SCHEMAS
+from .contracts import input_schema_for, output_schema_for
 
 
 _RESOURCE_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
@@ -23,6 +23,8 @@ _RESOURCE_FIELDS: dict[str, tuple[tuple[str, str], ...]] = {
     "craft.bop.execution_structure.preview": (("craft-bop-version", "version_gid"),),
     "craft.bop.linked_parts.get": (("craft-bop-version", "version_gid"),),
     "craft.bop.work_package.get": (("craft-bop-version", "version_gid"),),
+    "craft.bop.structure.outline.get": (("craft-bop-version", "version_gid"),),
+    "craft.bop.entry.detail.get": (("craft-bop-version", "version_gid"),),
     "craft.bop.version.compare": (
         ("craft-bop-version", "from_version_gid"),
         ("craft-bop-version", "to_version_gid"),
@@ -69,6 +71,12 @@ _DOMAIN_ERRORS = tuple(
         ("multiple_active_gbop_releases", "More than one active GBOP release exists."),
         ("active_gbop_item_not_found", "The GBOP item is not in the active release."),
         ("provider_unavailable", "The Craft application provider is unavailable."),
+        ("invalid_cursor", "The pagination cursor is invalid."),
+        ("invalid_page_size", "The requested page size is outside the capability limit."),
+        ("invalid_scope_kind", "The requested BOP scope kind is invalid."),
+        ("scope_not_found", "The requested BOP scope does not exist in the version."),
+        ("entry_not_found", "The requested BOP entry does not exist in the version."),
+        ("entry_detail_too_large", "The BOP entry has too many links for bounded detail output."),
     )
 )
 
@@ -76,8 +84,8 @@ _DOMAIN_ERRORS = tuple(
 def _governed_spec(spec: Any) -> Any:
     return spec.model_copy(update={
         "plugin_callable": True,
-        "input_schema": INPUT_SCHEMAS[spec.id],
-        "output_schema": OUTPUT_SCHEMAS[spec.id],
+        "input_schema": input_schema_for(spec.id, spec.version),
+        "output_schema": output_schema_for(spec.id, spec.version),
     })
 
 

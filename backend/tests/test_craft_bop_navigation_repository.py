@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import pytest
 
 from backend.capabilities.models_next import CapabilityBusinessError
@@ -125,7 +127,10 @@ def test_outline_is_bounded_and_counts_only_current_page_lines():
     result = repository.get_outline_page("version1", 3, cursor=None, page_size=2)
 
     assert result["total_lines"] == 2
-    assert result["lines"][0]["counts"] == {"station_process": 10}
+    assert result["lines"][0]["counts"] == {
+        "stations": 10, "roles": 0, "processes": 0,
+        "operations": 0, "parts": 0, "resources": 0,
+    }
     count_params = cursor.statements[4][1]
     assert count_params[1:-1] == ("line1", "line2")
 
@@ -141,3 +146,47 @@ def test_page_size_and_scope_kind_are_rejected_before_sql():
         )
     assert scope_error.value.code == "invalid_scope_kind"
     assert cursor.statements == []
+
+
+def test_entry_detail_decodes_json_and_transports_datetimes():
+    repository, _cursor = _repository([
+        {"one": {"revision": 5}},
+        {"one": {
+            "gid": "e1", "version_gid": "v1", "parent_gid": None,
+            "node_type": "operation", "sort_order": 1.0, "meta": '{"a":1}',
+            "process_flow_pic": "[]", "process_chart_pic": None,
+            "created_at": datetime(2026, 8, 18, tzinfo=UTC), "updated_at": None,
+        }},
+        {"all": [{
+            "entry_gid": "e1", "link_type": "pbom_part", "entity_gid": "p1",
+            "is_primary": 1, "snapshot_data": '{"part_no":"P1"}',
+        }]},
+        {"one": {"revision": 5}},
+    ])
+
+    result = repository.get_entry_detail("v1", 5, "e1")
+
+    assert result["entry"]["meta"] == {"a": 1}
+    assert result["entry"]["created_at"] == "2026-08-18T00:00:00+00:00"
+    assert result["links"][0]["snapshot_data"] == {"part_no": "P1"}
+
+
+def test_entry_detail_rejects_more_than_five_hundred_links_without_truncation():
+    repository, cursor = _repository([
+        {"one": {"revision": 5}},
+        {"one": {
+            "gid": "e1", "version_gid": "v1", "node_type": "operation",
+            "sort_order": 1.0, "meta": {},
+        }},
+        {"all": [
+            {"entry_gid": "e1", "link_type": "knowledge", "entity_gid": f"k{i}",
+             "is_primary": 0, "snapshot_data": None}
+            for i in range(501)
+        ]},
+    ])
+
+    with pytest.raises(CapabilityBusinessError) as raised:
+        repository.get_entry_detail("v1", 5, "e1")
+
+    assert raised.value.code == "entry_detail_too_large"
+    assert cursor.statements[2][1][-1] == 501
