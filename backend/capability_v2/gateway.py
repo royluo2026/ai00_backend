@@ -75,6 +75,10 @@ class CapabilityGatewayService:
     def catalog(self, release_id: str | None = None) -> CatalogRelease:
         return self._resolver.catalog(release_id or self.catalog_release)
 
+    def recent_metrics(self) -> tuple[CapabilityMetricRecord, ...]:
+        """Return payload-free in-process measurements for administrator diagnostics."""
+        return self._metrics.recent()
+
     async def request_approval(self, envelope: InvocationEnvelope) -> IssuedApproval:
         try:
             descriptor = self._resolver.descriptor(

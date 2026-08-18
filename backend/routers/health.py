@@ -1,8 +1,11 @@
 import os
 import time
+from dataclasses import dataclass
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
+
+from backend.capability_v2.resource_budget import MemoryPressureSampler, MemorySnapshot
 
 router = APIRouter(tags=["system"])
 
@@ -11,30 +14,30 @@ _start_time = time.time()
 
 @router.get("/health")
 def health():
-    from backend.db.connection import get_conn, get_pool_status
-    import logging
-    _log = logging.getLogger(__name__)
-    pool = get_pool_status()
-    try:
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT 1")
-        db_ok = True
-    except Exception as e:
-        db_ok = False
-        _log.error("Health check DB ping failed: %s", e)
     return {
-        "status": "ok" if db_ok else "degraded",
-        "db": "ok" if db_ok else "error",
-        "pool": pool,
+        "status": "ok",
         "uptime_s": int(time.time() - _start_time),
     }
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryReadiness:
+    ready: bool
+    snapshot: MemorySnapshot
+
+
+def memory_readiness(sampler: MemoryPressureSampler | None = None) -> MemoryReadiness:
+    snapshot = (sampler or MemoryPressureSampler()).snapshot()
+    return MemoryReadiness(ready=snapshot.level != "not_ready", snapshot=snapshot)
 
 
 @router.get("/ready")
 def ready(request: Request):
     """Deployment readiness: routes, migrations and domain DB credentials must work."""
     checks: dict[str, str] = {}
+
+    memory = memory_readiness()
+    checks["memory"] = "ok" if memory.ready else "not_ready"
 
     required_routes = {
         "/api/tasks",

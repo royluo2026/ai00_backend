@@ -1,4 +1,7 @@
 from pathlib import Path
+import runpy
+
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -20,9 +23,24 @@ def test_dockerfile_requires_runtime_env_file_in_container():
     text = (REPO_ROOT / 'backend' / 'Dockerfile').read_text(encoding='utf-8')
     assert 'ENV ENV_FILE=' not in text
     assert 'SERVICE_PORT' not in text
-    assert "assert env_file, 'ENV_FILE is required for container runtime'" in text
-    assert 'load_dotenv(env_file, override=True)' in text
-    assert "uvicorn.run('backend.main:app'" in text
+    assert 'ENV_FILE is required for container runtime' in text
+    assert 'gunicorn backend.main:app -c backend/gunicorn.conf.py' in text
+
+
+def test_gunicorn_workers_are_explicit_and_memory_safe():
+    text = (REPO_ROOT / 'backend' / 'gunicorn.conf.py').read_text(encoding='utf-8')
+    assert 'multiprocessing.cpu_count' not in text
+    assert 'AI00_WEB_WORKERS' in text
+    assert 'default=1' in text
+    assert 'AI00_MAX_REQUESTS' in text
+    assert 'AI00_MAX_REQUESTS_JITTER' in text
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "many"])
+def test_gunicorn_rejects_invalid_worker_count(monkeypatch, value):
+    monkeypatch.setenv("AI00_WEB_WORKERS", value)
+    with pytest.raises(ValueError, match="AI00_WEB_WORKERS must be a positive integer"):
+        runpy.run_path(str(REPO_ROOT / 'backend' / 'gunicorn.conf.py'))
 
 
 def test_prepare_test_runtime_env_generates_placeholder_runtime_env():
