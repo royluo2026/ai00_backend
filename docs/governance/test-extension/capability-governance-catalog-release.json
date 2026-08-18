@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_453f718427cf20a671895fd2b286fad0",
-  "catalog_hash": "sha256:453f718427cf20a671895fd2b286fad01cb34f338c13530804658baf703cc3a3",
+  "release_id": "rel_613561741a977d2a336275fa52c45f1f",
+  "catalog_hash": "sha256:613561741a977d2a336275fa52c45f1ff2f9590d66b4c7733d8b067a18ccdc1e",
   "descriptors": [
     {
       "id": "base.capability_analysis.get",
@@ -5987,8 +5987,8 @@
       "plugin_id": "test.governance",
       "module": "backend.capability_governance_test.provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:816b0ec79875d42be7e61f8b3974d8dd878630161da74150c5f6766ba0f7c0d6"
+      "artifact_hash": "sha256:43478b0ea5b67605c0267ea3b76c8015ba662e7046fe17cabcb794c3c7a41d20"
     }
   ],
-  "created_at": "2026-08-18T19:35:52.293658Z"
+  "created_at": "2026-08-18T20:02:27.387013Z"
 }
