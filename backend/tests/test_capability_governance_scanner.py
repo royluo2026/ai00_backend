@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import importlib
 from pathlib import Path
+import sys
+from types import ModuleType, SimpleNamespace
 
 import pytest
 
@@ -27,6 +30,12 @@ def settings(valid_fixture: Path) -> GovernanceSettings:
     )
 
 
+def _fixture_registry() -> tuple[SimpleNamespace, ...]:
+    handler = SimpleNamespace(__module__="plugins.craft.craft_backend.provider")
+    spec = SimpleNamespace(id="craft.bop.factory.create", version=1)
+    return (SimpleNamespace(spec=spec, handler=handler),)
+
+
 def scan_fixture(root: Path):
     settings = GovernanceSettings(
         deployment_profile="test-governance",
@@ -38,7 +47,7 @@ def scan_fixture(root: Path):
         product_catalog=json.loads((root / "product_catalog.json").read_text(encoding="utf-8")),
         extension_catalog=json.loads((root / "extension_catalog.json").read_text(encoding="utf-8")),
         domain_manifests=json.loads((root / "official_domains.json").read_text(encoding="utf-8")),
-        registry_snapshot=(),
+        registry_snapshot=_fixture_registry(),
     ).scan(code_revision="fixture-revision")
 
 
@@ -85,6 +94,41 @@ def test_dynamic_table_expression_becomes_unresolved_evidence() -> None:
 
     assert any(node.node_type == "unresolved_binding" for node in document.nodes)
     assert not any(node.node_type == "database_table" for node in document.nodes)
+    assert not any(binding.binding_type == "implemented_by" for binding in document.bindings)
+    assert any(node.source_symbol == "provider_not_resolved" for node in document.nodes)
+
+
+def test_partial_static_table_expression_is_unresolved() -> None:
+    """A literal fragment concatenated with a runtime value is not a table declaration."""
+    document = scan_fixture(FIXTURES / "invalid_provider")
+
+    assert not any(node.source_symbol == "workmanship_craft_bop_factories" for node in document.nodes)
+    assert any(node.metadata.get("reason", "").startswith("dynamic_table") for node in document.nodes)
+
+
+def test_scanner_emits_declared_exposure_runtime_and_migration_categories(valid_fixture: Path) -> None:
+    """Removing a supported category or cross-file table relation breaks graph coverage."""
+    document = scan_fixture(valid_fixture)
+    node_types = {node.node_type for node in document.nodes}
+
+    assert {
+        "migration", "rest_route", "legacy_api", "mount_binding", "agent_tool", "mcp_tool",
+        "worker", "local_runtime", "test_case",
+    } <= node_types
+    assert any(relation.relation_type == "migrates_table" for relation in document.relations)
+    assert any(relation.relation_type == "persists_to" for relation in document.relations)
+    assert any(node.source_path.endswith("0002_factory_schema.sql") for node in document.nodes)
+
+
+def test_offline_runner_does_not_require_provider_bootstrap(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The offline scanner must load without an import-capable provider bootstrap."""
+    blocked_bootstrap = ModuleType("backend.capability_v2.bootstrap")
+    monkeypatch.setitem(sys.modules, "backend.capability_v2.bootstrap", blocked_bootstrap)
+    sys.modules.pop("backend.scripts.run_capability_governance_scan", None)
+
+    runner = importlib.import_module("backend.scripts.run_capability_governance_scan")
+
+    assert callable(runner.run_offline_scan)
 
 
 def test_snapshot_hash_is_repeatable_and_does_not_include_generated_identity(

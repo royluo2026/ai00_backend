@@ -13,7 +13,6 @@ if str(REPOSITORY_ROOT) not in sys.path:
 
 from backend.capability_governance_test.config import GovernanceSettings
 from backend.capability_governance_test.scanner import GovernanceScanner
-from backend.capability_v2.bootstrap import build_capability_registry
 from backend.capability_v2.catalog import CatalogRelease
 from backend.capability_v2.domain_manifest import load_domain_manifests
 
@@ -22,6 +21,10 @@ PRODUCT_CATALOG = REPOSITORY_ROOT / "docs/governance/capability-catalog-release.
 EXTENSION_CATALOG = REPOSITORY_ROOT / "docs/governance/test-extension/capability-governance-catalog-release.json"
 OFFICIAL_DOMAINS = REPOSITORY_ROOT / "backend/capability_v2/official_domains.json"
 EXPECTED_OFFICIAL_DOMAIN_COUNT = 11
+EXPECTED_OFFICIAL_DOMAINS = (
+    "agent", "base", "craft", "device", "digital_model", "factory", "integration",
+    "knowledge", "ontology", "project_management", "simulation",
+)
 PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT = 267
 
 
@@ -41,13 +44,13 @@ def run_offline_scan(output: Path) -> dict[str, object]:
     manifests = load_domain_manifests(OFFICIAL_DOMAINS)
     if len(manifests.domains) != EXPECTED_OFFICIAL_DOMAIN_COUNT:
         raise RuntimeError("official_domain_count_mismatch")
+    if tuple(sorted(item.domain_id for item in manifests.domains)) != EXPECTED_OFFICIAL_DOMAINS:
+        raise RuntimeError("official_domain_set_mismatch")
     stable_count = sum(item.lifecycle_status.value == "stable" for item in product.descriptors)
     if stable_count != PINNED_STABLE_PRODUCT_DESCRIPTOR_COUNT:
         raise RuntimeError("pinned_product_descriptor_count_mismatch")
-    registry = build_capability_registry(REPOSITORY_ROOT, OFFICIAL_DOMAINS)
     document = GovernanceScanner(
         GovernanceSettings("test-governance", REPOSITORY_ROOT),
-        registry_snapshot=registry.snapshot(),
         product_catalog=product,
         extension_catalog=extension,
         domain_manifests=manifests,

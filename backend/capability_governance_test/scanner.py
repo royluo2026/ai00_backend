@@ -34,6 +34,15 @@ _CLASS_TYPES = (
     ("domain_port", "port"),
     ("repository", "repository"),
 )
+_PATH_TYPES = (
+    ("rest_route", ("/routes/", "/routers/", "routes.py", "router.py")),
+    ("legacy_api", ("legacy", "_api.py")),
+    ("mount_binding", ("mount",)),
+    ("agent_tool", ("agent_tool",)),
+    ("mcp_tool", ("mcp_tool",)),
+    ("worker", ("worker", "task")),
+    ("local_runtime", ("local_runtime",)),
+)
 
 
 def _json_document(value: Any) -> Mapping[str, Any]:
@@ -63,23 +72,22 @@ def _dotted_name(value: ast.AST) -> str:
     return ""
 
 
-def _constant_strings(value: ast.AST) -> tuple[str, ...]:
+def _constant_string(value: ast.AST) -> str | None:
     if isinstance(value, ast.Constant) and isinstance(value.value, str):
-        return (value.value,)
-    if isinstance(value, ast.JoinedStr):
-        return ()
-    if isinstance(value, ast.BinOp) and isinstance(value.op, ast.Add):
-        return _constant_strings(value.left) + _constant_strings(value.right)
-    return ()
+        return value.value
+    return None
 
 
 def _node_type(name: str, path: str) -> str | None:
     lower = f"{path}/{name}".lower()
+    if "/tests/" in f"/{path}/" or name.startswith("test_"):
+        return "test_case"
+    for node_type, markers in _PATH_TYPES:
+        if any(marker in lower for marker in markers):
+            return node_type
     for node_type, marker in _CLASS_TYPES:
         if marker in lower:
             return node_type
-    if "/tests/" in f"/{path}/" or name.startswith("test_"):
-        return "test_case"
     if "handler" in lower:
         return "handler"
     return None
@@ -97,10 +105,20 @@ class _AstUnit:
     node_type: str
     tree: ast.AST
     source_hash: str
+    imported_symbols: tuple[str, ...] = ()
 
     @property
     def key(self) -> str:
         return node_key(self.node_type, self.owner, self.source_path, self.symbol)
+
+
+@dataclass(frozen=True)
+class _TableReference:
+    owner: str
+    source_path: str
+    table: str
+    symbol: str | None
+    is_migration: bool = False
 
 
 class GovernanceScanner:
@@ -212,7 +230,7 @@ class GovernanceScanner:
 
     def _parse_allowlisted_sources(
         self, domains: Mapping[str, Mapping[str, Any]],
-    ) -> tuple[list[_AstUnit], list[tuple[str, str, str]], list[tuple[str, str, str]]]:
+    ) -> tuple[list[_AstUnit], list[_TableReference], list[tuple[str, str, str]]]:
         roots: dict[str, str] = {}
         for owner, manifest in domains.items():
             roots[str(manifest["artifact_path"])] = owner
@@ -221,8 +239,13 @@ class GovernanceScanner:
                 migration = database.get("migration_path")
                 if isinstance(migration, str):
                     roots[migration] = owner
+                schema_paths = database.get("schema_paths", ())
+                if isinstance(schema_paths, (list, tuple)):
+                    for schema_path in schema_paths:
+                        if isinstance(schema_path, str):
+                            roots[schema_path] = owner
         units: list[_AstUnit] = []
-        tables: list[tuple[str, str, str]] = []
+        tables: list[_TableReference] = []
         unresolved: list[tuple[str, str, str]] = []
         for relative_root, owner in sorted(roots.items()):
             paths = self._scan_declared_manifest_path(relative_root)
@@ -235,7 +258,7 @@ class GovernanceScanner:
                 except (OSError, UnicodeDecodeError):
                     continue
                 if path.suffix == ".sql":
-                    tables.extend((owner, relative, table.lower()) for table in _TABLE.findall(source))
+                    tables.extend(_TableReference(owner, relative, table.lower(), None, True) for table in _TABLE.findall(source))
                     continue
                 try:
                     tree = ast.parse(source, filename=relative)
@@ -243,25 +266,34 @@ class GovernanceScanner:
                     unresolved.append((owner, relative, "syntax_error"))
                     continue
                 source_hash = _source_hash(source)
+                imported_symbols = tuple(sorted({
+                    alias.asname or alias.name.rsplit(".", 1)[-1]
+                    for item in tree.body if isinstance(item, (ast.Import, ast.ImportFrom))
+                    for alias in item.names
+                }))
                 classes = [node for node in tree.body if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef))]
                 for item in classes:
                     found_type = _node_type(item.name, relative)
                     if found_type:
-                        units.append(_AstUnit(owner, relative, item.name, found_type, item, source_hash))
+                        units.append(_AstUnit(owner, relative, item.name, found_type, item, source_hash, imported_symbols))
                 for assignment in ast.walk(tree):
                     if not isinstance(assignment, ast.Assign):
                         continue
-                    strings = _constant_strings(assignment.value)
-                    table_names = {table.lower() for text in strings for table in _TABLE.findall(text)}
+                    text = _constant_string(assignment.value)
+                    table_names = {table.lower() for table in _TABLE.findall(text or "")}
+                    symbols = tuple(target.id for target in assignment.targets if isinstance(target, ast.Name))
                     if table_names:
-                        tables.extend((owner, relative, table) for table in sorted(table_names))
-                    elif any(isinstance(target, ast.Name) and "table" in target.id.lower() for target in assignment.targets):
+                        tables.extend(
+                            _TableReference(owner, relative, table, symbol)
+                            for table in sorted(table_names) for symbol in symbols or (None,)
+                        )
+                    elif any("table" in symbol.lower() for symbol in symbols) or isinstance(assignment.value, (ast.BinOp, ast.JoinedStr)):
                         unresolved.append((owner, relative, f"dynamic_table:{assignment.lineno}"))
                 for call in ast.walk(tree):
                     if not isinstance(call, ast.Call):
                         continue
                     dotted = _dotted_name(call.func).lower()
-                    if dotted.endswith(("execute", "executemany", "text")) and call.args and not _constant_strings(call.args[0]):
+                    if dotted.endswith(("execute", "executemany", "text")) and call.args and _constant_string(call.args[0]) is None:
                         unresolved.append((owner, relative, f"dynamic_sql:{call.lineno}"))
         return units, tables, unresolved
 
@@ -301,7 +333,7 @@ class GovernanceScanner:
     def _build_nodes_and_relations(
         self,
         units: list[_AstUnit],
-        tables: list[tuple[str, str, str]],
+        tables: list[_TableReference],
         unresolved: list[tuple[str, str, str]],
     ) -> tuple[dict[str, ImplementationNode], list[ImplementationRelation]]:
         nodes: dict[str, ImplementationNode] = {}
@@ -312,10 +344,20 @@ class GovernanceScanner:
             nodes[node.canonical_key] = node
             by_symbol[(unit.owner, unit.symbol)].append(unit)
         table_nodes: dict[tuple[str, str], str] = {}
-        for owner, source_path, table in sorted(set(tables)):
-            key = node_key("database_table", owner, source_path, table)
-            nodes[key] = ImplementationNode(key, owner, "database_table", source_path, _digest({"table": table}), table)
-            table_nodes[(owner, table)] = key
+        for reference in sorted(set(tables), key=lambda item: (item.owner, item.table, item.source_path, item.symbol or "")):
+            table_nodes.setdefault((reference.owner, reference.table), node_key("database_table", reference.owner, f"tables/{reference.table}", reference.table))
+        for (owner, table), key in sorted(table_nodes.items()):
+            nodes[key] = ImplementationNode(key, owner, "database_table", f"tables/{table}", _digest({"table": table}), table)
+        table_symbols: dict[tuple[str, str], set[str]] = defaultdict(set)
+        tables_by_source: dict[tuple[str, str], set[str]] = defaultdict(set)
+        for reference in tables:
+            tables_by_source[(reference.owner, reference.source_path)].add(reference.table)
+            if reference.symbol:
+                table_symbols[(reference.owner, reference.symbol)].add(reference.table)
+            if reference.is_migration:
+                migration_key = node_key("migration", reference.owner, reference.source_path)
+                nodes.setdefault(migration_key, ImplementationNode(migration_key, reference.owner, "migration", reference.source_path, _digest({"migration": reference.source_path})))
+                relations.append(self._relation(migration_key, table_nodes[(reference.owner, reference.table)], "migrates_table"))
         for owner, source_path, reason in sorted(set(unresolved)):
             key = node_key("unresolved_binding", owner, source_path, reason)
             nodes[key] = ImplementationNode(key, owner, "unresolved_binding", source_path, _digest({"reason": reason}), reason, metadata={"reason": reason})
@@ -331,9 +373,14 @@ class GovernanceScanner:
                     if target.key != unit.key:
                         relations.append(self._relation(unit.key, target.key, "calls"))
             if unit.node_type == "repository":
-                for (owner, _table), table_key in sorted(table_nodes.items()):
-                    if owner == unit.owner and nodes[table_key].source_path == unit.source_path:
-                        relations.append(self._relation(unit.key, table_key, "persists_to"))
+                referenced_tables = set(tables_by_source.get((unit.owner, unit.source_path), set()))
+                used_names = {item.id for item in ast.walk(unit.tree) if isinstance(item, ast.Name)}
+                for symbol in set(unit.imported_symbols) & used_names:
+                    candidates = table_symbols.get((unit.owner, symbol), set())
+                    if len(candidates) == 1:
+                        referenced_tables.update(candidates)
+                for table in sorted(referenced_tables):
+                    relations.append(self._relation(unit.key, table_nodes[(unit.owner, table)], "persists_to"))
                 for key, node in nodes.items():
                     if node.owner_domain == unit.owner and node.node_type == "unresolved_binding" and node.source_path == unit.source_path:
                         relations.append(self._relation(unit.key, key, "unresolved_binding"))
@@ -395,29 +442,28 @@ class GovernanceScanner:
                 capability.descriptor_hash, capability.capability_id,
             )
             bindings.append(self._binding(capability, descriptor_key, "declared_in"))
-            token = capability.capability_id.split(".")[-2] if capability.capability_id.count(".") >= 2 else ""
-            candidates = [unit for unit in units if unit.owner == capability.owner_domain and unit.node_type in {"gateway", "provider"}]
             module = registry_modules.get((capability.capability_id, capability.major_version))
-            if module:
-                candidates = [unit for unit in candidates if unit.source_path[:-3].replace("/", ".") == module] or candidates
-            if token:
-                exact = [unit for unit in candidates if token.lower() in f"{unit.source_path}/{unit.symbol}".lower()]
-                candidates = exact or candidates
-            gateways = [unit for unit in candidates if unit.node_type == "gateway"]
-            providers = [unit for unit in candidates if unit.node_type == "provider"]
-            if gateways:
-                for gateway in gateways:
-                    bindings.append(self._binding(capability, gateway.key, "exposed_by"))
-                    relations.append(self._relation(descriptor_key, gateway.key, "exposes"))
-            elif providers:
-                for provider in providers:
-                    bindings.append(self._binding(capability, provider.key, "implemented_by"))
-                    relations.append(self._relation(descriptor_key, provider.key, "implements"))
-            else:
+            providers = [
+                unit for unit in units if unit.owner == capability.owner_domain and unit.node_type == "provider"
+                and module is not None and unit.source_path[:-3].replace("/", ".") == module
+            ]
+            if not providers:
                 reason = "provider_not_resolved"
                 key = node_key("unresolved_binding", capability.owner_domain, descriptor_path, reason)
                 nodes[key] = ImplementationNode(key, capability.owner_domain, "unresolved_binding", descriptor_path, _digest({"reason": reason}), reason, metadata={"reason": reason})
                 relations.append(self._relation(descriptor_key, key, "unresolved_binding"))
+                continue
+            for provider in providers:
+                bindings.append(self._binding(capability, provider.key, "implemented_by"))
+                relations.append(self._relation(descriptor_key, provider.key, "implements"))
+            provider_symbols = {item.symbol for item in providers}
+            gateways = [
+                unit for unit in units if unit.owner == capability.owner_domain and unit.node_type == "gateway"
+                and any(self._called_constructor(call.func) in provider_symbols for call in ast.walk(unit.tree) if isinstance(call, ast.Call))
+            ]
+            for gateway in gateways:
+                bindings.append(self._binding(capability, gateway.key, "exposed_by"))
+                relations.append(self._relation(descriptor_key, gateway.key, "exposes"))
         return bindings, relations
 
     def _registry_modules(self) -> dict[tuple[str, int], str]:
