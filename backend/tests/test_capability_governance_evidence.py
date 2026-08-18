@@ -54,3 +54,26 @@ def test_equivalent_records_have_the_same_hash_regardless_of_mapping_order() -> 
 
     assert first == second
     assert hash(first) == hash(second)
+
+
+def test_runtime_results_are_deeply_immutable_and_to_json_returns_an_isolated_copy() -> None:
+    record = EvidenceRecord(
+        "runtime_probe", "passed", runtime_result={"nested": {"safe": "value"}, "items": ["one"]},
+    )
+
+    with pytest.raises(TypeError):
+        record.runtime_result["nested"]["safe"] = "changed"  # type: ignore[index]
+    assert record.runtime_result["items"] == ("one",)
+
+    serialized = record.to_json()
+    serialized["runtime_result"]["nested"]["safe"] = "changed"
+
+    assert record.runtime_result["nested"]["safe"] == "value"
+
+
+def test_dependency_match_requires_the_exact_canonical_map() -> None:
+    record = EvidenceRecord(
+        "runtime_probe", "passed", dependency_hashes={"catalog": "catalog-a", "provider": "provider-a"},
+    )
+
+    assert not record.matches(dependency_hashes={"catalog": "catalog-a"})

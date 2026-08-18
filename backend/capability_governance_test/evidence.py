@@ -37,7 +37,27 @@ def redact_runtime_result(value: Any) -> Any:
 def _freeze_mapping(value: Mapping[str, Any]) -> Mapping[str, Any]:
     redacted = redact_runtime_result(value)
     assert isinstance(redacted, Mapping)
-    return MappingProxyType(dict(redacted))
+    frozen = _deep_freeze(redacted)
+    assert isinstance(frozen, Mapping)
+    return frozen
+
+
+def _deep_freeze(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return MappingProxyType({str(key): _deep_freeze(item) for key, item in value.items()})
+    if isinstance(value, tuple | list):
+        return tuple(_deep_freeze(item) for item in value)
+    if isinstance(value, set | frozenset):
+        return tuple(sorted((_deep_freeze(item) for item in value), key=repr))
+    return value
+
+
+def _mutable_copy(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _mutable_copy(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_mutable_copy(item) for item in value]
+    return value
 
 
 def _normalize_time(value: datetime | None) -> datetime | None:
@@ -102,15 +122,17 @@ class EvidenceRecord:
         """Whether this evidence is still bound to the supplied immutable inputs."""
         if snapshot_hash and self.source_hash != str(snapshot_hash):
             return False
-        expected = dependency_hashes or {}
-        return all(self.dependency_hashes.get(str(key)) == str(value) for key, value in expected.items())
+        if dependency_hashes is None:
+            return True
+        expected = {str(key): str(value) for key, value in sorted(dependency_hashes.items())}
+        return dict(self.dependency_hashes) == expected
 
     def to_json(self) -> dict[str, Any]:
         return {
             "level": self.level, "status": self.status, "source_hash": self.source_hash,
             "dependency_hashes": dict(self.dependency_hashes),
             "observed_at": self.observed_at.isoformat() if self.observed_at else None,
-            "runtime_result": dict(self.runtime_result), "test_case_id": self.test_case_id,
+            "runtime_result": _mutable_copy(self.runtime_result), "test_case_id": self.test_case_id,
             "fixture_ids": list(self.fixture_ids),
         }
 

@@ -42,7 +42,7 @@ _RELEASE_E2E_PROFILE = TestProfile("release_e2e", ("read", "static", "write"), T
 def _result(case: RegisteredTestCase, *, level: str, force_no_skip: bool = False) -> EvidenceRecord:
     try:
         payload = dict(case.runner() or {})
-        status = str(payload.pop("status", "passed"))
+        status = str(payload.pop("status", "passed")).strip().lower()
         if force_no_skip and status == "skipped":
             status = "failed"
             payload = {"reason": "release_e2e_skip_forbidden", **payload}
@@ -87,6 +87,20 @@ def _validate_release_request(
     return candidate, fixtures
 
 
+def _validate_release_cases(
+    cases: tuple[RegisteredTestCase, ...], *, candidate: str, fixture_ids: tuple[str, ...], cleanup_plan: Mapping[str, str],
+) -> None:
+    planned = set(fixture_ids)
+    for case in cases:
+        if str(case.operation).strip().lower() not in _RELEASE_E2E_PROFILE.allowed_operations:
+            raise TestPolicyError("release_operation_forbidden")
+        owned = tuple(sorted(set(str(value) for value in case.fixture_ids)))
+        if not owned or any(not value.startswith(f"E2E-{candidate}-") for value in owned):
+            raise TestPolicyError("case_fixture_ids_required")
+        if not set(owned).issubset(planned) or any(value not in cleanup_plan for value in owned):
+            raise TestPolicyError("case_fixture_cleanup_mismatch")
+
+
 def run_release_e2e_profile(
     cases: Iterable[RegisteredTestCase],
     *,
@@ -96,11 +110,13 @@ def run_release_e2e_profile(
     cleanup_plan: Mapping[str, str] | None = None,
 ) -> TestRun:
     """Run authorized release checks, preserving each exception or skip as failure evidence."""
-    _validate_release_request(
+    materialized = tuple(cases)
+    candidate, fixtures = _validate_release_request(
         release_candidate_gid=release_candidate_gid, caller_permissions=caller_permissions,
         fixture_ids=fixture_ids, cleanup_plan=cleanup_plan,
     )
-    materialized = tuple(cases)
+    assert cleanup_plan is not None
+    _validate_release_cases(materialized, candidate=candidate, fixture_ids=fixtures, cleanup_plan=cleanup_plan)
     return TestRun(_RELEASE_E2E_PROFILE, tuple(_result(case, level="runtime_e2e", force_no_skip=True) for case in materialized))
 
 
