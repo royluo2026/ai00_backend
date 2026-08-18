@@ -3,6 +3,8 @@ from types import SimpleNamespace
 import pytest
 
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext
+from backend.capabilities.validation_next import validate_payload
+from backend.capability_governance_test.contracts import OUTPUT_SCHEMAS
 from backend.capability_governance_test.provider import register_governance_capabilities
 from backend.capability_governance_test.release_gate import ReleaseGate
 from backend.capability_governance_test.service import CapabilityGovernanceService
@@ -149,6 +151,64 @@ def test_provider_preserves_the_declared_bounded_response_envelope():
         "proposal_gid": "13",
         "waiver_gid": "14",
         "release_report_gid": "15",
+    }
+
+
+def test_provider_projects_workflow_mutation_and_release_records():
+    """Dropping a workflow-record branch would hide its outcome from callers."""
+    class Registry:
+        def __init__(self):
+            self.handlers = {}
+
+        def register(self, spec, handler, *, descriptor=None):
+            self.handlers[spec.id] = handler
+
+    registry = Registry()
+    service = CapabilityGovernanceService(release_gate=ReleaseGate(
+        next_gid=iter(range(1, 20)).__next__, signer=lambda value: "signature",
+    ))
+    register_governance_capabilities(registry, service)
+
+    proposal = registry.handlers["base.capability_proposal.submit"]({
+        "capability_id": "base.capability_registry.search", "capability_version_gid": "17",
+        "base_snapshot_gid": "31", "previous_hash": "sha256:old",
+        "proposed_descriptor_hash": "sha256:new", "evidence_hash": "sha256:evidence",
+        "idempotency_key": "proposal-projection",
+    }, _context())
+    waiver = registry.handlers["base.capability_waiver.grant"]({
+        "finding_gid": "23", "capability_version_gid": "17", "scope": "repository",
+        "reason": "temporary exception", "code_hash": "sha256:code",
+        "catalog_hash": "sha256:catalog", "evidence_hash": "sha256:evidence",
+        "starts_at": "2026-01-01T00:00:00Z", "expires_at": "2099-01-01T00:00:00Z",
+        "idempotency_key": "waiver-projection",
+    }, _context())
+    release = registry.handlers["base.capability_release_gate.evaluate"]({
+        "code_revision": "rev-a", "product_catalog_release_id": "catalog-a",
+        "snapshot_gid": "31", "test_run_gid": "41", "test_status": "unavailable",
+        "approvals_complete": True, "data_complete": True, "evidence_hash": "sha256:evidence",
+        "idempotency_key": "release-projection",
+    }, _context())
+
+    validate_payload(OUTPUT_SCHEMAS["base.capability_proposal.submit"], proposal, label="output")
+    validate_payload(OUTPUT_SCHEMAS["base.capability_waiver.grant"], waiver, label="output")
+    validate_payload(OUTPUT_SCHEMAS["base.capability_release_gate.evaluate"], release, label="output")
+
+    assert proposal == {
+        "capability_id": "base.capability_proposal.submit", "status": "accepted",
+        "proposal": {"proposal_gid": "1", "status": "submitted", "row_version": "3"},
+    }
+    assert waiver == {
+        "capability_id": "base.capability_waiver.grant", "status": "accepted",
+        "waiver": {"waiver_gid": "2", "status": "active", "row_version": "1"},
+    }
+    assert release == {
+        "capability_id": "base.capability_release_gate.evaluate", "status": "completed",
+        "release": {
+            "report_gid": "1", "conclusion": "fail",
+            "blockers": [
+                "governance_dependency_unavailable", "required_test_unavailable", "stale_evidence",
+            ],
+        },
     }
 
 

@@ -56,6 +56,23 @@ def _bounded_collection(value: Any, *, max_items: int = 500) -> list[dict[str, A
     return [_bounded_object(item) for item in value[:max_items] if isinstance(item, Mapping)]
 
 
+def _release_projection(record: Any) -> dict[str, Any]:
+    report_gid = _value(record, "release_report_gid") or _value(record, "report_gid")
+    response: dict[str, Any] = {}
+    if report_gid is not None:
+        response["report_gid"] = str(report_gid)
+    conclusion = _value(record, "conclusion")
+    if conclusion is not None:
+        response["conclusion"] = str(conclusion)
+    blockers = _value(record, "blockers")
+    if isinstance(blockers, (list, tuple)):
+        response["blockers"] = [
+            str(blocker) for blocker in blockers[:200]
+            if 0 < len(str(blocker)) <= 255
+        ]
+    return response
+
+
 def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, Any]:
     response: dict[str, Any] = {"capability_id": capability_id, "status": str(result["status"])}
     if isinstance(result.get("data"), Mapping):
@@ -91,6 +108,18 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             response["run"] = _projection(run, ("run_gid", "snapshot_gid", "kind", "status"))
     elif capability_id == "base.capability_repair_prompt.generate" and result.get("snapshot_gid") is not None:
         response["snapshot"] = {"snapshot_gid": str(result["snapshot_gid"])}
+    elif capability_id in {"base.capability_proposal.submit", "base.capability_review.decide"}:
+        proposal = result.get("proposal")
+        if proposal is not None:
+            response["proposal"] = _projection(proposal, ("proposal_gid", "status", "row_version"))
+    elif capability_id in {"base.capability_waiver.grant", "base.capability_waiver.revoke"}:
+        waiver = result.get("waiver")
+        if waiver is not None:
+            response["waiver"] = _projection(waiver, ("waiver_gid", "status", "row_version"))
+    elif capability_id == "base.capability_release_gate.evaluate":
+        release = result.get("release")
+        if release is not None:
+            response["release"] = _release_projection(release)
     return response
 
 

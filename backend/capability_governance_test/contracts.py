@@ -110,15 +110,15 @@ _SNAPSHOT_SCHEMA = _closed({"snapshot_gid": GID_SCHEMA, "snapshot_hash": _SMALL_
 _PROPOSAL_SCHEMA = _closed({
     "proposal_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
-})
+}, ("proposal_gid", "status", "row_version"))
 _WAIVER_SCHEMA = _closed({
     "waiver_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
-})
+}, ("waiver_gid", "status", "row_version"))
 _RELEASE_SCHEMA = _closed({
-    "release_report_gid": GID_SCHEMA, "conclusion": {"type": "string", "enum": ["pass", "fail", "expired"]},
+    "report_gid": GID_SCHEMA, "conclusion": {"type": "string", "enum": ["pass", "fail", "expired"]},
     "blockers": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 200},
-})
+}, ("report_gid", "conclusion", "blockers"))
 _BOUNDED_VALUE_SCHEMA = {"description": "Provider-validated bounded transport value."}
 _BOUNDED_OBJECT_SCHEMA = {
     "type": "object", "maxProperties": 50,
