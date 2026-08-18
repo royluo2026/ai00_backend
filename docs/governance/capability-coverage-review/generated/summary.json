@@ -101,7 +101,7 @@
     "boundary_violations": 0,
     "cross_domain_sql": 0,
     "internal_import": 0,
-    "tables": 204,
+    "tables": 226,
     "migrations": 35
   }
 }

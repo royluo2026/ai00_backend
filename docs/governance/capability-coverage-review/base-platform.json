@@ -3229,7 +3229,21 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_capability_analysis_runs",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_capability_approvals",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_audit_events",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",
@@ -3250,7 +3264,77 @@
       "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
     },
     {
+      "table": "workmanship_base_capability_bindings",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
       "table": "workmanship_base_capability_catalog_releases",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_change_proposals",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_entries",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_evidence",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_finding_subjects",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_findings",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_governance_migrations",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_health_rollups",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_implementation_nodes",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_implementation_relations",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",
@@ -3272,6 +3356,76 @@
     },
     {
       "table": "workmanship_base_capability_rate_windows",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_release_reports",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_reviews",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_scan_runs",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_snapshot_entries",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_snapshots",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_test_results",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_test_runs",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_versions",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_waivers",
+      "owner_domain": "Base Platform",
+      "access_mode": "read_write",
+      "migration_stream": "base",
+      "evidence": "Owned by the exact runtime table inventory bound to this coverage review."
+    },
+    {
+      "table": "workmanship_base_capability_worker_leases",
       "owner_domain": "Base Platform",
       "access_mode": "read_write",
       "migration_stream": "base",

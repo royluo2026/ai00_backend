@@ -22,7 +22,7 @@ from urllib.parse import quote
 from urllib.parse import quote
 
 from dotenv import load_dotenv
-from backend.capability_governance_test.config import GovernanceSettings
+from backend.domain_ports.capability_governance_config import GovernanceSettings
 
 _log = logging.getLogger(__name__)
 

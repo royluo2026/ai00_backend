@@ -4,6 +4,7 @@ import pytest
 
 from backend.capability_governance_test.config import GovernanceSettings
 from backend.config import get_governance_settings
+from backend.domain_ports.capability_governance_config import GovernanceSettings as SharedGovernanceSettings
 
 
 def test_governance_settings_requires_test_governance_profile():
@@ -41,3 +42,7 @@ def test_backend_config_uses_the_fail_closed_governance_settings():
     )
 
     assert isinstance(settings, GovernanceSettings)
+
+
+def test_governance_settings_contract_is_shared_outside_test_extension():
+    assert GovernanceSettings is SharedGovernanceSettings
