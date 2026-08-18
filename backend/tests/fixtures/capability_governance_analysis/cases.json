@@ -1,0 +1,6 @@
+{
+  "description": "Deterministic cross-domain analysis cases.",
+  "performance_descriptor_count": 267,
+  "max_candidates": 5000,
+  "max_subjects_per_finding": 20
+}
