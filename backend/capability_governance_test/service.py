@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
+import inspect
 from typing import Any
 
 from backend.capabilities.models_next import CapabilityBusinessError
@@ -19,6 +20,21 @@ _MAX_SEARCH = 200
 _MAX_GRAPH_DEPTH = 4
 _MAX_GRAPH_NODES = 500
 _PROMPT_READ_PERMISSION = "base.capability_repair_prompt.read"
+_DEFAULT_PORT = object()
+
+
+class _InlineGovernanceWorker:
+    """Deterministic local worker used only when no worker port is supplied.
+
+    Production/test deployments should inject :class:`LeasedGovernanceWorker`;
+    this adapter keeps direct unit calls executable while still running the
+    supplied callback instead of returning an accepted no-op.
+    """
+
+    @staticmethod
+    def run_once(kind: str, run_gid: str, execute: Callable[..., Any]) -> bool:
+        execute()
+        return True
 
 
 def _business_error(code: str) -> CapabilityBusinessError:
@@ -136,17 +152,22 @@ class CapabilityGovernanceService:
         store: Any | None = None,
         *,
         scanner: Any | None = None,
-        analysis_runner: Callable[..., Any] = run_deterministic_analysis,
+        analysis_runner: Callable[..., Any] | None | object = _DEFAULT_PORT,
+        test_runner: Any | None = None,
+        worker: Any | None | object = _DEFAULT_PORT,
         advisor: GovernanceAdvisorPort | None = None,
         audit_sink: Any | None = None,
         proposal_service: ProposalService | None = None,
         waiver_service: WaiverService | None = None,
         release_gate: ReleaseGate | None = None,
         release_evidence_port: Any | None = None,
+        workflow_port: Any | None = None,
     ) -> None:
         self._store = store
         self._scanner = scanner
-        self._analysis_runner = analysis_runner
+        self._analysis_runner = run_deterministic_analysis if analysis_runner is _DEFAULT_PORT else analysis_runner
+        self._test_runner = test_runner
+        self._worker = _InlineGovernanceWorker() if worker is _DEFAULT_PORT else worker
         self._advisor = advisor
         self._audit_sink = audit_sink
         self._runs: dict[tuple[str, str, str], GovernedRun] = {}
@@ -165,9 +186,23 @@ class CapabilityGovernanceService:
         # Gateway caller may identify a candidate, but cannot supply the
         # statuses, findings, approvals, or hashes that authorize a pass.
         self._release_evidence_port = release_evidence_port
+        # SQL snapshots survive a process restart, but the small workflow
+        # implementations are intentionally in-memory test components.  Do
+        # not let a persistent runtime silently report a mutation that would
+        # disappear on restart; the launcher must inject a workflow port.
+        self._workflow_port = workflow_port
+        self._workflow_persistence_required = bool(getattr(store, "persistent", False)) and workflow_port is None
+        if workflow_port is not None:
+            # A persistent adapter may expose the durable state machines
+            # directly.  Keeping this as a narrow port avoids coupling the
+            # service to a particular SQL driver or schema implementation.
+            self._proposals = getattr(workflow_port, "proposal_service", self._proposals)
+            self._waivers = getattr(workflow_port, "waiver_service", self._waivers)
         self._release_gate = release_gate or ReleaseGate(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,
         )
+        if workflow_port is not None:
+            self._release_gate = getattr(workflow_port, "release_gate", self._release_gate)
 
     def base_capability_registry_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         requested = payload.get("limit", _MAX_SEARCH)
@@ -246,15 +281,22 @@ class CapabilityGovernanceService:
             if callable(custom_loader):
                 findings = tuple(custom_loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_SEARCH]
             else:
-                analysis = self._analysis_runner(getattr(snapshot, "document"), AnalysisRequest())
+                if self._analysis_runner is None:
+                    raise _business_error("governance_dependency_unavailable")
+                analysis = self._invoke_port(
+                    self._analysis_runner, snapshot=snapshot, payload=payload, context=context,
+                    kind="analysis", run_gid=str(getattr(snapshot, "snapshot_gid")),
+                    request=AnalysisRequest(),
+                )
                 findings = self._finding_records(snapshot, getattr(analysis, "findings", ()))
         query = str(payload.get("query", "")).strip().lower()
         if query:
-            findings = tuple(item for item in findings if query in str(
-                getattr(item, "code", item.get("code", "") if isinstance(item, Mapping) else "")
-            ).lower() or query in str(
-                getattr(item, "fingerprint", item.get("fingerprint", "") if isinstance(item, Mapping) else "")
-            ).lower())
+            def field(item: Any, name: str) -> Any:
+                if isinstance(item, Mapping):
+                    return item.get(name, "")
+                return getattr(item, name, "")
+            findings = tuple(item for item in findings if query in str(field(item, "code")).lower()
+                             or query in str(field(item, "fingerprint")).lower())
         return self._completed("base.capability_finding.search", findings=tuple(findings[:limit]))
 
     def base_capability_analysis_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -265,24 +307,65 @@ class CapabilityGovernanceService:
         return self._completed("base.capability_analysis.get", run=run)
 
     def base_capability_analysis_run(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        return self._queue("base.capability_analysis.run", payload, context, kind="analysis")
+        return self._start_and_execute(
+            "base.capability_analysis.run", payload, context, kind="analysis",
+            runner=self._analysis_runner,
+        )
 
     def base_capability_repair_prompt_generate(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         snapshot = self._snapshot(payload)
+        # A target-only request remains a useful bounded discovery operation for
+        # the local acceptance probe, but it must not pretend that a prompt was
+        # generated.  A real prompt requires the structured candidate finding
+        # and evidence boundary below; arbitrary free-form prompt text is never
+        # accepted at this transport boundary.
+        if not all(field in payload for field in ("finding", "evidence", "boundary")):
+            return self._completed(
+                "base.capability_repair_prompt.generate", snapshot_gid=str(getattr(snapshot, "snapshot_gid")),
+                prompt_status="input_required",
+            )
+        finding = payload.get("finding")
+        evidence = payload.get("evidence")
+        boundary = payload.get("boundary")
+        if not isinstance(finding, Mapping) or not isinstance(evidence, Mapping) or not isinstance(boundary, Mapping):
+            raise _business_error("invalid_input")
+        prompt = self.generate_repair_prompt(
+            finding, evidence, {**boundary, "snapshot_gid": str(getattr(snapshot, "snapshot_gid"))},
+            context=context, request_id=str(payload.get("request_id", "repair-prompt")),
+        )
         return self._completed(
-            "base.capability_repair_prompt.generate", snapshot_gid=str(getattr(snapshot, "snapshot_gid")),
+            "base.capability_repair_prompt.generate",
+            snapshot_gid=str(getattr(snapshot, "snapshot_gid")),
+            prompt={"prompt_hash": prompt.prompt_hash, "redacted_summary": prompt.redacted_summary},
+            prompt_status="generated",
         )
 
     def base_capability_scan_run(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         self._idempotency(payload)
-        if self._scanner is not None:
-            self._scanner.scan(str(payload.get("code_revision", "")))
-        return self._accepted("base.capability_scan.run")
+        if self._scanner is None:
+            raise _business_error("governance_dependency_unavailable")
+        code_revision = _required_text(payload, "code_revision")
+        try:
+            document = self._scanner.scan(code_revision)
+            snapshot = self._persist_scanned_snapshot(document)
+        except CapabilityBusinessError:
+            raise
+        except Exception as exc:
+            raise _business_error("governance_dependency_unavailable") from exc
+        return self._completed(
+            "base.capability_scan.run",
+            snapshot_gid=str(getattr(snapshot, "snapshot_gid")),
+            scan_run_gid=str(getattr(snapshot, "scan_run_gid", "")),
+        )
 
     def base_capability_test_run(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        return self._queue("base.capability_test.run", payload, context, kind="test")
+        return self._start_and_execute(
+            "base.capability_test.run", payload, context, kind="test",
+            runner=self._test_runner,
+        )
 
     def base_capability_proposal_submit(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        self._require_workflow_persistence()
         key = self._idempotency(payload)
         try:
             if payload.get("proposal_gid") is not None or payload.get("target_gid") is not None:
@@ -315,6 +398,7 @@ class CapabilityGovernanceService:
         return self._accepted("base.capability_proposal.submit", proposal=proposal)
 
     def base_capability_review_decide(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        self._require_workflow_persistence()
         key = self._idempotency(payload)
         reviewer = ReviewerContext(
             gid=_mutation_actor(context),
@@ -337,6 +421,7 @@ class CapabilityGovernanceService:
         return self._accepted("base.capability_review.decide", proposal=proposal)
 
     def base_capability_waiver_grant(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        self._require_workflow_persistence()
         key = self._idempotency(payload)
         try:
             waiver = self._waivers.grant(
@@ -357,6 +442,7 @@ class CapabilityGovernanceService:
         return self._accepted("base.capability_waiver.grant", waiver=waiver)
 
     def base_capability_waiver_revoke(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        self._require_workflow_persistence()
         key = self._idempotency(payload)
         try:
             waiver = self._waivers.revoke(
@@ -372,6 +458,7 @@ class CapabilityGovernanceService:
         return self._accepted("base.capability_waiver.revoke", waiver=waiver)
 
     def base_capability_release_gate_evaluate(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
+        self._require_workflow_persistence()
         key = self._idempotency(payload)
         candidate = self._release_candidate(payload)
         evidence = self._load_release_evidence(candidate, payload)
@@ -532,7 +619,12 @@ class CapabilityGovernanceService:
     def run_analysis(self, snapshot_gid: str | int) -> Any:
         """Execute only the snapshot that was pinned when the run was queued."""
         snapshot = self._snapshot({"target_gid": str(snapshot_gid)})
-        return self._analysis_runner(getattr(snapshot, "document"), AnalysisRequest())
+        if self._analysis_runner is None:
+            raise _business_error("governance_dependency_unavailable")
+        return self._invoke_port(
+            self._analysis_runner, snapshot=snapshot, payload={}, context=None,
+            kind="analysis", run_gid=str(snapshot_gid), request=AnalysisRequest(),
+        )
 
     async def review_advisory(self, package: Mapping[str, Any], *, context: object, request_id: str) -> Any:
         """Request non-authoritative advice and retain only audit-safe metadata."""
@@ -585,6 +677,150 @@ class CapabilityGovernanceService:
         """Return persistence-safe prompt metadata only, never repair text."""
         return {key: dict(value) for key, value in self._prompt_records.items()}
 
+    def _start_and_execute(
+        self,
+        capability_id: str,
+        payload: Mapping[str, Any],
+        context: object,
+        *,
+        kind: str,
+        runner: Any | None,
+    ) -> dict[str, Any]:
+        """Pin a snapshot and execute through the service-owned worker port.
+
+        Governance operations must never return an accepted no-op.  The test
+        profile may provide either the leased worker facade (``run_once``) or a
+        queue adapter (``submit``/``enqueue``); without both a caller receives a
+        dependency error and no run record is created.
+        """
+        if runner is None or self._worker is None:
+            raise _business_error("governance_dependency_unavailable")
+        key = self._idempotency(payload)
+        snapshot = self._snapshot(payload)
+        snapshot_gid = str(getattr(snapshot, "snapshot_gid"))
+        run_key = (kind, snapshot_gid, key)
+        run = self._runs.get(run_key)
+        if run is not None:
+            return self._accepted(
+                capability_id, run_gid=run.run_gid, snapshot_gid=run.snapshot_gid,
+                run_status=run.status,
+            )
+        run = GovernedRun(str(self._next_run_gid), snapshot_gid, kind, _context_user(context), key)
+        self._next_run_gid += 1
+        self._runs[run_key] = run
+
+        def execute(heartbeat: Any | None = None) -> Any:
+            return self._invoke_port(
+                runner, snapshot=snapshot, payload=payload, context=context,
+                kind=kind, run_gid=run.run_gid, request=AnalysisRequest(),
+                heartbeat=heartbeat,
+            )
+
+        try:
+            completed = self._run_worker(kind, run.run_gid, execute)
+        except CapabilityBusinessError:
+            self._runs[run_key] = replace(run, status="failed")
+            raise
+        except Exception as exc:
+            self._runs[run_key] = replace(run, status="failed")
+            raise _business_error("governance_dependency_unavailable") from exc
+        if completed is False:
+            self._runs[run_key] = replace(run, status="failed")
+            raise _business_error("governance_worker_failed")
+        status = "completed" if completed is True else "queued"
+        self._runs[run_key] = replace(run, status=status)
+        return self._accepted(
+            capability_id, run_gid=run.run_gid, snapshot_gid=run.snapshot_gid,
+            run_status=status,
+        )
+
+    def _run_worker(self, kind: str, run_gid: str, execute: Callable[..., Any]) -> bool | None:
+        worker = self._worker
+        run_once = getattr(worker, "run_once", None)
+        if callable(run_once):
+            result = run_once(kind, run_gid, execute)
+            return bool(result)
+        for method_name in ("submit", "enqueue", "start"):
+            submit = getattr(worker, method_name, None)
+            if callable(submit):
+                result = submit(kind, run_gid, execute)
+                # Queue adapters may return an operation reference or None;
+                # only an explicit False is a failed submission.
+                return False if result is False else None
+        if callable(worker):
+            result = worker(kind, run_gid, execute)
+            return False if result is False else (True if result is True else None)
+        raise _business_error("governance_dependency_unavailable")
+
+    @staticmethod
+    def _invoke_port(
+        port: Any,
+        *,
+        snapshot: Any,
+        payload: Mapping[str, Any],
+        context: object | None,
+        kind: str,
+        run_gid: str,
+        request: Any,
+        heartbeat: Any | None = None,
+    ) -> Any:
+        """Call a bounded injected port without allowing arbitrary arguments."""
+        method = port
+        for name in ("run", "execute", "invoke"):
+            candidate = getattr(port, name, None)
+            if callable(candidate):
+                method = candidate
+                break
+        if not callable(method):
+            raise _business_error("governance_dependency_unavailable")
+        try:
+            signature = inspect.signature(method)
+        except (TypeError, ValueError) as exc:
+            raise _business_error("governance_dependency_unavailable") from exc
+        values = {
+            # The historical analysis port consumes the immutable document;
+            # a port that needs persistence metadata can request the explicit
+            # ``snapshot_record`` name instead.
+            "snapshot": getattr(snapshot, "document", snapshot),
+            "snapshot_record": snapshot,
+            "document": getattr(snapshot, "document", None),
+            "payload": payload,
+            "context": context,
+            "kind": kind,
+            "run_gid": run_gid,
+            "request": request,
+            "heartbeat": heartbeat,
+        }
+        kwargs: dict[str, Any] = {}
+        positional: list[Any] = []
+        has_var_kwargs = any(item.kind == inspect.Parameter.VAR_KEYWORD for item in signature.parameters.values())
+        for parameter in signature.parameters.values():
+            if parameter.kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD):
+                continue
+            if parameter.name in values:
+                if parameter.kind == inspect.Parameter.POSITIONAL_ONLY:
+                    positional.append(values[parameter.name])
+                else:
+                    kwargs[parameter.name] = values[parameter.name]
+            elif parameter.default is inspect.Parameter.empty:
+                raise _business_error("governance_dependency_unavailable")
+        if has_var_kwargs:
+            for name, value in values.items():
+                kwargs.setdefault(name, value)
+        return method(*positional, **kwargs)
+
+    def _persist_scanned_snapshot(self, document: Any) -> Any:
+        if self._store is None:
+            raise _business_error("governance_dependency_unavailable")
+        for method_name in ("import_snapshot", "save_snapshot"):
+            persist = getattr(self._store, method_name, None)
+            if callable(persist):
+                snapshot = persist(document)
+                if snapshot is None:
+                    raise _business_error("governance_dependency_unavailable")
+                return snapshot
+        raise _business_error("governance_dependency_unavailable")
+
     def _queue(self, capability_id: str, payload: Mapping[str, Any], context: object, *, kind: str) -> dict[str, Any]:
         key = self._idempotency(payload)
         snapshot = self._snapshot(payload)
@@ -613,20 +849,27 @@ class CapabilityGovernanceService:
     def _entries(self) -> tuple[Any, ...]:
         if self._store is None:
             return ()
-        snapshots = getattr(self._store, "_snapshots", {})
+        entries_loader = getattr(self._store, "list_entries", None)
+        if callable(entries_loader):
+            return tuple(entries_loader())
+        # Compatibility for legacy unit-test doubles.  Production stores are
+        # required to implement GovernanceStore.list_entries and therefore do
+        # not expose or depend on a private snapshot dictionary.
+        snapshots = getattr(self._store, "_snapshots", None)
         if isinstance(snapshots, Mapping):
             return tuple(entry for snapshot in snapshots.values() for entry in getattr(snapshot, "entries", ()))
-        snapshot = getattr(self._store, "latest_snapshot", lambda: None)()
-        return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+        return ()
 
     def _latest_snapshot(self) -> Any | None:
         if self._store is None:
             return None
-        snapshots = getattr(self._store, "_snapshots", {})
-        if isinstance(snapshots, Mapping) and snapshots:
-            return snapshots[max(snapshots)]
         loader = getattr(self._store, "latest_snapshot", None)
-        return loader() if callable(loader) else None
+        if callable(loader):
+            return loader()
+        # Compatibility for legacy unit-test doubles; never used by the
+        # Memory/SQL GovernanceStore implementations.
+        snapshots = getattr(self._store, "_snapshots", None)
+        return snapshots[max(snapshots)] if isinstance(snapshots, Mapping) and snapshots else None
 
     def _finding_records(self, snapshot: Any, findings: Any) -> tuple[dict[str, Any], ...]:
         """Project deterministic candidates into read-only, UI-safe records."""
@@ -711,6 +954,10 @@ class CapabilityGovernanceService:
         if not value:
             raise _business_error("idempotency_conflict")
         return value
+
+    def _require_workflow_persistence(self) -> None:
+        if self._workflow_persistence_required:
+            raise _business_error("governance_persistence_unavailable")
 
     @staticmethod
     def _completed(capability_id: str, **data: Any) -> dict[str, Any]:

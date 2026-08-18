@@ -71,12 +71,135 @@ def _subjects(left: ScannedCapability, right: ScannedCapability) -> tuple[Findin
     )))  # type: ignore[return-value]
 
 
+def _subject(capability: ScannedCapability, role: str = "capability") -> FindingSubject:
+    return FindingSubject(
+        capability.capability_id, capability.major_version, role,
+        f"capability:{capability.capability_id}@{capability.major_version}",
+    )
+
+
+def _pair_key(capability: ScannedCapability) -> tuple[str, str]:
+    return (_business_object(capability), _operation_family(capability))
+
+
+def _has_lifecycle_pair(capability: ScannedCapability, capabilities: tuple[ScannedCapability, ...]) -> bool:
+    descriptor = capability.descriptor
+    required = descriptor.get("requires_lifecycle_pair", descriptor.get("lifecycle_pair_required", False))
+    if not isinstance(required, bool) or not required:
+        return True
+    pair = descriptor.get("lifecycle_pair")
+    if isinstance(pair, str) and pair.strip():
+        pair_names = {pair.strip().lower()}
+    elif isinstance(pair, (tuple, list, set, frozenset)):
+        pair_names = {str(value).strip().lower() for value in pair if str(value).strip()}
+    else:
+        pair_names = {"get", "list", "search"} if _operation_family(capability) in {"create", "update", "delete"} else {"create", "update"}
+    business_object = _business_object(capability)
+    return any(
+        other is not capability and _business_object(other) == business_object
+        and _operation_family(other) in pair_names
+        for other in capabilities
+    )
+
+
+def _structural_findings(snapshot: SnapshotDocument) -> tuple[FindingCandidate, ...]:
+    """Return deterministic candidate classes not tied to implementation rules.
+
+    These are deliberately conservative: semantic evidence is derived only
+    from declared descriptor fields, never from names alone beyond the
+    normalized business object/operation family already declared by a
+    descriptor.  The same candidate is fingerprint-deduplicated below.
+    """
+    capabilities = tuple(sorted(snapshot.capabilities, key=lambda item: (item.capability_id, item.major_version)))
+    findings: list[FindingCandidate] = []
+    by_pair: dict[tuple[str, str], list[ScannedCapability]] = defaultdict(list)
+    for capability in capabilities:
+        by_pair[_pair_key(capability)].append(capability)
+
+    for values in by_pair.values():
+        for offset, left in enumerate(values):
+            for right in values[offset + 1:]:
+                if left.owner_domain == right.owner_domain:
+                    continue
+                subjects = _subjects(left, right)
+                evidence = tuple(subject.evidence_key for subject in subjects)
+                same_contract = (
+                    left.input_schema_hash == right.input_schema_hash
+                    and left.output_schema_hash == right.output_schema_hash
+                    and left.error_schema_hash == right.error_schema_hash
+                    and left.semantic_class == right.semantic_class
+                )
+                if same_contract and left.policy_hash == right.policy_hash:
+                    findings.append(FindingCandidate(
+                        "duplicate", "warning", subjects, evidence,
+                        "cross_domain_duplicate_boundary",
+                    ))
+                else:
+                    findings.append(FindingCandidate(
+                        "semantic_overlap", "warning", subjects, evidence,
+                        "cross_domain_semantic_boundary",
+                    ))
+                if left.policy_hash != right.policy_hash:
+                    findings.append(FindingCandidate(
+                        "cross_domain_conflict", "blocking", subjects, evidence,
+                        "cross_domain_policy_boundary",
+                    ))
+
+    for capability in capabilities:
+        descriptor = capability.descriptor
+        # A missing provider is already a blocking release rule; this compact
+        # candidate alias is what Agent advisory contracts consume as a gap.
+        # It is generated only from an explicit provider binding check here so
+        # the result cannot be forged by an advisory model.
+        provider_bound = any(
+            binding.capability_id == capability.capability_id
+            and binding.major_version == capability.major_version
+            and binding.binding_type == "implemented_by"
+            for binding in snapshot.bindings
+        )
+        if not provider_bound:
+            findings.append(FindingCandidate(
+                "gap", "blocking", (_subject(capability),),
+                (f"capability:{capability.capability_id}@{capability.major_version}",),
+                "capability_implementation_boundary",
+            ))
+        if not _has_lifecycle_pair(capability, capabilities):
+            findings.append(FindingCandidate(
+                "lifecycle_pair_gap", "warning", (_subject(capability),),
+                (f"capability:{capability.capability_id}@{capability.major_version}",),
+                "capability_lifecycle_boundary",
+            ))
+        provider_keys = tuple(
+            binding.node_canonical_key for binding in snapshot.bindings
+            if binding.capability_id == capability.capability_id
+            and binding.major_version == capability.major_version
+            and binding.binding_type == "implemented_by"
+        )
+        facade = bool(descriptor.get("facade") or descriptor.get("aggregate_facade") or descriptor.get("non_atomic_facade"))
+        if facade and len(provider_keys) > 1:
+            nodes = {node.canonical_key: node for node in snapshot.nodes}
+            transactional = any(
+                bool(nodes.get(key) and (nodes[key].metadata.get("transactional") or nodes[key].metadata.get("transaction_participant")))
+                for key in provider_keys
+            )
+            if not transactional:
+                subjects = tuple(sorted((_subject(capability),) + tuple(
+                    FindingSubject("", 0, "provider", key) for key in provider_keys
+                )))
+                findings.append(FindingCandidate(
+                    "non_atomic_facade", "blocking", subjects,
+                    tuple([f"capability:{capability.capability_id}@{capability.major_version}", *provider_keys]),
+                    "facade_transaction_boundary",
+                ))
+    return tuple(sorted(set(findings), key=lambda item: (item.code, item.fingerprint)))
+
+
 def _semantic_findings(snapshot: SnapshotDocument, request: AnalysisRequest) -> tuple[str, tuple[FindingCandidate, ...], int, int]:
     if request.max_candidates < 0 or request.max_candidates > _MAX_CANDIDATES or request.max_subjects_per_finding < 1 or request.max_subjects_per_finding > _MAX_SUBJECTS_PER_FINDING:
         return "analysis_budget_exceeded", (), 0, 0
-    blocks: dict[tuple[str, str, tuple[str, str, str], str, str, str], list[ScannedCapability]] = defaultdict(list)
+    blocks: dict[tuple[str, str], list[ScannedCapability]] = defaultdict(list)
     for capability in sorted(snapshot.capabilities, key=lambda item: (item.capability_id, item.major_version)):
-        blocks[_semantic_block(capability)].append(capability)
+        blocks[_pair_key(capability)].append(capability)
     candidates = 0
     operations = 0
     findings: list[FindingCandidate] = []
@@ -92,6 +215,18 @@ def _semantic_findings(snapshot: SnapshotDocument, request: AnalysisRequest) -> 
                 subjects = _subjects(left, right)
                 if len(subjects) > request.max_subjects_per_finding:
                     return "analysis_budget_exceeded", (), candidates, operations
+                same_contract = (
+                    left.input_schema_hash == right.input_schema_hash
+                    and left.output_schema_hash == right.output_schema_hash
+                    and left.error_schema_hash == right.error_schema_hash
+                    and left.semantic_class == right.semantic_class
+                )
+                if same_contract and left.policy_hash == right.policy_hash:
+                    code, severity, boundary = "duplicate", "warning", "cross_domain_duplicate_boundary"
+                else:
+                    code, severity, boundary = "semantic_overlap", "warning", "cross_domain_semantic_boundary"
+                findings.append(FindingCandidate(code, severity, subjects,
+                    tuple(subject.evidence_key for subject in subjects), boundary))
                 if left.policy_hash != right.policy_hash:
                     findings.append(FindingCandidate("cross_domain_conflict", "blocking", subjects,
                         tuple(subject.evidence_key for subject in subjects), "cross_domain_policy_boundary"))
@@ -105,6 +240,7 @@ def run_deterministic_analysis(snapshot: SnapshotDocument, request: AnalysisRequ
     if status != "ok":
         return AnalysisResult(status, (), candidates, operations)
     findings = [finding for rule in RULES for finding in rule(snapshot, graph)]
+    findings.extend(_structural_findings(snapshot))
     findings.extend(semantic)
     bounded = tuple(sorted(set(findings), key=lambda item: (item.code, item.fingerprint)))
     if any(len(finding.subjects) > request.max_subjects_per_finding for finding in bounded):

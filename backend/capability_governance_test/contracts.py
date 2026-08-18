@@ -49,7 +49,7 @@ _VERSION_SCHEMA = {"type": "string", "minLength": 1, "maxLength": 255}
 _SMALL_STRING_SCHEMA = {"type": "string", "minLength": 1, "maxLength": 255}
 _BOOLEAN_SCHEMA = {"type": "boolean"}
 _RESPONSE_GID_FIELDS = (
-    "capability_version_gid", "snapshot_gid", "run_gid", "proposal_gid",
+    "capability_version_gid", "snapshot_gid", "scan_run_gid", "run_gid", "proposal_gid",
     "waiver_gid", "release_report_gid",
 )
 
@@ -85,6 +85,9 @@ def _input_schema(capability_id: str) -> dict[str, object]:
         "base.capability_test.run",
     }:
         required = tuple(sorted(set(required) | {"target_gid"}))
+    if capability_id == "base.capability_scan.run":
+        properties["code_revision"] = _VERSION_SCHEMA
+        required = tuple(sorted(set(required) | {"code_revision"}))
     if capability_id in {"base.capability_review.decide", "base.capability_waiver.revoke"}:
         properties.update({"row_version": _VERSION_SCHEMA, "expected_resource_version": _VERSION_SCHEMA})
     # These are intentionally explicit rather than accepting an open-ended
@@ -140,6 +143,16 @@ def _input_schema(capability_id: str) -> dict[str, object]:
             "findings": _BOUNDED_COLLECTION_SCHEMA,
             "waivers": _BOUNDED_COLLECTION_SCHEMA,
             "now": _SMALL_STRING_SCHEMA,
+        })
+    elif capability_id == "base.capability_repair_prompt.generate":
+        # The prompt is generated from a bounded candidate finding and fixed
+        # evidence/change-boundary maps.  No free-form model prompt or source
+        # text crosses the Gateway.
+        properties.update({
+            "finding": _BOUNDED_OBJECT_SCHEMA,
+            "evidence": _BOUNDED_OBJECT_SCHEMA,
+            "boundary": _BOUNDED_OBJECT_SCHEMA,
+            "request_id": _SMALL_STRING_SCHEMA,
         })
     return _closed(properties, required)
 
@@ -197,6 +210,10 @@ _RUN_SCHEMA = _closed({
     "status": _SMALL_STRING_SCHEMA,
 }, ("run_gid", "snapshot_gid", "kind", "status"))
 _SNAPSHOT_SCHEMA = _closed({"snapshot_gid": GID_SCHEMA, "snapshot_hash": _SMALL_STRING_SCHEMA})
+_PROMPT_SCHEMA = _closed({
+    "prompt_hash": _VERSION_SCHEMA,
+    "redacted_summary": {"type": "string", "minLength": 1, "maxLength": 4000},
+}, ("prompt_hash", "redacted_summary"))
 _PROPOSAL_SCHEMA = _closed({
     "proposal_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
     "row_version": _VERSION_SCHEMA,
@@ -237,7 +254,11 @@ def _output_schema(capability_id: str) -> dict[str, object]:
     elif capability_id in {"base.capability_analysis.run", "base.capability_test.run", "base.capability_analysis.get"}:
         properties["run"] = _RUN_SCHEMA
     elif capability_id == "base.capability_repair_prompt.generate":
-        properties["snapshot"] = _SNAPSHOT_SCHEMA
+        properties.update({
+            "snapshot": _SNAPSHOT_SCHEMA,
+            "prompt_status": {"type": "string", "enum": ["input_required", "generated"]},
+            "prompt": _PROMPT_SCHEMA,
+        })
     elif capability_id in {"base.capability_proposal.submit", "base.capability_review.decide"}:
         properties["proposal"] = _PROPOSAL_SCHEMA
     elif capability_id in {"base.capability_waiver.grant", "base.capability_waiver.revoke"}:

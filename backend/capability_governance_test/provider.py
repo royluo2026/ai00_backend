@@ -106,7 +106,7 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
         if field in result:
             response[field] = _bounded_collection(result[field])
     for field in (
-        "capability_version_gid", "snapshot_gid", "run_gid", "proposal_gid",
+        "capability_version_gid", "snapshot_gid", "scan_run_gid", "run_gid", "proposal_gid",
         "waiver_gid", "release_report_gid",
     ):
         if result.get(field) is not None:
@@ -154,8 +154,17 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
             run = {"run_gid": result.get("run_gid"), "snapshot_gid": result.get("snapshot_gid"), "kind": result.get("kind", "analysis"), "status": result.get("run_status", "queued")}
         if run is not None:
             response["run"] = _projection(run, ("run_gid", "snapshot_gid", "kind", "status"))
-    elif capability_id == "base.capability_repair_prompt.generate" and result.get("snapshot_gid") is not None:
-        response["snapshot"] = {"snapshot_gid": str(result["snapshot_gid"])}
+    elif capability_id == "base.capability_repair_prompt.generate":
+        if result.get("snapshot_gid") is not None:
+            response["snapshot"] = {
+                "snapshot_gid": str(result["snapshot_gid"]),
+                **({"snapshot_hash": str(result["snapshot_hash"])} if result.get("snapshot_hash") else {}),
+            }
+        if result.get("prompt_status") is not None:
+            response["prompt_status"] = str(result["prompt_status"])
+        prompt = result.get("prompt")
+        if isinstance(prompt, Mapping):
+            response["prompt"] = _projection(prompt, ("prompt_hash", "redacted_summary"))
     elif capability_id in {"base.capability_proposal.submit", "base.capability_review.decide"}:
         proposal = result.get("proposal")
         if proposal is not None:
