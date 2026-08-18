@@ -14,6 +14,7 @@ App Secret 只在这里，永远不序列化到任何响应体。
 import os
 import json
 import logging
+from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
 from urllib.parse import quote
@@ -21,6 +22,7 @@ from urllib.parse import quote
 from urllib.parse import quote
 
 from dotenv import load_dotenv
+from backend.capability_governance_test.config import GovernanceSettings
 
 _log = logging.getLogger(__name__)
 
@@ -277,3 +279,10 @@ class Settings:
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def get_governance_settings(
+    environ: Mapping[str, str] | None = None,
+) -> GovernanceSettings:
+    """Load the separate fail-closed settings for test-governance tooling."""
+    return GovernanceSettings.from_environ(os.environ if environ is None else environ)

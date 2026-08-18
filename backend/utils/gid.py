@@ -8,15 +8,14 @@ backend/utils/gid.py
 
 起始时间戳：2025-01-01 00:00:00 UTC
 """
+import os
 import time
 import threading
+from collections.abc import Mapping
 from typing import Final
 
 
 class SnowflakeGID:
-    _instance: "SnowflakeGID" = None
-    _lock: threading.Lock = threading.Lock()
-
     EPOCH: Final[int] = 1735689600000
     SEQUENCE_BITS: Final[int] = 12
     MACHINE_ID_BITS: Final[int] = 10
@@ -25,23 +24,13 @@ class SnowflakeGID:
     MACHINE_ID_SHIFT: Final[int] = SEQUENCE_BITS
     TIMESTAMP_SHIFT: Final[int] = SEQUENCE_BITS + MACHINE_ID_BITS
 
-    def __new__(cls, machine_id: int = 1) -> "SnowflakeGID":
-        if not cls._instance:
-            with cls._lock:
-                if not cls._instance:
-                    cls._instance = super().__new__(cls)
-        return cls._instance
-
     def __init__(self, machine_id: int = 1):
-        if hasattr(self, '_initialized'):
-            return
         if machine_id < 0 or machine_id > self.MAX_MACHINE_ID:
             raise ValueError(f"机器ID必须在 0 ~ {self.MAX_MACHINE_ID} 之间")
         self.machine_id: int = machine_id
         self.last_timestamp: int = -1
         self.sequence: int = 0
         self._thread_lock: threading.Lock = threading.Lock()
-        self._initialized: bool = True
 
     def _get_current_timestamp(self) -> int:
         return int(time.time() * 1000)
@@ -72,7 +61,47 @@ class SnowflakeGID:
             return new_id
 
 
-gid_generator: SnowflakeGID = SnowflakeGID(machine_id=1)
-next_gid = gid_generator.next_id
+def machine_id_from_environment(environ: Mapping[str, str]) -> int:
+    profile = str(environ.get("AI00_DEPLOYMENT_PROFILE", "local")).strip()
+    raw = str(environ.get("AI00_GID_MACHINE_ID", "")).strip()
+    if not raw and profile in {"test-governance", "production"}:
+        raise RuntimeError("AI00_GID_MACHINE_ID is required")
+    try:
+        machine_id = int(raw or "1")
+    except ValueError as exc:
+        raise RuntimeError("AI00_GID_MACHINE_ID must be in 0..1023") from exc
+    if not 0 <= machine_id <= SnowflakeGID.MAX_MACHINE_ID:
+        raise RuntimeError("AI00_GID_MACHINE_ID must be in 0..1023")
+    return machine_id
 
-__all__ = ["next_gid", "gid_generator", "SnowflakeGID"]
+
+def gid_to_json(value: int) -> str:
+    if not 0 < value < 2**63:
+        raise ValueError("gid_out_of_signed_bigint_range")
+    return str(value)
+
+
+def configure_gid_generator(machine_id: int) -> SnowflakeGID:
+    """Configure the module default without sharing ordinary generator instances."""
+    global gid_generator
+    gid_generator = SnowflakeGID(machine_id=machine_id)
+    return gid_generator
+
+
+def next_gid() -> int:
+    """Return an ID from the process-level configured generator."""
+    return gid_generator.next_id()
+
+
+gid_generator: SnowflakeGID = SnowflakeGID(
+    machine_id=machine_id_from_environment(os.environ)
+)
+
+__all__ = [
+    "SnowflakeGID",
+    "configure_gid_generator",
+    "gid_generator",
+    "gid_to_json",
+    "machine_id_from_environment",
+    "next_gid",
+]
