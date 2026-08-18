@@ -320,7 +320,15 @@ def _permission_evidence() -> dict[str, Any]:
 
     registry = CapabilityRegistry()
     register_governance_capabilities(
-        registry, CapabilityGovernanceService(store=AcceptanceStore()),
+        # The delegated analysis call must execute an explicit runner.  The
+        # acceptance fixture deliberately supplies a bounded no-finding runner
+        # because its store only pins identity metadata; this is still a real
+        # provider invocation, never the historical accepted no-op path.
+        registry,
+        CapabilityGovernanceService(
+            store=AcceptanceStore(),
+            analysis_runner=lambda document, request: SimpleNamespace(findings=()),
+        ),
     )
     expected = {
         **{identifier: ("system.capability.read",) for identifier in READ_IDS},
@@ -418,7 +426,11 @@ def _delegation_evidence() -> dict[str, Any]:
 
     registry = CapabilityRegistry()
     register_governance_capabilities(
-        registry, CapabilityGovernanceService(store=AcceptanceStore()),
+        registry,
+        CapabilityGovernanceService(
+            store=AcceptanceStore(),
+            analysis_runner=lambda document, request: SimpleNamespace(findings=()),
+        ),
     )
 
     def authorize(token: str, capability_id: str, payload: dict[str, Any]):
