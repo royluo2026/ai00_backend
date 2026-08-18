@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 import pytest
 
@@ -98,3 +99,69 @@ def test_waiver_and_release_handlers_fail_closed_on_expiry_and_missing_approvals
 
     assert missing_evidence["release"].conclusion == "fail"
     assert "missing_required_data" in missing_evidence["release"].blockers
+
+
+def test_release_handler_does_not_accept_caller_supplied_green_evidence_without_authoritative_loader():
+    service = CapabilityGovernanceService(
+        release_gate=ReleaseGate(
+            next_gid=iter(range(500, 600)).__next__, signer=lambda _payload: "signature", signing_key_id="test-key",
+        ),
+    )
+
+    result = service.base_capability_release_gate_evaluate({
+        "code_revision": "rev-forged", "product_catalog_release_id": "catalog-forged",
+        "snapshot_gid": "101", "test_run_gid": "201", "available": True,
+        "test_status": "passed", "findings": (), "stale_evidence": False,
+        "waivers": (), "approvals_complete": True, "data_complete": True,
+        "evidence_hash": "sha256:forged", "idempotency_key": "release-forged",
+    }, _context(user_gid="attacker"))
+
+    assert result["release"].conclusion == "fail"
+    assert "governance_dependency_unavailable" in result["release"].blockers
+
+
+def test_release_handler_uses_authoritative_pinned_evidence_instead_of_caller_statuses():
+    class Store:
+        def get_snapshot(self, snapshot_gid):
+            if int(snapshot_gid) != 101:
+                return None
+            return SimpleNamespace(
+                snapshot_gid=101,
+                document=SimpleNamespace(
+                    code_revision="rev-authoritative", product_release_id="catalog-authoritative",
+                    snapshot_hash="sha256:snapshot",
+                ),
+            )
+
+    class Authority:
+        def resolve_test_run_gid(self, snapshot):
+            assert snapshot.snapshot_gid == 101
+            return 201
+
+        def load_release_evidence(self, candidate, snapshot):
+            assert candidate.snapshot_gid == 101
+            assert snapshot.snapshot_gid == 101
+            return {
+                "snapshot_gid": 101, "test_run_gid": 201,
+                "code_revision": "rev-authoritative", "product_catalog_release_id": "catalog-authoritative",
+                "snapshot_hash": "sha256:snapshot", "test_status": "failed",
+                "findings": (), "stale_evidence": False, "waivers": (),
+                "approvals_complete": True, "data_complete": True,
+                "evidence_hash": "sha256:authoritative",
+            }
+
+    service = CapabilityGovernanceService(
+        Store(), release_evidence_port=Authority(),
+        release_gate=ReleaseGate(
+            next_gid=iter(range(600, 700)).__next__, signer=lambda _payload: "signature", signing_key_id="test-key",
+        ),
+    )
+    result = service.base_capability_release_gate_evaluate({
+        "target_gid": "101", "available": True,
+        "test_status": "passed", "findings": (), "stale_evidence": False,
+        "waivers": (), "approvals_complete": True, "data_complete": True,
+        "evidence_hash": "sha256:forged", "idempotency_key": "release-authoritative",
+    }, _context(user_gid="releaser"))
+
+    assert result["release"].conclusion == "fail"
+    assert "required_test_not_passed" in result["release"].blockers
