@@ -98,7 +98,7 @@ def test_catalog_rejects_new_stable_unbounded_collection_with_json_path():
     })
 
     with pytest.raises(ValueError, match=r"craft\.routing\.search@1.*output_schema\.data\.items"):
-        build_release([unbounded])
+        build_release([unbounded], enforce_collection_boundaries=True)
 
     bounded_schema = unbounded.model_copy(update={
         "output_schema": {
@@ -118,7 +118,9 @@ def test_catalog_rejects_new_stable_unbounded_collection_with_json_path():
             "additionalProperties": False,
         },
     })
-    assert build_release([bounded_schema]).descriptor("craft.routing.search", 1)
+    assert build_release(
+        [bounded_schema], enforce_collection_boundaries=True,
+    ).descriptor("craft.routing.search", 1)
 
     paged = unbounded.model_copy(update={
         "execution_budget": ExecutionBudget(collection_policy="paged", max_page_size=100),
@@ -126,8 +128,8 @@ def test_catalog_rejects_new_stable_unbounded_collection_with_json_path():
     artifact = unbounded.model_copy(update={
         "execution_budget": ExecutionBudget(collection_policy="artifact"),
     })
-    assert build_release([paged]).descriptor("craft.routing.search", 1)
-    assert build_release([artifact]).descriptor("craft.routing.search", 1)
+    assert build_release([paged], enforce_collection_boundaries=True).descriptor("craft.routing.search", 1)
+    assert build_release([artifact], enforce_collection_boundaries=True).descriptor("craft.routing.search", 1)
 
 
 def test_catalog_requires_explicit_grandfathering_for_existing_unbounded_stable_path():
@@ -145,6 +147,7 @@ def test_catalog_requires_explicit_grandfathering_for_existing_unbounded_stable_
         grandfathered_unbounded_paths={
             ("craft.routing.search", 1, "output_schema.items"),
         },
+        enforce_collection_boundaries=True,
     )
 
     assert release.descriptor("craft.routing.search", 1) == legacy

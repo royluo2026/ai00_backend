@@ -151,6 +151,7 @@ def build_release(
     *,
     created_at: datetime | None = None,
     grandfathered_unbounded_paths: set[tuple[str, int, str]] | None = None,
+    enforce_collection_boundaries: bool = False,
 ) -> CatalogRelease:
     ordered_descriptors = tuple(sorted(descriptors, key=lambda item: (item.id, item.major_version)))
     ordered_providers = tuple(sorted(
@@ -163,9 +164,10 @@ def build_release(
     provider_ids = [item.plugin_id for item in ordered_providers]
     if len(provider_ids) != len(set(provider_ids)):
         raise ValueError("duplicate provider in catalog release")
-    _validate_collection_boundaries(
-        ordered_descriptors, set(grandfathered_unbounded_paths or ()),
-    )
+    if enforce_collection_boundaries:
+        _validate_collection_boundaries(
+            ordered_descriptors, set(grandfathered_unbounded_paths or ()),
+        )
     digest = hashlib.sha256(canonical_catalog_bytes(ordered_descriptors, ordered_providers)).hexdigest()
     return CatalogRelease(
         release_id=f"rel_{digest[:32]}",

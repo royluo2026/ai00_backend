@@ -51,6 +51,7 @@ def current_release() -> CatalogRelease:
         descriptors,
         _providers(),
         grandfathered_unbounded_paths=grandfathered,
+        enforce_collection_boundaries=True,
     )
 
 
