@@ -6,12 +6,13 @@ BOP 条目树 CRUD + import-tc + auto-link + entry-links CRUD + link-summary + e
 import base64 as _b64
 import json
 import logging
+import threading
 import traceback
 import uuid as _uuid
 from datetime import datetime, date
 from typing import Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel
 
 from ...data.connection import get_conn
@@ -31,10 +32,26 @@ from ._helpers import (
     _sync_child_vpps,
     _do_copy, _check_auto_link_rules,
     _get_line_gid, _log_entry_op, _check_line_editable,
+    legacy_entries_max_from_env,
 )
 from . import _history
 
 _log = logging.getLogger(__name__)
+
+_LEGACY_ENTRIES_MAX = legacy_entries_max_from_env()
+_LEGACY_ENTRIES_USAGE = {"served": 0, "rejected": 0}
+_LEGACY_ENTRIES_USAGE_LOCK = threading.Lock()
+
+
+def _record_legacy_entries_usage(outcome: str) -> None:
+    with _LEGACY_ENTRIES_USAGE_LOCK:
+        _LEGACY_ENTRIES_USAGE[outcome] += 1
+
+
+def legacy_entries_usage_snapshot() -> dict[str, int]:
+    """Return process-local aggregate migration counters without request labels."""
+    with _LEGACY_ENTRIES_USAGE_LOCK:
+        return dict(_LEGACY_ENTRIES_USAGE)
 
 router = APIRouter(prefix="/api/bop", tags=["bop"])
 
@@ -265,9 +282,36 @@ def get_line_op_catia_parts(
 
 
 @router.get("/versions/{version_gid}/entries")
-def list_entries(version_gid: str, _u=Depends(_READ)):
+def list_entries(version_gid: str, response: Response, _u=Depends(_READ)):
     with get_conn() as conn:
         with conn.cursor() as cur:
+            cur.execute(
+                "SELECT COUNT(*) AS entry_count "
+                "FROM workmanship_bop_bop_entries "
+                "WHERE version_gid=%s AND is_deleted=FALSE",
+                (version_gid,),
+            )
+            count_row = cur.fetchone()
+            entry_count = int(count_row["entry_count"] if count_row else 0)
+            if entry_count > _LEGACY_ENTRIES_MAX:
+                _record_legacy_entries_usage("rejected")
+                raise HTTPException(
+                    status_code=409,
+                    detail={
+                        "code": "dataset_too_large_use_paged_capability",
+                        "details": {
+                            "entry_count": entry_count,
+                            "configured_limit": _LEGACY_ENTRIES_MAX,
+                            "replacement_capabilities": [
+                                "craft.bop.structure.outline.get@1",
+                                "craft.bop.work_package.get@2",
+                                "craft.bop.entry.detail.get@1",
+                            ],
+                        },
+                    },
+                )
+            response.headers["Deprecation"] = "true"
+            _record_legacy_entries_usage("served")
             cur.execute(_ENTRY_LIST_SQL, (version_gid, version_gid))
             rows = _rows(cur, _ENTRY_KEYS)
             for row in rows:

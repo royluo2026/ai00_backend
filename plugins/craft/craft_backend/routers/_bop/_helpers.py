@@ -5,7 +5,8 @@ BOP 子包共享辅助函数。
 """
 import json
 import logging
-from typing import Optional
+import os
+from typing import Mapping, Optional
 
 from fastapi import HTTPException
 
@@ -22,6 +23,22 @@ from ._constants import (
 )
 
 _log = logging.getLogger(__name__)
+
+
+def legacy_entries_max_from_env(environ: Mapping[str, str] | None = None) -> int:
+    """Read the bounded compatibility limit and fail fast on bad deployment config."""
+    source = os.environ if environ is None else environ
+    name = "AI00_CRAFT_LEGACY_ENTRIES_MAX"
+    raw = source.get(name)
+    if raw is None:
+        return 2_000
+    try:
+        value = int(raw)
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError(f"{name} must be a positive integer") from exc
+    if value <= 0 or str(value) != str(raw).strip():
+        raise RuntimeError(f"{name} must be a positive integer")
+    return value
 
 
 # ── MySQL IN 展开辅助 ─────────────────────────────────────────────────────────
