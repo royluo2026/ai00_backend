@@ -19,12 +19,16 @@ class SnowflakeGID:
     EPOCH: Final[int] = 1735689600000
     SEQUENCE_BITS: Final[int] = 12
     MACHINE_ID_BITS: Final[int] = 10
+    TIMESTAMP_BITS: Final[int] = 41
     MAX_MACHINE_ID: Final[int] = -1 ^ (-1 << MACHINE_ID_BITS)
+    MAX_TIMESTAMP: Final[int] = -1 ^ (-1 << TIMESTAMP_BITS)
     MAX_SEQUENCE: Final[int] = -1 ^ (-1 << SEQUENCE_BITS)
     MACHINE_ID_SHIFT: Final[int] = SEQUENCE_BITS
     TIMESTAMP_SHIFT: Final[int] = SEQUENCE_BITS + MACHINE_ID_BITS
 
     def __init__(self, machine_id: int = 1):
+        if type(machine_id) is not int:
+            raise TypeError("machine_id must be an int")
         if machine_id < 0 or machine_id > self.MAX_MACHINE_ID:
             raise ValueError(f"机器ID必须在 0 ~ {self.MAX_MACHINE_ID} 之间")
         self.machine_id: int = machine_id
@@ -52,9 +56,12 @@ class SnowflakeGID:
                     timestamp = self._wait_next_millis(self.last_timestamp)
             else:
                 self.sequence = 0
+            timestamp_delta = timestamp - self.EPOCH
+            if not 0 <= timestamp_delta <= self.MAX_TIMESTAMP:
+                raise RuntimeError("gid_timestamp_out_of_range")
             self.last_timestamp = timestamp
             new_id = (
-                ((timestamp - self.EPOCH) << self.TIMESTAMP_SHIFT)
+                (timestamp_delta << self.TIMESTAMP_SHIFT)
                 | (self.machine_id << self.MACHINE_ID_SHIFT)
                 | self.sequence
             )
@@ -76,7 +83,7 @@ def machine_id_from_environment(environ: Mapping[str, str]) -> int:
 
 
 def gid_to_json(value: int) -> str:
-    if not 0 < value < 2**63:
+    if type(value) is not int or not 0 < value < 2**63:
         raise ValueError("gid_out_of_signed_bigint_range")
     return str(value)
 
