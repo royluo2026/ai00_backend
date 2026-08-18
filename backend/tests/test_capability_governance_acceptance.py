@@ -29,6 +29,7 @@ def test_acceptance_runner_has_no_optional_mandatory_sections() -> None:
     assert report.sections["permissions"].evidence["allowed_invocations"] == 2
     assert report.sections["agent_delegation"].evidence["delegated_allowed_invocations"] == 2
     assert report.sections["agent_delegation"].evidence["denied_invocations"] == 2
+    assert report.sections["agent_delegation"].evidence["revoked_token_blocked"] is True
 
 
 def test_live_acceptance_fails_closed_without_authorized_test_profile() -> None:

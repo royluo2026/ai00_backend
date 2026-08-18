@@ -379,13 +379,28 @@ def _health_evidence() -> dict[str, Any]:
 def _delegation_evidence() -> dict[str, Any]:
     from types import SimpleNamespace
 
+    from backend.capability_v2.authorization import AuthorizationGrants, CapabilityAuthorizer
+    from backend.capability_v2.contracts import (
+        ActorIdentity,
+        AutomationLevel,
+        ConsumerDescriptor,
+        ConsumerIdentity,
+        ConsumerType,
+        DelegationContext,
+        InvocationEnvelope,
+        TenantIdentity,
+    )
+    from backend.capability_v2.delegation import (
+        DelegationError,
+        DelegationGrant,
+        InMemoryDelegationStore,
+        issue_delegation,
+    )
     from backend.capabilities.confirmation_next import confirmation_manager
     from backend.capabilities.models_next import CapabilityContext
-    from backend.capabilities.registry_next import CapabilityPermissionError, CapabilityRegistry
+    from backend.capabilities.registry_next import CapabilityRegistry
     from backend.capability_governance_test.provider import register_governance_capabilities
     from backend.capability_governance_test.service import CapabilityGovernanceService
-    from backend.capability_v2.delegation import DelegationGrant, InMemoryDelegationStore, issue_delegation
-    from backend.capability_v2.contracts import AutomationLevel, ConsumerType
 
     class AcceptanceStore:
         @staticmethod
@@ -393,7 +408,7 @@ def _delegation_evidence() -> dict[str, Any]:
             return SimpleNamespace(snapshot_gid=snapshot_gid)
 
     now = datetime.now(UTC)
-    grant = DelegationGrant(delegation_id="delegation-1", delegated_by="admin", user_id="analyst", tenant_id="tenant", consumer_type=ConsumerType.AGENT, consumer_id="governance-agent", agent_run_id="run-1", catalog_release="rel_" + "a" * 32, capability_scopes=("base.capability_registry.search", "base.capability_analysis.run"), maximum_automation_level=AutomationLevel.A1, authentication_method="test", authenticated_at=now, expires_at=now + timedelta(minutes=5))
+    grant = DelegationGrant(delegation_id="delegation-1", delegated_by="admin", user_id="analyst", tenant_id="tenant", consumer_type=ConsumerType.AGENT, consumer_id="governance-agent", agent_run_id="run-1", catalog_release="rel_" + "a" * 32, capability_scopes=("base.capability_registry.search", "base.capability_analysis.run"), data_scopes=("confidential",), maximum_automation_level=AutomationLevel.A2, authentication_method="test", authenticated_at=now, expires_at=now + timedelta(minutes=5))
     active = InMemoryDelegationStore()
     issued = issue_delegation(active, grant)
     if not issued.token or set(grant.capability_scopes) != {
@@ -405,20 +420,76 @@ def _delegation_evidence() -> dict[str, Any]:
     register_governance_capabilities(
         registry, CapabilityGovernanceService(store=AcceptanceStore()),
     )
-    delegated_permissions = tuple(sorted({
-        permission
-        for capability_id in grant.capability_scopes
-        for permission in registry.get(capability_id).spec.permissions
-    }))
-    delegated_context = CapabilityContext(
-        user_gid=grant.user_id,
-        source="agent",
-        permissions=delegated_permissions,
-        agent_run_id=grant.agent_run_id,
-        delegation_token=issued.token,
-    )
+
+    def authorize(token: str, capability_id: str, payload: dict[str, Any]):
+        consumed = active.consume_active(token)
+        delegation = DelegationContext(
+            delegation_id=consumed.delegation_id,
+            delegated_by=consumed.delegated_by,
+            capability_scopes=consumed.capability_scopes,
+            resource_scopes=consumed.resource_scopes,
+            data_scopes=consumed.data_scopes,
+            catalog_release=consumed.catalog_release,
+            maximum_automation_level=consumed.maximum_automation_level,
+            expires_at=consumed.expires_at,
+        )
+        identity = ConsumerIdentity(
+            actor=ActorIdentity(
+                user_id=consumed.user_id,
+                authentication_method=consumed.authentication_method,
+                authenticated_at=consumed.authenticated_at,
+            ),
+            tenant=TenantIdentity(tenant_id=consumed.tenant_id, membership="member"),
+            consumer=ConsumerDescriptor(
+                type=ConsumerType.AGENT,
+                consumer_id=consumed.consumer_id,
+                consumer_version=consumed.consumer_version,
+                agent_run_id=consumed.agent_run_id,
+            ),
+            delegation=delegation,
+        )
+        permissions = tuple(sorted({
+            permission
+            for scope in consumed.capability_scopes
+            for permission in registry.get(scope).spec.permissions
+        }))
+        grants = AuthorizationGrants(
+            permissions=permissions,
+            capability_scopes=consumed.capability_scopes,
+            resource_scopes=consumed.resource_scopes,
+            data_scopes=consumed.data_scopes,
+            policy_version=f"delegation-v2:{consumed.delegation_id}",
+            tenant_id=consumed.tenant_id,
+        )
+        registered = registry.get(capability_id)
+        envelope = InvocationEnvelope(
+            capability_id=capability_id,
+            major_version=registered.spec.version,
+            catalog_release=consumed.catalog_release,
+            payload=payload,
+            identity=identity,
+            idempotency_key=payload.get("idempotency_key"),
+            request_id=f"acceptance-{capability_id.rsplit('.', 1)[-1]}",
+            trace_id="acceptance-delegation",
+        )
+        decision = CapabilityAuthorizer(lambda _identity: grants).authorize(
+            registered.descriptor,
+            envelope,
+            required_permissions=tuple(registered.spec.permissions),
+        )
+        context = CapabilityContext(
+            user_gid=str(consumed.user_id),
+            team_gid=consumed.tenant_id,
+            source="agent",
+            permissions=permissions,
+            agent_run_id=consumed.agent_run_id,
+            delegation_token=token,
+            identity=identity,
+        )
+        return decision, context
 
     allowed_invocations = 0
+    registry_invocations = 0
     allowed_attempts = (
         ("base.capability_registry.search", {"query": "capability"}, "completed"),
         (
@@ -428,14 +499,18 @@ def _delegation_evidence() -> dict[str, Any]:
         ),
     )
     for capability_id, payload, expected_status in allowed_attempts:
+        decision, context = authorize(issued.token, capability_id, payload)
+        if not decision.allowed:
+            raise RuntimeError(f"delegated_allowed_authorization_failed:{decision.code}")
         confirmation_token = confirmation_manager.issue(
             capability_id, 1, grant.user_id, payload,
         ) if registry.get(capability_id).spec.confirmation != "none" else None
         result = asyncio.run(registry.invoke(
             capability_id,
             payload,
-            delegated_context.model_copy(update={"confirmation_token": confirmation_token}),
+            context.model_copy(update={"confirmation_token": confirmation_token}),
         ))
+        registry_invocations += 1
         if result.data.get("status") != expected_status:
             raise RuntimeError("delegated_allowed_invocation_failed")
         allowed_invocations += 1
@@ -446,27 +521,30 @@ def _delegation_evidence() -> dict[str, Any]:
         ("base.capability_release_gate.evaluate", {}),
     )
     for capability_id, payload in attempts:
-        token = confirmation_manager.issue(
-            capability_id, 1, grant.user_id, payload,
-        ) if registry.get(capability_id).spec.confirmation != "none" else None
-        try:
-            asyncio.run(registry.invoke(
-                capability_id,
-                payload,
-                delegated_context.model_copy(update={"confirmation_token": token}),
-            ))
-        except CapabilityPermissionError:
-            denied_invocations += 1
-        else:
+        decision, _context = authorize(issued.token, capability_id, payload)
+        if decision.allowed:
             raise RuntimeError("delegated_permission_boundary_not_enforced")
+        if decision.code not in {"permission_denied", "consumer_capability_scope_denied", "capability_scope_denied"}:
+            raise RuntimeError(f"unexpected_delegated_denial:{decision.code}")
+        denied_invocations += 1
     if denied_invocations != len(attempts):
         raise RuntimeError("delegated_permission_boundary_not_exercised")
-    if active.consume_active(issued.token).capability_scopes != grant.capability_scopes:
-        raise RuntimeError("delegation_not_exercised")
+    if registry_invocations != len(allowed_attempts):
+        raise RuntimeError("unauthorized_registry_invocation")
+
+    active.revoke(grant.delegation_id)
+    revoked_token_blocked = False
+    try:
+        authorize(issued.token, "base.capability_registry.search", {"query": "capability"})
+    except DelegationError:
+        revoked_token_blocked = True
+    if not revoked_token_blocked or registry_invocations != len(allowed_attempts):
+        raise RuntimeError("revoked_delegation_not_blocked_before_invocation")
     return {"delegated_identity": grant.user_id, "allowed_capabilities": grant.capability_scopes,
             "denied_capabilities": ("base.capability_proposal.submit", "base.capability_release_gate.evaluate"),
             "delegated_allowed_invocations": allowed_invocations,
-            "denied_invocations": denied_invocations}
+            "denied_invocations": denied_invocations,
+            "revoked_token_blocked": revoked_token_blocked}
 
 
 def _redaction_evidence() -> dict[str, Any]:
