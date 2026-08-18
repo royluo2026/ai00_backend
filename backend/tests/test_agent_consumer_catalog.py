@@ -5,12 +5,15 @@ import pytest
 
 from backend.capabilities.models_next import CapabilityExecution, CapabilityRisk, CapabilitySpec
 from backend.capability_v2.descriptor_adapter import descriptor_from_provider_spec as adapt_v1_spec
+from backend.capability_v2.authorization import AuthorizationGrants, CapabilityAuthorizer
 from backend.capability_v2.contracts import (
     ActorIdentity, AutomationLevel, ConsumerDescriptor, ConsumerIdentity, ConsumerType,
     DelegationContext, TenantIdentity,
 )
 from backend.routers import agent_capabilities
 from backend.routers import deps
+from backend.capability_governance_test.provider import register_governance_capabilities
+from backend.capabilities.registry_next import CapabilityRegistry
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -92,3 +95,34 @@ def test_agent_runtime_uses_migrations_and_delegated_capability_transport():
     assert "delegation_ciphertext" in migration and "request_ciphertext" in migration
     assert "run_input_ciphertext" in migration and "goal_json" not in migration
     assert "full_result_json" in migration and "projected_result_json" in migration
+
+
+def test_agent_delegation_allows_only_exact_governance_capability_scope():
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry)
+    descriptor = registry.get("base.capability_registry.search").descriptor
+    now = datetime.now(UTC)
+    identity = ConsumerIdentity(
+        actor=ActorIdentity(user_id="user_1", authentication_method="test", authenticated_at=now),
+        tenant=TenantIdentity(tenant_id="tenant_1", membership="member"),
+        consumer=ConsumerDescriptor(type=ConsumerType.AGENT, consumer_id="ai00.agent-runtime", agent_run_id="run_1"),
+        delegation=DelegationContext(
+            delegation_id="dlg_1", delegated_by="user_1", capability_scopes=("base.capability_registry.search",),
+            resource_scopes=("*",), data_scopes=("confidential",),
+            catalog_release="rel_0123456789abcdef0123456789abcdef", maximum_automation_level=AutomationLevel.A2,
+            expires_at=now + timedelta(hours=1),
+        ),
+    )
+    grants = AuthorizationGrants(
+        permissions=("system.capability.read",), capability_scopes=identity.delegation.capability_scopes,
+        resource_scopes=("*",), data_scopes=("confidential",), policy_version="test",
+    )
+    envelope = type("Envelope", (), {"identity": identity, "payload": {}, "catalog_release": identity.delegation.catalog_release})()
+
+    assert CapabilityAuthorizer(lambda _identity: grants).authorize(
+        descriptor, envelope, required_permissions=("system.capability.read",),
+    ).allowed is True
+    denied_descriptor = registry.get("base.capability_graph.get").descriptor
+    assert CapabilityAuthorizer(lambda _identity: grants).authorize(
+        denied_descriptor, envelope, required_permissions=("system.capability.read",),
+    ).code == "consumer_capability_scope_denied"

@@ -4,6 +4,7 @@ backend/routers/deps.py
 FastAPI 依赖项：JWT 验证、权限门控。
 """
 import logging
+import os
 from datetime import UTC, datetime
 from typing import Optional
 import jwt as pyjwt
@@ -71,6 +72,12 @@ _GRANT_PERMISSIONS = {
     "project_owner": {"project.manage_assigned", "craft.write_direct",
                       "ebom.import", "approval.approve"},
     "section_lead":  {"craft.write_direct"},
+    "capability_analyst": {"system.capability.read", "system.capability.analyze"},
+    "capability_governor": {"system.capability.read", "system.capability.analyze", "system.capability.govern"},
+    "capability_release_manager": {
+        "system.capability.read", "system.capability.analyze",
+        "system.capability.govern", "system.capability.release",
+    },
 }
 
 _SETTINGS_VISIBILITY = {
@@ -315,6 +322,11 @@ def build_profile(user: dict) -> dict:
         grant_perms |= set(_GRANT_PERMISSIONS.get(g["grant_type"], set()))
 
     perms = list(base_perms | grant_perms)
+    if org_role == "super_admin" and os.environ.get("AI00_DEPLOYMENT_PROFILE") == "test-governance":
+        perms = list(set(perms) | {
+            "system.capability.read", "system.capability.analyze",
+            "system.capability.govern", "system.capability.release",
+        })
     # Capability V2 domain permissions are projected from the reviewed legacy
     # role model while the UI permission names remain backward compatible.
     v2_perms = set()
