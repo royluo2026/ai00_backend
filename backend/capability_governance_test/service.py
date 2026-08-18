@@ -9,13 +9,13 @@ from backend.capabilities.models_next import CapabilityBusinessError
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .analysis import AnalysisRequest, run_deterministic_analysis
-from .prompting import RedactedPrompt, build_repair_prompt
-from .redaction import redact
+from .prompting import PromptAuthorizationError, RedactedPrompt, build_repair_prompt
 
 
 _MAX_SEARCH = 200
 _MAX_GRAPH_DEPTH = 4
 _MAX_GRAPH_NODES = 500
+_PROMPT_READ_PERMISSION = "base.capability_repair_prompt.read"
 
 
 def _business_error(code: str) -> CapabilityBusinessError:
@@ -167,7 +167,11 @@ class CapabilityGovernanceService:
         result = await self._advisor.review(package, identity=identity, request_id=request_id)
         self._audit(
             operation="agent_invocation", request_id=request_id, context=context,
-            detail={"status": result.status, "finding_count": len(result.findings), "package": redact(package)},
+            detail={
+                "status": result.status,
+                "finding_count": len(result.findings),
+                "finding_types": tuple(finding.finding_type for finding in result.findings),
+            },
         )
         return result
 
@@ -188,6 +192,12 @@ class CapabilityGovernanceService:
             detail=prompt.store_record(),
         )
         return prompt
+
+    def read_repair_prompt(self, prompt: RedactedPrompt, *, context: object) -> str:
+        """Return ephemeral text only after service-owned governance authorization."""
+        if not self._can_read_repair_prompt(context):
+            raise PromptAuthorizationError("prompt_access_denied")
+        return prompt._text_for_governance_service()
 
     @property
     def prompt_records(self) -> Mapping[str, Mapping[str, str]]:
@@ -239,9 +249,37 @@ class CapabilityGovernanceService:
             entity_gid=None,
             actor_gid=_context_user(context),
             request_gid=request_id,
-            detail=detail,
+            detail=self._audit_detail(operation, detail),
             idempotency_key=f"{operation}:{request_id}",
         )
+
+    @staticmethod
+    def _can_read_repair_prompt(context: object) -> bool:
+        principal = str(getattr(context, "user_gid", "") or getattr(context, "actor_gid", "")).strip()
+        permissions = getattr(context, "governance_permissions", ())
+        if not principal or _PROMPT_READ_PERMISSION not in {str(item) for item in permissions}:
+            return False
+        delegation = getattr(context, "delegation", None)
+        if delegation is None:
+            return True
+        scopes = delegation.get("capability_scopes", ()) if isinstance(delegation, Mapping) else getattr(delegation, "capability_scopes", ())
+        return _PROMPT_READ_PERMISSION in {str(item) for item in scopes}
+
+    @staticmethod
+    def _audit_detail(operation: str, detail: Mapping[str, Any]) -> dict[str, Any]:
+        """Audit only fixed metadata; discard summary/payload fields even if supplied."""
+        if operation == "prompt_generation":
+            prompt_hash = str(detail.get("prompt_hash", ""))
+            return {"prompt_hash": prompt_hash} if prompt_hash.startswith("sha256:") and len(prompt_hash) == 71 else {}
+        if operation == "agent_invocation":
+            allowed = {"duplicate", "semantic_overlap", "conflict", "gap", "non_atomic_facade", "lifecycle_pair_gap"}
+            finding_types = tuple(str(value) for value in detail.get("finding_types", ()) if str(value) in allowed)
+            return {
+                "status": "candidate" if detail.get("status") == "candidate" else "invalid",
+                "finding_count": min(max(0, int(detail.get("finding_count", 0))), 5000),
+                "finding_types": finding_types,
+            }
+        return {}
 
     @staticmethod
     def _idempotency(payload: Mapping[str, Any]) -> str:

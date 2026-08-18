@@ -13,7 +13,7 @@ from backend.capability_governance_test.ai_advisory import (
 )
 from backend.capability_governance_test.audit import AuditSink
 from backend.capability_governance_test.service import CapabilityGovernanceService
-from backend.capability_v2.contracts import CapabilityResultV2, CapabilityStatus, CorrelationRef
+from backend.capability_v2.contracts import CapabilityResultV2, CapabilityStatus, CorrelationRef, OperationRef, OperationStatus
 
 
 class RecordingDomainClient:
@@ -73,6 +73,27 @@ def test_advisor_uses_only_governed_agent_client_with_bounded_redacted_package_a
     assert len(str(invocation.payload).encode("utf-8")) <= 4096
 
 
+def test_advisor_drops_benign_key_business_and_source_content_from_nested_candidate_package():
+    client = RecordingDomainClient({"findings": []})
+    advisor = GovernedAgentAdvisor(client, max_input_bytes=4096, max_output_bytes=4096)
+
+    asyncio.run(advisor.review({
+        "snapshot_gid": "9",
+        "capabilities": [{
+            "capability_id": "craft.order.submit",
+            "input_schema_hash": "sha256:" + "a" * 64,
+            "source_excerpt": "customer Alice order 123",
+            "benign_note": "business payload",
+        }],
+        "evidence_summaries": {"evidence_keys": ["evidence:7"], "notes": "customer payload"},
+    }, identity=object(), request_id="request-1"))
+
+    transmitted = repr(client.invocations[0][0].payload)
+    assert "Alice" not in transmitted
+    assert "business payload" not in transmitted
+    assert "customer payload" not in transmitted
+
+
 def test_advisor_rejects_packages_and_results_that_exceed_hard_byte_limits():
     advisor = GovernedAgentAdvisor(RecordingDomainClient({"findings": []}), max_input_bytes=32, max_output_bytes=32)
 
@@ -112,3 +133,63 @@ def test_service_audits_redacted_governed_advice_without_promoting_candidate_to_
     event = sink.events[0]
     assert event.operation == "agent_invocation"
     assert "secret" not in repr(event.detail)
+
+
+class SequencedDomainClient:
+    def __init__(self, results):
+        self._results = iter(results)
+        self.invocations = []
+
+    async def invoke(self, invocation, identity, correlation, deadline=None):
+        self.invocations.append((invocation, identity, correlation, deadline))
+        return next(self._results)
+
+
+def test_advisor_polls_governed_agent_run_after_accepted_interaction_until_completed():
+    accepted = CapabilityResultV2(
+        ok=True, status=CapabilityStatus.ACCEPTED, capability_id="agent.interaction.request", major_version=1,
+        operation_ref=OperationRef(operation_id="operation-1", status=OperationStatus.ACCEPTED),
+        correlation=CorrelationRef(request_id="request-1"),
+    )
+    completed = CapabilityResultV2(
+        ok=True, status=CapabilityStatus.COMPLETED, capability_id="agent.run.read", major_version=1,
+        data={"content": {"findings": []}}, correlation=CorrelationRef(request_id="request-1"),
+    )
+    client = SequencedDomainClient((accepted, completed))
+
+    result = asyncio.run(GovernedAgentAdvisor(client).review({}, identity=object(), request_id="request-1"))
+
+    assert result.findings == ()
+    assert [item[0].capability_id for item in client.invocations] == ["agent.interaction.request", "agent.run.read"]
+    assert client.invocations[1][0].payload == {"resource_gid": "operation-1"}
+
+
+def test_advisor_rejects_failed_governed_operation_result():
+    accepted = CapabilityResultV2(
+        ok=True, status=CapabilityStatus.ACCEPTED, capability_id="agent.interaction.request", major_version=1,
+        operation_ref=OperationRef(operation_id="operation-1", status=OperationStatus.ACCEPTED),
+        correlation=CorrelationRef(request_id="request-1"),
+    )
+    failed = CapabilityResultV2.model_validate({
+        "ok": False, "status": "failed", "capability_id": "agent.run.read", "major_version": 1,
+        "error": {"code": "invalid_input", "message": "failed"}, "correlation": {"request_id": "request-1"},
+    })
+
+    with pytest.raises(AdvisoryContractError, match="agent_advisory_failed"):
+        asyncio.run(GovernedAgentAdvisor(SequencedDomainClient((accepted, failed))).review({}, identity=object(), request_id="request-1"))
+
+
+def test_advisor_times_out_after_bounded_governed_operation_polls():
+    accepted = CapabilityResultV2(
+        ok=True, status=CapabilityStatus.ACCEPTED, capability_id="agent.interaction.request", major_version=1,
+        operation_ref=OperationRef(operation_id="operation-1", status=OperationStatus.ACCEPTED),
+        correlation=CorrelationRef(request_id="request-1"),
+    )
+    pending = CapabilityResultV2(
+        ok=True, status=CapabilityStatus.ACCEPTED, capability_id="agent.run.read", major_version=1,
+        operation_ref=OperationRef(operation_id="operation-1", status=OperationStatus.RUNNING),
+        correlation=CorrelationRef(request_id="request-1"),
+    )
+
+    with pytest.raises(AdvisoryContractError, match="agent_advisory_timeout"):
+        asyncio.run(GovernedAgentAdvisor(SequencedDomainClient((accepted, pending, pending, pending, pending))).review({}, identity=object(), request_id="request-1"))

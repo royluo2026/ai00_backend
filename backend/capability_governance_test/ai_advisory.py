@@ -14,18 +14,14 @@ from backend.capability_v2.contracts import CapabilityStatus, ConsumerIdentity, 
 from backend.capability_v2.domain_client import DomainCapabilityClient, DomainInvocation
 from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
-from .redaction import redact
+from .redaction import sanitize_candidate_package
 
 
 _MAX_INPUT_BYTES = 64 * 1024
 _MAX_OUTPUT_BYTES = 64 * 1024
 _MAX_TIMEOUT_SECONDS = 30
+_MAX_OPERATION_POLLS = 4
 _DECIMAL_GID = re.compile(r"^[0-9]{1,19}$")
-_ALLOWED_PACKAGE_FIELDS = frozenset({
-    "snapshot_gid", "snapshot_hash", "capability_ids", "capability_version_gids", "capabilities",
-    "business_effect", "business_effects", "schema_summaries", "policies", "evidence_summaries",
-    "model_policy_version", "hashes",
-})
 
 
 class AdvisoryContractError(ValueError):
@@ -95,10 +91,7 @@ def bounded_candidate_package(package: Mapping[str, Any]) -> dict[str, Any]:
     """Reduce a package to its declared advisory surface before redaction and transport."""
     if not isinstance(package, Mapping):
         raise AdvisoryContractError("invalid_candidate_package")
-    safe = redact({str(key): value for key, value in package.items() if str(key) in _ALLOWED_PACKAGE_FIELDS})
-    if not isinstance(safe, dict):
-        raise AdvisoryContractError("invalid_candidate_package")
-    return safe
+    return sanitize_candidate_package(package)
 
 
 class GovernedAgentAdvisor(GovernanceAdvisorPort):
@@ -151,14 +144,44 @@ class GovernedAgentAdvisor(GovernanceAdvisorPort):
             CorrelationRef(request_id=request_id),
             deadline=deadline,
         )
-        if result.status is not CapabilityStatus.COMPLETED or not result.ok:
-            raise AdvisoryContractError("agent_advisory_not_completed")
+        result = await self._completed_result(result, identity=identity, request_id=request_id, deadline=deadline)
         if len(_json_bytes(result.data)) > self._max_output_bytes:
             raise AdvisoryContractError("output_bytes_exceeded")
         data = result.data
         if isinstance(data, Mapping) and isinstance(data.get("content"), Mapping):
             data = data["content"]
         return validate_advisory(data)
+
+    async def _completed_result(
+        self,
+        result: Any,
+        *,
+        identity: ConsumerIdentity,
+        request_id: str,
+        deadline: datetime,
+    ) -> Any:
+        if result.ok and result.status is CapabilityStatus.COMPLETED:
+            return result
+        if result.status is not CapabilityStatus.ACCEPTED or not result.ok or result.operation_ref is None:
+            raise AdvisoryContractError("agent_advisory_failed")
+        operation_id = result.operation_ref.operation_id
+        for _ in range(_MAX_OPERATION_POLLS):
+            if datetime.now(UTC) >= deadline:
+                raise AdvisoryContractError("agent_advisory_timeout")
+            payload = {"resource_gid": operation_id}
+            if len(_json_bytes(payload)) > self._max_input_bytes:
+                raise AdvisoryContractError("input_bytes_exceeded")
+            result = await self._client.invoke(
+                DomainInvocation("agent.run.read", 1, payload),
+                identity,
+                CorrelationRef(request_id=request_id),
+                deadline=deadline,
+            )
+            if result.ok and result.status is CapabilityStatus.COMPLETED:
+                return result
+            if not result.ok or result.status in {CapabilityStatus.FAILED, CapabilityStatus.REJECTED}:
+                raise AdvisoryContractError("agent_advisory_failed")
+        raise AdvisoryContractError("agent_advisory_timeout")
 
 
 __all__ = [

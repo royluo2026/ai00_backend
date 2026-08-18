@@ -1,4 +1,4 @@
-"""Repair prompts with redacted persistence records and explicit read authorization."""
+"""Repair prompts with allow-listed persistence records and service-side authorization."""
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -8,7 +8,7 @@ import json
 from typing import Any
 
 from .ai_advisory import AdvisoryFinding, validate_advisory
-from .redaction import redact
+from .redaction import sanitize_evidence, sanitize_repair_boundary
 
 
 class PromptAuthorizationError(PermissionError):
@@ -20,8 +20,7 @@ def _stable_json(value: Any) -> str:
 
 
 def _summary(value: Any) -> str:
-    rendered = _stable_json(redact(value))
-    return rendered[:4000]
+    return _stable_json(value)[:4000]
 
 
 @dataclass(frozen=True)
@@ -30,9 +29,8 @@ class RedactedPrompt:
     redacted_summary: str
     _prompt_text: str = field(repr=False, compare=False)
 
-    def text_for(self, *, authorized: bool) -> str:
-        if authorized is not True:
-            raise PromptAuthorizationError("prompt_access_denied")
+    def _text_for_governance_service(self) -> str:
+        """Service-only retrieval; callers cannot supply their own authorization decision."""
         return self._prompt_text
 
     def store_record(self) -> dict[str, str]:
@@ -51,29 +49,36 @@ def build_repair_prompt(
     evidence: Mapping[str, Any],
     boundary: Mapping[str, Any],
 ) -> RedactedPrompt:
-    """Build a constrained repair request from only redacted, reviewable context."""
+    """Build all nine sections from only fixed, reviewable governance metadata."""
     safe_finding = _finding(finding)
-    safe_evidence = redact(evidence)
-    safe_boundary = redact(boundary)
-    snapshot_identity = safe_boundary.get("snapshot_identity", safe_boundary.get("snapshot_gid", "not supplied"))
-    capability_identities = safe_boundary.get("capability_identities", safe_finding.subject_version_gids)
-    observed_contract = safe_boundary.get("observed_contract", "review the supplied evidence only")
-    required_tests = safe_boundary.get("required_tests", ())
-    acceptance = safe_boundary.get("acceptance_criteria", "preserve candidate-only governance controls")
+    safe_evidence = sanitize_evidence(evidence)
+    safe_boundary = sanitize_repair_boundary(boundary)
+    snapshot_identity = {key: safe_boundary[key] for key in ("snapshot_gid", "snapshot_hash") if key in safe_boundary}
+    capability_identities = {
+        "capability_ids": safe_boundary.get("capability_ids", ()),
+        "capability_version_gids": safe_boundary.get("capability_version_gids", safe_finding.subject_version_gids),
+    }
+    finding_summary = {
+        "finding_type": safe_finding.finding_type,
+        "subject_version_gids": safe_finding.subject_version_gids,
+        "confidence": safe_finding.confidence,
+        "evidence_keys": safe_finding.evidence_keys,
+        "status": safe_finding.status,
+    }
     text = "\n\n".join((
         f"Snapshot identity\n{_summary(snapshot_identity)}",
         f"Capability identities\n{_summary(capability_identities)}",
-        f"Observed contract\n{_summary(observed_contract)}",
+        f"Observed contract\n{_summary(safe_boundary.get('observed_contract_hashes', {}))}",
         f"Implementation evidence\n{_summary(safe_evidence)}",
-        f"Finding\n{_summary(safe_finding.model_dump())}",
-        f"Allowed change boundary\n{_summary(safe_boundary.get('allowed', ()))}",
-        f"Forbidden changes\n{_summary(safe_boundary.get('forbidden', ()))}",
-        f"Required tests\n{_summary(required_tests)}",
-        f"Acceptance criteria\n{_summary(acceptance)}",
+        f"Finding\n{_summary(finding_summary)}",
+        f"Allowed change boundary\n{_summary(safe_boundary.get('allowed_change_ids', ()))}",
+        f"Forbidden changes\n{_summary(safe_boundary.get('forbidden_change_ids', ()))}",
+        f"Required tests\n{_summary(safe_boundary.get('required_test_ids', ()))}",
+        f"Acceptance criteria\n{_summary(safe_boundary.get('acceptance_criteria_ids', ()))}",
     ))
     prompt_hash = "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
     return RedactedPrompt(prompt_hash=prompt_hash, redacted_summary=_summary({
-        "finding": safe_finding.model_dump(), "evidence": safe_evidence, "boundary": safe_boundary,
+        "finding": finding_summary, "evidence": safe_evidence, "boundary": safe_boundary,
     }), _prompt_text=text)
 
 
