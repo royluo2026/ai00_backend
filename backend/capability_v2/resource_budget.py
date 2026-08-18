@@ -135,6 +135,9 @@ class ResourceAdmissionController:
     def in_flight(self, capability_key: str) -> int:
         return self._capability_counts[capability_key]
 
+    def snapshot(self) -> MemorySnapshot:
+        return self._sampler.snapshot()
+
     async def acquire(
         self,
         *,

@@ -2,7 +2,11 @@
 from __future__ import annotations
 
 import inspect
+import asyncio
+import hashlib
+import json
 import logging
+import time
 from pathlib import Path
 from typing import Any
 
@@ -28,11 +32,15 @@ from .policies import (
     GatewayPolicyError,
 )
 from .operations import OperationService
+from .metrics import CapabilityMetricRecord, InMemoryCapabilityMetrics
 from .projection import project_result
 from .reliability import (
     InvocationLease, ReliabilityCoordinator, ReliabilityError, TransactionalCapabilityOutput,
 )
 from .reliability import IssuedApproval
+from .resource_budget import (
+    AdmissionLease, AdmissionRejected, MemoryPressureSampler, ResourceAdmissionController,
+)
 
 
 _log = logging.getLogger(__name__)
@@ -41,11 +49,17 @@ _log = logging.getLogger(__name__)
 class CapabilityGatewayService:
     def __init__(self, resolver: CatalogResolver, policy: GatewayPolicy | None = None,
                  *, reliability: ReliabilityCoordinator | None = None,
-                 operations: OperationService | None = None) -> None:
+                 operations: OperationService | None = None,
+                 admission: ResourceAdmissionController | None = None,
+                 metrics: InMemoryCapabilityMetrics | None = None,
+                 admission_timeout_seconds: float = 0.25) -> None:
         self._resolver = resolver
         self._policy = policy or FailClosedGatewayPolicy()
         self._reliability = reliability
         self._operations = operations
+        self._admission = admission or ResourceAdmissionController(MemoryPressureSampler())
+        self._metrics = metrics or InMemoryCapabilityMetrics()
+        self._admission_timeout_seconds = max(0.0, admission_timeout_seconds)
         self._catalog_release: str | None = None
 
     @property
@@ -145,6 +159,13 @@ class CapabilityGatewayService:
             validate_payload(dict(descriptor.input_schema), dict(envelope.payload))
         except (TypeError, ValueError) as exc:
             return self._rejected(envelope, "invalid_input", str(exc))
+        input_bytes = self._json_size(dict(envelope.payload))
+        if input_bytes > descriptor.execution_budget.max_input_bytes:
+            return self._rejected(
+                envelope,
+                "capability_input_limit_exceeded",
+                "Capability input exceeds its declared byte limit.",
+            )
         concurrency_error = self._concurrency_error(descriptor, envelope)
         if concurrency_error:
             return self._rejected(
@@ -244,7 +265,33 @@ class CapabilityGatewayService:
         context = self._legacy_context(
             envelope, operation_id=(async_operation.operation_id if async_operation else None)
         )
+        capability_key = f"{descriptor.id}@{descriptor.major_version}"
+        started = time.perf_counter()
+        before = self._admission.snapshot()
+        output_bytes = 0
+        admission_lease: AdmissionLease | None = None
+        try:
+            admission_lease = await self._admission.acquire(
+                capability_key=capability_key,
+                tenant_key=envelope.identity.tenant.tenant_id,
+                consumer_key=self._consumer_key(envelope),
+                budget=descriptor.execution_budget,
+                timeout_seconds=self._admission_timeout_seconds,
+            )
+        except AdmissionRejected as exc:
+            result = self._rejected(
+                envelope, exc.code, "Capability capacity is temporarily unavailable.",
+                retryable=exc.retryable,
+            )
+            self._record_metric(
+                descriptor, envelope, started, before, output_bytes, result, capability_key,
+            )
+            return project_result(
+                result, descriptor, envelope.identity,
+                data_scopes=authorization.data_scopes if authorization is not None else (),
+            )
         transaction = None
+        cancelled = False
         try:
             try:
                 value = provider.handler(dict(envelope.payload), context)
@@ -277,7 +324,19 @@ class CapabilityGatewayService:
                 ) for item in value.evidence)
                 value = value.data
             validate_payload(dict(descriptor.output_schema), value, label="output")
+            output_bytes = self._json_size(value)
+            if output_bytes > descriptor.execution_budget.max_output_bytes:
+                raise CapabilityBusinessError(
+                    "capability_output_limit_exceeded",
+                    "Capability provider exceeded its declared output byte limit.",
+                )
             projected = self._policy.project(descriptor, envelope.identity, value)
+        except asyncio.CancelledError:
+            cancelled = True
+            if transaction is not None:
+                self._rollback_and_close(transaction)
+                transaction = None
+            raise
         except CapabilityBusinessError as exc:
             if transaction is not None:
                 self._rollback_and_close(transaction)
@@ -315,6 +374,14 @@ class CapabilityGatewayService:
                     data=projected,
                     evidence=evidence,
                     correlation=CorrelationRef(request_id=envelope.request_id, trace_id=envelope.trace_id),
+                )
+        finally:
+            if admission_lease is not None:
+                await admission_lease.release()
+            if cancelled:
+                self._record_metric(
+                    descriptor, envelope, started, before, output_bytes, None, capability_key,
+                    cancelled=True,
                 )
         if async_operation is not None and not result.ok:
             try:
@@ -382,12 +449,57 @@ class CapabilityGatewayService:
                 envelope, "unexpected_transaction",
                 "A transactional provider requires durable write reliability."
             )
-        return project_result(
+        projected_result = project_result(
             result,
             descriptor,
             envelope.identity,
             data_scopes=authorization.data_scopes if authorization is not None else (),
         )
+        self._record_metric(
+            descriptor, envelope, started, before, output_bytes, projected_result, capability_key,
+        )
+        return projected_result
+
+    @staticmethod
+    def _json_size(value: Any) -> int:
+        return len(json.dumps(
+            value, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8"))
+
+    @staticmethod
+    def _consumer_key(envelope: InvocationEnvelope) -> str:
+        consumer = envelope.identity.consumer
+        return (
+            consumer.mount_session_id
+            or consumer.agent_run_id
+            or consumer.installation_id
+            or consumer.consumer_id
+        )
+
+    def _record_metric(
+        self, descriptor, envelope: InvocationEnvelope, started: float, before,
+        output_bytes: int, result: CapabilityResultV2 | None, capability_key: str,
+        *, cancelled: bool = False,
+    ) -> None:
+        after = self._admission.snapshot()
+        consumer_hash = hashlib.sha256(self._consumer_key(envelope).encode("utf-8")).hexdigest()
+        self._metrics.record(CapabilityMetricRecord(
+            capability_id=descriptor.id,
+            major_version=descriptor.major_version,
+            owner_domain=descriptor.owner_domain,
+            consumer_type=envelope.identity.consumer.type.value,
+            consumer_key_hash=consumer_hash,
+            elapsed_ms=(time.perf_counter() - started) * 1000,
+            output_bytes=output_bytes,
+            rss_before_bytes=before.rss_bytes,
+            rss_after_bytes=after.rss_bytes,
+            cgroup_ratio=after.ratio,
+            in_flight=self._admission.in_flight(capability_key),
+            cancelled=cancelled,
+            error_code=("cancelled" if cancelled else (
+                result.error.code if result is not None and result.error else None
+            )),
+        ))
 
     @staticmethod
     def _legacy_context(envelope: InvocationEnvelope, *, operation_id: str | None = None) -> CapabilityContext:
