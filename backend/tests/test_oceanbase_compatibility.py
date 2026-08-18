@@ -4,6 +4,7 @@ from pathlib import Path
 from backend.db.versioned_migrations import Migration, MigrationError, validate_migration
 from backend.governance import load_registry
 from backend.scripts.oceanbase_compatibility_audit import declared_schema_columns
+from backend.scripts.migrate_capability_governance_test import compile_governance_migrations
 
 from backend.db.oceanbase_compat import (
     assert_supported_server,
@@ -102,6 +103,14 @@ class OceanBaseCompatibilityTests(unittest.TestCase):
         ])
         with self.assertRaises(RuntimeError):
             verify_live_server(loose)
+
+    def test_test_governance_migrations_follow_oceanbase_ddl_policy(self):
+        root = Path(__file__).resolve().parents[2]
+        compiled = compile_governance_migrations(root)
+        for migration in compiled.migrations:
+            self.assertEqual(audit_sql(migration.path, migration.sql), [])
+            self.assertNotIn("ENGINE=", migration.sql.upper())
+            self.assertNotIn("ON DELETE CASCADE", migration.sql.upper())
 
 
 if __name__ == "__main__":
