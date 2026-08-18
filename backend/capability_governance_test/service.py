@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 
 from backend.capabilities.models_next import CapabilityBusinessError
@@ -10,6 +11,8 @@ from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .analysis import AnalysisRequest, run_deterministic_analysis
 from .prompting import PromptAuthorizationError, RedactedPrompt, _render_repair_prompt
+from .release_gate import ReleaseCandidate, ReleaseGate, ReleaseGateError
+from .workflow import ProposalService, ReviewerContext, WaiverService, WorkflowError
 
 
 _MAX_SEARCH = 200
@@ -34,6 +37,81 @@ def _gid(value: object, *, field: str = "target_gid") -> int:
 
 def _context_user(context: object) -> str:
     return str(getattr(context, "user_gid", ""))
+
+
+def _mutation_actor(context: object) -> str:
+    actor = _context_user(context).strip()
+    if not actor:
+        raise _business_error("invalid_input")
+    return actor
+
+
+def _context_values(context: object, *fields: str) -> tuple[str, ...]:
+    values: list[str] = []
+    for field in fields:
+        value = getattr(context, field, ())
+        if value is not None:
+            values.extend(str(item) for item in value)
+    return tuple(values)
+
+
+def _required_text(payload: Mapping[str, Any], field: str) -> str:
+    value = str(payload.get(field, "")).strip()
+    if not value:
+        raise _business_error("invalid_input")
+    return value
+
+
+def _payload_gid(payload: Mapping[str, Any], *fields: str) -> int:
+    for field in fields:
+        if payload.get(field) is not None:
+            return _gid(payload.get(field), field=field)
+    raise _business_error("invalid_input")
+
+
+def _row_version(payload: Mapping[str, Any]) -> int:
+    value = payload.get("row_version") or payload.get("expected_resource_version")
+    if value is None or not str(value).strip():
+        raise _business_error("version_conflict")
+    return _gid(value, field="row_version")
+
+
+def _optional_bool(payload: Mapping[str, Any], field: str, *, default: bool) -> bool:
+    value = payload.get(field)
+    if value is None:
+        return default
+    if not isinstance(value, bool):
+        raise _business_error("invalid_input")
+    return value
+
+
+def _items(payload: Mapping[str, Any], field: str) -> tuple[Any, ...]:
+    value = payload.get(field, ())
+    if isinstance(value, (str, bytes, Mapping)):
+        raise _business_error("invalid_input")
+    try:
+        return tuple(value)
+    except TypeError as exc:
+        raise _business_error("invalid_input") from exc
+
+
+def _timestamp(payload: Mapping[str, Any], field: str) -> datetime | None:
+    value = payload.get(field)
+    if value is None or value == "":
+        return None
+    if isinstance(value, datetime):
+        return value
+    if not isinstance(value, str):
+        raise _business_error("invalid_input")
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise _business_error("invalid_input") from exc
+
+
+def _workflow_error(exc: WorkflowError | ReleaseGateError) -> CapabilityBusinessError:
+    code = str(exc)
+    return _business_error(code if code else "invalid_input")
 
 
 @dataclass(frozen=True)
@@ -61,6 +139,9 @@ class CapabilityGovernanceService:
         analysis_runner: Callable[..., Any] = run_deterministic_analysis,
         advisor: GovernanceAdvisorPort | None = None,
         audit_sink: Any | None = None,
+        proposal_service: ProposalService | None = None,
+        waiver_service: WaiverService | None = None,
+        release_gate: ReleaseGate | None = None,
     ) -> None:
         self._store = store
         self._scanner = scanner
@@ -68,10 +149,19 @@ class CapabilityGovernanceService:
         self._advisor = advisor
         self._audit_sink = audit_sink
         self._runs: dict[tuple[str, str, str], GovernedRun] = {}
-        self._mutations: dict[tuple[str, str], dict[str, str]] = {}
         self._prompt_records: dict[str, dict[str, str]] = {}
         self._prompt_texts: dict[str, str] = {}
         self._next_run_gid = 1
+        self._next_governance_gid_value = 1
+        self._proposals = proposal_service or ProposalService(
+            next_gid=self._next_governance_gid, audit_sink=audit_sink,
+        )
+        self._waivers = waiver_service or WaiverService(
+            next_gid=self._next_governance_gid, audit_sink=audit_sink,
+        )
+        self._release_gate = release_gate or ReleaseGate(
+            next_gid=self._next_governance_gid, audit_sink=audit_sink,
+        )
 
     def base_capability_registry_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         requested = payload.get("limit", _MAX_SEARCH)
@@ -139,19 +229,122 @@ class CapabilityGovernanceService:
         return self._queue("base.capability_test.run", payload, context, kind="test")
 
     def base_capability_proposal_submit(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        return self._mutate("base.capability_proposal.submit", payload, require_version=False)
+        key = self._idempotency(payload)
+        try:
+            if payload.get("proposal_gid") is not None or payload.get("target_gid") is not None:
+                proposal = self._proposals.submit(
+                    _payload_gid(payload, "proposal_gid", "target_gid"),
+                    expected_row_version=_row_version(payload),
+                    idempotency_key=f"proposal-submit:{key}",
+                )
+            else:
+                proposal = self._proposals.detect(
+                    capability_id=_required_text(payload, "capability_id"),
+                    capability_version_gid=_payload_gid(payload, "capability_version_gid"),
+                    base_snapshot_gid=_payload_gid(payload, "base_snapshot_gid"),
+                    previous_hash=_required_text(payload, "previous_hash"),
+                    proposed_descriptor_hash=_required_text(payload, "proposed_descriptor_hash"),
+                    evidence_hash=_required_text(payload, "evidence_hash"),
+                    submitted_by_gid=_mutation_actor(context),
+                    idempotency_key=f"proposal-detect:{key}",
+                )
+                draft = self._proposals.transition(
+                    proposal.proposal_gid, "draft", expected_row_version=proposal.row_version,
+                    idempotency_key=f"proposal-draft:{key}",
+                )
+                proposal = self._proposals.submit(
+                    draft.proposal_gid, expected_row_version=draft.row_version,
+                    idempotency_key=f"proposal-submit:{key}",
+                )
+        except WorkflowError as exc:
+            raise _workflow_error(exc) from exc
+        return self._accepted("base.capability_proposal.submit", proposal=proposal)
 
     def base_capability_review_decide(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        return self._mutate("base.capability_review.decide", payload, require_version=True)
+        key = self._idempotency(payload)
+        reviewer = ReviewerContext(
+            gid=_mutation_actor(context),
+            roles=_context_values(context, "active_roles", "governance_roles"),
+            permissions=_context_values(context, "permissions", "governance_permissions"),
+            owned_domains=_context_values(context, "owned_domains", "governance_owned_domains"),
+        )
+        try:
+            proposal = self._proposals.decide(
+                _payload_gid(payload, "proposal_gid", "target_gid"),
+                stage=_required_text(payload, "stage"),
+                decision=_required_text(payload, "decision"),
+                reviewer_context=reviewer,
+                expected_row_version=_row_version(payload),
+                idempotency_key=f"proposal-review:{key}",
+                decided_at=_timestamp(payload, "decided_at"),
+            )
+        except WorkflowError as exc:
+            raise _workflow_error(exc) from exc
+        return self._accepted("base.capability_review.decide", proposal=proposal)
 
     def base_capability_waiver_grant(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        return self._mutate("base.capability_waiver.grant", payload, require_version=False)
+        key = self._idempotency(payload)
+        try:
+            waiver = self._waivers.grant(
+                finding_gid=_payload_gid(payload, "finding_gid", "target_gid"),
+                capability_version_gid=_payload_gid(payload, "capability_version_gid"),
+                scope=_required_text(payload, "scope"),
+                reason=_required_text(payload, "reason"),
+                granted_by_gid=_mutation_actor(context),
+                code_hash=_required_text(payload, "code_hash"),
+                catalog_hash=_required_text(payload, "catalog_hash"),
+                evidence_hash=_required_text(payload, "evidence_hash"),
+                starts_at=_timestamp(payload, "starts_at"),
+                expires_at=_timestamp(payload, "expires_at"),
+                idempotency_key=f"waiver-grant:{key}",
+            )
+        except WorkflowError as exc:
+            raise _workflow_error(exc) from exc
+        return self._accepted("base.capability_waiver.grant", waiver=waiver)
 
     def base_capability_waiver_revoke(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        return self._mutate("base.capability_waiver.revoke", payload, require_version=True)
+        key = self._idempotency(payload)
+        try:
+            waiver = self._waivers.revoke(
+                _payload_gid(payload, "waiver_gid", "target_gid"),
+                expected_row_version=_row_version(payload),
+                idempotency_key=f"waiver-revoke:{key}",
+                revoked_at=_timestamp(payload, "revoked_at"),
+            )
+        except (KeyError, WorkflowError) as exc:
+            if isinstance(exc, KeyError):
+                raise _business_error("resource_not_found") from exc
+            raise _workflow_error(exc) from exc
+        return self._accepted("base.capability_waiver.revoke", waiver=waiver)
 
     def base_capability_release_gate_evaluate(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        return self._completed("base.capability_release_gate.evaluate")
+        key = self._idempotency(payload)
+        evidence_hash = str(payload.get("evidence_hash", "")).strip()
+        data_complete = _optional_bool(payload, "data_complete", default=False) and bool(evidence_hash)
+        candidate = ReleaseCandidate(
+            code_revision=_required_text(payload, "code_revision"),
+            product_catalog_release_id=_required_text(payload, "product_catalog_release_id"),
+            snapshot_gid=_payload_gid(payload, "snapshot_gid", "target_gid"),
+            test_run_gid=_payload_gid(payload, "test_run_gid"),
+        )
+        try:
+            report = self._release_gate.evaluate(
+                candidate,
+                available=_optional_bool(payload, "available", default=False),
+                test_status=str(payload.get("test_status", "")) or None,
+                findings=_items(payload, "findings"),
+                stale_evidence=_optional_bool(payload, "stale_evidence", default=True),
+                waivers=_items(payload, "waivers"),
+                approvals_complete=_optional_bool(payload, "approvals_complete", default=False),
+                data_complete=data_complete,
+                evidence_hash=evidence_hash,
+                now=_timestamp(payload, "now"),
+                idempotency_key=f"release-gate:{key}",
+                evaluated_by_gid=_mutation_actor(context),
+            )
+        except ReleaseGateError as exc:
+            raise _workflow_error(exc) from exc
+        return self._completed("base.capability_release_gate.evaluate", release=report)
 
     def run_analysis(self, snapshot_gid: str | int) -> Any:
         """Execute only the snapshot that was pinned when the run was queued."""
@@ -221,13 +414,10 @@ class CapabilityGovernanceService:
             self._runs[run_key] = run
         return self._accepted(capability_id, run_gid=run.run_gid, snapshot_gid=run.snapshot_gid)
 
-    def _mutate(self, capability_id: str, payload: Mapping[str, Any], *, require_version: bool) -> dict[str, Any]:
-        key = self._idempotency(payload)
-        if require_version and not str(payload.get("row_version") or payload.get("expected_resource_version") or "").strip():
-            raise _business_error("version_conflict")
-        mutation_key = (capability_id, key)
-        self._mutations.setdefault(mutation_key, {"idempotency_key": key})
-        return self._accepted(capability_id)
+    def _next_governance_gid(self) -> int:
+        gid = self._next_governance_gid_value
+        self._next_governance_gid_value += 1
+        return gid
 
     def _snapshot(self, payload: Mapping[str, Any]) -> Any:
         if self._store is None or not hasattr(self._store, "get_snapshot"):
