@@ -3,7 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from backend.base import provider as base_provider
-from backend.capability_v2.bootstrap import build_capability_registry
+from backend.capability_v2.bootstrap import (
+    build_capability_registry,
+    build_test_governance_capability_registry,
+)
 from backend.capability_governance_test.contracts import ALL_IDS, provider_artifact
 from backend.capability_v2.provider_loader import hash_domain_artifact
 from backend.scripts.build_capability_governance_catalog import current_release
@@ -18,6 +21,18 @@ def test_product_registry_is_unchanged_without_test_extension():
     test = build_capability_registry(ROOT, include_test_governance=True)
     assert ("base.capability_registry.search", 1) not in product.keys()
     assert ("base.capability_registry.search", 1) in test.keys()
+
+
+def test_test_governance_profile_injects_a_functional_service_not_none():
+    registry = build_test_governance_capability_registry(ROOT)
+
+    result = registry.get("base.capability_registry.search").handler({"query": "capability"}, object())
+
+    assert result == {
+        "capability_id": "base.capability_registry.search",
+        "status": "completed",
+        "items": [],
+    }
 
 
 def test_test_governance_extension_has_exact_base_owned_contracts():

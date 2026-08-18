@@ -21,6 +21,28 @@ def build_capability_registry(
     *,
     include_test_governance: bool = False,
 ) -> CapabilityRegistry:
+    if include_test_governance:
+        return build_test_governance_capability_registry(root, manifest_path)
+    return _build_official_capability_registry(root, manifest_path)
+
+
+def build_test_governance_capability_registry(
+    root: Path | None = None,
+    manifest_path: Path | None = None,
+) -> CapabilityRegistry:
+    """Build the explicit test-only governance profile with a real service port."""
+    registry = _build_official_capability_registry(root, manifest_path)
+    from backend.capability_governance_test.provider import register_governance_capabilities
+    from backend.capability_governance_test.service import CapabilityGovernanceService
+
+    register_governance_capabilities(registry, service_port=CapabilityGovernanceService())
+    return registry
+
+
+def _build_official_capability_registry(
+    root: Path | None = None,
+    manifest_path: Path | None = None,
+) -> CapabilityRegistry:
     repository_root = (root or Path(__file__).resolve().parents[2]).resolve()
     path = manifest_path or Path(__file__).with_name("official_domains.json")
     registry = CapabilityRegistry()
@@ -28,9 +50,6 @@ def build_capability_registry(
         repository_root,
         load_domain_manifests(path),
     ).register_all(registry)
-    if include_test_governance:
-        from backend.capability_governance_test.provider import register_governance_capabilities
-        register_governance_capabilities(registry, service_port=None)
     return registry
 
 
@@ -55,6 +74,7 @@ def reset_capability_registry_for_tests() -> None:
 
 __all__ = [
     "build_capability_registry",
+    "build_test_governance_capability_registry",
     "get_capability_registry",
     "reset_capability_registry_for_tests",
 ]

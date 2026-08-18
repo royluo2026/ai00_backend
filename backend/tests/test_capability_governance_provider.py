@@ -73,7 +73,82 @@ def test_provider_uses_service_handlers_instead_of_placeholder_results():
 
     result = registry.items["base.capability_registry.search"][1]({"query": "example"}, _context())
 
-    assert result == {"capability_id": "base.capability_registry.search", "status": "completed"}
+    assert result["capability_id"] == "base.capability_registry.search"
+    assert result["status"] == "completed"
+    assert result["items"][0] == {
+        "capability_id": "base.example.0", "capability_version_gid": "0",
+    }
+    assert len(result["items"]) == 200
+
+
+def test_provider_drops_undeclared_service_response_fields():
+    class Service:
+        def base_capability_registry_search(self, payload, context):
+            return {
+                "capability_id": "base.capability_registry.search",
+                "status": "completed",
+                "items": (SimpleNamespace(capability_id="base.safe", capability_version_gid=17),),
+                "secret": "must-not-cross-transport",
+            }
+
+    class Registry:
+        def register(self, spec, handler, *, descriptor=None):
+            if spec.id == "base.capability_registry.search":
+                self.handler = handler
+
+    registry = Registry()
+    register_governance_capabilities(registry, Service())
+
+    assert registry.handler({"query": "safe"}, _context()) == {
+        "capability_id": "base.capability_registry.search",
+        "status": "completed",
+        "items": [{"capability_id": "base.safe", "capability_version_gid": "17"}],
+    }
+
+
+def test_provider_preserves_the_declared_bounded_response_envelope():
+    """Removing an envelope field below would discard a service result."""
+    from backend.capabilities.registry_next import CapabilityRegistry
+
+    class Service:
+        def base_capability_registry_search(self, payload, context):
+            return {
+                "capability_id": "base.capability_registry.search",
+                "status": "completed",
+                "data": {"summary": "one matching capability"},
+                "items": ({"capability_id": "base.safe", "capability_version_gid": 17},),
+                "nodes": ({"canonical_key": "base.safe"},),
+                "findings": ({"code": "governance_check"},),
+                "snapshot_gid": 11,
+                "run_gid": 12,
+                "proposal_gid": 13,
+                "waiver_gid": 14,
+                "release_report_gid": 15,
+                "secret": "must-not-cross-transport",
+            }
+
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry, Service())
+
+    result = __import__("asyncio").run(registry.invoke(
+        "base.capability_registry.search",
+        {"query": "safe"},
+        CapabilityContext(user_gid="42", permissions=("system.capability.read",)),
+    ))
+
+    assert result.data == {
+        "capability_id": "base.capability_registry.search",
+        "status": "completed",
+        "data": {"summary": "one matching capability"},
+        "items": [{"capability_id": "base.safe", "capability_version_gid": "17"}],
+        "nodes": [{"canonical_key": "base.safe"}],
+        "findings": [{"code": "governance_check"}],
+        "snapshot_gid": "11",
+        "run_gid": "12",
+        "proposal_gid": "13",
+        "waiver_gid": "14",
+        "release_report_gid": "15",
+    }
 
 
 def test_closed_provider_schema_admits_graph_bounds_required_by_service():
@@ -88,7 +163,11 @@ def test_closed_provider_schema_admits_graph_bounds_required_by_service():
         CapabilityContext(user_gid="42", permissions=("system.capability.read",)),
     ))
 
-    assert result.data == {"capability_id": "base.capability_graph.get", "status": "completed"}
+    assert result.data == {
+        "capability_id": "base.capability_graph.get", "status": "completed",
+        "snapshot_gid": "100", "snapshot": {"snapshot_gid": "100"},
+        "max_depth": 4, "max_nodes": 500, "nodes": [],
+    }
 
 
 def test_unconfigured_provider_fails_closed_instead_of_returning_empty_results():
