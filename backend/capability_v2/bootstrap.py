@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import sys
 import threading
+import os
 from pathlib import Path
+from typing import Any
 
 from backend.capabilities.registry_next import CapabilityRegistry
 
@@ -29,13 +31,32 @@ def build_capability_registry(
 def build_test_governance_capability_registry(
     root: Path | None = None,
     manifest_path: Path | None = None,
+    *,
+    service_port: Any | None = None,
+    store: Any | None = None,
+    seed_document: Any | None = None,
 ) -> CapabilityRegistry:
-    """Build the explicit test-only governance profile with a real service port."""
+    """Build the explicit test-only governance profile with injectable authority.
+
+    The official registry never imports this extension.  Tests, local tooling,
+    and the explicitly selected ``test-governance`` profile may inject a
+    service, an in-memory store, and an immutable seed document.  Keeping those
+    ports explicit prevents a test bootstrap from silently using production
+    persistence while still making the profile useful for end-to-end tests.
+    """
     registry = _build_official_capability_registry(root, manifest_path)
     from backend.capability_governance_test.provider import register_governance_capabilities
     from backend.capability_governance_test.service import CapabilityGovernanceService
+    from backend.capability_governance_test.store import MemoryGovernanceStore
 
-    register_governance_capabilities(registry, service_port=CapabilityGovernanceService())
+    governance_store = store or MemoryGovernanceStore()
+    if seed_document is not None:
+        importer = getattr(governance_store, "import_snapshot", None)
+        if not callable(importer):
+            raise TypeError("test_governance_store_requires_import_snapshot")
+        importer(seed_document)
+    service = service_port or CapabilityGovernanceService(store=governance_store)
+    register_governance_capabilities(registry, service_port=service)
     return registry
 
 
@@ -59,7 +80,12 @@ def get_capability_registry() -> CapabilityRegistry:
         return _registry
     with _registry_lock:
         if _registry is None:
-            complete_registry = build_capability_registry()
+            # Production and ordinary development bootstraps remain strictly
+            # official.  Loading the extension requires an explicit profile;
+            # an accidental environment variable cannot alter the artifact
+            # because the extension itself is test-only and separately built.
+            profile = os.environ.get("AI00_DEPLOYMENT_PROFILE", "").strip()
+            complete_registry = build_test_governance_capability_registry() if profile == "test-governance" else build_capability_registry()
             _registry = complete_registry
     return _registry
 

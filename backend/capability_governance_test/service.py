@@ -142,6 +142,7 @@ class CapabilityGovernanceService:
         proposal_service: ProposalService | None = None,
         waiver_service: WaiverService | None = None,
         release_gate: ReleaseGate | None = None,
+        release_evidence_port: Any | None = None,
     ) -> None:
         self._store = store
         self._scanner = scanner
@@ -151,6 +152,7 @@ class CapabilityGovernanceService:
         self._runs: dict[tuple[str, str, str], GovernedRun] = {}
         self._prompt_records: dict[str, dict[str, str]] = {}
         self._prompt_texts: dict[str, str] = {}
+        self._finding_gids: dict[str, int] = {}
         self._next_run_gid = 1
         self._next_governance_gid_value = 1
         self._proposals = proposal_service or ProposalService(
@@ -159,6 +161,10 @@ class CapabilityGovernanceService:
         self._waivers = waiver_service or WaiverService(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,
         )
+        # Release evidence is deliberately a separate, service-owned port.  A
+        # Gateway caller may identify a candidate, but cannot supply the
+        # statuses, findings, approvals, or hashes that authorize a pass.
+        self._release_evidence_port = release_evidence_port
         self._release_gate = release_gate or ReleaseGate(
             next_gid=self._next_governance_gid, audit_sink=audit_sink,
         )
@@ -194,14 +200,62 @@ class CapabilityGovernanceService:
         if not 1 <= max_depth <= _MAX_GRAPH_DEPTH or not 1 <= max_nodes <= _MAX_GRAPH_NODES:
             raise _business_error("invalid_input")
         document = getattr(snapshot, "document", None)
-        graph_nodes = tuple(getattr(document, "nodes", ()))[:max_nodes]
-        return self._completed(
+        source_nodes = tuple(getattr(document, "nodes", ()))[:max_nodes]
+        node_gids = getattr(snapshot, "node_gids", {})
+        graph_nodes = tuple(
+            {**getattr(node, "__dict__", {}), "implementation_node_gid": node_gids.get(getattr(node, "canonical_key", ""))}
+            if node_gids.get(getattr(node, "canonical_key", "")) is not None else node
+            for node in source_nodes
+        )
+        result = self._completed(
             "base.capability_graph.get", snapshot_gid=str(getattr(snapshot, "snapshot_gid")),
             max_depth=max_depth, max_nodes=max_nodes, nodes=graph_nodes,
         )
+        bindings = tuple(getattr(document, "bindings", ()))
+        relations = tuple(getattr(document, "relations", ()))
+        binding_gids = tuple(getattr(snapshot, "binding_gids", ()))
+        relation_gids = tuple(getattr(snapshot, "relation_gids", ()))
+        if bindings:
+            result["bindings"] = tuple(
+                {**getattr(binding, "__dict__", {}), "binding_gid": binding_gids[index]}
+                if index < len(binding_gids) else binding
+                for index, binding in enumerate(bindings[:_MAX_GRAPH_NODES])
+            )
+        if relations:
+            result["relations"] = tuple(
+                {**getattr(relation, "__dict__", {}), "relation_gid": relation_gids[index]}
+                if index < len(relation_gids) else relation
+                for index, relation in enumerate(relations[:_MAX_GRAPH_NODES])
+            )
+        return result
 
     def base_capability_finding_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
-        return self._completed("base.capability_finding.search", items=())
+        requested = payload.get("limit", _MAX_SEARCH)
+        try:
+            limit = min(max(1, int(requested)), _MAX_SEARCH)
+        except (TypeError, ValueError) as exc:
+            raise _business_error("invalid_input") from exc
+        snapshot = None
+        if payload.get("target_gid") is not None:
+            snapshot = self._snapshot(payload)
+        elif self._store is not None:
+            snapshot = self._latest_snapshot()
+        findings: tuple[Any, ...] = ()
+        if snapshot is not None:
+            custom_loader = getattr(self._store, "get_findings", None)
+            if callable(custom_loader):
+                findings = tuple(custom_loader(int(getattr(snapshot, "snapshot_gid"))) or ())[:_MAX_SEARCH]
+            else:
+                analysis = self._analysis_runner(getattr(snapshot, "document"), AnalysisRequest())
+                findings = self._finding_records(snapshot, getattr(analysis, "findings", ()))
+        query = str(payload.get("query", "")).strip().lower()
+        if query:
+            findings = tuple(item for item in findings if query in str(
+                getattr(item, "code", item.get("code", "") if isinstance(item, Mapping) else "")
+            ).lower() or query in str(
+                getattr(item, "fingerprint", item.get("fingerprint", "") if isinstance(item, Mapping) else "")
+            ).lower())
+        return self._completed("base.capability_finding.search", findings=tuple(findings[:limit]))
 
     def base_capability_analysis_get(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         target = str(payload.get("target_gid", ""))
@@ -319,32 +373,161 @@ class CapabilityGovernanceService:
 
     def base_capability_release_gate_evaluate(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
         key = self._idempotency(payload)
-        evidence_hash = str(payload.get("evidence_hash", "")).strip()
-        data_complete = _optional_bool(payload, "data_complete", default=False) and bool(evidence_hash)
-        candidate = ReleaseCandidate(
-            code_revision=_required_text(payload, "code_revision"),
-            product_catalog_release_id=_required_text(payload, "product_catalog_release_id"),
-            snapshot_gid=_payload_gid(payload, "snapshot_gid", "target_gid"),
-            test_run_gid=_payload_gid(payload, "test_run_gid"),
-        )
+        candidate = self._release_candidate(payload)
+        evidence = self._load_release_evidence(candidate, payload)
         try:
             report = self._release_gate.evaluate(
                 candidate,
-                available=_optional_bool(payload, "available", default=False),
-                test_status=str(payload.get("test_status", "")) or None,
-                findings=_items(payload, "findings"),
-                stale_evidence=_optional_bool(payload, "stale_evidence", default=True),
-                waivers=_items(payload, "waivers"),
-                approvals_complete=_optional_bool(payload, "approvals_complete", default=False),
-                data_complete=data_complete,
-                evidence_hash=evidence_hash,
-                now=_timestamp(payload, "now"),
+                available=evidence["available"],
+                test_status=evidence["test_status"],
+                findings=evidence["findings"],
+                stale_evidence=evidence["stale_evidence"],
+                waivers=evidence["waivers"],
+                approvals_complete=evidence["approvals_complete"],
+                data_complete=evidence["data_complete"],
+                evidence_hash=evidence["evidence_hash"],
                 idempotency_key=f"release-gate:{key}",
                 evaluated_by_gid=_mutation_actor(context),
             )
         except ReleaseGateError as exc:
             raise _workflow_error(exc) from exc
         return self._completed("base.capability_release_gate.evaluate", release=report)
+
+    def _release_candidate(self, payload: Mapping[str, Any]) -> ReleaseCandidate:
+        """Resolve a target-only UI request against the pinned snapshot.
+
+        Code/catalog identities come from the service-owned snapshot when the
+        caller omits them.  A test-run resolver is likewise service-owned;
+        without one, the zero sentinel guarantees a fail-closed report rather
+        than inventing a run identity from request data.
+        """
+        snapshot_gid = _payload_gid(payload, "snapshot_gid", "target_gid")
+        snapshot = None
+        if self._store is not None and hasattr(self._store, "get_snapshot"):
+            try:
+                snapshot = self._store.get_snapshot(snapshot_gid)
+            except Exception:
+                snapshot = None
+        document = getattr(snapshot, "document", None) if snapshot is not None else None
+        code_revision = str(payload.get("code_revision", "")).strip() or str(getattr(document, "code_revision", "")).strip()
+        product_catalog_release_id = str(payload.get("product_catalog_release_id", "")).strip() or str(getattr(document, "product_release_id", "")).strip()
+        if not code_revision or not product_catalog_release_id:
+            raise _business_error("invalid_input")
+        test_run_value = payload.get("test_run_gid")
+        if test_run_value is None and snapshot is not None and self._release_evidence_port is not None:
+            resolver = getattr(self._release_evidence_port, "resolve_test_run_gid", None)
+            if callable(resolver):
+                try:
+                    test_run_value = resolver(snapshot)
+                except Exception:
+                    test_run_value = None
+        try:
+            test_run_gid = _gid(test_run_value, field="test_run_gid") if test_run_value is not None else 0
+        except CapabilityBusinessError:
+            test_run_gid = 0
+        return ReleaseCandidate(code_revision, product_catalog_release_id, snapshot_gid, test_run_gid)
+
+    def _load_release_evidence(self, candidate: ReleaseCandidate, payload: Mapping[str, Any]) -> dict[str, Any]:
+        """Load all release inputs from service-owned authority, failing closed.
+
+        ``payload`` is accepted only for backwards-compatible diagnostic
+        blockers when no authority is configured.  It is never used to make a
+        release pass.  A configured port must return a complete, pinned
+        evidence record; partial or mismatched records are treated as an
+        unavailable governance dependency.
+        """
+        fallback = {
+            "available": False,
+            # Preserve the useful distinction in existing diagnostics while
+            # forcing the dependency blocker that prevents a caller-supplied
+            # all-green payload from becoming a signed pass.
+            "test_status": str(payload.get("test_status", "")) or None,
+            "findings": (),
+            "stale_evidence": True,
+            "waivers": (),
+            "approvals_complete": False,
+            "data_complete": False,
+            "evidence_hash": "",
+        }
+        # These caller values may enrich a fail-closed diagnostic, but the
+        # forced ``available=False`` below means they can never authorize a
+        # pass.  Keeping them preserves actionable legacy blocker details.
+        try:
+            fallback.update(
+                findings=_items(payload, "findings"),
+                stale_evidence=_optional_bool(payload, "stale_evidence", default=True),
+                waivers=_items(payload, "waivers"),
+                approvals_complete=_optional_bool(payload, "approvals_complete", default=False),
+                data_complete=_optional_bool(payload, "data_complete", default=False) and bool(str(payload.get("evidence_hash", "")).strip()),
+                evidence_hash=str(payload.get("evidence_hash", "")).strip(),
+            )
+        except CapabilityBusinessError:
+            pass
+        if self._store is None or not hasattr(self._store, "get_snapshot"):
+            return fallback
+        try:
+            snapshot = self._store.get_snapshot(candidate.snapshot_gid)
+        except Exception:
+            return fallback
+        document = getattr(snapshot, "document", None) if snapshot is not None else None
+        if document is None:
+            return fallback
+        if (
+            str(getattr(document, "code_revision", "")) != candidate.code_revision
+            or str(getattr(document, "product_release_id", "")) != candidate.product_catalog_release_id
+        ):
+            return fallback
+        port = self._release_evidence_port
+        if port is None:
+            return fallback
+        loader = getattr(port, "load_release_evidence", None)
+        if not callable(loader):
+            return fallback
+        try:
+            evidence = loader(candidate, snapshot)
+        except Exception:
+            return fallback
+        if not isinstance(evidence, Mapping):
+            return fallback
+        required = {
+            "snapshot_gid", "test_run_gid", "code_revision", "product_catalog_release_id",
+            "snapshot_hash", "test_status", "findings", "stale_evidence", "waivers",
+            "approvals_complete", "data_complete", "evidence_hash",
+        }
+        if not required.issubset(evidence):
+            return fallback
+        if (
+            str(evidence.get("snapshot_gid")) != str(candidate.snapshot_gid)
+            or str(evidence.get("test_run_gid")) != str(candidate.test_run_gid)
+            or str(evidence.get("code_revision")) != candidate.code_revision
+            or str(evidence.get("product_catalog_release_id")) != candidate.product_catalog_release_id
+            or str(evidence.get("snapshot_hash")) != str(getattr(document, "snapshot_hash", ""))
+        ):
+            return fallback
+        try:
+            findings = _items(evidence, "findings")
+            waivers = _items(evidence, "waivers")
+            test_status = str(evidence["test_status"]).strip() or None
+            stale_evidence = evidence["stale_evidence"]
+            approvals_complete = evidence["approvals_complete"]
+            data_complete = evidence["data_complete"]
+            evidence_hash = str(evidence["evidence_hash"]).strip()
+            if not isinstance(stale_evidence, bool) or not isinstance(approvals_complete, bool) or not isinstance(data_complete, bool):
+                return fallback
+            if not evidence_hash:
+                return fallback
+        except (CapabilityBusinessError, TypeError, ValueError):
+            return fallback
+        return {
+            "available": True,
+            "test_status": test_status,
+            "findings": findings,
+            "stale_evidence": stale_evidence,
+            "waivers": waivers,
+            "approvals_complete": approvals_complete,
+            "data_complete": data_complete,
+            "evidence_hash": evidence_hash,
+        }
 
     def run_analysis(self, snapshot_gid: str | int) -> Any:
         """Execute only the snapshot that was pinned when the run was queued."""
@@ -435,6 +618,52 @@ class CapabilityGovernanceService:
             return tuple(entry for snapshot in snapshots.values() for entry in getattr(snapshot, "entries", ()))
         snapshot = getattr(self._store, "latest_snapshot", lambda: None)()
         return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+
+    def _latest_snapshot(self) -> Any | None:
+        if self._store is None:
+            return None
+        snapshots = getattr(self._store, "_snapshots", {})
+        if isinstance(snapshots, Mapping) and snapshots:
+            return snapshots[max(snapshots)]
+        loader = getattr(self._store, "latest_snapshot", None)
+        return loader() if callable(loader) else None
+
+    def _finding_records(self, snapshot: Any, findings: Any) -> tuple[dict[str, Any], ...]:
+        """Project deterministic candidates into read-only, UI-safe records."""
+        entries = {
+            (str(getattr(entry, "capability_id", "")), int(getattr(entry, "major_version", 0))): str(getattr(entry, "capability_version_gid", ""))
+            for entry in getattr(snapshot, "entries", ())
+        }
+        domains = {
+            (str(getattr(entry, "capability_id", "")), int(getattr(entry, "major_version", 0))): str(getattr(entry, "owner_domain", ""))
+            for entry in getattr(snapshot, "entries", ())
+        }
+        records: list[dict[str, Any]] = []
+        for candidate in tuple(findings or ())[:_MAX_SEARCH]:
+            code = str(getattr(candidate, "code", ""))
+            fingerprint = str(getattr(candidate, "fingerprint", ""))
+            if not code or not fingerprint:
+                continue
+            finding_gid = self._finding_gids.get(fingerprint)
+            if finding_gid is None:
+                finding_gid = self._next_governance_gid()
+                self._finding_gids[fingerprint] = finding_gid
+            subjects = tuple(getattr(candidate, "subjects", ()))
+            subject_gids = tuple(
+                entries[key] for subject in subjects
+                if (key := (str(getattr(subject, "capability_id", "")), int(getattr(subject, "major_version", 0)))) in entries
+            )
+            finding_domains = tuple(sorted({domains[key] for subject in subjects if (key := (str(getattr(subject, "capability_id", "")), int(getattr(subject, "major_version", 0)))) in domains and domains[key]}))
+            records.append({
+                "finding_gid": str(finding_gid), "code": code,
+                "severity": str(getattr(candidate, "severity", "warning")), "status": "open",
+                "fingerprint": fingerprint,
+                "remediation_boundary": str(getattr(candidate, "remediation_boundary", "")),
+                "subject_version_gids": subject_gids,
+                "domains": finding_domains,
+                "evidence": tuple(str(value) for value in getattr(candidate, "evidence_keys", ())[:200]),
+            })
+        return tuple(records)
 
     def _audit(self, *, operation: str, request_id: str, context: object, detail: Mapping[str, Any]) -> None:
         if self._audit_sink is None:

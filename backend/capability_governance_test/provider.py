@@ -35,16 +35,41 @@ def _projection(record: Any, fields: tuple[str, ...]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for field in fields:
         value = _value(record, field)
+        if value is None and field == "domain":
+            value = _value(record, "owner_domain")
+        if value is None and field == "lifecycle":
+            value = _value(record, "lifecycle_status")
+        if value is None and field == "contract":
+            descriptor = _value(record, "descriptor")
+            if isinstance(descriptor, Mapping):
+                value = descriptor.get("contract", descriptor)
         if value is not None:
-            result[field] = str(value) if field.endswith("_gid") or field == "row_version" else str(value)
+            result[field] = _transport_value(value, depth=0) if not field.endswith("_gid") and field != "row_version" else str(value)
     return result
+
+
+def _transport_value(value: Any, *, depth: int, max_items: int = 50) -> Any:
+    """Keep nested catalog evidence bounded without flattening its meaning."""
+    if depth >= 3:
+        return str(value)[:512]
+    if isinstance(value, Mapping):
+        return {
+            str(key): _transport_value(item, depth=depth + 1)
+            for key, item in tuple(value.items())[:max_items]
+            if isinstance(key, str) and len(key) <= 255
+        }
+    if isinstance(value, (list, tuple)):
+        return [_transport_value(item, depth=depth + 1) for item in value[:max_items]]
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    return str(value)[:512]
 
 
 def _bounded_object(value: Any, *, max_properties: int = 50) -> dict[str, Any]:
     if not isinstance(value, Mapping):
         return {}
     return {
-        str(key): item
+        str(key): _transport_value(item, depth=0)
         for key, item in tuple(value.items())[:max_properties]
         if isinstance(key, str) and len(key) <= 255
     }
@@ -87,9 +112,17 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
         if result.get(field) is not None:
             response[field] = str(result[field])
     if capability_id == "base.capability_registry.search":
-        response["items"] = [_projection(item, ("capability_id", "capability_version_gid")) for item in tuple(result.get("items", ()))[:200]]
+        response["items"] = [_projection(item, (
+            "capability_id", "capability_version_gid", "capability_gid", "major_version",
+            "owner_domain", "domain", "semantic_class", "business_effect", "lifecycle_status",
+            "lifecycle", "descriptor_hash", "contract",
+        )) for item in tuple(result.get("items", ()))[:200]]
     elif capability_id == "base.capability_registry.get" and result.get("item") is not None:
-        response["item"] = _projection(result["item"], ("capability_id", "capability_version_gid"))
+        response["item"] = _projection(result["item"], (
+            "capability_id", "capability_version_gid", "capability_gid", "major_version",
+            "owner_domain", "domain", "semantic_class", "business_effect", "lifecycle_status",
+            "lifecycle", "descriptor_hash", "contract",
+        ))
     elif capability_id == "base.capability_graph.get":
         snapshot_gid = result.get("snapshot_gid")
         if snapshot_gid is not None:
@@ -97,9 +130,24 @@ def _safe_response(capability_id: str, result: Mapping[str, Any]) -> dict[str, A
         for field in ("max_depth", "max_nodes"):
             if field in result:
                 response[field] = int(result[field])
-        response["nodes"] = [_projection(node, ("canonical_key", "owner_domain", "node_type", "source_path", "artifact_hash")) for node in tuple(result.get("nodes", ()))[:500]]
+        response["nodes"] = [_projection(node, (
+            "canonical_key", "owner_domain", "node_type", "source_path", "artifact_hash",
+            "implementation_node_gid", "source_symbol", "http_method", "route_path", "metadata",
+        )) for node in tuple(result.get("nodes", ()))[:500]]
+        if result.get("bindings"):
+            response["bindings"] = [_projection(binding, (
+                "binding_gid", "capability_id", "major_version", "node_canonical_key",
+                "binding_type", "binding_hash",
+            )) for binding in tuple(result.get("bindings", ()))[:500]]
+        if result.get("relations"):
+            response["relations"] = [_projection(relation, (
+                "relation_gid", "from_canonical_key", "to_canonical_key", "relation_type", "relation_hash",
+            )) for relation in tuple(result.get("relations", ()))[:500]]
     elif capability_id == "base.capability_finding.search":
-        response["findings"] = [_projection(finding, ("code", "severity", "fingerprint", "remediation_boundary")) for finding in tuple(result.get("findings", result.get("items", ())))[:200]]
+        response["findings"] = [_projection(finding, (
+            "finding_gid", "code", "severity", "status", "fingerprint", "remediation_boundary",
+            "subject_version_gids", "domains", "evidence",
+        )) for finding in tuple(result.get("findings", result.get("items", ())))[:200]]
     elif capability_id in {"base.capability_analysis.run", "base.capability_test.run", "base.capability_analysis.get"}:
         run = result.get("run")
         if run is None and result.get("run_gid") is not None:

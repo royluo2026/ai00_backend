@@ -40,6 +40,7 @@ WRITE_IDS = {
     "base.capability_review.decide",
     "base.capability_waiver.grant",
     "base.capability_waiver.revoke",
+    "base.capability_release_gate.evaluate",
 }
 _LIMIT_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 200}
 _DEPTH_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 4}
@@ -73,6 +74,8 @@ def _input_schema(capability_id: str) -> dict[str, object]:
         required = ("idempotency_key",)
     if capability_id == "base.capability_registry.search":
         properties["limit"] = _LIMIT_SCHEMA
+    if capability_id == "base.capability_finding.search":
+        properties["limit"] = _LIMIT_SCHEMA
     if capability_id == "base.capability_graph.get":
         properties.update({"max_depth": _DEPTH_SCHEMA, "max_nodes": _NODES_SCHEMA})
         required = ("target_gid", "max_depth", "max_nodes")
@@ -84,23 +87,110 @@ def _input_schema(capability_id: str) -> dict[str, object]:
         required = tuple(sorted(set(required) | {"target_gid"}))
     if capability_id in {"base.capability_review.decide", "base.capability_waiver.revoke"}:
         properties.update({"row_version": _VERSION_SCHEMA, "expected_resource_version": _VERSION_SCHEMA})
+    # These are intentionally explicit rather than accepting an open-ended
+    # workflow payload.  The service has two proposal paths (detect a new
+    # proposal or transition an existing one), so all fields used by either
+    # path are declared here and the handler remains responsible for the
+    # branch-specific required fields.
+    if capability_id == "base.capability_proposal.submit":
+        properties.update({
+            "proposal_gid": GID_SCHEMA,
+            "capability_id": STRING_SCHEMA,
+            "capability_version_gid": GID_SCHEMA,
+            "base_snapshot_gid": GID_SCHEMA,
+            "previous_hash": _VERSION_SCHEMA,
+            "proposed_descriptor_hash": _VERSION_SCHEMA,
+            "evidence_hash": _VERSION_SCHEMA,
+            "row_version": _VERSION_SCHEMA,
+            "expected_resource_version": _VERSION_SCHEMA,
+        })
+    elif capability_id == "base.capability_review.decide":
+        properties.update({
+            "proposal_gid": GID_SCHEMA,
+            "stage": _SMALL_STRING_SCHEMA,
+            "decision": _SMALL_STRING_SCHEMA,
+            "decided_at": _SMALL_STRING_SCHEMA,
+        })
+    elif capability_id == "base.capability_waiver.grant":
+        properties.update({
+            "finding_gid": GID_SCHEMA,
+            "capability_version_gid": GID_SCHEMA,
+            "scope": _SMALL_STRING_SCHEMA,
+            "reason": STRING_SCHEMA,
+            "code_hash": _VERSION_SCHEMA,
+            "catalog_hash": _VERSION_SCHEMA,
+            "evidence_hash": _VERSION_SCHEMA,
+            "starts_at": _SMALL_STRING_SCHEMA,
+            "expires_at": _SMALL_STRING_SCHEMA,
+        })
+    elif capability_id == "base.capability_waiver.revoke":
+        properties.update({"waiver_gid": GID_SCHEMA, "revoked_at": _SMALL_STRING_SCHEMA})
+    elif capability_id == "base.capability_release_gate.evaluate":
+        properties.update({
+            "code_revision": _VERSION_SCHEMA,
+            "product_catalog_release_id": _VERSION_SCHEMA,
+            "snapshot_gid": GID_SCHEMA,
+            "test_run_gid": GID_SCHEMA,
+            "test_status": _SMALL_STRING_SCHEMA,
+            "available": _BOOLEAN_SCHEMA,
+            "stale_evidence": _BOOLEAN_SCHEMA,
+            "approvals_complete": _BOOLEAN_SCHEMA,
+            "data_complete": _BOOLEAN_SCHEMA,
+            "evidence_hash": _VERSION_SCHEMA,
+            "findings": _BOUNDED_COLLECTION_SCHEMA,
+            "waivers": _BOUNDED_COLLECTION_SCHEMA,
+            "now": _SMALL_STRING_SCHEMA,
+        })
     return _closed(properties, required)
 
-
-INPUT_SCHEMAS = {capability_id: _input_schema(capability_id) for capability_id in ALL_IDS}
 
 # These are deliberately projections, rather than record dumps.  They keep the
 # agent transport closed while retaining the bounded result shapes returned by
 # the governance service.
-_ITEM_SCHEMA = _closed({"capability_id": STRING_SCHEMA, "capability_version_gid": GID_SCHEMA}, ("capability_id", "capability_version_gid"))
+_BOUNDED_VALUE_SCHEMA = {"description": "Provider-validated bounded transport value."}
+_BOUNDED_OBJECT_SCHEMA = {
+    "type": "object", "maxProperties": 50,
+    "additionalProperties": _BOUNDED_VALUE_SCHEMA,
+}
+_BOUNDED_COLLECTION_SCHEMA = {
+    "type": "array", "maxItems": 500, "items": _BOUNDED_OBJECT_SCHEMA,
+}
+INPUT_SCHEMAS = {capability_id: _input_schema(capability_id) for capability_id in ALL_IDS}
+_CONTRACT_SCHEMA = {"type": "object", "maxProperties": 50, "additionalProperties": _BOUNDED_VALUE_SCHEMA}
+_ITEM_SCHEMA = _closed({
+    "capability_id": STRING_SCHEMA, "capability_version_gid": GID_SCHEMA,
+    "capability_gid": GID_SCHEMA, "major_version": {"type": "integer", "minimum": 1},
+    "owner_domain": _SMALL_STRING_SCHEMA, "domain": _SMALL_STRING_SCHEMA,
+    "semantic_class": _SMALL_STRING_SCHEMA, "business_effect": STRING_SCHEMA,
+    "lifecycle_status": _SMALL_STRING_SCHEMA, "lifecycle": _SMALL_STRING_SCHEMA,
+    "descriptor_hash": _VERSION_SCHEMA, "contract": _CONTRACT_SCHEMA,
+}, ("capability_id", "capability_version_gid"))
 _NODE_SCHEMA = _closed({
     "canonical_key": STRING_SCHEMA, "owner_domain": _SMALL_STRING_SCHEMA,
     "node_type": _SMALL_STRING_SCHEMA, "source_path": STRING_SCHEMA,
     "artifact_hash": _SMALL_STRING_SCHEMA,
+    "implementation_node_gid": GID_SCHEMA, "source_symbol": _SMALL_STRING_SCHEMA,
+    "http_method": _SMALL_STRING_SCHEMA, "route_path": STRING_SCHEMA,
+    "metadata": _CONTRACT_SCHEMA,
 })
 _FINDING_SCHEMA = _closed({
     "code": _SMALL_STRING_SCHEMA, "severity": _SMALL_STRING_SCHEMA,
     "fingerprint": _SMALL_STRING_SCHEMA, "remediation_boundary": _SMALL_STRING_SCHEMA,
+    "finding_gid": GID_SCHEMA, "status": _SMALL_STRING_SCHEMA,
+    "subject_version_gids": {"type": "array", "items": GID_SCHEMA, "maxItems": 20},
+    "domains": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 20},
+    "evidence": {"type": "array", "items": STRING_SCHEMA, "maxItems": 200},
+})
+_BINDING_SCHEMA = _closed({
+    "binding_gid": GID_SCHEMA, "capability_id": STRING_SCHEMA,
+    "major_version": {"type": "integer", "minimum": 1},
+    "node_canonical_key": STRING_SCHEMA, "binding_type": _SMALL_STRING_SCHEMA,
+    "binding_hash": _VERSION_SCHEMA,
+})
+_RELATION_SCHEMA = _closed({
+    "relation_gid": GID_SCHEMA, "from_canonical_key": STRING_SCHEMA,
+    "to_canonical_key": STRING_SCHEMA, "relation_type": _SMALL_STRING_SCHEMA,
+    "relation_hash": _VERSION_SCHEMA,
 })
 _RUN_SCHEMA = _closed({
     "run_gid": GID_SCHEMA, "snapshot_gid": GID_SCHEMA, "kind": _SMALL_STRING_SCHEMA,
@@ -119,16 +209,6 @@ _RELEASE_SCHEMA = _closed({
     "report_gid": GID_SCHEMA, "conclusion": {"type": "string", "enum": ["pass", "fail", "expired"]},
     "blockers": {"type": "array", "items": _SMALL_STRING_SCHEMA, "maxItems": 200},
 }, ("report_gid", "conclusion", "blockers"))
-_BOUNDED_VALUE_SCHEMA = {"description": "Provider-validated bounded transport value."}
-_BOUNDED_OBJECT_SCHEMA = {
-    "type": "object", "maxProperties": 50,
-    "additionalProperties": _BOUNDED_VALUE_SCHEMA,
-}
-_BOUNDED_COLLECTION_SCHEMA = {
-    "type": "array", "maxItems": 500, "items": _BOUNDED_OBJECT_SCHEMA,
-}
-
-
 def _output_schema(capability_id: str) -> dict[str, object]:
     properties: dict[str, object] = {
         "capability_id": STRING_SCHEMA,
@@ -149,6 +229,8 @@ def _output_schema(capability_id: str) -> dict[str, object]:
             "max_depth": _DEPTH_SCHEMA,
             "max_nodes": _NODES_SCHEMA,
             "nodes": {"type": "array", "items": _NODE_SCHEMA, "maxItems": 500},
+            "bindings": {"type": "array", "items": _BINDING_SCHEMA, "maxItems": 500},
+            "relations": {"type": "array", "items": _RELATION_SCHEMA, "maxItems": 500},
         })
     elif capability_id == "base.capability_finding.search":
         properties["findings"] = {"type": "array", "items": _FINDING_SCHEMA, "maxItems": 200}
