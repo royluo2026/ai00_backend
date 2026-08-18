@@ -117,7 +117,37 @@ def test_scanner_emits_declared_exposure_runtime_and_migration_categories(valid_
     } <= node_types
     assert any(relation.relation_type == "migrates_table" for relation in document.relations)
     assert any(relation.relation_type == "persists_to" for relation in document.relations)
-    assert any(node.source_path.endswith("0002_factory_schema.sql") for node in document.nodes)
+    assert any(
+        any(path.endswith("0002_factory_schema.sql") for path in node.metadata.get("declared_by", ()))
+        for node in document.nodes if node.node_type == "database_table"
+    )
+
+
+def test_schema_path_sql_is_not_promoted_to_a_migration(valid_fixture: Path) -> None:
+    """Only the manifest migration_path may create migration evidence."""
+    document = scan_fixture(valid_fixture)
+
+    assert not any(
+        node.node_type == "migration" and node.source_path.endswith("0002_factory_schema.sql")
+        for node in document.nodes
+    )
+    assert not any(
+        relation.relation_type == "migrates_table"
+        and "0002_factory_schema.sql" in relation.from_canonical_key
+        for relation in document.relations
+    )
+
+
+def test_imported_literal_table_constant_does_not_create_dynamic_evidence(valid_fixture: Path) -> None:
+    """A unique imported literal table constant is resolvable static evidence."""
+    document = scan_fixture(valid_fixture)
+
+    assert not any(
+        node.node_type == "unresolved_binding"
+        and node.source_path.endswith("factory_repository.py")
+        and node.metadata.get("reason", "").startswith("dynamic_table")
+        for node in document.nodes
+    )
 
 
 def test_offline_runner_does_not_require_provider_bootstrap(monkeypatch: pytest.MonkeyPatch) -> None:

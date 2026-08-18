@@ -231,23 +231,24 @@ class GovernanceScanner:
     def _parse_allowlisted_sources(
         self, domains: Mapping[str, Mapping[str, Any]],
     ) -> tuple[list[_AstUnit], list[_TableReference], list[tuple[str, str, str]]]:
-        roots: dict[str, str] = {}
+        roots: dict[str, tuple[str, bool]] = {}
         for owner, manifest in domains.items():
-            roots[str(manifest["artifact_path"])] = owner
+            roots[str(manifest["artifact_path"])] = (owner, False)
             database = manifest.get("database")
             if isinstance(database, Mapping):
                 migration = database.get("migration_path")
                 if isinstance(migration, str):
-                    roots[migration] = owner
+                    roots[migration] = (owner, True)
                 schema_paths = database.get("schema_paths", ())
                 if isinstance(schema_paths, (list, tuple)):
                     for schema_path in schema_paths:
                         if isinstance(schema_path, str):
-                            roots[schema_path] = owner
+                            roots.setdefault(schema_path, (owner, False))
         units: list[_AstUnit] = []
         tables: list[_TableReference] = []
         unresolved: list[tuple[str, str, str]] = []
-        for relative_root, owner in sorted(roots.items()):
+        deferred_table_names: list[tuple[str, str, int, str, str]] = []
+        for relative_root, (owner, is_migration_path) in sorted(roots.items()):
             paths = self._scan_declared_manifest_path(relative_root)
             for path in paths:
                 if path.suffix not in {".py", ".sql"} or path.name.startswith("."):
@@ -258,7 +259,7 @@ class GovernanceScanner:
                 except (OSError, UnicodeDecodeError):
                     continue
                 if path.suffix == ".sql":
-                    tables.extend(_TableReference(owner, relative, table.lower(), None, True) for table in _TABLE.findall(source))
+                    tables.extend(_TableReference(owner, relative, table.lower(), None, is_migration_path) for table in _TABLE.findall(source))
                     continue
                 try:
                     tree = ast.parse(source, filename=relative)
@@ -287,7 +288,18 @@ class GovernanceScanner:
                             _TableReference(owner, relative, table, symbol)
                             for table in sorted(table_names) for symbol in symbols or (None,)
                         )
-                    elif any("table" in symbol.lower() for symbol in symbols) or isinstance(assignment.value, (ast.BinOp, ast.JoinedStr)):
+                    elif (
+                        isinstance(assignment.value, ast.Name)
+                        and any("table" in symbol.lower() for symbol in symbols)
+                        and assignment.value.id in imported_symbols
+                    ):
+                        for symbol in symbols:
+                            if "table" in symbol.lower():
+                                deferred_table_names.append((owner, relative, assignment.lineno, symbol, assignment.value.id))
+                    elif (
+                        (any("table" in symbol.lower() or "sql" in symbol.lower() for symbol in symbols))
+                        and isinstance(assignment.value, (ast.BinOp, ast.JoinedStr, ast.Call, ast.Name))
+                    ):
                         unresolved.append((owner, relative, f"dynamic_table:{assignment.lineno}"))
                 for call in ast.walk(tree):
                     if not isinstance(call, ast.Call):
@@ -295,6 +307,16 @@ class GovernanceScanner:
                     dotted = _dotted_name(call.func).lower()
                     if dotted.endswith(("execute", "executemany", "text")) and call.args and _constant_string(call.args[0]) is None:
                         unresolved.append((owner, relative, f"dynamic_sql:{call.lineno}"))
+        literal_symbols: dict[tuple[str, str], set[str]] = defaultdict(set)
+        for reference in tables:
+            if reference.symbol:
+                literal_symbols[(reference.owner, reference.symbol)].add(reference.table)
+        for owner, source_path, lineno, target_symbol, imported_symbol in deferred_table_names:
+            candidates = literal_symbols.get((owner, imported_symbol), set())
+            if len(candidates) == 1:
+                tables.append(_TableReference(owner, source_path, next(iter(candidates)), target_symbol))
+            else:
+                unresolved.append((owner, source_path, f"dynamic_table:{lineno}"))
         return units, tables, unresolved
 
     def _scan_declared_manifest_path(self, relative_root: str) -> tuple[Path, ...]:
@@ -344,10 +366,15 @@ class GovernanceScanner:
             nodes[node.canonical_key] = node
             by_symbol[(unit.owner, unit.symbol)].append(unit)
         table_nodes: dict[tuple[str, str], str] = {}
+        table_declarations: dict[tuple[str, str], set[str]] = defaultdict(set)
         for reference in sorted(set(tables), key=lambda item: (item.owner, item.table, item.source_path, item.symbol or "")):
             table_nodes.setdefault((reference.owner, reference.table), node_key("database_table", reference.owner, f"tables/{reference.table}", reference.table))
+            table_declarations[(reference.owner, reference.table)].add(reference.source_path)
         for (owner, table), key in sorted(table_nodes.items()):
-            nodes[key] = ImplementationNode(key, owner, "database_table", f"tables/{table}", _digest({"table": table}), table)
+            nodes[key] = ImplementationNode(
+                key, owner, "database_table", f"tables/{table}", _digest({"table": table}), table,
+                metadata={"declared_by": tuple(sorted(table_declarations[(owner, table)]))},
+            )
         table_symbols: dict[tuple[str, str], set[str]] = defaultdict(set)
         tables_by_source: dict[tuple[str, str], set[str]] = defaultdict(set)
         for reference in tables:
