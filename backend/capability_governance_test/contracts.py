@@ -33,6 +33,7 @@ GID_SCHEMA = {"type": "string", "pattern": r"^[0-9]{1,19}$", "minLength": 1, "ma
 STRING_SCHEMA = {"type": "string", "minLength": 1, "maxLength": 512}
 STATUS_SCHEMA = {"type": "string", "enum": ["accepted", "completed"]}
 WRITE_IDS = {
+    "base.capability_analysis.run",
     "base.capability_scan.run",
     "base.capability_test.run",
     "base.capability_proposal.submit",
@@ -40,6 +41,10 @@ WRITE_IDS = {
     "base.capability_waiver.grant",
     "base.capability_waiver.revoke",
 }
+_LIMIT_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 200}
+_DEPTH_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 4}
+_NODES_SCHEMA = {"type": "integer", "minimum": 1, "maximum": 500}
+_VERSION_SCHEMA = {"type": "string", "minLength": 1, "maxLength": 255}
 
 
 def _closed(properties: dict[str, object], required: tuple[str, ...] = ()) -> dict[str, object]:
@@ -60,6 +65,19 @@ def _input_schema(capability_id: str) -> dict[str, object]:
     if capability_id in WRITE_IDS:
         properties["idempotency_key"] = {"type": "string", "minLength": 1, "maxLength": 255}
         required = ("idempotency_key",)
+    if capability_id == "base.capability_registry.search":
+        properties["limit"] = _LIMIT_SCHEMA
+    if capability_id == "base.capability_graph.get":
+        properties.update({"max_depth": _DEPTH_SCHEMA, "max_nodes": _NODES_SCHEMA})
+        required = ("target_gid", "max_depth", "max_nodes")
+    if capability_id in {
+        "base.capability_registry.get", "base.capability_analysis.get",
+        "base.capability_analysis.run", "base.capability_repair_prompt.generate",
+        "base.capability_test.run",
+    }:
+        required = tuple(sorted(set(required) | {"target_gid"}))
+    if capability_id in {"base.capability_review.decide", "base.capability_waiver.revoke"}:
+        properties.update({"row_version": _VERSION_SCHEMA, "expected_resource_version": _VERSION_SCHEMA})
     return _closed(properties, required)
 
 

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_version": 1,
-  "table_count": 225,
+  "table_count": 226,
   "tables": [
     {
       "table": "workmanship_agent_capability_resources",
@@ -1343,6 +1343,12 @@
     },
     {
       "table": "workmanship_base_capability_audit_events",
+      "owner": "base",
+      "runtime_domain": "base",
+      "legacy_name": false
+    },
+    {
+      "table": "workmanship_base_capability_worker_leases",
       "owner": "base",
       "runtime_domain": "base",
       "legacy_name": false

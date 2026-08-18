@@ -74,3 +74,28 @@ def test_provider_uses_service_handlers_instead_of_placeholder_results():
     result = registry.items["base.capability_registry.search"][1]({"query": "example"}, _context())
 
     assert result == {"capability_id": "base.capability_registry.search", "status": "completed"}
+
+
+def test_closed_provider_schema_admits_graph_bounds_required_by_service():
+    from backend.capabilities.registry_next import CapabilityRegistry
+
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry, CapabilityGovernanceService(_Store()))
+
+    result = __import__("asyncio").run(registry.invoke(
+        "base.capability_graph.get",
+        {"target_gid": "100", "max_depth": 4, "max_nodes": 500},
+        CapabilityContext(user_gid="42", permissions=("system.capability.read",)),
+    ))
+
+    assert result.data == {"capability_id": "base.capability_graph.get", "status": "completed"}
+
+
+def test_unconfigured_provider_fails_closed_instead_of_returning_empty_results():
+    from backend.capabilities.registry_next import CapabilityRegistry
+
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry)
+
+    with pytest.raises(CapabilityBusinessError, match="provider_unavailable"):
+        registry.get("base.capability_registry.search").handler({"query": "example"}, _context())

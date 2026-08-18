@@ -27,3 +27,44 @@ def test_worker_renews_lease_and_requeues_an_expired_run():
     leases.expire("test", "200", now + timedelta(seconds=11))
 
     assert leases.status("test", "200") == "queued"
+
+
+def test_long_running_work_renews_before_another_worker_can_claim_with_fake_clock():
+    now = [datetime(2026, 8, 18, tzinfo=UTC)]
+    leases = InMemoryRunLeaseStore(clock=lambda: now[0])
+    leases.queue("analysis", "300")
+    first = LeasedGovernanceWorker(leases, worker_id="worker-a", lease_seconds=10)
+    second = LeasedGovernanceWorker(leases, worker_id="worker-b", lease_seconds=10)
+
+    def execute(heartbeat):
+        now[0] += timedelta(seconds=9)
+        assert heartbeat() is True
+        now[0] += timedelta(seconds=9)
+        assert heartbeat() is True
+        assert second.acquire("analysis", "300") is False
+
+    assert first.run_once("analysis", "300", execute) is True
+
+
+def test_sql_completion_requeues_an_expired_lease_without_completing_it():
+    from backend.capability_governance_test.worker import SqlRunLeaseStore
+
+    statements = []
+
+    class Cursor:
+        rowcount = 0
+        def execute(self, statement, values):
+            statements.append((statement, values))
+        def close(self):
+            return None
+
+    class Connection:
+        def cursor(self): return Cursor()
+        def commit(self): return None
+        def rollback(self): return None
+
+    store = SqlRunLeaseStore(lambda: Connection(), clock=lambda: datetime(2026, 8, 18, tzinfo=UTC))
+
+    assert store.complete("analysis", "300", "worker-a") is False
+    assert "lease_expires_at > %s" in statements[0][0]
+    assert statements[1][1][0] == "queued"

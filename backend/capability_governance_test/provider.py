@@ -5,10 +5,9 @@ from typing import Any, Callable
 from unittest.mock import patch
 
 from backend.base import provider as base_provider
-from backend.capability_v2.provider_contracts import CapabilityRisk, CapabilitySpec
+from backend.capability_v2.provider_contracts import CapabilityBusinessError, CapabilityRisk, CapabilitySpec
 
 from .contracts import ALL_IDS, ANALYZE_IDS, GOVERN_IDS, INPUT_SCHEMAS, OUTPUT_SCHEMAS, RELEASE_IDS, WRITE_IDS
-from .service import CapabilityGovernanceService
 
 
 _READ_PERMISSION = "system.capability.read"
@@ -29,17 +28,17 @@ def _permissions(capability_id: str) -> tuple[str, ...]:
 
 def _handler(capability_id: str, service_port: Any) -> Callable[[dict[str, Any], object], dict[str, str]]:
     def invoke(payload: dict[str, Any], context: object) -> dict[str, str]:
-        method = getattr(service_port, capability_id.replace(".", "_"), None) if service_port else None
+        method = getattr(service_port, capability_id.replace(".", "_"), None) if service_port is not None else None
         if callable(method):
             result = method(payload, context)
             return {"capability_id": capability_id, "status": str(result["status"])}
-        return {"capability_id": capability_id, "status": "accepted" if capability_id in WRITE_IDS else "completed"}
+        raise CapabilityBusinessError("provider_unavailable", "provider_unavailable", retryable=True)
     return invoke
 
 
 def register_governance_capabilities(registry: Any, service_port: Any = None) -> None:
     """Register the extension only when explicitly requested by test bootstrap."""
-    service = service_port or CapabilityGovernanceService()
+    service = service_port
     with patch.dict(base_provider.INPUT_SCHEMAS, INPUT_SCHEMAS), patch.dict(
         base_provider.OUTPUT_SCHEMAS, OUTPUT_SCHEMAS,
     ):

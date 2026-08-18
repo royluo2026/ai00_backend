@@ -3,12 +3,13 @@ import asyncio
 from backend.capabilities.models_next import CapabilityContext
 from backend.capabilities.registry_next import CapabilityRegistry
 from backend.capability_governance_test.provider import register_governance_capabilities
+from backend.capability_governance_test.service import CapabilityGovernanceService
 from backend.routers import deps
 
 
 def _registry() -> CapabilityRegistry:
     registry = CapabilityRegistry()
-    register_governance_capabilities(registry)
+    register_governance_capabilities(registry, CapabilityGovernanceService())
     return registry
 
 

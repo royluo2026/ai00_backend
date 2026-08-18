@@ -35,6 +35,7 @@ EXPECTED_TABLES = {
     "workmanship_base_capability_waivers",
     "workmanship_base_capability_release_reports",
     "workmanship_base_capability_audit_events",
+    "workmanship_base_capability_worker_leases",
 }
 
 
@@ -66,6 +67,12 @@ def test_test_governance_migration_ledger_has_authoritative_ownership():
 
     assert ledger in {item["table"] for item in ownership["tables"]}
     assert ledger in {item["table"] for item in inventory["tables"]}
+
+
+def test_worker_leases_have_an_explicit_test_governance_table():
+    compiled = compile_governance_migrations(ROOT)
+
+    assert "CREATE TABLE IF NOT EXISTS workmanship_base_capability_worker_leases" in compiled.normalized_sql
 
 
 def test_cli_failure_redacts_configuration_and_traceback():

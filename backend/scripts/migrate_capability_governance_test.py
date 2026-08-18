@@ -54,6 +54,7 @@ GOVERNANCE_TABLES = (
     "workmanship_base_capability_waivers",
     "workmanship_base_capability_release_reports",
     "workmanship_base_capability_audit_events",
+    "workmanship_base_capability_worker_leases",
 )
 
 

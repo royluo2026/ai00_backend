@@ -1,6 +1,6 @@
 {
-  "release_id": "rel_91e644b7b533867834ac64de580f7485",
-  "catalog_hash": "sha256:91e644b7b533867834ac64de580f74850fc41d3106ac6cbae777c08f79cce640",
+  "release_id": "rel_660df808eb482b74dda4e16bf686a890",
+  "catalog_hash": "sha256:660df808eb482b74dda4e16bf686a890532dcb86760af9f7eeaef60889d774a7",
   "descriptors": [
     {
       "id": "base.capability_analysis.get",
@@ -24,7 +24,7 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -43,7 +43,9 @@
             "maxLength": 512
           }
         },
-        "required": [],
+        "required": [
+          "target_gid"
+        ],
         "additionalProperties": false
       },
       "output_schema": {
@@ -90,7 +92,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "schema_hash": "sha256:a8ba452ab4788fea3741fcea3d09c3eade001f065573066aeec0efc47506c2ff",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -167,7 +169,7 @@
       "description": "Test-only governance operation base.capability_analysis.run.",
       "use_when": "The test-governance profile needs this governed capability contract.",
       "do_not_use_when": "The test-governance extension is not explicitly enabled.",
-      "side_effect_level": "read",
+      "side_effect_level": "write",
       "execution_mode": "cloud_sync",
       "exposure": {
         "web": true,
@@ -178,8 +180,8 @@
         "worker": false,
         "local_runtime": false
       },
-      "automation_level": "A2",
-      "authorization_policy": "base.v2:system.tech_config",
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -196,9 +198,17 @@
           "query": {
             "type": "string",
             "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
           }
         },
-        "required": [],
+        "required": [
+          "idempotency_key",
+          "target_gid"
+        ],
         "additionalProperties": false
       },
       "output_schema": {
@@ -245,13 +255,13 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "schema_hash": "sha256:0a5f369e3b8ba9ccf4b777d23631e46266942cfd36c97a1efc413f94648baf7f",
       "artifact_policy": "none",
-      "operation_policy": "none",
+      "operation_policy": "optional",
       "concurrency_policy": "none",
       "expected_version_payload_path": null,
-      "idempotency_policy": "none",
-      "consistency_policy": "strong",
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
       "timeout_seconds": 30,
       "rate_limit_cost": 1,
       "execution_budget": {
@@ -264,7 +274,7 @@
         "max_parallel_per_tenant": 32,
         "overload_policy": "reject"
       },
-      "confirmation_policy": "none",
+      "confirmation_policy": "admin",
       "evidence_policy": "optional",
       "audit_policy": "standard",
       "deprecation_message": null,
@@ -334,7 +344,7 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -489,7 +499,7 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -506,9 +516,23 @@
           "query": {
             "type": "string",
             "maxLength": 512
+          },
+          "max_depth": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "max_nodes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
           }
         },
-        "required": [],
+        "required": [
+          "target_gid",
+          "max_depth",
+          "max_nodes"
+        ],
         "additionalProperties": false
       },
       "output_schema": {
@@ -555,7 +579,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "schema_hash": "sha256:346c5ba04f996ec919eb7afab73237a5d5a29a8f8c018bd65abe9b9a0b05edef",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -644,7 +668,7 @@
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -806,7 +830,7 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -825,7 +849,9 @@
             "maxLength": 512
           }
         },
-        "required": [],
+        "required": [
+          "target_gid"
+        ],
         "additionalProperties": false
       },
       "output_schema": {
@@ -872,7 +898,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "schema_hash": "sha256:a8ba452ab4788fea3741fcea3d09c3eade001f065573066aeec0efc47506c2ff",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -961,7 +987,7 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -978,6 +1004,11 @@
           "query": {
             "type": "string",
             "maxLength": 512
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
           }
         },
         "required": [],
@@ -1027,7 +1058,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "schema_hash": "sha256:ee13603882466dfdf26a470618e524cc2780f6c0f91b85661d00e1db6644b6c2",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1116,7 +1147,7 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern,system.capability.release",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -1271,7 +1302,7 @@
         "local_runtime": false
       },
       "automation_level": "A2",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -1290,7 +1321,9 @@
             "maxLength": 512
           }
         },
-        "required": [],
+        "required": [
+          "target_gid"
+        ],
         "additionalProperties": false
       },
       "output_schema": {
@@ -1337,7 +1370,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "schema_hash": "sha256:a8ba452ab4788fea3741fcea3d09c3eade001f065573066aeec0efc47506c2ff",
       "artifact_policy": "none",
       "operation_policy": "none",
       "concurrency_policy": "none",
@@ -1426,7 +1459,7 @@
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -1445,6 +1478,16 @@
             "maxLength": 512
           },
           "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "row_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "expected_resource_version": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255
@@ -1499,7 +1542,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "schema_hash": "sha256:8b961ea2c52fc50d921886fed075b1d1f949f5410dab9b31da75fc2cb5e37341",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -1588,7 +1631,7 @@
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -1750,7 +1793,7 @@
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -1775,7 +1818,8 @@
           }
         },
         "required": [
-          "idempotency_key"
+          "idempotency_key",
+          "target_gid"
         ],
         "additionalProperties": false
       },
@@ -1823,7 +1867,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "schema_hash": "sha256:0a5f369e3b8ba9ccf4b777d23631e46266942cfd36c97a1efc413f94648baf7f",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -1912,7 +1956,7 @@
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -2074,7 +2118,7 @@
         "local_runtime": false
       },
       "automation_level": "A1",
-      "authorization_policy": "base.v2:system.tech_config",
+      "authorization_policy": "base.v2:system.capability.read,system.capability.analyze,system.capability.govern",
       "resource_selectors": [],
       "data_classification": "confidential",
       "required_auth_freshness_seconds": 0,
@@ -2093,6 +2137,16 @@
             "maxLength": 512
           },
           "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "row_version": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "expected_resource_version": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255
@@ -2147,7 +2201,7 @@
         ],
         "additionalProperties": false
       },
-      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "schema_hash": "sha256:8b961ea2c52fc50d921886fed075b1d1f949f5410dab9b31da75fc2cb5e37341",
       "artifact_policy": "none",
       "operation_policy": "optional",
       "concurrency_policy": "none",
@@ -2220,8 +2274,8 @@
       "plugin_id": "test.governance",
       "module": "backend.capability_governance_test.provider",
       "version": "1.0.0",
-      "artifact_hash": "sha256:881bf2317f0ea5c564880ff37420103843d7bc998b0eaeb98eab060c195c8c0d"
+      "artifact_hash": "sha256:905cd9413c358224520accf52b7e086de96873ce05689e121a92819976d088b9"
     }
   ],
-  "created_at": "2026-08-18T13:13:39.528341Z"
+  "created_at": "2026-08-18T15:21:08.080523Z"
 }

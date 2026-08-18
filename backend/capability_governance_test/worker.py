@@ -4,7 +4,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
-from threading import RLock
+import inspect
+from threading import Event, RLock, Thread
 from typing import Any, Callable
 
 
@@ -127,11 +128,19 @@ class SqlRunLeaseStore(RunLeaseStore):
         )
 
     def complete(self, kind: str, run_gid: str, worker_id: str) -> bool:
-        return self._update(
+        now = self._clock()
+        completed = self._update(
             "UPDATE " + self.TABLE + " SET status=%s, worker_id=NULL, lease_expires_at=NULL "
-            "WHERE run_kind=%s AND run_gid=%s AND status='running' AND worker_id=%s",
-            ("completed", kind, str(run_gid), worker_id),
+            "WHERE run_kind=%s AND run_gid=%s AND status='running' AND worker_id=%s AND lease_expires_at > %s",
+            ("completed", kind, str(run_gid), worker_id, now),
         )
+        if not completed:
+            self._update(
+                "UPDATE " + self.TABLE + " SET status=%s, worker_id=NULL, lease_expires_at=NULL "
+                "WHERE run_kind=%s AND run_gid=%s AND status='running' AND worker_id=%s AND lease_expires_at <= %s",
+                ("queued", kind, str(run_gid), worker_id, now),
+            )
+        return completed
 
     def _update(self, statement: str, values: tuple[Any, ...]) -> bool:
         connection = self._connection_factory()
@@ -167,17 +176,39 @@ class LeasedGovernanceWorker:
     def complete(self, kind: str, run_gid: str) -> bool:
         return self._leases.complete(kind, str(run_gid), self._worker_id)
 
-    def run_once(self, kind: str, run_gid: str, execute: Callable[[], Any]) -> bool:
+    def run_once(self, kind: str, run_gid: str, execute: Callable[..., Any]) -> bool:
         if not self.acquire(kind, run_gid):
             return False
+        stop = Event()
+        lease_lost = Event()
+
+        def heartbeat() -> bool:
+            renewed = self.renew(kind, run_gid)
+            if not renewed:
+                lease_lost.set()
+            return renewed
+
+        def renew_while_active() -> None:
+            while not stop.wait(max(0.01, self._lease_seconds / 3)):
+                if not heartbeat():
+                    return
+
+        renewal_thread = Thread(target=renew_while_active, daemon=True)
+        renewal_thread.start()
         try:
-            execute()
-            if not self.renew(kind, run_gid):
+            if len(inspect.signature(execute).parameters) == 0:
+                execute()
+            else:
+                execute(heartbeat)
+            if lease_lost.is_set() or not heartbeat():
                 return False
             return self.complete(kind, run_gid)
         except Exception:
             # Lease expiry returns the run to queued; failures never masquerade as complete.
             raise
+        finally:
+            stop.set()
+            renewal_thread.join(timeout=1)
 
 
 __all__ = [
