@@ -43,7 +43,7 @@ def snapshot(capability_id: str, major_version: int) -> SnapshotDocument:
         product_release_id="product-2026.08",
         extension_release_id="governance-1.0",
         code_revision="abc123",
-        snapshot_hash="sha256:" + "2" * 64,
+        snapshot_hash="sha256:" + f"{major_version:064x}",
         capabilities=(capability,),
         nodes=(node,),
         bindings=(CapabilityBinding(capability_id, major_version, node.canonical_key, "provider", "sha256:" + "3" * 64),),
@@ -58,6 +58,7 @@ def test_repeat_projection_reuses_logical_and_major_gid():
 
     assert first.entries[0].capability_gid == second.entries[0].capability_gid
     assert first.entries[0].capability_version_gid == second.entries[0].capability_version_gid
+    assert first is second
 
 
 def test_major_version_gets_new_version_gid_but_preserves_logical_gid():
@@ -69,12 +70,12 @@ def test_major_version_gets_new_version_gid_but_preserves_logical_gid():
     assert first.entries[0].capability_version_gid != second.entries[0].capability_version_gid
 
 
-def test_repeat_projection_does_not_allocate_unused_identity_gids():
+def test_repeat_projection_reuses_immutable_snapshot_without_allocating_gids():
     store = MemoryGovernanceStore(next_ids=iter(range(100, 200)).__next__)
     project_snapshot(store, snapshot("craft.bop.version.list", 1))
     repeated = project_snapshot(store, snapshot("craft.bop.version.list", 1))
 
-    assert repeated.scan_run_gid == 108
+    assert repeated.scan_run_gid == 102
 
 
 def test_models_are_immutable_and_json_gids_are_decimal_strings():
@@ -87,6 +88,31 @@ def test_models_are_immutable_and_json_gids_are_decimal_strings():
     assert encoded["snapshot_gid"] == str(record.snapshot_gid)
     assert encoded["entries"][0]["capability_gid"] == str(record.entries[0].capability_gid)
     assert encoded["entries"][0]["capability_version_gid"] == str(record.entries[0].capability_version_gid)
+
+
+def test_models_deep_freeze_payloads_and_coerce_document_collections_to_tuples():
+    descriptor = {"nested": {"items": ["original"]}}
+    metadata = {"nested": {"items": ["original"]}}
+    capability = ScannedCapability(
+        capability_id="craft.bop.version.list", major_version=1, owner_domain="craft",
+        semantic_class="query", business_effect="Lists governed versions.", lifecycle_status="active",
+        descriptor_hash="sha256:" + "a" * 64, input_schema_hash="sha256:" + "b" * 64,
+        output_schema_hash="sha256:" + "c" * 64, error_schema_hash="sha256:" + "d" * 64,
+        policy_hash="sha256:" + "e" * 64, provider_hash="sha256:" + "f" * 64, descriptor=descriptor,
+    )
+    node = ImplementationNode("provider:craft.bop", "craft", "provider", "plugins/craft/provider.py", "sha256:" + "1" * 64, metadata=metadata)
+    document = SnapshotDocument("product-2026.08", "governance-1.0", "abc123", "sha256:" + "2" * 64,
+        [capability], [node], [CapabilityBinding(capability.capability_id, 1, node.canonical_key, "provider", "sha256:" + "3" * 64)],
+        [ImplementationRelation(node.canonical_key, node.canonical_key, "contains", "sha256:" + "4" * 64)],)
+
+    fingerprint_before = canonical_fingerprint(document.to_json())
+    descriptor["nested"]["items"].append("caller-change")
+    metadata["nested"]["items"].append("caller-change")
+
+    assert document.capabilities[0].descriptor["nested"]["items"] == ("original",)
+    assert document.nodes[0].metadata["nested"]["items"] == ("original",)
+    assert all(isinstance(value, tuple) for value in (document.capabilities, document.nodes, document.bindings, document.relations))
+    assert canonical_fingerprint(document.to_json()) == fingerprint_before
 
 
 def test_canonical_fingerprint_is_independent_of_mapping_order():

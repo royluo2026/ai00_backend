@@ -13,8 +13,29 @@ class ImmutableRecordError(RuntimeError):
     """Raised when an immutable governance record would be changed."""
 
 
+def _freeze(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return MappingProxyType({str(key): _freeze(item) for key, item in value.items()})
+    if isinstance(value, tuple | list):
+        return tuple(_freeze(item) for item in value)
+    if isinstance(value, set | frozenset):
+        return tuple(sorted((_freeze(item) for item in value), key=repr))
+    return value
+
+
 def _frozen_mapping(value: Mapping[str, Any]) -> Mapping[str, Any]:
-    return MappingProxyType(dict(value))
+    frozen = _freeze(value)
+    if not isinstance(frozen, Mapping):
+        raise TypeError("expected a mapping")
+    return frozen
+
+
+def _json_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _json_value(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_json_value(item) for item in value]
+    return value
 
 
 @dataclass(frozen=True)
@@ -50,7 +71,7 @@ class ScannedCapability:
             "error_schema_hash": self.error_schema_hash,
             "policy_hash": self.policy_hash,
             "provider_hash": self.provider_hash,
-            "descriptor": dict(self.descriptor),
+            "descriptor": _json_value(self.descriptor),
         }
 
 
@@ -75,7 +96,7 @@ class ImplementationNode:
             "node_type": self.node_type, "source_path": self.source_path,
             "artifact_hash": self.artifact_hash, "source_symbol": self.source_symbol,
             "http_method": self.http_method, "route_path": self.route_path,
-            "metadata": dict(self.metadata),
+            "metadata": _json_value(self.metadata),
         }
 
 
@@ -133,6 +154,12 @@ class SnapshotDocument:
     bindings: tuple[CapabilityBinding, ...]
     relations: tuple[ImplementationRelation, ...]
 
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "capabilities", tuple(self.capabilities))
+        object.__setattr__(self, "nodes", tuple(self.nodes))
+        object.__setattr__(self, "bindings", tuple(self.bindings))
+        object.__setattr__(self, "relations", tuple(self.relations))
+
     def to_json(self) -> dict[str, Any]:
         return {
             "product_release_id": self.product_release_id,
@@ -141,8 +168,8 @@ class SnapshotDocument:
             "snapshot_hash": self.snapshot_hash,
             "capabilities": [item.to_json() for item in self.capabilities],
             "nodes": [item.to_json() for item in self.nodes],
-            "bindings": [item.__dict__.copy() for item in self.bindings],
-            "relations": [item.__dict__.copy() for item in self.relations],
+            "bindings": [_json_value(item.__dict__) for item in self.bindings],
+            "relations": [_json_value(item.__dict__) for item in self.relations],
         }
 
 
@@ -166,6 +193,9 @@ class SnapshotRecord:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "node_gids", _frozen_mapping(self.node_gids))
+        object.__setattr__(self, "entries", tuple(self.entries))
+        object.__setattr__(self, "binding_gids", tuple(self.binding_gids))
+        object.__setattr__(self, "relation_gids", tuple(self.relation_gids))
 
     def to_json(self) -> dict[str, Any]:
         return {

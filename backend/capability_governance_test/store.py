@@ -55,9 +55,15 @@ class MemoryGovernanceStore(GovernanceStore):
         self._logical_ids: dict[str, int] = {}
         self._major_ids: dict[tuple[int, int], int] = {}
         self._snapshots: dict[int, SnapshotRecord] = {}
+        self._snapshots_by_hash: dict[str, SnapshotRecord] = {}
 
     def import_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         with self._lock:
+            existing = self._snapshots_by_hash.get(document.snapshot_hash)
+            if existing is not None:
+                if existing.document != document:
+                    raise ImmutableRecordError("snapshot_hash_conflict")
+                return existing
             projections = self._project_capabilities(document)
             scan_run_gid = self._next_ids()
             snapshot_gid = self._next_ids()
@@ -76,6 +82,7 @@ class MemoryGovernanceStore(GovernanceStore):
                 relation_gids=tuple(self._next_ids() for _ in document.relations),
             )
             self._snapshots[snapshot_gid] = record
+            self._snapshots_by_hash[document.snapshot_hash] = record
             return record
 
     def get_snapshot(self, snapshot_gid: int) -> SnapshotRecord | None:
@@ -113,13 +120,28 @@ class SqlGovernanceStore(GovernanceStore):
     def import_snapshot(self, document: SnapshotDocument) -> SnapshotRecord:
         cursor = self._connection.cursor()
         try:
-            projections = tuple(self._resolve_projection(cursor, capability) for capability in document.capabilities)
-            self._ensure_no_duplicate_majors(projections)
+            existing = self._select_snapshot(cursor, document.snapshot_hash)
+            if existing is not None:
+                return self._load_existing_snapshot(cursor, existing, document)
             created_at = _now()
             scan_run_gid = self._next_ids()
             snapshot_gid = self._next_ids()
+            projections = tuple(
+                self._resolve_projection(cursor, capability, snapshot_gid)
+                for capability in document.capabilities
+            )
+            self._ensure_no_duplicate_majors(projections)
             self._insert_scan_run(cursor, scan_run_gid, document, created_at)
-            self._insert_snapshot(cursor, snapshot_gid, scan_run_gid, document, created_at)
+            try:
+                self._insert_snapshot(cursor, snapshot_gid, scan_run_gid, document, created_at)
+            except Exception as exc:
+                if not _duplicate_key(exc):
+                    raise
+                self._connection.rollback()
+                recovered = self._select_snapshot(cursor, document.snapshot_hash)
+                if recovered is None:
+                    raise ImmutableRecordError("snapshot_hash_conflict: winning snapshot was not recoverable") from exc
+                return self._load_existing_snapshot(cursor, recovered, document)
             entries = self._insert_snapshot_entries(cursor, snapshot_gid, projections, document, created_at)
             node_gids = self._insert_nodes(cursor, snapshot_gid, document, created_at)
             binding_gids = self._insert_bindings(cursor, snapshot_gid, projections, node_gids, document)
@@ -139,9 +161,9 @@ class SqlGovernanceStore(GovernanceStore):
             if callable(close):
                 close()
 
-    def _resolve_projection(self, cursor: Any, capability: ScannedCapability) -> CapabilityProjection:
+    def _resolve_projection(self, cursor: Any, capability: ScannedCapability, snapshot_gid: int) -> CapabilityProjection:
         capability_gid = self._resolve_logical_gid(cursor, capability)
-        capability_version_gid = self._resolve_major_gid(cursor, capability_gid, capability)
+        capability_version_gid = self._resolve_major_gid(cursor, capability_gid, capability, snapshot_gid)
         return _projection(capability, capability_gid, capability_version_gid)
 
     def _resolve_logical_gid(self, cursor: Any, capability: ScannedCapability) -> int:
@@ -166,7 +188,7 @@ class SqlGovernanceStore(GovernanceStore):
                 raise ImmutableRecordError("identity_conflict: logical capability was not recoverable") from exc
             return self._verify_logical(recovered, capability)
 
-    def _resolve_major_gid(self, cursor: Any, capability_gid: int, capability: ScannedCapability) -> int:
+    def _resolve_major_gid(self, cursor: Any, capability_gid: int, capability: ScannedCapability, first_seen_snapshot_gid: int) -> int:
         row = self._select_major(cursor, capability_gid, capability.major_version)
         if row is not None:
             return self._verify_major(row, capability_gid, capability.major_version)
@@ -177,7 +199,7 @@ class SqlGovernanceStore(GovernanceStore):
                 "(capability_version_gid, capability_gid, major_version, semantic_class, business_effect, lifecycle_status, first_seen_snapshot_gid, latest_snapshot_gid, retired_at, row_version) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (candidate, capability_gid, capability.major_version, capability.semantic_class,
-                 capability.business_effect, capability.lifecycle_status, None, None, None, 1),
+                 capability.business_effect, capability.lifecycle_status, first_seen_snapshot_gid, None, None, 1),
             )
             return candidate
         except Exception as exc:
@@ -197,6 +219,70 @@ class SqlGovernanceStore(GovernanceStore):
         return cursor.fetchone()
 
     @staticmethod
+    def _select_snapshot(cursor: Any, snapshot_hash: str) -> Any:
+        cursor.execute(
+            "SELECT snapshot_gid, scan_run_gid, snapshot_hash, code_revision, catalog_release_id, descriptor_count "
+            "FROM workmanship_base_capability_snapshots WHERE snapshot_hash = %s",
+            (snapshot_hash,),
+        )
+        return cursor.fetchone()
+
+    def _load_existing_snapshot(self, cursor: Any, row: Any, document: SnapshotDocument) -> SnapshotRecord:
+        snapshot_gid = int(_row_value(row, "snapshot_gid", 0))
+        scan_run_gid = int(_row_value(row, "scan_run_gid", 1))
+        if (_row_value(row, "snapshot_hash", 2) != document.snapshot_hash
+                or _row_value(row, "code_revision", 3) != document.code_revision
+                or _row_value(row, "catalog_release_id", 4) != document.product_release_id
+                or int(_row_value(row, "descriptor_count", 5)) != len(document.capabilities)):
+            raise ImmutableRecordError("snapshot_hash_conflict")
+        cursor.execute(
+            "SELECT snapshot_entry_gid, capability_gid, capability_version_gid, capability_id, major_version, owner_domain, semantic_class, business_effect, lifecycle_status, descriptor_hash "
+            "FROM workmanship_base_capability_snapshot_entries AS snapshot_entry "
+            "JOIN workmanship_base_capability_versions AS capability_version "
+            "ON capability_version.capability_version_gid = snapshot_entry.capability_version_gid "
+            "JOIN workmanship_base_capability_entries AS capability_entry "
+            "ON capability_entry.capability_gid = capability_version.capability_gid "
+            "WHERE snapshot_entry.snapshot_gid = %s",
+            (snapshot_gid,),
+        )
+        entries = tuple(self._entry_from_row(item) for item in cursor.fetchall())
+        expected = {(item.capability_id, item.major_version, item.descriptor_hash) for item in document.capabilities}
+        actual = {(item.capability_id, item.major_version, item.descriptor_hash) for item in entries}
+        if actual != expected:
+            raise ImmutableRecordError("snapshot_hash_conflict")
+        cursor.execute(
+            "SELECT implementation_node_gid, canonical_key FROM workmanship_base_capability_implementation_nodes WHERE snapshot_gid = %s",
+            (snapshot_gid,),
+        )
+        node_gids = {str(_row_value(item, "canonical_key", 1)): int(_row_value(item, "implementation_node_gid", 0)) for item in cursor.fetchall()}
+        cursor.execute(
+            "SELECT binding_gid FROM workmanship_base_capability_bindings WHERE snapshot_gid = %s",
+            (snapshot_gid,),
+        )
+        binding_gids = tuple(int(_row_value(item, "binding_gid", 0)) for item in cursor.fetchall())
+        cursor.execute(
+            "SELECT relation_gid FROM workmanship_base_capability_implementation_relations WHERE snapshot_gid = %s",
+            (snapshot_gid,),
+        )
+        relation_gids = tuple(int(_row_value(item, "relation_gid", 0)) for item in cursor.fetchall())
+        return SnapshotRecord(snapshot_gid, scan_run_gid, document, entries, node_gids, binding_gids, relation_gids)
+
+    @staticmethod
+    def _entry_from_row(row: Any) -> SnapshotEntry:
+        return SnapshotEntry(
+            snapshot_entry_gid=int(_row_value(row, "snapshot_entry_gid", 0)),
+            capability_gid=int(_row_value(row, "capability_gid", 1)),
+            capability_version_gid=int(_row_value(row, "capability_version_gid", 2)),
+            capability_id=str(_row_value(row, "capability_id", 3)),
+            major_version=int(_row_value(row, "major_version", 4)),
+            owner_domain=str(_row_value(row, "owner_domain", 5)),
+            semantic_class=str(_row_value(row, "semantic_class", 6)),
+            business_effect=str(_row_value(row, "business_effect", 7)),
+            lifecycle_status=str(_row_value(row, "lifecycle_status", 8)),
+            descriptor_hash=str(_row_value(row, "descriptor_hash", 9)),
+        )
+
+    @staticmethod
     def _select_major(cursor: Any, capability_gid: int, major_version: int) -> Any:
         cursor.execute(
             "SELECT capability_version_gid, capability_gid, major_version FROM workmanship_base_capability_versions "
@@ -209,7 +295,8 @@ class SqlGovernanceStore(GovernanceStore):
     def _verify_logical(row: Any, capability: ScannedCapability) -> int:
         if _row_value(row, "capability_id", 1) != capability.capability_id:
             raise ImmutableRecordError("identity_conflict: logical capability mismatch")
-        if isinstance(row, Mapping) and row.get("owner_domain") not in {None, capability.owner_domain}:
+        owner_domain = row.get("owner_domain") if isinstance(row, Mapping) else _row_value(row, "owner_domain", 2)
+        if owner_domain not in {None, capability.owner_domain}:
             raise ImmutableRecordError("identity_conflict: logical owner mismatch")
         return int(_row_value(row, "capability_gid", 0))
 
@@ -315,8 +402,8 @@ class SqlGovernanceStore(GovernanceStore):
     def _update_mutable_projections(cursor: Any, snapshot_gid: int, projections: tuple[CapabilityProjection, ...], seen_at: datetime) -> None:
         for projection in projections:
             cursor.execute(
-                "UPDATE workmanship_base_capability_entries SET current_major_version = %s, current_lifecycle_status = %s, last_seen_at = %s, row_version = row_version + 1 WHERE capability_gid = %s",
-                (projection.major_version, projection.lifecycle_status, seen_at, projection.capability_gid),
+                "UPDATE workmanship_base_capability_entries SET current_lifecycle_status = %s, last_seen_at = %s, row_version = row_version + 1 WHERE capability_gid = %s",
+                (projection.lifecycle_status, seen_at, projection.capability_gid),
             )
             cursor.execute(
                 "UPDATE workmanship_base_capability_versions SET latest_snapshot_gid = %s, lifecycle_status = %s, row_version = row_version + 1 WHERE capability_version_gid = %s",
