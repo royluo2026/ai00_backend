@@ -2,16 +2,19 @@
 from __future__ import annotations
 
 import json
+import base64
 import subprocess
 import sys
 from pathlib import Path
 
+from backend.scripts.check_capability_v2_completion import _governance_acceptance
 from backend.scripts.run_capability_governance_release_acceptance import (
     FakeEnvironment,
     MANDATORY_SECTIONS,
     run_real_acceptance,
     run_acceptance,
 )
+from backend.capability_governance_test.fingerprint import canonical_fingerprint
 
 
 def test_acceptance_runner_has_no_optional_mandatory_sections() -> None:
@@ -23,6 +26,8 @@ def test_acceptance_runner_has_no_optional_mandatory_sections() -> None:
     assert report.sections["health"].evidence["fast_profile"] == "passed"
     assert report.sections["health"].evidence["release_e2e_profile"] == "passed"
     assert report.sections["ui"].evidence["css_asset_hash"].startswith("sha256:")
+    assert report.sections["permissions"].evidence["allowed_invocations"] == 2
+    assert report.sections["agent_delegation"].evidence["denied_invocations"] == 2
 
 
 def test_live_acceptance_fails_closed_without_authorized_test_profile() -> None:
@@ -69,6 +74,39 @@ def test_completion_check_rejects_forged_unit_governance_acceptance_report(tmp_p
     root = Path(__file__).resolve().parents[2]
     report_path = tmp_path / "acceptance.json"
     report_path.write_text(json.dumps({"status": "passed", "failed": 0, "skipped": 0, "mandatory_sections": sorted(MANDATORY_SECTIONS), "sections": {name: {"status": "passed"} for name in MANDATORY_SECTIONS}}), encoding="utf-8")
+
+    completed = subprocess.run(
+        [sys.executable, str(root / "backend/scripts/check_capability_v2_completion.py"), "--mode", "strict", "--governance-acceptance-report", str(report_path)],
+        cwd=root, text=True, capture_output=True, check=False,
+    )
+
+    assert completed.returncode == 1
+    assert json.loads(completed.stdout)["governance_acceptance"]["status"] == "failed"
+
+
+def test_completion_check_rejects_forged_complete_live_report_with_invalid_signature(tmp_path: Path) -> None:
+    root = Path(__file__).resolve().parents[2]
+    sections = {name: {"status": "passed", "evidence": {}} for name in MANDATORY_SECTIONS}
+    sections["snapshot"]["evidence"]["snapshot_gid"] = "2"
+    sections["health"]["evidence"]["test_run_gid"] = "3"
+    sections["release_gate"]["evidence"]["release_report_gid"] = "4"
+    report = {
+        "execution_mode": "live", "status": "passed", "failed": 0, "skipped": 0,
+        "report_gid": "1", "mandatory_sections": sorted(MANDATORY_SECTIONS), "sections": sections,
+        "hashes": {name: "sha256:" + "0" * 64 for name in ("product_catalog", "governance_extension", "snapshot")},
+        "provenance": {
+            "adapter": "AI00Backend-CapabilityV2",
+            "signing_key_id": "capability-governance-test-release",
+            "signature": base64.b64encode(b"forged-signature" * 5).decode("ascii"),
+        },
+    }
+    report["report_hash"] = canonical_fingerprint(report)
+    report_path = tmp_path / "forged-live-acceptance.json"
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+
+    # A length-only signature check would accept this report.  The checker must
+    # validate the signed payload with the allowlisted Ed25519 public key.
+    assert _governance_acceptance(report_path)["status"] == "failed"
 
     completed = subprocess.run(
         [sys.executable, str(root / "backend/scripts/check_capability_v2_completion.py"), "--mode", "strict", "--governance-acceptance-report", str(report_path)],

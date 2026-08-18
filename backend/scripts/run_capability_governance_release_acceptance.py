@@ -8,6 +8,7 @@ requires an explicit authorised test profile and test-only credentials.
 from __future__ import annotations
 
 import argparse
+import asyncio
 import hashlib
 import json
 import os
@@ -305,12 +306,22 @@ def _controlled_fixture_codes() -> dict[str, str]:
 
 
 def _permission_evidence() -> dict[str, Any]:
+    from types import SimpleNamespace
+
+    from backend.capabilities.models_next import CapabilityContext
     from backend.capabilities.registry_next import CapabilityRegistry
     from backend.capability_governance_test.provider import register_governance_capabilities
     from backend.capability_governance_test.service import CapabilityGovernanceService
 
+    class AcceptanceStore:
+        @staticmethod
+        def get_snapshot(snapshot_gid: int) -> SimpleNamespace:
+            return SimpleNamespace(snapshot_gid=snapshot_gid)
+
     registry = CapabilityRegistry()
-    register_governance_capabilities(registry, CapabilityGovernanceService())
+    register_governance_capabilities(
+        registry, CapabilityGovernanceService(store=AcceptanceStore()),
+    )
     expected = {
         **{identifier: ("system.capability.read",) for identifier in READ_IDS},
         **{identifier: ("system.capability.read", "system.capability.analyze") for identifier in ANALYZE_IDS},
@@ -320,7 +331,33 @@ def _permission_evidence() -> dict[str, Any]:
     actual = {identifier: tuple(registry.get(identifier).spec.permissions) for identifier in expected}
     if actual != expected:
         raise RuntimeError("permission_boundary_not_exercised")
-    return {"permission_contract_hash": canonical_fingerprint(actual), "capability_count": len(actual)}
+
+    invocations = (
+        (
+            "base.capability_registry.search",
+            {"query": "capability"},
+            CapabilityContext(user_gid="analyst", permissions=("system.capability.read",)),
+        ),
+        (
+            "base.capability_repair_prompt.generate",
+            {"target_gid": "1"},
+            CapabilityContext(
+                user_gid="analyst",
+                permissions=("system.capability.read", "system.capability.analyze"),
+            ),
+        ),
+    )
+    allowed = 0
+    for capability_id, payload, context in invocations:
+        result = asyncio.run(registry.invoke(capability_id, payload, context))
+        if result.data.get("status") != "completed":
+            raise RuntimeError("allowed_permission_invocation_failed")
+        allowed += 1
+    return {
+        "permission_contract_hash": canonical_fingerprint(actual),
+        "capability_count": len(actual),
+        "allowed_invocations": allowed,
+    }
 
 
 def _health_evidence() -> dict[str, Any]:
@@ -340,6 +377,11 @@ def _health_evidence() -> dict[str, Any]:
 
 
 def _delegation_evidence() -> dict[str, Any]:
+    from backend.capabilities.confirmation_next import confirmation_manager
+    from backend.capabilities.models_next import CapabilityContext
+    from backend.capabilities.registry_next import CapabilityPermissionError, CapabilityRegistry
+    from backend.capability_governance_test.provider import register_governance_capabilities
+    from backend.capability_governance_test.service import CapabilityGovernanceService
     from backend.capability_v2.delegation import DelegationGrant, InMemoryDelegationStore, issue_delegation
     from backend.capability_v2.contracts import AutomationLevel, ConsumerType
 
@@ -354,8 +396,37 @@ def _delegation_evidence() -> dict[str, Any]:
     issued = issue_delegation(active, grant.model_copy(update={"delegation_id": "delegation-2"}))
     if active.consume_active(issued.token).capability_scopes != grant.capability_scopes:
         raise RuntimeError("delegation_not_exercised")
+
+    registry = CapabilityRegistry()
+    register_governance_capabilities(registry, CapabilityGovernanceService())
+    denied_invocations = 0
+    attempts = (
+        ("base.capability_proposal.submit", {"idempotency_key": "delegated-submit"}),
+        ("base.capability_release_gate.evaluate", {}),
+    )
+    for capability_id, payload in attempts:
+        token = confirmation_manager.issue(
+            capability_id, 1, grant.user_id, payload,
+        ) if registry.get(capability_id).spec.confirmation != "none" else None
+        context = CapabilityContext(
+            user_gid=grant.user_id,
+            source="agent",
+            permissions=("system.capability.read", "system.capability.analyze"),
+            confirmation_token=token,
+            agent_run_id=grant.agent_run_id,
+            delegation_token=issued.token,
+        )
+        try:
+            asyncio.run(registry.invoke(capability_id, payload, context))
+        except CapabilityPermissionError:
+            denied_invocations += 1
+        else:
+            raise RuntimeError("delegated_permission_boundary_not_enforced")
+    if denied_invocations != len(attempts):
+        raise RuntimeError("delegated_permission_boundary_not_exercised")
     return {"delegated_identity": grant.user_id, "allowed_capabilities": grant.capability_scopes,
-            "denied_capabilities": ("base.capability_proposal.submit", "base.capability_release_gate.evaluate")}
+            "denied_capabilities": ("base.capability_proposal.submit", "base.capability_release_gate.evaluate"),
+            "denied_invocations": denied_invocations}
 
 
 def _redaction_evidence() -> dict[str, Any]:
