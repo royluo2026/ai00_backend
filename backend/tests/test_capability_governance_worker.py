@@ -68,3 +68,42 @@ def test_sql_completion_requeues_an_expired_lease_without_completing_it():
     assert store.complete("analysis", "300", "worker-a") is False
     assert "lease_expires_at > %s" in statements[0][0]
     assert statements[1][1][0] == "queued"
+
+
+def test_sql_acquire_creates_queue_row_denies_live_competitor_and_reclaims_expiry():
+    from backend.capability_governance_test.worker import SqlRunLeaseStore
+
+    now = [datetime(2026, 8, 18, tzinfo=UTC)]
+    rows = {}
+
+    class Cursor:
+        rowcount = 0
+        def execute(self, statement, values):
+            if statement.startswith("INSERT INTO"):
+                _, kind, run_gid, status, _, _, _, _ = values
+                rows.setdefault((kind, run_gid), {"status": status, "worker_id": None, "expires": None})
+                self.rowcount = 1
+            elif "SET status=%s, worker_id=%s, lease_expires_at=%s" in statement:
+                _, worker_id, expiry, _, kind, run_gid, observed = values
+                row = rows[(kind, run_gid)]
+                eligible = row["status"] == "queued" or (
+                    row["status"] == "running" and row["expires"] <= observed
+                )
+                if eligible:
+                    row.update(status="running", worker_id=worker_id, expires=expiry)
+                    self.rowcount = 1
+                else:
+                    self.rowcount = 0
+        def close(self): return None
+
+    class Connection:
+        def cursor(self): return Cursor()
+        def commit(self): return None
+        def rollback(self): return None
+
+    store = SqlRunLeaseStore(lambda: Connection(), clock=lambda: now[0], next_ids=lambda: 9001)
+
+    assert store.acquire("analysis", "300", "worker-a", lease_seconds=10) is True
+    assert store.acquire("analysis", "300", "worker-b", lease_seconds=10) is False
+    now[0] += timedelta(seconds=11)
+    assert store.acquire("analysis", "300", "worker-b", lease_seconds=10) is True

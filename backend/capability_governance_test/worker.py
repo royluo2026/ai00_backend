@@ -8,6 +8,8 @@ import inspect
 from threading import Event, RLock, Thread
 from typing import Any, Callable
 
+from backend.utils.gid import next_gid
+
 
 def _now() -> datetime:
     return datetime.now(UTC)
@@ -106,18 +108,45 @@ class SqlRunLeaseStore(RunLeaseStore):
 
     TABLE = "workmanship_base_capability_worker_leases"
 
-    def __init__(self, connection_factory: Callable[[], Any], *, clock: Callable[[], datetime] = _now) -> None:
+    def __init__(
+        self,
+        connection_factory: Callable[[], Any],
+        *,
+        clock: Callable[[], datetime] = _now,
+        next_ids: Callable[[], int] = next_gid,
+    ) -> None:
         self._connection_factory = connection_factory
         self._clock = clock
+        self._next_ids = next_ids
 
     def acquire(self, kind: str, run_gid: str, worker_id: str, *, lease_seconds: int) -> bool:
         now = self._clock()
         expiry = now + timedelta(seconds=lease_seconds)
-        return self._update(
-            "UPDATE " + self.TABLE + " SET status=%s, worker_id=%s, lease_expires_at=%s "
-            "WHERE run_kind=%s AND run_gid=%s AND (status='queued' OR (status='running' AND lease_expires_at <= %s))",
-            ("running", worker_id, expiry, kind, str(run_gid), now),
-        )
+        connection = self._connection_factory()
+        cursor = connection.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO " + self.TABLE + " "
+                "(worker_lease_gid, run_kind, run_gid, status, worker_id, lease_expires_at, created_at, updated_at) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) "
+                "ON DUPLICATE KEY UPDATE updated_at=updated_at",
+                (self._next_ids(), kind, int(run_gid), "queued", None, None, now, now),
+            )
+            cursor.execute(
+                "UPDATE " + self.TABLE + " SET status=%s, worker_id=%s, lease_expires_at=%s, updated_at=%s "
+                "WHERE run_kind=%s AND run_gid=%s AND (status='queued' OR (status='running' AND lease_expires_at <= %s))",
+                ("running", worker_id, expiry, now, kind, int(run_gid), now),
+            )
+            changed = int(cursor.rowcount) == 1
+            connection.commit()
+            return changed
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            close = getattr(cursor, "close", None)
+            if callable(close):
+                close()
 
     def renew(self, kind: str, run_gid: str, worker_id: str, *, lease_seconds: int) -> bool:
         now = self._clock()
