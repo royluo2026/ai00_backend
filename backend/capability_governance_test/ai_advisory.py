@@ -1,0 +1,167 @@
+"""Bounded candidate-only advisory adapter over the governed Agent domain."""
+from __future__ import annotations
+
+from collections.abc import Mapping
+from datetime import UTC, datetime, timedelta
+import hashlib
+import json
+import re
+from typing import Any, Literal
+
+from pydantic import Field, ValidationError
+
+from backend.capability_v2.contracts import CapabilityStatus, ConsumerIdentity, CorrelationRef, FrozenModel
+from backend.capability_v2.domain_client import DomainCapabilityClient, DomainInvocation
+from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
+
+from .redaction import redact
+
+
+_MAX_INPUT_BYTES = 64 * 1024
+_MAX_OUTPUT_BYTES = 64 * 1024
+_MAX_TIMEOUT_SECONDS = 30
+_DECIMAL_GID = re.compile(r"^[0-9]{1,19}$")
+_ALLOWED_PACKAGE_FIELDS = frozenset({
+    "snapshot_gid", "snapshot_hash", "capability_ids", "capability_version_gids", "capabilities",
+    "business_effect", "business_effects", "schema_summaries", "policies", "evidence_summaries",
+    "model_policy_version", "hashes",
+})
+
+
+class AdvisoryContractError(ValueError):
+    """Raised when a model-advisory input or output crosses its fixed contract."""
+
+
+class AdvisoryFinding(FrozenModel):
+    finding_type: Literal[
+        "duplicate", "semantic_overlap", "conflict", "gap", "non_atomic_facade", "lifecycle_pair_gap",
+    ]
+    subject_version_gids: tuple[str, ...] = Field(min_length=1)
+    confidence: float = Field(ge=0, le=1)
+    evidence_keys: tuple[str, ...]
+    recommendation: str = Field(min_length=1, max_length=4000)
+    status: Literal["candidate"] = "candidate"
+
+    @classmethod
+    def _validate_gids(cls, value: Any) -> Any:
+        if not isinstance(value, (tuple, list)) or not value or any(
+            not isinstance(item, str) or _DECIMAL_GID.fullmatch(item) is None
+            for item in value
+        ):
+            raise AdvisoryContractError("candidate_only: subject_version_gids must be decimal strings")
+        return value
+
+    def __init__(self, **data: Any) -> None:
+        data["subject_version_gids"] = self._validate_gids(data.get("subject_version_gids"))
+        super().__init__(**data)
+
+
+class AdvisoryResult(FrozenModel):
+    findings: tuple[AdvisoryFinding, ...] = ()
+    status: Literal["candidate"] = "candidate"
+
+
+def advisory_result(**values: Any) -> dict[str, Any]:
+    """Small fixture-safe constructor; validation remains at the boundary."""
+    return {"findings": values.pop("findings", ()), "status": values.pop("status", "candidate"), **values}
+
+
+def validate_advisory(value: Any) -> AdvisoryResult:
+    """Validate exactly the candidate contract; advice can never become a decision."""
+    try:
+        if isinstance(value, AdvisoryResult):
+            result = value
+        elif isinstance(value, Mapping):
+            result = AdvisoryResult.model_validate(value)
+        else:
+            raise AdvisoryContractError("candidate_only: advisory result must be a mapping")
+    except AdvisoryContractError:
+        raise
+    except ValidationError as exc:
+        raise AdvisoryContractError(f"candidate_only: {exc.errors()[0]['msg']}") from exc
+    if result.status != "candidate" or any(finding.status != "candidate" for finding in result.findings):
+        raise AdvisoryContractError("candidate_only: confirmed findings are forbidden")
+    return result
+
+
+def _json_bytes(value: Any) -> bytes:
+    try:
+        return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+    except (TypeError, ValueError) as exc:
+        raise AdvisoryContractError("invalid_advisory_json") from exc
+
+
+def bounded_candidate_package(package: Mapping[str, Any]) -> dict[str, Any]:
+    """Reduce a package to its declared advisory surface before redaction and transport."""
+    if not isinstance(package, Mapping):
+        raise AdvisoryContractError("invalid_candidate_package")
+    safe = redact({str(key): value for key, value in package.items() if str(key) in _ALLOWED_PACKAGE_FIELDS})
+    if not isinstance(safe, dict):
+        raise AdvisoryContractError("invalid_candidate_package")
+    return safe
+
+
+class GovernedAgentAdvisor(GovernanceAdvisorPort):
+    """Calls only ``DomainCapabilityClient``; no model HTTP client is present here."""
+
+    def __init__(
+        self,
+        client: DomainCapabilityClient,
+        *,
+        max_input_bytes: int = _MAX_INPUT_BYTES,
+        max_output_bytes: int = _MAX_OUTPUT_BYTES,
+        timeout_seconds: int = _MAX_TIMEOUT_SECONDS,
+    ) -> None:
+        if not 1 <= max_input_bytes <= _MAX_INPUT_BYTES:
+            raise AdvisoryContractError("invalid_input_byte_limit")
+        if not 1 <= max_output_bytes <= _MAX_OUTPUT_BYTES:
+            raise AdvisoryContractError("invalid_output_byte_limit")
+        if not 1 <= timeout_seconds <= _MAX_TIMEOUT_SECONDS:
+            raise AdvisoryContractError("invalid_advisory_deadline")
+        self._client = client
+        self._max_input_bytes = max_input_bytes
+        self._max_output_bytes = max_output_bytes
+        self._timeout_seconds = timeout_seconds
+
+    async def review(
+        self,
+        package: Mapping[str, Any],
+        *,
+        identity: ConsumerIdentity,
+        request_id: str,
+    ) -> AdvisoryResult:
+        if len(_json_bytes(package)) > self._max_input_bytes:
+            raise AdvisoryContractError("input_bytes_exceeded")
+        candidate_package = bounded_candidate_package(package)
+        request_hash = hashlib.sha256(_json_bytes(candidate_package)).hexdigest()
+        payload = {
+            "resource_gid": "capability-governance-advisory",
+            "status": "requested",
+            "content": {"kind": "capability_governance_advisory", "package": candidate_package},
+        }
+        if len(_json_bytes(payload)) > self._max_input_bytes:
+            raise AdvisoryContractError("input_bytes_exceeded")
+        deadline = datetime.now(UTC) + timedelta(seconds=self._timeout_seconds)
+        result = await self._client.invoke(
+            DomainInvocation(
+                "agent.interaction.request", 1, payload,
+                idempotency_key=f"capability-advisory:{request_hash}",
+            ),
+            identity,
+            CorrelationRef(request_id=request_id),
+            deadline=deadline,
+        )
+        if result.status is not CapabilityStatus.COMPLETED or not result.ok:
+            raise AdvisoryContractError("agent_advisory_not_completed")
+        if len(_json_bytes(result.data)) > self._max_output_bytes:
+            raise AdvisoryContractError("output_bytes_exceeded")
+        data = result.data
+        if isinstance(data, Mapping) and isinstance(data.get("content"), Mapping):
+            data = data["content"]
+        return validate_advisory(data)
+
+
+__all__ = [
+    "AdvisoryContractError", "AdvisoryFinding", "AdvisoryResult", "GovernedAgentAdvisor",
+    "advisory_result", "bounded_candidate_package", "validate_advisory",
+]

@@ -6,8 +6,11 @@ from dataclasses import dataclass
 from typing import Any
 
 from backend.capabilities.models_next import CapabilityBusinessError
+from backend.domain_ports.capability_governance_ai import GovernanceAdvisorPort
 
 from .analysis import AnalysisRequest, run_deterministic_analysis
+from .prompting import RedactedPrompt, build_repair_prompt
+from .redaction import redact
 
 
 _MAX_SEARCH = 200
@@ -56,12 +59,17 @@ class CapabilityGovernanceService:
         *,
         scanner: Any | None = None,
         analysis_runner: Callable[..., Any] = run_deterministic_analysis,
+        advisor: GovernanceAdvisorPort | None = None,
+        audit_sink: Any | None = None,
     ) -> None:
         self._store = store
         self._scanner = scanner
         self._analysis_runner = analysis_runner
+        self._advisor = advisor
+        self._audit_sink = audit_sink
         self._runs: dict[tuple[str, str, str], GovernedRun] = {}
         self._mutations: dict[tuple[str, str], dict[str, str]] = {}
+        self._prompt_records: dict[str, dict[str, str]] = {}
         self._next_run_gid = 1
 
     def base_capability_registry_search(self, payload: Mapping[str, Any], context: object) -> dict[str, Any]:
@@ -149,6 +157,43 @@ class CapabilityGovernanceService:
         snapshot = self._snapshot({"target_gid": str(snapshot_gid)})
         return self._analysis_runner(getattr(snapshot, "document"), AnalysisRequest())
 
+    async def review_advisory(self, package: Mapping[str, Any], *, context: object, request_id: str) -> Any:
+        """Request non-authoritative advice and retain only audit-safe metadata."""
+        if self._advisor is None:
+            raise _business_error("resource_not_found")
+        identity = getattr(context, "identity", None)
+        if identity is None:
+            raise _business_error("invalid_input")
+        result = await self._advisor.review(package, identity=identity, request_id=request_id)
+        self._audit(
+            operation="agent_invocation", request_id=request_id, context=context,
+            detail={"status": result.status, "finding_count": len(result.findings), "package": redact(package)},
+        )
+        return result
+
+    def generate_repair_prompt(
+        self,
+        finding: Mapping[str, Any],
+        evidence: Mapping[str, Any],
+        boundary: Mapping[str, Any],
+        *,
+        context: object,
+        request_id: str,
+    ) -> RedactedPrompt:
+        """Create a prompt without persisting text; callers must authorize each read."""
+        prompt = build_repair_prompt(finding, evidence, boundary)
+        self._prompt_records[prompt.prompt_hash] = prompt.store_record()
+        self._audit(
+            operation="prompt_generation", request_id=request_id, context=context,
+            detail=prompt.store_record(),
+        )
+        return prompt
+
+    @property
+    def prompt_records(self) -> Mapping[str, Mapping[str, str]]:
+        """Return persistence-safe prompt metadata only, never repair text."""
+        return {key: dict(value) for key, value in self._prompt_records.items()}
+
     def _queue(self, capability_id: str, payload: Mapping[str, Any], context: object, *, kind: str) -> dict[str, Any]:
         key = self._idempotency(payload)
         snapshot = self._snapshot(payload)
@@ -185,6 +230,18 @@ class CapabilityGovernanceService:
             return tuple(entry for snapshot in snapshots.values() for entry in getattr(snapshot, "entries", ()))
         snapshot = getattr(self._store, "latest_snapshot", lambda: None)()
         return tuple(getattr(snapshot, "entries", ())) if snapshot is not None else ()
+
+    def _audit(self, *, operation: str, request_id: str, context: object, detail: Mapping[str, Any]) -> None:
+        if self._audit_sink is None:
+            return
+        self._audit_sink.append(
+            operation=operation,
+            entity_gid=None,
+            actor_gid=_context_user(context),
+            request_gid=request_id,
+            detail=detail,
+            idempotency_key=f"{operation}:{request_id}",
+        )
 
     @staticmethod
     def _idempotency(payload: Mapping[str, Any]) -> str:
