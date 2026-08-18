@@ -4,6 +4,7 @@ import pytest
 
 from backend.capabilities.models_next import CapabilityBusinessError, CapabilityContext
 from backend.capability_governance_test.provider import register_governance_capabilities
+from backend.capability_governance_test.release_gate import ReleaseGate
 from backend.capability_governance_test.service import CapabilityGovernanceService
 
 
@@ -168,6 +169,39 @@ def test_closed_provider_schema_admits_graph_bounds_required_by_service():
         "snapshot_gid": "100", "snapshot": {"snapshot_gid": "100"},
         "max_depth": 4, "max_nodes": 500, "nodes": [],
     }
+
+
+def test_service_proposal_submit_uses_the_workflow_and_review_fails_before_approval():
+    service = CapabilityGovernanceService()
+    submitted = service.base_capability_proposal_submit({
+        "capability_id": "base.capability_registry.search", "capability_version_gid": "17",
+        "base_snapshot_gid": "31", "previous_hash": "sha256:old",
+        "proposed_descriptor_hash": "sha256:new", "evidence_hash": "sha256:evidence",
+        "idempotency_key": "proposal-1",
+    }, _context())
+
+    assert submitted["proposal"].status == "submitted"
+    with pytest.raises(CapabilityBusinessError, match="invalid_transition"):
+        service.base_capability_review_decide({
+            "proposal_gid": str(submitted["proposal"].proposal_gid), "stage": "base_owner",
+            "decision": "approved", "row_version": str(submitted["proposal"].row_version),
+            "idempotency_key": "review-1",
+        }, _context())
+
+
+def test_service_release_handler_uses_fail_closed_release_gate():
+    service = CapabilityGovernanceService(release_gate=ReleaseGate(
+        next_gid=iter(range(1, 20)).__next__, signer=lambda value: "signature",
+    ))
+
+    result = service.base_capability_release_gate_evaluate({
+        "code_revision": "rev-a", "product_catalog_release_id": "catalog-a",
+        "snapshot_gid": "101", "test_run_gid": "201", "test_status": "unavailable",
+        "approvals_complete": True, "data_complete": True, "idempotency_key": "gate-1",
+    }, _context())
+
+    assert result["release"].conclusion == "fail"
+    assert "required_test_unavailable" in result["release"].blockers
 
 
 def test_unconfigured_provider_fails_closed_instead_of_returning_empty_results():
