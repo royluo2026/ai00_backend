@@ -1,0 +1,2227 @@
+{
+  "release_id": "rel_744775af5d99804a84a131e27b9d5f33",
+  "catalog_hash": "sha256:744775af5d99804a84a131e27b9d5f334c235bff917e67417331150bb08ecb32",
+  "descriptors": [
+    {
+      "id": "base.capability_analysis.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_analysis.get",
+      "description": "Test-only governance operation base.capability_analysis.get.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_analysis.run",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_analysis.run",
+      "description": "Test-only governance operation base.capability_analysis.run.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_finding.search",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_finding.search",
+      "description": "Test-only governance operation base.capability_finding.search.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_graph.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_graph.get",
+      "description": "Test-only governance operation base.capability_graph.get.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_proposal.submit",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_proposal.submit",
+      "description": "Test-only governance operation base.capability_proposal.submit.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_registry.get",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_registry.get",
+      "description": "Test-only governance operation base.capability_registry.get.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_registry.search",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_registry.search",
+      "description": "Test-only governance operation base.capability_registry.search.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_release_gate.evaluate",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_release_gate.evaluate",
+      "description": "Test-only governance operation base.capability_release_gate.evaluate.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_repair_prompt.generate",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_repair_prompt.generate",
+      "description": "Test-only governance operation base.capability_repair_prompt.generate.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "read",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A2",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:7b4b2cebca11b7a54a58767c99ce5aa82c5f1a608d54b1ce0594b15b9e3535f0",
+      "artifact_policy": "none",
+      "operation_policy": "none",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "none",
+      "consistency_policy": "strong",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "none",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_review.decide",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_review.decide",
+      "description": "Test-only governance operation base.capability_review.decide.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_scan.run",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_scan.run",
+      "description": "Test-only governance operation base.capability_scan.run.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_test.run",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_test.run",
+      "description": "Test-only governance operation base.capability_test.run.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_waiver.grant",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_waiver.grant",
+      "description": "Test-only governance operation base.capability_waiver.grant.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    },
+    {
+      "id": "base.capability_waiver.revoke",
+      "major_version": 1,
+      "owner_domain": "base",
+      "lifecycle_status": "stable",
+      "catalog_release": null,
+      "title": "base.capability_waiver.revoke",
+      "description": "Test-only governance operation base.capability_waiver.revoke.",
+      "use_when": "The test-governance profile needs this governed capability contract.",
+      "do_not_use_when": "The test-governance extension is not explicitly enabled.",
+      "side_effect_level": "write",
+      "execution_mode": "cloud_sync",
+      "exposure": {
+        "web": true,
+        "plugin": true,
+        "agent": true,
+        "api": true,
+        "mcp": true,
+        "worker": false,
+        "local_runtime": false
+      },
+      "automation_level": "A1",
+      "authorization_policy": "base.v2:system.tech_config",
+      "resource_selectors": [],
+      "data_classification": "confidential",
+      "required_auth_freshness_seconds": 0,
+      "delegation_policy": "scoped",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target_gid": {
+            "type": "string",
+            "pattern": "^[0-9]{1,19}$",
+            "minLength": 1,
+            "maxLength": 19
+          },
+          "query": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "agent_output_schema": {
+        "type": "object",
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "completed"
+            ]
+          }
+        },
+        "required": [
+          "capability_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "schema_hash": "sha256:3526f63b9c5d4266b4174c31211a6e122997dab134fe41a1164f877e43848242",
+      "artifact_policy": "none",
+      "operation_policy": "optional",
+      "concurrency_policy": "none",
+      "expected_version_payload_path": null,
+      "idempotency_policy": "required",
+      "consistency_policy": "external",
+      "timeout_seconds": 30,
+      "rate_limit_cost": 1,
+      "execution_budget": {
+        "memory_class": "small",
+        "max_input_bytes": 1048576,
+        "max_output_bytes": 4194304,
+        "collection_policy": "bounded",
+        "max_page_size": null,
+        "max_parallel_per_consumer": 4,
+        "max_parallel_per_tenant": 32,
+        "overload_policy": "reject"
+      },
+      "confirmation_policy": "admin",
+      "evidence_policy": "optional",
+      "audit_policy": "standard",
+      "deprecation_message": null,
+      "domain_errors": [
+        {
+          "code": "resource_not_found",
+          "meaning": "The requested Base resource does not exist or is not visible.",
+          "retryable": false
+        },
+        {
+          "code": "permission_denied",
+          "meaning": "The caller lacks a required Base Platform permission.",
+          "retryable": false
+        },
+        {
+          "code": "approval_required",
+          "meaning": "The governed operation requires a valid approval.",
+          "retryable": false
+        },
+        {
+          "code": "authentication_stale",
+          "meaning": "The caller must authenticate again before this high-risk operation.",
+          "retryable": false
+        },
+        {
+          "code": "idempotency_conflict",
+          "meaning": "The idempotency key is bound to a different request.",
+          "retryable": false
+        },
+        {
+          "code": "version_conflict",
+          "meaning": "The resource version differs from the expected version.",
+          "retryable": false
+        },
+        {
+          "code": "provider_unavailable",
+          "meaning": "A required domain provider is not registered.",
+          "retryable": true
+        },
+        {
+          "code": "plugin_state_conflict",
+          "meaning": "The plugin installation cannot perform this lifecycle transition.",
+          "retryable": false
+        }
+      ],
+      "domain_errors_complete": true
+    }
+  ],
+  "provider_artifacts": [
+    {
+      "plugin_id": "test.governance",
+      "module": "backend.capability_governance_test.provider",
+      "version": "1.0.0",
+      "artifact_hash": "sha256:5f57bb31a5b099578974b43e75dd6f644e9501e4d8fd8b0bba49dbb2cb9d8c4f"
+    }
+  ],
+  "created_at": "2026-08-18T13:07:45.387971Z"
+}

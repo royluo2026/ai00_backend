@@ -18,6 +18,8 @@ _registry_lock = threading.Lock()
 def build_capability_registry(
     root: Path | None = None,
     manifest_path: Path | None = None,
+    *,
+    include_test_governance: bool = False,
 ) -> CapabilityRegistry:
     repository_root = (root or Path(__file__).resolve().parents[2]).resolve()
     path = manifest_path or Path(__file__).with_name("official_domains.json")
@@ -26,6 +28,9 @@ def build_capability_registry(
         repository_root,
         load_domain_manifests(path),
     ).register_all(registry)
+    if include_test_governance:
+        from backend.capability_governance_test.provider import register_governance_capabilities
+        register_governance_capabilities(registry, service_port=None)
     return registry
 
 
