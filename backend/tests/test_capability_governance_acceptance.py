@@ -27,6 +27,7 @@ def test_acceptance_runner_has_no_optional_mandatory_sections() -> None:
     assert report.sections["health"].evidence["release_e2e_profile"] == "passed"
     assert report.sections["ui"].evidence["css_asset_hash"].startswith("sha256:")
     assert report.sections["permissions"].evidence["allowed_invocations"] == 2
+    assert report.sections["agent_delegation"].evidence["delegated_allowed_invocations"] == 2
     assert report.sections["agent_delegation"].evidence["denied_invocations"] == 2
 
 

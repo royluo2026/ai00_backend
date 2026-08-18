@@ -377,6 +377,8 @@ def _health_evidence() -> dict[str, Any]:
 
 
 def _delegation_evidence() -> dict[str, Any]:
+    from types import SimpleNamespace
+
     from backend.capabilities.confirmation_next import confirmation_manager
     from backend.capabilities.models_next import CapabilityContext
     from backend.capabilities.registry_next import CapabilityPermissionError, CapabilityRegistry
@@ -385,20 +387,59 @@ def _delegation_evidence() -> dict[str, Any]:
     from backend.capability_v2.delegation import DelegationGrant, InMemoryDelegationStore, issue_delegation
     from backend.capability_v2.contracts import AutomationLevel, ConsumerType
 
+    class AcceptanceStore:
+        @staticmethod
+        def get_snapshot(snapshot_gid: int) -> SimpleNamespace:
+            return SimpleNamespace(snapshot_gid=snapshot_gid)
+
     now = datetime.now(UTC)
     grant = DelegationGrant(delegation_id="delegation-1", delegated_by="admin", user_id="analyst", tenant_id="tenant", consumer_type=ConsumerType.AGENT, consumer_id="governance-agent", agent_run_id="run-1", catalog_release="rel_" + "a" * 32, capability_scopes=("base.capability_registry.search", "base.capability_analysis.run"), maximum_automation_level=AutomationLevel.A1, authentication_method="test", authenticated_at=now, expires_at=now + timedelta(minutes=5))
-    issued = issue_delegation(InMemoryDelegationStore(), grant)
+    active = InMemoryDelegationStore()
+    issued = issue_delegation(active, grant)
     if not issued.token or set(grant.capability_scopes) != {
         "base.capability_registry.search", "base.capability_analysis.run",
     }:
         raise RuntimeError("delegation_scope_invalid")
-    active = InMemoryDelegationStore()
-    issued = issue_delegation(active, grant.model_copy(update={"delegation_id": "delegation-2"}))
-    if active.consume_active(issued.token).capability_scopes != grant.capability_scopes:
-        raise RuntimeError("delegation_not_exercised")
 
     registry = CapabilityRegistry()
-    register_governance_capabilities(registry, CapabilityGovernanceService())
+    register_governance_capabilities(
+        registry, CapabilityGovernanceService(store=AcceptanceStore()),
+    )
+    delegated_permissions = tuple(sorted({
+        permission
+        for capability_id in grant.capability_scopes
+        for permission in registry.get(capability_id).spec.permissions
+    }))
+    delegated_context = CapabilityContext(
+        user_gid=grant.user_id,
+        source="agent",
+        permissions=delegated_permissions,
+        agent_run_id=grant.agent_run_id,
+        delegation_token=issued.token,
+    )
+
+    allowed_invocations = 0
+    allowed_attempts = (
+        ("base.capability_registry.search", {"query": "capability"}, "completed"),
+        (
+            "base.capability_analysis.run",
+            {"target_gid": "1", "idempotency_key": "delegated-analysis"},
+            "accepted",
+        ),
+    )
+    for capability_id, payload, expected_status in allowed_attempts:
+        confirmation_token = confirmation_manager.issue(
+            capability_id, 1, grant.user_id, payload,
+        ) if registry.get(capability_id).spec.confirmation != "none" else None
+        result = asyncio.run(registry.invoke(
+            capability_id,
+            payload,
+            delegated_context.model_copy(update={"confirmation_token": confirmation_token}),
+        ))
+        if result.data.get("status") != expected_status:
+            raise RuntimeError("delegated_allowed_invocation_failed")
+        allowed_invocations += 1
+
     denied_invocations = 0
     attempts = (
         ("base.capability_proposal.submit", {"idempotency_key": "delegated-submit"}),
@@ -408,24 +449,23 @@ def _delegation_evidence() -> dict[str, Any]:
         token = confirmation_manager.issue(
             capability_id, 1, grant.user_id, payload,
         ) if registry.get(capability_id).spec.confirmation != "none" else None
-        context = CapabilityContext(
-            user_gid=grant.user_id,
-            source="agent",
-            permissions=("system.capability.read", "system.capability.analyze"),
-            confirmation_token=token,
-            agent_run_id=grant.agent_run_id,
-            delegation_token=issued.token,
-        )
         try:
-            asyncio.run(registry.invoke(capability_id, payload, context))
+            asyncio.run(registry.invoke(
+                capability_id,
+                payload,
+                delegated_context.model_copy(update={"confirmation_token": token}),
+            ))
         except CapabilityPermissionError:
             denied_invocations += 1
         else:
             raise RuntimeError("delegated_permission_boundary_not_enforced")
     if denied_invocations != len(attempts):
         raise RuntimeError("delegated_permission_boundary_not_exercised")
+    if active.consume_active(issued.token).capability_scopes != grant.capability_scopes:
+        raise RuntimeError("delegation_not_exercised")
     return {"delegated_identity": grant.user_id, "allowed_capabilities": grant.capability_scopes,
             "denied_capabilities": ("base.capability_proposal.submit", "base.capability_release_gate.evaluate"),
+            "delegated_allowed_invocations": allowed_invocations,
             "denied_invocations": denied_invocations}
 
 
